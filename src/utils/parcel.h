@@ -766,11 +766,11 @@ private:
         return (((size + SIZE_OFFSET) & (~SIZE_OFFSET)) - size);
     }
 
-    size_t CalcNewCapacity(size_t minCapacity);
+    size_t CalcNewCapacity(size_t minNewCapacity);
 
     bool WriteDataBytes(const void *data, size_t size);
 
-    void WritePadBytes(size_t padded);
+    void WritePadBytes(size_t padSize);
 
     bool EnsureWritableCapacity(size_t desireCapacity);
 

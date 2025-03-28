@@ -12,6 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//foundation/graphic/graphics_effect/config.gni")
 
 config("export_config") {
   include_dirs = [ "include" ]
@@ -33,7 +34,6 @@ ohos_source_set("graphics_effect_src") {
     "-D_FORTIFY_SOURCE=2",
     "-fdata-sections",
     "-ffunction-sections",
-    "-flto",
   ]
   cflags_cc = [
     "-std=c++17",
@@ -45,7 +45,6 @@ ohos_source_set("graphics_effect_src") {
     "-fvisibility-inlines-hidden",
     "-fdata-sections",
     "-ffunction-sections",
-    "-flto",
   ]
 
   public_configs = [ ":export_config" ]
@@ -95,9 +94,7 @@ ohos_source_set("graphics_effect_src") {
     external_deps += [ "init:libbegetutil" ]
   }
 
-  if (is_mingw || is_win) {
-    defines += [ "GE_PLATFORM_WIN" ]
-  } else {
+  if (ge_is_ohos || ge_is_linux) {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
 
