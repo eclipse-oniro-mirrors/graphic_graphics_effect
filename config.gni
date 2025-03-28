@@ -11,4 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/ohos.gni")
+
 graphics_effect_root = "//foundation/graphic/graphics_effect"
+
+ge_is_ohos = current_os == "ohos"
+ge_is_ios = current_os == "ios" || current_os == "tvos"
+ge_is_mac = current_os == "mac"
+ge_is_win = current_os == "win" || current_os == "mingw"
+ge_is_linux = current_os == "linux"

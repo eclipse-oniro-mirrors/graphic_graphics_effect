@@ -332,7 +332,7 @@ size_t Parcel::GetWritePosition()
     return {};
 }
 
-bool Parcel::RewindWrite(size_t newPosition)
+bool Parcel::RewindWrite(size_t offsets)
 {
     return {};
 }
@@ -513,12 +513,12 @@ bool Parcel::ReadString16(std::u16string &value)
     return {};
 }
 
-const std::u16string Parcel::ReadString16WithLength(int32_t &readLength)
+const std::u16string Parcel::ReadString16WithLength(int32_t &len)
 {
     return {};
 }
 
-const std::string Parcel::ReadString8WithLength(int32_t &readLength)
+const std::string Parcel::ReadString8WithLength(int32_t &len)
 {
     return {};
 }
