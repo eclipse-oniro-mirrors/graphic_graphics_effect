@@ -41,6 +41,7 @@ public:
         WATER_RIPPLE,
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
+        COMPLEX_SHADER,
         MAX
     };
 
