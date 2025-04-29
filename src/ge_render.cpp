@@ -23,6 +23,7 @@
 #include "ge_magnifier_shader_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
+#include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 
 namespace OHOS {
@@ -97,6 +98,17 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
                 dmShader(static_cast<GELinearGradientBlurShaderFilter*>(object));
             return dmShader;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
+            const auto& edgeLightParams = ve->GetEdgeLightParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(type), sizeof(Drawing::GEEdgeLightShaderFilterParams),
+                static_cast<void*>(edgeLightParams.get()));
+            if (!object) {
+                return std::make_shared<GEEdgeLightShaderFilter>(*edgeLightParams);
+            }
+            std::shared_ptr<GEEdgeLightShaderFilter> dmShader(static_cast<GEEdgeLightShaderFilter*>(object));
+            return dmShader;
+        }
         default:
             break;
     }
@@ -144,6 +156,10 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE: {
                 const auto& waterRippleParams = ve->GetWaterRippleParams();
                 shaderFilter = std::make_shared<GEWaterRippleFilter>(*waterRippleParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
+                shaderFilter = GenerateExtShaderFilter(ve);
                 break;
             }
             default:
