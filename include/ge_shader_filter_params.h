@@ -149,6 +149,38 @@ struct GEMagnifierShaderFilterParams {
     int32_t rotateDegree = 0;
 };
 
+constexpr char GE_FILTER_EDGE_LIGHT[] = "EDGE_LIGHT";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_THRESHOLD[] = "EDGE_LIGHT_EDGE_THRESHOLD";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_INTENSITY[] = "EDGE_LIGHT_EDGE_INTENSITY";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_SOFT_THRESHOLD[] = "EDGE_LIGHT_EDGE_SOFT_THRESHOLD";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_R[] = "EDGE_LIGHT_EDGE_DETECT_COLOR_R";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_G[] = "EDGE_LIGHT_EDGE_DETECT_COLOR_G";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_B[] = "EDGE_LIGHT_EDGE_DETECT_COLOR_B";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R[] = "EDGE_LIGHT_EDGE_COLOR_R";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G[] = "EDGE_LIGHT_EDGE_COLOR_G";
+constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B[] = "EDGE_LIGHT_EDGE_COLOR_B";
+constexpr char GE_FILTER_EDGE_LIGHT_IF_RAW_COLOR[] = "EDGE_LIGHT_IF_RAW_COLOR";
+constexpr char GE_FILTER_EDGE_LIGHT_MIP_LEVEL[] = "EDGE_LIGHT_MIP_LEVEL";
+constexpr char GE_FILTER_EDGE_LIGHT_IF_GRADIENT[] = "EDGE_LIGHT_IF_GRADIENT";
+constexpr char GE_FILTER_EDGE_LIGHT_ALPHA_PROGRESS[] = "EDGE_LIGHT_ALPHA_PROGRESS";
+constexpr char GE_FILTER_EDGE_LIGHT_MERGE_IF_IMAGE[] = "EDGE_LIGHT_MERGE_IF_IMAGE";
+struct GEEdgeLightShaderFilterParams {
+    float edgeLightEdgeThreshold = 0.3f;
+    float edgeLightEdgeIntensity = 1.0f;
+    float edgeLightEdgeSoftThreshold = 0.3f;
+    float edgeDetectColorR = 0.2f;
+    float edgeDetectColorG = 0.7f;
+    float edgeDetectColorB = 0.1f;
+    float edgeColorR = 0.2f;
+    float edgeColorG = 0.7f;
+    float edgeColorB = 0.1f;
+    bool edgeRawColor = true;
+    uint32_t edgeBloomLevel = 6;
+    bool edgeLightIfGradient = true;
+    float alphaProgress = 1.0;
+    bool addImage = false;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

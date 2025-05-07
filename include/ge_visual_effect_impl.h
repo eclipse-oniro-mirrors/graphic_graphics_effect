@@ -42,6 +42,7 @@ public:
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
         COMPLEX_SHADER,
+        EDGE_LIGHT,
         MAX
     };
 
@@ -142,6 +143,16 @@ public:
         return magnifierParams_;
     }
 
+    void MakeEdgeLightParams()
+    {
+        edgeLightParams_ = std::make_shared<GEEdgeLightShaderFilterParams>();
+    }
+ 
+    const std::shared_ptr<GEEdgeLightShaderFilterParams>& GetEdgeLightParams() const
+    {
+        return edgeLightParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -154,6 +165,7 @@ private:
     void SetMagnifierParamsUint32(const std::string& tag, uint32_t param);
 
     void SetWaterRippleParams(const std::string& tag, float param);
+    void SetEdgeLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -165,6 +177,8 @@ private:
 
     std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
+    std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
+
 };
 
 } // namespace Drawing

@@ -64,6 +64,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::WATER_RIPPLE);
             impl->MakeWaterRippleParams();
         }
+    },
+    { GE_FILTER_EDGE_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+            impl->MakeEdgeLightParams();
+        }
     }
 };
 
@@ -141,6 +147,21 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             break;
         }
+        case FilterType::EDGE_LIGHT: {
+            if (edgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_EDGE_LIGHT_IF_RAW_COLOR) {
+                edgeLightParams_->edgeRawColor = param;
+            } else if (tag == GE_FILTER_EDGE_LIGHT_IF_GRADIENT) {
+                edgeLightParams_->edgeLightIfGradient = param;
+            } else if (tag == GE_FILTER_EDGE_LIGHT_MERGE_IF_IMAGE) {
+                edgeLightParams_->addImage = param;
+            } else {
+                // do nothing
+            }
+            break;
+        }
         default:
             break;
     }
@@ -174,6 +195,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::WATER_RIPPLE: {
             SetWaterRippleParams(tag, param);
+            break;
+        }
+        case FilterType::EDGE_LIGHT: {
+            SetEdgeLightParams(tag, param);
             break;
         }
         default:
@@ -239,6 +264,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
                 waterRippleParams_->rippleMode = param;
             } else if (tag == GE_FILTER_WATER_RIPPLE_WAVE_NUM) {
                 waterRippleParams_->waveCount = param;
+            }
+            break;
+        }
+        case FilterType::EDGE_LIGHT: {
+            if (edgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_EDGE_LIGHT_MIP_LEVEL) {
+                edgeLightParams_->edgeBloomLevel = param;
             }
             break;
         }
@@ -422,6 +456,42 @@ void GEVisualEffectImpl::SetWaterRippleParams(const std::string& tag, float para
         it->second(this, param);
     }
 }
+
+void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
+{
+    if (edgeLightParams_ == nullptr) {
+        return;
+    }
+ 
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_EDGE_LIGHT_EDGE_THRESHOLD,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeLightEdgeThreshold = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_INTENSITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeLightEdgeIntensity = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_SOFT_THRESHOLD,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeLightEdgeSoftThreshold = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_R,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeDetectColorR = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_G,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeDetectColorG = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_DETECT_COLOR_B,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeDetectColorB = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorR = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorG = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorB = p; } },
+        { GE_FILTER_EDGE_LIGHT_ALPHA_PROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->alphaProgress = p; } },
+    };
+ 
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
