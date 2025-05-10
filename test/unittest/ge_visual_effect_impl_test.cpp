@@ -64,6 +64,9 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType001, TestSize.Level1)
 
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_WATER_RIPPLE);
     EXPECT_EQ(geVisualEffectImpl.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplSound(Drawing::GE_FILTER_SOUND_WAVE);
+    EXPECT_EQ(geVisualEffectImplSound.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE);
 }
 
 /**
@@ -325,6 +328,81 @@ HWTEST_F(GEVisualEffectImplTest, SetParam011, TestSize.Level1)
     geVisualEffectImplKawaseBulr.SetParam("GE_FILTER_KAWASE_BLUR_RADIUS", "1");
     ASSERT_NE(geVisualEffectImplKawaseBulr.GetKawaseParams(), nullptr);
     EXPECT_NE(geVisualEffectImplKawaseBulr.GetKawaseParams()->radius, paramUint32);
+}
+
+/**
+ * @tc.name: SetSoundWaveParamsFloat001
+ * @tc.desc: Verify function SetSoundWaveParamsFloat
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetSoundWaveParamsFloat001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplSoundWave(Drawing::GE_FILTER_SOUND_WAVE);
+    float colorProgress = 0.5f;
+    geVisualEffectImplSoundWave.SetParam(Drawing::GE_FILTER_SOUND_WAVE_COLORPROGRESS, colorProgress);
+    EXPECT_NE(geVisualEffectImplSoundWave.GetSoundWaveParams(), nullptr);
+
+    // test valid sound wave params setting
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_COLORPROGRESS, 0.5f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->colorProgress, 0.5f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_CENTERBRIGHTNESS, 1.5f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->centerBrightness, 1.5f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_SOUNDINTENSITY, 1.0f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->soundIntensity, 1.0f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A, 0.6f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->shockWaveAlphaA, 0.6f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B, 1.0f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->shockWaveAlphaB, 1.0f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A, 1.0f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->shockWaveProgressA, 1.0f);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B, 1.0f);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->shockWaveProgressB, 1.0f);
+}
+
+/**
+ * @tc.name: SetSoundWaveParamsUint32001
+ * @tc.desc: Verify function SetSoundWaveParamsUint32 for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetSoundWaveParamsUint32001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplSoundWave(Drawing::GE_FILTER_SOUND_WAVE);
+    uint32_t color = 0XFF00FFFF;
+    geVisualEffectImplSoundWave.SetParam(Drawing::GE_FILTER_SOUND_WAVE_COLOR_A, color);
+    EXPECT_NE(geVisualEffectImplSoundWave.GetSoundWaveParams(), nullptr);
+
+    geVisualEffectImplSoundWave.SetSoundWaveParamsUint32(Drawing::GE_FILTER_SOUND_WAVE_COLOR_A, 0XFF00FFFF);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->colorA, 0XFF00FFFF);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsUint32(Drawing::GE_FILTER_SOUND_WAVE_COLOR_B, 0XFF00FF00);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->colorB, 0XFF00FF00);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsUint32(Drawing::GE_FILTER_SOUND_WAVE_COLOR_C, 0XFFFF0000);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams()->colorC, 0XFFFF0000);
+}
+
+/**
+ * @tc.name: SetSoundWaveParam001
+ * @tc.desc: Verify function SetSoundWaveParamUint32 and SetSoundWaveParamFloat
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetSoundWaveParam001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplSoundWave("");
+    uint32_t color = 0XFF00FFFF;
+    float param = 1.2f;
+
+    // test invalid params setting
+    geVisualEffectImplSoundWave.SetSoundWaveParamsUint32(Drawing::GE_FILTER_SOUND_WAVE_COLOR_A, color);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams(), nullptr);
+    geVisualEffectImplSoundWave.SetSoundWaveParamsFloat(Drawing::GE_FILTER_SOUND_WAVE_COLORPROGRESS, param);
+    EXPECT_EQ(geVisualEffectImplSoundWave.GetSoundWaveParams(), nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplSoundWave1(Drawing::GE_FILTER_SOUND_WAVE);
+    EXPECT_NE(geVisualEffectImplSoundWave1.GetSoundWaveParams(), nullptr);
+
+    geVisualEffectImplSoundWave1.SetSoundWaveParamsFloat("", param);
+    EXPECT_NE(geVisualEffectImplSoundWave1.GetSoundWaveParams()->shockWaveProgressB, param);
+    geVisualEffectImplSoundWave1.SetSoundWaveParamsUint32("", color);
+    EXPECT_NE(geVisualEffectImplSoundWave1.GetSoundWaveParams()->colorA, color);
 }
 
 /**
