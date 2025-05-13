@@ -43,22 +43,22 @@ void GEXDotMatrixShaderTest::SetUp() {}
 void GEXDotMatrixShaderTest::TearDown() {}
  
 /**
- * @tc.name: CreateDynamicImpl001
+ * @tc.name: CreateDynamicImpl_001
  * @tc.desc: Verify function CreateDynamicImpl
  * @tc.type:FUNC
  */
-HWTEST_F(GEXDotMatrixShaderTest, CreateDynamicImpl001, TestSize.Level1)
+HWTEST_F(GEXDotMatrixShaderTest, CreateDynamicImpl_001, TestSize.Level0)
 {
     auto impl = GEXDotMatrixShader::CreateDynamicImpl(params_);
     EXPECT_EQ(impl, nullptr);
 }
  
 /**
- * @tc.name: GetDescription001
+ * @tc.name: GetDescription_001
  * @tc.desc: Verify function GetDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GEXDotMatrixShaderTest, GetDescription001, TestSize.Level1)
+HWTEST_F(GEXDotMatrixShaderTest, GetDescription_001, TestSize.Level3)
 {
     auto dotShader = std::make_shared<GEXDotMatrixShader>();
     auto description = dotShader->GetDescription();

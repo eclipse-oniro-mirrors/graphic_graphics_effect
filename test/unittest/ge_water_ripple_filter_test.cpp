@@ -58,11 +58,11 @@ void GEWaterRippleFilterTest::SetUp()
 void GEWaterRippleFilterTest::TearDown() {}
  
 /**
- * @tc.name: ProcessImage001
+ * @tc.name: ProcessImage_001
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage001, TestSize.Level1)
+HWTEST_F(GEWaterRippleFilterTest, ProcessImage_001, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.7f, 1.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
@@ -70,11 +70,11 @@ HWTEST_F(GEWaterRippleFilterTest, ProcessImage001, TestSize.Level1)
 }
  
 /**
- * @tc.name: ProcessImage002
+ * @tc.name: ProcessImage_002
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GEWaterRippleFilterTest, ProcessImage_002, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.7f, 1.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
@@ -82,11 +82,11 @@ HWTEST_F(GEWaterRippleFilterTest, ProcessImage002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage003
+ * @tc.name: ProcessImage_003
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GEWaterRippleFilterTest, ProcessImage_003, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.0f, 2.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
@@ -94,11 +94,11 @@ HWTEST_F(GEWaterRippleFilterTest, ProcessImage003, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage004
+ * @tc.name: ProcessImage_004
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GEWaterRippleFilterTest, ProcessImage_004, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.0f, 0.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
@@ -106,11 +106,11 @@ HWTEST_F(GEWaterRippleFilterTest, ProcessImage004, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage005
+ * @tc.name: ProcessImage_005
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage005, TestSize.Level1)
+HWTEST_F(GEWaterRippleFilterTest, ProcessImage_005, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2, 0.5f, 0.0f, 3 };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);

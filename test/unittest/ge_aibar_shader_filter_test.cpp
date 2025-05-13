@@ -59,13 +59,13 @@ void GEAIBarShaderFilterTest::SetUp()
 void GEAIBarShaderFilterTest::TearDown() {}
 
 /**
- * @tc.name: ProcessImage002
+ * @tc.name: ProcessImage_001
  * @tc.desc: Verify the ProcessImage: image is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage002 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_001 start";
 
     // 0.0, 0.0, 0.0, 0.0, 0.0 valid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -73,17 +73,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage002, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage002 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_001 end";
 }
 
 /**
- * @tc.name: ProcessImage003
+ * @tc.name: ProcessImage_002
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage003 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_002 start";
 
     // -0.5, -0.5, -0.5, -0.5, -0.5 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { -0.5, -0.5, -0.5, -0.5, -0.5 };
@@ -91,17 +91,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage003, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage003 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_002 end";
 }
 
 /**
- * @tc.name: ProcessImage004
+ * @tc.name: ProcessImage_003
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage004 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_003 start";
 
     // 2.0, 2.0, 2.0, 2.0, 3.0 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 2.0, 2.0, 2.0, 2.0, 3.0 };
@@ -109,17 +109,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage004, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage004 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_003 end";
 }
 
 /**
- * @tc.name: ProcessImage005
+ * @tc.name: ProcessImage_004
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage005, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_004, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage005 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_004 start";
 
     // 1.0, 2.0, 2.0, 2.0, 3.0 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 1.0, 2.0, 2.0, 2.0, 3.0 };
@@ -127,17 +127,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage005, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage005 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_004 end";
 }
 
 /**
- * @tc.name: ProcessImage006
+ * @tc.name: ProcessImage_005
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage006, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_005, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage006 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_005 start";
 
     // 2.0, 1.0, 2.0, 2.0, 3.0 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 2.0, 1.0, 2.0, 2.0, 3.0 };
@@ -145,17 +145,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage006, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage006 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_005 end";
 }
 
 /**
- * @tc.name: ProcessImage007
+ * @tc.name: ProcessImage_006
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage007, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_006, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage007 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_006 start";
 
     // 2.0, 2.0, 1.0, 2.0, 3.0 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 2.0, 2.0, 1.0, 2.0, 3.0 };
@@ -163,17 +163,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage007, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage007 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_006 end";
 }
 
 /**
- * @tc.name: ProcessImage008
+ * @tc.name: ProcessImage_007
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage008, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_007, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage008 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_007 start";
 
     // 2.0, 2.0, 2.0, 1.0, 3.0 invalid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 2.0, 2.0, 2.0, 1.0, 3.0 };
@@ -181,15 +181,15 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage008, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage008 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_007 end";
 }
 
 /**
- * @tc.name: ProcessImage009
+ * @tc.name: ProcessImage_008
  * @tc.desc: Verify the ProcessImage: filter param is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, ProcessImage009, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, ProcessImage_008, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage009 start";
 
@@ -199,17 +199,17 @@ HWTEST_F(GEAIBarShaderFilterTest, ProcessImage009, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage009 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest ProcessImage_008 end";
 }
 
 /**
- * @tc.name: GetDescription001
+ * @tc.name: GetDescription_001
  * @tc.desc: Verify the GetDescription
  * @tc.type: FUNC
  */
-HWTEST_F(GEAIBarShaderFilterTest, GetDescription001, TestSize.Level1)
+HWTEST_F(GEAIBarShaderFilterTest, GetDescription_001, TestSize.Level3)
 {
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest GetDescription001 start";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest GetDescription_001 start";
 
     // 0.0, 0.0, 0.0, 0.0, 0.0 valid AI bar blur params
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 0.0, 0.0, 0.0, 0.0, 0.0 };
@@ -217,7 +217,7 @@ HWTEST_F(GEAIBarShaderFilterTest, GetDescription001, TestSize.Level1)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->GetDescription(), "GEAIBarShaderFilter");
 
-    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest GetDescription001 end";
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest GetDescription_001 end";
 }
 
 } // namespace Rosen

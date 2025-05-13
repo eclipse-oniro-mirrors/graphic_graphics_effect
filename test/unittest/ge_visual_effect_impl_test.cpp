@@ -41,11 +41,11 @@ void GEVisualEffectImplTest::SetUp() {}
 void GEVisualEffectImplTest::TearDown() {}
 
 /**
- * @tc.name: GetFilterType001
+ * @tc.name: GetFilterType_001
  * @tc.desc: Verify function GetFilterType
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, GetFilterType001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl1(Drawing::GE_FILTER_KAWASE_BLUR);
     EXPECT_EQ(geVisualEffectImpl1.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR);
@@ -67,11 +67,11 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam001
+ * @tc.name: SetParam_001
  * @tc.desc: Verify function SetParam
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_001, TestSize.Level2)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl1(Drawing::GE_FILTER_KAWASE_BLUR);
 
@@ -120,11 +120,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam002
+ * @tc.name: SetParam_002
  * @tc.desc: Verify function SetParam
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam002, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_002, TestSize.Level1)
 {
     // 1.0f is params of AI Bar blur, Grey blur
     float paramfloat { 1.0f };
@@ -150,11 +150,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam002, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam003
+ * @tc.name: SetParam_003
  * @tc.desc: Verify function SetParam  no filter type
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam003, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_003, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     geVisualEffectImpl.SetParam("", 0); // 0 invalid params
@@ -172,11 +172,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam003, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam004
+ * @tc.name: SetParam_004
  * @tc.desc: Verify function SetParam for param is nullptr when filtertype is NONE
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam004, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_004, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR);
@@ -194,11 +194,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam004, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam005
+ * @tc.name: SetParam_005
  * @tc.desc: Verify function SetParam for tag is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam005, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_005, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_KAWASE_BLUR);
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 2); // 2 blur radius
@@ -208,11 +208,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam005, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam006
+ * @tc.name: SetParam_006
  * @tc.desc: Verify function SetParam for tag is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam006, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_006, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_DIRECTION, 2); // 2 blur direction
@@ -243,11 +243,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam006, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam007
+ * @tc.name: SetParam_007
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam007, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_007, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_AI_BAR);
     geVisualEffectImpl.SetAIBarParams(Drawing::GE_FILTER_AI_BAR_LOW, 1.0f);
@@ -257,11 +257,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam007, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam008
+ * @tc.name: SetParam_008
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam008, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_008, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_GREY);
     geVisualEffectImpl.SetGreyParams(Drawing::GE_FILTER_GREY_COEF_1, 1.0f);
@@ -271,11 +271,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam008, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam009
+ * @tc.name: SetParam_009
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam009, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_009, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
     geVisualEffectImpl.SetLinearGradientBlurParams(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_RADIUS, 1.0f);
@@ -285,11 +285,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam009, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam010
+ * @tc.name: SetParam_010
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam010, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_010, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_WATER_RIPPLE);
     geVisualEffectImpl.SetWaterRippleParams(Drawing::GE_FILTER_WATER_RIPPLE_PROGRESS, 0.5f);
@@ -303,11 +303,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam010, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam011
+ * @tc.name: SetParam_011
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam011, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_011, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplWaterRipple(Drawing::GE_FILTER_WATER_RIPPLE);
     Drawing::GEVisualEffectImpl geVisualEffectImplKawaseBulr(Drawing::GE_FILTER_KAWASE_BLUR);
@@ -328,11 +328,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam011, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetWaterRippleParams001
+ * @tc.name: SetWaterRippleParams_001
  * @tc.desc: Verify function SetWaterRippleParams is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams_001, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_WATER_RIPPLE);
     ASSERT_NE(geVisualEffectImpl.waterRippleParams_, nullptr);
@@ -347,11 +347,11 @@ HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetWaterRippleParams002
+ * @tc.name: SetWaterRippleParams_002
  * @tc.desc: Verify function SetWaterRippleParams
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams002, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams_002, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_WATER_RIPPLE);
 
@@ -361,11 +361,11 @@ HWTEST_F(GEVisualEffectImplTest, SetWaterRippleParams002, TestSize.Level1)
 }
 
 /**
- * @tc.name: MakeWaterRippleParams001
+ * @tc.name: MakeWaterRippleParams_001
  * @tc.desc: Verify function MakeWaterRippleParams is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, MakeWaterRippleParams001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, MakeWaterRippleParams_001, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE);
@@ -375,11 +375,11 @@ HWTEST_F(GEVisualEffectImplTest, MakeWaterRippleParams001, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetMESAParams001
+ * @tc.name: GetMESAParams_001
  * @tc.desc: Verify function GetMESAParams
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, GetMESAParams001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, GetMESAParams_001, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_MESA_BLUR);
     // 0.0f, 1, 1.0f: mesa blur params
@@ -406,11 +406,11 @@ HWTEST_F(GEVisualEffectImplTest, GetMESAParams001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam012
+ * @tc.name: SetParam_012
  * @tc.desc: Verify function SetParam for param is nullptr
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam012, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_012, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     int32_t paramInt32 { 0 }; // 0 invalid params
@@ -434,8 +434,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam012, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetXXXParam001
- * @tc.desc: Verify function Set XXX Param for param is nullptr
+ * @tc.name: SetAllParam_001
+ * @tc.desc: Verify function Set All Param for param is nullptr
  * @tc.type:FUNC
  */
 HWTEST_F(GEVisualEffectImplTest, SetXXXParam001, TestSize.Level1)
@@ -452,11 +452,11 @@ HWTEST_F(GEVisualEffectImplTest, SetXXXParam001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetXXXParam002
+ * @tc.name: SetAllParam_002
  * @tc.desc: Verify function Set XXX Param for param is not nullptr and tag is invalid
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetXXXParam002, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetAllParam_002, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     uint32_t paramUint32 { 0 };

@@ -60,11 +60,11 @@ void GEMagnifierShaderFilterTest::SetUp()
 void GEMagnifierShaderFilterTest::TearDown() {}
 
 /**
- * @tc.name: GetDescription001
+ * @tc.name: GetDescription_001
  * @tc.desc: Verify function GetDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level3)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -76,11 +76,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage001
+ * @tc.name: ProcessImage_001
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -92,11 +92,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage002
+ * @tc.name: ProcessImage_002
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -107,11 +107,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage003
+ * @tc.name: ProcessImage_003
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -125,11 +125,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage003, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage004
+ * @tc.name: ProcessImage_004
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_004, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -144,11 +144,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage004, TestSize.Level1)
 }
 
 /**
- * @tc.name: ConvertToRgba001
+ * @tc.name: ConvertToRgba_001
  * @tc.desc: Verify function ConvertToRgba
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_001, TestSize.Level1)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -161,11 +161,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ConvertToRgba002
+ * @tc.name: ConvertToRgba_002
  * @tc.desc: Verify function ConvertToRgba
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba002, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_002, TestSize.Level1)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -179,11 +179,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba002, TestSize.Level1)
 }
 
 /**
- * @tc.name: MakeMagnifierShader001
+ * @tc.name: MakeMagnifierShader_001
  * @tc.desc: Verify function MakeMagnifierShader
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader_001, TestSize.Level1)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};

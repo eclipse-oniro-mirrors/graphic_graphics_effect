@@ -60,11 +60,11 @@ void GELinearGradientBlurShaderFilterTest::SetUp()
 void GELinearGradientBlurShaderFilterTest::TearDown() {}
 
 /**
- * @tc.name: GetDescription001
+ * @tc.name: GetDescription_001
  * @tc.desc: Verify function GetDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDescription001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDescription_001, TestSize.Level3)
 {
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
         Drawing::Matrix(), 1.f, 1.f, true, false};
@@ -76,11 +76,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDescription001, TestSize.Level
 }
 
 /**
- * @tc.name: GetDetailedDescription001
+ * @tc.name: GetDetailedDescription_001
  * @tc.desc: Verify function GetDetailedDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription_001, TestSize.Level3)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -93,11 +93,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription001, TestSi
 }
 
 /**
- * @tc.name: GetDetailedDescription002
+ * @tc.name: GetDetailedDescription_002
  * @tc.desc: Verify function GetDetailedDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription002, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription_002, TestSize.Level3)
 {
     // blur params: 1.5 f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -110,11 +110,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription002, TestSi
 }
 
 /**
- * @tc.name: GetDetailedDescription003
+ * @tc.name: GetDetailedDescription_003
  * @tc.desc: Verify function GetDetailedDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription003, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription_003, TestSize.Level3)
 {
     // blur params: 10.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{10.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -127,11 +127,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription003, TestSi
 }
 
 /**
- * @tc.name: ProcessImage001
+ * @tc.name: ProcessImage_001
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -144,11 +144,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage002
+ * @tc.name: ProcessImage_002
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -160,11 +160,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage004
+ * @tc.name: ProcessImage_003
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -179,11 +179,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage004, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage005
+ * @tc.name: ProcessImage_004
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage005, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_004, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 0 direction LEFT, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 0, 1.f, 1.f,
@@ -224,11 +224,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage005, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage006
+ * @tc.name: ProcessImage_005
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage006, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_005, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -241,11 +241,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage006, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage007
+ * @tc.name: ProcessImage_006
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage007, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_006, TestSize.Level0)
 {
     // blur params: -1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{-1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -263,11 +263,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage007, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage008
+ * @tc.name: ProcessImage_007
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage008, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_007, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -282,11 +282,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage008, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage003
+ * @tc.name: ProcessImage_008
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_008, TestSize.Level0)
 {
     // blur params: 10.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{10.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -298,11 +298,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage003, TestSize.Level1)
 }
 
 /**
- * @tc.name: CalcDirectionBias001
+ * @tc.name: CalcDirectionBias_001
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_001, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -317,11 +317,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias001, TestSize.Le
 }
 
 /**
- * @tc.name: CalcDirectionBias002
+ * @tc.name: CalcDirectionBias_002
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias002, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_002, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -337,11 +337,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias002, TestSize.Le
 }
 
 /**
- * @tc.name: CalcDirectionBias003
+ * @tc.name: CalcDirectionBias_003
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias003, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_003, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -357,11 +357,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias003, TestSize.Le
 }
 
 /**
- * @tc.name: CalcDirectionBias004
+ * @tc.name: CalcDirectionBias_004
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias004, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_004, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -377,11 +377,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias004, TestSize.Le
 }
 
 /**
- * @tc.name: CalcDirectionBias005
+ * @tc.name: CalcDirectionBias_005
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias005, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_005, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -396,11 +396,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias005, TestSize.Le
 }
 
 /**
- * @tc.name: CalcDirectionBias006
+ * @tc.name: CalcDirectionBias_006
  * @tc.desc: Verify function CalcDirectionBias
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias006, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias_006, TestSize.Level1)
 {
     // blur params: 10.f blurRadius, {0.1f, 0.1f} fractionStops, 2 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{10.f, {{0.1f, 0.1f}}, 2, 1.f, 1.f,
@@ -416,11 +416,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, CalcDirectionBias006, TestSize.Le
 }
 
 /**
- * @tc.name: ProcessImageDDGR001
+ * @tc.name: ProcessImageDDGR_001
  * @tc.desc: Verify function ProcessImageDDGR
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR_001, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -433,11 +433,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR001, TestSize.Lev
 }
 
 /**
- * @tc.name: ProcessImageDDGR002
+ * @tc.name: ProcessImageDDGR_002
  * @tc.desc: Verify function ProcessImageDDGR
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR002, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR_002, TestSize.Level1)
 {
     // blur params: 1001.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{1001.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -450,11 +450,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR002, TestSize.Lev
 }
 
 /**
- * @tc.name: ProcessImageDDGR003
+ * @tc.name: ProcessImageDDGR_003
  * @tc.desc: Verify function ProcessImageDDGR
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR003, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR_003, TestSize.Level1)
 {
     // blur params: 1001.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1001.1f, {{0.1, 0.1f}}, 1, 1.f, 1.f,
@@ -467,11 +467,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR003, TestSize.Lev
 }
 
 /**
- * @tc.name: ComputeScale001
+ * @tc.name: ComputeScale_001
  * @tc.desc: Verify function ComputeScale
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale_001, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -487,11 +487,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ComputeScale002
+ * @tc.name: ComputeScale_002
  * @tc.desc: Verify function ComputeScale
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale002, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale_002, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -507,11 +507,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ComputeScale002, TestSize.Level1)
 }
 
 /**
- * @tc.name: TransformGradientBlurDirection001
+ * @tc.name: TransformGradientBlurDirection_001
  * @tc.desc: Verify function TransformGradientBlurDirection
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, TransformGradientBlurDirection001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, TransformGradientBlurDirection_001, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -545,11 +545,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, TransformGradientBlurDirection001
 }
 
 /**
- * @tc.name: DrawMeanLinearGradientBlur001
+ * @tc.name: DrawMeanLinearGradientBlur_001
  * @tc.desc: Verify function DrawMeanLinearGradientBlur
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMeanLinearGradientBlur001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMeanLinearGradientBlur_001, TestSize.Level1)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -581,11 +581,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMeanLinearGradientBlur001, Te
 }
 
 /**
- * @tc.name: MakeAlphaGradientShader001
+ * @tc.name: MakeAlphaGradientShader_001
  * @tc.desc: Verify function MakeAlphaGradientShader
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, MakeAlphaGradientShader001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, MakeAlphaGradientShader_001, TestSize.Level1)
 {
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.005f}, {0.1f, 1.f}}, 7, 1.f, 1.f,
     Drawing::Matrix(), 1.f, 1.f, true, false};
@@ -603,11 +603,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, MakeAlphaGradientShader001, TestS
 }
 
 /**
- * @tc.name: DrawMaskLinearGradientBlur001
+ * @tc.name: DrawMaskLinearGradientBlur_001
  * @tc.desc: Verify function DrawMaskLinearGradientBlur
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMaskLinearGradientBlur001, TestSize.Level1)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMaskLinearGradientBlur_001, TestSize.Level1)
 {
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
         Drawing::Matrix(), 1.f, 1.f, true, false};
