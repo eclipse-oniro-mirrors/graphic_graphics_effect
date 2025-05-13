@@ -134,13 +134,13 @@ std::shared_ptr<Drawing::Image> GERenderTest::MakeImage(Drawing::Canvas& canvas)
 }
 
 /**
- * @tc.name: DrawImageEffect001
+ * @tc.name: DrawImageEffect_001
  * @tc.desc: Verify the DrawImageEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, DrawImageEffect001, TestSize.Level1)
+HWTEST_F(GERenderTest, DrawImageEffect_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect001 start";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_001 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
@@ -159,17 +159,17 @@ HWTEST_F(GERenderTest, DrawImageEffect001, TestSize.Level1)
     }
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect001 end";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_001 end";
 }
 
 /**
- * @tc.name: DrawImageEffect002
+ * @tc.name: DrawImageEffect_002
  * @tc.desc: Verify the DrawImageEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, DrawImageEffect002, TestSize.Level1)
+HWTEST_F(GERenderTest, DrawImageEffect_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect002 start";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_002 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 0);
@@ -192,17 +192,17 @@ HWTEST_F(GERenderTest, DrawImageEffect002, TestSize.Level1)
     }
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect002 end";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_002 end";
 }
 
 /**
- * @tc.name: DrawImageEffect003
+ * @tc.name: DrawImageEffect_003
  * @tc.desc: Verify the DrawImageEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, DrawImageEffect003, TestSize.Level1)
+HWTEST_F(GERenderTest, DrawImageEffect_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect003 start";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_003 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
@@ -225,17 +225,17 @@ HWTEST_F(GERenderTest, DrawImageEffect003, TestSize.Level1)
     }
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
-    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect003 end";
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_003 end";
 }
 
 /**
- * @tc.name: ApplyImageEffect001
+ * @tc.name: ApplyImageEffect_001
  * @tc.desc: Verify the ApplyImageEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level1)
+HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect001 start";
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_001 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
@@ -255,17 +255,17 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level1)
     auto outImage = geRender->ApplyImageEffect(canvas_, *veContainer, image, src, dst, sampling);
     EXPECT_TRUE(outImage == image);
 
-    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect001 end";
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_001 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter001
+ * @tc.name: GenerateShaderFilter_001
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter001, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter001 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_001 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_AI_BAR);
     visualEffect->SetParam(Drawing::GE_FILTER_AI_BAR_LOW, 1.0f); // 1.0 AI bar blur low
@@ -279,17 +279,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilter001, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
 
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter001 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_001 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter002
+ * @tc.name: GenerateShaderFilter_002
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter002, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter002 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_002 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
     visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 1.0f); // 1.0 grey blur coff
@@ -300,17 +300,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilter002, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
 
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter002 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_002 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter003
+ * @tc.name: GenerateShaderFilter_003
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter003, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter003 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_003 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_DIRECTION, 1); // 1 blur directon
@@ -320,17 +320,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilter003, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
 
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter003 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_003 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter004
+ * @tc.name: GenerateShaderFilter_004
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter004, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter004 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_004 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>("");
     visualEffect->SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_DIRECTION, 1); // 1 blur directon
@@ -340,17 +340,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilter004, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_EQ(shaderFilters[0], nullptr);
 
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter003 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_004 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilterMESA
+ * @tc.name: GenerateShaderFilterMESA_001
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilterMESA, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilterMESA_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterMESA start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterMESA_001 start";
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, 1); // 1 blur directon
@@ -370,17 +370,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilterMESA, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
 
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterMESA end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterMESA_001 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter005
+ * @tc.name: GenerateShaderFilter_005
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter005, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter005 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_005 start";
  
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_WATER_RIPPLE);
     visualEffect->SetParam("PROGRESS", 0.5f);
@@ -393,17 +393,17 @@ HWTEST_F(GERenderTest, GenerateShaderFilter005, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
  
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter005 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_005 end";
 }
 
 /**
- * @tc.name: GenerateShaderFilter006
+ * @tc.name: GenerateShaderFilter_006
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilter006, TestSize.Level1)
+HWTEST_F(GERenderTest, GenerateShaderFilter_006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter006 start";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_006 start";
  
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MAGNIFIER);
     Drawing::GEVisualEffectContainer veContainer;
@@ -412,7 +412,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilter006, TestSize.Level1)
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
     EXPECT_NE(shaderFilters[0], nullptr);
  
-    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter006 end";
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_006 end";
 }
 
 } // namespace GraphicsEffectEngine

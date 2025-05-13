@@ -39,13 +39,13 @@ void GEVisualEffectContainerTest::SetUp() {}
 void GEVisualEffectContainerTest::TearDown() {}
 
 /**
- * @tc.name: AddToChainedFilter001
+ * @tc.name: AddToChainedFilter_001
  * @tc.desc: Verify the AddToChainedFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter001, TestSize.Level1)
+HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter001 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_001 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, 1);
@@ -53,22 +53,22 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter001, TestSize.Level1)
     auto visualEffectContainer = std::make_shared<GEVisualEffectContainer>();
     visualEffectContainer->AddToChainedFilter(visualEffect);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter001 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_001 end";
 }
 
 /**
- * @tc.name: AddToChainedFilter002
+ * @tc.name: AddToChainedFilter_002
  * @tc.desc: Verify the AddToChainedFilter
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter002, TestSize.Level1)
+HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter002 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_002 start";
 
     auto visualEffectContainer = std::make_shared<GEVisualEffectContainer>();
     visualEffectContainer->AddToChainedFilter(nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter002 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_002 end";
 }
 
 } // namespace Drawing

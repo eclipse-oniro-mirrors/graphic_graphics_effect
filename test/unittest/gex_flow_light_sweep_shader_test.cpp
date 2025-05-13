@@ -42,11 +42,11 @@ void GEXFlowLightSweepShaderTest::SetUp() {}
 void GEXFlowLightSweepShaderTest::TearDown() {}
 
 /**
- * @tc.name: CreateDynamicImpl001
+ * @tc.name: CreateDynamicImpl_001
  * @tc.desc: Verify function CreateDynamicImpl
  * @tc.type:FUNC
  */
-HWTEST_F(GEXFlowLightSweepShaderTest, CreateDynamicImpl001, TestSize.Level1)
+HWTEST_F(GEXFlowLightSweepShaderTest, CreateDynamicImpl_001, TestSize.Level0)
 {
     std::vector<std::pair<Drawing::Color, float>> para;
     para.push_back(std::pair(Drawing::Color::COLOR_RED, 0.0f));
@@ -57,11 +57,11 @@ HWTEST_F(GEXFlowLightSweepShaderTest, CreateDynamicImpl001, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetDescription001
+ * @tc.name: GetDescription_001
  * @tc.desc: Verify function GetDescription
  * @tc.type:FUNC
  */
-HWTEST_F(GEXFlowLightSweepShaderTest, GetDescription001, TestSize.Level1)
+HWTEST_F(GEXFlowLightSweepShaderTest, GetDescription_001, TestSize.Level3)
 {
     auto shader = std::make_shared<GEXFlowLightSweepShader>();
     ASSERT_TRUE(shader != nullptr);

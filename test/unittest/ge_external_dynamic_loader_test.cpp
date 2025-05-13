@@ -55,20 +55,20 @@ void GEExternalDynamicLoaderTest::TearDown()
 }
 
 /**
- * @tc.name: DynamicLoaderTest001
+ * @tc.name: DynamicLoader_Test_001
  * @tc.desc: Verify loader is OK or not
  * @tc.type: FUNC
  */
-HWTEST_F(GEExternalDynamicLoaderTest, DynamicLoaderTest001, TestSize.Level1)
+HWTEST_F(GEExternalDynamicLoaderTest, DynamicLoader_Test_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoaderTest001 start";
+    GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoader_Test_001 start";
 
     ASSERT_NE(testLoader_, nullptr);
     std::ifstream file(GRAPHICS_EFFECT_EXT_LIB_PATH);
     if (!file) {
         EXPECT_EQ(testLoader_->libHandle_, nullptr);
         EXPECT_EQ(testLoader_->createObjectFunc_, nullptr);
-        GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoaderTest001 end, so not exist";
+        GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoader_Test_001 end, so not exist";
         return;
     }
 

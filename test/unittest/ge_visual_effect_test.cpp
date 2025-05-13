@@ -39,63 +39,63 @@ void GEVisualEffectTest::SetUp() {}
 void GEVisualEffectTest::TearDown() {}
 
 /**
- * @tc.name: SetParam001
+ * @tc.name: SetParam_001
  * @tc.desc: Verify the SetParam
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectTest, SetParam001, TestSize.Level1)
+HWTEST_F(GEVisualEffectTest, SetParam_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam001 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_001 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, 1);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam001 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_001 end";
 }
 
 /**
- * @tc.name: SetParam002
+ * @tc.name: SetParam_002
  * @tc.desc: Verify the SetParam
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectTest, SetParam002, TestSize.Level1)
+HWTEST_F(GEVisualEffectTest, SetParam_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam002 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_002 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, static_cast<double>(1));
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam002 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_002 end";
 }
 
 /**
- * @tc.name: SetParam003
+ * @tc.name: SetParam_003
  * @tc.desc: Verify the SetParam
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectTest, SetParam003, TestSize.Level1)
+HWTEST_F(GEVisualEffectTest, SetParam_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam003 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_003 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, static_cast< const char* const>("1"));
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam003 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_003 end";
 }
 
 /**
- * @tc.name: SetParam004
+ * @tc.name: SetParam_004
  * @tc.desc: Verify the SetParam
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectTest, SetParam004, TestSize.Level1)
+HWTEST_F(GEVisualEffectTest, SetParam_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam004 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_004 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, static_cast<int64_t>(1));
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam004 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_004 end";
 }
 
 

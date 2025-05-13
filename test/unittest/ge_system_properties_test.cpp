@@ -41,21 +41,21 @@ void GESystemPropertiesTest::SetUp() {}
 void GESystemPropertiesTest::TearDown() {}
 
 /**
- * @tc.name: GetEventProperty001
+ * @tc.name: GetEventProperty_001
  * @tc.desc: Verify function GetEventProperty
  * @tc.type:FUNC
  */
-HWTEST_F(GESystemPropertiesTest, GetEventProperty001, TestSize.Level1)
+HWTEST_F(GESystemPropertiesTest, GetEventProperty_001, TestSize.Level2)
 {
     EXPECT_EQ(GESystemProperties::GetEventProperty(""), "0");
 }
 
 /**
- * @tc.name: GetBoolSystemProperty001
+ * @tc.name: GetBoolSystemProperty_001
  * @tc.desc: Verify function GetBoolSystemProperty
  * @tc.type:FUNC
  */
-HWTEST_F(GESystemPropertiesTest, GetBoolSystemProperty001, TestSize.Level1)
+HWTEST_F(GESystemPropertiesTest, GetBoolSystemProperty_001, TestSize.Level2)
 {
     EXPECT_FALSE(GESystemProperties::GetBoolSystemProperty("", false));
 }

@@ -61,11 +61,11 @@ void GEMESABlurShaderFilterTest::SetUp()
 void GEMESABlurShaderFilterTest::TearDown() {}
 
 /**
- * @tc.name: GetRadius001
+ * @tc.name: GetRadius_001
  * @tc.desc: Verify function GetRadius
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, GetRadius001, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, GetRadius_001, TestSize.Level3)
 {
     // 1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -76,11 +76,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, GetRadius001, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetRadius002
+ * @tc.name: GetRadius_002
  * @tc.desc: Verify function GetRadius
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, GetRadius002, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, GetRadius_002, TestSize.Level3)
 {
     // 8000, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{8000, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -91,11 +91,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, GetRadius002, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetRadius003
+ * @tc.name: GetRadius_003
  * @tc.desc: Verify function GetRadius
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, GetRadius003, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, GetRadius_003, TestSize.Level3)
 {
     // 10000, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{10000, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -106,11 +106,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, GetRadius003, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetRadius004
+ * @tc.name: GetRadius_004
  * @tc.desc: Verify function GetRadius
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, GetRadius004, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, GetRadius_004, TestSize.Level3)
 {
     // 0, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{0, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -122,11 +122,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, GetRadius004, TestSize.Level1)
 
 
 /**
- * @tc.name: ProcessImage001
+ * @tc.name: ProcessImage_001
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage001, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
     // 0, 1, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -138,11 +138,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage001, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage002
+ * @tc.name: ProcessImage_002
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
     // 0, 0.f, 1.f: valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params1{0, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0, 0.f, 0.f};
@@ -160,11 +160,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage003
+ * @tc.name: ProcessImage_003
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
     // 1,7,12,18,21,55,81,120,240,360: valid blur radius
     int blurRadius[] = {1, 7, 12, 18, 21, 55, 81, 120, 240, 360};
@@ -197,11 +197,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage003, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessImage004
+ * @tc.name: ProcessImage_004
  * @tc.desc: Verify function ProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage_004, TestSize.Level0)
 {
     // 1,7,12,18,21,55,81,120,240,360: valid blur radius
     int blurRadius[] = {1, 7, 12, 18, 21, 55, 81, 120, 240, 360};
@@ -216,11 +216,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, ProcessImage004, TestSize.Level1)
 }
 
 /**
- * @tc.name: ScaleAndAddRandomColor001
+ * @tc.name: ScaleAndAddRandomColor_001
  * @tc.desc: Verify function ScaleAndAddRandomColor
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, ScaleAndAddRandomColor001, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, ScaleAndAddRandomColor_001, TestSize.Level1)
 {
     // 1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -242,11 +242,11 @@ HWTEST_F(GEMESABlurShaderFilterTest, ScaleAndAddRandomColor001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetMesaModeByCCM001
+ * @tc.name: SetMesaModeByCCM_001
  * @tc.desc: Verify function SetMesaModeByCCM
  * @tc.type:FUNC
  */
-HWTEST_F(GEMESABlurShaderFilterTest, SetMesaModeByCCM001, TestSize.Level1)
+HWTEST_F(GEMESABlurShaderFilterTest, SetMesaModeByCCM_001, TestSize.Level1)
 {
     int num = GEMESABlurShaderFilter::g_isSimpleX;
     for (int mode = 0; mode < 4; mode++) {

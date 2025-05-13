@@ -43,11 +43,11 @@ void DotMatrixShaderParamsTest::SetUp() {}
 void DotMatrixShaderParamsTest::TearDown() {}
 
 /**
- * @tc.name: RotateEffectParamsMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: RotateEffectParamsMarshalling_001
+ * @tc.desc: Verify function RotateEffectParamsMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsMarshalling_001, TestSize.Level1)
 {
     RotateEffectParams params;
     Parcel parcel;
@@ -57,11 +57,11 @@ HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsMarshalling001, TestSize.L
 }
 
 /**
- * @tc.name: RotateEffectParamsUnmarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: RotateEffectParamsUnmarshalling_001
+ * @tc.desc: Verify function RotateEffectParamsUnmarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling_001, TestSize.Level1)
 {
     RotateEffectParams params;
     Parcel parcel;
@@ -83,11 +83,11 @@ HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling001, TestSize
 }
 
 /**
- * @tc.name: RotateEffectParamsUnmarshalling002
- * @tc.desc: Verify function GetDescription
+ * @tc.name: RotateEffectParamsUnmarshalling_002
+ * @tc.desc: Verify function RotateEffectParamsUnmarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling002, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling_002, TestSize.Level1)
 {
     RotateEffectParams params1{DotMatrixDirection::TOP, colorVector_};
     Parcel parcel;
@@ -99,11 +99,11 @@ HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling002, TestSize
 }
 
 /**
- * @tc.name: RippleEffectParamsMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: RippleEffectParamsMarshalling_001
+ * @tc.desc: Verify function RippleEffectParamsMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsMarshalling_001, TestSize.Level1)
 {
     RippleEffectParams params;
     Parcel parcel;
@@ -121,11 +121,11 @@ HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsMarshalling001, TestSize.L
 }
 
 /**
- * @tc.name: RippleEffectParamsUnMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: RippleEffectParamsUnMarshalling_001
+ * @tc.desc: Verify function RippleEffectParamsUnMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsUnMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsUnMarshalling_001, TestSize.Level1)
 {
     RippleEffectParams params;
     Parcel parcel;
@@ -150,11 +150,11 @@ HWTEST_F(DotMatrixShaderParamsTest, RippleEffectParamsUnMarshalling001, TestSize
 }
 
 /**
- * @tc.name: DotMatrixNormalParamsMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: DotMatrixNormalParamsMarshalling_001
+ * @tc.desc: Verify function DotMatrixNormalParamsMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsMarshalling_001, TestSize.Level1)
 {
     DotMatrixNormalParams params;
     Parcel parcel;
@@ -162,11 +162,11 @@ HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsMarshalling001, TestSiz
 }
 
 /**
- * @tc.name: DotMatrixNormalParamsUnMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: DotMatrixNormalParamsUnMarshalling_001
+ * @tc.desc: Verify function DotMatrixNormalParamsUnMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsUnMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsUnMarshalling_001, TestSize.Level1)
 {
     DotMatrixNormalParams params;
     Parcel parcel;
@@ -179,11 +179,11 @@ HWTEST_F(DotMatrixShaderParamsTest, DotMatrixNormalParamsUnMarshalling001, TestS
 }
 
 /**
- * @tc.name: DotMatrixShaderParamsMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: DotMatrixShaderParamsMarshalling_001
+ * @tc.desc: Verify function DotMatrixShaderParamsMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, DotMatrixShaderParamsMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, DotMatrixShaderParamsMarshalling_001, TestSize.Level1)
 {
     DotMatrixShaderParams params;
     Parcel parcel;
@@ -191,11 +191,11 @@ HWTEST_F(DotMatrixShaderParamsTest, DotMatrixShaderParamsMarshalling001, TestSiz
 }
 
 /**
- * @tc.name: DotMatrixShaderParamsUnMarshalling001
- * @tc.desc: Verify function GetDescription
+ * @tc.name: DotMatrixShaderParamsUnMarshalling_001
+ * @tc.desc: Verify function DotMatrixShaderParamsUnMarshalling
  * @tc.type:FUNC
  */
-HWTEST_F(DotMatrixShaderParamsTest, DotMatrixShaderParamsUnMarshalling001, TestSize.Level1)
+HWTEST_F(DotMatrixShaderParamsTest, DotMatrixShaderParamsUnMarshalling_001, TestSize.Level1)
 {
     DotMatrixShaderParams params1;
     Parcel parcel;
