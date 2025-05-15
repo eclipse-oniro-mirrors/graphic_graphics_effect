@@ -49,6 +49,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ext/gex_dot_matrix_shader.cpp",
     "${graphics_effect_root}/src/ext/gex_flow_light_sweep_shader.cpp",
     "${graphics_effect_root}/src/ext/gex_marshalling_helper.cpp",
+    "${graphics_effect_root}/src/ext/gex_complex_shader.cpp",
     "${graphics_effect_root}/src/ge_aibar_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_external_dynamic_loader.cpp",
     "${graphics_effect_root}/src/ge_grey_shader_filter.cpp",
@@ -114,6 +115,7 @@ ohos_unittest("GraphicsEffectTest") {
     "gex_dot_matrix_shader_params_test.cpp",
     "gex_dot_matrix_shader_test.cpp",
     "gex_flow_light_sweep_shader_test.cpp",
+    "gex_complex_shader_test.cpp",
   ]
 
   if (!is_mingw && !is_win) {

@@ -16,6 +16,8 @@
 #include "ge_log.h"
 #include "ext/gex_dot_matrix_shader.h"
 #include "ext/gex_flow_light_sweep_shader.h"
+#include "ext/gex_complex_shader.h"
+#include "transaction/rs_marshalling_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -314,6 +316,60 @@ bool GEXFlowLightSweepParams::Unmarshalling(Parcel& parcel)
         }
  
         return true;
+}
+
+bool GEXComplexShaderParams::Marshalling(Parcel& parcel)
+{
+    if (!parcel.WriteUint32(static_cast<uint32_t>(type_))) {
+        return false;
+    }
+ 
+    auto paramsSize = static_cast<uint32_t>(params_.size());
+    if (!parcel.WriteUint32(paramsSize)) {
+        return false;
+    }
+ 
+    for (const auto &elem : params_) {
+        if (!parcel.WriteFloat(elem)) {
+            return false;
+        }
+    }
+ 
+    return true;
+}
+ 
+bool GEXComplexShaderParams::Unmarshalling(Parcel& parcel)
+{
+    uint32_t typeVal;
+    float floatVal;
+    uint32_t intVal;
+    if (!parcel.ReadUint32(typeVal)) {
+        GE_LOGE("GEXComplexShaderParams::Unmarshalling Read typeVal failed!");
+        return false;
+    }
+    static constexpr uint32_t ValidEnumMin = static_cast<int32_t>(GexComlexShaderType::NONE);
+    static constexpr uint32_t ValidEnumMax = static_cast<int32_t>(GexComlexShaderType::MAX);
+    if (typeVal >= ValidEnumMin && typeVal < ValidEnumMax) {
+        if (!parcel.ReadUint32(intVal)) {
+            GE_LOGE("GEXComplexShaderParams::Unmarshalling Read type_ failed!");
+            return false;
+        }
+        type_ = GexComlexShaderType{intVal};
+        if (!parcel.ReadUint32(intVal)) {
+            GE_LOGE("GEXComplexShaderParams::Unmarshalling Read paramsSize failed!");
+            return false;
+        }
+        uint32_t paramsSize = intVal;
+        for (auto i = 0u; i < paramsSize; i++) {
+            if (!parcel.ReadFloat(floatVal)) {
+                GE_LOGE("GEXComplexShaderParams::Unmarshalling Read float failed!");
+                return false;
+            }
+            params_.emplace_back(floatVal);
+        }
+        return true;
+    }
+    return false;
 }
 } // namespace Rosen
 } // namespace OHOS
