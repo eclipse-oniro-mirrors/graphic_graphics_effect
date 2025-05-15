@@ -64,6 +64,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::WATER_RIPPLE);
             impl->MakeWaterRippleParams();
         }
+    },
+    { GE_FILTER_COLOR_GRADIENT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::COLOR_GRADIENT);
+            impl->MakeColorGradientParams();
+        }
     }
 };
 
@@ -228,6 +234,29 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<std:
     }
 }
 
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<float> param)
+{
+    switch (filterType_) {
+        case FilterType::COLOR_GRADIENT: {
+            if (colorGradientParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_COLOR_GRADIENT_COLOR) {
+                colorGradientParams_->colors = param;
+            }
+            if (tag == GE_FILTER_COLOR_GRADIENT_POSITION) {
+                colorGradientParams_->positions = param;
+            }
+            if (tag == GE_FILTER_COLOR_GRADIENT_STRENGTH) {
+                colorGradientParams_->strengths = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
 {
     switch (filterType_) {
@@ -243,6 +272,23 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
                 waterRippleParams_->rippleMode = param;
             } else if (tag == GE_FILTER_WATER_RIPPLE_WAVE_NUM) {
                 waterRippleParams_->waveCount = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param)
+{
+    switch (filterType_) {
+        case FilterType::COLOR_GRADIENT: {
+            if (colorGradientParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_COLOR_GRADIENT_MASK) {
+                colorGradientParams_->mask = param;
             }
             break;
         }

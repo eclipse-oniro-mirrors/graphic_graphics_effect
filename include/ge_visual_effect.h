@@ -49,6 +49,7 @@ public:
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
+    void SetParam(const std::string& tag, const std::vector<float> param);
 
     const std::string& GetName() const
     {

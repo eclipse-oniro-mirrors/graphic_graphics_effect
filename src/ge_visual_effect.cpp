@@ -74,6 +74,11 @@ void GEVisualEffect::SetParam(const std::string& tag, uint32_t param)
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const std::vector<float> param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

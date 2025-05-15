@@ -15,6 +15,7 @@
 #include "ge_render.h"
 
 #include "ge_aibar_shader_filter.h"
+#include "ge_color_gradient_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_mesa_blur_shader_filter.h"
@@ -127,6 +128,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::AIBAR: {
                 const auto& aiBarParams = ve->GetAIBarParams();
                 shaderFilter = std::make_shared<GEAIBarShaderFilter>(*aiBarParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::COLOR_GRADIENT: {
+                const auto& colorGradientParams = ve->GetColorGradientParams();
+                shaderFilter = std::make_shared<GEColorGradientShaderFilter>(*colorGradientParams);
                 break;
             }
             case Drawing::GEVisualEffectImpl::FilterType::GREY: {

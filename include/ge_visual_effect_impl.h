@@ -41,6 +41,7 @@ public:
         WATER_RIPPLE,
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
+        COLOR_GRADIENT,
         MAX
     };
 
@@ -60,6 +61,7 @@ public:
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
+    void SetParam(const std::string& tag, const std::vector<float> param);
 
     void SetFilterType(FilterType type)
     {
@@ -141,6 +143,16 @@ public:
         return magnifierParams_;
     }
 
+    void MakeColorGradientParams()
+    {
+        colorGradientParams_ = std::make_shared<GEColorGradientShaderFilterParams>();
+    }
+ 
+    const std::shared_ptr<GEColorGradientShaderFilterParams>& GetColorGradientParams() const
+    {
+        return colorGradientParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -159,6 +171,7 @@ private:
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
     std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
     std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;
+    std::shared_ptr<GEColorGradientShaderFilterParams> colorGradientParams_ = nullptr;
     std::shared_ptr<GEGreyShaderFilterParams> greyParams_ = nullptr;
     std::shared_ptr<GELinearGradientBlurShaderFilterParams> linearGradientBlurParams_ = nullptr;
 

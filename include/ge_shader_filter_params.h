@@ -151,6 +151,18 @@ struct GEMagnifierShaderFilterParams {
     int32_t rotateDegree = 0;
 };
 
+constexpr char GE_FILTER_COLOR_GRADIENT[] = "COLOR_GRADIENT";
+constexpr char GE_FILTER_COLOR_GRADIENT_COLOR[] = "COLOR";
+constexpr char GE_FILTER_COLOR_GRADIENT_POSITION[] = "POSITION";
+constexpr char GE_FILTER_COLOR_GRADIENT_STRENGTH[] = "STRENGTH";
+constexpr char GE_FILTER_COLOR_GRADIENT_MASK[] = "MASK";
+struct GEColorGradientShaderFilterParams {
+    std::vector<float> colors;
+    std::vector<float> positions;
+    std::vector<float> strengths;
+    std::shared_ptr<GEShaderMask> mask = nullptr;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
