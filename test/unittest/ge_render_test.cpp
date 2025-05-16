@@ -344,6 +344,27 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GenerateShaderFilter_008
+ * @tc.desc: Verify the GenerateShaderFilter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilter_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_008 start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>("");
+    std::pair<float, float> factor = {1.0f, 1.0f};
+    visualEffect->SetParam(Drawing::GE_FILTER_DISPLACEMENT_DISTORT_FACTOR, factor); // 1 blur directon
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
+    EXPECT_EQ(shaderFilters[0], nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_008 end";
+}
+
+/**
  * @tc.name: GenerateShaderFilterMESA_001
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
@@ -415,5 +436,29 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_006, TestSize.Level1)
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_006 end";
 }
 
+/**
+ * @tc.name: GenerateShaderFilter_007
+ * @tc.desc: Verify the GenerateShaderFilter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilter_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_007 start";
+ 
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_COLOR_GRADIENT);
+    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_COLOR, colors);
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_POSITION, positions);
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_STRENGTH, strengths);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_007 end";
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

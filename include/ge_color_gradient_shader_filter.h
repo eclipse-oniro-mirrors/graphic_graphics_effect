@@ -13,30 +13,33 @@
  * limitations under the License.
  */
 
- #ifndef GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_FILTER_H
- #define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_FILTER_H
- 
- #include "ge_shader_filter.h"
- #include "ge_visual_effect.h"
- 
- #include "draw/canvas.h"
- #include "effect/runtime_effect.h"
- #include "effect/runtime_shader_builder.h"
- #include "image/image.h"
- 
+#ifndef GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_FILTER_H
+#define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_FILTER_H
+
+#include <vector>
+
+#include "ge_shader_filter.h"
+#include "ge_visual_effect.h"
+
+#include "draw/canvas.h"
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+#include "image/image.h"
+
 namespace OHOS {
 namespace Rosen {
 class GEColorGradientShaderFilter : public GEShaderFilter {
 public:
-    GE_EXPORT GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params);
+    GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params);
     ~GEColorGradientShaderFilter() override = default;
 
-    virtual GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
-    bool CheckInParams();
+    bool CheckInParams(float* color, float* position, float* strength, int tupleSize);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeColorGradientBuilder();
-    GE_EXPORT std::string GetDescription();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMaskColorGradientBuilder();
+    std::string GetDescription();
 
 private:
     std::vector<float> colors_;

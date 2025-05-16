@@ -59,6 +59,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Matrix para
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const std::pair<float, float>& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 void GEVisualEffect::SetParam(const std::string& tag, const std::vector<std::pair<float, float>> param)
 {
     visualEffectImpl_->SetParam(tag, param);
@@ -75,6 +80,11 @@ void GEVisualEffect::SetParam(const std::string& tag, uint32_t param)
 }
 
 void GEVisualEffect::SetParam(const std::string& tag, const std::vector<float> param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }

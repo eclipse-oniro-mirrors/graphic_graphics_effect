@@ -14,6 +14,7 @@
  */
 #include <map>
 
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
@@ -69,6 +70,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::COLOR_GRADIENT);
             impl->MakeColorGradientParams();
+        }
+    },
+    { GE_FILTER_DISPLACEMENT_DISTORT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
+            impl->MakeDisplacementDistortParams();
         }
     }
 };
@@ -186,6 +193,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetWaterRippleParams(tag, param);
             break;
         }
+        case FilterType::RIPPLE_MASK : {
+            SetRippleMaskParamsFloat(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -209,6 +220,32 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Matrix 
 
             if (tag == GE_FILTER_LINEAR_GRADIENT_BLUR_CANVAS_MAT) {
                 linearGradientBlurParams_->mat = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float, float>& param)
+{
+    switch (filterType_) {
+        case FilterType::RIPPLE_MASK: {
+            if (rippleMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_RIPPLE_CENTER) {
+                rippleMaskParams_->center_ = param;
+            }
+            break;
+        }
+        case FilterType::DISPLACEMENT_DISTORT_FILTER: {
+            if (displacementDistortParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_DISPLACEMENT_DISTORT_FACTOR) {
+                displacementDistortParams_->factor_ = param;
             }
             break;
         }
@@ -283,6 +320,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param)
 {
     switch (filterType_) {
+        case FilterType::DISPLACEMENT_DISTORT_FILTER: {
+            if (displacementDistortParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_DISPLACEMENT_DISTORT_MASK) {
+                displacementDistortParams_->mask_ = param;
+            }
+            break;
+        }
         case FilterType::COLOR_GRADIENT: {
             if (colorGradientParams_ == nullptr) {
                 return;
@@ -420,6 +466,27 @@ void GEVisualEffectImpl::SetMagnifierParamsFloat(const std::string& tag, float p
             [](GEVisualEffectImpl* obj, float p) { obj->magnifierParams_->shadowSize = p; } },
         { GE_FILTER_MAGNIFIER_SHADOW_STRENGTH,
             [](GEVisualEffectImpl* obj, float p) { obj->magnifierParams_->shadowStrength = p; } }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetRippleMaskParamsFloat(const std::string& tag, float param)
+{
+    if (rippleMaskParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_MASK_RIPPLE_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->rippleMaskParams_->radius_ = p; } },
+        { GE_MASK_RIPPLE_WIDTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->rippleMaskParams_->width_ = p; } },
+        { GE_MASK_RIPPLE_WIDTH_CENTER_OFFSET,
+            [](GEVisualEffectImpl* obj, float p) { obj->rippleMaskParams_->widthCenterOffset_ = p; } },
     };
 
     auto it = actions.find(tag);

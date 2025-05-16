@@ -22,6 +22,7 @@
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
+#include "ge_displacement_distort_shader_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_external_dynamic_loader.h"
@@ -152,6 +153,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE: {
                 const auto& waterRippleParams = ve->GetWaterRippleParams();
                 shaderFilter = std::make_shared<GEWaterRippleFilter>(*waterRippleParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER: {
+                const auto& displacementDistortParams = ve->GetDisplacementDistortParams();
+                shaderFilter = std::make_shared<GEDisplacementDistortFilter>(*displacementDistortParams);
                 break;
             }
             default:

@@ -28,6 +28,7 @@ constexpr static uint8_t ARRAY_SIZE = 12;  // 12 len of array
 } // namespace
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_maskColorGradientShaderEffect_ = nullptr;
 
 GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params)
 {
@@ -45,49 +46,45 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
         return nullptr;
     }
 
-    if (!CheckInParams()) { return image; }
+    float color[ARRAY_SIZE * COLOR_CHANNEL] = {0.0}; // 0.0 default
+    float position[ARRAY_SIZE * POSITION_CHANNEL] = {0.0}; // 0.0 default
+    float strength[ARRAY_SIZE] = {0.0}; // 0.0 default
+    if (!CheckInParams(color, position, strength, ARRAY_SIZE)) { return image; }
 
-    auto builder = MakeColorGradientBuilder();
-    if (builder == nullptr) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage builder error\n");
+    Drawing::Matrix matrix;
+    auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (srcImageShader == nullptr) {
+        LOGE("GEColorGradientShaderFilter::ProcessImage srcImageShader is null");
         return image;
     }
 
-    float color[ARRAY_SIZE * COLOR_CHANNEL] = {0.0}; // 0.0 default
-    float pos[ARRAY_SIZE * POSITION_CHANNEL] = {0.0}; // 0.0 default
-    float strength[ARRAY_SIZE] = {1.0}; // 0.0 default
-    size_t arraySize = strengths_.size();
-    for (size_t i = 0; i < arraySize; ) {
-        color[i * COLOR_CHANNEL 0] = colors_[i * COLOR_CHANNEL 0];   // 0 red
-        color[i * COLOR_CHANNEL 1] = colors_[i * COLOR_CHANNEL 1];   // 1 green
-        color[i * COLOR_CHANNEL 2] = colors_[i * COLOR_CHANNEL 2];   // 2 blur
-        color[i * COLOR_CHANNEL 3] = colors_[i * COLOR_CHANNEL 3];   // 3 alpha
-
-        pos[i * POSITION_CHANNEL 0] = positions_[i * POSITION_CHANNEL 0];   // 0 x
-        pos[i * POSITION_CHANNEL 1] = positions_[i * POSITION_CHANNEL 1];   // 1 y
-
-        strength[i] = strengths_[i];
-    }
-
-    float width = image->GetWidth();
-    float height = image->GetHeight();
-    std::shared_ptr<Drawing::ShaderEffect> maskImageShader;
-    float alphaFlag = 1.0;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
     if (mask_) {
-        maskImageShader = mask_->GenerateDrawingShader(width, height);
+        builder = MakeMaskColorGradientBuilder();
+        if (builder == nullptr) {
+            LOGE("GEColorGradientShaderFilter::ProcessImage mask builder error\n");
+            return image;
+        }
+        auto maskImageShader = mask_->GenerateDrawingShader(image->GetWidth(), image->GetHeight());
         if (!maskImageShader) {
             LOGE("GEColorGradientShaderFilter::ProcessImage maskImageShader is null");
             return image;
         }
-        alphaFlag = 0.0;
+        builder->SetChild("maskImageShader", maskImageShader);
+    } else {
+        builder = MakeColorGradientBuilder();
+        if (builder == nullptr) {
+            LOGE("GEColorGradientShaderFilter::ProcessImage builder error\n");
+            return image;
+        }
     }
-
-    builder->SetChild("maskImageShader", maskImageShader);
-    builder->SetUniform("iResolution", width, height);
+    
+    builder->SetChild("srcImageShader", srcImageShader);
+    builder->SetUniform("iResolution", image->GetWidth(), image->GetHeight());
     builder->SetUniform("color", color, ARRAY_SIZE * COLOR_CHANNEL);
-    builder->SetUniform("pos", pos, ARRAY_SIZE * POSITION_CHANNEL);
+    builder->SetUniform("position", position, ARRAY_SIZE * POSITION_CHANNEL);
     builder->SetUniform("strength", strength, ARRAY_SIZE);
-    builder->SetUniform("alphaFlag", alphaFlag);
     auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
     if (resultImage == nullptr) {
         LOGE("GEColorGradientShaderFilter::ProcessImage resultImage is null");
@@ -97,7 +94,7 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
     return resultImage;
 }
 
-bool GEColorGradientShaderFilter::CheckInParams()
+bool GEColorGradientShaderFilter::CheckInParams(float* color, float* position, float* strength, int tupleSize)
 {
     if (strengths_.size() <= 0 || strengths_.size() > ARRAY_SIZE ||
         strengths_.size() * COLOR_CHANNEL != colors_.size() ||
@@ -105,6 +102,25 @@ bool GEColorGradientShaderFilter::CheckInParams()
         LOGE("GEColorGradientShaderFilter::CheckInParams param size error\n");
         return false;
     }
+
+    int arraySize = strengths_.size();
+    if (!color || !position || !strength || tupleSize < arraySize) {
+        LOGE("GEColorGradientShaderFilter::CheckInParams array size error\n");
+        return false;
+    }
+
+    for (int i = 0; i < arraySize; i++) {
+        color[i * COLOR_CHANNEL + 0] = colors_[i * COLOR_CHANNEL + 0];   // 0 red
+        color[i * COLOR_CHANNEL + 1] = colors_[i * COLOR_CHANNEL + 1];   // 1 green
+        color[i * COLOR_CHANNEL + 2] = colors_[i * COLOR_CHANNEL + 2];   // 2 blur
+        color[i * COLOR_CHANNEL + 3] = colors_[i * COLOR_CHANNEL + 3];   // 3 alpha
+
+        position[i * POSITION_CHANNEL + 0] = positions_[i * POSITION_CHANNEL + 0];   // 0 x
+        position[i * POSITION_CHANNEL + 1] = positions_[i * POSITION_CHANNEL + 1];   // 1 y
+
+        strength[i] = strengths_[i];
+    }
+
     return true;
 }
 
@@ -112,20 +128,19 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
 {
     if (g_colorGradientShaderEffect_ == nullptr) {
         static constexpr char prog[] = R"(
-            uniform shader maskImageShader;
+            uniform shader srcImageShader;
             uniform float2 iResolution;
             uniform vec4 color[12];
-            uniform vec2 pos[12];
+            uniform vec2 position[12];
             uniform float strength[12];
-            uniform float alphaFlag;
 
             const float epsilon = 0.001;
 
-            float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float size)
+            float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
             {
-                if (size < epsilon) { return 0.0; }
-                float dist = length(uv - positions) epsilon;
-                float weight = 1.0 / pow(dist * size, 2.0);
+                if (strength < epsilon) { return 0.0; }
+                float dist = length(uv - positions) + epsilon;
+                float weight = 1.0 / pow(dist * strength, 2.0);
                 return weight;
             }
 
@@ -134,14 +149,15 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
                 vec2 uv = fragCoord / iResolution.xy;
                 float totalWeight = 0.0;
                 vec4 blendColor = vec4(0.0);
-                for (int i = 0; i < 12; ) {
-                    float colorSphereWeight = blendMultipleColorsByDistance(uv, pos[i], strength[i]);
-                    totalWeight= colorSphereWeight;
-                    blendColor= color[i] * colorSphereWeight;
+                for (int i = 0; i < 12; i++) {
+                    float colorSphereWeight = blendMultipleColorsByDistance(uv, position[i], strength[i]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[i] * colorSphereWeight;
                 }
-                float maskAlpha = alphaFlag;
-                if (alphaFlag < 0.5) { maskAlpha = maskImageShader.eval(fragCoord).a; }
-                return vec4(blendColor / totalWeight) * maskAlpha;
+
+                vec4 finalColor = vec4(blendColor / totalWeight);
+                finalColor = finalColor + srcImageShader.eval(fragCoord) * (1.0 - finalColor.a);
+                return finalColor;
             }
         )";
 
@@ -153,6 +169,54 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
     }
 
     return std::make_shared<Drawing::RuntimeShaderBuilder>(g_colorGradientShaderEffect_);
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::MakeMaskColorGradientBuilder()
+{
+    if (g_maskColorGradientShaderEffect_ == nullptr) {
+        static constexpr char withMaskProg[] = R"(
+            uniform shader srcImageShader;
+            uniform shader maskImageShader;
+            uniform float2 iResolution;
+            uniform vec4 color[12];
+            uniform vec2 position[12];
+            uniform float strength[12];
+
+            const float epsilon = 0.001;
+
+            float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
+            {
+                if (strength < epsilon) { return 0.0; }
+                float dist = length(uv - positions) + epsilon;
+                float weight = 1.0 / pow(dist * strength, 2.0);
+                return weight;
+            }
+
+            vec4 main(float2 fragCoord)
+            {
+                vec2 uv = fragCoord / iResolution.xy;
+                float totalWeight = 0.0;
+                vec4 blendColor = vec4(0.0);
+                for (int i = 0; i < 12; i++) {
+                    float colorSphereWeight = blendMultipleColorsByDistance(uv, position[i], strength[i]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[i] * colorSphereWeight;
+                }
+
+                vec4 finalColor = vec4(blendColor / totalWeight) * maskImageShader.eval(fragCoord).a;
+                finalColor = finalColor + srcImageShader.eval(fragCoord) * (1.0 - finalColor.a);
+                return finalColor;
+            }
+        )";
+
+        g_maskColorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(withMaskProg);
+        if (g_maskColorGradientShaderEffect_ == nullptr) {
+            LOGD("GEColorGradientShaderFilter::MakeMaskColorGradientBuilder effect error\n");
+            return nullptr;
+        }
+    }
+
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_maskColorGradientShaderEffect_);
 }
 
 std::string GEColorGradientShaderFilter::GetDescription()

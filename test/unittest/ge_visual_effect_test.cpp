@@ -98,6 +98,21 @@ HWTEST_F(GEVisualEffectTest, SetParam_004, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_004 end";
 }
 
+/**
+ * @tc.name: SetParam_005
+ * @tc.desc: Verify the SetParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetParam_005, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_005 start";
+
+    std::pair<float, float> factor = {0.5f, 0.5f};
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_RIPPLE);
+    visualEffect->SetParam(GE_MASK_RIPPLE_CENTER, factor);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_005 end";
+}
 
 } // namespace Drawing
 } // namespace Rosen

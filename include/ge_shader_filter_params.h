@@ -20,6 +20,7 @@
 #include <utility>
 
 #include "utils/matrix.h"
+#include "ge_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -149,6 +150,26 @@ struct GEMagnifierShaderFilterParams {
     uint32_t outerContourColor2 = 0x00000000;
 
     int32_t rotateDegree = 0;
+};
+
+constexpr char GE_MASK_RIPPLE[] = "MASK_RIPPLE";
+constexpr char GE_MASK_RIPPLE_CENTER[] = "MASK_RIPPLE_CENTER";
+constexpr char GE_MASK_RIPPLE_RADIUS[] = "MASK_RIPPLE_RADIUS";
+constexpr char GE_MASK_RIPPLE_WIDTH[] = "MASK_RIPPLE_WIDTH";
+constexpr char GE_MASK_RIPPLE_WIDTH_CENTER_OFFSET[] = "MASK_RIPPLE_WIDTH_CENTER_OFFSET";
+struct GERippleShaderMaskParams {
+    std::pair<float, float> center_ = {0.f, 0.f};
+    float radius_ = 0.f;
+    float width_ = 0.f;
+    float widthCenterOffset_ = 0.0f;
+};
+
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DISPLACEMENT_DISTORT";
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT_FACTOR[] = "DISTORT_FACTOR";
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT_MASK[] = "DISTORT_MASK";
+struct GEDisplacementDistortFilterParams {
+    std::pair<float, float> factor_ = {1.0f, 1.0f};
+    std::shared_ptr<GEShaderMask> mask_;
 };
 
 constexpr char GE_FILTER_COLOR_GRADIENT[] = "COLOR_GRADIENT";
