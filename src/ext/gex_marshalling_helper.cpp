@@ -347,14 +347,14 @@ bool GEXComplexShaderParams::Unmarshalling(Parcel& parcel)
         GE_LOGE("GEXComplexShaderParams::Unmarshalling Read typeVal failed!");
         return false;
     }
-    static constexpr uint32_t ValidEnumMin = static_cast<int32_t>(GexComlexShaderType::NONE);
-    static constexpr uint32_t ValidEnumMax = static_cast<int32_t>(GexComlexShaderType::MAX);
+    static constexpr uint32_t ValidEnumMin = static_cast<int32_t>(GexComplexShaderType::NONE);
+    static constexpr uint32_t ValidEnumMax = static_cast<int32_t>(GexComplexShaderType::MAX);
     if (typeVal >= ValidEnumMin && typeVal < ValidEnumMax) {
         if (!parcel.ReadUint32(intVal)) {
             GE_LOGE("GEXComplexShaderParams::Unmarshalling Read type_ failed!");
             return false;
         }
-        type_ = GexComlexShaderType{intVal};
+        type_ = GexComplexShaderType{intVal};
         if (!parcel.ReadUint32(intVal)) {
             GE_LOGE("GEXComplexShaderParams::Unmarshalling Read paramsSize failed!");
             return false;
