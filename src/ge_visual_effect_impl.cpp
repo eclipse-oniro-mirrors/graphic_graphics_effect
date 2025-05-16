@@ -18,6 +18,7 @@
 #include "ge_visual_effect_impl.h"
 #include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
+#include "common/rs_vector4.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -82,6 +83,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SOUND_WAVE);
             impl->MakeSoundWaveParams();
+        }
+    },
+    { GE_FILTER_EDGE_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+            impl->MakeEdgeLightParams();
         }
     }
 };
@@ -164,6 +171,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
 
             break;
         }
+        case FilterType::EDGE_LIGHT: {
+            if (edgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR) {
+                edgeLightParams_->useRawColor = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -205,6 +221,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::SOUND_WAVE: {
             SetSoundWaveParamsFloat(tag, param);
+            break;
+        }
+        case FilterType::EDGE_LIGHT: {
+            SetEdgeLightParams(tag, param);
             break;
         }
         default:
@@ -349,6 +369,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_FILTER_COLOR_GRADIENT_MASK) {
                 colorGradientParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::EDGE_LIGHT: {
+            if (edgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_EDGE_LIGHT_MASK) {
+                edgeLightParams_->mask = param;
             }
             break;
         }
@@ -598,6 +627,30 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveProgressA = p; } },
         { GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveProgressB = p; } },
+    };
+ 
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+
+void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
+{
+    if (edgeLightParams_ == nullptr) {
+        return;
+    }
+ 
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorR = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorG = p; } },
+        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorB = p; } },
+        { GE_FILTER_EDGE_LIGHT_ALPHA,
+            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->alpha = p; } },
     };
  
     auto it = actions.find(tag);

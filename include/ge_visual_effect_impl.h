@@ -50,6 +50,7 @@ public:
         FLOW_LIGHT_SWEEP,
         COMPLEX_SHADER,
         SOUND_WAVE,
+        EDGE_LIGHT,
         MAX
     };
 
@@ -183,6 +184,16 @@ public:
         return soundWaveParams_;
     }
 
+    void MakeEdgeLightParams()
+    {
+        edgeLightParams_ = std::make_shared<GEEdgeLightShaderFilterParams>();
+    }
+ 
+    const std::shared_ptr<GEEdgeLightShaderFilterParams>& GetEdgeLightParams() const
+    {
+        return edgeLightParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -198,6 +209,7 @@ private:
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
     void SetSoundWaveParamsUint32(const std::string& tag, uint32_t param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
+    void SetEdgeLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -215,6 +227,7 @@ private:
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
+    std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
 };
 
 } // namespace Drawing

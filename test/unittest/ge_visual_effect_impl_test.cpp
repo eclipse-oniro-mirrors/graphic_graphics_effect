@@ -68,6 +68,9 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
 
     Drawing::GEVisualEffectImpl geVisualEffectImplSound(Drawing::GE_FILTER_SOUND_WAVE);
     EXPECT_EQ(geVisualEffectImplSound.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplEdgeLight(Drawing::GE_FILTER_EDGE_LIGHT);
+    EXPECT_EQ(geVisualEffectImplEdgeLight.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT);
 }
 
 /**
@@ -474,6 +477,24 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
         std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DISTORT_MASK", shaderMask);
     EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->mask_, shaderMask);
+}
+
+/**
+ * @tc.name: SetParamEdgelight_001
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParamEdgelight_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_EDGE_LIGHT);
+    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->alpha, 0.5f);
+    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorR, 0.5f);
+    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorG, 0.5f);
+    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorB, 0.5f);
 }
 
 /**

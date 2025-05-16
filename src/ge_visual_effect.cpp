@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <vector>
 #include "ge_visual_effect.h"
 
 #include "ge_log.h"

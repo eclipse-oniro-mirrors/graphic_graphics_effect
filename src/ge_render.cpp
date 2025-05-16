@@ -27,6 +27,8 @@
 #include "ge_water_ripple_filter.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_external_dynamic_loader.h"
+#include "ge_edge_light_shader_filter.h"
+
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -102,6 +104,17 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             }
             return std::make_shared<GELinearGradientBlurShaderFilter>(*linearGradientBlurParams);
         }
+        case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
+            const auto& edgeLightParams = ve->GetEdgeLightParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(type), sizeof(Drawing::GEEdgeLightShaderFilterParams),
+                static_cast<void*>(edgeLightParams.get()));
+            if (!object) {
+                return std::make_shared<GEEdgeLightShaderFilter>(*edgeLightParams);
+            }
+            std::shared_ptr<GEEdgeLightShaderFilter> dmShader(static_cast<GEEdgeLightShaderFilter*>(object));
+            return dmShader;
+        }
         default:
             break;
     }
@@ -164,6 +177,10 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE: {
                 const auto& soundWaveParams = ve->GetSoundWaveParams();
                 shaderFilter = std::make_shared<GESoundWaveFilter>(*soundWaveParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
+                shaderFilter = GenerateExtShaderFilter(ve);
                 break;
             }
             default:
