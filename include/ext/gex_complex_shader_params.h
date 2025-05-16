@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace Rosen {
 
-enum class GexComlexShaderType: uint32_t {
+enum class GexComplexShaderType: uint32_t {
     NONE = 0,
     COLOR_GRADIENT,
     RADIAL_GRADIENT,
@@ -36,7 +36,7 @@ enum class GexComlexShaderType: uint32_t {
 };
 
 struct GE_EXPORT GEXComplexShaderParams {
-    GexComlexShaderType type_;
+    GexComplexShaderType type_;
     std::vector<float> params_;
  
     bool Marshalling(Parcel& parcel);
