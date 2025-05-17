@@ -66,7 +66,7 @@ constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SHOCKWAVEALPHAB";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SHOCKWAVEPROGRESSA";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SHOCKWAVEPROGRESSB";
 struct GESoundWaveFilterParams {
-    //sound wave
+    // sound wave
     uint32_t colorA = 0xFFFFFFFF;
     uint32_t colorB = 0xFFFFFFFF;
     uint32_t colorC = 0xFFFFFFFF;
@@ -74,7 +74,7 @@ struct GESoundWaveFilterParams {
     float centerBrightness = 1.0f;
     float soundIntensity = 0.0f;
 
-    //shock wave
+    // shock wave
     float shockWaveAlphaA = 1.0f;
     float shockWaveAlphaB = 1.0f;
     float shockWaveProgressA = 0.0f;
