@@ -16,6 +16,7 @@
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 
 #include <memory>
+#include <vector>
 
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
@@ -35,10 +36,16 @@ public:
         NONE,
         KAWASE_BLUR,
         MESA_BLUR,
-        GREY, AIBAR,
+        GREY,
+        AIBAR,
         LINEAR_GRADIENT_BLUR,
         MAGNIFIER,
         WATER_RIPPLE,
+        DISPLACEMENT_DISTORT_FILTER,
+        COLOR_GRADIENT,
+        // Mask
+        RIPPLE_MASK,
+        // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
         COMPLEX_SHADER,
@@ -58,9 +65,12 @@ public:
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param);
     void SetParam(const std::string& tag, const Drawing::Matrix param);
+    void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
+    void SetParam(const std::string& tag, const std::vector<float> param);
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
 
     void SetFilterType(FilterType type)
     {
@@ -142,6 +152,26 @@ public:
         return magnifierParams_;
     }
 
+    void MakeColorGradientParams()
+    {
+        colorGradientParams_ = std::make_shared<GEColorGradientShaderFilterParams>();
+    }
+ 
+    const std::shared_ptr<GEColorGradientShaderFilterParams>& GetColorGradientParams() const
+    {
+        return colorGradientParams_;
+    }
+
+    void MakeDisplacementDistortParams()
+    {
+        displacementDistortParams_ = std::make_shared<GEDisplacementDistortFilterParams>();
+    }
+
+    const std::shared_ptr<GEDisplacementDistortFilterParams> &GetDisplacementDistortParams() const
+    {
+        return displacementDistortParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -154,17 +184,22 @@ private:
     void SetMagnifierParamsUint32(const std::string& tag, uint32_t param);
 
     void SetWaterRippleParams(const std::string& tag, float param);
+    void SetRippleMaskParamsFloat(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
+    // ShaderFilter Params
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
     std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
     std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;
+    std::shared_ptr<GEColorGradientShaderFilterParams> colorGradientParams_ = nullptr;
     std::shared_ptr<GEGreyShaderFilterParams> greyParams_ = nullptr;
     std::shared_ptr<GELinearGradientBlurShaderFilterParams> linearGradientBlurParams_ = nullptr;
 
     std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
+    std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
+    std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
 };
 
 } // namespace Drawing

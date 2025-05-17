@@ -15,12 +15,14 @@
 #include "ge_render.h"
 
 #include "ge_aibar_shader_filter.h"
+#include "ge_color_gradient_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
+#include "ge_displacement_distort_shader_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_external_dynamic_loader.h"
@@ -129,6 +131,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
                 shaderFilter = std::make_shared<GEAIBarShaderFilter>(*aiBarParams);
                 break;
             }
+            case Drawing::GEVisualEffectImpl::FilterType::COLOR_GRADIENT: {
+                const auto& colorGradientParams = ve->GetColorGradientParams();
+                shaderFilter = std::make_shared<GEColorGradientShaderFilter>(*colorGradientParams);
+                break;
+            }
             case Drawing::GEVisualEffectImpl::FilterType::GREY: {
                 const auto& greyParams = ve->GetGreyParams();
                 shaderFilter = std::make_shared<GEGreyShaderFilter>(*greyParams);
@@ -146,6 +153,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE: {
                 const auto& waterRippleParams = ve->GetWaterRippleParams();
                 shaderFilter = std::make_shared<GEWaterRippleFilter>(*waterRippleParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER: {
+                const auto& displacementDistortParams = ve->GetDisplacementDistortParams();
+                shaderFilter = std::make_shared<GEDisplacementDistortFilter>(*displacementDistortParams);
                 break;
             }
             default:

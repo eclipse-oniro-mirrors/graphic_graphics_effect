@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "ge_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
 
 using namespace testing;
@@ -114,8 +115,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_001, TestSize.Level2)
     EXPECT_EQ(geVisualEffectImpl2.GetLinearGradientBlurParams()->mat, mat);
 
     // 0.1f, 0.1f is linear gradient blur params: FRACTION_STOPS
-    geVisualEffectImpl2.SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_FRACTION_STOPS, { { 0.1f, 0.1f } });
     std::vector<std::pair<float, float>> expectFraStops { { 0.1f, 0.1f } };
+    geVisualEffectImpl2.SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_FRACTION_STOPS, expectFraStops);
     EXPECT_EQ(geVisualEffectImpl2.GetLinearGradientBlurParams()->fractionStops, expectFraStops);
 }
 
@@ -328,6 +329,76 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_011, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_013
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_013, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplRippleMask(Drawing::GE_MASK_RIPPLE);
+    geVisualEffectImplRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+    geVisualEffectImplRippleMask.rippleMaskParams_ = std::make_shared<Drawing::GERippleShaderMaskParams>();
+
+    // test invalid params setting
+    float rippleRadius = 0.5f;
+    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_RADIUS", rippleRadius);
+    EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->radius_, rippleRadius);
+
+    float rippleWidth = 0.6f;
+    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_WIDTH", rippleWidth);
+    EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->width_, rippleWidth);
+
+    float centerOffset = 0.7f;
+    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_WIDTH_CENTER_OFFSET", centerOffset);
+    EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->widthCenterOffset_, centerOffset);
+}
+
+/**
+ * @tc.name: SetParam_014
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplRippleMask(Drawing::GE_MASK_RIPPLE);
+    geVisualEffectImplRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+    geVisualEffectImplRippleMask.rippleMaskParams_ = std::make_shared<Drawing::GERippleShaderMaskParams>();
+
+    std::pair<float, float> center = {0.5f, 0.5f};
+    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_CENTER", center);
+    EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->center_, center);
+
+
+    std::pair<float, float> factor = {0.5f, 0.5f};
+    Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImplDisplaceDistort.filterType_ =
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
+        std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
+    geVisualEffectImplDisplaceDistort.SetParam("DISTORT_FACTOR", factor);
+    EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->factor_, factor);
+}
+
+/**
+ * @tc.name: SetParam_015
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
+{
+    Drawing::GERippleShaderMaskParams param;
+    auto geRippleShaderMask = std::make_shared<Drawing::GERippleShaderMask>(param);
+    auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRippleShaderMask);
+    Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImplDisplaceDistort.filterType_ = 
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
+        std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
+    geVisualEffectImplDisplaceDistort.SetParam("DISTORT_MASK", shaderMask);
+    EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->mask_, shaderMask);
+}
+
+/**
  * @tc.name: SetWaterRippleParams_001
  * @tc.desc: Verify function SetWaterRippleParams is invalid
  * @tc.type:FUNC
@@ -438,7 +509,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_012, TestSize.Level1)
  * @tc.desc: Verify function Set All Param for param is nullptr
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetXXXParam001, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetAllParam_001, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("");
     uint32_t paramUint32 { 0 };
@@ -449,6 +520,7 @@ HWTEST_F(GEVisualEffectImplTest, SetXXXParam001, TestSize.Level1)
     geVisualEffectImpl.SetMagnifierParamsFloat("", paramFloat);
     geVisualEffectImpl.SetMagnifierParamsUint32("", paramUint32);
     geVisualEffectImpl.SetWaterRippleParams("", paramFloat);
+    geVisualEffectImpl.SetRippleMaskParamsFloat("", paramFloat);
 }
 
 /**
@@ -476,5 +548,44 @@ HWTEST_F(GEVisualEffectImplTest, SetAllParam_002, TestSize.Level1)
     geVisualEffectImpl.SetParam("", paramInt32);
 }
 
+/**
+ * @tc.name: SetColorGradientParam_001
+ * @tc.desc: Verify function Set ColorGradient Param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetColorGradientParam_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+
+    geVisualEffectImpl.SetParam("", nullptr);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientParams(), nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl1(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImpl.SetParam("", nullptr);
+    EXPECT_EQ(geVisualEffectImpl1.GetColorGradientParams(), nullptr);  
+}
+
+/**
+ * @tc.name: SetColorGradientParam_002
+ * @tc.desc: Verify function Set ColorGradient Param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetColorGradientParam_002, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    std::vector<float> param;
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientParams(), nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl1(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_EQ(geVisualEffectImpl1.GetColorGradientParams(), nullptr);
+
+    geVisualEffectImpl1.MakeColorGradientParams();
+    param = {0.1f, 0.5f}; // 0.1f, 0.5f is param of ColorGradient
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_NE(geVisualEffectImpl1.GetColorGradientParams(), nullptr);
+    EXPECT_TRUE(geVisualEffectImpl1.GetColorGradientParams()->colors.empty());
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
