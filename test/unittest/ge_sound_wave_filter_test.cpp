@@ -88,7 +88,7 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage002, TestSize.Level1)
     // init data
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(0, 1, format); // 0, 1  bitmap size
+    bmp.Build(1, 1, format); // 1, 1  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto image = bmp.MakeImage();
 
@@ -112,7 +112,7 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage003, TestSize.Level1)
     // init data
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(1, 0, format); // 0, 1  bitmap size
+    bmp.Build(10, 10, format); // 10, 10  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto image = bmp.MakeImage();
 
