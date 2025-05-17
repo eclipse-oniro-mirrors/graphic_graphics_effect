@@ -25,6 +25,7 @@
 #include "ge_displacement_distort_shader_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
+#include "ge_sound_wave_filter.h"
 #include "ge_external_dynamic_loader.h"
 
 namespace OHOS {
@@ -158,6 +159,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER: {
                 const auto& displacementDistortParams = ve->GetDisplacementDistortParams();
                 shaderFilter = std::make_shared<GEDisplacementDistortFilter>(*displacementDistortParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE: {
+                const auto& soundWaveParams = ve->GetSoundWaveParams();
+                shaderFilter = std::make_shared<GESoundWaveFilter>(*soundWaveParams);
                 break;
             }
             default:

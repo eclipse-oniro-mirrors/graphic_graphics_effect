@@ -49,6 +49,7 @@ public:
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
         COMPLEX_SHADER,
+        SOUND_WAVE,
         MAX
     };
 
@@ -171,6 +172,16 @@ public:
     {
         return displacementDistortParams_;
     }
+    
+    void MakeSoundWaveParams()
+    {
+        soundWaveParams_ = std::make_shared<GESoundWaveFilterParams>();
+    }
+
+    const std::shared_ptr<GESoundWaveFilterParams>& GetSoundWaveParams() const
+    {
+        return soundWaveParams_;
+    }
 
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
@@ -185,6 +196,8 @@ private:
 
     void SetWaterRippleParams(const std::string& tag, float param);
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
+    void SetSoundWaveParamsUint32(const std::string& tag, uint32_t param);
+    void SetSoundWaveParamsFloat(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -198,8 +211,10 @@ private:
 
     std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
+
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
+    std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
 };
 
 } // namespace Drawing

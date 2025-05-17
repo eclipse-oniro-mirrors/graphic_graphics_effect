@@ -54,6 +54,33 @@ struct GEWaterRippleFilterParams {
     uint32_t rippleMode = 1;
 };
 
+constexpr char GE_FILTER_SOUND_WAVE[] = "SOUND_WAVE";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "COLORA";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_B[] = "COLORB";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_C[] = "COLORC";
+constexpr char GE_FILTER_SOUND_WAVE_COLORPROGRESS[] = "COLORPROGRESS";
+constexpr char GE_FILTER_SOUND_WAVE_CENTERBRIGHTNESS[] = "CENTERBRIGHTNESS";
+constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SOUNDINTENSITY";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A[] = "SHOCKWAVEALPHAA";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SHOCKWAVEALPHAB";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SHOCKWAVEPROGRESSA";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SHOCKWAVEPROGRESSB";
+struct GESoundWaveFilterParams {
+    // sound wave
+    uint32_t colorA = 0xFFFFFFFF;
+    uint32_t colorB = 0xFFFFFFFF;
+    uint32_t colorC = 0xFFFFFFFF;
+    float colorProgress = 0.0f;
+    float centerBrightness = 1.0f;
+    float soundIntensity = 0.0f;
+
+    // shock wave
+    float shockWaveAlphaA = 1.0f;
+    float shockWaveAlphaB = 1.0f;
+    float shockWaveProgressA = 0.0f;
+    float shockWaveProgressB = 0.0f;
+};
+
 constexpr char GE_FILTER_GREY[] = "GREY";
 constexpr char GE_FILTER_GREY_COEF_1[] = "GREY_COEF_1";
 constexpr char GE_FILTER_GREY_COEF_2[] = "GREY_COEF_2";
