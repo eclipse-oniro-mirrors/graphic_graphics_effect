@@ -82,6 +82,7 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SOUND_WAVE);
             impl->MakeSoundWaveParams();
+        }
     }
 };
 
