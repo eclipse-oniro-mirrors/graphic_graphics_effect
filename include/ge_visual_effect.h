@@ -18,12 +18,14 @@
 #include <memory>
 #include <vector>
 
+#include "common/rs_vector4.h"
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 
 #include "ge_shader_filter_params.h"
 #include "ge_common.h"
+#include "ge_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -52,9 +54,8 @@ public:
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float> param);
-
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
-
+    
     const std::string& GetName() const
     {
         return visualEffectName_;
