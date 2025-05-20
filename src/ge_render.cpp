@@ -15,6 +15,7 @@
 #include "ge_render.h"
 
 #include "ge_aibar_shader_filter.h"
+#include "ge_bezier_warp_shader_filter.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
@@ -181,6 +182,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             }
             case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
                 shaderFilter = GenerateExtShaderFilter(ve);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::BEZIER_WARP: {
+                const auto& bezierWarpParams = ve->GetBezierWarpParams();
+                shaderFilter = std::make_shared<GEBezierWarpShaderFilter>(*bezierWarpParams);
                 break;
             }
             default:

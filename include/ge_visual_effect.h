@@ -30,6 +30,7 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+constexpr size_t POINT_NUM = 12;
 
 enum class DrawingPaintType { NONE, BRUSH, PEN, PAINT, BRUSH_PEN };
 
@@ -51,11 +52,12 @@ public:
     void SetParam(const std::string& tag, const Drawing::Matrix param);
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);
+    void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
-    
+
     const std::string& GetName() const
     {
         return visualEffectName_;
