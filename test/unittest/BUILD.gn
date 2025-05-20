@@ -71,6 +71,7 @@ ohos_source_set("graphics_effect_test_src") {
   ]
 
   external_deps = []
+  external_deps += [ "c_utils:utils" ]
   if (is_arkui_x) {
     deps += [
       "//base/hiviewdfx/hilog/interfaces/native/innerkits:libhilog_${target_os}",
