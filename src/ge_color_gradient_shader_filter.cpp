@@ -138,15 +138,17 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
 
             float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
             {
-                if (strength < epsilon) { return 0.0; }
+                positions.x *= iResolution.x / iResolution.y;
                 float dist = length(uv - positions) + epsilon;
-                float weight = 1.0 / pow(dist * strength, 2.0);
+                float weight = strength / pow(dist, 2.0);
                 return weight;
             }
 
             vec4 main(float2 fragCoord)
             {
                 vec2 uv = fragCoord / iResolution.xy;
+                float screenRatio = iResolution.x / iResolution.y;
+                uv.x *= screenRatio;
                 float totalWeight = 0.0;
                 vec4 blendColor = vec4(0.0);
                 for (int i = 0; i < 12; i++) {
@@ -156,8 +158,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
                 }
 
                 vec4 finalColor = vec4(blendColor / totalWeight);
-                finalColor = finalColor + srcImageShader.eval(fragCoord) * (1.0 - finalColor.a);
-                return finalColor;
+                finalColor.rgb = mix(srcImageShader.eval(fragCoord).rgb, finalColor.rgb, finalColor.a);
+                return vec4(finalColor.rgb, 1.0);
             }
         )";
 
@@ -186,15 +188,17 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
 
             float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
             {
-                if (strength < epsilon) { return 0.0; }
+                positions.x *= iResolution.x / iResolution.y;
                 float dist = length(uv - positions) + epsilon;
-                float weight = 1.0 / pow(dist * strength, 2.0);
+                float weight = strength / pow(dist, 2.0);
                 return weight;
             }
 
             vec4 main(float2 fragCoord)
             {
                 vec2 uv = fragCoord / iResolution.xy;
+                float screenRatio = iResolution.x / iResolution.y;
+                uv.x *= screenRatio;
                 float totalWeight = 0.0;
                 vec4 blendColor = vec4(0.0);
                 for (int i = 0; i < 12; i++) {
@@ -204,8 +208,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
                 }
 
                 vec4 finalColor = vec4(blendColor / totalWeight) * maskImageShader.eval(fragCoord).a;
-                finalColor = finalColor + srcImageShader.eval(fragCoord) * (1.0 - finalColor.a);
-                return finalColor;
+                finalColor.rgb = mix(srcImageShader.eval(fragCoord).rgb, finalColor.rgb, finalColor.a);
+                return vec4(finalColor.rgb, 1.0);
             }
         )";
 
