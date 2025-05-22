@@ -46,7 +46,7 @@ std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::ProcessImage(Drawing::
 
     int imageHeight = image->GetHeight();
     int imageWidth = image->GetWidth();
-    if (imageHeight <= 0 || imageWidth <= 0 ) {
+    if (imageHeight <= 0 || imageWidth <= 0) {
         LOGE("GEBezierWarpShaderFilter::ProcessImage imageinfo is invalid");
         return nullptr;
     }
@@ -135,7 +135,8 @@ Drawing::Brush GEBezierWarpShaderFilter::GetBrush(const std::shared_ptr<Drawing:
     return brush;
 }
 
-void GEBezierWarpShaderFilter::SetPathTo(Drawing::Path &path, std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const
+void GEBezierWarpShaderFilter::SetPathTo(Drawing::Path &path,
+    std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const
 {
     // The 0th point is the starting point of drawing.
     path.MoveTo(bezierPatch[0].GetX(), bezierPatch[0].GetY());
