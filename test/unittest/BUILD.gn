@@ -68,6 +68,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/ge_visual_effect_impl.cpp",
     "${graphics_effect_root}/src/ge_water_ripple_filter.cpp",
+    "${graphics_effect_root}/src/ge_bezier_warp_shader_filter.cpp",
   ]
 
   external_deps = []
@@ -106,6 +107,7 @@ ohos_unittest("GraphicsEffectTest") {
 
   sources = [
     "ge_aibar_shader_filter_test.cpp",
+    "ge_bezier_warp_shader_filter_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
     "ge_displacement_distort_shader_filter_test.cpp",
     "ge_edge_light_shader_filter_test.cpp",
