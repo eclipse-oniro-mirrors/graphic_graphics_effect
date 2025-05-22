@@ -18,6 +18,7 @@
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_external_dynamic_loader.h"
+#include "draw/path.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -135,6 +136,5 @@ HWTEST_F(GEBezierWarpShaderFilterTest, SetPathTo_001, TestSize.Level1)
     geBezierWarpShaderFilter->SetPathTo(path, bezierPatch);
     EXPECT_NE(path.GetLength(true), 0.0f);
 }
-
 } // namespace Rosen
 } // namespace OHOS
