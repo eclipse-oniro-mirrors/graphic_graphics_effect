@@ -26,12 +26,12 @@
 namespace OHOS {
 namespace Rosen {
 
-class GEEdgeLightShaderFilter : public GEShaderFilter {
+class GE_EXPORT GEEdgeLightShaderFilter : public GEShaderFilter {
 public:
-    GE_EXPORT GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
+    GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
     ~GEEdgeLightShaderFilter() override = default;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
 protected:
