@@ -20,6 +20,7 @@
 
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
 
 #include "effect/color_filter.h"
@@ -45,6 +46,7 @@ public:
         COLOR_GRADIENT,
         // Mask
         RIPPLE_MASK,
+        PIXEL_MAP_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,

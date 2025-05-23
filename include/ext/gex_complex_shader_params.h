@@ -32,6 +32,11 @@ enum class GexComplexShaderType: uint32_t {
     UV_VOICE,
     UV_SCREEN,
     SOUND_WAVE,
+    SDF_RAIN,
+    SDF_SNOW,
+    SDF_MID_SNOW,
+    SDF_HEAVY_SNOW,
+    LIGHT_CAVE,
     MAX
 };
 
