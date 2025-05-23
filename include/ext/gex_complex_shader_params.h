@@ -36,6 +36,7 @@ enum class GexComplexShaderType: uint32_t {
     SDF_SNOW,
     SDF_MID_SNOW,
     SDF_HEAVY_SNOW,
+    LIGHT_CAVE,
     MAX
 };
 
