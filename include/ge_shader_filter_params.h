@@ -19,6 +19,7 @@
 #include <vector>
 #include <utility>
 
+#include "common/rs_vector4.h"
 #include "utils/matrix.h"
 #include "ge_shader_mask.h"
 
@@ -227,6 +228,17 @@ struct GEEdgeLightShaderFilterParams {
     bool useRawColor = false;
 };
 
+constexpr char GE_MASK_PIXEL_MAP[] = "MASK_PIXEL_MAP";
+constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "MASK_PIXEL_MAP_PIXEL_MAP";
+constexpr char GE_MASK_PIXEL_MAP_SRC[] = "MASK_PIXEL_MAP_SRC";
+constexpr char GE_MASK_PIXEL_MAP_DST[] = "MASK_PIXEL_MAP_DST";
+constexpr char GE_MASK_PIXEL_MAP_FILL_COLOR[] = "MASK_PIXEL_MAP_FILL_COLOR";
+struct GEPixelMapMaskParams {
+    std::shared_ptr<Drawing::Image> image = nullptr;
+    RectF src;
+    RectF dst;
+    Vector4f fillColor;
+};
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
