@@ -51,6 +51,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ext/gex_marshalling_helper.cpp",
     "${graphics_effect_root}/src/ext/gex_complex_shader.cpp",
     "${graphics_effect_root}/src/ge_aibar_shader_filter.cpp",
+    "${graphics_effect_root}/src/ge_bezier_warp_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_color_gradient_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_displacement_distort_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_edge_light_shader_filter.cpp",
@@ -108,6 +109,7 @@ ohos_unittest("GraphicsEffectTest") {
 
   sources = [
     "ge_aibar_shader_filter_test.cpp",
+    "ge_bezier_warp_shader_filter_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
     "ge_displacement_distort_shader_filter_test.cpp",
     "ge_edge_light_shader_filter_test.cpp",

@@ -90,6 +90,18 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::EDGE_LIGHT);
             impl->MakeEdgeLightParams();
         }
+    },
+    { GE_FILTER_BEZIER_WARP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::BEZIER_WARP);
+            impl->MakeBezierWarpParams();
+        }
+    },
+    { GE_FILTER_DISPERSION,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISPERSION);
+            impl->MakeDispersionParams();
+        }
     }
 };
 
@@ -227,6 +239,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetEdgeLightParams(tag, param);
             break;
         }
+        case FilterType::DISPERSION: {
+            SetDispersionParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -293,6 +309,23 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<std:
             }
             if (tag == GE_FILTER_LINEAR_GRADIENT_BLUR_FRACTION_STOPS) {
                 linearGradientBlurParams_->fractionStops = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param)
+{
+    switch (filterType_) {
+        case FilterType::BEZIER_WARP: {
+            if (bezierWarpParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_BEZIER_WARP_DESTINATION_PATCH) {
+                bezierWarpParams_->destinationPatch = param;
             }
             break;
         }
@@ -378,6 +411,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_FILTER_EDGE_LIGHT_MASK) {
                 edgeLightParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::DISPERSION: {
+            if (dispersionParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_DISPERSION_MASK) {
+                dispersionParams_->mask = param;
             }
             break;
         }
@@ -566,9 +609,9 @@ void GEVisualEffectImpl::SetWaterRippleParams(const std::string& tag, float para
     if (waterRippleParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
-        
+
         { GE_FILTER_WATER_RIPPLE_PROGRESS,
             [](GEVisualEffectImpl* obj, float p) { obj->waterRippleParams_->progress = p; } },
         { GE_FILTER_WATER_RIPPLE_RIPPLE_CENTER_X,
@@ -576,7 +619,7 @@ void GEVisualEffectImpl::SetWaterRippleParams(const std::string& tag, float para
         { GE_FILTER_WATER_RIPPLE_RIPPLE_CENTER_Y,
             [](GEVisualEffectImpl* obj, float p) { obj->waterRippleParams_->rippleCenterY = p; } },
     };
- 
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
@@ -588,9 +631,9 @@ void GEVisualEffectImpl::SetSoundWaveParamsUint32(const std::string& tag, uint32
     if (soundWaveParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, uint32_t)>> actions = {
-        
+
         { GE_FILTER_SOUND_WAVE_COLOR_A,
             [](GEVisualEffectImpl* obj, uint32_t p) { obj->soundWaveParams_->colorA = p; } },
         { GE_FILTER_SOUND_WAVE_COLOR_B,
@@ -598,7 +641,7 @@ void GEVisualEffectImpl::SetSoundWaveParamsUint32(const std::string& tag, uint32
         { GE_FILTER_SOUND_WAVE_COLOR_C,
             [](GEVisualEffectImpl* obj, uint32_t p) { obj->soundWaveParams_->colorC = p; } },
     };
- 
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
@@ -610,9 +653,9 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
     if (soundWaveParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
-        
+
         { GE_FILTER_SOUND_WAVE_COLORPROGRESS,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->colorProgress = p; } },
         { GE_FILTER_SOUND_WAVE_CENTERBRIGHTNESS,
@@ -628,7 +671,7 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
         { GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveProgressB = p; } },
     };
- 
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
@@ -641,7 +684,7 @@ void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
     if (edgeLightParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R,
             [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorR = p; } },
@@ -651,6 +694,35 @@ void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
             [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorB = p; } },
         { GE_FILTER_EDGE_LIGHT_ALPHA,
             [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->alpha = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param)
+{
+    if (dispersionParams_ == nullptr) {
+        return;
+    }
+ 
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_DISPERSION_OPACITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->opacity = p; } },
+        { GE_FILTER_DISPERSION_RED_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetX = p; } },
+        { GE_FILTER_DISPERSION_RED_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetY = p; } },
+        { GE_FILTER_DISPERSION_GREEN_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetX = p; } },
+        { GE_FILTER_DISPERSION_GREEN_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetY = p; } },
+        { GE_FILTER_DISPERSION_BLUE_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetX = p; } },
+        { GE_FILTER_DISPERSION_BLUE_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetY = p; } },
     };
  
     auto it = actions.find(tag);

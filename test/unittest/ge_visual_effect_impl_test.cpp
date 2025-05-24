@@ -71,6 +71,9 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
 
     Drawing::GEVisualEffectImpl geVisualEffectImplEdgeLight(Drawing::GE_FILTER_EDGE_LIGHT);
     EXPECT_EQ(geVisualEffectImplEdgeLight.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplDispersion(Drawing::GE_FILTER_DISPERSION);
+    EXPECT_EQ(geVisualEffectImplDispersion.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::DISPERSION);
 }
 
 /**
@@ -480,6 +483,34 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_016
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_016, TestSize.Level1)
+{
+    constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
+    std::array<Drawing::Point, BEZIER_WARP_POINT_NUM> points = {{
+        {1.0f, 2.0f},
+        {3.0f, 4.0f},
+        {5.0f, 6.0f},
+        {7.0f, 8.0f},
+        {9.0f, 10.0f},
+        {11.0f, 12.0f},
+        {13.0f, 14.0f},
+        {15.0f, 16.0f},
+        {17.0f, 18.0f},
+        {19.0f, 20.0f},
+        {21.0f, 22.0f},
+        {23.0f, 24.0f}
+    }};
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_BEZIER_WARP);
+    geVisualEffectImpl.MakeBezierWarpParams();
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_BEZIER_WARP_DESTINATION_PATCH, points);
+    EXPECT_EQ(geVisualEffectImpl.bezierWarpParams_->destinationPatch, points);
+}
+
+/**
  * @tc.name: SetParamEdgelight_001
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC
@@ -495,6 +526,30 @@ HWTEST_F(GEVisualEffectImplTest, SetParamEdgelight_001, TestSize.Level1)
     EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorG, 0.5f);
     geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B, 0.5f);
     EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorB, 0.5f);
+}
+
+/**
+ * @tc.name: SetParamDispersion_001
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParamDispersion_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_DISPERSION);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_OPACITY, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->opacity, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetY, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetY, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetY, 0.5f);
 }
 
 /**

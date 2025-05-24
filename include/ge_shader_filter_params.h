@@ -228,6 +228,13 @@ struct GEEdgeLightShaderFilterParams {
     bool useRawColor = false;
 };
 
+constexpr char GE_FILTER_BEZIER_WARP[] = "BEZIER_WARP";
+constexpr char GE_FILTER_BEZIER_WARP_DESTINATION_PATCH[] = "BEZIER_WARP_DESTINATION_PATCH";
+constexpr size_t GE_FILTER_BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
+struct GEBezierWarpShaderFilterParams {
+    std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM> destinationPatch;
+};
+
 constexpr char GE_MASK_PIXEL_MAP[] = "MASK_PIXEL_MAP";
 constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "MASK_PIXEL_MAP_PIXEL_MAP";
 constexpr char GE_MASK_PIXEL_MAP_SRC[] = "MASK_PIXEL_MAP_SRC";
@@ -239,6 +246,26 @@ struct GEPixelMapMaskParams {
     RectF dst;
     Vector4f fillColor;
 };
+constexpr char GE_FILTER_DISPERSION[] = "DISPERSION";
+constexpr char GE_FILTER_DISPERSION_MASK[] = "DISPERSION_MASK";
+constexpr char GE_FILTER_DISPERSION_OPACITY[] = "DISPERSION_OPACITY";
+constexpr char GE_FILTER_DISPERSION_RED_OFFSET_X[] = "DISPERSION_RED_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_RED_OFFSET_Y[] = "DISPERSION_REF_OFFSET_Y";
+constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_X[] = "DISPERSION_GREEN_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_Y[] = "DISPERSION_GREEN_OFFSET_Y";
+constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_X[] = "DISPERSION_BLUE_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_Y[] = "DISPERSION_BLUE_OFFSET_Y";
+struct GEDispersionShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    float opacity;
+    float redOffsetX;
+    float redOffsetY;
+    float greenOffsetX;
+    float greenOffsetY;
+    float blueOffsetX;
+    float blueOffsetY;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
