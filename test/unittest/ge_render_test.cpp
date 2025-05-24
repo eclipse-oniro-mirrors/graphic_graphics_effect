@@ -444,9 +444,14 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_006, TestSize.Level1)
 HWTEST_F(GERenderTest, GenerateShaderFilter_007, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_007 start";
- 
-    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
-    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_COLOR_GRADIENT);
+    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_COLOR, colors);
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_POSITION, positions);
+    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_STRENGTH, strengths);
     Drawing::GEVisualEffectContainer veContainer;
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
@@ -484,13 +489,8 @@ HWTEST_F(GERenderTest, GenerateShaderFilterEdgelight_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterEdgelight_001 start";
  
-    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_COLOR_GRADIENT);
-    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
-    std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
-    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_COLOR, colors);
-    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_POSITION, positions);
-    visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_STRENGTH, strengths);
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
+    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     Drawing::GEVisualEffectContainer veContainer;
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
@@ -498,6 +498,26 @@ HWTEST_F(GERenderTest, GenerateShaderFilterEdgelight_001, TestSize.Level1)
     EXPECT_NE(shaderFilters[0], nullptr);
  
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterEdgelight_001 end";
+}
+
+/**
+ * @tc.name: GenerateShaderFilterDispersion_001
+ * @tc.desc: Verify the GenerateShaderFilterDispersion
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilterDispersion_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterDispersion_001 start";
+ 
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_DISPERSION);
+    visualEffect->SetParam(Drawing::GE_FILTER_DISPERSION_OPACITY, 0.5f);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterDispersion_001 end";
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

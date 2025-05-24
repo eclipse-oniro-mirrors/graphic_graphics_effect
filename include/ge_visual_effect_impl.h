@@ -54,6 +54,7 @@ public:
         SOUND_WAVE,
         EDGE_LIGHT,
         BEZIER_WARP,
+        DISPERSION,
         MAX
     };
 
@@ -208,6 +209,16 @@ public:
         return bezierWarpParams_;
     }
 
+    void MakeDispersionParams()
+    {
+        dispersionParams_ = std::make_shared<GEDispersionShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEDispersionShaderFilterParams>& GetDispersionParams() const
+    {
+        return dispersionParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -224,6 +235,7 @@ private:
     void SetSoundWaveParamsUint32(const std::string& tag, uint32_t param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
+    void SetDispersionParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -243,6 +255,7 @@ private:
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
+    std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
 };
 
 } // namespace Drawing

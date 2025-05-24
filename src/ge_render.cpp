@@ -116,6 +116,17 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             std::shared_ptr<GEEdgeLightShaderFilter> dmShader(static_cast<GEEdgeLightShaderFilter*>(object));
             return dmShader;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::DISPERSION: {
+            const auto& dispersionParams = ve->GetDispersionParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(type), sizeof(Drawing::GEDispersionShaderFilterParams),
+                static_cast<void*>(dispersionParams.get()));
+            if (!object) {
+                return nullptr;
+            }
+            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter*>(object));
+            return dmShader;
+        }
         default:
             break;
     }
@@ -187,6 +198,10 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::BEZIER_WARP: {
                 const auto& bezierWarpParams = ve->GetBezierWarpParams();
                 shaderFilter = std::make_shared<GEBezierWarpShaderFilter>(*bezierWarpParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::DISPERSION: {
+                shaderFilter = GenerateExtShaderFilter(ve);
                 break;
             }
             default:

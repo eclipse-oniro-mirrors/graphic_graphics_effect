@@ -71,6 +71,9 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
 
     Drawing::GEVisualEffectImpl geVisualEffectImplEdgeLight(Drawing::GE_FILTER_EDGE_LIGHT);
     EXPECT_EQ(geVisualEffectImplEdgeLight.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplDispersion(Drawing::GE_FILTER_DISPERSION);
+    EXPECT_EQ(geVisualEffectImplDispersion.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::DISPERSION);
 }
 
 /**
@@ -523,6 +526,30 @@ HWTEST_F(GEVisualEffectImplTest, SetParamEdgelight_001, TestSize.Level1)
     EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorG, 0.5f);
     geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B, 0.5f);
     EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorB, 0.5f);
+}
+
+/**
+ * @tc.name: SetParamDispersion_001
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParamDispersion_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_DISPERSION);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_OPACITY, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->opacity, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetY, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetY, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_X, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetX, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_Y, 0.5f);
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetY, 0.5f);
 }
 
 /**

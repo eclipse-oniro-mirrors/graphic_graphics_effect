@@ -96,6 +96,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::BEZIER_WARP);
             impl->MakeBezierWarpParams();
         }
+    },
+    { GE_FILTER_DISPERSION,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISPERSION);
+            impl->MakeDispersionParams();
+        }
     }
 };
 
@@ -231,6 +237,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::EDGE_LIGHT: {
             SetEdgeLightParams(tag, param);
+            break;
+        }
+        case FilterType::DISPERSION: {
+            SetDispersionParams(tag, param);
             break;
         }
         default:
@@ -401,6 +411,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_FILTER_EDGE_LIGHT_MASK) {
                 edgeLightParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::DISPERSION: {
+            if (dispersionParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_DISPERSION_MASK) {
+                dispersionParams_->mask = param;
             }
             break;
         }
@@ -676,6 +696,35 @@ void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
             [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->alpha = p; } },
     };
 
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param)
+{
+    if (dispersionParams_ == nullptr) {
+        return;
+    }
+ 
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_DISPERSION_OPACITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->opacity = p; } },
+        { GE_FILTER_DISPERSION_RED_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetX = p; } },
+        { GE_FILTER_DISPERSION_RED_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetY = p; } },
+        { GE_FILTER_DISPERSION_GREEN_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetX = p; } },
+        { GE_FILTER_DISPERSION_GREEN_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetY = p; } },
+        { GE_FILTER_DISPERSION_BLUE_OFFSET_X,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetX = p; } },
+        { GE_FILTER_DISPERSION_BLUE_OFFSET_Y,
+            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetY = p; } },
+    };
+ 
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);

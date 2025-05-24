@@ -246,6 +246,26 @@ struct GEPixelMapMaskParams {
     RectF dst;
     Vector4f fillColor;
 };
+constexpr char GE_FILTER_DISPERSION[] = "DISPERSION";
+constexpr char GE_FILTER_DISPERSION_MASK[] = "DISPERSION_MASK";
+constexpr char GE_FILTER_DISPERSION_OPACITY[] = "DISPERSION_OPACITY";
+constexpr char GE_FILTER_DISPERSION_RED_OFFSET_X[] = "DISPERSION_RED_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_RED_OFFSET_Y[] = "DISPERSION_REF_OFFSET_Y";
+constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_X[] = "DISPERSION_GREEN_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_Y[] = "DISPERSION_GREEN_OFFSET_Y";
+constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_X[] = "DISPERSION_BLUE_OFFSET_X";
+constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_Y[] = "DISPERSION_BLUE_OFFSET_Y";
+struct GEDispersionShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    float opacity;
+    float redOffsetX;
+    float redOffsetY;
+    float greenOffsetX;
+    float greenOffsetY;
+    float blueOffsetX;
+    float blueOffsetY;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
