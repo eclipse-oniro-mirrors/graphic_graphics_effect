@@ -228,6 +228,13 @@ struct GEEdgeLightShaderFilterParams {
     bool useRawColor = false;
 };
 
+constexpr char GE_FILTER_BEZIER_WARP[] = "BEZIER_WARP";
+constexpr char GE_FILTER_BEZIER_WARP_DESTINATION_PATCH[] = "BEZIER_WARP_DESTINATION_PATCH";
+constexpr size_t GE_FILTER_BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
+struct GEBezierWarpShaderFilterParams {
+    std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM> destinationPatch;
+};
+
 constexpr char GE_MASK_PIXEL_MAP[] = "MASK_PIXEL_MAP";
 constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "MASK_PIXEL_MAP_PIXEL_MAP";
 constexpr char GE_MASK_PIXEL_MAP_SRC[] = "MASK_PIXEL_MAP_SRC";

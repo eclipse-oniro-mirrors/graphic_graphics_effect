@@ -457,6 +457,25 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_007, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GenerateShaderFilter_009
+ * @tc.desc: Verify the GenerateShaderFilter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilter_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_009 start";
+ 
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_BEZIER_WARP);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_009 end";
+}
+
+/**
  * @tc.name: GenerateShaderFilterEdgelight_001
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC

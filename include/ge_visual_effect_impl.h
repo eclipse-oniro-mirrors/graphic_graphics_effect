@@ -53,6 +53,7 @@ public:
         COMPLEX_SHADER,
         SOUND_WAVE,
         EDGE_LIGHT,
+        BEZIER_WARP,
         MAX
     };
 
@@ -71,6 +72,7 @@ public:
     void SetParam(const std::string& tag, const Drawing::Matrix param);
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);
+    void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float> param);
@@ -150,7 +152,7 @@ public:
     {
         magnifierParams_ = std::make_shared<GEMagnifierShaderFilterParams>();
     }
- 
+
     const std::shared_ptr<GEMagnifierShaderFilterParams>& GetMagnifierParams() const
     {
         return magnifierParams_;
@@ -160,7 +162,7 @@ public:
     {
         colorGradientParams_ = std::make_shared<GEColorGradientShaderFilterParams>();
     }
- 
+
     const std::shared_ptr<GEColorGradientShaderFilterParams>& GetColorGradientParams() const
     {
         return colorGradientParams_;
@@ -175,7 +177,7 @@ public:
     {
         return displacementDistortParams_;
     }
-    
+
     void MakeSoundWaveParams()
     {
         soundWaveParams_ = std::make_shared<GESoundWaveFilterParams>();
@@ -190,10 +192,20 @@ public:
     {
         edgeLightParams_ = std::make_shared<GEEdgeLightShaderFilterParams>();
     }
- 
+
     const std::shared_ptr<GEEdgeLightShaderFilterParams>& GetEdgeLightParams() const
     {
         return edgeLightParams_;
+    }
+
+    void MakeBezierWarpParams()
+    {
+        bezierWarpParams_ = std::make_shared<GEBezierWarpShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEBezierWarpShaderFilterParams>& GetBezierWarpParams() const
+    {
+        return bezierWarpParams_;
     }
 
 private:
@@ -230,6 +242,7 @@ private:
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
+    std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
 };
 
 } // namespace Drawing
