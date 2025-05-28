@@ -103,7 +103,7 @@ bool GEColorGradientShaderFilter::CheckInParams(float* color, float* position, f
         return false;
     }
 
-    int arraySize = strengths_.size();
+    int arraySize = static_cast<int>(strengths_.size());
     if (!color || !position || !strength || tupleSize < arraySize) {
         LOGE("GEColorGradientShaderFilter::CheckInParams array size error\n");
         return false;
