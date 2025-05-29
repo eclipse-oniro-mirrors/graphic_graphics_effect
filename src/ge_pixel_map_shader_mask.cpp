@@ -85,7 +85,7 @@ std::shared_ptr<ShaderEffect> GEPixelMapShaderMask::GenerateDrawingShader(float 
     auto sx = param_.dst.GetWidth() * width / (param_.src.GetWidth() * param_.image->GetWidth());
     auto sy = param_.dst.GetHeight() * height / (param_.src.GetHeight() * param_.image->GetHeight());
     auto tx = param_.dst.left_ * width - param_.src.left_ * param_.image->GetWidth() * sx;
-    auto ty = param_.dst.top_ * height - param_.dst.top_ * param_.image->GetHeight() * sy;
+    auto ty = param_.dst.top_ * height - param_.src.top_ * param_.image->GetHeight() * sy;
     matrix.SetScaleTranslate(sx, sy, tx, ty);
     builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(*param_.image,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, option, matrix));
