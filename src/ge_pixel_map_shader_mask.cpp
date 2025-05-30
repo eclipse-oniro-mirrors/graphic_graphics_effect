@@ -46,22 +46,22 @@ GEPixelMapShaderMask::GEPixelMapShaderMask(const GEPixelMapMaskParams& param) : 
 bool GEPixelMapShaderMask::IsValid() const
 {
     if (param_.image == nullptr) {
-        ROSEN_LOGE("GEPixelMapShaderMask::IsValid image is nullptr");
+        LOGE("GEPixelMapShaderMask::IsValid image is nullptr");
         return false;
     }
 
     if (!param_.src.IsValid()) {
-        ROSEN_LOGE("GEPixelMapShaderMask::IsValid src is invalid");
+        LOGE("GEPixelMapShaderMask::IsValid src is invalid");
         return false;
     }
 
     if (ROSEN_LE(param_.src.GetWidth() * param_.image->GetWidth(), 0.f)) {
-        ROSEN_LOGE("GEPixelMapShaderMask::IsValid src width is zero");
+        LOGE("GEPixelMapShaderMask::IsValid src width is zero");
         return false;
     }
 
     if (ROSEN_LE(param_.src.GetHeight() * param_.image->GetHeight(), 0.f)) {
-        ROSEN_LOGE("GEPixelMapShaderMask::IsValid src height is zero");
+        LOGE("GEPixelMapShaderMask::IsValid src height is zero");
         return false;
     }
 
@@ -71,7 +71,7 @@ bool GEPixelMapShaderMask::IsValid() const
 std::shared_ptr<ShaderEffect> GEPixelMapShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {
-        ROSEN_LOGE("GEPixelMapShaderMask::GenerateDrawingShader param is invalid");
+        LOGE("GEPixelMapShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
