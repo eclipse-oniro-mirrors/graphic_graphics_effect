@@ -140,5 +140,33 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage004, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage004 end";
 }
+
+/**
+ * @tc.name: CheckSoundWaveParams
+ * @tc.desc: Verify the CheckSoundWaveParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveParams, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveParams start";
+
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    geSoundWaveFilterParams.colorA = {20.0f, -10.0f, 20.0f, -10.0f};
+    geSoundWaveFilterParams.soundIntensity = 10.0f;
+    geSoundWaveFilterParams.shockWaveAlphaA = 10.0f;
+    geSoundWaveFilterParams.shockWaveAlphaB = 10.0f;
+    geSoundWaveFilterParams.shockWaveTotalAlpha = 20.0f;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    geSoundWaveFilter->CheckSoundWaveParams();
+    EXPECT_NE(geSoundWaveFilter->colorA_.greenF_, 0.0f);
+    EXPECT_NE(geSoundWaveFilter->soundIntensity_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveProgressA_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveProgressB_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveTotalAlpha_, 20.0f);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveParams end";
+}
+
 } // namespace Rosen
 } // namespace OHOS

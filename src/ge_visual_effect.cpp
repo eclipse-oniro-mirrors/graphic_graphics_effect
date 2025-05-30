@@ -94,6 +94,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Draw
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Color4f& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

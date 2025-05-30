@@ -60,19 +60,18 @@ constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "COLORA";
 constexpr char GE_FILTER_SOUND_WAVE_COLOR_B[] = "COLORB";
 constexpr char GE_FILTER_SOUND_WAVE_COLOR_C[] = "COLORC";
 constexpr char GE_FILTER_SOUND_WAVE_COLORPROGRESS[] = "COLORPROGRESS";
-constexpr char GE_FILTER_SOUND_WAVE_CENTERBRIGHTNESS[] = "CENTERBRIGHTNESS";
 constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SOUNDINTENSITY";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A[] = "SHOCKWAVEALPHAA";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SHOCKWAVEALPHAB";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SHOCKWAVEPROGRESSA";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SHOCKWAVEPROGRESSB";
+constexpr char GE_FILTER_SOUND_WAVE_TOTAL_ALPHA[] = "SHOCKWAVETOTALALPHA";
 struct GESoundWaveFilterParams {
     // sound wave
-    uint32_t colorA = 0xFFFFFFFF;
-    uint32_t colorB = 0xFFFFFFFF;
-    uint32_t colorC = 0xFFFFFFFF;
+    Drawing::Color4f colorA = {1.0, 1.0, 1.0, 1.0};
+    Drawing::Color4f colorB = {1.0, 1.0, 1.0, 1.0};
+    Drawing::Color4f colorC = {1.0, 1.0, 1.0, 1.0};
     float colorProgress = 0.0f;
-    float centerBrightness = 1.0f;
     float soundIntensity = 0.0f;
 
     // shock wave
@@ -80,6 +79,7 @@ struct GESoundWaveFilterParams {
     float shockWaveAlphaB = 1.0f;
     float shockWaveProgressA = 0.0f;
     float shockWaveProgressB = 0.0f;
+    float shockWaveTotalAlpha = 1.0f;
 };
 
 constexpr char GE_FILTER_GREY[] = "GREY";

@@ -25,15 +25,15 @@ namespace {
 constexpr static uint8_t COLOR_CHANNEL = 3; // 3 len of rgb
 } // namespace
 
-GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
-    :colorProgress_(params.colorProgress), centerBrightness_(params.centerBrightness),
-    soundIntensity_(params.soundIntensity), shockWaveAlphaA_(params.shockWaveAlphaA),
-    shockWaveAlphaB_(params.shockWaveAlphaB), shockWaveProgressA_(params.shockWaveProgressA),
-    shockWaveProgressB_(params.shockWaveProgressB)
+GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams &params)
+    : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
+      shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
+      shockWaveProgressA_(params.shockWaveProgressA), shockWaveProgressB_(params.shockWaveProgressB),
+      shockWaveTotalAlpha_(params.shockWaveTotalAlpha)
 {
-    colorA_ = Drawing::Color(params.colorA);
-    colorB_ = Drawing::Color(params.colorB);
-    colorC_ = Drawing::Color(params.colorC);
+    colorA_ = params.colorA;
+    colorB_ = params.colorB;
+    colorC_ = params.colorC;
 }
 
  
@@ -60,9 +60,10 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
         return nullptr;
     }
 
-    float colorA[COLOR_CHANNEL] = {colorA_.GetRedF(), colorA_.GetGreenF(), colorA_.GetBlueF()};
-    float colorB[COLOR_CHANNEL] = {colorB_.GetRedF(), colorB_.GetGreenF(), colorB_.GetBlueF()};
-    float colorC[COLOR_CHANNEL] = {colorC_.GetRedF(), colorC_.GetGreenF(), colorC_.GetBlueF()};
+    CheckSoundWaveParams();
+    float colorA[COLOR_CHANNEL] = {colorA_.redF_, colorA_.greenF_, colorA_.blueF_};
+    float colorB[COLOR_CHANNEL] = {colorB_.redF_, colorB_.greenF_, colorB_.blueF_};
+    float colorC[COLOR_CHANNEL] = {colorC_.redF_, colorC_.greenF_, colorC_.blueF_};
 
     Drawing::RuntimeShaderBuilder builder(soundWaveShader);
     builder.SetChild("image", shader);
@@ -71,12 +72,12 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
     builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
     builder.SetUniform("colorC", colorC, COLOR_CHANNEL);
     builder.SetUniform("colorProgress", colorProgress_);
-    builder.SetUniform("centerBrightness", centerBrightness_);
     builder.SetUniform("soundIntensity", soundIntensity_);
     builder.SetUniform("shockWaveAlphaA", shockWaveAlphaA_);
     builder.SetUniform("shockWaveAlphaB", shockWaveAlphaB_);
     builder.SetUniform("shockWaveProgressA", shockWaveProgressA_);
     builder.SetUniform("shockWaveProgressB", shockWaveProgressB_);
+    builder.SetUniform("shockWaveTotalAlpha", shockWaveTotalAlpha_);
  
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     if (invertedImage == nullptr) {
@@ -84,6 +85,25 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
         return nullptr;
     }
     return invertedImage;
+}
+
+void GESoundWaveFilter::CheckSoundWaveParams()
+{
+    CheckSoundWaveColor4f(colorA_);
+    CheckSoundWaveColor4f(colorB_);
+    CheckSoundWaveColor4f(colorC_);
+    soundIntensity_ = std::clamp(soundIntensity_, 0.0f, 1.0f);
+    shockWaveAlphaA_ = std::clamp(shockWaveAlphaA_, 0.0f, 1.0f);
+    shockWaveAlphaB_ = std::clamp(shockWaveAlphaB_, 0.0f, 1.0f);
+    shockWaveTotalAlpha_ = std::clamp(shockWaveTotalAlpha_, 0.0f, 1.0f);
+}
+
+void GESoundWaveFilter::CheckSoundWaveColor4f(Drawing::Color4f& color)
+{
+    color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
+    color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
+    color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
+    color.redF_ = std::clamp(color.redF_, 0.0f, 1.0f);
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
