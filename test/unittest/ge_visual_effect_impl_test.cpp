@@ -634,11 +634,11 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam_016
+ * @tc.name: SetParam_017
  * @tc.desc: Verify function SetParam for param is nullptr
  * @tc.type:FUNC
  */
-HWTEST_F(GEVisualEffectImplTest, SetParam_016, TestSize.Level1)
+HWTEST_F(GEVisualEffectImplTest, SetParam_017, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplTest("");
     Drawing::Color4f colorTestA = {0.0, 1.0, 1.0, 1.0};
