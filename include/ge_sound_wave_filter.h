@@ -76,7 +76,7 @@ private:
         {
             k *= 6.0;
             float h = max(k - abs(a - b), 0.0) / k;
-            return min(a, b) - h * h * h * k * (1.0 / 6.0);
+            return min(a, b) - h * h * h * k / 6.0;
         }
 
         // Create a smooth color gradient effect based on the threshold over X or Y or user defined
@@ -140,8 +140,8 @@ private:
             float smoothUnion = smoothstep(smoothGap, -0.035, mix(0.0, 0.66, smoothUnionDistance));
 
             float verticalGradient = centeredUVs.y - barPosition;
-            verticalGradient =
-                1.0 - min(smoothUnionThreshold - barPosition, verticalGradient) / (smoothUnionThreshold - barPosition);
+			float verticalGap = max(smoothUnionThreshold - barPosition, 1e-5);
+			verticalGradient = 1.0 - min(verticalGap, verticalGradient) / verticalGap;
             float gradient = mix(1.0, horizontalGradient, 1.0 - verticalGradient) * horizontalGradient;
             smoothUnion *= gradient;
 
