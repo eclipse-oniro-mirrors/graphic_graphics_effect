@@ -168,5 +168,27 @@ HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveParams, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveParams end";
 }
 
+/**
+ * @tc.name: CheckSoundWaveColor4f
+ * @tc.desc: Verify the CheckSoundWaveColor4f
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveColor4f, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveColor4f start";
+
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    Drawing::Color4f colorA = { 20.0f, 20.0f, 20.0f, 20.0f };
+    geSoundWaveFilter->CheckSoundWaveColor4f(colorA);
+    EXPECT_EQ(colorA.redF_, 10.0f);
+    EXPECT_EQ(colorA.greenF_, 10.0f);
+    EXPECT_EQ(colorA.blueF_, 10.0f);
+    EXPECT_EQ(colorA.alphaF_, 1.0f);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveColor4f end";
+}
+
 } // namespace Rosen
 } // namespace OHOS
