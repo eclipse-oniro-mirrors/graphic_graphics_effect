@@ -25,7 +25,7 @@ namespace {
 constexpr static uint8_t COLOR_CHANNEL = 3; // 3 len of rgb
 } // namespace
 
-GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams &params)
+GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
       shockWaveProgressA_(params.shockWaveProgressA), shockWaveProgressB_(params.shockWaveProgressB),
@@ -101,9 +101,9 @@ void GESoundWaveFilter::CheckSoundWaveParams()
 void GESoundWaveFilter::CheckSoundWaveColor4f(Drawing::Color4f& color)
 {
     color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
-    color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
-    color.redF_ = std::clamp(color.redF_, 0.0f, 10.0f);
-    color.redF_ = std::clamp(color.redF_, 0.0f, 1.0f);
+    color.greenF_ = std::clamp(color.greenF_, 0.0f, 10.0f);
+    color.blueF_ = std::clamp(color.blueF_, 0.0f, 10.0f);
+    color.alphaF_ = std::clamp(color.alphaF_, 0.0f, 1.0f);
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
