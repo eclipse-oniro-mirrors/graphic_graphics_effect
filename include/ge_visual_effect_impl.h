@@ -78,6 +78,7 @@ public:
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
+    void SetParam(const std::string& tag, const Drawing::Color4f& param);
 
     void SetFilterType(FilterType type)
     {
@@ -232,7 +233,6 @@ private:
 
     void SetWaterRippleParams(const std::string& tag, float param);
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
-    void SetSoundWaveParamsUint32(const std::string& tag, uint32_t param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);

@@ -57,6 +57,7 @@ public:
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
+    void SetParam(const std::string& tag, const Drawing::Color4f& param);
 
     const std::string& GetName() const
     {

@@ -375,10 +375,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
             }
             break;
         }
-        case FilterType::SOUND_WAVE: {
-            SetSoundWaveParamsUint32(tag, param);
-            break;
-        }
         default:
             break;
     }
@@ -421,6 +417,29 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_FILTER_DISPERSION_MASK) {
                 dispersionParams_->mask = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Color4f& param)
+{
+    switch (filterType_) {
+        case FilterType::SOUND_WAVE: {
+            if (soundWaveParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_SOUND_WAVE_COLOR_A) {
+                soundWaveParams_->colorA = param;
+            }
+            if (tag == GE_FILTER_SOUND_WAVE_COLOR_B) {
+                soundWaveParams_->colorB = param;
+            }
+            if (tag == GE_FILTER_SOUND_WAVE_COLOR_C) {
+                soundWaveParams_->colorC = param;
             }
             break;
         }
@@ -626,28 +645,6 @@ void GEVisualEffectImpl::SetWaterRippleParams(const std::string& tag, float para
     }
 }
 
-void GEVisualEffectImpl::SetSoundWaveParamsUint32(const std::string& tag, uint32_t param)
-{
-    if (soundWaveParams_ == nullptr) {
-        return;
-    }
-
-    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, uint32_t)>> actions = {
-
-        { GE_FILTER_SOUND_WAVE_COLOR_A,
-            [](GEVisualEffectImpl* obj, uint32_t p) { obj->soundWaveParams_->colorA = p; } },
-        { GE_FILTER_SOUND_WAVE_COLOR_B,
-            [](GEVisualEffectImpl* obj, uint32_t p) { obj->soundWaveParams_->colorB = p; } },
-        { GE_FILTER_SOUND_WAVE_COLOR_C,
-            [](GEVisualEffectImpl* obj, uint32_t p) { obj->soundWaveParams_->colorC = p; } },
-    };
-
-    auto it = actions.find(tag);
-    if (it != actions.end()) {
-        it->second(this, param);
-    }
-}
-
 void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float param)
 {
     if (soundWaveParams_ == nullptr) {
@@ -658,8 +655,6 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
 
         { GE_FILTER_SOUND_WAVE_COLORPROGRESS,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->colorProgress = p; } },
-        { GE_FILTER_SOUND_WAVE_CENTERBRIGHTNESS,
-            [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->centerBrightness = p; } },
         { GE_FILTER_SOUND_WAVE_SOUNDINTENSITY,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->soundIntensity = p; } },
         { GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A,
@@ -670,6 +665,8 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveProgressA = p; } },
         { GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B,
             [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveProgressB = p; } },
+        { GE_FILTER_SOUND_WAVE_TOTAL_ALPHA,
+            [](GEVisualEffectImpl* obj, float p) { obj->soundWaveParams_->shockWaveTotalAlpha = p; } },
     };
 
     auto it = actions.find(tag);

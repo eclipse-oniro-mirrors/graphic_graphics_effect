@@ -140,5 +140,55 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage004, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage004 end";
 }
+
+/**
+ * @tc.name: CheckSoundWaveParams
+ * @tc.desc: Verify the CheckSoundWaveParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveParams, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveParams start";
+
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    geSoundWaveFilterParams.colorA = {20.0f, -10.0f, 20.0f, -10.0f};
+    geSoundWaveFilterParams.soundIntensity = 10.0f;
+    geSoundWaveFilterParams.shockWaveAlphaA = 10.0f;
+    geSoundWaveFilterParams.shockWaveAlphaB = 10.0f;
+    geSoundWaveFilterParams.shockWaveTotalAlpha = 20.0f;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    geSoundWaveFilter->CheckSoundWaveParams();
+    EXPECT_NE(geSoundWaveFilter->colorA_.greenF_, 0.0f);
+    EXPECT_NE(geSoundWaveFilter->soundIntensity_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveProgressA_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveProgressB_, 10.0f);
+    EXPECT_NE(geSoundWaveFilter->shockWaveTotalAlpha_, 20.0f);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveParams end";
+}
+
+/**
+ * @tc.name: CheckSoundWaveColor4f
+ * @tc.desc: Verify the CheckSoundWaveColor4f
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveColor4f, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveColor4f start";
+
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    Drawing::Color4f colorA = { 20.0f, 20.0f, 20.0f, 20.0f };
+    geSoundWaveFilter->CheckSoundWaveColor4f(colorA);
+    EXPECT_EQ(colorA.redF_, 10.0f);
+    EXPECT_EQ(colorA.greenF_, 10.0f);
+    EXPECT_EQ(colorA.blueF_, 10.0f);
+    EXPECT_EQ(colorA.alphaF_, 1.0f);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveColor4f end";
+}
+
 } // namespace Rosen
 } // namespace OHOS
