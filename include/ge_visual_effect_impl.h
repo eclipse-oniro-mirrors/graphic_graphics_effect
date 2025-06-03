@@ -47,6 +47,7 @@ public:
         // Mask
         RIPPLE_MASK,
         PIXEL_MAP_MASK,
+        RADIAL_GRADIENT_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
@@ -233,6 +234,7 @@ private:
 
     void SetWaterRippleParams(const std::string& tag, float param);
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
+    void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
@@ -250,6 +252,7 @@ private:
     std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
 
+    std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;

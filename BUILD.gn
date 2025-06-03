@@ -71,6 +71,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_mesa_blur_shader_filter.cpp",
     "src/ge_pixel_map_shader_mask.cpp",
     "src/ge_render.cpp",
+    "src/ge_radial_gradient_shader_mask.cpp",
     "src/ge_ripple_shader_mask.cpp",
     "src/ge_sound_wave_filter.cpp",
     "src/ge_system_properties.cpp",

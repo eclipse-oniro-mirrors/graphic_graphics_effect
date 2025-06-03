@@ -266,6 +266,20 @@ struct GEDispersionShaderFilterParams {
     float blueOffsetY;
 };
 
+constexpr char GE_MASK_RADIAL_GRADIENT[] = "MASK_RADIAL_GRADIENT";
+constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "MASK_RADIAL_GRADIENT_CENTER";
+constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSX[] = "MASK_RADIAL_GRADIENT_RADIUSX";
+constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSY[] = "MASK_RADIAL_GRADIENT_RADIUSY";
+constexpr char GE_MASK_RADIAL_GRADIENT_COLORS[] = "MASK_RADIAL_GRADIENT_COLORS";
+constexpr char GE_MASK_RADIAL_GRADIENT_POSITIONS[] = "MASK_RADIAL_GRADIENT_POSITIONS";
+struct GERadialGradientShaderMaskParams {
+    std::pair<float, float> center_ = {0.f, 0.f};
+    float radiusX_ = 0.f;
+    float radiusY_ = 0.f;
+    std::vector<float> colors_;
+    std::vector<float> positions_;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
