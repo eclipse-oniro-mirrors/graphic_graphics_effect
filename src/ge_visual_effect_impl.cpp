@@ -231,6 +231,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetRippleMaskParamsFloat(tag, param);
             break;
         }
+        case FilterType::RADIAL_GRADIENT_MASK: {
+            SetRadialGradientMaskParamsFloat(tag, param);
+            break;
+        }
         case FilterType::SOUND_WAVE: {
             SetSoundWaveParamsFloat(tag, param);
             break;
@@ -295,6 +299,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             }
             break;
         }
+        case FilterType::RADIAL_GRADIENT_MASK: {
+            if (radialGradientMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_RADIAL_GRADIENT_CENTER) {
+                radialGradientMaskParams_->center_ = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -349,6 +362,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<floa
             }
             if (tag == GE_FILTER_COLOR_GRADIENT_STRENGTH) {
                 colorGradientParams_->strengths = param;
+            }
+            break;
+        }
+        case FilterType::RADIAL_GRADIENT_MASK: {
+            if (radialGradientMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_RADIAL_GRADIENT_COLORS) {
+                radialGradientMaskParams_->colors_ = param;
+            }
+            if (tag == GE_MASK_RADIAL_GRADIENT_POSITIONS) {
+                radialGradientMaskParams_->positions_ = param;
             }
             break;
         }
@@ -600,6 +625,25 @@ void GEVisualEffectImpl::SetRippleMaskParamsFloat(const std::string& tag, float 
     }
 }
 
+void GEVisualEffectImpl::SetRadialGradientMaskParamsFloat(const std::string& tag, float param)
+{
+    if (radialGradientMaskParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_MASK_RADIAL_GRADIENT_RADIUSX,
+            [](GEVisualEffectImpl* obj, float p) { obj->radialGradientMaskParams_->radiusX_ = p; } },
+        { GE_MASK_RADIAL_GRADIENT_RADIUSY,
+            [](GEVisualEffectImpl* obj, float p) { obj->radialGradientMaskParams_->radiusY_ = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
 void GEVisualEffectImpl::SetMagnifierParamsUint32(const std::string& tag, uint32_t param)
 {
     if (magnifierParams_ == nullptr) {
@@ -704,7 +748,7 @@ void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param
     if (dispersionParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_DISPERSION_OPACITY,
             [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->opacity = p; } },
@@ -721,7 +765,7 @@ void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param
         { GE_FILTER_DISPERSION_BLUE_OFFSET_Y,
             [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetY = p; } },
     };
- 
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
