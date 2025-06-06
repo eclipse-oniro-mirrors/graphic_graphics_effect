@@ -69,7 +69,8 @@ void GEEdgeLightShaderFilterTest::TearDown() {}
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
-    Rosen::Drawing::GEEdgeLightShaderFilterParams geEdgeLightShaderParams { 1.0f, 0.2f, 0.7f, 0.1f, nullptr, false };
+    Rosen::Drawing::GEEdgeLightShaderFilterParams
+        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 }
@@ -81,7 +82,8 @@ HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_001, TestSize.Level0)
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
-    Rosen::Drawing::GEEdgeLightShaderFilterParams geEdgeLightShaderParams { 1.0f, 0.2f, 0.7f, 0.1f, nullptr, false };
+    Rosen::Drawing::GEEdgeLightShaderFilterParams
+        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
@@ -93,7 +95,8 @@ HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
-    Rosen::Drawing::GEEdgeLightShaderFilterParams geEdgeLightShaderParams { 1.0f, 0.2f, 0.7f, 0.1f, nullptr, false };
+    Rosen::Drawing::GEEdgeLightShaderFilterParams
+        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, imageEmpty_, src_, dst_), nullptr);
 }

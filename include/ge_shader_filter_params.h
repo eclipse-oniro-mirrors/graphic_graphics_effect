@@ -214,6 +214,7 @@ struct GEColorGradientShaderFilterParams {
 
 constexpr char GE_FILTER_EDGE_LIGHT[] = "EDGE_LIGHT";
 constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "EDGE_LIGHT_ALPHA";
+constexpr char GE_FILTER_EDGE_LIGHT_BLOOM[] = "EDGE_LIGHT_BLOOM";
 constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R[] = "EDGE_LIGHT_EDGE_COLOR_R";
 constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G[] = "EDGE_LIGHT_EDGE_COLOR_G";
 constexpr char GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B[] = "EDGE_LIGHT_EDGE_COLOR_B";
@@ -221,6 +222,7 @@ constexpr char GE_FILTER_EDGE_LIGHT_MASK[] = "EDGE_LIGHT_MASK";
 constexpr char GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR[] = "EDGE_LIGHT_USE_RAW_COLOR";
 struct GEEdgeLightShaderFilterParams {
     float alpha = 1.0f;
+    bool bloom = true;
     float edgeColorR = 0.2f;
     float edgeColorG = 0.7f;
     float edgeColorB = 0.1f;

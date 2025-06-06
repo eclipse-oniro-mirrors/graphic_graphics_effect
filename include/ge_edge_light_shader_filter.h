@@ -36,6 +36,7 @@ public:
 
 protected:
     float alpha_ = 1.0f;
+    bool bloom_ = true;
     float edgeColorR_ = 0.2f;
     float edgeColorG_ = 0.7f;
     float edgeColorB_ = 0.1f;
