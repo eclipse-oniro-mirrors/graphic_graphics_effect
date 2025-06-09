@@ -21,10 +21,6 @@
 
 #include "effect/color_matrix.h"
 
-#ifdef USE_M133_SKIA
-#include "include/core/SkM44.h"
-#endif
-
 namespace OHOS {
 namespace Rosen {
 // Advanced Filter
