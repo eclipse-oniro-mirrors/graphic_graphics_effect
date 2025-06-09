@@ -28,6 +28,10 @@
 #include "utils/matrix.h"
 #include "utils/rect.h"
 
+#ifdef USE_M133_SKIA
+#include "include/core/SkM44.h"
+#endif
+
 namespace OHOS {
 namespace Rosen {
 
