@@ -190,6 +190,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             if (tag == GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR) {
                 edgeLightParams_->useRawColor = param;
             }
+            if (tag == GE_FILTER_EDGE_LIGHT_BLOOM) {
+                edgeLightParams_->bloom = param;
+            }
             break;
         }
         default:
