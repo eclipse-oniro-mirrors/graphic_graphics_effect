@@ -44,12 +44,11 @@ public:
 };
 
 void GEMESABlurShaderFilterTest::SetUpTestCase(void) {}
+
 void GEMESABlurShaderFilterTest::TearDownTestCase(void) {}
 
 void GEMESABlurShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -58,7 +57,7 @@ void GEMESABlurShaderFilterTest::SetUp()
     src_ = image_->GetImageInfo().GetBound();
 }
 
-void GEMESABlurShaderFilterTest::TearDown() {}
+void GEMESABlurShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: GetRadius_001

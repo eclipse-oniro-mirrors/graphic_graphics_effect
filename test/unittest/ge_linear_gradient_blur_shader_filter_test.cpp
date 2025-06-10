@@ -44,12 +44,11 @@ public:
 };
 
 void GELinearGradientBlurShaderFilterTest::SetUpTestCase(void) {}
+
 void GELinearGradientBlurShaderFilterTest::TearDownTestCase(void) {}
 
 void GELinearGradientBlurShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -57,7 +56,7 @@ void GELinearGradientBlurShaderFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GELinearGradientBlurShaderFilterTest::TearDown() {}
+void GELinearGradientBlurShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: GetDescription_001

@@ -35,6 +35,7 @@ public:
 };
 
 void GEVisualEffectImplTest::SetUpTestCase(void) {}
+
 void GEVisualEffectImplTest::TearDownTestCase(void) {}
 
 void GEVisualEffectImplTest::SetUp() {}

@@ -34,6 +34,7 @@ public:
 };
 
 void GESystemPropertiesTest::SetUpTestCase(void) {}
+
 void GESystemPropertiesTest::TearDownTestCase(void) {}
 
 void GESystemPropertiesTest::SetUp() {}

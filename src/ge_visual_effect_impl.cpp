@@ -334,7 +334,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::array<Drawi
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<float> param)
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<float>& param)
 {
     switch (filterType_) {
         case FilterType::COLOR_GRADIENT: {

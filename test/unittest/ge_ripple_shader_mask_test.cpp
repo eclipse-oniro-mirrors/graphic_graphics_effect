@@ -33,9 +33,11 @@ public:
 };
 
 void GERippleShaderMaskTest::SetUpTestCase(void) {}
+
 void GERippleShaderMaskTest::TearDownTestCase(void) {}
 
 void GERippleShaderMaskTest::SetUp() {}
+
 void GERippleShaderMaskTest::TearDown() {}
 
 /**
