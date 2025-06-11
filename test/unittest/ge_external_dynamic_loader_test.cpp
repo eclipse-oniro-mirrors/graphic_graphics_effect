@@ -42,17 +42,12 @@ public:
 };
 
 void GEExternalDynamicLoaderTest::SetUpTestCase(void) {}
+
 void GEExternalDynamicLoaderTest::TearDownTestCase(void) {}
 
-void GEExternalDynamicLoaderTest::SetUp()
-{
-    testLoader_ = &GEExternalDynamicLoader::GetInstance();
-}
+void GEExternalDynamicLoaderTest::SetUp() { testLoader_ = &GEExternalDynamicLoader::GetInstance(); }
 
-void GEExternalDynamicLoaderTest::TearDown()
-{
-    testLoader_ = nullptr;
-}
+void GEExternalDynamicLoaderTest::TearDown() { testLoader_ = nullptr; }
 
 /**
  * @tc.name: DynamicLoader_Test_001

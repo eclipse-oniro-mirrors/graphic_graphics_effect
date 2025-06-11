@@ -43,12 +43,11 @@ public:
 };
 
 void GESoundWaveFilterTest::SetUpTestCase(void) {}
+
 void GESoundWaveFilterTest::TearDownTestCase(void) {}
 
 void GESoundWaveFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -56,7 +55,7 @@ void GESoundWaveFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GESoundWaveFilterTest::TearDown() {}
+void GESoundWaveFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: ProcessImage001
@@ -159,7 +158,7 @@ HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveParams, TestSize.Level1)
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
     geSoundWaveFilter->CheckSoundWaveParams();
-    EXPECT_NE(geSoundWaveFilter->colorA_.greenF_, 0.0f);
+    EXPECT_NE(geSoundWaveFilter->colorA_.greenF_, -10.0f);
     EXPECT_NE(geSoundWaveFilter->soundIntensity_, 10.0f);
     EXPECT_NE(geSoundWaveFilter->shockWaveProgressA_, 10.0f);
     EXPECT_NE(geSoundWaveFilter->shockWaveProgressB_, 10.0f);

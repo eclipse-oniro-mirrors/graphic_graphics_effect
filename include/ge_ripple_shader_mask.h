@@ -28,7 +28,7 @@ namespace Drawing {
 
 class GE_EXPORT GERippleShaderMask : public GEShaderMask {
 public:
-    GERippleShaderMask(GERippleShaderMaskParams param);
+    GERippleShaderMask(const GERippleShaderMaskParams& param);
     GERippleShaderMask(const GERippleShaderMask&) = delete;
     virtual ~GERippleShaderMask() = default;
 

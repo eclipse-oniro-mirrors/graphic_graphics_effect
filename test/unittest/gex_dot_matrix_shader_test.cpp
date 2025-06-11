@@ -36,6 +36,7 @@ public:
 };
  
 void GEXDotMatrixShaderTest::SetUpTestCase(void) {}
+
 void GEXDotMatrixShaderTest::TearDownTestCase(void) {}
  
 void GEXDotMatrixShaderTest::SetUp() {}

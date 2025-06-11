@@ -76,7 +76,7 @@ public:
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
-    void SetParam(const std::string& tag, const std::vector<float> param);
+    void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
 
