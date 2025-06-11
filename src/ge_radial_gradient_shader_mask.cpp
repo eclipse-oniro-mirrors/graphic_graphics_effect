@@ -290,7 +290,7 @@ std::shared_ptr<ShaderEffect> GERadialGradientShaderMask::GenerateShaderEffect(f
 
     bool success = true;
     for (size_t i = 1; i < colorSize; i++) {
-        success &&= position[i] >= position[i - 1];
+        success = success && (position[i] >= position[i - 1]);
     }
     if (!success) {
         return nullptr;
