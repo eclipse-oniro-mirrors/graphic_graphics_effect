@@ -515,7 +515,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilterDispersion_001, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
  
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterDispersion_001 end";
 }

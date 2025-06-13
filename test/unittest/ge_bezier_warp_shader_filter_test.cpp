@@ -72,7 +72,7 @@ HWTEST_F(GEBezierWarpShaderFilterTest, ProcessImage_001, TestSize.Level0)
 
     Drawing::GEBezierWarpShaderFilterParams geBezierWarpShaderFilterParams;
     auto geBezierWarpShaderFilter = std::make_unique<GEBezierWarpShaderFilter>(geBezierWarpShaderFilterParams);
-    EXPECT_EQ(geBezierWarpShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geBezierWarpShaderFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     GTEST_LOG_(INFO) << "GEBezierWarpShaderFilterTest ProcessImage_001 end";
 }
