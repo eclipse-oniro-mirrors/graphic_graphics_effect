@@ -55,6 +55,7 @@ public:
         EDGE_LIGHT,
         BEZIER_WARP,
         DISPERSION,
+        BORDER_LIGHT,
         MAX
     };
 
