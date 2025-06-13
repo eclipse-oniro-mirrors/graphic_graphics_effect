@@ -23,6 +23,8 @@
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
 
+#include "common/rs_vector3.h"
+#include "common/rs_vector4.h"
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
@@ -56,6 +58,7 @@ public:
         EDGE_LIGHT,
         BEZIER_WARP,
         DISPERSION,
+        CONTENT_LIGHT,
         MAX
     };
 
@@ -80,6 +83,8 @@ public:
     void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
+    void SetParam(const std::string& tag, const Vector3f& param);
+    void SetParam(const std::string& tag, const Vector4f& param);
 
     void SetFilterType(FilterType type)
     {
@@ -221,6 +226,16 @@ public:
         return dispersionParams_;
     }
 
+    void MakeContentLightParams()
+    {
+        contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
+    }
+
+    const std::shared_ptr<GEContentLightFilterParams>& GetContentLightParams() const
+    {
+        return contentLightParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -238,6 +253,7 @@ private:
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
+    void SetContentLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -259,6 +275,7 @@ private:
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
+    std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
 };
 
 } // namespace Drawing

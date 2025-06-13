@@ -19,6 +19,7 @@
 #include <vector>
 #include <utility>
 
+#include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 #include "utils/matrix.h"
 #include "ge_shader_mask.h"
@@ -280,6 +281,18 @@ struct GERadialGradientShaderMaskParams {
     float radiusY_ = 0.f;
     std::vector<float> colors_;
     std::vector<float> positions_;
+};
+
+constexpr char GE_FILTER_CONTENT_LIGHT[] = "CONTENT_LIGHT";
+constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "CONTENT_LIGHT_POSITION";
+constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "CONTENT_LIGHT_COLOR";
+constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "CONTENT_LIGHT_INTENSITY";
+constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGEL[] = "CONTENT_LIGHT_ROTATION_ANGEL";
+struct GEContentLightFilterParams {
+    Vector3f lightPosition;
+    Vector4f lightColor;
+    float lightIntensity;
+    Vector3f rotationAngle;
 };
 
 } // namespace Drawing

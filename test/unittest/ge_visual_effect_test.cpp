@@ -165,6 +165,31 @@ HWTEST_F(GEVisualEffectTest, SetParam_006, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_006 end";
 }
 
+/**
+ * @tc.name: SetParam_007
+ * @tc.desc: Verify the SetParam Vector3f Vector4f
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetParam_007, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_007 start";
+ 
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_CONTENT_LIGHT);
+    visualEffect->visualEffectImpl_->contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::CONTENT_LIGHT;
+    
+    Vector3f lightPosition = Vector3f(0.0f, 0.f, 0.0f);
+    visualEffect->SetParam(GE_FILTER_CONTENT_LIGHT_POSITION, lightPosition);
+    bool ret = visualEffect->visualEffectImpl_->contentLightParams_->lightPosition == lightPosition;
+    EXPECT_TRUE(ret);
+ 
+    Vector4f lightColor = Vector4f(0.2f, 0.4f, 0.6f, 0.5f);
+    visualEffect->SetParam(GE_FILTER_CONTENT_LIGHT_COLOR, lightColor);
+    ret = visualEffect->visualEffectImpl_->contentLightParams_->lightColor == lightColor;
+    EXPECT_TRUE(ret);
+ 
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_007 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
