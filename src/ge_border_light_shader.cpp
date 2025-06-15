@@ -64,7 +64,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             const float cornerRadius = 30.0;
             const float boundaryThickness = 5.0;
 
-            // 计算圆角矩形SDF
             float sdRoundedBox(vec2 p, vec2 b, float r)
             {
                 vec2 q = abs(p)-b+r;
