@@ -31,6 +31,7 @@ struct GE_EXPORT BorderLightParams {
     float lightWidth_;
     Vector3f rotationAngle_;
 };
+
 class GE_EXPORT GEBorderLightShader : public GEShader {
 public:
     GEBorderLightShader();
