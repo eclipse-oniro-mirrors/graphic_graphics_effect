@@ -39,7 +39,7 @@ public:
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
 private:
-    void GetContentLightEffect();
+    void GenerateContentLightEffect();
     static std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_;
     
     Vector3f lightPosition_;
