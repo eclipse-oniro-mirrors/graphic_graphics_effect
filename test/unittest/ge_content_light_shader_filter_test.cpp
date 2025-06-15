@@ -114,20 +114,20 @@ HWTEST_F(GEContentLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
 }
 
 /**
- * @tc.name: GetContentLightEffect_001
- * @tc.desc: Verify the GetContentLightEffect
+ * @tc.name: GenerateContentLightEffect_001
+ * @tc.desc: Verify the GenerateContentLightEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GEContentLightShaderFilterTest, GetContentLightEffect_001, TestSize.Level0)
+HWTEST_F(GEContentLightShaderFilterTest, GenerateContentLightEffect_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GetContentLightEffect_001 start";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GenerateContentLightEffect_001 start";
 
     Drawing::GEContentLightFilterParams params;
     auto filter = std::make_unique<GEContentLightFilter>(params);
-    filter->GetContentLightEffect();
+    filter->GenerateContentLightEffect();
     EXPECT_NE(filter->contentLightShaderEffect_, nullptr);
 
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GetContentLightEffect_001 end";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GenerateContentLightEffect_001 end";
 }
 } // namespace Rosen
 } // namespace OHOS
