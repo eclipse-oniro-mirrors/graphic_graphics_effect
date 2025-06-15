@@ -26,7 +26,7 @@ constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 constexpr size_t NUM_4 = 4;
 
-std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightEffect = nullptr;
+std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShaderEffect_ = nullptr;
 
 GEContentLightFilter::GEContentLightFilter(const Drawing::GEContentLightFilterParams& params)
     : lightPosition_(params.lightPosition), lightColor_(params.lightColor), lightIntensity_(params.lightIntensity),
@@ -171,7 +171,7 @@ void GEContentLightFilter::GetContentLightEffect()
         }
 
     )";
-    if (contentLightShaderEffect_){
+    if (contentLightShaderEffect_) {
         contentLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(shaderStringContentLight);
     }
 }
