@@ -58,8 +58,8 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canv
     builder.SetUniform("iResolution", width, height);
     builder.SetUniform("lightIntensity", lightIntensity_);
     builder.SetUniform("lightPosition", lightPosition_[NUM_0], lightPosition_[NUM_1], lightPosition_[NUM_2]);
-    builder.SetUniform("lightColor", lightColor, 4);
-    builder.SetUniform("contentRotationAngle", rotationAngle_[0], rotationAngle_[1], rotationAngle_[2]);
+    builder.SetUniform("lightColor", lightColor, NUM_4);
+    builder.SetUniform("contentRotationAngle", rotationAngle_[NUM_0], rotationAngle_[NUM_1], rotationAngle_[NUM_2]);
 #ifdef RS_ENABLE_GPU
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 #else
