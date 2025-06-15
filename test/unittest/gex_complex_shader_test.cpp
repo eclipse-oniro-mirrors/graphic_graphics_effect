@@ -36,8 +36,11 @@ public:
 };
 
 void GEXComplexShaderTest::SetUpTestCase() {}
+
 void GEXComplexShaderTest::TearDownTestCase() {}
+
 void GEXComplexShaderTest::SetUp() {}
+
 void GEXComplexShaderTest::TearDown() {}
 
 /**

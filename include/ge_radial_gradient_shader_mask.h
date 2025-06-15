@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_RIPPLE_MASK_H
-#define GRAPHICS_EFFECT_GE_RIPPLE_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H
+#define GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H
 
 #include "draw/canvas.h"
 #include "ge_shader_mask.h"
@@ -26,22 +26,24 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-class GE_EXPORT GERippleShaderMask : public GEShaderMask {
+class GE_EXPORT GERadialGradientShaderMask : public GEShaderMask {
 public:
-    GERippleShaderMask(const GERippleShaderMaskParams& param);
-    GERippleShaderMask(const GERippleShaderMask&) = delete;
-    virtual ~GERippleShaderMask() = default;
+    GERadialGradientShaderMask(GERadialGradientShaderMaskParams param);
+    GERadialGradientShaderMask(const GERadialGradientShaderMask&) = delete;
+    virtual ~GERadialGradientShaderMask() = default;
 
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
 private:
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRippleShaderMaskBuilder() const;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRippleShaderNormalMaskBuilder() const;
-    GERippleShaderMaskParams param_;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRadialGradientShaderMaskBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRadialGradientNormalMaskBuilder() const;
+    std::shared_ptr<ShaderEffect> GenerateShaderEffect(float width, float height,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+    GERadialGradientShaderMaskParams param_;
 };
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_RIPPLE_MASK_H
+#endif // GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H

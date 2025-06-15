@@ -12,39 +12,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GRAPHICS_EFFECT_EDGE_LIGHT_SHADER_FILTER_H
-#define GRAPHICS_EFFECT_EDGE_LIGHT_SHADER_FILTER_H
+#ifndef GRAPHICS_EFFECT_GE_CONTENT_LIGHT_FILTER_H
+#define GRAPHICS_EFFECT_GE_CONTENT_LIGHT_FILTER_H
 
 #include <memory>
-#include <optional>
 
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
-#include "draw/color.h"
+
+#include "draw/canvas.h"
+#include "effect/color_filter.h"
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+#include "image/image.h"
+#include "utils/matrix.h"
 #include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {
-
-class GE_EXPORT GEEdgeLightShaderFilter : public GEShaderFilter {
+class GEContentLightFilter : public GEShaderFilter {
 public:
-    GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
-    ~GEEdgeLightShaderFilter() override = default;
+    GE_EXPORT GEContentLightFilter(const Drawing::GEContentLightFilterParams& params);
+    ~GEContentLightFilter() override = default;
 
-    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
-protected:
-    float alpha_ = 1.0f;
-    bool bloom_ = true;
-    float edgeColorR_ = 0.2f;
-    float edgeColorG_ = 0.7f;
-    float edgeColorB_ = 0.1f;
-    std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
-    bool useRawColor_ = false;
+private:
+    void GenerateContentLightEffect();
+    static std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_;
+    
+    Vector3f lightPosition_;
+    Vector4f lightColor_;
+    float lightIntensity_;
+    Vector3f rotationAngle_;
 };
 
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_EDGE_LIGHT_SHADER_FILTER_H
+#endif // GRAPHICS_EFFECT_GE_CONTENT_LIGHT_FILTER_H

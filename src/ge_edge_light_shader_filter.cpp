@@ -30,6 +30,7 @@ namespace {
 GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params)
 {
     alpha_ = params.alpha;
+    bloom_ = params.bloom;
     edgeColorR_ = params.edgeColorR;
     edgeColorG_ = params.edgeColorG;
     edgeColorB_ = params.edgeColorB;

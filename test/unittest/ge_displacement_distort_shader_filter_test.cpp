@@ -42,9 +42,19 @@ public:
 };
  
 void GEDisplacementDistortShaderFilterTest::SetUpTestCase(void) {}
+
 void GEDisplacementDistortShaderFilterTest::TearDownTestCase(void) {}
-void GEDisplacementDistortShaderFilterTest::SetUp() {}
-void GEDisplacementDistortShaderFilterTest::TearDown() {}
+
+void GEDisplacementDistortShaderFilterTest::SetUp()
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format); // 50, 50  bitmap size
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    image_ = bmp.MakeImage();
+}
+
+void GEDisplacementDistortShaderFilterTest::TearDown() { image_ = nullptr; }
  
 /**
  * @tc.name: ProcessImage_001
@@ -55,7 +65,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, ProcessImage_001, TestSize.Level
 {
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_EQ(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 }
  
 /**
@@ -68,7 +78,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, ProcessImage_002, TestSize.Level
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     geDisplacementDistortFilterParams.factor_ = {0.5f, 0.5f};
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_EQ(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**

@@ -29,6 +29,7 @@
 #include "ge_sound_wave_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_edge_light_shader_filter.h"
+#include "ge_content_light_shader_filter.h"
 
 
 namespace OHOS {
@@ -202,6 +203,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             }
             case Drawing::GEVisualEffectImpl::FilterType::DISPERSION: {
                 shaderFilter = GenerateExtShaderFilter(ve);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::CONTENT_LIGHT: {
+                const auto& contentLightParams = ve->GetContentLightParams();
+                shaderFilter = std::make_shared<GEContentLightFilter>(*contentLightParams);
                 break;
             }
             default:

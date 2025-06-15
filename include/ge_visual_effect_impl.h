@@ -23,6 +23,8 @@
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
 
+#include "common/rs_vector3.h"
+#include "common/rs_vector4.h"
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
@@ -47,6 +49,7 @@ public:
         // Mask
         RIPPLE_MASK,
         PIXEL_MAP_MASK,
+        RADIAL_GRADIENT_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
@@ -55,6 +58,7 @@ public:
         EDGE_LIGHT,
         BEZIER_WARP,
         DISPERSION,
+        CONTENT_LIGHT,
         BORDER_LIGHT,
         MAX
     };
@@ -77,9 +81,11 @@ public:
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
-    void SetParam(const std::string& tag, const std::vector<float> param);
+    void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
+    void SetParam(const std::string& tag, const Vector3f& param);
+    void SetParam(const std::string& tag, const Vector4f& param);
 
     void SetFilterType(FilterType type)
     {
@@ -221,6 +227,16 @@ public:
         return dispersionParams_;
     }
 
+    void MakeContentLightParams()
+    {
+        contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
+    }
+
+    const std::shared_ptr<GEContentLightFilterParams>& GetContentLightParams() const
+    {
+        return contentLightParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -234,9 +250,11 @@ private:
 
     void SetWaterRippleParams(const std::string& tag, float param);
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
+    void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
+    void SetContentLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -251,12 +269,14 @@ private:
     std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
 
+    std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
+    std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
 };
 
 } // namespace Drawing

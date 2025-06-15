@@ -56,12 +56,11 @@ public:
 };
 
 void GEKawaseBlurShaderFilterTest::SetUpTestCase(void) {}
+
 void GEKawaseBlurShaderFilterTest::TearDownTestCase(void) {}
 
 void GEKawaseBlurShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -70,7 +69,7 @@ void GEKawaseBlurShaderFilterTest::SetUp()
     src_ = image_->GetImageInfo().GetBound();
 }
 
-void GEKawaseBlurShaderFilterTest::TearDown() {}
+void GEKawaseBlurShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: GetRadius_001

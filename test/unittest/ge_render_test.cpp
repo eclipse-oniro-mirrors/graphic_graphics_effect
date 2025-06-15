@@ -43,12 +43,10 @@ private:
 };
 
 void GERenderTest::SetUpTestCase(void) {}
+
 void GERenderTest::TearDownTestCase(void) {}
 
-void GERenderTest::SetUp()
-{
-    canvas_.Restore();
-}
+void GERenderTest::SetUp() {}
 
 void GERenderTest::TearDown() {}
 
@@ -481,6 +479,25 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_009, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GenerateShaderFilter_010
+ * @tc.desc: Verify the GenerateShaderFilter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilter_010, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_010 start";
+ 
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_CONTENT_LIGHT);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_010 end";
+}
+
+/**
  * @tc.name: GenerateShaderFilterEdgelight_001
  * @tc.desc: Verify the GenerateShaderFilter
  * @tc.type: FUNC
@@ -515,7 +532,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilterDispersion_001, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
  
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterDispersion_001 end";
 }

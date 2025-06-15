@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-GERippleShaderMask::GERippleShaderMask(GERippleShaderMaskParams param) : param_(param) {}
+GERippleShaderMask::GERippleShaderMask(const GERippleShaderMaskParams& param) : param_(param) {}
 
 std::shared_ptr<ShaderEffect> GERippleShaderMask::GenerateDrawingShader(float width, float height) const
 {

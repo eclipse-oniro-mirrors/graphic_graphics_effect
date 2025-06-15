@@ -43,12 +43,11 @@ public:
 };
 
 void GEGreyShaderFilterTest::SetUpTestCase(void) {}
+
 void GEGreyShaderFilterTest::TearDownTestCase(void) {}
 
 void GEGreyShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -56,7 +55,7 @@ void GEGreyShaderFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GEGreyShaderFilterTest::TearDown() {}
+void GEGreyShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: ProcessImage_001

@@ -84,7 +84,7 @@ void GEVisualEffect::SetParam(const std::string& tag, uint32_t param)
     visualEffectImpl_->SetParam(tag, param);
 }
 
-void GEVisualEffect::SetParam(const std::string& tag, const std::vector<float> param)
+void GEVisualEffect::SetParam(const std::string& tag, const std::vector<float>& param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }
@@ -95,6 +95,16 @@ void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Draw
 }
 
 void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Color4f& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const Vector3f& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }

@@ -18,6 +18,7 @@
 #include <memory>
 #include <vector>
 
+#include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
@@ -55,9 +56,11 @@ public:
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
-    void SetParam(const std::string& tag, const std::vector<float> param);
+    void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
+    void SetParam(const std::string& tag, const Vector3f& param);
+    void SetParam(const std::string& tag, const Vector4f& param);
 
     const std::string& GetName() const
     {

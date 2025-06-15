@@ -29,8 +29,8 @@ public:
     GEShaderMask() = default;
     GEShaderMask(const GEShaderMask&) = delete;
     virtual ~GEShaderMask() = default;
-    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const;
-    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
 };
 } // namespace Drawing
 } // namespace Rosen
