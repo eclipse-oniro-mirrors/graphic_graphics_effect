@@ -129,15 +129,15 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             mat3 GetRotationMatrix(vec3 rotAngle)
             {
                 rotAngle *= 3.1415926 / 180.0;
-                mat3 Rx = mat3 {1.0, 0.0, 0.0,
+                mat3 Rx = mat3 (1.0, 0.0, 0.0,
                                 0.0, cos(rotAngle.x), -sin(rotAngle.x),
-                                0.0, sin(rotAngle.x), cos(rotAngle.x)};
-                mat3 Ry = mat3 {cos(rotAngle.y), 0.0, sin(rotAngle.y),
+                                0.0, sin(rotAngle.x), cos(rotAngle.x));
+                mat3 Ry = mat3 (cos(rotAngle.y), 0.0, sin(rotAngle.y),
                                 0.0, 1.0, 0.0,
-                                -sin(rotAngle.y), 0.0, cos(rotAngle.y)};
-                mat3 Rz = mat3 {cos(rotAngle.z), -sin(rotAngle.z), 0.0,
+                                -sin(rotAngle.y), 0.0, cos(rotAngle.y));
+                mat3 Rz = mat3 (cos(rotAngle.z), -sin(rotAngle.z), 0.0,
                                 sin(rotAngle.z), cos(rotAngle.z), 0.0,
-                                0.0, 0.0, 1.0};
+                                0.0, 0.0, 1.0);
                 return Rz * Ry * Rx;
             }
 
