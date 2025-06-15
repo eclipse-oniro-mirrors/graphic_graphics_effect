@@ -16,7 +16,7 @@
 #include "ge_border_light_shader.h"
 #include "ge_visual_effect_impl.h"
 
-namespace OHOS{
+namespace OHOS {
 namespace Rosen {
 
 constexpr size_t NUM_0 = 0;
@@ -141,7 +141,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 return Rz * Ry * Rx;
             }
 
-            vec4 main(vec2 fragCoord )
+            vec4 main(vec2 fragCoord)
             {
                 vec2 uv = fragCoord / iResolution.xy;
                 uv = uv + uv - 1.0;
@@ -159,7 +159,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             }
         )";
         borderLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
-
     }
 
     if (borderLightShaderEffect_ == nullptr) {
@@ -184,7 +183,6 @@ std::shared_ptr<Drawing::ShaderEffect> GEBorderLightShader::MakeBorderLightShade
     builder_->SetUniform("lightWidth", borderLightParams_.lightWidth_);
     builder_->SetUniform("borderLightRotationAngle", borderLightParams_.rotationAngle_[NUM_0],
         borderLightParams_.rotationAngle_[NUM_1], borderLightParams_.rotationAngle_[NUM_2]);
-
     auto borderLightShader = builder_->MakeShader(nullptr, false);
 
     if (borderLightShader == nullptr) {
