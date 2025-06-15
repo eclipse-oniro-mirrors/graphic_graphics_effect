@@ -111,7 +111,7 @@ ohos_unittest("GraphicsEffectTest") {
   sources = [
     "ge_aibar_shader_filter_test.cpp",
     "ge_bezier_warp_shader_filter_test.cpp",
-    "ge_border_light_shader_test.cpp"
+    "ge_border_light_shader_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
     "ge_displacement_distort_shader_filter_test.cpp",
     "ge_edge_light_shader_filter_test.cpp",
