@@ -126,8 +126,5 @@ HWTEST_F(GEBorderLightShaderTest, GEBorderLightShaderTest006, TestSize.Level1)
     shader->MakeDrawingShader(rect, 0.75f);
     shader->SetBorderLightParams(params);
 }
-
-
-
 }  // namespace Rosen
 }  // namespace OHOS
