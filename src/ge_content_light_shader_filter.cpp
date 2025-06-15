@@ -49,7 +49,7 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canv
     if (height < 1e-6 || width < 1e-6) {
         return nullptr;
     }
-    GetContentLightEffect();
+    GenerateContentLightEffect();
 
     float lightColor[NUM_4] = {lightColor_[NUM_0], lightColor_[NUM_1], lightColor_[NUM_2], lightColor_[NUM_3]};
     Drawing::RuntimeShaderBuilder builder(contentLightShaderEffect_);
@@ -71,7 +71,7 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canv
     return invertedImage;
 }
 
-void GEContentLightFilter::GetContentLightEffect()
+void GEContentLightFilter::GenerateContentLightEffect()
 {
     const std::string shaderStringContentLight = R"(
         uniform shader image;
