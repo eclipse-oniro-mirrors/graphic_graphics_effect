@@ -175,7 +175,7 @@ HWTEST_F(GEVisualEffectTest, SetParam_007, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_007 start";
  
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_CONTENT_LIGHT);
-    visualEffect->visualEffectImpl_->contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
+    visualEffect->visualEffectImpl_->MakeContentLightParams();
     visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::CONTENT_LIGHT;
     
     Vector3f lightPosition = Vector3f(0.0f, 0.f, 0.0f);
