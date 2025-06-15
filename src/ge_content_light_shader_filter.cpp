@@ -53,7 +53,7 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canv
     GetContentLightEffect();
 
     float lightColor[NUM_4] = {lightColor_[NUM_0], lightColor_[NUM_1], lightColor_[NUM_2], lightColor_[NUM_3]};
-    Drawing::RuntimeShaderBuilder builder(contentLight);
+    Drawing::RuntimeShaderBuilder builder(contentLightShaderEffect_);
     builder.SetChild("image", shader);
     builder.SetUniform("iResolution", width, height);
     builder.SetUniform("lightIntensity", lightIntensity_);
@@ -133,8 +133,8 @@ void GEContentLightFilter::GetContentLightEffect()
             return Rz * Ry * Rx;
         }
 
-        vec4 ContentShinning(vec2 uv, vec4 specularColor, float shinning, vec3 lightPos,
-            vec3 viewPos, mat3 rotM, float maskAlpha)
+        vec4 ContentShinning(
+            vec2 uv, vec4 specularColor, float shinning, vec3 lightPos, vec3 viewPos, mat3 rotM, float maskAlpha)
         {
             vec3 fragPos = vec3(uv, 0.0);
             vec4 normal = createContentNormal(uv, maskAlpha);
@@ -171,7 +171,7 @@ void GEContentLightFilter::GetContentLightEffect()
         }
 
     )";
-    if (contentLightShaderEffect_) {
+    if (contentLightShaderEffect_ == nullptr) {
         contentLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(shaderStringContentLight);
     }
 }

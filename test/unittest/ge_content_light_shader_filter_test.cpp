@@ -124,8 +124,8 @@ HWTEST_F(GEContentLightShaderFilterTest, GetContentLightEffect_001, TestSize.Lev
 
     Drawing::GEContentLightFilterParams params;
     auto filter = std::make_unique<GEContentLightFilter>(params);
-    auto contentLightEffect = filter->GetContentLightEffect();
-    EXPECT_NE(contentLightEffect, nullptr);
+    filter->GetContentLightEffect();
+    EXPECT_NE(filter->contentLightShaderEffect_, nullptr);
 
     GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GetContentLightEffect_001 end";
 }
