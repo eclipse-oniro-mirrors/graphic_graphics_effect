@@ -474,7 +474,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             if (tag == GE_FILTER_CONTENT_LIGHT_POSITION) {
                 contentLightParams_->lightPosition = param;
             }
-            if (tag == GE_FILTER_CONTENT_LIGHT_ROTATION_ANGEL) {
+            if (tag == GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE) {
                 contentLightParams_->rotationAngle = param;
             }
             break;
