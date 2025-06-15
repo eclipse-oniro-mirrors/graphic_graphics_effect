@@ -19,6 +19,7 @@
 #include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
 #include "common/rs_vector4.h"
+#include "common/rs_vector3.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -101,6 +102,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::DISPERSION);
             impl->MakeDispersionParams();
+        }
+    },
+    { GE_FILTER_CONTENT_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTENT_LIGHT);
+            impl->MakeContentLightParams();
         }
     }
 };
@@ -248,6 +255,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::DISPERSION: {
             SetDispersionParams(tag, param);
+            break;
+        }
+        case FilterType::CONTENT_LIGHT: {
+            SetContentLightParams(tag, param);
             break;
         }
         default:
@@ -445,6 +456,43 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_FILTER_DISPERSION_MASK) {
                 dispersionParams_->mask = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
+{
+    switch (filterType_) {
+        case FilterType::CONTENT_LIGHT: {
+            if (contentLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_CONTENT_LIGHT_POSITION) {
+                contentLightParams_->lightPosition = param;
+            }
+            if (tag == GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE) {
+                contentLightParams_->rotationAngle = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
+{
+    switch (filterType_) {
+        case FilterType::CONTENT_LIGHT: {
+            if (contentLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_CONTENT_LIGHT_COLOR) {
+                contentLightParams_->lightColor = param;
             }
             break;
         }
@@ -769,6 +817,23 @@ void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param
             [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetY = p; } },
     };
 
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetContentLightParams(const std::string& tag, float param)
+{
+    if (contentLightParams_ == nullptr) {
+        return;
+    }
+ 
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_CONTENT_LIGHT_INTENSITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentLightParams_->lightIntensity = p; } },
+    };
+ 
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);

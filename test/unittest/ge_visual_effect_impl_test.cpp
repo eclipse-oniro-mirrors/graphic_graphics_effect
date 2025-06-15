@@ -659,6 +659,33 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_017, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_020
+ * @tc.desc: Verify function SetParam for param is content light
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplTest("");
+    float lightIntensity = 0.5f;
+    geVisualEffectImplTest.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_INTENSITY, lightIntensity);
+    EXPECT_EQ(geVisualEffectImplTest.GetContentLightParams(), nullptr);
+ 
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_CONTENT_LIGHT);
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::CONTENT_LIGHT);
+ 
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_INTENSITY, lightIntensity);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightIntensity, lightIntensity);
+ 
+    Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_POSITION, lightPosition);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightPosition, lightPosition);
+ 
+    Vector4f lightColor = Vector4f(0.3f, 0.6f, 0.9f, 0.0f);
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_COLOR, lightColor);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightColor, lightColor);
+}
+
+/**
  * @tc.name: SetAllParam_001
  * @tc.desc: Verify function Set All Param for param is nullptr
  * @tc.type:FUNC
@@ -740,6 +767,27 @@ HWTEST_F(GEVisualEffectImplTest, SetColorGradientParam_002, TestSize.Level1)
     geVisualEffectImpl.SetParam("", param);
     EXPECT_NE(geVisualEffectImpl1.GetColorGradientParams(), nullptr);
     EXPECT_TRUE(geVisualEffectImpl1.GetColorGradientParams()->colors.empty());
+}
+
+/**
+ * @tc.name: SetContentLightParams_001
+ * @tc.desc: Verify function Set ContentLight Param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetContentLightParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    float param = 0.5f;
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams(), nullptr);
+ 
+    Drawing::GEVisualEffectImpl geVisualEffectImpl1(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_EQ(geVisualEffectImpl1.GetContentLightParams(), nullptr);
+ 
+    geVisualEffectImpl1.MakeContentLightParams();
+    geVisualEffectImpl.SetParam("", param);
+    EXPECT_NE(geVisualEffectImpl1.GetContentLightParams(), nullptr);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
