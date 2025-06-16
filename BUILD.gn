@@ -60,6 +60,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ext/gex_complex_shader.cpp",
     "src/ge_aibar_shader_filter.cpp",
     "src/ge_bezier_warp_shader_filter.cpp",
+    "src/ge_border_light_shader.cpp",
     "src/ge_color_gradient_shader_filter.cpp",
     "src/ge_content_light_shader_filter.cpp",
     "src/ge_displacement_distort_shader_filter.cpp",
