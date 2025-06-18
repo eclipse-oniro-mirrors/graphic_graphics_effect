@@ -295,6 +295,41 @@ struct GEContentLightFilterParams {
     Vector3f rotationAngle;
 };
 
+// Declare same with in rs_render_shader_base.h
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT[] = "ContourDiagonalFlowLight";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR[] = "ContourDiagonalFlowLight_Contour";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_START[] = "ContourDiagonalFlowLight_Line1Start";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_LENGTH[] = "ContourDiagonalFlowLight_Line1Length";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR[] = "ContourDiagonalFlowLight_Line1Color";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START[] = "ContourDiagonalFlowLight_Line2Start";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH[] = "ContourDiagonalFlowLight_Line2Length";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR[] = "ContourDiagonalFlowLight_Line2Color";
+struct GEContentDiagonalFlowLightShaderParams {
+    std::shared_ptr<Drawing::Path> contour_ = nullptr;
+    float line1Start_ = 0.f;
+    float line1Length_ = 0.f;
+    Vector4f line1Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);
+    float line2Start_ = 0.f;
+    float line2Length_ = 0.f;
+    Vector4f line2Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);
+};
+
+// Declare same with in rs_render_shader_base.h
+constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT[] = "WavyRippleLight";
+constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT_CENTER[] = "WavyRippleLight_Center";
+constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT_RIADIUS[] = "WavyRippleLight_Radius";
+struct GEWavyRippleLightShaderParams {
+    std::pair<float, float> center_ = {0.f, 0.f};
+    float radius_ = 0.f;
+};
+
+// Declare same with in rs_render_shader_base.h
+constexpr char GE_SHADER_AURORA_NOISE[] = "AuroraNoise";
+constexpr char GE_SHADER_AURORA_NOISE_VALUE[] = "AuroraNoise_Noise";
+struct GEAuroraNoiseShaderParams {
+    float noise_ = 0.f;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

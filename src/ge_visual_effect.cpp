@@ -54,6 +54,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const char* const param)
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Matrix param)
 {
     visualEffectImpl_->SetParam(tag, param);

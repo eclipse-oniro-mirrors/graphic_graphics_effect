@@ -40,6 +40,8 @@ class GE_EXPORT GERender {
 public:
     GERender();
     ~GERender();
+    void DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const Drawing::Rect& bounds);
 
     void DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
@@ -50,6 +52,8 @@ public:
         const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
 
 private:
+    std::vector<std::shared_ptr<GEShader>> GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer);
+
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilter(Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);

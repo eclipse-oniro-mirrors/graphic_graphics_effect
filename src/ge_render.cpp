@@ -218,5 +218,55 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
     return shaderFilters;
 }
 
+void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+    const Drawing::Rect& bounds)
+{
+    std::vector<std::shared_ptr<GEShader>> geShaderEffects = GenerateShaderEffect(veContainer);
+    for (auto geShaderEffect : geShaderEffects) {
+        if (geShaderEffect == nullptr) {
+            LOGD("GERender::DrawShaderEffect shader is null");
+            continue;
+        }
+        geShaderEffect->MakeDrawingShader(bounds, -1.f); // new flow not use progress
+        auto shader = geShaderEffect->GetDrawingShader();
+        Drawing::Brush brush;
+        brush.SetShaderEffect(shader);
+        canvas.AttachBrush(brush);
+        canvas.DrawRect(bounds);
+        canvas.DetachBrush();
+    }
+}
+
+std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer)
+{
+    LOGD("GERender::shaderEffects %{public}zu", veContainer.GetFilters().size());
+    std::vector<std::shared_ptr<GEShader>> shaderEffects;
+    for (auto vef : veContainer.GetFilters()) {
+        auto ve = vef->GetImpl();
+        std::shared_ptr<GEShader> shaderEffect;
+        LOGD("GERender::shaderEffects %{public}d", static_cast<int>(ve->GetFilterType()));
+        switch (ve->GetFilterType()) {
+            case Drawing::GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
+                const auto& params = ve->GetWavyRippleLightParams();
+                (void)params;
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT: {
+                const auto& params = ve->GetWavyRippleLightParams();
+                (void)params;
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::AURORA_NOISE: {
+                const auto& params = ve->GetAuroraNoiseParams();
+                (void)params;
+                break;
+            }
+            default:
+                break;
+        }
+        shaderEffects.push_back(shaderEffect);
+    }
+    return shaderEffects;
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

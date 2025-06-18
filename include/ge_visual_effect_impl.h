@@ -60,6 +60,9 @@ public:
         DISPERSION,
         CONTENT_LIGHT,
         BORDER_LIGHT,
+        CONTOUR_DIAGONAL_FLOW_LIGHT,
+        WAVY_RIPPLE_LIGHT,
+        AURORA_NOISE,
         MAX
     };
 
@@ -74,6 +77,7 @@ public:
     void SetParam(const std::string& tag, const char* const param);
 
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param);
     void SetParam(const std::string& tag, const Drawing::Matrix param);
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
@@ -237,6 +241,35 @@ public:
         return contentLightParams_;
     }
 
+    void MakeContentDiagonalParams()
+    {
+        contentDiagonalParams_ = std::make_shared<GEContentDiagonalFlowLightShaderParams>();
+    }
+
+    const std::shared_ptr<GEContentDiagonalFlowLightShaderParams>& GetContenDiagonalParams() const
+    {
+        return contentDiagonalParams_;
+    }
+
+    void MakeWavyRippleLightParams()
+    {
+        wavyRippleLightParams_ = std::make_shared<GEWavyRippleLightShaderParams>();
+    }
+
+    const std::shared_ptr<GEWavyRippleLightShaderParams>& GetWavyRippleLightParams() const
+    {
+        return wavyRippleLightParams_;
+    }
+
+    void MakeAuroraNoiseParams()
+    {
+        auroNoiseParams_ = std::make_shared<GEAuroraNoiseShaderParams>();
+    }
+
+    const std::shared_ptr<GEAuroraNoiseShaderParams>& GetAuroraNoiseParams() const
+    {
+        return auroNoiseParams_;
+    }
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
 
@@ -255,7 +288,11 @@ private:
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
     void SetContentLightParams(const std::string& tag, float param);
-
+    void SetContentDiagonalFlowParams(const std::string& tag, const Vector4f& param);
+    void SetContentDiagonalFlowParams(const std::string& tag, float param);
+    void SetWavyRippleLightParams(const std::string& tag, float param);
+    void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetAuroraNoiseParams(const std::string& tag, float param);
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
     // ShaderFilter Params
@@ -277,6 +314,10 @@ private:
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
     std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
+
+    std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
+    std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
+    std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
 };
 
 } // namespace Drawing
