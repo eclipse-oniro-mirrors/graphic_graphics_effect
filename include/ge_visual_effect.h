@@ -50,6 +50,7 @@ public:
 
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param) {}
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param) {}
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param);
     void SetParam(const std::string& tag, const Drawing::Matrix param);
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>);

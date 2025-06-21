@@ -109,6 +109,24 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTENT_LIGHT);
             impl->MakeContentLightParams();
         }
+    },
+    { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT);
+            impl->MakeContentDiagonalParams();
+        }
+    },
+    { GE_SHADER_WAVY_RIPPLE_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT);
+            impl->MakeWavyRippleLightParams();
+        }
+    },
+    { GE_SHADER_AURORA_NOISE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::AURORA_NOISE);
+            impl->MakeAuroraNoiseParams();
+        }
     }
 };
 
@@ -261,6 +279,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetContentLightParams(tag, param);
             break;
         }
+        case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
+            SetContentDiagonalFlowParams(tag, param);
+            break;
+        }
+        case FilterType::WAVY_RIPPLE_LIGHT: {
+            SetWavyRippleLightParams(tag, param);
+            break;
+        }
+        case FilterType::AURORA_NOISE: {
+            SetAuroraNoiseParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -271,6 +301,24 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, double param) {}
 void GEVisualEffectImpl::SetParam(const std::string& tag, const char* const param) {}
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param) {}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param)
+{
+    switch (filterType_) {
+        case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
+            if (contentDiagonalParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR) {
+                contentDiagonalParams_->contour_ = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param) {}
 
@@ -320,6 +368,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             if (tag == GE_MASK_RADIAL_GRADIENT_CENTER) {
                 radialGradientMaskParams_->center_ = param;
             }
+            break;
+        }
+        case FilterType::WAVY_RIPPLE_LIGHT: {
+            SetWavyRippleLightParams(tag, param);
             break;
         }
         default:
@@ -494,6 +546,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             if (tag == GE_FILTER_CONTENT_LIGHT_COLOR) {
                 contentLightParams_->lightColor = param;
             }
+            break;
+        }
+        case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
+            SetContentDiagonalFlowParams(tag, param);
             break;
         }
         default:
@@ -840,6 +896,70 @@ void GEVisualEffectImpl::SetContentLightParams(const std::string& tag, float par
     }
 }
 
+void GEVisualEffectImpl::SetContentDiagonalFlowParams(const std::string& tag, const Vector4f& param)
+{
+    if (contentDiagonalParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR) {
+        contentDiagonalParams_->line1Color_ = param;
+    }
+    if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR) {
+        contentDiagonalParams_->line2Color_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetContentDiagonalFlowParams(const std::string& tag, float param)
+{
+    if (contentDiagonalParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_START,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line1Start_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_LENGTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line1Length_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Start_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Length_ = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, float param)
+{
+    if (wavyRippleLightParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_WAVY_RIPPLE_LIGHT_RIADIUS) {
+        wavyRippleLightParams_->radius_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (wavyRippleLightParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_WAVY_RIPPLE_LIGHT_CENTER) {
+        wavyRippleLightParams_->center_ = param;
+    }
+}
+void GEVisualEffectImpl::SetAuroraNoiseParams(const std::string& tag, float param)
+{
+    if (auroNoiseParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_AURORA_NOISE_VALUE) {
+        auroNoiseParams_->noise_ = param;
+    }
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
