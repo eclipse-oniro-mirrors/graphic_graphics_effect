@@ -39,6 +39,9 @@ enum class GexComplexShaderType: uint32_t {
     LIGHT_CAVE,
     BACKGROUND_GRADIENT,
     BACKGROUND_GRADIENT_RIPPLE,
+    WAVY_RIPPLE_LIGHT,
+    AURORA_NOISE,
+    CONTOUR_DIAGONAL_FLOW_LIGHT,    
     MAX
 };
 
