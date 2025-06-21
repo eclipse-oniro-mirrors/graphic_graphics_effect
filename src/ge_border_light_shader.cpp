@@ -48,6 +48,11 @@ void GEBorderLightShader::SetRotationAngle(const Vector3f& rotationAngle)
     borderLightParams_.rotationAngle_ = rotationAngle;
 }
 
+void GEBorderLightShader::SetCornerRadius(const float cornerRadius)
+{
+    borderLightParams_.cornerRadius_ = cornerRadius;
+}
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLightBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> borderLightShaderEffect_ = nullptr;
@@ -60,8 +65,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             uniform half lightIntensity;
             uniform half lightWidth;
             uniform half3 borderLightRotationAngle;
+            uniform half cornerRadius;
 
-            const float cornerRadius = 30.0;
             const float boundaryThickness = 5.0;
 
             float sdRoundedBox(vec2 p, vec2 b, float r)
@@ -95,9 +100,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             vec4 createBoundNormal(vec2 pos) // pos in [-w, w] x [-1, 1]
             {
                 vec2 halfWH = vec2(iResolution.x, iResolution.y) / iResolution.y;
-                float r = min(cornerRadius / iResolution.y, min(halfWH.x, halfWH.y));
+                float r = min(cornerRadius / iResolution.y * 2.0, min(halfWH.x, halfWH.y));
                 float dist = sdRoundedBox(pos, halfWH, r);
-                float thickness = min(boundaryThickness, cornerRadius) / iResolution.y;
+                float thickness = min(lightWidth, cornerRadius) / iResolution.y;
                 if (dist >= 0.0 || dist <= -thickness) {
                     return vec4(0.0, 0.0, 1.0, -1.0);
                 }
@@ -121,7 +126,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 vec3 fragNormal = rotM * normal.xyz;
 
                 vec4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
-                shinningColor *= smoothstep(0.0, 0.1, normal.w) * smoothstep(1.0, 0.9, normal.w);
                 return shinningColor;
             }
 
@@ -150,11 +154,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
                 vec4 specularColor = lightColor;
                 float shinning = 16.0f;
-                vec3 lightPos = lightPosition;
+                vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
                 vec3 viewPos = lightPos;
                 vec4 shinningColor = RoundedBoxShinning(uv, specularColor, shinning, lightPos, viewPos, rotM);
 
-                return shinningColor * lightIntensity;
+                return shinningColor * clamp(lightIntensity, 0.0, 2.0);
             }
         )";
         borderLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
@@ -182,6 +186,7 @@ std::shared_ptr<Drawing::ShaderEffect> GEBorderLightShader::MakeBorderLightShade
     builder_->SetUniform("lightWidth", borderLightParams_.lightWidth_);
     builder_->SetUniform("borderLightRotationAngle", borderLightParams_.rotationAngle_[NUM_0],
         borderLightParams_.rotationAngle_[NUM_1], borderLightParams_.rotationAngle_[NUM_2]);
+    builder_->SetUniform("cornerRadius", borderLightParams_.cornerRadius_);
     auto borderLightShader = builder_->MakeShader(nullptr, false);
 
     if (borderLightShader == nullptr) {

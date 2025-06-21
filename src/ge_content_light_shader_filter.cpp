@@ -157,7 +157,7 @@ void GEContentLightFilter::GenerateContentLightEffect()
             mat3 rotM = GetRotationMatrix(contentRotationAngle);
             vec4 specularColor = lightColor;
             float shinning = 8.0;
-            vec3 lightPos = lightPosition;
+            vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
             vec3 viewPos = lightPos;
 
@@ -165,7 +165,8 @@ void GEContentLightFilter::GenerateContentLightEffect()
             vec4 shinningColor =
                 ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
 
-            return vec4(inputImage.rgb + shinningColor.rgb * lightIntensity, 1.0);
+            return vec4(inputImage.rgb + shinningColor.rgb * clamp(lightIntensity, 0.0, 1.0) * lightColor.a,
+                inputImage.w);
         }
 
     )";
