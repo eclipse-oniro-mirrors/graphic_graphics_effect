@@ -30,6 +30,7 @@ struct GE_EXPORT BorderLightParams {
     float lightIntensity_;
     float lightWidth_;
     Vector3f rotationAngle_;
+    float cornerRadius_;
 };
 
 class GE_EXPORT GEBorderLightShader : public GEShader {
@@ -49,6 +50,8 @@ public:
     }
 
     void SetRotationAngle(const Vector3f& rotationAngle);
+
+    void SetCornerRadius(float cornerRadius);
 
     std::shared_ptr<Drawing::ShaderEffect> MakeBorderLightShader(const Drawing::Rect& rect);
 
