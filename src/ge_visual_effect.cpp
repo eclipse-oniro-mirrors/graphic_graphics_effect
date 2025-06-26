@@ -22,9 +22,16 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-GEVisualEffect::GEVisualEffect(const std::string& name, DrawingPaintType type)
+GEVisualEffect::GEVisualEffect(
+    const std::string& name, DrawingPaintType type, const std::optional<Drawing::CanvasInfo>& canvasInfo)
     : visualEffectName_(name), type_(type), visualEffectImpl_(std::make_unique<GEVisualEffectImpl>(name))
-{}
+{
+    if (canvasInfo) {
+        canvasInfo_ = canvasInfo.value();
+    } else {
+        canvasInfo_ = Drawing::CanvasInfo();
+    }
+}
 
 GEVisualEffect::~GEVisualEffect() {}
 

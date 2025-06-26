@@ -213,6 +213,9 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             default:
                 break;
         }
+        if (shaderFilter) {
+            shaderFilter->SetShaderFilterCanvasinfo(vef->GetCanvasInfo());
+        }
         shaderFilters.push_back(shaderFilter);
     }
     return shaderFilters;

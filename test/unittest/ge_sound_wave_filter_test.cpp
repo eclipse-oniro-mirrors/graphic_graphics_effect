@@ -94,7 +94,7 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage002, TestSize.Level1)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), image);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage002 end";
 }
@@ -118,7 +118,7 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage003, TestSize.Level1)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), image);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage003 end";
 }
@@ -135,7 +135,7 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage004, TestSize.Level1)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage004 end";
 }

@@ -45,19 +45,22 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
         return nullptr;
     }
  
-    Drawing::Matrix matrix;
+    Drawing::Matrix matrix = canvasInfo_.mat_;
+    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix invertMatrix;
+    matrix.Invert(invertMatrix);
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     auto imageInfo = image->GetImageInfo();
     float height = imageInfo.GetHeight();
     float width = imageInfo.GetWidth();
     if (height < 1e-6 || width < 1e-6) {
-        return nullptr;
+        return image;
     }
     auto soundWaveShader = GetSoundWaveEffect();
     if (soundWaveShader == nullptr) {
         LOGE("GESoundWaveFilter::ProcessImage g_SoundWaveEffect init failed");
-        return nullptr;
+        return image;
     }
 
     CheckSoundWaveParams();
@@ -67,7 +70,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
 
     Drawing::RuntimeShaderBuilder builder(soundWaveShader);
     builder.SetChild("image", shader);
-    builder.SetUniform("iResolution", width, height);
+    builder.SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
     builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
     builder.SetUniform("colorC", colorC, COLOR_CHANNEL);
@@ -79,10 +82,10 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
     builder.SetUniform("shockWaveProgressB", shockWaveProgressB_);
     builder.SetUniform("shockWaveTotalAlpha", shockWaveTotalAlpha_);
  
-    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (invertedImage == nullptr) {
         LOGE("GESoundWaveFilter::ProcessImage make image failed");
-        return nullptr;
+        return image;
     }
     return invertedImage;
 }

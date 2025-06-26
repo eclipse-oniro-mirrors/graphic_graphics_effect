@@ -162,5 +162,27 @@ HWTEST_F(GEColorGradientShaderFilterTest, CheckInParams_001, TestSize.Level0)
 
     GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest CheckInParams_001 end";
 }
+
+/**
+ * @tc.name: PreProcessColorGradientBuilder_001
+ * @tc.desc: Verify the PreProcessColorGradientBuilder
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEColorGradientShaderFilterTest, PreProcessColorGradientBuilder_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest PreProcessColorGradientBuilder_001 start";
+
+    // 1.0, 0.0, 0.0, 1.0 is the color rgba params
+    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
+    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
+    float geoWidth = 100;
+    float geoHeight = 100;
+    Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
+    auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
+    EXPECT_NE(filter->PreProcessColorGradientBuilder(geoWidth, geoHeight), nullptr);
+
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest PreProcessColorGradientBuilder_001 end";
+}
 } // namespace Rosen
 } // namespace OHOS
