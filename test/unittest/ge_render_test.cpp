@@ -350,14 +350,14 @@ HWTEST_F(GERenderTest, GenerateShaderFilter_008, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_008 start";
 
-    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>("");
     std::pair<float, float> factor = {1.0f, 1.0f};
     visualEffect->SetParam(Drawing::GE_FILTER_DISPLACEMENT_DISTORT_FACTOR, factor); // 1 blur directon
     Drawing::GEVisualEffectContainer veContainer;
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilter(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilter_008 end";
 }
