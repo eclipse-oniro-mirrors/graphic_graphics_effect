@@ -107,7 +107,11 @@ ohos_source_set("graphics_effect_src") {
     defines += [ "GE_OHOS" ]
     external_deps += [ "init:libbegetutil" ]
   }
-
+  if (is_arkui_x) {
+    if (graphics_effect_feature_upgrade_skia) {
+      defines += [ "USE_M133_SKIA" ]
+    }
+  }
   if (ge_is_ohos || ge_is_linux) {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
