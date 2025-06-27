@@ -18,6 +18,7 @@
 
 #include "draw/canvas.h"
 #include "image/image.h"
+#include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -35,7 +36,13 @@ public:
         return hash_;
     }
 
+    void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
+    {
+        canvasInfo_ = canvasInfo;
+    }
+
 protected:
+    Drawing::CanvasInfo canvasInfo_;
     uint32_t hash_ = 0;
 };
 } // namespace Rosen

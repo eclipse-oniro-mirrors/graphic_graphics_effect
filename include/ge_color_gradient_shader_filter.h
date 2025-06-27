@@ -42,6 +42,8 @@ public:
     std::string GetDescription();
 
 private:
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> PreProcessColorGradientBuilder(float geoWidth, float geoHeight);
+
     std::vector<float> colors_;
     std::vector<float> positions_;
     std::vector<float> strengths_;

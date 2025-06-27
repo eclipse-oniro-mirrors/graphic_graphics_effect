@@ -190,6 +190,28 @@ HWTEST_F(GEVisualEffectTest, SetParam_007, TestSize.Level1)
  
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_007 end";
 }
+
+/**
+ * @tc.name: GetCanvasInfo_001
+ * @tc.desc: Verify the GetCanvasInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GetCanvasInfo_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GetCanvasInfo_001 start";
+ 
+    auto visualEffect1 = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    Drawing::CanvasInfo canvasInfo1 = visualEffect1->GetCanvasInfo();
+    EXPECT_EQ(canvasInfo1.geoWidth_, 0.0f);
+
+    Drawing::CanvasInfo canvasInfo2 = {100.0f, 100.0f, 0.0f, 0.0f, Drawing::Matrix()};
+    auto visualEffect2 =
+        std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR, Drawing::DrawingPaintType::BRUSH, canvasInfo2);
+    Drawing::CanvasInfo canvasInfo3 = visualEffect2->GetCanvasInfo();
+    EXPECT_EQ(canvasInfo3.geoWidth_, canvasInfo2.geoWidth_);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GetCanvasInfo_001 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

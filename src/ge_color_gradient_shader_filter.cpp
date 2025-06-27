@@ -51,41 +51,30 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
     float strength[ARRAY_SIZE] = {0.0}; // 0.0 default
     if (!CheckInParams(color, position, strength, ARRAY_SIZE)) { return image; }
 
-    Drawing::Matrix matrix;
+    Drawing::Matrix matrix = canvasInfo_.mat_;
+    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix invertMatrix;
+    matrix.Invert(invertMatrix);
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     if (srcImageShader == nullptr) {
         LOGE("GEColorGradientShaderFilter::ProcessImage srcImageShader is null");
         return image;
     }
 
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    if (mask_) {
-        builder = MakeMaskColorGradientBuilder();
-        if (builder == nullptr) {
-            LOGE("GEColorGradientShaderFilter::ProcessImage mask builder error\n");
-            return image;
-        }
-        auto maskImageShader = mask_->GenerateDrawingShader(image->GetWidth(), image->GetHeight());
-        if (!maskImageShader) {
-            LOGE("GEColorGradientShaderFilter::ProcessImage maskImageShader is null");
-            return image;
-        }
-        builder->SetChild("maskImageShader", maskImageShader);
-    } else {
-        builder = MakeColorGradientBuilder();
-        if (builder == nullptr) {
-            LOGE("GEColorGradientShaderFilter::ProcessImage builder error\n");
-            return image;
-        }
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
+        PreProcessColorGradientBuilder(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    if (!builder) {
+        LOGE("GEColorGradientShaderFilter::ProcessImage mask builder error\n");
+        return image;
     }
     
     builder->SetChild("srcImageShader", srcImageShader);
-    builder->SetUniform("iResolution", image->GetWidth(), image->GetHeight());
+    builder->SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     builder->SetUniform("color", color, ARRAY_SIZE * COLOR_CHANNEL);
     builder->SetUniform("position", position, ARRAY_SIZE * POSITION_CHANNEL);
     builder->SetUniform("strength", strength, ARRAY_SIZE);
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
     if (resultImage == nullptr) {
         LOGE("GEColorGradientShaderFilter::ProcessImage resultImage is null");
         return image;
@@ -226,6 +215,32 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
 std::string GEColorGradientShaderFilter::GetDescription()
 {
     return "GEColorGradientShaderFilter";
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::PreProcessColorGradientBuilder(
+    float geoWidth, float geoHeight)
+{
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
+    if (mask_) {
+        builder = MakeMaskColorGradientBuilder();
+        if (!builder) {
+            LOGE("GEColorGradientShaderFilter::PreProcessColorGradientBuilder mask builder error\n");
+            return nullptr;
+        }
+        auto maskImageShader = mask_->GenerateDrawingShader(geoWidth, geoHeight);
+        if (!maskImageShader) {
+            LOGE("GEColorGradientShaderFilter::PreProcessColorGradientBuilder maskImageShader is null");
+            return nullptr;
+        }
+        builder->SetChild("maskImageShader", maskImageShader);
+    } else {
+        builder = MakeColorGradientBuilder();
+        if (!builder) {
+            LOGE("GEColorGradientShaderFilter::PreProcessColorGradientBuilder builder error\n");
+            return nullptr;
+        }
+    }
+    return builder;
 }
 
 } // namespace Rosen

@@ -28,6 +28,14 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+struct CanvasInfo {
+    float geoWidth_ = 0.0f;
+    float geoHeight_ = 0.0f;
+    float tranX_ = 0.0f;
+    float tranY_ = 0.0f;
+    Drawing::Matrix mat_;
+};
+
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
 constexpr char GE_FILTER_AI_BAR_LOW[] = "AIBAR_LOW";
 constexpr char GE_FILTER_AI_BAR_HIGH[] = "AIBAR_HIGH";

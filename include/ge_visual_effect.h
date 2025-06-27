@@ -39,7 +39,8 @@ class GEVisualEffectImpl;
 
 class GE_EXPORT GEVisualEffect {
 public:
-    GEVisualEffect(const std::string& name, DrawingPaintType type = DrawingPaintType::BRUSH);
+    GEVisualEffect(const std::string& name, DrawingPaintType type = DrawingPaintType::BRUSH,
+        const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
     ~GEVisualEffect();
 
     void SetParam(const std::string& tag, int32_t param);
@@ -73,10 +74,16 @@ public:
         return visualEffectImpl_;
     }
 
+    const Drawing::CanvasInfo GetCanvasInfo() const
+    {
+        return canvasInfo_;
+    }
+
 private:
     std::string visualEffectName_;
     DrawingPaintType type_;
     std::shared_ptr<GEVisualEffectImpl> visualEffectImpl_;
+    Drawing::CanvasInfo canvasInfo_;
 };
 
 } // namespace Drawing
