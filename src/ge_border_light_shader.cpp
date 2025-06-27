@@ -107,13 +107,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                     return vec4(0.0, 0.0, 1.0, -1.0);
                 }
 
-                dist += thickness;
-                float R = thickness * 2.0; // 1.0 is adjustable parameters
-                float sinTheta = dist / R;
+                float R = thickness * 9.0;  // 9.0 is adjustable parameters
+                float sinTheta = abs(dist) / R;
+
                 float normalZ = sqrt(1.0 - sinTheta * sinTheta);
                 vec2 normalXY = sdRoundedBoxGradient(pos, halfWH, r) * sinTheta;
 
-                return vec4(normalXY, normalZ, dist / thickness);
+                return vec4(normalXY, normalZ, dist / thickness + 1.0);
             }
 
             vec4 RoundedBoxShinning(vec2 uv, vec4 specularColor, float shinning, vec3 lightPos, vec3 viewPos, mat3 rotM)
@@ -126,6 +126,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 vec3 fragNormal = rotM * normal.xyz;
 
                 vec4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
+                shinningColor *= smoothstep(0.0, 0.1, normal.w); // edge smooth
                 return shinningColor;
             }
 
@@ -158,7 +159,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 vec3 viewPos = lightPos;
                 vec4 shinningColor = RoundedBoxShinning(uv, specularColor, shinning, lightPos, viewPos, rotM);
 
-                return shinningColor * clamp(lightIntensity, 0.0, 2.0);
+                return vec4(shinningColor.xyz * lightColor.w, shinningColor.w) * clamp(lightIntensity, 0.0, 1.0);
             }
         )";
         borderLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);

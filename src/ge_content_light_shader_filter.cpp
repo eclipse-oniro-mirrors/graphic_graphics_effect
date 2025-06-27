@@ -153,10 +153,9 @@ void GEContentLightFilter::GenerateContentLightEffect()
             float screenRatio = iResolution.x / iResolution.y;
             uv.x *= screenRatio;
 
-            float alpha = 0.7;
             mat3 rotM = GetRotationMatrix(contentRotationAngle);
             vec4 specularColor = lightColor;
-            float shinning = 8.0;
+            float shinning = 6.0;
             vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
             vec3 viewPos = lightPos;
@@ -165,8 +164,12 @@ void GEContentLightFilter::GenerateContentLightEffect()
             vec4 shinningColor =
                 ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
 
-            return vec4(inputImage.rgb + shinningColor.rgb * clamp(lightIntensity, 0.0, 1.0) * lightColor.a,
-                inputImage.w);
+            vec3 finalColor = inputImage.rgb + shinningColor.rgb * clamp(lightIntensity, 0.0, 1.0) * lightColor.a;
+            float finalColorMax = max(finalColor.r, max(finalColor.g, finalColor.b));  // avoid over expose
+            if (finalColorMax > 1.0) {
+                finalColor /= finalColorMax;
+            }
+            return vec4(finalColor, inputImage.w);
         }
 
     )";
