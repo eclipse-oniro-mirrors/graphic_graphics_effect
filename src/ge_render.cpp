@@ -30,6 +30,7 @@
 #include "ge_external_dynamic_loader.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
+#include "ge_contour_diagonal_flow_light_shader.h"
 
 
 namespace OHOS {
@@ -251,9 +252,10 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
         switch (ve->GetFilterType()) {
             case Drawing::GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
                 const auto& params = ve->GetWavyRippleLightParams();
-                (void)params;
-                break;
+                out = std::make_shared<GEContourDiagonalFlowLightShader>(*params);
+                return out;
             }
+
             case Drawing::GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT: {
                 const auto& params = ve->GetWavyRippleLightParams();
                 (void)params;
