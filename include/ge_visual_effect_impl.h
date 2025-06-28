@@ -272,7 +272,7 @@ public:
     }
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
-
+    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
     void SetMESABlurParams(const std::string& tag, float param);
     void SetAIBarParams(const std::string& tag, float param);
     void SetGreyParams(const std::string& tag, float param);

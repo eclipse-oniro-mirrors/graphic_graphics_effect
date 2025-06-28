@@ -40,7 +40,7 @@ public:
         contourDiagonalFlowLightParams_ = params;
     }
 
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
     std::shared_ptr<Drawing::ShaderEffect> MakeContourDiagonalFlowLightShader(const Drawing::Rect& rect);
 

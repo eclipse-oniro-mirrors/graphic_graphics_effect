@@ -40,28 +40,28 @@ float controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     -0.32, 0.45,
     -0.20, 0.50,
     -0.05, 0.50,
-     0.10, 0.50,
-     0.19, 0.45,
-     0.28, 0.40,
-     0.315, 0.31,
-     0.35, 0.22,
-     0.30, 0.20,
-     0.25, 0.18,
-     0.215, 0.155,
-     0.18, 0.13,
-     0.17, 0.09,
-     0.16, 0.05,
-     0.13, 0.015,
-     0.10, -0.02,
-     0.06, -0.01,
-     0.02, 0.0,
-     0.02, -0.035,
-     0.02, -0.07,
-     0.035, -0.26,
-     0.05, -0.45,
-     0.035, -0.475,
-     0.02, -0.50,
-     0.0 , -0.54,
+    0.10, 0.50,
+    0.19, 0.45,
+    0.28, 0.40,
+    0.315, 0.31,
+    0.35, 0.22,
+    0.30, 0.20,
+    0.25, 0.18,
+    0.215, 0.155,
+    0.18, 0.13,
+    0.17, 0.09,
+    0.16, 0.05,
+    0.13, 0.015,
+    0.10, -0.02,
+    0.06, -0.01,
+    0.02, 0.0,
+    0.02, -0.035,
+    0.02, -0.07,
+    0.035, -0.26,
+    0.05, -0.45,
+    0.035, -0.475,
+    0.02, -0.50,
+    0.0 , -0.54,
     -0.02, -0.58,
     -0.045, -0.565,
     -0.07, -0.55,
@@ -78,24 +78,24 @@ float controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     -0.20, 0.05,
     -0.15, 0.15,
     -0.25, 0.15,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0,
-     0.0, 0.0
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0
 };
 
 } // namespace
@@ -108,8 +108,8 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiag
     controlPoints_ = std::vector<float>(controlPoints, controlPoints + ARRAY_SIZE * POSITION_CHANNEL); // test data
 }
 
-std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
-    GEContentDiagonalFlowLightShaderParams& param)
+std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::
+    CreateContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
     std::shared_ptr<GEContourDiagonalFlowLightShader> contourDiagonalFlowLightShader =
         std::make_shared<GEContourDiagonalFlowLightShader>(param);
@@ -121,8 +121,8 @@ void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& re
     drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder>
-    GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::
+    GetContourDiagonalFlowLightPrecalculationBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
 
@@ -1397,7 +1397,8 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     return contourDiagonalFlowLightShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::
+    GetContourDiagonalFlowLightBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffect_ = nullptr;
 
