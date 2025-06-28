@@ -16,6 +16,7 @@
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_H
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "common/rs_vector3.h"
