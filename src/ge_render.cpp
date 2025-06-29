@@ -251,8 +251,8 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
         LOGD("GERender::shaderEffects %{public}d", static_cast<int>(ve->GetFilterType()));
         switch (ve->GetFilterType()) {
             case Drawing::GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
-                const auto& params = ve->GetWavyRippleLightParams();
-                shaderEffect = std::make_shared<GEContourDiagonalFlowLightShader>(*params);
+                const auto& params = ve->GetContenDiagonalParams();
+                shaderEffect = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(*params);
                 shaderEffects.push_back(shaderEffect);
                 return shaderEffects;
             }
