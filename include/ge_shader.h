@@ -41,7 +41,7 @@ public:
         cacheAnyPtr_ = cacheData;
     }
 
-    void GetCache()
+    std::shared_ptr<std::any> GetCache()
     {
         return cacheAnyPtr_;
     }
