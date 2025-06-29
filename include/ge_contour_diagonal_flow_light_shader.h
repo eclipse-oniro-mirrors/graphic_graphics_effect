@@ -32,7 +32,7 @@ public:
 
     ~GEContourDiagonalFlowLightShader() override = default;
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect) override;
 
     const std::string GetDescription() const { return "GEContourDiagonalFlowLightShader"; }
 
