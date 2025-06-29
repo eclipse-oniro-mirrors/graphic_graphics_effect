@@ -25,13 +25,13 @@ namespace Rosen {
 using CacheDataType = std::shared_ptr<Drawing::Image>;
 using namespace Drawing;
 namespace {
-constexpr size_t Num0 = 0;
-constexpr size_t Num1 = 1;
-constexpr size_t Num2 = 2;
-constexpr static uint8_t PositionChannel = 2; // 2 floats per point
-constexpr static uint8_t ArraySize = 64;  // 32 segments need 64 control points
+constexpr size_t NUM0 = 0;
+constexpr size_t NUM1 = 1;
+constexpr size_t NUM2 = 2;
+constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
+constexpr static uint8_t ARRAY_SIZE = 64;  // 32 segments need 64 control points
 constexpr static uint8_t COUNT = 46;  // 32 segments need 64 control points
-float controlPoints[ArraySize * PositionChannel] = {
+float controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     -0.35, 0.15,
     -0.435, 0.165,
     -0.52, 0.18,
@@ -104,7 +104,7 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
     contourDiagonalFlowLightParams_ = param;
-    controlPoints_ = std::vector<float>(controlPoints, controlPoints + ArraySize * PositionChannel); // test data
+    controlPoints_ = std::vector<float>(controlPoints, controlPoints + ARRAY_SIZE * POSITION_CHANNEL); // test data
 }
 
 std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
@@ -120,10 +120,10 @@ void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& re
     drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> 
-    GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
+
     if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
         static constexpr char prog[] = R"(
             uniform vec2 iResolution;
@@ -1546,12 +1546,12 @@ std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeCont
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("line1Start", contourDiagonalFlowLightParams_.line1Start_);
     builder_->SetUniform("line1Length", contourDiagonalFlowLightParams_.line1Length_);
-    builder_->SetUniform("line1Color", contourDiagonalFlowLightParams_.line1Color_[Num0],
-        contourDiagonalFlowLightParams_.line1Color_[Num1], contourDiagonalFlowLightParams_.line1Color_[Num2]);
+    builder_->SetUniform("line1Color", contourDiagonalFlowLightParams_.line1Color_[NUM0],
+        contourDiagonalFlowLightParams_.line1Color_[NUM1], contourDiagonalFlowLightParams_.line1Color_[NUM2]);
     builder_->SetUniform("line2Start", contourDiagonalFlowLightParams_.line2Start_);
     builder_->SetUniform("line2Length", contourDiagonalFlowLightParams_.line2Length_);
-    builder_->SetUniform("line2Color", contourDiagonalFlowLightParams_.line2Color_[Num0],
-        contourDiagonalFlowLightParams_.line2Color_[Num1], contourDiagonalFlowLightParams_.line2Color_[Num2]);
+    builder_->SetUniform("line2Color", contourDiagonalFlowLightParams_.line2Color_[NUM0],
+        contourDiagonalFlowLightParams_.line2Color_[NUM1], contourDiagonalFlowLightParams_.line2Color_[NUM2]);
     builder_->SetUniform("lineThickness", contourDiagonalFlowLightParams_.thickness_);
     auto contourDiagonalFlowLightShader = builder_->MakeShader(nullptr, false);
     if (contourDiagonalFlowLightShader == nullptr) {
