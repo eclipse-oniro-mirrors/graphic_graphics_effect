@@ -97,7 +97,7 @@ float g_controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     0.0, 0.0,
     0.0, 0.0
 };
-} // namespace
+} // namespacesu
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 
@@ -115,7 +115,7 @@ std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShade
     return contourDiagonalFlowLightShader;
 }
 
-void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect)
+void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
