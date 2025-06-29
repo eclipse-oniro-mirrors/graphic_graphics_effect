@@ -61,7 +61,7 @@ float controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     0.05, -0.45,
     0.035, -0.475,
     0.02, -0.50,
-    0.0 , -0.54,
+    0.0, -0.54,
     -0.02, -0.58,
     -0.045, -0.565,
     -0.07, -0.55,
@@ -108,8 +108,8 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiag
     controlPoints_ = std::vector<float>(controlPoints, controlPoints + ARRAY_SIZE * POSITION_CHANNEL); // test data
 }
 
-std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::
-    CreateContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
+std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
+    GEContentDiagonalFlowLightShaderParams& param)
 {
     std::shared_ptr<GEContourDiagonalFlowLightShader> contourDiagonalFlowLightShader =
         std::make_shared<GEContourDiagonalFlowLightShader>(param);
@@ -121,8 +121,7 @@ void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& re
     drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::
-    GetContourDiagonalFlowLightPrecalculationBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
 
@@ -1389,7 +1388,6 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     builder->SetUniform("count", static_cast<float>(COUNT));
     builder->SetUniform("controlPoints", controlPoints_.data(), controlPoints_.size());
     auto contourDiagonalFlowLightShader = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
-
     if (contourDiagonalFlowLightShader == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader is nullptr.");
         return nullptr;
@@ -1397,8 +1395,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     return contourDiagonalFlowLightShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::
-    GetContourDiagonalFlowLightBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffect_ = nullptr;
 
@@ -1514,10 +1511,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
                 float haloStrength = haloEnergy * pow(0.2 / max(sdf, 1e-5), 0.4); // 0.2, 0.4: strength and exponent
                 vec3 haloColor = normalize(glow) * haloStrength;
                 float haloMask = exp(-pow(sdf / 0.1, 1.0)); // 0.1: falloff exponent
-
                 vec3 halo = vec3(0.0);
                 GetSegmentHalo(sdf, haloIntensity, mix(line1Color, line2Color, 0.5), halo); // 0.5: average color
-
                 vec3 col = glow + halo;
                 float alpha = clamp(length(col), 0.0, 1.0);
                 return vec4(col, alpha);
@@ -1560,7 +1555,6 @@ std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeCont
         contourDiagonalFlowLightParams_.line2Color_[NUM_1], contourDiagonalFlowLightParams_.line2Color_[NUM_2]);
     builder_->SetUniform("lineThickness", contourDiagonalFlowLightParams_.thickness_);
     auto contourDiagonalFlowLightShader = builder_->MakeShader(nullptr, false);
-
     if (contourDiagonalFlowLightShader == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader is nullptr.");
         return nullptr;
