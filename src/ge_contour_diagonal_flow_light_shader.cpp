@@ -31,7 +31,7 @@ constexpr size_t NUM2 = 2;
 constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
 constexpr static uint8_t ARRAY_SIZE = 64;  // 32 segments need 64 control points
 constexpr static uint8_t COUNT = 46;  // 32 segments need 64 control points
-float controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
+float g_controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
     -0.35, 0.15,
     -0.435, 0.165,
     -0.52, 0.18,
