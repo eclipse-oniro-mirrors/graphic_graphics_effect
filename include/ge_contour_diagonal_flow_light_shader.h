@@ -14,6 +14,7 @@
  */
 #ifndef GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
+#include <any>
 
 #include "ge_shader.h"
 #include "common/rs_vector4.h"

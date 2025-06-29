@@ -1376,7 +1376,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
     // one cloest bezier need 4 point
-    int miniSizeOfPoints = 4;
+    uint8_t miniSizeOfPoints = 4;
     if (controlPoints_.size() < miniSizeOfPoints) {
         GE_LOGD("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader path less points.");
         return nullptr;

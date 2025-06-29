@@ -271,6 +271,17 @@ public:
     {
         return auroNoiseParams_;
     }
+
+    void SetCache(std::shared_ptr<std::any> cacheData)
+    {
+        cacheAnyPtr_ = cacheData;
+    }
+
+    void GetCache()
+    {
+        return cacheAnyPtr_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
