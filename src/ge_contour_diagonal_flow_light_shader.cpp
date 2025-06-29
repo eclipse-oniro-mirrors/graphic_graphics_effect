@@ -115,7 +115,8 @@ std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShade
     return contourDiagonalFlowLightShader;
 }
 
-void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect,
+    float progress)
 {
     drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
