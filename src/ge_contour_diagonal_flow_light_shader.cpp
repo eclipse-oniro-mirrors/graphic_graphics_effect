@@ -1528,7 +1528,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
 }
 
 std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeContourDiagonalFlowLightShader(
-    const Drawing::Rect& rect)
+    const Drawing::Rect& rect, float progress)
 {
     GE_LOGD("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader start");
     if (cacheAnyPtr_ == nullptr) {
