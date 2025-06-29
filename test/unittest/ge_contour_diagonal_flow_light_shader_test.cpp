@@ -156,3 +156,5 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilde
     auto builder = shader->GetContourDiagonalFlowLightBuilder();
     EXPECT_NE(builder, nullptr);
 }
+}
+}
