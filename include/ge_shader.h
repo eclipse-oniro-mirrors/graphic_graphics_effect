@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_SHADER_H
 #define GRAPHICS_EFFECT_GE_SHADER_H
 
+#include <any>
 #include "draw/canvas.h"
 #include "utils/rect.h"
 #include "effect/shader_effect.h"
@@ -35,9 +36,20 @@ public:
 
     uint32_t Hash() const { return hash_; }
 
+    void SetCache(std::shared_ptr<std::any> cacheData)
+    {
+        cacheAnyPtr_ = cacheData;
+    }
+
+    std::shared_ptr<std::any> GetCache()
+    {
+        return cacheAnyPtr_;
+    }
+
 protected:
     uint32_t hash_ = 0;
     std::shared_ptr<Drawing::ShaderEffect> drShader_ = nullptr;
+    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
 };
 } // namespace Rosen
 } // namespace OHOS

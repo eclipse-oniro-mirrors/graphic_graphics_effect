@@ -320,6 +320,7 @@ struct GEContentDiagonalFlowLightShaderParams {
     float line2Start_ = 0.f;
     float line2Length_ = 0.f;
     Vector4f line2Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);
+    float thickness_ = 0.5f;
 };
 
 // Declare same with in rs_render_shader_base.h

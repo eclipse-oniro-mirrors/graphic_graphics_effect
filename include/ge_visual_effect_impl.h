@@ -17,6 +17,7 @@
 
 #include <memory>
 #include <vector>
+#include <any>
 
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
@@ -270,9 +271,20 @@ public:
     {
         return auroNoiseParams_;
     }
+
+    void SetCache(std::shared_ptr<std::any> cacheData)
+    {
+        cacheAnyPtr_ = cacheData;
+    }
+
+    std::shared_ptr<std::any> GetCache()
+    {
+        return cacheAnyPtr_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
-
+    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
     void SetMESABlurParams(const std::string& tag, float param);
     void SetAIBarParams(const std::string& tag, float param);
     void SetGreyParams(const std::string& tag, float param);

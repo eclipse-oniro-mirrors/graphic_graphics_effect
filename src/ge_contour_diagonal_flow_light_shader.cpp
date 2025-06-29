@@ -1,0 +1,1593 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "ge_contour_diagonal_flow_light_shader.h"
+
+#include <sstream>
+#include "ge_log.h"
+#include "ge_visual_effect_impl.h"
+#include "common/rs_vector2.h"
+
+namespace OHOS {
+namespace Rosen {
+using CacheDataType = std::shared_ptr<Drawing::Image>;
+using namespace Drawing;
+namespace {
+constexpr size_t NUM0 = 0;
+constexpr size_t NUM1 = 1;
+constexpr size_t NUM2 = 2;
+constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
+constexpr static uint8_t ARRAY_SIZE = 64;  // 32 segments need 64 control points
+constexpr static uint8_t COUNT = 46;  // 32 segments need 64 control points
+float g_controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
+    -0.35, 0.15,
+    -0.435, 0.165,
+    -0.52, 0.18,
+    -0.48, 0.29,
+    -0.44, 0.40,
+    -0.32, 0.45,
+    -0.20, 0.50,
+    -0.05, 0.50,
+    0.10, 0.50,
+    0.19, 0.45,
+    0.28, 0.40,
+    0.315, 0.31,
+    0.35, 0.22,
+    0.30, 0.20,
+    0.25, 0.18,
+    0.215, 0.155,
+    0.18, 0.13,
+    0.17, 0.09,
+    0.16, 0.05,
+    0.13, 0.015,
+    0.10, -0.02,
+    0.06, -0.01,
+    0.02, 0.0,
+    0.02, -0.035,
+    0.02, -0.07,
+    0.035, -0.26,
+    0.05, -0.45,
+    0.035, -0.475,
+    0.02, -0.50,
+    0.0, -0.54,
+    -0.02, -0.58,
+    -0.045, -0.565,
+    -0.07, -0.55,
+    -0.085, -0.575,
+    -0.10, -0.60,
+    -0.135, -0.525,
+    -0.17, -0.45,
+    -0.165, -0.285,
+    -0.16, -0.12,
+    -0.17, -0.085,
+    -0.18, -0.05,
+    -0.215, -0.05,
+    -0.25, -0.05,
+    -0.20, 0.05,
+    -0.15, 0.15,
+    -0.25, 0.15,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0,
+    0.0, 0.0
+};
+} // namespacesu
+
+GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
+
+GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
+{
+    contourDiagonalFlowLightParams_ = param;
+    controlPoints_ = std::vector<float>(g_controlPoints, g_controlPoints + ARRAY_SIZE * POSITION_CHANNEL); // test data
+}
+
+std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
+    GEContentDiagonalFlowLightShaderParams& param)
+{
+    std::shared_ptr<GEContourDiagonalFlowLightShader> contourDiagonalFlowLightShader =
+        std::make_shared<GEContourDiagonalFlowLightShader>(param);
+    return contourDiagonalFlowLightShader;
+}
+
+void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect,
+    float progress)
+{
+    drShader_ = MakeContourDiagonalFlowLightShader(rect);
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
+{
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
+
+    if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
+        static constexpr char prog[] = R"(
+            uniform vec2 iResolution;
+            uniform float count;
+            const int CAPACITY = 64; // 64 control points for 32 Bezier curves
+            uniform vec2 controlPoints[CAPACITY];
+
+            // ===== Constant =====
+            const float INF = 1e10; // infinity, i.e., 1.0 / 0.0
+            const float SQRT3 = 1.7320508;
+            const float w = 2.0;
+
+            // ===== Vector Math Utilities =====
+            float Cross2(vec2 a, vec2 b) { return a.x * b.y - a.y * b.x; }
+            float SaturateFloat(float a) { return clamp(a, 0.0, 1.0); }
+            vec3 SaturateVec3(vec3 a) { return clamp(a, 0.0, 1.0); }
+            float AbsMin(float a, float b) { return abs(a) < abs(b) ? a : b; }
+
+            vec2 GetElement(vec2 arr[CAPACITY], int index) {
+                for (int i = 0; i < CAPACITY; ++i) {
+                    if (i == index) return arr[i];
+                }
+                return vec2(0.0);
+            }
+
+            vec2 Bezier(vec2 pointA, vec2 pointB, vec2 pointC, float t)
+            {
+                return pointA + t * (-2.0 * pointA + 2.0 * pointB) + t * t * (pointA - 2.0 * pointB + pointC);
+            }
+
+            float ClosestBezier(vec2 p, vec2 pointA, vec2 pointB, vec2 pointC, inout float bestT)
+            {
+                float minDist = INF;
+                bestT = 0.0;
+
+                float t = 0.0; // 0.0: discrete t
+                vec2 pos = Bezier(pointA, pointB, pointC, t);
+                float dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.05; // 0.05: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.1; // 0.1: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.15; // 0.15: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.2; // 0.2: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.25; // 0.25: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.3; // 0.3: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.35; // 0.35: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.4; // 0.4: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.45; // 0.45: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.5; // 0.5: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.55; // 0.55: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.6; // 0.6: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.65; // 0.65: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.7; // 0.7: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.75; // 0.75: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.8; // 0.8: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.85; // 0.85: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.9; // 0.9: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                t = 0.95; // 0.95: discrete t
+                pos = Bezier(pointA, pointB, pointC, t);
+                dsq = dot(p - pos, p - pos);
+                if (dsq < minDist) {
+                    minDist = dsq;
+                    bestT = t;
+                }
+
+                return sqrt(minDist);
+            }
+
+            float SdfLine(vec2 p, vec2 a, vec2 b) {
+                float h = SaturateFloat(dot(p - a, b - a) / dot(b - a, b - a));
+                return length(p - a - h * (b - a));
+            }
+
+            float SdfBezier(vec2 pos, vec2 pointA, vec2 pointB, vec2 pointC)
+            {
+                const float EPSILON = 1e-3;
+                const float ONE_THIRD = 1.0 / 3.0;
+
+                vec2 a = pointB - pointA;
+                vec2 b = pointA - 2.0 * pointB + pointC;
+                vec2 c = a * 2.0;
+                vec2 d = pointA - pos;
+
+                float kk = 1.0 / dot(b, b);
+                float kx = kk * dot(a, b);
+                float ky = kk * (2.0 * dot(a, a) + dot(d, b)) * ONE_THIRD;
+                float kz = kk * dot(d, a);
+
+                float res = 0.0;
+                float sgn = 0.0;
+                float p = ky - kx * kx;
+                float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
+                float h = q * q + 4.0 * p * p * p;
+
+                if (h >= 0.0) {
+                    h = sqrt(h);
+                    vec2 x = 0.5 * (vec2(h, -h) - q);
+                    vec2 uv = vec2((x.x > 0.0 ? 1.0 : -1.0) * pow(abs(x.x), ONE_THIRD),
+                                (x.y > 0.0 ? 1.0 : -1.0) * pow(abs(x.y), ONE_THIRD));
+                    float t = SaturateFloat(uv.x + uv.y - kx) + EPSILON;
+                    vec2 qv = d + (c + b * t) * t;
+                    res = dot(qv, qv);
+                    sgn = Cross2(c + 2.0 * b * t, qv);
+                    return (sgn > 0.0 ? 1.0 : -1.0) * sqrt(res);
+                }
+
+                float z = sqrt(-p);
+                float v = acos(q / (p * z * 2.0)) * ONE_THIRD;
+                float m = cos(v);
+                float n = sin(v) * SQRT3;
+                vec3 t = SaturateVec3(vec3(m + m, -n - m, n - m) * z - kx) + EPSILON;
+                vec2 qx = d + (c + b * t.x) * t.x;
+                float dx = dot(qx, qx);
+                float sx = Cross2(c + 2.0 * b * t.x, qx);
+                vec2 qy = d + (c + b * t.y) * t.y;
+                float dy = dot(qy, qy);
+                float sy = Cross2(c + 2.0 * b * t.y, qy);
+                res = (dx < dy) ? dx : dy;
+                sgn = (dx < dy) ? sx : sy;
+
+                return (sgn > 0.0 ? 1.0 : -1.0) * sqrt(res);
+            }
+
+            // ================= SDF Polygon =================
+            float SdfControlSegment(vec2 p, vec2 pointA, vec2 pointB, vec2 pointC) {
+                return AbsMin(SdfLine(p, pointA, pointB), SdfLine(p, pointB, pointC));
+            }
+
+            float SdfControlPolygon(vec2 p, vec2 controlPoly[CAPACITY], int size, inout vec2 closest[3]) {
+                float minDist = INF;
+                int segmentCount = size / 2;
+
+                // i = 0
+                int iMidPrev = size - 1; // (iPrev + 1) % size, iPrev = (i - 2 + size) % size
+                vec2 pointA = GetElement(controlPoly, iMidPrev);
+                vec2 pointB = controlPoly[0]; // i
+                vec2 pointC = controlPoly[1]; // iMid = (i + 1) % size
+                float d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+
+                // i = 2
+                pointA = controlPoly[1]; // iMidPrev = i - 1
+                pointB = controlPoly[2]; // i
+                pointC = controlPoly[3]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+
+                // i = 4
+                pointA = controlPoly[3]; // iMidPrev = i - 1
+                pointB = controlPoly[4]; // i
+                pointC = controlPoly[5]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 6) return minDist; // 6: next i beyond legal size
+
+                // i = 6
+                pointA = controlPoly[5]; // iMidPrev = i - 1
+                pointB = controlPoly[6]; // i
+                pointC = controlPoly[7]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 8) return minDist; // 8: next i beyond legal size
+
+                // i = 8
+                pointA = controlPoly[7]; // iMidPrev = i - 1
+                pointB = controlPoly[8]; // i
+                pointC = controlPoly[9]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 10) return minDist; // 10: next i beyond legal size
+
+                // i = 10
+                pointA = controlPoly[9]; // iMidPrev = i - 1
+                pointB = controlPoly[10]; // i
+                pointC = controlPoly[11]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 12) return minDist; // 12: next i beyond legal size
+
+                // i = 12
+                pointA = controlPoly[11]; // iMidPrev = i - 1
+                pointB = controlPoly[12]; // i
+                pointC = controlPoly[13]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 14) return minDist; // 14: next i beyond legal size
+
+                // i = 14
+                pointA = controlPoly[13]; // iMidPrev = i - 1
+                pointB = controlPoly[14]; // i
+                pointC = controlPoly[15]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 16) return minDist; // 16: next i beyond legal size
+
+                // i = 16
+                pointA = controlPoly[15]; // iMidPrev = i - 1
+                pointB = controlPoly[16]; // i
+                pointC = controlPoly[17]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 18) return minDist; // 18: next i beyond legal size
+
+                // i = 18
+                pointA = controlPoly[17]; // iMidPrev = i - 1
+                pointB = controlPoly[18]; // i
+                pointC = controlPoly[19]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 20) return minDist; // 20: next i beyond legal size
+
+                // i = 20
+                pointA = controlPoly[19]; // iMidPrev = i - 1
+                pointB = controlPoly[20]; // i
+                pointC = controlPoly[21]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 22) return minDist; // 22: next i beyond legal size
+
+                // i = 22
+                pointA = controlPoly[21]; // iMidPrev = i - 1
+                pointB = controlPoly[22]; // i
+                pointC = controlPoly[23]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 24) return minDist; // 24: next i beyond legal size
+
+                // i = 24
+                pointA = controlPoly[23]; // iMidPrev = i - 1
+                pointB = controlPoly[24]; // i
+                pointC = controlPoly[25]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 26) return minDist; // 26: next i beyond legal size
+
+                // i = 26
+                pointA = controlPoly[25]; // iMidPrev = i - 1
+                pointB = controlPoly[26]; // i
+                pointC = controlPoly[27]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 28) return minDist; // 28: next i beyond legal size
+
+                // i = 28
+                pointA = controlPoly[27]; // iMidPrev = i - 1
+                pointB = controlPoly[28]; // i
+                pointC = controlPoly[29]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 30) return minDist; // 30: next i beyond legal size
+
+                // i = 30
+                pointA = controlPoly[29]; // iMidPrev = i - 1
+                pointB = controlPoly[30]; // i
+                pointC = controlPoly[31]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 32) return minDist; // 32: next i beyond legal size
+
+                // i = 32
+                pointA = controlPoly[31]; // iMidPrev = i - 1
+                pointB = controlPoly[32]; // i
+                pointC = controlPoly[33]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 34) return minDist; // 34: next i beyond legal size
+
+                // i = 34
+                pointA = controlPoly[33]; // iMidPrev = i - 1
+                pointB = controlPoly[34]; // i
+                pointC = controlPoly[35]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 36) return minDist; // 36: next i beyond legal size
+
+                // i = 36
+                pointA = controlPoly[35]; // iMidPrev = i - 1
+                pointB = controlPoly[36]; // i
+                pointC = controlPoly[37]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 38) return minDist; // 38: next i beyond legal size
+
+                // i = 38
+                pointA = controlPoly[37]; // iMidPrev = i - 1
+                pointB = controlPoly[38]; // i
+                pointC = controlPoly[39]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 40) return minDist; // 40: next i beyond legal size
+
+                // i = 40
+                pointA = controlPoly[39]; // iMidPrev = i - 1
+                pointB = controlPoly[40]; // i
+                pointC = controlPoly[41]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 42) return minDist; // 42: next i beyond legal size
+
+                // i = 42
+                pointA = controlPoly[41]; // iMidPrev = i - 1
+                pointB = controlPoly[42]; // i
+                pointC = controlPoly[43]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 44) return minDist; // 44: next i beyond legal size
+
+                // i = 44
+                pointA = controlPoly[43]; // iMidPrev = i - 1
+                pointB = controlPoly[44]; // i
+                pointC = controlPoly[45]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 46) return minDist; // 46: next i beyond legal size
+
+                // i = 46
+                pointA = controlPoly[45]; // iMidPrev = i - 1
+                pointB = controlPoly[46]; // i
+                pointC = controlPoly[47]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 48) return minDist; // 48: next i beyond legal size
+
+                // i = 48
+                pointA = controlPoly[47]; // iMidPrev = i - 1
+                pointB = controlPoly[48]; // i
+                pointC = controlPoly[49]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 50) return minDist; // 50: next i beyond legal size
+
+                // i = 50
+                pointA = controlPoly[49]; // iMidPrev = i - 1
+                pointB = controlPoly[50]; // i
+                pointC = controlPoly[51]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 52) return minDist; // 52: next i beyond legal size
+
+                // i = 52
+                pointA = controlPoly[51]; // iMidPrev = i - 1
+                pointB = controlPoly[52]; // i
+                pointC = controlPoly[53]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 54) return minDist; // 54: next i beyond legal size
+
+                // i = 54
+                pointA = controlPoly[53]; // iMidPrev = i - 1
+                pointB = controlPoly[54]; // i
+                pointC = controlPoly[55]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 56) return minDist; // 56: next i beyond legal size
+
+                // i = 56
+                pointA = controlPoly[55]; // iMidPrev = i - 1
+                pointB = controlPoly[56]; // i
+                pointC = controlPoly[57]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 58) return minDist; // 58: next i beyond legal size
+
+                // i = 58
+                pointA = controlPoly[57]; // iMidPrev = i - 1
+                pointB = controlPoly[58]; // i
+                pointC = controlPoly[59]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 60) return minDist; // 60: next i beyond legal size
+
+                // i = 60
+                pointA = controlPoly[59]; // iMidPrev = i - 1
+                pointB = controlPoly[60]; // i
+                pointC = controlPoly[61]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+                if (size <= 62) return minDist; // 62: next i beyond legal size
+
+                // i = 62
+                pointA = controlPoly[61]; // iMidPrev = i - 1
+                pointB = controlPoly[62]; // i
+                pointC = controlPoly[63]; // iMid = i + 1
+                d = SdfControlSegment(p, pointA, pointB, pointC);
+                if (abs(d) < abs(minDist)) {
+                    minDist = d;
+                    closest[0] = pointA;
+                    closest[1] = pointB;
+                    closest[2] = pointC;
+                }
+
+                return minDist;
+            }
+
+            float SdfBezierShape(vec2 p, vec2 controlPoly[CAPACITY], int controlPolySize) {
+                vec2 closest[3];
+                SdfControlPolygon(p, controlPoly, controlPolySize, closest);
+                return SdfBezier(p, closest[0], closest[1], closest[2]);
+            }
+
+            float FastArctanQQuad(float x)
+            {
+                float xx = x * x;
+                float y = (x < 1.0 && x > -1.0) ? x / (1.0 + 0.28086 * xx)
+                        : 1.5707963 * x / abs(x) - x / (xx + 0.28086);
+                return y;
+            }
+
+            float Integrate(vec2 p1, vec2 p2, vec2 ndc)
+            {
+                const float integralEpsilon = 0.005;
+                vec2 p12 = p1 - p2;
+                float pointA = dot(p12, p12);
+                vec2 p01 = ndc - p1;
+                float pointB = 2.0 * dot(p01, p12);
+                float pointC = dot(p01, p01) + integralEpsilon;
+
+                float delta = 4.0 * pointA * pointC - pointB * pointB;
+                float deltaSqrtInv = 1.0 / sqrt(delta);
+
+                float I = deltaSqrtInv * (FastArctanQQuad((pointA + pointA + pointB) * deltaSqrtInv) -
+                    FastArctanQQuad(pointB * deltaSqrtInv));
+                return I;
+            }
+
+            void GetSDFandTGlobal(vec2 p, vec2 controlPoints[CAPACITY], int size,
+                inout float sdf, inout float tGlobal, inout float accumulateIntensity)
+            {
+                sdf = SdfBezierShape(p, controlPoints, size);
+
+                float bestTGlobal = -1.0;
+                float weightedIntensity = 0.0;
+                float minDist = INF;
+                int segmentCount = size / 2;
+
+                // i = 0
+                int iMidPrev = size - 1; // (iPrev + 1) % size, iPrev = (i - 2 + size) % size
+                vec2 pointA = GetElement(controlPoints, iMidPrev);
+                vec2 pointB = controlPoints[0]; // i
+                vec2 pointC = controlPoints[1]; // (i + 1) % size
+                float tLocal;
+                float dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (0.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+
+                // i = 2
+                pointA = controlPoints[1];
+                pointB = controlPoints[2];
+                pointC = controlPoints[3];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (1.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+
+                // i = 4
+                pointA = controlPoints[3];
+                pointB = controlPoints[4];
+                pointC = controlPoints[5];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (2.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 6) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 6
+                pointA = controlPoints[5];
+                pointB = controlPoints[6];
+                pointC = controlPoints[7];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (3.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 8) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 8
+                pointA = controlPoints[7];
+                pointB = controlPoints[8];
+                pointC = controlPoints[9];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (4.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 10) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 10
+                pointA = controlPoints[9];
+                pointB = controlPoints[10];
+                pointC = controlPoints[11];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (5.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 12) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 12
+                pointA = controlPoints[11];
+                pointB = controlPoints[12];
+                pointC = controlPoints[13];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (6.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 14) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 14
+                pointA = controlPoints[13];
+                pointB = controlPoints[14];
+                pointC = controlPoints[15];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (7.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 16) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 16
+                pointA = controlPoints[15];
+                pointB = controlPoints[16];
+                pointC = controlPoints[17];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (8.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 18) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 18
+                pointA = controlPoints[17];
+                pointB = controlPoints[18];
+                pointC = controlPoints[19];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (9.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 20) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 20
+                pointA = controlPoints[19];
+                pointB = controlPoints[20];
+                pointC = controlPoints[21];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (10.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 22) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 22
+                pointA = controlPoints[21];
+                pointB = controlPoints[22];
+                pointC = controlPoints[23];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (11.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 24) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 24
+                pointA = controlPoints[23];
+                pointB = controlPoints[24];
+                pointC = controlPoints[25];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (12.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 26) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 26
+                pointA = controlPoints[25];
+                pointB = controlPoints[26];
+                pointC = controlPoints[27];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (13.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 28) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 28
+                pointA = controlPoints[27];
+                pointB = controlPoints[28];
+                pointC = controlPoints[29];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (14.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 30) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 30
+                pointA = controlPoints[29];
+                pointB = controlPoints[30];
+                pointC = controlPoints[31];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (15.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 32) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 32
+                pointA = controlPoints[31];
+                pointB = controlPoints[32];
+                pointC = controlPoints[33];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (16.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 34) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 34
+                pointA = controlPoints[33];
+                pointB = controlPoints[34];
+                pointC = controlPoints[35];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (17.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 36) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 36
+                pointA = controlPoints[35];
+                pointB = controlPoints[36];
+                pointC = controlPoints[37];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (18.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 38) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 38
+                pointA = controlPoints[37];
+                pointB = controlPoints[38];
+                pointC = controlPoints[39];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (19.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 40) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 40
+                pointA = controlPoints[39];
+                pointB = controlPoints[40];
+                pointC = controlPoints[41];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (20.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 42) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 42
+                pointA = controlPoints[41];
+                pointB = controlPoints[42];
+                pointC = controlPoints[43];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (21.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 44) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 44
+                pointA = controlPoints[43];
+                pointB = controlPoints[44];
+                pointC = controlPoints[45];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (22.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 46) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                    // i = 48
+                pointA = controlPoints[47];
+                pointB = controlPoints[48];
+                pointC = controlPoints[49];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (24.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 50) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 50
+                pointA = controlPoints[49];
+                pointB = controlPoints[50];
+                pointC = controlPoints[51];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (25.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 52) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 52
+                pointA = controlPoints[51];
+                pointB = controlPoints[52];
+                pointC = controlPoints[53];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (26.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 54) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 54
+                pointA = controlPoints[53];
+                pointB = controlPoints[54];
+                pointC = controlPoints[55];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (27.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 56) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 56
+                pointA = controlPoints[55];
+                pointB = controlPoints[56];
+                pointC = controlPoints[57];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (28.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 58) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 58
+                pointA = controlPoints[57];
+                pointB = controlPoints[58];
+                pointC = controlPoints[59];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (29.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 60) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 60
+                pointA = controlPoints[59];
+                pointB = controlPoints[60];
+                pointC = controlPoints[61];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (30.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                if (size <= 62) {
+                    accumulateIntensity = weightedIntensity / float(segmentCount);
+                    return;
+                }
+
+                // i = 62
+                pointA = controlPoints[61];
+                pointB = controlPoints[62];
+                pointC = controlPoints[63];
+                dist = ClosestBezier(p, pointA, pointB, pointC, tLocal);
+                weightedIntensity += Integrate(pointA, pointC, p);
+                if (dist < w && dist < minDist) {
+                    minDist = dist;
+                    bestTGlobal = (31.0 + tLocal) / float(segmentCount);
+                }
+                tGlobal = bestTGlobal;
+                accumulateIntensity = weightedIntensity / float(segmentCount);
+            }
+
+            vec4 main(vec2 fragCoord) {
+                int size = int(count);
+
+                vec2 flipped = vec2(fragCoord.x, iResolution.y - fragCoord.y);
+                vec2 p = (2.0 * flipped - iResolution.xy) / iResolution.y; // 2.0: normalized screen coordinates
+
+                float sdf = 0.0, tGlobal = 0.0, haloIntensity = 0.0;
+                GetSDFandTGlobal(p, controlPoints, size, sdf, tGlobal, haloIntensity);
+
+                return vec4(abs(sdf), tGlobal, haloIntensity, 1.0);
+            }
+        )";
+        contourDiagonalFlowLightShaderEffectPrecalculation_ = Drawing::RuntimeEffect::CreateForShader(prog);
+    }
+
+    if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffectPrecalculation_ is nullptr.");
+        return nullptr;
+    }
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffectPrecalculation_);
+}
+
+void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
+    if (cacheAnyPtr_ == nullptr) {
+        GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
+        Drawing::ImageInfo cacheImgInf(rect.GetWidth(), rect.GetHeight(),
+            Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+        auto cacheImg = MakeContourDiagonalFlowLightPrecalculationShader(canvas, cacheImgInf);
+        if (cacheImg) {
+            cacheAnyPtr_ = std::make_shared<std::any>(std::make_any<CacheDataType>(cacheImg));
+            GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess OK");
+        } else {
+            GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess NG");
+        }
+    }
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDiagonalFlowLightPrecalculationShader(
+    Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
+{
+    // one cloest bezier need 4 point
+    uint8_t miniSizeOfPoints = 4;
+    if (controlPoints_.size() < miniSizeOfPoints) {
+        GE_LOGD("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader path less points.");
+        return nullptr;
+    }
+    float width = imageInfo.GetWidth();
+    float height = imageInfo.GetHeight();
+    auto builder = GetContourDiagonalFlowLightPrecalculationBuilder();
+    builder->SetUniform("iResolution", width, height);
+    builder->SetUniform("count", static_cast<float>(COUNT));
+    builder->SetUniform("controlPoints", controlPoints_.data(), controlPoints_.size());
+    auto contourDiagonalFlowLightShader = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    if (contourDiagonalFlowLightShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader is nullptr.");
+        return nullptr;
+    }
+    return contourDiagonalFlowLightShader;
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightBuilder()
+{
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffect_ = nullptr;
+
+    if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
+        static constexpr char prog[] = R"(
+            uniform shader precalculationImage;
+            uniform vec2 iResolution;
+            uniform float line1Start;
+            uniform float line1Length;
+            uniform vec3 line1Color;
+            uniform float line2Start;
+            uniform float line2Length;
+            uniform vec3 line2Color;
+            uniform float lineThickness;
+
+            // ===== Constant =====
+            const float thickness = 0.02;
+            const float glowBellSigma = 0.28;
+            const float haloBellSigma = 0.18;
+            const float haloArcLenRatio = 1.7;
+
+            const float distMin = 1e-4;
+            const float intensity = 1.8;
+            const float glowRadius = 0.05;
+            const float haloFactor = 0.001;
+
+            // ===== Glow Profile and Halo Rendering (based on tGlobal and SDF) =====
+
+            // Gaussian bell-shaped profile centered at t = 0.5
+            float BellShape(float t, float sigma) {
+                float x = (t - 0.5) / sigma;
+                return exp(-x * x);
+            }
+
+            // Compute glowing intensity based on SDF and local t on segment
+            void GetSegmentGlowSDF(float sdfData, vec3 color, float tLocal, inout vec3 glowCol) {
+                float w = BellShape(tLocal, glowBellSigma); // tLocal: [0,1]
+                float th = thickness * w * lineThickness;
+
+                glowCol = color * pow(glowRadius / max(sdfData - th, distMin), intensity);
+            }
+
+            // Compute a global halo effect for the entire path
+            void GetGlobalGlowSDF(float sdfData, vec3 color, inout vec3 glowCol) {
+                glowCol = color * pow(glowRadius * haloFactor / max(sdfData, distMin), intensity * haloFactor);
+            }
+
+            float GetSegmentHalo(float sdf, float weightedIntensity, vec3 color, inout vec3 glowCol) {
+                float g = pow(glowRadius * haloFactor / max(sdf, distMin), intensity * haloFactor);
+                float brightness = log(1.0 + weightedIntensity) * g * 0.15; // 0.15: brightness scaling factor
+                glowCol = brightness * color;
+
+                return g;
+            }
+
+            void ComputeArcWindow(float tGlobal, float tStart, float windowLen, float sigma,
+                inout float tLocal, inout float weight) {
+                float shiftedT = mod(tGlobal - tStart + 1.0, 1.0);
+                tLocal = shiftedT / windowLen;
+                float inWindow = step(0.0, shiftedT) * step(shiftedT, windowLen);
+                weight = inWindow * BellShape(tLocal, sigma);
+            }
+
+            void ComputeHaloWindow(float tGlobal, float tGlowStart, float arcLen, float windowLen, float sigma,
+                inout float weight) {
+                float tStart = mod(tGlowStart - 0.5 * (windowLen - arcLen), 1.0); // 0.5: diagonal progress offset
+                float shiftedT = mod(tGlobal - tStart + 1.0, 1.0);
+                float tLocal = shiftedT / windowLen;
+                float inWindow = step(0.0, shiftedT) * step(shiftedT, windowLen);
+                weight = inWindow * BellShape(tLocal, sigma);
+            }
+
+            vec3 SamplePrecalculationImage(vec2 coord) {
+                return precalculationImage.eval(coord).rgb;
+            }
+
+            vec4 main(vec2 fragCoord) {
+                vec2 flipped = vec2(fragCoord.x, iResolution.y - fragCoord.y);
+                vec2 p = (2.0 * flipped - iResolution.xy) / iResolution.y; // 2.0: map uv to [-1,1]
+
+                vec3 precalculationData = SamplePrecalculationImage(fragCoord);
+                float sdf = precalculationData.r;
+                float tGlobal = precalculationData.g;
+                float haloIntensity = precalculationData.b;
+
+                // === Sliding window for glow arcs ===
+                float weight1 = 0.0, tLocal1 = 0.0;
+                float weight2 = 0.0, tLocal2 = 0.0;
+                ComputeArcWindow(tGlobal, line1Start, line1Length, glowBellSigma, tLocal1, weight1);
+                ComputeArcWindow(tGlobal, line2Start, line2Length, glowBellSigma, tLocal2, weight2);
+
+                // === Glow and Halo color composition ===
+                vec3 glowCol1 = vec3(0.0), glowCol2 = vec3(0.0), haloCol = vec3(0.0);
+                GetSegmentGlowSDF(sdf, line1Color * weight1, tLocal1, glowCol1);
+                GetSegmentGlowSDF(sdf, line2Color * weight2, tLocal2, glowCol2);
+                GetGlobalGlowSDF(sdf, mix(line1Color, line2Color, 0.5), haloCol);
+
+                vec3 glow = (glowCol1 + glowCol2 + haloCol) * 0.01; // 0.01: light strength scaling factor
+                glow = 1.0 - exp(-glow); // tone mapping
+                glow = pow(glow, vec3(0.4545)); // 0.4545: gamma
+
+                // === Halo layers ===
+                float inHaloWindows = 0.0;
+                float haloWeight1 = 0.0, haloWeight2 = 0.0;
+                float halo1Length = mod(line1Length * haloArcLenRatio, 1.0);
+                float halo2Length = mod(line2Length * haloArcLenRatio, 1.0);
+                ComputeHaloWindow(tGlobal, line1Start, line1Length, halo1Length, haloBellSigma, haloWeight1);
+                ComputeHaloWindow(tGlobal, line2Start, line2Length, halo2Length, haloBellSigma, haloWeight2);
+                inHaloWindows += haloWeight1 + haloWeight2;
+
+                // Volumetric halo
+                float haloEnergy = 0.5 * inHaloWindows; // 0.5: energy scaling factor
+                float haloStrength = haloEnergy * pow(0.2 / max(sdf, 1e-5), 0.4); // 0.2, 0.4: strength and exponent
+                vec3 haloColor = normalize(glow) * haloStrength;
+                float haloMask = exp(-pow(sdf / 0.1, 1.0)); // 0.1: falloff exponent
+                vec3 halo = vec3(0.0);
+                GetSegmentHalo(sdf, haloIntensity, mix(line1Color, line2Color, 0.5), halo); // 0.5: average color
+                vec3 col = glow + halo;
+                float alpha = clamp(length(col), 0.0, 1.0);
+                return vec4(col, alpha);
+            }
+        )";
+        contourDiagonalFlowLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+    }
+
+    if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffect_ is nullptr.");
+        return nullptr;
+    }
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffect_);
+}
+
+std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeContourDiagonalFlowLightShader(
+    const Drawing::Rect& rect)
+{
+    GE_LOGD("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader start");
+    if (cacheAnyPtr_ == nullptr) {
+        GE_LOGD("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader cache is nullptr.");
+        return nullptr;
+    }
+    auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_);
+    auto width = rect.GetWidth();
+    auto height = rect.GetHeight();
+    builder_ = GetContourDiagonalFlowLightBuilder();
+    Drawing::Matrix matrix;
+    auto shader = Drawing::ShaderEffect::CreateImageShader(*precalculationImage, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    builder_->SetChild("precalculationImage", shader);
+    builder_->SetUniform("iResolution", width, height);
+    builder_->SetUniform("line1Start", contourDiagonalFlowLightParams_.line1Start_);
+    builder_->SetUniform("line1Length", contourDiagonalFlowLightParams_.line1Length_);
+    builder_->SetUniform("line1Color", contourDiagonalFlowLightParams_.line1Color_[NUM0],
+        contourDiagonalFlowLightParams_.line1Color_[NUM1], contourDiagonalFlowLightParams_.line1Color_[NUM2]);
+    builder_->SetUniform("line2Start", contourDiagonalFlowLightParams_.line2Start_);
+    builder_->SetUniform("line2Length", contourDiagonalFlowLightParams_.line2Length_);
+    builder_->SetUniform("line2Color", contourDiagonalFlowLightParams_.line2Color_[NUM0],
+        contourDiagonalFlowLightParams_.line2Color_[NUM1], contourDiagonalFlowLightParams_.line2Color_[NUM2]);
+    builder_->SetUniform("lineThickness", contourDiagonalFlowLightParams_.thickness_);
+    auto contourDiagonalFlowLightShader = builder_->MakeShader(nullptr, false);
+    if (contourDiagonalFlowLightShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader is nullptr.");
+        return nullptr;
+    }
+    return contourDiagonalFlowLightShader;
+}
+
+std::vector<float> GEContourDiagonalFlowLightShader::PathStringToFloats(const std::string& str)
+{
+    std::vector<float> result;
+    std::istringstream iss(str);
+    char command;
+    float value;
+    while (iss >> command) {
+        if (command == 'm' || command == 'M') {
+            // process move cmd, 1 point
+            iss >> value;
+            result.push_back(value);
+            iss >> value;
+            result.push_back(value);
+        } else if (command == 'q' || command == 'Q') {
+            // process qubic cmd，2 points
+            iss >> value;
+            result.push_back(value);
+            iss >> value;
+            result.push_back(value);
+            iss >> value;
+            result.push_back(value);
+            iss >> value;
+            result.push_back(value);
+        }
+    }
+    return result;
+}
+} // namespace Rosen
+} // namespace OHOS
