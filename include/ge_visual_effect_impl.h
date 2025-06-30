@@ -29,6 +29,7 @@
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -91,6 +92,7 @@ public:
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
+    void SetParam(const std::string& tag, const RectF& param);
 
     void SetFilterType(FilterType type)
     {
@@ -282,6 +284,36 @@ public:
         return cacheAnyPtr_;
     }
 
+    void MakeRippleMaskParams()
+    {
+        rippleMaskParams_ = std::make_shared<GERippleShaderMaskParams>();
+    }
+
+    const std::shared_ptr<GERippleShaderMaskParams>& GetRippleMaskParams() const
+    {
+        return rippleMaskParams_;
+    }
+
+    void MakeRadialGradientMaskParams()
+    {
+        radialGradientMaskParams_ = std::make_shared<GERadialGradientShaderMaskParams>();
+    }
+
+    const std::shared_ptr<GERadialGradientShaderMaskParams>& GetRadialGradientMaskParams() const
+    {
+        return radialGradientMaskParams_;
+    }
+
+    void MakePixelMapMaskParams()
+    {
+        pixelMapMaskParams_ = std::make_shared<GEPixelMapMaskParams>();
+    }
+
+    const std::shared_ptr<GEPixelMapMaskParams>& GetPixelMapMaskParams() const
+    {
+        return pixelMapMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -305,6 +337,7 @@ private:
     void SetWavyRippleLightParams(const std::string& tag, float param);
     void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
     void SetAuroraNoiseParams(const std::string& tag, float param);
+    void SetPixelMapMaskParams(const std::string& tag, const RectF& param);
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
     // ShaderFilter Params
@@ -319,6 +352,7 @@ private:
     std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
 
     std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
+    std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;

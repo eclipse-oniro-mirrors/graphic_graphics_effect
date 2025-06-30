@@ -80,6 +80,8 @@ public:
         return canvasInfo_;
     }
 
+    const std::shared_ptr<Drawing::GEShaderMask> GenerateShaderMask() const;
+
 private:
     std::string visualEffectName_;
     DrawingPaintType type_;

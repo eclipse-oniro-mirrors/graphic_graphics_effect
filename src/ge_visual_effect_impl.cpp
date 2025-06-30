@@ -127,6 +127,24 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::AURORA_NOISE);
             impl->MakeAuroraNoiseParams();
         }
+    },
+    { GE_MASK_RIPPLE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::RIPPLE_MASK);
+            impl->MakeRippleMaskParams();
+        }
+    },
+    { GE_MASK_RADIAL_GRADIENT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK);
+            impl->MakeRadialGradientMaskParams();
+        }
+    },
+    { GE_MASK_PIXEL_MAP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK);
+            impl->MakePixelMapMaskParams();
+        }
     }
 };
 
@@ -300,7 +318,22 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, double param) {}
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const char* const param) {}
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param) {}
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param)
+{
+    switch (filterType_) {
+        case FilterType::PIXEL_MAP_MASK: {
+            if (pixelMapMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_PIXEL_MAP_PIXEL_MAP) {
+                pixelMapMaskParams_->image = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param)
 {
@@ -552,8 +585,42 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             SetContentDiagonalFlowParams(tag, param);
             break;
         }
+        case FilterType::PIXEL_MAP_MASK: {
+            if (pixelMapMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_PIXEL_MAP_FILL_COLOR) {
+                pixelMapMaskParams_->fillColor = param;
+            }
+            break;
+        }
         default:
             break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const RectF& param)
+{
+    switch (filterType_) {
+        case FilterType::PIXEL_MAP_MASK: {
+            SetPixelMapMaskParams(tag, param);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const RectF& param)
+{
+    if (pixelMapMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_PIXEL_MAP_SRC) {
+        pixelMapMaskParams_->src = param;
+    }
+    if (tag == GE_MASK_PIXEL_MAP_DST) {
+        pixelMapMaskParams_->dst = param;
     }
 }
 
