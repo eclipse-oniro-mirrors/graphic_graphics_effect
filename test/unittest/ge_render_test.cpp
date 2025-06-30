@@ -536,5 +536,40 @@ HWTEST_F(GERenderTest, GenerateShaderFilterDispersion_001, TestSize.Level1)
  
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilterDispersion_001 end";
 }
+
+/**
+ * @tc.name: ApplyHpsImageEffect_001
+ * @tc.desc: Verify the ApplyHpsImageEffect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsImageEffect_001 start";
+
+    Drawing::GEVisualEffectContainer veContainer;
+    const std::shared_ptr<Drawing::Image> image = nullptr;
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+
+    /* image is nullptr*/
+    geRender->ApplyHpsImageEffect(canvas_, veContainer, image, outImage, src, dst, brush);
+
+    /* no filter*/
+    auto image2 = MakeImage(canvas_);
+    geRender->ApplyHpsImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush);
+
+    /* normal case */
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
+    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
+    veContainer.AddToChainedFilter(visualEffect);
+    EXPECT_EQ(geRender->ApplyHpsImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush), false);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsImageEffect_001 end";
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

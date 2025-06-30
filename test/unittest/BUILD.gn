@@ -72,6 +72,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/ge_visual_effect_impl.cpp",
     "${graphics_effect_root}/src/ge_water_ripple_filter.cpp",
+    "${graphics_effect_root}/src/ge_hps_effect_filter.cpp",
   ]
 
   external_deps = []
@@ -135,6 +136,7 @@ ohos_unittest("GraphicsEffectTest") {
     "gex_dot_matrix_shader_test.cpp",
     "gex_flow_light_sweep_shader_test.cpp",
     "gex_complex_shader_test.cpp",
+    "ge_hps_effect_filter_test.cpp"
   ]
 
   if (!is_mingw && !is_win) {
