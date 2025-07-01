@@ -51,6 +51,10 @@ public:
         Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
         const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
 
+    bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
+
 private:
     std::vector<std::shared_ptr<GEShader>> GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer);
 

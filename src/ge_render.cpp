@@ -21,6 +21,7 @@
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
+#include "ge_hps_effect_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
@@ -75,6 +76,33 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     }
 
     return resImage;
+}
+
+// true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
+bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+    const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& src,
+    const Drawing::Rect& dst, Drawing::Brush& brush)
+{
+    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas);
+    if (!image) {
+        LOGE("GERender::ApplyImageEffect image is null");
+        return false;
+    }
+
+    if (veContainer.GetFilters().empty()) {
+        return false;
+    }
+
+    if (hpsEffectFilter->HpsSupportEffectGE(veContainer)) {
+        for (auto vef : veContainer.GetFilters()) {
+            auto ve = vef->GetImpl();
+            hpsEffectFilter->GenerateVisualEffectFromGE(ve, src, dst);
+        }
+
+        return hpsEffectFilter->ApplyHpsEffect(canvas, image, outImage, brush);
+    }
+
+    return false;
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(

@@ -82,6 +82,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_visual_effect_container.cpp",
     "src/ge_visual_effect_impl.cpp",
     "src/ge_water_ripple_filter.cpp",
+    "src/ge_hps_effect_filter.cpp",
   ]
 
   deps = [ ":utils" ]
