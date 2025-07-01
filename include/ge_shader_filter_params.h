@@ -189,11 +189,11 @@ struct GEMagnifierShaderFilterParams {
     int32_t rotateDegree = 0;
 };
 
-constexpr char GE_MASK_RIPPLE[] = "MASK_RIPPLE";
-constexpr char GE_MASK_RIPPLE_CENTER[] = "MASK_RIPPLE_CENTER";
-constexpr char GE_MASK_RIPPLE_RADIUS[] = "MASK_RIPPLE_RADIUS";
-constexpr char GE_MASK_RIPPLE_WIDTH[] = "MASK_RIPPLE_WIDTH";
-constexpr char GE_MASK_RIPPLE_WIDTH_CENTER_OFFSET[] = "MASK_RIPPLE_WIDTH_CENTER_OFFSET";
+constexpr char GE_MASK_RIPPLE[] = "RippleMask";
+constexpr char GE_MASK_RIPPLE_CENTER[] = "RippleMask_Center";
+constexpr char GE_MASK_RIPPLE_RADIUS[] = "RippleMask_Radius";
+constexpr char GE_MASK_RIPPLE_WIDTH[] = "RippleMask_Width";
+constexpr char GE_MASK_RIPPLE_WIDTH_CENTER_OFFSET[] = "RippleMask_Offset";
 struct GERippleShaderMaskParams {
     std::pair<float, float> center_ = {0.f, 0.f};
     float radius_ = 0.f;
@@ -201,9 +201,9 @@ struct GERippleShaderMaskParams {
     float widthCenterOffset_ = 0.0f;
 };
 
-constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DISPLACEMENT_DISTORT";
-constexpr char GE_FILTER_DISPLACEMENT_DISTORT_FACTOR[] = "DISTORT_FACTOR";
-constexpr char GE_FILTER_DISPLACEMENT_DISTORT_MASK[] = "DISTORT_MASK";
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DispDistort";
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT_FACTOR[] = "DispDistort_Factor";
+constexpr char GE_FILTER_DISPLACEMENT_DISTORT_MASK[] = "DispDistort_Mask";
 struct GEDisplacementDistortFilterParams {
     std::pair<float, float> factor_ = {1.0f, 1.0f};
     std::shared_ptr<GEShaderMask> mask_;
@@ -246,11 +246,11 @@ struct GEBezierWarpShaderFilterParams {
     std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM> destinationPatch;
 };
 
-constexpr char GE_MASK_PIXEL_MAP[] = "MASK_PIXEL_MAP";
-constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "MASK_PIXEL_MAP_PIXEL_MAP";
-constexpr char GE_MASK_PIXEL_MAP_SRC[] = "MASK_PIXEL_MAP_SRC";
-constexpr char GE_MASK_PIXEL_MAP_DST[] = "MASK_PIXEL_MAP_DST";
-constexpr char GE_MASK_PIXEL_MAP_FILL_COLOR[] = "MASK_PIXEL_MAP_FILL_COLOR";
+constexpr char GE_MASK_PIXEL_MAP[] = "PixelMapMask";
+constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "PixelMapMask_Image";
+constexpr char GE_MASK_PIXEL_MAP_SRC[] = "PixelMapMask_Src";
+constexpr char GE_MASK_PIXEL_MAP_DST[] = "PixelMapMask_Dst";
+constexpr char GE_MASK_PIXEL_MAP_FILL_COLOR[] = "PixelMapMask_FillColor";
 struct GEPixelMapMaskParams {
     std::shared_ptr<Drawing::Image> image = nullptr;
     RectF src;
@@ -277,12 +277,12 @@ struct GEDispersionShaderFilterParams {
     float blueOffsetY;
 };
 
-constexpr char GE_MASK_RADIAL_GRADIENT[] = "MASK_RADIAL_GRADIENT";
-constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "MASK_RADIAL_GRADIENT_CENTER";
-constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSX[] = "MASK_RADIAL_GRADIENT_RADIUSX";
-constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSY[] = "MASK_RADIAL_GRADIENT_RADIUSY";
-constexpr char GE_MASK_RADIAL_GRADIENT_COLORS[] = "MASK_RADIAL_GRADIENT_COLORS";
-constexpr char GE_MASK_RADIAL_GRADIENT_POSITIONS[] = "MASK_RADIAL_GRADIENT_POSITIONS";
+constexpr char GE_MASK_RADIAL_GRADIENT[] = "RadialGradientMask";
+constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "RadialGradientMask_Center";
+constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSX[] = "RadialGradientMask_RadiusX";
+constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSY[] = "RadialGradientMask_RadiusY";
+constexpr char GE_MASK_RADIAL_GRADIENT_COLORS[] = "RadialGradientMask_Colors";
+constexpr char GE_MASK_RADIAL_GRADIENT_POSITIONS[] = "RadialGradientMask_Positions";
 struct GERadialGradientShaderMaskParams {
     std::pair<float, float> center_ = {0.f, 0.f};
     float radiusX_ = 0.f;

@@ -17,6 +17,7 @@
 
 #include "ge_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
+#include "utils/rect.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -401,15 +402,15 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_013, TestSize.Level1)
 
     // test invalid params setting
     float rippleRadius = 0.5f;
-    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_RADIUS", rippleRadius);
+    geVisualEffectImplRippleMask.SetParam("RippleMask_Radius", rippleRadius);
     EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->radius_, rippleRadius);
 
     float rippleWidth = 0.6f;
-    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_WIDTH", rippleWidth);
+    geVisualEffectImplRippleMask.SetParam("RippleMask_Width", rippleWidth);
     EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->width_, rippleWidth);
 
     float centerOffset = 0.7f;
-    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_WIDTH_CENTER_OFFSET", centerOffset);
+    geVisualEffectImplRippleMask.SetParam("RippleMask_Offset", centerOffset);
     EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->widthCenterOffset_, centerOffset);
 }
 
@@ -425,7 +426,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
     geVisualEffectImplRippleMask.rippleMaskParams_ = std::make_shared<Drawing::GERippleShaderMaskParams>();
 
     std::pair<float, float> center = {0.5f, 0.5f};
-    geVisualEffectImplRippleMask.SetParam("MASK_RIPPLE_CENTER", center);
+    geVisualEffectImplRippleMask.SetParam("RippleMask_Center", center);
     EXPECT_EQ(geVisualEffectImplRippleMask.rippleMaskParams_->center_, center);
 
 
@@ -435,7 +436,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
         std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
-    geVisualEffectImplDisplaceDistort.SetParam("DISTORT_FACTOR", factor);
+    geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Factor", factor);
     EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->factor_, factor);
 }
 
@@ -454,7 +455,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
         std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
-    geVisualEffectImplDisplaceDistort.SetParam("DISTORT_MASK", shaderMask);
+    geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
     EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->mask_, shaderMask);
 }
 
@@ -683,6 +684,49 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
     Vector4f lightColor = Vector4f(0.3f, 0.6f, 0.9f, 0.0f);
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_COLOR, lightColor);
     EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightColor, lightColor);
+}
+
+/**
+ * @tc.name: SetParam_021
+ * @tc.desc: Verify function SetParam for pixelMapMask params
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_021, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplPixelMapMask(Drawing::GE_MASK_PIXEL_MAP);
+    geVisualEffectImplPixelMapMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK;
+    geVisualEffectImplPixelMapMask.pixelMapMaskParams_ = std::make_shared<Drawing::GEPixelMapMaskParams>();
+
+    Drawing::RectF srcRect = Drawing::RectF(0.0f, 0.0f, 100.0f, 100.0f);
+    geVisualEffectImplPixelMapMask.SetParam("PixelMapMask_Src", srcRect);
+    EXPECT_EQ(geVisualEffectImplPixelMapMask.pixelMapMaskParams_->src, srcRect);
+
+    Drawing::RectF dstRect = Drawing::RectF(0.0f, 0.0f, 200.0f, 200.0f);
+    geVisualEffectImplPixelMapMask.SetParam("PixelMapMask_Dst", dstRect);
+    EXPECT_EQ(geVisualEffectImplPixelMapMask.pixelMapMaskParams_->dst, dstRect);
+
+    Vector4f fillColor = Vector4f(1.0f, 0.5f, 0.2f, 0.8f);
+    geVisualEffectImplPixelMapMask.SetParam("PixelMapMask_FillColor", fillColor);
+    EXPECT_EQ(geVisualEffectImplPixelMapMask.pixelMapMaskParams_->fillColor, fillColor);
+
+    auto testImage = std::make_shared<Drawing::Image>();
+    geVisualEffectImplPixelMapMask.SetParam("PixelMapMask_Image", testImage);
+    EXPECT_EQ(geVisualEffectImplPixelMapMask.pixelMapMaskParams_->image, testImage);
+}
+
+/**
+ * @tc.name: MakePixelMapMaskParams_001
+ * @tc.desc: Verify function MakePixelMapMaskParams is invalid
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakePixelMapMaskParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK);
+    ASSERT_EQ(geVisualEffectImpl.GetPixelMapMaskParams(), nullptr);
+
+    geVisualEffectImpl.MakePixelMapMaskParams();
+    ASSERT_NE(geVisualEffectImpl.GetPixelMapMaskParams(), nullptr);
 }
 
 /**

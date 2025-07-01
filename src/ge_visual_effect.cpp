@@ -17,6 +17,9 @@
 
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_pixel_map_shader_mask.h"
+#include "ge_radial_gradient_shader_mask.h"
+#include "ge_ripple_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -119,6 +122,40 @@ void GEVisualEffect::SetParam(const std::string& tag, const Vector3f& param)
 void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
 {
     visualEffectImpl_->SetParam(tag, param);
+}
+
+const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask() const
+{
+    auto impl = visualEffectImpl_;
+    if (impl == nullptr) {
+        return nullptr;
+    }
+
+    switch (impl->GetFilterType()) {
+        case GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK: {
+            auto radialParams = impl->GetRadialGradientMaskParams();
+            if (radialParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GERadialGradientShaderMask>(*radialParams);
+        }
+        case GEVisualEffectImpl::FilterType::RIPPLE_MASK: {
+            auto rippleParams = impl->GetRippleMaskParams();
+            if (rippleParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GERippleShaderMask>(*rippleParams);
+        }
+        case GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK: {
+            auto pixelMapParams = impl->GetPixelMapMaskParams();
+            if (pixelMapParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GEPixelMapShaderMask>(*pixelMapParams);
+        }
+        default:
+            return nullptr;
+    }
 }
 
 } // namespace Drawing
