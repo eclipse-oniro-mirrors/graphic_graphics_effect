@@ -65,6 +65,7 @@ public:
         CONTOUR_DIAGONAL_FLOW_LIGHT,
         WAVY_RIPPLE_LIGHT,
         AURORA_NOISE,
+        PARTICLE_CIRCULAR_HALO,
         MAX
     };
 
@@ -274,6 +275,16 @@ public:
         return auroNoiseParams_;
     }
 
+    void MakeParticleCircularHaloParams()
+    {
+        particleCircularHaloParams_ = std::make_shared<GEParticleCircularHaloShaderParams>();
+    }
+
+    const std::shared_ptr<GEParticleCircularHaloShaderParams>& GetParticleCircularHaloParams() const
+    {
+        return particleCircularHaloParams_;
+    }
+
     void SetCache(std::shared_ptr<std::any> cacheData)
     {
         cacheAnyPtr_ = cacheData;
@@ -338,6 +349,8 @@ private:
     void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
     void SetAuroraNoiseParams(const std::string& tag, float param);
     void SetPixelMapMaskParams(const std::string& tag, const RectF& param);
+    void SetParticleCircularHaloParams(const std::string& tag, float param);
+    void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
     // ShaderFilter Params
@@ -364,6 +377,7 @@ private:
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
+    std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
 };
 
 } // namespace Drawing

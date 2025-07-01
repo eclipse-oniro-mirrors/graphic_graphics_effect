@@ -339,6 +339,18 @@ struct GEAuroraNoiseShaderParams {
     float noise_ = 0.f;
 };
 
+// Declare same with in rs_render_shader_base.h
+constexpr char GE_SHADER_PARTICLE_CIRCULAR_HALO[] = "ParticleCircularHalo";
+constexpr char GE_SHADER_PARTICLE_CIRCULAR_HALO_CENTER[] = "ParticleCircularHalo_Center";
+constexpr char GE_SHADER_PARTICLE_CIRCULAR_HALO_RADIUS[] = "ParticleCircularHalo_Radius";
+constexpr char GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE[] = "ParticleCircularHalo_Noise";
+struct GEParticleCircularHaloShaderParams {
+    std::pair<float, float> center_ = {0.f, 0.f};
+    float radius_ = 0.f;
+    float noise_ = 0.f;
+};
+
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

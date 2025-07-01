@@ -145,7 +145,13 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK);
             impl->MakePixelMapMaskParams();
         }
-    }
+    },
+    { GE_SHADER_PARTICLE_CIRCULAR_HALO,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO);
+            impl->MakeParticleCircularHaloParams();
+        }
+     }
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
@@ -309,6 +315,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetAuroraNoiseParams(tag, param);
             break;
         }
+        case FilterType::PARTICLE_CIRCULAR_HALO: {
+            SetParticleCircularHaloParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -405,6 +415,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::WAVY_RIPPLE_LIGHT: {
             SetWavyRippleLightParams(tag, param);
+            break;
+        }
+        case FilterType::PARTICLE_CIRCULAR_HALO: {
+            SetParticleCircularHaloParams(tag, param);
             break;
         }
         default:
@@ -1025,6 +1039,29 @@ void GEVisualEffectImpl::SetAuroraNoiseParams(const std::string& tag, float para
     }
     if (tag == GE_SHADER_AURORA_NOISE_VALUE) {
         auroNoiseParams_->noise_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (particleCircularHaloParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_CENTER) {
+        particleCircularHaloParams_->center_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, float param)
+{
+    if (particleCircularHaloParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_RADIUS) {
+        particleCircularHaloParams_->radius_ = param;
+    }
+    if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
+        particleCircularHaloParams_->noise_ = param;
     }
 }
 } // namespace Drawing
