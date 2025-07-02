@@ -25,6 +25,7 @@
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
+#include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_sound_wave_filter.h"
@@ -292,6 +293,11 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
             }
             case Drawing::GEVisualEffectImpl::FilterType::AURORA_NOISE: {
                 const auto& params = ve->GetAuroraNoiseParams();
+                (void)params;
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO: {
+                const auto& params = ve->GetParticleCircularHaloParams();
                 (void)params;
                 break;
             }
