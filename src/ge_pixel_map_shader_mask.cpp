@@ -71,7 +71,6 @@ bool GEPixelMapShaderMask::IsValid() const
 std::shared_ptr<ShaderEffect> GEPixelMapShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {
-        LOGE("GEPixelMapShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
