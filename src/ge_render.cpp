@@ -76,9 +76,9 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
         auto ve = vef->GetImpl();
         std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(ve);
         if (geShaderFilter == nullptr) {
-             LOGD("GERender::ApplyImageEffect filter is null");
+            LOGD("GERender::ApplyImageEffect filter is null");
             continue;
-         }
+        }
         geShaderFilter->SetCache(ve->GetCache());
         geShaderFilter->Preprocess(canvas, src, dst);
         resImage = geShaderFilter->ProcessImage(canvas, resImage, src, dst);
