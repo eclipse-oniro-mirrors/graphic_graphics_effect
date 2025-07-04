@@ -25,6 +25,7 @@
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
+#include "ge_direction_light_shader_filter.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
@@ -238,6 +239,11 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::CONTENT_LIGHT: {
                 const auto& contentLightParams = ve->GetContentLightParams();
                 shaderFilter = std::make_shared<GEContentLightFilter>(*contentLightParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::DIRECTION_LIGHT: {
+                const auto& directionLightParams = ve->GetDirectionLightParams();
+                shaderFilter = std::make_shared<GEDirectionLightShaderFilter>(*directionLightParams);
                 break;
             }
             default:

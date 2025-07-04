@@ -110,6 +110,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeContentLightParams();
         }
     },
+    { GE_FILTER_DIRECTION_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DIRECTION_LIGHT);
+            impl->MakeDirectionLightParams();
+        }
+    },
     { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT);
@@ -321,6 +327,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::CONTENT_LIGHT: {
             SetContentLightParams(tag, param);
+            break;
+        }
+        case FilterType::DIRECTION_LIGHT: {
+            SetDirectionLightParamsFloat(tag, param);
             break;
         }
         case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
@@ -599,6 +609,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::DIRECTION_LIGHT: {
+            if (directionLightParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_DIRECTION_LIGHT_MASK) {
+                directionLightParams_->mask = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -616,6 +636,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             }
             if (tag == GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE) {
                 contentLightParams_->rotationAngle = param;
+            }
+            break;
+        }
+        case FilterType::DIRECTION_LIGHT: {
+            if (directionLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_DIRECTION_LIGHT_DIRECTION) {
+                directionLightParams_->lightDirection = param;
             }
             break;
         }
@@ -645,6 +674,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
                 return;
             }
             SetPixelMapMaskParams(tag, param);
+            break;
+        }
+        case FilterType::DIRECTION_LIGHT: {
+            if (directionLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_DIRECTION_LIGHT_COLOR) {
+                directionLightParams_->lightColor = param;
+            }
             break;
         }
         default:
@@ -1072,6 +1110,23 @@ void GEVisualEffectImpl::SetContentLightParams(const std::string& tag, float par
             [](GEVisualEffectImpl* obj, float p) { obj->contentLightParams_->lightIntensity = p; } },
     };
  
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDirectionLightParamsFloat(const std::string& tag, float param)
+{
+    if (directionLightParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_DIRECTION_LIGHT_INTENSITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->directionLightParams_->lightIntensity = p; } },
+    };
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
