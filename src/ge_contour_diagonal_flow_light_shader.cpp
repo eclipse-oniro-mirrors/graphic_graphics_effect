@@ -28,83 +28,42 @@ namespace {
 constexpr size_t NUM0 = 0;
 constexpr size_t NUM1 = 1;
 constexpr size_t NUM2 = 2;
+constexpr size_t MIN_NUM = 6;
 constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
 constexpr static uint8_t ARRAY_SIZE = 64;  // 32 segments need 64 control points
-constexpr static uint8_t COUNT = 46;  // 32 segments need 64 control points
-float g_controlPoints[ARRAY_SIZE * POSITION_CHANNEL] = {
-    -0.35, 0.15,
-    -0.435, 0.165,
-    -0.52, 0.18,
-    -0.48, 0.29,
-    -0.44, 0.40,
-    -0.32, 0.45,
-    -0.20, 0.50,
-    -0.05, 0.50,
-    0.10, 0.50,
-    0.19, 0.45,
-    0.28, 0.40,
-    0.315, 0.31,
-    0.35, 0.22,
-    0.30, 0.20,
-    0.25, 0.18,
-    0.215, 0.155,
-    0.18, 0.13,
-    0.17, 0.09,
-    0.16, 0.05,
-    0.13, 0.015,
-    0.10, -0.02,
-    0.06, -0.01,
-    0.02, 0.0,
-    0.02, -0.035,
-    0.02, -0.07,
-    0.035, -0.26,
-    0.05, -0.45,
-    0.035, -0.475,
-    0.02, -0.50,
-    0.0, -0.54,
-    -0.02, -0.58,
-    -0.045, -0.565,
-    -0.07, -0.55,
-    -0.085, -0.575,
-    -0.10, -0.60,
-    -0.135, -0.525,
-    -0.17, -0.45,
-    -0.165, -0.285,
-    -0.16, -0.12,
-    -0.17, -0.085,
-    -0.18, -0.05,
-    -0.215, -0.05,
-    -0.25, -0.05,
-    -0.20, 0.05,
-    -0.15, 0.15,
-    -0.25, 0.15,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    0.0, 0.0
-};
 } // namespacesu
+
+std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, float width, float height)
+{
+    std::vector<Vector2f> ndcPoints;
+    ndcPoints.reserve(uvPoints.size());
+
+    float aspect = width / height;
+
+    for (const auto& uv : uvPoints)
+    {
+        float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
+        float ndcY = uv[1] * 2.0f - 1.0f;
+        ndcPoints.emplace_back(ndcX, ndcY);
+    }
+
+    return ndcPoints;
+}
+
+void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
+{
+    out.clear();
+    for (auto& p : in) {
+        out.push_back(p[0]);
+        out.push_back(p[1]);
+    }
+}
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
-    contourDiagonalFlowLightParams_ = param;
-    controlPoints_ = std::vector<float>(g_controlPoints, g_controlPoints + ARRAY_SIZE * POSITION_CHANNEL); // test data
+     contourDiagonalFlowLightParams_ = param;
 }
 
 std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
@@ -1358,8 +1317,20 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder>GEContourDiagonalFlowLightShader::
 void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
+    if (contourDiagonalFlowLightParams_.contour_.size() < MIN_NUM) {
+        GE_LOGW("GEContourDiagonalFlowLightShader less point %{public}zu",
+            contourDiagonalFlowLightParams_.contour_.size());
+        return;
+    }
+
+
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
+        auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_,
+            static_cast<float>(rect.GetWidth()), static_cast<float>(rect.GetHeight()));
+        pointCnt_ = ndcPoints.size();
+        ConvertPointsTo(ndcPoints, controlPoints_);
+        controlPoints_.resize(ARRAY_SIZE * POSITION_CHANNEL);
         Drawing::ImageInfo cacheImgInf(rect.GetWidth(), rect.GetHeight(),
             Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
         auto cacheImg = MakeContourDiagonalFlowLightPrecalculationShader(canvas, cacheImgInf);
@@ -1375,9 +1346,8 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDiagonalFlowLightPrecalculationShader(
     Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
-    // one cloest bezier need 4 point
-    uint8_t miniSizeOfPoints = 4;
-    if (controlPoints_.size() < miniSizeOfPoints) {
+     // requires at least 6 control points, corresponding to 3 quadratic bezier curves
+    if (pointCnt_ < MIN_NUM) {
         GE_LOGD("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader path less points.");
         return nullptr;
     }
@@ -1385,7 +1355,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     float height = imageInfo.GetHeight();
     auto builder = GetContourDiagonalFlowLightPrecalculationBuilder();
     builder->SetUniform("iResolution", width, height);
-    builder->SetUniform("count", static_cast<float>(COUNT));
+    builder->SetUniform("count", static_cast<float>(pointCnt_));
     builder->SetUniform("controlPoints", controlPoints_.data(), controlPoints_.size());
     auto contourDiagonalFlowLightShader = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     if (contourDiagonalFlowLightShader == nullptr) {
@@ -1533,7 +1503,7 @@ std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeCont
 {
     GE_LOGD("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader start");
     if (cacheAnyPtr_ == nullptr) {
-        GE_LOGD("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader cache is nullptr.");
+        GE_LOGW("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader cache is nullptr.");
         return nullptr;
     }
     auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_);

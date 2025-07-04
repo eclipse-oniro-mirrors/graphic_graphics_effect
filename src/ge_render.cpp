@@ -15,6 +15,7 @@
 #include "ge_render.h"
 
 #include "ge_aibar_shader_filter.h"
+#include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_grey_shader_filter.h"
@@ -282,8 +283,7 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
             case Drawing::GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
                 const auto& params = ve->GetContenDiagonalParams();
                 shaderEffect = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(*params);
-                shaderEffects.push_back(shaderEffect);
-                return shaderEffects;
+                break;
             }
 
             case Drawing::GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT: {
@@ -293,6 +293,7 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
             }
             case Drawing::GEVisualEffectImpl::FilterType::AURORA_NOISE: {
                 const auto& params = ve->GetAuroraNoiseParams();
+                shaderEffect = GEAuroraNoiseShader::CreateAuroraNoiseShader(*params);
                 (void)params;
                 break;
             }
