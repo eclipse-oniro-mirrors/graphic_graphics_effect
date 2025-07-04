@@ -89,7 +89,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                 half2 u = f * f * (3.0 - 2.0 * f);
 
                 return mix(mix(dot(random2(i + half2(0.0, 0.0)), f - half2(0.0, 0.0)),
-                               dot(random2(i + half2(1.0, .0)), f - half2(1.0, 0.0)), u.x),
+                               dot(random2(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
                            mix(dot(random2(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
                                dot(random2(i + half2(1.0, 1.0)), f - half2(1., 1.0)), u.x), u.y);
             }
