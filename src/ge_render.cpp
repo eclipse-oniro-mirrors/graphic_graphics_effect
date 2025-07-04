@@ -29,6 +29,7 @@
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
+#include "ge_wavy_ripple_light_shader.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_edge_light_shader_filter.h"
@@ -288,7 +289,7 @@ std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::G
 
             case Drawing::GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT: {
                 const auto& params = ve->GetWavyRippleLightParams();
-                (void)params;
+                shaderEffect = GEWavyRippleLightShader::CreateWavyRippleLightShader(*params);
                 break;
             }
             case Drawing::GEVisualEffectImpl::FilterType::AURORA_NOISE: {
