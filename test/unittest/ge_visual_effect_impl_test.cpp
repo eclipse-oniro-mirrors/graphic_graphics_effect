@@ -15,8 +15,9 @@
 
 #include <gtest/gtest.h>
 
-#include "ge_ripple_shader_mask.h"
 #include "ge_double_ripple_shader_mask.h"
+#include "ge_radial_gradient_shader_mask.h"
+#include "ge_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
 #include "utils/rect.h"
@@ -497,14 +498,31 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_016, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParamEdgelight_001, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_EDGE_LIGHT);
+
     geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 0.5f);
     EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->alpha, 0.5f);
-    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorR, 0.5f);
-    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorG, 0.5f);
-    geVisualEffectImpl.SetEdgeLightParams(Drawing::GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->edgeColorB, 0.5f);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_BLOOM, true);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->bloom, true);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_BLOOM, false);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->bloom, false);
+
+    Vector4f color = Vector4f{0.2f, 0.7f, 0.1f, 0.0f};
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_COLOR, color);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->color, color);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR, true);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->useRawColor, true);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR, false);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->useRawColor, false);
+
+    Drawing::GERadialGradientShaderMaskParams param;
+    auto geRadialGradientShaderMask = std::make_shared<Drawing::GERadialGradientShaderMask>(param);
+    auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRadialGradientShaderMask);
+    geVisualEffectImpl.SetParam(Drawing::GE_FILTER_EDGE_LIGHT_MASK, shaderMask);
+    EXPECT_EQ(geVisualEffectImpl.GetEdgeLightParams()->mask, shaderMask);
 }
 
 /**

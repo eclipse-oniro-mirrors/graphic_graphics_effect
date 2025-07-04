@@ -17,6 +17,7 @@
  
 #include "ge_edge_light_shader_filter.h"
 
+#include "common/rs_vector4.h"
 #include "draw/color.h"
 #include "image/bitmap.h"
 
@@ -24,6 +25,7 @@ using namespace testing;
 using namespace testing::ext;
  
 namespace OHOS {
+namespace Rosen {
 namespace GraphicsEffectEngine {
  
 class GEEdgeLightShaderFilterTest : public testing::Test {
@@ -71,8 +73,9 @@ void GEEdgeLightShaderFilterTest::TearDown()
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_001, TestSize.Level0)
 {
+    Vector4f color = Vector4f{0.2f, 0.7f, 0.1f, 0.0f};
     Rosen::Drawing::GEEdgeLightShaderFilterParams
-        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
+        geEdgeLightShaderParams{ 1.0f, true, color, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 }
@@ -84,8 +87,9 @@ HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_001, TestSize.Level0)
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
 {
+    Vector4f color = Vector4f{0.2f, 0.7f, 0.1f, 0.0f};
     Rosen::Drawing::GEEdgeLightShaderFilterParams
-        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
+        geEdgeLightShaderParams{ 1.0f, true, color, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
@@ -97,11 +101,13 @@ HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, ProcessImage_003, TestSize.Level0)
 {
+    Vector4f color = Vector4f{0.2f, 0.7f, 0.1f, 0.0f};
     Rosen::Drawing::GEEdgeLightShaderFilterParams
-        geEdgeLightShaderParams{ 1.0f, true, 0.2f, 0.7f, 0.1f, nullptr, false };
+        geEdgeLightShaderParams{ 1.0f, true, color, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
     EXPECT_EQ(geEdgeLightShaderFilter->ProcessImage(canvas_, imageEmpty_, src_, dst_), nullptr);
 }
 
 } // namespace GraphicsEffectEngine
+} // namespace Rosen
 } // namespace OHOS

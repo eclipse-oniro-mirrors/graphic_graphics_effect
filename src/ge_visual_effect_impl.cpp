@@ -647,6 +647,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             SetPixelMapMaskParams(tag, param);
             break;
         }
+        case FilterType::EDGE_LIGHT: {
+            if (edgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_EDGE_LIGHT_COLOR) {
+                edgeLightParams_->color = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1016,12 +1025,6 @@ void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
     }
 
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
-        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_R,
-            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorR = p; } },
-        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_G,
-            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorG = p; } },
-        { GE_FILTER_EDGE_LIGHT_EDGE_COLOR_B,
-            [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->edgeColorB = p; } },
         { GE_FILTER_EDGE_LIGHT_ALPHA,
             [](GEVisualEffectImpl* obj, float p) { obj->edgeLightParams_->alpha = p; } },
     };

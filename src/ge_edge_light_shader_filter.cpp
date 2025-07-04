@@ -31,9 +31,7 @@ GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShade
 {
     alpha_ = params.alpha;
     bloom_ = params.bloom;
-    edgeColorR_ = params.edgeColorR;
-    edgeColorG_ = params.edgeColorG;
-    edgeColorB_ = params.edgeColorB;
+    color_ = params.color;
     mask_ = params.mask;
     useRawColor_ = params.useRawColor;
 }
