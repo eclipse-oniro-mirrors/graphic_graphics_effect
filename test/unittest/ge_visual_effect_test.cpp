@@ -212,6 +212,46 @@ HWTEST_F(GEVisualEffectTest, GetCanvasInfo_001, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GetCanvasInfo_001 end";
 }
+
+/**
+ * @tc.name: SetParam_008
+ * @tc.desc: Verify the SetParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetParam_008, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_008 start";
+
+    std::pair<float, float> factor = {0.5f, 0.5f};
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_WAVE_GRADIENT);
+    visualEffect->visualEffectImpl_->waveGradientMaskParams_ = std::make_shared<GEWaveGradientShaderMaskParams>();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK;
+    visualEffect->SetParam(GE_MASK_WAVE_GRADIENT_CENTER, factor);
+    EXPECT_EQ(visualEffect->visualEffectImpl_->waveGradientMaskParams_->center_, factor);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_008 end";
+}
+
+/**
+ * @tc.name: SetParam_009
+ * @tc.desc: Verify the SetParam Vector2f
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetParam_009, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_009 start";
+
+    std::pair<float, float> factor = {0.5f, 0.5f};
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_DOUBLE_RIPPLE);
+    visualEffect->visualEffectImpl_->doubleRippleMaskParams_ = std::make_shared<GEDoubleRippleShaderMaskParams>();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK;
+    visualEffect->SetParam(GE_MASK_DOUBLE_RIPPLE_CENTER1, factor);
+    EXPECT_EQ(visualEffect->visualEffectImpl_->doubleRippleMaskParams_->center1_, factor);
+    visualEffect->SetParam(GE_MASK_DOUBLE_RIPPLE_CENTER2, factor);
+    EXPECT_EQ(visualEffect->visualEffectImpl_->doubleRippleMaskParams_->center2_, factor);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_009 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

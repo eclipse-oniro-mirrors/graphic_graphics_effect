@@ -134,6 +134,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeRippleMaskParams();
         }
     },
+    { GE_MASK_DOUBLE_RIPPLE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK);
+            impl->MakeDoubleRippleMaskParams();
+        }
+    },
     { GE_MASK_RADIAL_GRADIENT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK);
@@ -144,6 +150,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK);
             impl->MakePixelMapMaskParams();
+        }
+    },
+    { GE_MASK_WAVE_GRADIENT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK);
+            impl->MakeWaveGradientMaskParams();
         }
     },
     { GE_SHADER_PARTICLE_CIRCULAR_HALO,
@@ -283,8 +295,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetRippleMaskParamsFloat(tag, param);
             break;
         }
+        case FilterType::DOUBLE_RIPPLE_MASK : {
+            SetDoubleRippleMaskParamsFloat(tag, param);
+            break;
+        }
         case FilterType::RADIAL_GRADIENT_MASK: {
             SetRadialGradientMaskParamsFloat(tag, param);
+            break;
+        }
+        case FilterType::WAVE_GRADIENT_MASK : {
+            SetWaveGradientMaskParamsFloat(tag, param);
             break;
         }
         case FilterType::SOUND_WAVE: {
@@ -395,6 +415,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             }
             break;
         }
+        case FilterType::DOUBLE_RIPPLE_MASK: {
+            if (doubleRippleMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_DOUBLE_RIPPLE_CENTER1) {
+                doubleRippleMaskParams_->center1_ = param;
+            }
+            if (tag == GE_MASK_DOUBLE_RIPPLE_CENTER2) {
+                doubleRippleMaskParams_->center2_ = param;
+            }
+            break;
+        }
         case FilterType::DISPLACEMENT_DISTORT_FILTER: {
             if (displacementDistortParams_ == nullptr) {
                 return;
@@ -415,6 +447,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::WAVY_RIPPLE_LIGHT: {
             SetWavyRippleLightParams(tag, param);
+            break;
+        }
+        case FilterType::WAVE_GRADIENT_MASK: {
+            if (waveGradientMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_WAVE_GRADIENT_CENTER) {
+                waveGradientMaskParams_->center_ = param;
+            }
             break;
         }
         case FilterType::PARTICLE_CIRCULAR_HALO: {
@@ -603,9 +644,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             if (pixelMapMaskParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_PIXEL_MAP_FILL_COLOR) {
-                pixelMapMaskParams_->fillColor = param;
-            }
+            SetPixelMapMaskParams(tag, param);
             break;
         }
         default:
@@ -635,6 +674,24 @@ void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Rec
     }
     if (tag == GE_MASK_PIXEL_MAP_DST) {
         pixelMapMaskParams_->dst = param;
+    }
+}
+
+void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Vector4f& param)
+{
+    if (pixelMapMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_PIXEL_MAP_SRC) {
+        Drawing::RectF rect(param.x_, param.y_, param.z_, param.w_);
+        pixelMapMaskParams_->src = rect;
+    }
+    if (tag == GE_MASK_PIXEL_MAP_DST) {
+        Drawing::RectF rect(param.x_, param.y_, param.z_, param.w_);
+        pixelMapMaskParams_->dst = rect;
+    }
+    if (tag == GE_MASK_PIXEL_MAP_FILL_COLOR) {
+        pixelMapMaskParams_->fillColor = param;
     }
 }
 
@@ -784,6 +841,50 @@ void GEVisualEffectImpl::SetMagnifierParamsFloat(const std::string& tag, float p
             [](GEVisualEffectImpl* obj, float p) { obj->magnifierParams_->shadowSize = p; } },
         { GE_FILTER_MAGNIFIER_SHADOW_STRENGTH,
             [](GEVisualEffectImpl* obj, float p) { obj->magnifierParams_->shadowStrength = p; } }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetWaveGradientMaskParamsFloat(const std::string& tag, float param)
+{
+    if (waveGradientMaskParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_MASK_WAVE_GRADIENT_WIDTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->waveGradientMaskParams_->width_ = p; } },
+        { GE_MASK_WAVE_GRADIENT_PROPAGATION_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->waveGradientMaskParams_->propagationRadius_ = p; } },
+        { GE_MASK_WAVE_GRADIENT_BLUR_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->waveGradientMaskParams_->blurRadius_ = p; } },
+        { GE_MASK_WAVE_GRADIENT_TURBULENCE_STRENGTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->waveGradientMaskParams_->turbulenceStrength_ = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDoubleRippleMaskParamsFloat(const std::string& tag, float param)
+{
+    if (doubleRippleMaskParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_MASK_DOUBLE_RIPPLE_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->radius_ = p; } },
+        { GE_MASK_DOUBLE_RIPPLE_WIDTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->width_ = p; } },
+        { GE_MASK_DOUBLE_RIPPLE_TURBULENCE,
+            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->turbulence_ = p; } }
     };
 
     auto it = actions.find(tag);

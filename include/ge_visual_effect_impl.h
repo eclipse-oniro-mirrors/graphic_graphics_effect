@@ -50,8 +50,10 @@ public:
         COLOR_GRADIENT,
         // Mask
         RIPPLE_MASK,
+        DOUBLE_RIPPLE_MASK,
         PIXEL_MAP_MASK,
         RADIAL_GRADIENT_MASK,
+        WAVE_GRADIENT_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
@@ -305,6 +307,16 @@ public:
         return rippleMaskParams_;
     }
 
+    void MakeDoubleRippleMaskParams()
+    {
+        doubleRippleMaskParams_ = std::make_shared<GEDoubleRippleShaderMaskParams>();
+    }
+
+    const std::shared_ptr<GEDoubleRippleShaderMaskParams>& GetDoubleRippleMaskParams() const
+    {
+        return doubleRippleMaskParams_;
+    }
+
     void MakeRadialGradientMaskParams()
     {
         radialGradientMaskParams_ = std::make_shared<GERadialGradientShaderMaskParams>();
@@ -325,6 +337,16 @@ public:
         return pixelMapMaskParams_;
     }
 
+    void MakeWaveGradientMaskParams()
+    {
+        waveGradientMaskParams_ = std::make_shared<GEWaveGradientShaderMaskParams>();
+    }
+
+    const std::shared_ptr<GEWaveGradientShaderMaskParams>& GetWaveGradientMaskParams() const
+    {
+        return waveGradientMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -338,7 +360,9 @@ private:
 
     void SetWaterRippleParams(const std::string& tag, float param);
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
+    void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
+    void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
@@ -349,6 +373,7 @@ private:
     void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
     void SetAuroraNoiseParams(const std::string& tag, float param);
     void SetPixelMapMaskParams(const std::string& tag, const RectF& param);
+    void SetPixelMapMaskParams(const std::string& tag, const Vector4f& param);
     void SetParticleCircularHaloParams(const std::string& tag, float param);
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
@@ -367,6 +392,8 @@ private:
     std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
     std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
+    std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
+    std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
