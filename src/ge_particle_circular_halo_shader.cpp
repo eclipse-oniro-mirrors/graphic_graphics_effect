@@ -79,7 +79,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
             half2 random2(half2 st)
             {
                 st = half2(dot(st, half2(127.1, 1.7)), dot(st, half2(269.5, 183.3)));
-                return -1.0 + 2.0 * fract(sin(st) * 423758.5453123);
+                return -1.0 + 2.0 * fract(sin(st) * 43758.5453123);
             }
 
             half noise(half2 st)
