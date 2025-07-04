@@ -37,16 +37,14 @@ std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, floa
 {
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
-
-    float aspect = width / height;
-
-    for (const auto& uv : uvPoints)
-    {
-        float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
-        float ndcY = uv[1] * 2.0f - 1.0f;
-        ndcPoints.emplace_back(ndcX, ndcY);
+    if(height > 0.0) {
+        float aspect = width / height;
+        for (const auto& uv : uvPoints) {
+            float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
+            float ndcY = uv[1] * 2.0f - 1.0f;
+            ndcPoints.emplace_back(ndcX, ndcY);
+        }
     }
-
     return ndcPoints;
 }
 
@@ -63,7 +61,7 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
-     contourDiagonalFlowLightParams_ = param;
+    contourDiagonalFlowLightParams_ = param;
 }
 
 std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
@@ -1322,7 +1320,6 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
             contourDiagonalFlowLightParams_.contour_.size());
         return;
     }
-
 
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");

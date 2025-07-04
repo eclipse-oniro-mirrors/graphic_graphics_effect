@@ -1,25 +1,46 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "ge_log.h"
 #include "ge_aurora_noise_shader.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
+
 using CacheDataType = std::shared_ptr<Drawing::Image>;
+
 GEAuroraNoiseShader::GEAuroraNoiseShader() {}
+
 GEAuroraNoiseShader::GEAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& param)
 {
     auroraNoiseParams_ = param;
 }
+
 std::shared_ptr<GEAuroraNoiseShader> GEAuroraNoiseShader::CreateAuroraNoiseShader(
     Drawing::GEAuroraNoiseShaderParams& param)
 {
     std::shared_ptr<GEAuroraNoiseShader> auroraNoiseShader = std::make_shared<GEAuroraNoiseShader>(param);
     return auroraNoiseShader;
 }
+
 void GEAuroraNoiseShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeAuroraNoiseShader(rect);
 }
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseAtlasPrecalculationBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseAtlasShaderPrecalculation_ = nullptr;
@@ -151,6 +172,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
     }
     return std::make_shared<Drawing::RuntimeShaderBuilder>(auroraNoiseAtlasShaderPrecalculation_);
 }
+
 void GEAuroraNoiseShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     if (cacheAnyPtr_ == nullptr) {
@@ -165,9 +187,9 @@ void GEAuroraNoiseShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rec
         }
     }
 }
-std::shared_ptr<Drawing::Image>
-    GEAuroraNoiseShader::MakeAuroraNoiseAtlasPrecalculationShader(Drawing::Canvas& canvas,
-    const Drawing::ImageInfo& imageInfo)
+
+std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseAtlasPrecalculationShader(
+    Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
@@ -180,6 +202,7 @@ std::shared_ptr<Drawing::Image>
     }
     return auroraNoiseAtlasShader;
 }
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseShaderEffect_ = nullptr;
@@ -225,6 +248,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
     }
     return std::make_shared<Drawing::RuntimeShaderBuilder>(auroraNoiseShaderEffect_);
 }
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseVerticalBlurBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseVerticalBlurShaderEffect_ = nullptr;
@@ -324,5 +348,6 @@ std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShade
     }
     return auroraNoiseVerticleBlurShader;
 }
+
 } // namespace Rosen
-} // namespace OHOS   
+} // namespace OHOS

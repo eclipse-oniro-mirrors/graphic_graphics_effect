@@ -121,7 +121,6 @@ std::shared_ptr<Drawing::ShaderEffect> GEWavyRippleLightShader::MakeWavyRippleLi
         wavyRippleLightParams_.center_.second);
     builder_->SetUniform("radius", wavyRippleLightParams_.radius_);
     auto wavyRippleLightShader = builder_->MakeShader(nullptr, false);
-
     if (wavyRippleLightShader == nullptr) {
         GE_LOGE("GEWavyRippleLightShader::MakeWavyRippleLightShader wavyRippleLightShader is nullptr.");
         return nullptr;
