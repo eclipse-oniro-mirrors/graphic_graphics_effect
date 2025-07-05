@@ -99,7 +99,7 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
         LOGE("GERender::ApplyImageEffect image is null");
         return false;
     }
-    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters; // = GenerateShaderFilters(veContainer);
+    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters = GenerateShaderFilters(veContainer);
 
     if (veContainer.GetFilters().empty()) {
         return false;
