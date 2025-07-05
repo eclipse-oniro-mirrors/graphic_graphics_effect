@@ -517,18 +517,12 @@ HWTEST_F(GEVisualEffectImplTest, SetParamDispersion_001, TestSize.Level1)
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_DISPERSION);
     geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_OPACITY, 0.5f);
     EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->opacity, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_X, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetX, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET_Y, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffsetY, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_X, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetX, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET_Y, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffsetY, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_X, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetX, 0.5f);
-    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET_Y, 0.5f);
-    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffsetY, 0.5f);
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_RED_OFFSET, std::make_pair(0.5f, 0.5f));
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->redOffset, std::make_pair(0.5f, 0.5f));
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_GREEN_OFFSET, std::make_pair(0.5f, 0.5f));
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->greenOffset, std::make_pair(0.5f, 0.5f));
+    geVisualEffectImpl.SetDispersionParams(Drawing::GE_FILTER_DISPERSION_BLUE_OFFSET, std::make_pair(0.5f, 0.5f));
+    EXPECT_EQ(geVisualEffectImpl.GetDispersionParams()->blueOffset, std::make_pair(0.5f, 0.5f));
 }
 
 /**

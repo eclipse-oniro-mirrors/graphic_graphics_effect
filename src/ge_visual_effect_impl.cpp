@@ -462,6 +462,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             SetParticleCircularHaloParams(tag, param);
             break;
         }
+        case FilterType::DISPERSION: {
+            SetDispersionParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -1041,23 +1045,26 @@ void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, float param
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_DISPERSION_OPACITY,
             [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->opacity = p; } },
-        { GE_FILTER_DISPERSION_RED_OFFSET_X,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetX = p; } },
-        { GE_FILTER_DISPERSION_RED_OFFSET_Y,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->redOffsetY = p; } },
-        { GE_FILTER_DISPERSION_GREEN_OFFSET_X,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetX = p; } },
-        { GE_FILTER_DISPERSION_GREEN_OFFSET_Y,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->greenOffsetY = p; } },
-        { GE_FILTER_DISPERSION_BLUE_OFFSET_X,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetX = p; } },
-        { GE_FILTER_DISPERSION_BLUE_OFFSET_Y,
-            [](GEVisualEffectImpl* obj, float p) { obj->dispersionParams_->blueOffsetY = p; } },
     };
 
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (dispersionParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_DISPERSION_RED_OFFSET) {
+        dispersionParams_->redOffset = param;
+    } else if (tag == GE_FILTER_DISPERSION_GREEN_OFFSET) {
+        dispersionParams_->greenOffset = param;
+    } else if (tag == GE_FILTER_DISPERSION_BLUE_OFFSET) {
+        dispersionParams_->blueOffset = param;
     }
 }
 

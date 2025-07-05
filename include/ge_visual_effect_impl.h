@@ -366,6 +366,7 @@ private:
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
+    void SetDispersionParams(const std::string& tag, const std::pair<float, float>& param);
     void SetContentLightParams(const std::string& tag, float param);
     void SetContentDiagonalFlowParams(const std::string& tag, const Vector4f& param);
     void SetContentDiagonalFlowParams(const std::string& tag, float param);
