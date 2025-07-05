@@ -201,6 +201,20 @@ struct GERippleShaderMaskParams {
     float widthCenterOffset_ = 0.0f;
 };
 
+constexpr char GE_MASK_DOUBLE_RIPPLE[] = "DoubleRippleMask";
+constexpr char GE_MASK_DOUBLE_RIPPLE_CENTER1[] = "DoubleRippleMask_Center1";
+constexpr char GE_MASK_DOUBLE_RIPPLE_CENTER2[] = "DoubleRippleMask_Center2";
+constexpr char GE_MASK_DOUBLE_RIPPLE_RADIUS[] = "DoubleRippleMask_Radius";
+constexpr char GE_MASK_DOUBLE_RIPPLE_WIDTH[] = "DoubleRippleMask_Width";
+constexpr char GE_MASK_DOUBLE_RIPPLE_TURBULENCE[] = "DoubleRippleMask_Turbulence";
+struct GEDoubleRippleShaderMaskParams {
+    std::pair<float, float> center1_ = {0.f, 0.f};
+    std::pair<float, float> center2_ = {0.f, 0.f};
+    float radius_ = 0.f;
+    float width_ = 0.f;
+    float turbulence_ = 0.0f;
+};
+
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DispDistort";
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT_FACTOR[] = "DispDistort_Factor";
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT_MASK[] = "DispDistort_Mask";
@@ -277,6 +291,18 @@ struct GEDispersionShaderFilterParams {
     float blueOffsetY;
 };
 
+constexpr char GE_FILTER_DIRECTION_LIGHT[] = "DirectionLight";
+constexpr char GE_FILTER_DIRECTION_LIGHT_MASK[] = "DirectionLight_Mask";
+constexpr char GE_FILTER_DIRECTION_LIGHT_DIRECTION[] = "DirectionLight_Direction";
+constexpr char GE_FILTER_DIRECTION_LIGHT_COLOR[] = "DirectionLight_Color";
+constexpr char GE_FILTER_DIRECTION_LIGHT_INTENSITY[] = "DirectionLight_Intensity";
+struct GEDirectionLightShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    Vector3f lightDirection = Vector3f(0.0f, 0.0f, 1.0f);
+    Vector4f lightColor = Vector4f(2.0f, 2.0f, 2.0f, 1.0f);
+    float lightIntensity = 0.5f;
+};
+
 constexpr char GE_MASK_RADIAL_GRADIENT[] = "RadialGradientMask";
 constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "RadialGradientMask_Center";
 constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSX[] = "RadialGradientMask_RadiusX";
@@ -289,6 +315,20 @@ struct GERadialGradientShaderMaskParams {
     float radiusY_ = 0.f;
     std::vector<float> colors_;
     std::vector<float> positions_;
+};
+
+constexpr char GE_MASK_WAVE_GRADIENT[] = "WaveGradientMask";
+constexpr char GE_MASK_WAVE_GRADIENT_CENTER[] = "WaveGradientMask_WaveCenter";
+constexpr char GE_MASK_WAVE_GRADIENT_WIDTH[] = "WaveGradientMask_WaveWidth";
+constexpr char GE_MASK_WAVE_GRADIENT_BLUR_RADIUS[] = "WaveGradientMask_BlurRadius";
+constexpr char GE_MASK_WAVE_GRADIENT_TURBULENCE_STRENGTH[] = "WaveGradientMask_TurbulenceStrength";
+constexpr char GE_MASK_WAVE_GRADIENT_PROPAGATION_RADIUS[] = "WaveGradientMask_PropagationRadius";
+struct GEWaveGradientShaderMaskParams {
+    std::pair<float, float> center_ = {0.f, 0.f};
+    float width_ = 0.f;
+    float propagationRadius_ = 0.f;
+    float blurRadius_ = 0.f;
+    float turbulenceStrength_ = 0.f;
 };
 
 constexpr char GE_FILTER_CONTENT_LIGHT[] = "CONTENT_LIGHT";

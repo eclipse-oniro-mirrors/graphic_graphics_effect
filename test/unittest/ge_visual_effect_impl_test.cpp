@@ -16,7 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "ge_ripple_shader_mask.h"
+#include "ge_double_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_wave_gradient_shader_mask.h"
 #include "utils/rect.h"
 
 using namespace testing;
@@ -662,7 +664,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_017, TestSize.Level1)
 /**
  * @tc.name: SetParam_020
  * @tc.desc: Verify function SetParam for param is content light
- * @tc.type:FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
 {
@@ -689,7 +691,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
 /**
  * @tc.name: SetParam_021
  * @tc.desc: Verify function SetParam for pixelMapMask params
- * @tc.type:FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectImplTest, SetParam_021, TestSize.Level1)
 {
@@ -715,9 +717,147 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_021, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_022
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_022, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplWaveGradientMask(Drawing::GE_MASK_WAVE_GRADIENT);
+    geVisualEffectImplWaveGradientMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK;
+    geVisualEffectImplWaveGradientMask.waveGradientMaskParams_ =
+        std::make_shared<Drawing::GEWaveGradientShaderMaskParams>();
+
+    // test invalid params setting
+    float width = 0.5f;
+    geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_WaveWidth", width);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.waveGradientMaskParams_->width_, width);
+
+    float turbulenceStrength = 0.5f;
+    geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_TurbulenceStrength", turbulenceStrength);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.waveGradientMaskParams_->turbulenceStrength_, turbulenceStrength);
+
+    float blurRadius = 0.5f;
+    geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_BlurRadius", blurRadius);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.waveGradientMaskParams_->blurRadius_, blurRadius);
+
+    float propagationRadius = 0.5f;
+    geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_PropagationRadius", propagationRadius);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.waveGradientMaskParams_->propagationRadius_, propagationRadius);
+
+    std::pair<float, float> center = {-2.5f, -2.5f};
+    geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_WaveCenter", center);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.waveGradientMaskParams_->center_, center);
+}
+
+/**
+ * @tc.name: SetParam_023
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_023, TestSize.Level1)
+{
+    Drawing::GEWaveGradientShaderMaskParams param;
+    auto geWaveGradientShaderMask = std::make_shared<Drawing::GEWaveGradientShaderMask>(param);
+    auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geWaveGradientShaderMask);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImplDisplaceDistort.filterType_ =
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
+        std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
+    geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
+    EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->mask_, shaderMask);
+}
+
+/**
+ * @tc.name: SetParam_024
+ * @tc.desc: Verify function SetParam for DoubleRippleMask is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_024, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImplDoubleRippleMask(Drawing::GE_MASK_DOUBLE_RIPPLE);
+    geVisualEffectImplDoubleRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK;
+    geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_ =
+        std::make_shared<Drawing::GEDoubleRippleShaderMaskParams>();
+
+    // test invalid params setting
+    std::pair<float, float> center1 = {-2.5f, -2.5f};
+    geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Center1", center1);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_->center1_, center1);
+
+    std::pair<float, float> center2 = {2.5f, 2.5f};
+    geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Center2", center2);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_->center2_, center2);
+
+    float radius = 0.5f;
+    geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Radius", radius);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_->radius_, radius);
+
+    float width = 0.5f;
+    geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Width", width);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_->width_, width);
+
+    float turbulence = 0.5f;
+    geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Turbulence", turbulence);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.doubleRippleMaskParams_->turbulence_, turbulence);
+}
+
+/**
+ * @tc.name: SetParam_025
+ * @tc.desc: Verify function SetParam for DoubleRippleMask is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_025, TestSize.Level1)
+{
+    Drawing::GEDoubleRippleShaderMaskParams param;
+    auto geDoubleRippleShaderMask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(param);
+    auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geDoubleRippleShaderMask);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImplDisplaceDistort.filterType_ =
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.displacementDistortParams_ =
+        std::make_shared<Drawing::GEDisplacementDistortFilterParams>();
+    geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
+    EXPECT_EQ(geVisualEffectImplDisplaceDistort.displacementDistortParams_->mask_, shaderMask);
+}
+
+/**
+ * @tc.name: MakeDoubleRippleMaskParams_001
+ * @tc.desc: Verify function DoubleRippleMaskParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, DoubleRippleMaskParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK);
+    EXPECT_EQ(geVisualEffectImpl.GetDoubleRippleMaskParams(), nullptr);
+
+    geVisualEffectImpl.MakeDoubleRippleMaskParams();
+    EXPECT_NE(geVisualEffectImpl.GetDoubleRippleMaskParams(), nullptr);
+}
+
+/**
+ * @tc.name: MakeWaveGradientMaskParams_001
+ * @tc.desc: Verify function WaveGradientMaskParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, WaveGradientMaskParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK);
+    EXPECT_EQ(geVisualEffectImpl.GetWaveGradientMaskParams(), nullptr);
+    
+    geVisualEffectImpl.MakeWaveGradientMaskParams();
+    EXPECT_NE(geVisualEffectImpl.GetWaveGradientMaskParams(), nullptr);
+}
+
+/**
  * @tc.name: MakePixelMapMaskParams_001
  * @tc.desc: Verify function MakePixelMapMaskParams is invalid
- * @tc.type:FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectImplTest, MakePixelMapMaskParams_001, TestSize.Level1)
 {
@@ -732,7 +872,7 @@ HWTEST_F(GEVisualEffectImplTest, MakePixelMapMaskParams_001, TestSize.Level1)
 /**
  * @tc.name: SetAllParam_001
  * @tc.desc: Verify function Set All Param for param is nullptr
- * @tc.type:FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectImplTest, SetAllParam_001, TestSize.Level1)
 {
@@ -746,6 +886,8 @@ HWTEST_F(GEVisualEffectImplTest, SetAllParam_001, TestSize.Level1)
     geVisualEffectImpl.SetMagnifierParamsUint32("", paramUint32);
     geVisualEffectImpl.SetWaterRippleParams("", paramFloat);
     geVisualEffectImpl.SetRippleMaskParamsFloat("", paramFloat);
+    geVisualEffectImpl.SetWaveGradientMaskParamsFloat("", paramFloat);
+    geVisualEffectImpl.SetDoubleRippleMaskParamsFloat("", paramFloat);
 }
 
 /**

@@ -55,6 +55,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_border_light_shader.cpp",
     "${graphics_effect_root}/src/ge_color_gradient_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_content_light_shader_filter.cpp",
+    "${graphics_effect_root}/src/ge_direction_light_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_contour_diagonal_flow_light_shader.cpp",
     "${graphics_effect_root}/src/ge_displacement_distort_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_edge_light_shader_filter.cpp",
@@ -68,6 +69,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_pixel_map_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_render.cpp",
     "${graphics_effect_root}/src/ge_ripple_shader_mask.cpp",
+    "${graphics_effect_root}/src/ge_double_ripple_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_sound_wave_filter.cpp",
     "${graphics_effect_root}/src/ge_system_properties.cpp",
     "${graphics_effect_root}/src/ge_visual_effect.cpp",
@@ -75,6 +77,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_visual_effect_impl.cpp",
     "${graphics_effect_root}/src/ge_water_ripple_filter.cpp",
     "${graphics_effect_root}/src/ge_hps_effect_filter.cpp",
+    "${graphics_effect_root}/src/ge_wave_gradient_shader_mask.cpp",
   ]
 
   external_deps = []

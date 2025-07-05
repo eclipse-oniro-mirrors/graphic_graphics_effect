@@ -25,6 +25,7 @@
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
+#include "ge_direction_light_shader_filter.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
@@ -172,6 +173,84 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             break;
     }
     return nullptr;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)
+{
+    std::shared_ptr<GEShaderFilter> shaderFilter;
+    LOGD("GERender::GenerateShaderFilter %{public}d", (int)ve->GetFilterType());
+    switch (ve->GetFilterType()) {
+        case Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR: {
+            const auto& kawaseParams = ve->GetKawaseParams();
+            shaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(*kawaseParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::AIBAR: {
+            const auto& aiBarParams = ve->GetAIBarParams();
+            shaderFilter = std::make_shared<GEAIBarShaderFilter>(*aiBarParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::COLOR_GRADIENT: {
+            const auto& colorGradientParams = ve->GetColorGradientParams();
+            shaderFilter = std::make_shared<GEColorGradientShaderFilter>(*colorGradientParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::GREY: {
+            const auto& greyParams = ve->GetGreyParams();
+            shaderFilter = std::make_shared<GEGreyShaderFilter>(*greyParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::MAGNIFIER: {
+            const auto& magnifierParams = ve->GetMagnifierParams();
+            shaderFilter = std::make_shared<GEMagnifierShaderFilter>(*magnifierParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE: {
+            const auto& waterRippleParams = ve->GetWaterRippleParams();
+            shaderFilter = std::make_shared<GEWaterRippleFilter>(*waterRippleParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER: {
+            const auto& displacementDistortParams = ve->GetDisplacementDistortParams();
+            shaderFilter = std::make_shared<GEDisplacementDistortFilter>(*displacementDistortParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE: {
+            const auto& soundWaveParams = ve->GetSoundWaveParams();
+            shaderFilter = std::make_shared<GESoundWaveFilter>(*soundWaveParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::BEZIER_WARP: {
+            const auto& bezierWarpParams = ve->GetBezierWarpParams();
+            shaderFilter = std::make_shared<GEBezierWarpShaderFilter>(*bezierWarpParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::DISPERSION: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::CONTENT_LIGHT: {
+            const auto& contentLightParams = ve->GetContentLightParams();
+            shaderFilter = std::make_shared<GEContentLightFilter>(*contentLightParams);
+            break;
+        }
+        default:
+            break;
+    }
+    return shaderFilter;
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
