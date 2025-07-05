@@ -68,6 +68,7 @@ public:
         WAVY_RIPPLE_LIGHT,
         AURORA_NOISE,
         PARTICLE_CIRCULAR_HALO,
+        DIRECTION_LIGHT,
         MAX
     };
 
@@ -237,6 +238,16 @@ public:
         return dispersionParams_;
     }
 
+    void MakeDirectionLightParams()
+    {
+        directionLightParams_ = std::make_shared<GEDirectionLightShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEDirectionLightShaderFilterParams>& GetDirectionLightParams() const
+    {
+        return directionLightParams_;
+    }
+
     void MakeContentLightParams()
     {
         contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
@@ -364,6 +375,7 @@ private:
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
     void SetSoundWaveParamsFloat(const std::string& tag, float param);
+    void SetDirectionLightParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
     void SetContentLightParams(const std::string& tag, float param);
@@ -400,6 +412,7 @@ private:
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
     std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
+    std::shared_ptr<GEDirectionLightShaderFilterParams> directionLightParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
