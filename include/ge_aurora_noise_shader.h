@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_AURORA_NOISE_SHADER_H
 
 #include "ge_shader.h"
+#include "ge_shader_filter_params.h"
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
 namespace OHOS {

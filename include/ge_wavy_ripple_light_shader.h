@@ -17,10 +17,10 @@
 #define GRAPHICS_EFFECT_WAVY_RIPPLE_LIGHT_SHADER_H
 
 #include "ge_shader.h"
+#include "ge_shader_filter_params.h"
 #include "common/rs_vector2.h"
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
-#include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {

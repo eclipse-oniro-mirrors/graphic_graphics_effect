@@ -17,7 +17,6 @@
 
 #include <sstream>
 #include "ge_log.h"
-#include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 #include "common/rs_vector2.h"
 

@@ -15,7 +15,6 @@
 
 #include "ge_log.h"
 #include "ge_aurora_noise_shader.h"
-#include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
