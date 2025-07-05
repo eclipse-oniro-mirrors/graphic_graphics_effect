@@ -291,6 +291,18 @@ struct GEDispersionShaderFilterParams {
     float blueOffsetY;
 };
 
+constexpr char GE_FILTER_DIRECTION_LIGHT[] = "DirectionLight";
+constexpr char GE_FILTER_DIRECTION_LIGHT_MASK[] = "DirectionLight_Mask";
+constexpr char GE_FILTER_DIRECTION_LIGHT_DIRECTION[] = "DirectionLight_Direction";
+constexpr char GE_FILTER_DIRECTION_LIGHT_COLOR[] = "DirectionLight_Color";
+constexpr char GE_FILTER_DIRECTION_LIGHT_INTENSITY[] = "DirectionLight_Intensity";
+struct GEDirectionLightShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    Vector3f lightDirection = Vector3f(0.0f, 0.0f, 1.0f);
+    Vector4f lightColor = Vector4f(2.0f, 2.0f, 2.0f, 1.0f);
+    float lightIntensity = 0.5f;
+};
+
 constexpr char GE_MASK_RADIAL_GRADIENT[] = "RadialGradientMask";
 constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "RadialGradientMask_Center";
 constexpr char GE_MASK_RADIAL_GRADIENT_RADIUSX[] = "RadialGradientMask_RadiusX";

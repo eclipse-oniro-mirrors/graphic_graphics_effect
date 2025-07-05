@@ -65,6 +65,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_content_light_shader_filter.cpp",
     "src/ge_contour_diagonal_flow_light_shader.cpp",
     "src/ge_displacement_distort_shader_filter.cpp",
+    "src/ge_direction_light_shader_filter.cpp",
     "src/ge_edge_light_shader_filter.cpp",
     "src/ge_external_dynamic_loader.cpp",
     "src/ge_grey_shader_filter.cpp",
