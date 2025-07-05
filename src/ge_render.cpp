@@ -247,6 +247,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
             shaderFilter = std::make_shared<GEContentLightFilter>(*contentLightParams);
             break;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::DIRECTION_LIGHT: {
+            const auto& directionLightParams = ve->GetContentLightParams();
+            shaderFilter = std::make_shared<GEDirectionLightFilter>(*directionLightParams);
+            break;
+        }
         default:
             break;
     }
