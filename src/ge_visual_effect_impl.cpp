@@ -375,24 +375,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param)
-{
-    switch (filterType_) {
-        case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
-            if (contentDiagonalParams_ == nullptr) {
-                return;
-            }
-
-            if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR) {
-                contentDiagonalParams_->contour_ = param;
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
-
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param) {}
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Matrix param)
@@ -477,7 +459,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<std::pair<float, float>> param)
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<std::pair<float, float>>& param)
 {
     switch (filterType_) {
         case FilterType::LINEAR_GRADIENT_BLUR: {
@@ -486,6 +468,23 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<std:
             }
             if (tag == GE_FILTER_LINEAR_GRADIENT_BLUR_FRACTION_STOPS) {
                 linearGradientBlurParams_->fractionStops = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vector2f>& param)
+{
+    switch (filterType_) {
+        case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
+            if (contentDiagonalParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR) {
+                contentDiagonalParams_->contour_ = param;
             }
             break;
         }

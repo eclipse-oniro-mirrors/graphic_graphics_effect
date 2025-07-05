@@ -19,6 +19,7 @@
 #include <vector>
 #include <utility>
 
+#include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 #include "utils/matrix.h"
@@ -353,7 +354,7 @@ constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START[] = "ContourDia
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH[] = "ContourDiagonalFlowLight_Line2Length";
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR[] = "ContourDiagonalFlowLight_Line2Color";
 struct GEContentDiagonalFlowLightShaderParams {
-    std::shared_ptr<Drawing::Path> contour_ = nullptr;
+    std::vector<Vector2f> contour_{};
     float line1Start_ = 0.f;
     float line1Length_ = 0.f;
     Vector4f line1Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);

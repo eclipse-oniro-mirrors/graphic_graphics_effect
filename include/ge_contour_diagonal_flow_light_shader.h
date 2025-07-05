@@ -12,15 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+ 
 #ifndef GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #include <any>
 
 #include "ge_shader.h"
+#include "ge_shader_filter_params.h"
 #include "common/rs_vector4.h"
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
-#include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -41,7 +42,7 @@ public:
         contourDiagonalFlowLightParams_ = params;
     }
 
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     std::shared_ptr<Drawing::ShaderEffect> MakeContourDiagonalFlowLightShader(const Drawing::Rect& rect);
 
@@ -62,9 +63,9 @@ private:
     static std::vector<float> PathStringToFloats(const std::string& str);
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
-    std::vector<float> controlPoints_;
+    std::vector<float> controlPoints_{}; // fix 64 X 2
+    size_t pointCnt_ = 0; // real input Point Cnt
 };
-
 } // namespace Rosen
 } // namespace OHOS
 #endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
