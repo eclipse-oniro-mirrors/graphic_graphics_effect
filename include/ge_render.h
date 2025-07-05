@@ -58,7 +58,7 @@ public:
 private:
     std::vector<std::shared_ptr<GEShader>> GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer);
 
-    std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve);
+    std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffect>& ve);
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);

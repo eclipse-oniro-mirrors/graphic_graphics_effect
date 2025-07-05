@@ -67,7 +67,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
         LOGE("GERender::ApplyImageEffect image is null");
         return nullptr;
     }
-    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters; // = GenerateShaderFilters(veContainer);
+    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
     auto resImage = image;
     for (auto vef : veContainer.GetFilters()) {
         if (vef == nullptr) {
@@ -75,7 +75,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
             continue;
         }
         auto ve = vef->GetImpl();
-        std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(ve);
+        std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(vef);
         if (geShaderFilter == nullptr) {
             LOGD("GERender::ApplyImageEffect filter is null");
             continue;
@@ -99,7 +99,6 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
         LOGE("GERender::ApplyImageEffect image is null");
         return false;
     }
-    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters = GenerateShaderFilters(veContainer);
 
     if (veContainer.GetFilters().empty()) {
         return false;
@@ -176,8 +175,9 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
-    const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)
+    const std::shared_ptr<Drawing::GEVisualEffect>& vef)
 {
+    auto ve = vef->GetImpl();
     std::shared_ptr<GEShaderFilter> shaderFilter;
     LOGD("GERender::GenerateShaderFilter %{public}d", (int)ve->GetFilterType());
     switch (ve->GetFilterType()) {
@@ -255,6 +255,9 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         default:
             break;
     }
+    if (shaderFilter) {
+        shaderFilter->SetShaderFilterCanvasinfo(vef->GetCanvasInfo());
+    }
     return shaderFilter;
 }
 
@@ -264,11 +267,7 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilters(
     LOGD("GERender::shaderFilters %{public}d", (int)veContainer.GetFilters().size());
     std::vector<std::shared_ptr<GEShaderFilter>> shaderFilters;
     for (auto vef : veContainer.GetFilters()) {
-        auto ve = vef->GetImpl();
-        std::shared_ptr<GEShaderFilter> shaderFilter = GenerateShaderFilter(ve);
-        if (shaderFilter) {
-            shaderFilter->SetShaderFilterCanvasinfo(vef->GetCanvasInfo());
-        }
+        std::shared_ptr<GEShaderFilter> shaderFilter = GenerateShaderFilter(vef);
         shaderFilters.push_back(shaderFilter);
     }
     return shaderFilters;
