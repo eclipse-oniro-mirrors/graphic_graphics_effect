@@ -50,7 +50,6 @@ private:
 
     Drawing::GEWavyRippleLightShaderParams wavyRippleLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
-
 };
 
 } // namespace Rosen

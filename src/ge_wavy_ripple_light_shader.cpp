@@ -18,7 +18,53 @@
 
 namespace OHOS {
 namespace Rosen {
-
+namespace {
+static constexpr char WAVY_PROG[] = R"(
+    uniform vec2 iResolution;
+    uniform vec2 center;
+    uniform float radius;
+    const float noiseScale = 0.3;
+    const float waveScale  = 0.5;
+    const float freqX = 4.0;
+    const float freqY = 6.0;
+    const float freqDiag = 8.0;
+    const float thickness = 0.2;
+    float shapeSDF(vec2 p, float radius)
+    {
+        float dist = length(p);
+        float noise = 0.0;
+        noise += sin(p.x * freqX) * 0.25;
+        noise += sin(p.y * freqY) * 0.35;
+        noise += sin((p.x + p.y) * freqDiag) * 0.1;
+        float distortedDist = dist + noise * noiseScale;
+        float attenuation = waveScale / (1.0 + distortedDist * 5.0);
+        float wave = sin(distortedDist * 30.0) * attenuation;
+        return distortedDist - radius + wave * 0.05;
+    }
+    vec4 main(vec2 fragCoord)
+    {
+        vec2 uv = fragCoord.xy / iResolution.xy;
+        float aspect = iResolution.x / iResolution.y;
+        vec3 color = vec3(0.0);
+        vec2 p = uv * 2.0 - 1.0;
+        p.x *= aspect;
+        vec2 c = center * 2.0 - 1.0;
+        c.x *= aspect;
+        vec2 delta = p - c;
+        float dist0 = length(c - vec2(-aspect, -1.0));
+        float dist1 = length(c - vec2(-aspect,  1.0));
+        float dist2 = length(c - vec2(aspect, -1.0));
+        float dist3 = length(c - vec2(aspect,  1.0));
+        float maxRadius = max(max(dist0, dist1), max(dist2, dist3));
+        float currentRadius = maxRadius * radius;
+        float d = abs(shapeSDF(delta, currentRadius));
+        float mask = smoothstep(thickness, 0.0, d);
+        vec3 baseColor = vec3(0.8, 0.5, 1.0);
+        color = baseColor * mask;
+        return vec4(color, mask);
+    }
+)";
+} // anonymous namespace
 GEWavyRippleLightShader::GEWavyRippleLightShader() {}
 
 GEWavyRippleLightShader::GEWavyRippleLightShader(Drawing::GEWavyRippleLightShaderParams& param)
@@ -43,66 +89,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEWavyRippleLightShader::GetWavyR
     thread_local std::shared_ptr<Drawing::RuntimeEffect> wavyRippleLightShaderEffect_ = nullptr;
 
     if (wavyRippleLightShaderEffect_ == nullptr) {
-        static constexpr char prog[] = R"(
-            uniform vec2 iResolution;
-            uniform vec2 center;
-            uniform float radius;
-
-            const float noiseScale = 0.3;
-            const float waveScale  = 0.5;
-
-            const float freqX = 4.0;
-            const float freqY = 6.0;
-            const float freqDiag = 8.0;
-
-            const float thickness = 0.2;
-
-            float shapeSDF(vec2 p, float radius)
-            {
-                float dist = length(p);
-
-                float noise = 0.0;
-                noise += sin(p.x * freqX) * 0.25;
-                noise += sin(p.y * freqY) * 0.35;
-                noise += sin((p.x + p.y) * freqDiag) * 0.1;
-
-                float distortedDist = dist + noise * noiseScale;
-                float attenuation = waveScale / (1.0 + distortedDist * 5.0);
-                float wave = sin(distortedDist * 30.0) * attenuation;
-
-                return distortedDist - radius + wave * 0.05;
-            }
-
-            vec4 main(vec2 fragCoord)
-            {
-                vec2 uv = fragCoord.xy / iResolution.xy;
-                float aspect = iResolution.x / iResolution.y;
-                vec3 color = vec3(0.0);
-
-                vec2 p = uv * 2.0 - 1.0;
-                p.x *= aspect;
-                vec2 c = center * 2.0 - 1.0;
-                c.x *= aspect;
-
-                vec2 delta = p - c;
-
-                float dist0 = length(c - vec2(-aspect, -1.0));
-                float dist1 = length(c - vec2(-aspect,  1.0));
-                float dist2 = length(c - vec2(aspect, -1.0));
-                float dist3 = length(c - vec2(aspect,  1.0));
-                float maxRadius = max(max(dist0, dist1), max(dist2, dist3));
-
-                float currentRadius = maxRadius * radius;
-                float d = abs(shapeSDF(delta, currentRadius));
-                float mask = smoothstep(thickness, 0.0, d);
-
-                vec3 baseColor = vec3(0.8, 0.5, 1.0);
-                color = baseColor * mask;
-
-                return vec4(color, mask);
-            }
-        )";
-        wavyRippleLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        wavyRippleLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(WAVY_PROG);
     }
     if (wavyRippleLightShaderEffect_ == nullptr) {
         GE_LOGE("GEWavyRippleLightShader::GetWavyRippleLightBuilder wavyRippleLightShaderEffect_ is nullptr.");

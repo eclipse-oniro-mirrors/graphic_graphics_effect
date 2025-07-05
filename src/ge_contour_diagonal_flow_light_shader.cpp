@@ -33,17 +33,18 @@ constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
 constexpr static uint8_t ARRAY_SIZE = 64;  // 32 segments need 64 control points
 } // namespacesu
 
-std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, float width, float height)
+std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int width, int height)
 {
+    if (height < 1) {
+        return {};
+    }
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
-    if (height > 0.0) {
-        float aspect = width / height;
-        for (const auto& uv : uvPoints) {
-            float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
-            float ndcY = uv[1] * 2.0f - 1.0f;
-            ndcPoints.emplace_back(ndcX, ndcY);
-        }
+    float aspect = static_cast<float>(width) / static_cast<float>(height);
+    for (const auto& uv : uvPoints) {
+        float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
+        float ndcY = uv[1] * 2.0f - 1.0f;
+        ndcPoints.emplace_back(ndcX, ndcY);
     }
     return ndcPoints;
 }
@@ -52,8 +53,8 @@ void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
 {
     out.clear();
     for (auto& p : in) {
-        out.push_back(p[0]);
-        out.push_back(p[1]);
+        out.emplace_back(p[0]);
+        out.emplace_back(p[1]);
     }
 }
 
@@ -1323,8 +1324,7 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
 
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
-        auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_,
-            static_cast<float>(rect.GetWidth()), static_cast<float>(rect.GetHeight()));
+        auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_, rect.GetWidth(), rect.GetHeight());
         pointCnt_ = ndcPoints.size();
         ConvertPointsTo(ndcPoints, controlPoints_);
         controlPoints_.resize(ARRAY_SIZE * POSITION_CHANNEL);
