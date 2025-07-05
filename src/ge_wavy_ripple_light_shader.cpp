@@ -14,6 +14,7 @@
  */
  
 #include "ge_log.h"
+#include "ge_shader_filter_params.h"
 #include "ge_wavy_ripple_light_shader.h"
 
 namespace OHOS {

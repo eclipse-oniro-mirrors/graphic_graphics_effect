@@ -42,7 +42,7 @@ public:
         contourDiagonalFlowLightParams_ = params;
     }
 
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     std::shared_ptr<Drawing::ShaderEffect> MakeContourDiagonalFlowLightShader(const Drawing::Rect& rect);
 
@@ -64,7 +64,8 @@ private:
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::vector<float> controlPoints_{}; // fix 64 X 2
-    size_t pointCnt_ = 0; // real input Point Cnt};
+    size_t pointCnt_ = 0; // real input Point Cnt
+};
 } // namespace Rosen
 } // namespace OHOS
 #endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H

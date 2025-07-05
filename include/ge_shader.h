@@ -34,6 +34,8 @@ public:
 
     virtual const std::shared_ptr<Drawing::ShaderEffect>& GetDrawingShader() { return drShader_; }
 
+    virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) {}
+
     uint32_t Hash() const { return hash_; }
 
     void SetCache(std::shared_ptr<std::any> cacheData)

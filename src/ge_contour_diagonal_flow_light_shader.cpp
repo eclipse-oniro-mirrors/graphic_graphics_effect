@@ -17,6 +17,7 @@
 
 #include <sstream>
 #include "ge_log.h"
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 #include "common/rs_vector2.h"
 
@@ -37,7 +38,7 @@ std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, floa
 {
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
-    if(height > 0.0) {
+    if (height > 0.0) {
         float aspect = width / height;
         for (const auto& uv : uvPoints) {
             float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
