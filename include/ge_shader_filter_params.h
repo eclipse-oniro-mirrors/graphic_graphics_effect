@@ -224,11 +224,11 @@ struct GEDisplacementDistortFilterParams {
     std::shared_ptr<GEShaderMask> mask_;
 };
 
-constexpr char GE_FILTER_COLOR_GRADIENT[] = "COLOR_GRADIENT";
-constexpr char GE_FILTER_COLOR_GRADIENT_COLOR[] = "COLOR";
-constexpr char GE_FILTER_COLOR_GRADIENT_POSITION[] = "POSITION";
-constexpr char GE_FILTER_COLOR_GRADIENT_STRENGTH[] = "STRENGTH";
-constexpr char GE_FILTER_COLOR_GRADIENT_MASK[] = "MASK";
+constexpr char GE_FILTER_COLOR_GRADIENT[] = "ColorGradient";
+constexpr char GE_FILTER_COLOR_GRADIENT_COLOR[] = "ColorGradient_Colors";
+constexpr char GE_FILTER_COLOR_GRADIENT_POSITION[] = "ColorGradient_Positions";
+constexpr char GE_FILTER_COLOR_GRADIENT_STRENGTH[] = "ColorGradient_Strengths";
+constexpr char GE_FILTER_COLOR_GRADIENT_MASK[] = "ColorGradient_Mask";
 struct GEColorGradientShaderFilterParams {
     std::vector<float> colors;
     std::vector<float> positions;
@@ -272,24 +272,19 @@ struct GEPixelMapMaskParams {
     RectF dst;
     Vector4f fillColor;
 };
-constexpr char GE_FILTER_DISPERSION[] = "DISPERSION";
-constexpr char GE_FILTER_DISPERSION_MASK[] = "DISPERSION_MASK";
-constexpr char GE_FILTER_DISPERSION_OPACITY[] = "DISPERSION_OPACITY";
-constexpr char GE_FILTER_DISPERSION_RED_OFFSET_X[] = "DISPERSION_RED_OFFSET_X";
-constexpr char GE_FILTER_DISPERSION_RED_OFFSET_Y[] = "DISPERSION_REF_OFFSET_Y";
-constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_X[] = "DISPERSION_GREEN_OFFSET_X";
-constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET_Y[] = "DISPERSION_GREEN_OFFSET_Y";
-constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_X[] = "DISPERSION_BLUE_OFFSET_X";
-constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET_Y[] = "DISPERSION_BLUE_OFFSET_Y";
+
+constexpr char GE_FILTER_DISPERSION[] = "Dispersion";
+constexpr char GE_FILTER_DISPERSION_MASK[] = "Dispersion_Mask";
+constexpr char GE_FILTER_DISPERSION_OPACITY[] = "Dispersion_Opacity";
+constexpr char GE_FILTER_DISPERSION_RED_OFFSET[] = "Dispersion_RedOffset";
+constexpr char GE_FILTER_DISPERSION_GREEN_OFFSET[] = "Dispersion_GreenOffset";
+constexpr char GE_FILTER_DISPERSION_BLUE_OFFSET[] = "Dispersion_BlueOffset";
 struct GEDispersionShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     float opacity;
-    float redOffsetX;
-    float redOffsetY;
-    float greenOffsetX;
-    float greenOffsetY;
-    float blueOffsetX;
-    float blueOffsetY;
+    std::pair<float, float> redOffset;
+    std::pair<float, float> greenOffset;
+    std::pair<float, float> blueOffset;
 };
 
 constexpr char GE_FILTER_DIRECTION_LIGHT[] = "DirectionLight";
