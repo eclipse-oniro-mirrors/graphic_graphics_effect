@@ -37,9 +37,7 @@ public:
 protected:
     float alpha_ = 1.0f;
     bool bloom_ = true;
-    float edgeColorR_ = 0.2f;
-    float edgeColorG_ = 0.7f;
-    float edgeColorB_ = 0.1f;
+    Vector4f color_ = {0.2f, 0.7f, 0.1f, 0.0f};
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
     bool useRawColor_ = false;
 };

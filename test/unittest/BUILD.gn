@@ -68,6 +68,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_mesa_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_particle_circular_halo_shader.cpp",
     "${graphics_effect_root}/src/ge_pixel_map_shader_mask.cpp",
+    "${graphics_effect_root}/src/ge_radial_gradient_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_render.cpp",
     "${graphics_effect_root}/src/ge_ripple_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_double_ripple_shader_mask.cpp",
