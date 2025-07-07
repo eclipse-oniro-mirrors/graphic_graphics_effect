@@ -55,12 +55,17 @@ public:
         const Drawing::ImageInfo& imageInfo);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightPrecalculationBuilder();
+
+    std::shared_ptr<Drawing::Image> MakeContourDiagonalFlowLightHaloAtlasShader(Drawing::Canvas& canvas,
+        const Drawing::ImageInfo& imageInfo);
+
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightHaloAtlasBuilder();
+
 private:
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&&) = delete;
-    static std::vector<float> PathStringToFloats(const std::string& str);
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::vector<float> controlPoints_{}; // fix 64 X 2
