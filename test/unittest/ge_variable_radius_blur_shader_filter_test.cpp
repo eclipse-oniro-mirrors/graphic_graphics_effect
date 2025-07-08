@@ -78,7 +78,6 @@ std::shared_ptr<Drawing::GERippleShaderMask> CreateRippleShaderMask()
 
 std::shared_ptr<GEVariableRadiusBlurShaderFilter> CreateVariableRadiusBlurShaderFilter()
 {
-
     Drawing::GEVariableRadiusBlurShaderFilterParams params = {
         CreateRippleShaderMask(), 100.0f};
     return CreateVariableRadiusBlurShaderFilter(params);
