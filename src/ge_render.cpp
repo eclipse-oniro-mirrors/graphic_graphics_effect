@@ -180,7 +180,8 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             if (!object) {
                 return std::make_shared<GEVariableRadiusBlurShaderFilter>(*variableRadiusBlurParams);
             }
-            std::shared_ptr<GEVariableRadiusBlurShaderFilter> dmShader(static_cast<GEVariableRadiusBlurShaderFilter*>(object));
+            std::shared_ptr<GEVariableRadiusBlurShaderFilter> dmShader(
+                static_cast<GEVariableRadiusBlurShaderFilter*>(object));
             return dmShader;
         }
         default:
