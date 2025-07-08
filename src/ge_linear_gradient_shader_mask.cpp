@@ -42,10 +42,10 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShader(
          static_cast<float>(endPos_.GetX()),
          static_cast<float>(endPos_.GetY()),
          static_cast<int>(fractionStops_.size()));
-
-    if (fractionStops_[0].second > 0.01) {
+    constexpr bias = 0.01; // 0.01 represents the fraction bias
+    if (fractionStops_[0].second > bias) {
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(ColorMin, ColorMin, ColorMin, ColorMin));
-        p.emplace_back(fractionStops_[0].second - 0.01); // 0.01 represents the fraction bias
+        p.emplace_back(fractionStops_[0].second - bias);
     }
 
     for (size_t i = 0; i < fractionStops_.size(); i++) {
@@ -53,16 +53,15 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShader(
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(alpha, alpha, alpha, alpha));
         p.emplace_back(fractionStops_[i].second);
     }
-    // 0.01 represents the fraction bias
-    if (fractionStops_[fractionStops_.size() - 1].second < (1 - 0.01)) {
+    if (fractionStops_[fractionStops_.size() - 1].second < (1 - bias)) {
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(ColorMin, ColorMax, ColorMax, ColorMax));
-        // 0.01 represents the fraction bias
-        p.emplace_back(fractionStops_[fractionStops_.size() - 1].second + 0.01);
+        p.emplace_back(fractionStops_[fractionStops_.size() - 1].second + bias);
     }
     return Drawing::ShaderEffect::CreateLinearGradient(startPos_, endPos_, c, p, Drawing::TileMode::CLAMP);
 }
 
-std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShaderHasNormal(float width, float height) const
+std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShaderHasNormal(float width,
+    float height) const
 {
     std::vector<Drawing::ColorQuad> c;
     std::vector<Drawing::scalar> p;
@@ -78,10 +77,10 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShaderH
          static_cast<float>(endPos_.GetX()),
          static_cast<float>(endPos_.GetY()),
          static_cast<int>(fractionStops_.size()));
-
-    if (fractionStops_[0].second > 0.01) {
+    constexpr bias = 0.01; // 0.01 represents the fraction bias
+    if (fractionStops_[0].second > bias) {
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(ColorMin, ColorMin, ColorMin, ColorMin));
-        p.emplace_back(fractionStops_[0].second - 0.01); // 0.01 represents the fraction bias
+        p.emplace_back(fractionStops_[0].second - bias);
     }
 
     for (size_t i = 0; i < fractionStops_.size(); i++) {
@@ -89,11 +88,9 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::GenerateDrawingShaderH
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(alpha, alpha, alpha, alpha));
         p.emplace_back(fractionStops_[i].second);
     }
-    // 0.01 represents the fraction bias
-    if (fractionStops_[fractionStops_.size() - 1].second < (1 - 0.01)) {
+    if (fractionStops_[fractionStops_.size() - 1].second < (1 - bias)) {
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(ColorMin, ColorMax, ColorMax, ColorMax));
-        // 0.01 represents the fraction bias
-        p.emplace_back(fractionStops_[fractionStops_.size() - 1].second + 0.01);
+        p.emplace_back(fractionStops_[fractionStops_.size() - 1].second + bias);
     }
     return Drawing::ShaderEffect::CreateLinearGradient(startPos_, endPos_, c, p, Drawing::TileMode::CLAMP);
 }
