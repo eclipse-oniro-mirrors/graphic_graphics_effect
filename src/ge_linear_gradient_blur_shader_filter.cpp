@@ -131,7 +131,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImage(D
         // use original LinearGradientBlur
         float radius = std::clamp(para->blurRadius_, 0.0f, 60.0f); // 60.0 represents largest blur radius
         Drawing::GEVariableRadiusBlurShaderFilterParams radiusGradientBlurParam {mask, radius};
-        GEVariableRadiusBlurShaderFilter radiusGradientBlur(radiusGradientBlurParam)；
+        GEVariableRadiusBlurShaderFilter radiusGradientBlur(radiusGradientBlurParam);
         return radiusGradientBlur.ProcessImage(canvas, image, src, dst);
     }
 }
