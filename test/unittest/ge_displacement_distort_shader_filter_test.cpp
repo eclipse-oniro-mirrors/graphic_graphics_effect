@@ -93,5 +93,21 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, GetDisplacementDistortEffect_001
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
     EXPECT_NE(geDisplacementDistortFilter->GetDisplacementDistortEffect(), nullptr);
 }
+
+/**
+ * @tc.name: Cache_001
+ * @tc.desc: Verify cache function
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEDisplacementDistortShaderFilterTest, Cache_001, TestSize.Level2)
+{
+    Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
+    auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
+    EXPECT_EQ(geDisplacementDistortFilter->GetCache(), nullptr);
+    auto cache = std::make_shared<std::any>(std::make_any<float>(1.0));
+    geDisplacementDistortFilter->SetCache(cache);
+    EXPECT_EQ(std::any_cast<float>(*geDisplacementDistortFilter->GetCache()), 1.0);
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

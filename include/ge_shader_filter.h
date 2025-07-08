@@ -16,6 +16,8 @@
 #ifndef GRAPHICS_EFFECT_GE_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_SHADER_FILTER_H
 
+#include <any>
+
 #include "draw/canvas.h"
 #include "image/image.h"
 #include "ge_shader_filter_params.h"
@@ -41,9 +43,22 @@ public:
         canvasInfo_ = canvasInfo;
     }
 
+    virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) {}
+
+    void SetCache(std::shared_ptr<std::any> cacheData)
+    {
+        cacheAnyPtr_ = cacheData;
+    }
+
+    std::shared_ptr<std::any> GetCache() const
+    {
+        return cacheAnyPtr_;
+    }
+
 protected:
     Drawing::CanvasInfo canvasInfo_;
     uint32_t hash_ = 0;
+    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
 };
 } // namespace Rosen
 } // namespace OHOS
