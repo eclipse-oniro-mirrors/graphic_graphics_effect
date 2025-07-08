@@ -29,6 +29,7 @@
 #include "ge_direction_light_shader_filter.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
 #include "ge_sound_wave_filter.h"
@@ -161,6 +162,18 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter*>(object));
             return dmShader;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
+            const auto& variableRadiusBlurParams = ve->GetVariableRadiusBlurParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(type),
+                sizeof(Drawing::GEVariableRadiusBlurShaderFilterParams),
+                static_cast<void*>(variableRadiusBlurParams.get()));
+            if (!object) {
+                return std::make_shared<GEVariableRadiusBlurShaderFilter>(*variableRadiusBlurParams);
+            }
+            std::shared_ptr<GEVariableRadiusBlurShaderFilter> dmShader(static_cast<GEVariableRadiusBlurShaderFilter*>(object));
+            return dmShader;
+        }
         default:
             break;
     }
@@ -246,6 +259,10 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilter(
             case Drawing::GEVisualEffectImpl::FilterType::DIRECTION_LIGHT: {
                 const auto& directionLightParams = ve->GetDirectionLightParams();
                 shaderFilter = std::make_shared<GEDirectionLightShaderFilter>(*directionLightParams);
+                break;
+            }
+            case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
+                shaderFilter = GenerateExtShaderFilter(ve);
                 break;
             }
             default:

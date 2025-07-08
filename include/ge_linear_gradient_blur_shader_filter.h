@@ -18,6 +18,8 @@
 #include "ge_gradient_blur_para.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
+#include "ge_linear_gradient_shader_mask.h"
+#include "ge_variable_radius_blur_shader_filter.h"
 
 #include "draw/canvas.h"
 #include "effect/runtime_effect.h"
@@ -51,6 +53,7 @@ protected:
     inline static float geoHeight_ = 0.f;
     inline static float tranX_ = 0.f;
     inline static float tranY_ = 0.f;
+    inline static Drawing::Matrix mat_;
     inline static bool isOffscreenCanvas_ = true;
 
     static void TransformGradientBlurDirection(uint8_t& direction, const uint8_t directionBias);
@@ -59,35 +62,17 @@ protected:
         Drawing::Point (&pts)[2], const Drawing::Rect& clipBounds, GEGradientDirection direction);  // 2 size of points
     static bool GetGEGradientDirectionPoints(
         Drawing::Point (&pts)[2], const Drawing::Rect& clipBounds, GEGradientDirection direction);  // 2 size of points
-    static std::shared_ptr<Drawing::ShaderEffect> MakeAlphaGradientShader(
-        const Drawing::Rect& clipBounds, const std::shared_ptr<GELinearGradientBlurPara>& para, uint8_t directionBias);
 private:
     static void ComputeScale(float width, float height, bool useMaskAlgorithm);
-    static void MakeHorizontalMeanBlurEffect();
-    static void MakeVerticalMeanBlurEffect();
-    static void MakeTextureShaderEffect();
 
-    static Drawing::Rect ComputeRectBeforeClip(const uint8_t directionBias, const Drawing::Rect& dst);
     static std::shared_ptr<Drawing::Image> DrawMaskLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, std::shared_ptr<GEShaderFilter>& blurFilter,
         std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader, const Drawing::Rect& dst);
     static std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMaskLinearGradientBlurShader(
         std::shared_ptr<Drawing::ShaderEffect> srcImageShader, std::shared_ptr<Drawing::ShaderEffect> blurImageShader,
         std::shared_ptr<Drawing::ShaderEffect> gradientShader);
-    static std::shared_ptr<Drawing::Image> DrawMeanLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
-        Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
-        const Drawing::Rect& dst);
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImageDDGR(
         Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, uint8_t directionBias);
-    static std::shared_ptr<Drawing::Image> BuildMeanLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
-        Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
-        Drawing::Matrix blurMatrix);
-
-    static std::shared_ptr<Drawing::RuntimeEffect> horizontalMeanBlurShaderEffect_;
-    static std::shared_ptr<Drawing::RuntimeEffect> verticalMeanBlurShaderEffect_;
-    static std::shared_ptr<Drawing::RuntimeEffect> maskBlurShaderEffect_;
-    static std::shared_ptr<Drawing::RuntimeEffect> textureShaderEffect_;
-    inline static Drawing::Matrix mat_;
 };
 
 } // namespace Rosen
