@@ -82,7 +82,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_ripple_shader_mask.cpp",
     "src/ge_sound_wave_filter.cpp",
     "src/ge_system_properties.cpp",
-    "src/ge_variable_radius_blur_shader_filter.cpp"
+    "src/ge_variable_radius_blur_shader_filter.cpp",
     "src/ge_visual_effect.cpp",
     "src/ge_visual_effect_container.cpp",
     "src/ge_visual_effect_impl.cpp",
