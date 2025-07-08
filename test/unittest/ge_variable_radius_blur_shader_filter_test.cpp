@@ -60,7 +60,8 @@ void GEVariableRadiusBlurShaderFilterTest::SetUp()
 
 void GEVariableRadiusBlurShaderFilterTest::TearDown() {}
 
-std::shared_ptr<GEVariableRadiusBlurShaderFilter> CreateVariableRadiusBlurShaderFilter(Drawing::GEVariableRadiusBlurShaderFilterParams params)
+std::shared_ptr<GEVariableRadiusBlurShaderFilter> CreateVariableRadiusBlurShaderFilter(
+    Drawing::GEVariableRadiusBlurShaderFilterParams params)
 {
     return std::make_shared<GEVariableRadiusBlurShaderFilter>(params);
 }
@@ -74,7 +75,6 @@ std::shared_ptr<Drawing::GERippleShaderMask> CreateRippleShaderMask()
     maskParams.widthCenterOffset_ = 0.0f;
     return std::make_shared<Drawing::GERippleShaderMask>(maskParams);
 }
-
 
 std::shared_ptr<GEVariableRadiusBlurShaderFilter> CreateVariableRadiusBlurShaderFilter()
 {
