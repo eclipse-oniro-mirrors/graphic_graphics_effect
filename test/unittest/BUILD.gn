@@ -65,6 +65,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_kawase_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_linear_gradient_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_magnifier_shader_filter.cpp",
+    "${graphics_effect_root}/src/ge_mask_transition_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_mesa_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_particle_circular_halo_shader.cpp",
     "${graphics_effect_root}/src/ge_pixel_map_shader_mask.cpp",

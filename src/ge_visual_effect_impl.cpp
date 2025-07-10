@@ -169,6 +169,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO);
             impl->MakeParticleCircularHaloParams();
         }
+    },
+    { GE_FILTER_MASK_TRANSITION,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::MASK_TRANSITION);
+            impl->MakeMaskTransitionParams();
+        }
      }
 };
 
@@ -262,6 +268,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             break;
         }
+        case FilterType::MASK_TRANSITION: {
+            if (maskTransitionParams_ == nullptr) {
+                GE_LOGE("GEVisualEffectImpl set inverse failed, maskTransitionParams is nullptr");
+                return;
+            }
+            if (tag == GE_FILTER_MASK_TRANSITION_INVERSE) {
+                maskTransitionParams_->inverse = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -347,6 +363,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::PARTICLE_CIRCULAR_HALO: {
             SetParticleCircularHaloParams(tag, param);
+            break;
+        }
+        case FilterType::MASK_TRANSITION: {
+            SetMaskTransitionParamsFloat(tag, param);
             break;
         }
         default:
@@ -619,6 +639,17 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_FILTER_DIRECTION_LIGHT_MASK) {
                 directionLightParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::MASK_TRANSITION: {
+            if (maskTransitionParams_ == nullptr) {
+                GE_LOGE("GEVisualEffectImpl set mask failed, maskTransitionParams is nullptr");
+                return;
+            }
+
+            if (tag == GE_FILTER_MASK_TRANSITION_MASK) {
+                maskTransitionParams_->mask = param;
             }
             break;
         }
@@ -1229,6 +1260,25 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
         particleCircularHaloParams_->noise_ = param;
     }
 }
+
+void GEVisualEffectImpl::SetMaskTransitionParamsFloat(const std::string& tag, float param)
+{
+    if (maskTransitionParams_ == nullptr) {
+        GE_LOGE("GEVisualEffectImpl set factor failed, maskTransitionParams is nullptr");
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_MASK_TRANSITION_FACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->maskTransitionParams_->factor = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

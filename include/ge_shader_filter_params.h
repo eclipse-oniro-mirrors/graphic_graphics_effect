@@ -382,6 +382,15 @@ struct GEParticleCircularHaloShaderParams {
     float noise_ = 0.f;
 };
 
+constexpr char GE_FILTER_MASK_TRANSITION[] = "MaskTransition";
+constexpr char GE_FILTER_MASK_TRANSITION_MASK[] = "MaskTransition_Mask";
+constexpr char GE_FILTER_MASK_TRANSITION_FACTOR[] = "MaskTransition_Factor";
+constexpr char GE_FILTER_MASK_TRANSITION_INVERSE[] = "MaskTransition_Inverse";
+struct GEMaskTransitionShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask = nullptr;
+    float factor = 1.0f;
+    bool inverse = false;
+};
 
 } // namespace Drawing
 } // namespace Rosen

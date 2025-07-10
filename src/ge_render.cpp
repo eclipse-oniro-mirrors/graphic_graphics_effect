@@ -18,25 +18,25 @@
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_color_gradient_shader_filter.h"
+#include "ge_content_light_shader_filter.h"
+#include "ge_contour_diagonal_flow_light_shader.h"
+#include "ge_direction_light_shader_filter.h"
+#include "ge_displacement_distort_shader_filter.h"
+#include "ge_edge_light_shader_filter.h"
+#include "ge_external_dynamic_loader.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
-#include "ge_mesa_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
-#include "ge_displacement_distort_shader_filter.h"
-#include "ge_direction_light_shader_filter.h"
+#include "ge_mask_transition_shader_filter.h"
+#include "ge_mesa_blur_shader_filter.h"
 #include "ge_particle_circular_halo_shader.h"
+#include "ge_sound_wave_filter.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
-#include "ge_sound_wave_filter.h"
-#include "ge_external_dynamic_loader.h"
-#include "ge_edge_light_shader_filter.h"
-#include "ge_content_light_shader_filter.h"
-#include "ge_contour_diagonal_flow_light_shader.h"
-
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -252,6 +252,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::DIRECTION_LIGHT: {
             const auto& directionLightParams = ve->GetDirectionLightParams();
             shaderFilter = std::make_shared<GEDirectionLightShaderFilter>(*directionLightParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::MASK_TRANSITION: {
+            const auto& maskTransitionParams = ve->GetMaskTransitionParams();
+            shaderFilter = std::make_shared<GEMaskTransitionShaderFilter>(*maskTransitionParams);
             break;
         }
         default:
