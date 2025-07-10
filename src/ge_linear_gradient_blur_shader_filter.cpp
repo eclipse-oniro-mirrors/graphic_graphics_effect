@@ -23,6 +23,7 @@ namespace Rosen {
 namespace {
 constexpr static float FLOAT_ZERO_THRESHOLD = 0.001f;
 constexpr static uint8_t DIRECTION_NUM = 4;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> maskBlurShaderEffect_ = nullptr;
 
 static bool GetMaskLinearBlurEnabled()
 {
@@ -37,8 +38,6 @@ static bool GetMaskLinearBlurEnabled()
 #endif
 }
 } // namespace
-
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> maskBlurShaderEffect_ = nullptr;
 
 GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     const Drawing::GELinearGradientBlurShaderFilterParams& params)
@@ -101,10 +100,6 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImage(D
     Drawing::Point pts[2];
     uint8_t direction = static_cast<uint8_t>(para->direction_);
     auto clipIPadding = Drawing::Rect(0, 0, geoWidth_ * imageScale_, geoHeight_ * imageScale_);
-    constexpr uint8_t directionBias = 0;
-    if (directionBias != 0) {
-        TransformGradientBlurDirection(direction, directionBias);
-    }
     bool result = GetGEGradientDirectionPoints(pts, clipIPadding, static_cast<GEGradientDirection>(direction));
     if (!result) {
         return image;
