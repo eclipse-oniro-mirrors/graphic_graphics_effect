@@ -48,8 +48,6 @@ public:
 
     float ClampValue(float x, float minValue, float maxValue);
 
-    void ClampInputValue();
-
     static std::shared_ptr<GEParticleCircularHaloShader>
         CreateParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& param);
 
@@ -62,6 +60,8 @@ private:
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&&) = delete;
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&) = delete;
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&&) = delete;
+
+    void ClampInputValue();
 
     Drawing::GEParticleCircularHaloShaderParams ParticleCircularHaloParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
