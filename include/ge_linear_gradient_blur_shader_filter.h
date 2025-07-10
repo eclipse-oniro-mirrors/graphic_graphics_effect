@@ -48,13 +48,13 @@ public:
 
 protected:
     std::shared_ptr<GELinearGradientBlurPara> linearGradientBlurPara_ = nullptr;
-    inline static float imageScale_ = 1.f;
-    inline static float geoWidth_ = 0.f;
-    inline static float geoHeight_ = 0.f;
-    inline static float tranX_ = 0.f;
-    inline static float tranY_ = 0.f;
-    inline static Drawing::Matrix mat_;
-    inline static bool isOffscreenCanvas_ = true;
+    float imageScale_ = 1.f;
+    float geoWidth_ = 0.f;
+    float geoHeight_ = 0.f;
+    float tranX_ = 0.f;
+    float tranY_ = 0.f;
+    Drawing::Matrix mat_;
+    bool isOffscreenCanvas_ = true;
 
     static void TransformGradientBlurDirection(uint8_t& direction, const uint8_t directionBias);
     static uint8_t CalcDirectionBias(const Drawing::Matrix& mat);
