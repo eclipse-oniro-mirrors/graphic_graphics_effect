@@ -16,6 +16,7 @@
 #include "ge_visual_effect_container.h"
 
 #include "ge_log.h"
+#include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -33,6 +34,38 @@ void GEVisualEffectContainer::AddToChainedFilter(std::shared_ptr<Drawing::GEVisu
     filterVec_.push_back(visualEffect);
 }
 
+void GEVisualEffectContainer::UpdateCacheDataFrom(const std::shared_ptr<GEVisualEffectContainer>& ge)
+{
+    if (ge == nullptr) {
+        return;
+    }
+    for (auto vef : ge->GetFilters()) {
+        if (vef == nullptr || vef->GetImpl() == nullptr) {
+            LOGD("GEVisualEffectContainer::UpdateCacheDataFrom vef is null");
+            continue;
+        }
+        auto vefTarget = GetGEVisualEffect(vef->GetName());
+        if (vefTarget == nullptr || vefTarget->GetImpl() == nullptr) {
+            LOGD("GEVisualEffectContainer::UpdateCacheDataFrom ve is null");
+            continue;
+        }
+        vefTarget->GetImpl()->SetCache(vef->GetImpl()->GetCache());
+    }
+}
+
+std::shared_ptr<GEVisualEffect> GEVisualEffectContainer::GetGEVisualEffect(const std::string& name)
+{
+    for (auto vef : filterVec_) {
+        if (vef == nullptr) {
+            LOGD("GEVisualEffectContainer::GetGEVisualEffect vef is null");
+            continue;
+        }
+        if (vef->GetName() == name) {
+            return vef;
+        }
+    }
+    return nullptr;
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
