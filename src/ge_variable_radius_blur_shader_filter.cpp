@@ -20,9 +20,11 @@
 namespace OHOS {
 namespace Rosen {
 
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> horizontalMeanBlurShaderEffect_ = nullptr;
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> verticalMeanBlurShaderEffect_ = nullptr;
+namespace {
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> horizontalBoxBlurShaderEffect_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> verticalBoxBlurShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> textureShaderEffect_ = nullptr;
+} // namespace
 
 GEVariableRadiusBlurShaderFilter::GEVariableRadiusBlurShaderFilter(
     const Drawing::GEVariableRadiusBlurShaderFilterParams &params)
@@ -45,33 +47,40 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::ProcessImage(D
     }
     float radius = std::clamp(params_.blurRadius, 0.0f, 60.0f); // 60.0 represents largest blur radius
     radius = radius / 2; // 2 half blur radius
-    MakeHorizontalMeanBlurEffect();
-    MakeVerticalMeanBlurEffect();
+    MakeHorizontalBoxBlurEffect();
+    MakeVerticalBoxBlurEffect();
     MakeTextureShaderEffect();
-    return DrawMeanLinearGradientBlur(image, canvas, radius, maskShader, dst);
+    return DrawBoxLinearGradientBlur(image, canvas, radius, maskShader, dst);
 }
 
 void GEVariableRadiusBlurShaderFilter::MakeTextureShaderEffect()
 {
+    if (textureShaderEffect_ != nullptr) {
+        return;
+    }
     static const std::string generateTextureShader(R"(
         uniform shader imageInput;
         half4 main(float2 xy) {
             return imageInput.eval(xy);
         }
     )");
+    textureShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(generateTextureShader);
     if (textureShaderEffect_ == nullptr) {
-        textureShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(generateTextureShader);
+        LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader textureShaderEffect create failed");
     }
 }
 
-void GEVariableRadiusBlurShaderFilter::MakeHorizontalMeanBlurEffect()
+void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect()
 {
+    if (horizontalBoxBlurShaderEffect_ != nullptr) {
+        return;
+    }
     static const std::string HorizontalBlurString(
         R"(
         uniform half r;
         uniform shader imageShader;
         uniform shader gradientShader;
-        half4 meanFilter(float2 coord, half radius)
+        half4 boxFilter(float2 coord, half radius)
         {
             half4 sum = vec4(0.0);
             half div = 0;
@@ -92,22 +101,26 @@ void GEVariableRadiusBlurShaderFilter::MakeHorizontalMeanBlurEffect()
                 return imageShader.eval(coord);
             }
             float val = clamp(r * gradientShader.eval(coord).a, 1.0, r);
-            return meanFilter(coord, val);
+            return boxFilter(coord, val);
         }
     )");
-    if (horizontalMeanBlurShaderEffect_ == nullptr) {
-        horizontalMeanBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(HorizontalBlurString);
+    horizontalBoxBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(HorizontalBlurString);
+    if (horizontalBoxBlurShaderEffect_ == nullptr) {
+        LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader horizontalBoxBlurShaderEffect create failed");
     }
 }
 
-void GEVariableRadiusBlurShaderFilter::MakeVerticalMeanBlurEffect()
+void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect()
 {
+    if (verticalBoxBlurShaderEffect_ != nullptr) {
+        return;
+    }
     static const std::string VerticalBlurString(
         R"(
         uniform half r;
         uniform shader imageShader;
         uniform shader gradientShader;
-        half4 meanFilter(float2 coord, half radius)
+        half4 boxFilter(float2 coord, half radius)
         {
             half4 sum = vec4(0.0);
             half div = 0;
@@ -128,26 +141,26 @@ void GEVariableRadiusBlurShaderFilter::MakeVerticalMeanBlurEffect()
                 return imageShader.eval(coord);
             }
             float val = clamp(r * gradientShader.eval(coord).a, 1.0, r);
-            return meanFilter(coord, val);
+            return boxFilter(coord, val);
         }
     )");
-    if (verticalMeanBlurShaderEffect_ == nullptr) {
-        verticalMeanBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(VerticalBlurString);
+    verticalBoxBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(VerticalBlurString);
+    if (verticalBoxBlurShaderEffect_ == nullptr) {
+        LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader verticalBoxBlurShaderEffect create failed");
     }
 }
 
-std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::DrawMeanLinearGradientBlur(
+std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::DrawBoxLinearGradientBlur(
     const std::shared_ptr<Drawing::Image>& image, Drawing::Canvas& canvas, float radius,
     std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader, const Drawing::Rect& dst)
 {
-    if (!horizontalMeanBlurShaderEffect_ || !verticalMeanBlurShaderEffect_ || !image) {
+    if (!horizontalBoxBlurShaderEffect_ || !verticalBoxBlurShaderEffect_ || !image) {
         return image;
     }
-    Drawing::Matrix m;
     Drawing::Matrix blurMatrix;
     blurMatrix.PostTranslate(dst.GetLeft(), dst.GetTop());
     Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
-    auto tmpBlur4 = BuildMeanLinearGradientBlur(image, canvas, radius, alphaGradientShader, blurMatrix);
+    auto tmpBlur4 = BuildBoxLinearGradientBlur(image, canvas, radius, alphaGradientShader, blurMatrix);
     Drawing::Matrix invBlurMatrix;
     auto blurShader = Drawing::ShaderEffect::CreateImageShader(
         *tmpBlur4, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, linear, invBlurMatrix);
@@ -161,13 +174,13 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::DrawMeanLinear
     auto blurImage = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
     if (!blurImage) {
-        LOGE("GEVariableRadiusBlurShaderFilter::DrawMeanLinearGradientBlur fail to make final image");
+        LOGE("GEVariableRadiusBlurShaderFilter::DrawBoxLinearGradientBlur fail to make final image");
         return image;
     }
     return blurImage;
 }
  
-std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::BuildMeanLinearGradientBlur(
+std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::BuildBoxLinearGradientBlur(
     const std::shared_ptr<Drawing::Image>& image, Drawing::Canvas& canvas, float radius,
     std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader, Drawing::Matrix blurMatrix)
 {
@@ -178,14 +191,14 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::BuildMeanLinea
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
     Drawing::Matrix m;
     Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
-    Drawing::RuntimeShaderBuilder hBlurBuilder(horizontalMeanBlurShaderEffect_);
+    Drawing::RuntimeShaderBuilder hBlurBuilder(horizontalBoxBlurShaderEffect_);
     hBlurBuilder.SetUniform("r", radius);
     hBlurBuilder.SetChild("gradientShader", alphaGradientShader);
  
-    Drawing::RuntimeShaderBuilder vBlurBuilder(verticalMeanBlurShaderEffect_);
+    Drawing::RuntimeShaderBuilder vBlurBuilder(verticalBoxBlurShaderEffect_);
     vBlurBuilder.SetUniform("r", radius);
     vBlurBuilder.SetChild("gradientShader", alphaGradientShader);
-    int blurTimes = 4;
+    constexpr int blurTimes = 4;
     auto localImage = image;
     auto blurImageShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, linear, blurMatrix);
@@ -201,7 +214,7 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::BuildMeanLinea
             blurBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
 #endif
         if (!localImage) {
-            LOGE("GEVariableRadiusBlurShaderFilter::BuildMeanLinearGradientBlur fail to make blur image");
+            LOGE("GEVariableRadiusBlurShaderFilter::BuildBoxLinearGradientBlur fail to make blur image");
             return image;
         }
         blurImageShader = Drawing::ShaderEffect::CreateImageShader(
