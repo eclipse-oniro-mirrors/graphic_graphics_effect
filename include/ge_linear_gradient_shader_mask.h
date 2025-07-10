@@ -19,10 +19,11 @@
 #include "draw/canvas.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "image/image.h"
+
 #include "ge_log.h"
 #include "ge_shader_filter_params.h"
 #include "ge_shader_mask.h"
-#include "image/image.h"
 
 namespace OHOS {
 namespace Rosen {
