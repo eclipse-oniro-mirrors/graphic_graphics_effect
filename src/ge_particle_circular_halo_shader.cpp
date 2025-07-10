@@ -25,12 +25,12 @@ constexpr float MIN_NOISE = 0.0f;
 
 namespace OHOS {
 namespace Rosen {
-GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams &param)
+GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& param)
 {
     ParticleCircularHaloParams_ = param;
 }
 
-void GEParticleCircularHaloShader::MakeDrawingShader(const Drawing::Rect &rect, float progress)
+void GEParticleCircularHaloShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeParticleCircularHaloShader(rect);
 }
@@ -40,7 +40,7 @@ void GEParticleCircularHaloShader::SetGlobalRadius(const float globalRadius)
     ParticleCircularHaloParams_.radius_ = globalRadius;
 }
 
-void GEParticleCircularHaloShader::SetRotationCenter(const std::pair<float, float> &rotationCenter)
+void GEParticleCircularHaloShader::SetRotationCenter(const std::pair<float, float>& rotationCenter)
 {
     ParticleCircularHaloParams_.center_ = rotationCenter;
 }
@@ -56,7 +56,7 @@ float GEParticleCircularHaloShader::ClampValue(float x, float minValue, float ma
 }
 
 std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::CreateParticleCircularHaloShader(
-    Drawing::GEParticleCircularHaloShaderParams &param)
+    Drawing::GEParticleCircularHaloShaderParams& param)
 {
     std::shared_ptr<GEParticleCircularHaloShader> ParticleCircularHaloShader =
         std::make_shared<GEParticleCircularHaloShader>(param);
@@ -246,7 +246,7 @@ void GEParticleCircularHaloShader::ClampInputValue()
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticleCircularHaloShader(
-    const Drawing::Rect &rect)
+    const Drawing::Rect& rect)
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
