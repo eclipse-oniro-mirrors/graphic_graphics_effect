@@ -39,8 +39,8 @@ public:
 
 private:
     std::vector<std::pair<float, float>> fractionStops_;
-    Drawing::Point startPos_{0.f, 0.f};
-    Drawing::Point endPos_{0.f, 0.f};
+    Drawing::Point startPos_;
+    Drawing::Point endPos_;
 };
 } // Drawing
 } // namespace Rosen
