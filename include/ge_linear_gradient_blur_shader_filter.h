@@ -56,15 +56,14 @@ protected:
     Drawing::Matrix mat_;
     bool isOffscreenCanvas_ = true;
 
-    static void TransformGradientBlurDirection(uint8_t& direction, const uint8_t directionBias);
-    static uint8_t CalcDirectionBias(const Drawing::Matrix& mat);
-    static bool ProcessGradientDirectionPoints(
+    void TransformGradientBlurDirection(uint8_t& direction, const uint8_t directionBias);
+    uint8_t CalcDirectionBias(const Drawing::Matrix& mat);
+    bool ProcessGradientDirectionPoints(
         Drawing::Point (&pts)[2], const Drawing::Rect& clipBounds, GEGradientDirection direction);  // 2 size of points
-    static bool GetGEGradientDirectionPoints(
+    bool GetGEGradientDirectionPoints(
         Drawing::Point (&pts)[2], const Drawing::Rect& clipBounds, GEGradientDirection direction);  // 2 size of points
 private:
-    static void ComputeScale(float width, float height, bool useMaskAlgorithm);
-
+    void ComputeScale(float width, float height, bool useMaskAlgorithm);
     static std::shared_ptr<Drawing::Image> DrawMaskLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, std::shared_ptr<GEShaderFilter>& blurFilter,
         std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader, const Drawing::Rect& dst);
