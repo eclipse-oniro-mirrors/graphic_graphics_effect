@@ -44,12 +44,13 @@ public:
         GE,
         HPS,
     };
- 
+    
+    using IndexRange = HpsEffectFilter::IndexRange;
     struct IndexRangeInfo {
         EffectMode mode;
-        std::array<int32_t, 2> range;
- 
-        IndexRangeInfo(EffectMode em, const std::array<int32_t, 2>& r) : mode(em), range(r) {}
+        IndexRange range;
+
+        IndexRangeInfo(EffectMode em, const IndexRange& r) : mode(em), range(r) {}
     };
 
     GERender();
@@ -83,7 +84,7 @@ private:
     friend class OHOS::Rosen::GEFilterComposer;
 
     std::vector<IndexRangeInfo> CategorizeRanges(
-        const std::vector<std::array<int32_t, 2>>& hpsIndexRanges, const int32_t veContainerSize);
+        const std::vector<IndexRange>& hpsIndexRanges, const int32_t veContainerSize);
 
     std::shared_ptr<Drawing::Image> ComposeOrApplyEffect(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
@@ -92,7 +93,7 @@ private:
     std::shared_ptr<Drawing::Image> ApplyGEEffects(Drawing::Canvas& canvas,
         std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
-        const Drawing::SamplingOptions& sampling);\
+        const Drawing::SamplingOptions& sampling);
 
     std::vector<std::shared_ptr<GEShader>> GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer);
 

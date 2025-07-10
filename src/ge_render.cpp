@@ -106,7 +106,7 @@ bool GERender::ApplyHpsGEImageEffect(
     }
 
     auto resImage = image;
-    std::vector<std::array<int32_t, 2>> hpsSupportedIndexRanges;
+    std::vector<IndexRange> hpsSupportedIndexRanges;
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>();
     hpsSupportedIndexRanges = hpsEffectFilter->HpsSupportedEffectsIndexRanges(visualEffects);
 
@@ -136,7 +136,7 @@ bool GERender::ApplyHpsGEImageEffect(
 }
  
 std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
-    const std::vector<std::array<int32_t, 2>>& hpsIndexRanges, const int32_t veContainerSize)
+    const std::vector<IndexRange>& hpsIndexRanges, const int32_t veContainerSize)
 {
     std::vector<IndexRangeInfo> categorizedRanges;
     for (size_t i = 0; i <= hpsIndexRanges.size(); ++i) {
@@ -153,7 +153,7 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
             end = veContainerSize - 1;
         }
         if (start <= end) {
-            std::array<int32_t, 2> geIndexRange = { start, end };
+            IndexRange geIndexRange = { start, end };
             categorizedRanges.emplace_back(EffectMode::GE, geIndexRange);
         }
         if (i < hpsIndexRanges.size()) {

@@ -39,8 +39,11 @@ public:
     HpsEffectFilter(Drawing::Canvas& canvas);
     ~HpsEffectFilter() = default;
 
+    static constexpr size_t INDEX_RANGE_NUM = 2;
+    using IndexRange = std::array<int32_t, INDEX_RANGE_NUM>;
+
     bool HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer);
-    std::vector<std::array<int32_t, 2>> HpsSupportedEffectsIndexRanges(
+    std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst);

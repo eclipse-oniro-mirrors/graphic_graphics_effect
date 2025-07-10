@@ -389,6 +389,8 @@ HWTEST_F(GERenderTest, ApplyGEEffects004, TestSize.Level1)
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects004 end";
 }
 
+using IndexRange = GERender::IndexRange;
+
 /**
  * @tc.name: CategorizeRanges001
  * @tc.desc: Verify the CategorizeRanges
@@ -403,7 +405,7 @@ HWTEST_F(GERenderTest, CategorizeRanges001, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    vector<std::array<int32_t, 2>> hpsRanges = { { 3, 5 } };
+    vector<IndexRange> hpsRanges = { { 3, 5 } };
     int32_t veSize = 10;
     auto result = geRender->CategorizeRanges(hpsRanges, veSize);
     EXPECT_EQ(result.size(), 3);
@@ -437,7 +439,7 @@ HWTEST_F(GERenderTest, CategorizeRanges002, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    vector<std::array<int32_t, 2>> hpsRanges = { { 2, 4 }, { 7, 9 } };
+    vector<IndexRange> hpsRanges = { { 2, 4 }, { 7, 9 } };
     int32_t veSize = 10;
     auto result = geRender->CategorizeRanges(hpsRanges, veSize);
     EXPECT_EQ(result.size(), 4);
@@ -475,7 +477,7 @@ HWTEST_F(GERenderTest, CategorizeRanges003, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    vector<std::array<int32_t, 2>> hpsRanges = { { 2, 5 }, { 6, 8 } };
+    vector<IndexRange> hpsRanges = { { 2, 5 }, { 6, 8 } };
     int32_t veSize = 10;
     auto result = geRender->CategorizeRanges(hpsRanges, veSize);
     EXPECT_EQ(result.size(), 4);
@@ -513,7 +515,7 @@ HWTEST_F(GERenderTest, CategorizeRanges004, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    vector<std::array<int32_t, 2>> hpsRanges = { { 0, 0 } };
+    vector<IndexRange> hpsRanges = { { 0, 0 } };
     int32_t veSize = 1;
     auto result = geRender->CategorizeRanges(hpsRanges, veSize);
     EXPECT_EQ(result.size(), 1);
