@@ -44,14 +44,14 @@ protected:
     Drawing::GEVariableRadiusBlurShaderFilterParams params_;
 
 private:
-    static void MakeHorizontalMeanBlurEffect();
-    static void MakeVerticalMeanBlurEffect();
+    static void MakeHorizontalGaussianBlurEffect();
+    static void MakeVerticalGaussianBlurEffect();
     static void MakeTextureShaderEffect();
 
-    static std::shared_ptr<Drawing::Image> DrawMeanLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
+    static std::shared_ptr<Drawing::Image> DrawGaussianLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         const Drawing::Rect& dst);
-    static std::shared_ptr<Drawing::Image> BuildMeanLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
+    static std::shared_ptr<Drawing::Image> BuildGaussianLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         Drawing::Matrix blurMatrix);
 };
