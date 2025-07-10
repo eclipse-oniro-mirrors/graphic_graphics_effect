@@ -18,6 +18,8 @@
 
 #include <memory>
 
+#include "ge_filter_composer.h"
+#include "ge_hps_effect_filter.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
@@ -38,6 +40,18 @@ using namespace Rosen;
 
 class GE_EXPORT GERender {
 public:
+    enum class EffectMode {
+        GE,
+        HPS,
+    };
+ 
+    struct IndexRangeInfo {
+        EffectMode mode;
+        std::array<int32_t, 2> range;
+ 
+        IndexRangeInfo(EffectMode em, const std::array<int32_t, 2>& r) : mode(em), range(r) {}
+    };
+
     GERender();
     ~GERender();
     void DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
@@ -55,7 +69,31 @@ public:
         const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
         const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
 
+    bool HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
+                          std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);
+
+    bool ApplyHpsGEImageEffect(
+        Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush,
+        const Drawing::SamplingOptions& sampling
+    );
+
 private:
+    friend class OHOS::Rosen::GEFilterComposer;
+
+    std::vector<IndexRangeInfo> CategorizeRanges(
+        const std::vector<std::array<int32_t, 2>>& hpsIndexRanges, const int32_t veContainerSize);
+
+    std::shared_ptr<Drawing::Image> ComposeOrApplyEffect(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const std::shared_ptr<GEShaderFilter>& filter, std::shared_ptr<GEFilterComposer>& filterComposer);
+
+    std::shared_ptr<Drawing::Image> ApplyGEEffects(Drawing::Canvas& canvas,
+        std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const Drawing::SamplingOptions& sampling);\
+
     std::vector<std::shared_ptr<GEShader>> GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffect>& ve);

@@ -135,6 +135,40 @@ bool HpsEffectFilter::HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veCon
     return true;
 }
 
+std::vector<std::array<int32_t, 2>> HpsEffectFilter::HpsSupportedEffectsIndexRanges(
+    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& filters)
+{
+    std::vector<std::array<int32_t, 2>> intervals;
+    std::vector<size_t> supportedIndices;
+ 
+    for (size_t i = 0; i < filters.size(); ++i) {
+        const auto& vef = filters[i];
+        if (IsEffectSupported(vef)) {
+            supportedIndices.push_back(i);
+        }
+    }
+ 
+    if (supportedIndices.empty()) {
+        return intervals;
+    }
+ 
+    size_t start = supportedIndices[0];
+    size_t end = start;
+ 
+    for (size_t i = 1; i < supportedIndices.size(); ++i) {
+        if (supportedIndices[i] == end + 1) {
+            end = supportedIndices[i];
+        } else {
+            intervals.push_back({start, end});
+            start = supportedIndices[i];
+            end = start;
+        }
+    }
+ 
+    intervals.push_back({start, end});
+    return intervals;
+}
+
 void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
     const Drawing::Rect& src, const Drawing::Rect& dst)
 {

@@ -17,6 +17,8 @@
 #define GRAPHICS_EFFECT_GE_SHADER_FILTER_H
 
 #include <any>
+#include <optional>
+#include <variant>
 
 #include "draw/canvas.h"
 #include "image/image.h"
@@ -26,6 +28,11 @@ namespace OHOS {
 namespace Rosen {
 class GEShaderFilter {
 public:
+    using FilterParams = std::optional<std::variant<Drawing::GEAIBarShaderFilterParams,
+        Drawing::GEWaterRippleFilterParams, Drawing::GEGreyShaderFilterParams, Drawing::GEKawaseBlurShaderFilterParams,
+        Drawing::GEMESABlurShaderFilterParams, Drawing::GELinearGradientBlurShaderFilterParams,
+        Drawing::GEMagnifierShaderFilterParams>>;
+
     GEShaderFilter() = default;
     GEShaderFilter(const GEShaderFilter&) = delete;
     virtual ~GEShaderFilter() = default;
@@ -36,6 +43,16 @@ public:
     uint32_t Hash() const
     {
         return hash_;
+    }
+
+    std::string Type() const
+    {
+        return type_;
+    }
+ 
+    FilterParams& Params()
+    {
+        return params_;
     }
 
     void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
@@ -59,6 +76,8 @@ protected:
     Drawing::CanvasInfo canvasInfo_;
     uint32_t hash_ = 0;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
+    std::string type_ = "";
+    FilterParams params_;
 };
 } // namespace Rosen
 } // namespace OHOS

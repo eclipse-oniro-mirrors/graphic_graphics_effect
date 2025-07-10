@@ -91,6 +91,135 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     return resImage;
 }
 
+bool GERender::ApplyHpsGEImageEffect(
+    Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+    const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& src,
+    const Drawing::Rect& dst, Drawing::Brush& brush, const Drawing::SamplingOptions& sampling)
+{
+    if (!image) {
+        LOGE("GERender::ApplyHpsGEImageEffect image is null");
+        return false;
+    }
+    auto visualEffects = veContainer.GetFilters();
+    if (visualEffects.empty()) {
+        return false;
+    }
+
+    auto resImage = image;
+    std::vector<std::array<int32_t, 2>> hpsSupportedIndexRanges;
+    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>();
+    hpsSupportedIndexRanges = hpsEffectFilter->HpsSupportedEffectsIndexRanges(visualEffects);
+
+    bool hpsContainsBlurOrMesa = false;
+    if (hpsSupportedIndexRanges.empty()) {
+        resImage = ApplyGEEffects(canvas, visualEffects, resImage, src, src, sampling);
+        outImage = resImage;
+        return hpsContainsBlurOrMesa;
+    }
+
+    auto indexRangeInfos = CategorizeRanges(hpsSupportedIndexRanges, visualEffects.size());
+    for (auto& indexRangeInfo : indexRangeInfos) {
+        std::vector<std::shared_ptr<Drawing::GEVisualEffect>> subVisualEffects(
+            visualEffects.begin() + indexRangeInfo.range[0], visualEffects.begin() + indexRangeInfo.range[1] + 1);
+        if (indexRangeInfo.mode == EffectMode::GE) {
+            resImage = ApplyGEEffects(canvas, subVisualEffects, resImage, src, src, sampling);
+        } else {
+            for (auto vef : subVisualEffects) {
+                auto ve = vef->GetImpl();
+                hpsEffectFilter->GenerateVisualEffectFromGE(ve, src, dst);
+            }
+            hpsContainsBlurOrMesa = hpsEffectFilter->ApplyHpsEffect(canvas, resImage, resImage, brush);
+        }
+    }
+    outImage = resImage;
+    return hpsContainsBlurOrMesa;
+}
+ 
+std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
+    const std::vector<std::array<int32_t, 2>>& hpsIndexRanges, const int32_t veContainerSize)
+{
+    std::vector<IndexRangeInfo> categorizedRanges;
+    for (size_t i = 0; i <= hpsIndexRanges.size(); ++i) {
+        int start;
+        int end;
+        if (i == 0) {
+            start = 0;
+            end = hpsIndexRanges[0][0] - 1;
+        } else if (i < hpsIndexRanges.size()) {
+            start = hpsIndexRanges[i - 1][1] + 1;
+            end = hpsIndexRanges[i][0] - 1;
+        } else {
+            start = hpsIndexRanges.back()[1] + 1;
+            end = veContainerSize - 1;
+        }
+        if (start <= end) {
+            std::array<int32_t, 2> geIndexRange = { start, end };
+            categorizedRanges.emplace_back(EffectMode::GE, geIndexRange);
+        }
+        if (i < hpsIndexRanges.size()) {
+            categorizedRanges.emplace_back(EffectMode::HPS, hpsIndexRanges[i]);
+        }
+    }
+    return categorizedRanges;
+}
+ 
+std::shared_ptr<Drawing::Image> GERender::ComposeOrApplyEffect(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
+    const std::shared_ptr<GEShaderFilter>& filter, std::shared_ptr<GEFilterComposer>& filterComposer)
+{
+    if (filterComposer == nullptr) {
+        filterComposer = std::make_shared<GEFilterComposer>(filter);
+        return image;
+    }
+ 
+    if (filterComposer->Compose(filter)) {
+        return image;
+    } else {
+        std::shared_ptr<Drawing::Image> processedImage = filterComposer->ApplyComposedEffect(canvas, image, src, dst);
+        filterComposer = std::make_shared<GEFilterComposer>(filter);
+        return processedImage;
+    }
+}
+ 
+std::shared_ptr<Drawing::Image> GERender::ApplyGEEffects(Drawing::Canvas& canvas,
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects, const std::shared_ptr<Drawing::Image>& image,
+    const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling)
+{
+    auto resImage = image;
+    std::shared_ptr<GEFilterComposer> filterComposer = nullptr;
+    for (auto vef : visualEffects) {
+        auto ve = vef->GetImpl();
+        auto currentFilter = GenerateShaderFilter(vef);
+        if (currentFilter == nullptr) {
+            continue;
+        }
+        auto& filterParams = currentFilter->Params();
+        if (currentFilter->Type().empty() || !filterParams || !filterParams.has_value()) {
+            if (filterComposer) {
+                resImage = filterComposer->ApplyComposedEffect(canvas, resImage, src, dst);
+                filterComposer.reset();
+            }
+            resImage = currentFilter->ProcessImage(canvas, resImage, src, dst);
+        } else {
+            resImage = ComposeOrApplyEffect(canvas, resImage, src, dst, currentFilter, filterComposer);
+        }
+    }
+    if (filterComposer) {
+        resImage = filterComposer->ApplyComposedEffect(canvas, resImage, src, dst);
+    }
+ 
+    return resImage;
+}
+ 
+bool GERender::HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
+                                std::shared_ptr<HpsEffectFilter>& hpsEffectFilter)
+{
+    if (hpsEffectFilter == nullptr) {
+        return false;
+    }
+    return hpsEffectFilter->HpsSupportEffectGE(veContainer);
+}
+
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
 bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
     const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& src,

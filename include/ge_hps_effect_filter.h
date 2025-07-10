@@ -40,6 +40,8 @@ public:
     ~HpsEffectFilter() = default;
 
     bool HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer);
+    std::vector<std::array<int32_t, 2>> HpsSupportedEffectsIndexRanges(
+        const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst);
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,

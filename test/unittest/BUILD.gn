@@ -61,6 +61,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_displacement_distort_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_edge_light_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_external_dynamic_loader.cpp",
+    "${graphics_effect_root}/src/ge_filter_composer.cpp",
     "${graphics_effect_root}/src/ge_grey_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_kawase_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_linear_gradient_blur_shader_filter.cpp",
