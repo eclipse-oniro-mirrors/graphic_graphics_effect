@@ -40,6 +40,55 @@
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
+using namespace Rosen::Drawing;
+using ShaderCreator = std::function<std::shared_ptr<GEShader>(std::shared_ptr<GEVisualEffectImpl>)>;
+
+static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shaderCreatorLUT = {
+    {GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetContenDiagonalParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetContenDiagonalParams();
+            out = std::make_shared<GEContourDiagonalFlowLightShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetWavyRippleLightParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetWavyRippleLightParams();
+            out = std::make_shared<GEWavyRippleLightShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::AURORA_NOISE, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetAuroraNoiseParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetAuroraNoiseParams();
+            out = GEAuroraNoiseShader::CreateAuroraNoiseShader(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetParticleCircularHaloParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetParticleCircularHaloParams();
+            out = std::make_shared<GEParticleCircularHaloShader>(*params);
+            return out;
+        }
+    }
+};
 
 GERender::GERender() {}
 
@@ -407,59 +456,36 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilters(
 void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
     const Drawing::Rect& bounds)
 {
-    std::vector<std::shared_ptr<GEShader>> geShaderEffects = GenerateShaderEffect(veContainer);
-    for (auto geShaderEffect : geShaderEffects) {
+    LOGD("GERender::DrawShaderEffect %{public}zu", veContainer.GetFilters().size());
+    for (auto vef : veContainer.GetFilters()) {
+        if (vef == nullptr) {
+            LOGD("GERender::DrawShaderEffect vef is null");
+            continue;
+        }
+        auto ve = vef->GetImpl();
+        std::shared_ptr<GEShader> geShaderEffect = GenerateShaderEffect(ve);
         if (geShaderEffect == nullptr) {
             LOGD("GERender::DrawShaderEffect shader is null");
             continue;
         }
-        geShaderEffect->MakeDrawingShader(bounds, -1.f); // new flow not use progress
+        geShaderEffect->SetCache(ve->GetCache());
+        geShaderEffect->Preprocess(canvas, bounds); // to calculate your cache data
+        geShaderEffect->MakeDrawingShader(bounds, -1.f); // not use progress
         auto shader = geShaderEffect->GetDrawingShader();
         Drawing::Brush brush;
         brush.SetShaderEffect(shader);
         canvas.AttachBrush(brush);
         canvas.DrawRect(bounds);
         canvas.DetachBrush();
+
+        ve->SetCache(geShaderEffect->GetCache());
     }
 }
 
-std::vector<std::shared_ptr<GEShader>> GERender::GenerateShaderEffect(Drawing::GEVisualEffectContainer& veContainer)
+std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)
 {
-    LOGD("GERender::shaderEffects %{public}zu", veContainer.GetFilters().size());
-    std::vector<std::shared_ptr<GEShader>> shaderEffects;
-    for (auto vef : veContainer.GetFilters()) {
-        auto ve = vef->GetImpl();
-        std::shared_ptr<GEShader> shaderEffect;
-        LOGD("GERender::shaderEffects %{public}d", static_cast<int>(ve->GetFilterType()));
-        switch (ve->GetFilterType()) {
-            case Drawing::GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
-                const auto& params = ve->GetContenDiagonalParams();
-                shaderEffect = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(*params);
-                break;
-            }
-
-            case Drawing::GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT: {
-                const auto& params = ve->GetWavyRippleLightParams();
-                shaderEffect = GEWavyRippleLightShader::CreateWavyRippleLightShader(*params);
-                break;
-            }
-            case Drawing::GEVisualEffectImpl::FilterType::AURORA_NOISE: {
-                const auto& params = ve->GetAuroraNoiseParams();
-                shaderEffect = GEAuroraNoiseShader::CreateAuroraNoiseShader(*params);
-                (void)params;
-                break;
-            }
-            case Drawing::GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO: {
-                const auto& params = ve->GetParticleCircularHaloParams();
-                (void)params;
-                break;
-            }
-            default:
-                break;
-        }
-        shaderEffects.push_back(shaderEffect);
-    }
-    return shaderEffects;
+    auto it = g_shaderCreatorLUT.find(ve->GetFilterType());
+    return it != g_shaderCreatorLUT.end() ? it->second(ve) : nullptr;
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

@@ -33,7 +33,11 @@ public:
         return filterVec_;
     }
 
+    void UpdateCacheDataFrom(const std::shared_ptr<GEVisualEffectContainer>& ge);
+
 private:
+    std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
+
     std::vector<std::shared_ptr<GEVisualEffect>> filterVec_;
 };
 
