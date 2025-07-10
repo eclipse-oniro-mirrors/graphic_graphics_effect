@@ -16,14 +16,14 @@
 #ifndef GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_MASK_H
 #define GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_MASK_H
 
+#include "ge_log.h"
+#include "ge_shader_filter_params.h"
+#include "ge_shader_mask.h"
+
 #include "draw/canvas.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "image/image.h"
-
-#include "ge_log.h"
-#include "ge_shader_filter_params.h"
-#include "ge_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
