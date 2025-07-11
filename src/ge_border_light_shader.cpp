@@ -114,7 +114,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 return half4(normalXY, normalZ, dist / thickness + 1.0);
             }
 
-            half4 RoundedBoxShinning(half2 uv, half4 specularColor, half shinning, half3 lightPos, half3 viewPos, mat3 rotM)
+            half4 RoundedBoxShinning(half2 uv, half4 specularColor, half shinning, half3 lightPos,
+                half3 viewPos, mat3 rotM)
             {
                 half3 fragPos = half3(uv, 0.0);
                 half4 normal = createBoundNormal(uv);
@@ -164,7 +165,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 } else {
                     mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
                     half4 specularColor = lightColor;
-                    half shinning = 16.0f;
+                    half shinning = 16.0;
                     half3 viewPos = lightPos;
                     shinningColor = RoundedBoxShinning(uv, specularColor, shinning, lightPos, viewPos, rotM);
                 }
