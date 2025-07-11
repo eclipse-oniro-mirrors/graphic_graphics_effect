@@ -81,97 +81,96 @@ void GEContentLightFilter::GenerateContentLightEffect()
         uniform half4 lightColor;
         uniform half3 contentRotationAngle;
 
-        const float cornerRadius = 30.0;
-        const float boundaryThickness = 5.0;
-
-        float sdRoundedBox(vec2 p, vec2 b, float r)
+        half sdRoundedBox(half2 p, half2 b, half r)
         {
-            vec2 q = abs(p) - b + r;
+            half2 q = abs(p) - b + r;
             return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
         }
 
-        vec4 shinningEffect(in vec3 fragPos, in vec3 normal, in vec3 lightPos, in vec3 viewPos,
-            in vec4 specularColor, in float shinning)
+        half4 shinningEffect(in half3 fragPos, in half3 normal, in half3 lightPos, in half3 viewPos,
+            in half4 specularColor, in half shinning)
         {
-            vec3 lightDir = normalize(lightPos - fragPos);
-            vec3 viewDir = normalize(viewPos - fragPos);
-            vec3 halfwayDir = normalize(lightDir + viewDir);
-            
-            // Blinn-Phong
-            vec4 specularC = specularColor * pow(max(dot(normal, halfwayDir), 0.), shinning);
+            half3 lightDir = normalize(lightPos - fragPos);
+            half3 viewDir = normalize(viewPos - fragPos);
+            half3 halfwayDir = normalize(lightDir + viewDir);
 
+            // Blinn-Phong
+            half4 specularC = specularColor * pow(max(dot(normal, halfwayDir), 0.), shinning);
             return specularC;
         }
 
-        vec4 createContentNormal(vec2 pos, float maskAlpha) // pos in [-w, w] x [-1, 1]
+        half4 createContentNormal(half2 pos, half maskAlpha) // pos in [-w, w] x [-1, 1]
         {
             if (maskAlpha < 0.01) {
-                return vec4(0.0, 0.0, -1.0, -1.0);
+                return half4(0.0, 0.0, -1.0, -1.0);
             }
 
-            float R = max(iResolution.x, iResolution.y) * 4. / iResolution.y;
-            float z = sqrt(R * R - pos.x * pos.x - pos.y * pos.y);
-            vec3 normal = normalize(vec3(pos.x / z, pos.y / z, 0.5));
-            
-            return vec4(normal, 1.);
+            half R = max(iResolution.x, iResolution.y) * 4. / iResolution.y;
+            half z = sqrt(R * R - pos.x * pos.x - pos.y * pos.y);
+            half3 normal = normalize(half3(pos.x / z, pos.y / z, 0.5));
+
+            return half4(normal, 1.);
         }
-        
-        mat3 GetRotationMatrix(vec3 rotAngle)
+
+        mat3 GetRotationMatrix(half3 rotAngle)
         {
             rotAngle *= 3.1415926 / 180.0;
-            mat3 Rx = mat3 {1.0, 0.0, 0.0,
+            mat3 Rx = mat3 (1.0, 0.0, 0.0,
                             0.0, cos(rotAngle.x), -sin(rotAngle.x),
-                            0.0, sin(rotAngle.x), cos(rotAngle.x)};
-            mat3 Ry = mat3 {cos(rotAngle.y), 0.0, sin(rotAngle.y),
+                            0.0, sin(rotAngle.x), cos(rotAngle.x));
+            mat3 Ry = mat3 (cos(rotAngle.y), 0.0, sin(rotAngle.y),
                             0.0, 1.0, 0.0,
-                            -sin(rotAngle.y), 0.0, cos(rotAngle.y)};
-            mat3 Rz = mat3 {cos(rotAngle.z), -sin(rotAngle.z), 0.0,
+                            -sin(rotAngle.y), 0.0, cos(rotAngle.y));
+            mat3 Rz = mat3 (cos(rotAngle.z), -sin(rotAngle.z), 0.0,
                             sin(rotAngle.z), cos(rotAngle.z), 0.0,
-                            0.0, 0.0, 1.0};
+                            0.0, 0.0, 1.0);
             return Rz * Ry * Rx;
         }
 
-        vec4 ContentShinning(
-            vec2 uv, vec4 specularColor, float shinning, vec3 lightPos, vec3 viewPos, mat3 rotM, float maskAlpha)
+        half4 ContentShinning(
+            half2 uv, half4 specularColor, half shinning, half3 lightPos, half3 viewPos, mat3 rotM, half maskAlpha)
         {
-            vec3 fragPos = vec3(uv, 0.0);
-            vec4 normal = createContentNormal(uv, maskAlpha);
+            half3 fragPos = half3(uv, 0.0);
+            half4 normal = createContentNormal(uv, maskAlpha);
             if (normal.w < 0.0) {
-                return vec4(0.0);
+                return half4(0.0);
             }
-            vec3 fragNormal = rotM * normal.xyz;
+            half3 fragNormal = rotM * normal.xyz;
 
-            vec4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
-            // shinningColor *= smoothstep(0.0, 0.1, normal.w) * smoothstep(1.0, 0.9, normal.w);
+            half4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
             return shinningColor;
         }
 
-        vec4 main(in vec2 fragCoord)
+        half4 main(in vec2 fragCoord)
         {
-            vec2 uv = fragCoord / iResolution.xy;
+            half4 inputImage = image.eval(fragCoord);
+            half2 uv = fragCoord / iResolution.xy;
             uv = uv + uv - 1.0;
-            float screenRatio = iResolution.x / iResolution.y;
+            half screenRatio = iResolution.x / iResolution.y;
             uv.x *= screenRatio;
 
-            mat3 rotM = GetRotationMatrix(contentRotationAngle);
-            vec4 specularColor = lightColor;
-            float shinning = 6.0;
-            vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
+            half4 shinningColor = half4(0.0);
+            half3 lightPos = half3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
-            vec3 viewPos = lightPos;
-
-            vec4 inputImage = image.eval(fragCoord);
-            vec4 shinningColor =
-                ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
-
-            vec3 finalColor = inputImage.rgb + shinningColor.rgb * clamp(lightIntensity, 0.0, 1.0) * lightColor.a;
-            float finalColorMax = max(finalColor.r, max(finalColor.g, finalColor.b));  // avoid over expose
-            if (finalColorMax > 1.0) {
-                finalColor /= finalColorMax;
+            if (dot(contentRotationAngle, contentRotationAngle) < 0.01) {
+                half3 fragPos = half3(uv, 0.0);
+                shinningColor = inputImage.w > 0.0
+                    ? lightColor * pow(max(normalize(lightPos - fragPos).z, 0.), 36.0) : half4(0.0);
+            } else {
+                mat3 rotM = GetRotationMatrix(contentRotationAngle);
+                half4 specularColor = lightColor;
+                half shinning = 6.0;
+                half3 viewPos = lightPos;
+                shinningColor =
+                    ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
             }
-            return vec4(finalColor, inputImage.w);
-        }
 
+            half intensity = clamp(lightIntensity, 0.0, 1.0) * lightColor.a;
+            shinningColor.rgb *= intensity;
+            shinningColor.rgb += inputImage.rgb - inputImage.rgb * shinningColor.rgb * 0.85;
+
+            return half4(shinningColor.rgb, inputImage.w);
+        }
     )";
     if (contentLightShaderEffect_ == nullptr) {
         contentLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(shaderStringContentLight);

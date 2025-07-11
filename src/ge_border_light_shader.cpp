@@ -67,70 +67,68 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
             uniform half3 borderLightRotationAngle;
             uniform half cornerRadius;
 
-            const float boundaryThickness = 5.0;
-
-            float sdRoundedBox(vec2 p, vec2 b, float r)
+            half sdRoundedBox(half2 p, half2 b, half r)
             {
-                vec2 q = abs(p)-b+r;
+                half2 q = abs(p) - b + r;
                 return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
             }
 
-            vec2 sdRoundedBoxGradient(vec2 p, vec2 b, float r)
+            half2 sdRoundedBoxGradient(half2 p, half2 b, half r)
             {
-                vec2 signs = vec2(p.x >= 0.0 ? 1.0 : -1.0, p.y >= 0.0 ? 1.0 : -1.0);
-                vec2 q = abs(p) - b + r;
-                vec2 nor = (q.y > q.x) ? vec2(0.0, 1.0) : vec2(1.0, 0.0);
+                half2 signs = half2(p.x >= 0.0 ? 1.0 : -1.0, p.y >= 0.0 ? 1.0 : -1.0);
+                half2 q = abs(p) - b + r;
+                half2 nor = (q.y > q.x) ? half2(0.0, 1.0) : half2(1.0, 0.0);
                 nor = (q.x > 0.0 && q.y > 0.0) ? normalize(q) : nor;
                 return signs * nor;
             }
 
-            vec4 shinningEffect(in vec3 fragPos, in vec3 normal, in vec3 lightPos, in vec3 viewPos,
-                in vec4 specularColor, in float shinning)
+            half4 shinningEffect(in half3 fragPos, in half3 normal, in half3 lightPos, in half3 viewPos,
+                in half4 specularColor, in half shinning)
             {
-                vec3 lightDir = normalize(lightPos - fragPos);
-                vec3 viewDir = normalize(viewPos - fragPos);
-                vec3 halfwayDir = normalize(lightDir + viewDir);
+                half3 lightDir = normalize(lightPos - fragPos);
+                half3 viewDir = normalize(viewPos - fragPos);
+                half3 halfwayDir = normalize(lightDir + viewDir);
                 
                 // Blinn-Phong
-                vec4 specularC = specularColor * pow(max(dot(normal, halfwayDir), 0.), shinning);
+                half4 specularC = specularColor * pow(max(dot(normal, halfwayDir), 0.), shinning);
 
                 return specularC;
             }
 
-            vec4 createBoundNormal(vec2 pos) // pos in [-w, w] x [-1, 1]
+            half4 createBoundNormal(half2 pos) // pos in [-w, w] x [-1, 1]
             {
-                vec2 halfWH = vec2(iResolution.x, iResolution.y) / iResolution.y;
-                float r = min(cornerRadius / iResolution.y * 2.0, min(halfWH.x, halfWH.y));
-                float dist = sdRoundedBox(pos, halfWH, r);
-                float thickness = min(lightWidth, cornerRadius) / iResolution.y;
+                half2 halfWH = half2(iResolution.x, iResolution.y) / iResolution.y;
+                half r = min(cornerRadius / iResolution.y * 2.0, min(halfWH.x, halfWH.y));
+                half dist = sdRoundedBox(pos, halfWH, r);
+                half thickness = min(lightWidth, cornerRadius) / iResolution.y;
                 if (dist >= 0.0 || dist <= -thickness) {
-                    return vec4(0.0, 0.0, 1.0, -1.0);
+                    return half4(0.0, 0.0, 1.0, -1.0);
                 }
 
-                float R = thickness * 9.0;  // 9.0 is adjustable parameters
-                float sinTheta = abs(dist) / R;
+                half R = thickness * 9.0;  // 9.0 is adjustable parameters
+                half sinTheta = abs(dist) / R;
 
-                float normalZ = sqrt(1.0 - sinTheta * sinTheta);
-                vec2 normalXY = sdRoundedBoxGradient(pos, halfWH, r) * sinTheta;
+                half normalZ = sqrt(1.0 - sinTheta * sinTheta);
+                half2 normalXY = sdRoundedBoxGradient(pos, halfWH, r) * sinTheta;
 
-                return vec4(normalXY, normalZ, dist / thickness + 1.0);
+                return half4(normalXY, normalZ, dist / thickness + 1.0);
             }
 
-            vec4 RoundedBoxShinning(vec2 uv, vec4 specularColor, float shinning, vec3 lightPos, vec3 viewPos, mat3 rotM)
+            half4 RoundedBoxShinning(half2 uv, half4 specularColor, half shinning, half3 lightPos, half3 viewPos, mat3 rotM)
             {
-                vec3 fragPos = vec3(uv, 0.0);
-                vec4 normal = createBoundNormal(uv);
+                half3 fragPos = half3(uv, 0.0);
+                half4 normal = createBoundNormal(uv);
                 if (normal.w < 0.0) {
-                    return vec4(0.0);
+                    return half4(0.0);
                 }
-                vec3 fragNormal = rotM * normal.xyz;
+                half3 fragNormal = rotM * normal.xyz;
 
-                vec4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
+                half4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
                 shinningColor *= smoothstep(0.0, 0.1, normal.w); // edge smooth
                 return shinningColor;
             }
 
-            mat3 GetRotationMatrix(vec3 rotAngle)
+            mat3 GetRotationMatrix(half3 rotAngle)
             {
                 rotAngle *= 3.1415926 / 180.0;
                 mat3 Rx = mat3 (1.0, 0.0, 0.0,
@@ -145,21 +143,33 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 return Rz * Ry * Rx;
             }
 
-            vec4 main(vec2 fragCoord)
+            half4 main(vec2 fragCoord)
             {
-                vec2 uv = fragCoord / iResolution.xy;
+                half2 uv = fragCoord / iResolution.xy;
                 uv = uv + uv - 1.0;
-                float screenRatio = iResolution.x / iResolution.y;
+                half screenRatio = iResolution.x / iResolution.y;
                 uv.x *= screenRatio;
 
-                mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
-                vec4 specularColor = lightColor;
-                float shinning = 16.0f;
-                vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
-                vec3 viewPos = lightPos;
-                vec4 shinningColor = RoundedBoxShinning(uv, specularColor, shinning, lightPos, viewPos, rotM);
+                half4 shinningColor = half4(0.0);
+                half3 lightPos = half3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
-                return vec4(shinningColor.xyz * lightColor.w, shinningColor.w) * clamp(lightIntensity, 0.0, 1.0);
+                if (dot(borderLightRotationAngle, borderLightRotationAngle) < 0.01) {
+                    half r = min(cornerRadius * 2.0, min(iResolution.x, iResolution.y));
+                    half2 q = abs(fragCoord + fragCoord - iResolution.xy) - iResolution.xy + r;
+                    half dist = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+                    half normalizedDist = dist / (lightWidth + 0.001) + 1.0;
+                    shinningColor = (normalizedDist > 0.0 && normalizedDist < 1.0)
+                        ? lightColor * pow(max(normalize(lightPos - half3(uv, 0.0)).z, 0.), 16.0) : half4(0.0);
+                    shinningColor *= smoothstep(0.0, 0.1, normalizedDist); // edge smooth
+                } else {
+                    mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
+                    half4 specularColor = lightColor;
+                    half shinning = 16.0f;
+                    half3 viewPos = lightPos;
+                    shinningColor = RoundedBoxShinning(uv, specularColor, shinning, lightPos, viewPos, rotM);
+                }
+
+                return half4(shinningColor.xyz * lightColor.w, shinningColor.w) * clamp(lightIntensity, 0.0, 1.0);
             }
         )";
         borderLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
