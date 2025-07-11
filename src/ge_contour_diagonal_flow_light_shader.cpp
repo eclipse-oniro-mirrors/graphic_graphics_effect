@@ -1045,7 +1045,8 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
     const float TILE_COUNT = 8.0;
     const float TILE_SIZE = 64.0;
     const float haloBellSigma = 0.18;
-    const float haloArcLenRatio = 1.7;
+    const float haloArcLenRatio = 1.7; // halo length with respect to glow length
+    const float haloThicknessFactor = 7.0; // the greater, the thinner
     float SampleTGlobal(vec2 coord)
     {
         return precalculationImage.eval(coord).g;
@@ -1086,7 +1087,7 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
         t = clamp(t, 0.0, 1.0);
         vec2 projection = p1 + t * dir;
         vec2 d = ndc - projection;
-        float distSq = dot(d, d);
+        float distSq = dot(d, d) * haloThicknessFactor;
         return 1.0 / (distSq + intergralEpsilon);
     }
     void GetAccumulateIntensity(vec2 p, vec2 controlPoints[CAPACITY], int size, float tGlobal, float lineStart,
@@ -1887,7 +1888,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
             const float intensity = 1.8;
             const float glowRadius = 0.05;
             const float haloFactor = 0.001;
-            const float integralHaloBrightness = 0.2;
+            const float integralHaloBrightness = 0.4;
 
             // ===== Glow Profile and Halo Rendering (based on tGlobal and SDF) =====
 
@@ -1913,15 +1914,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
                 glowCol = color * pow(glowRadius * haloFactor / max(sdfData, distMin), intensity * haloFactor);
             }
 
-            float GetSegmentHalo(float sdf, float weightedIntensity, vec3 color, inout vec3 glowCol)
-            {
-                float g = pow(glowRadius * haloFactor / max(sdf, distMin), intensity * haloFactor);
-                float brightness = log(1.0 + weightedIntensity) * g * 0.15; // 0.15: brightness scaling factor
-                glowCol = brightness * color;
-
-                return g;
-            }
-
             void ComputeArcWindow(float tGlobal, float tStart, float windowLen, float sigma,
                 inout float tLocal, inout float weight)
             {
@@ -1941,7 +1933,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
                 weight = inWindow * BellShape(tLocal, sigma);
             }
 
-            void getSegmentHalo(float weightedIntensity, vec3 color, out vec3 glowCol)
+            void GetSegmentHalo(float weightedIntensity, vec3 color, inout vec3 glowCol)
             {
                 float brightness = log(1.0 + weightedIntensity) * integralHaloBrightness;
                 glowCol = brightness * color;
@@ -2001,10 +1993,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
 
                 float atlasOffset = haloAtlasImage.eval(fragCoord).b;
                 vec2 halo1 = vec3(0.0), halo2 = vec3(0.0);
-                getSegmentHalo(haloIntensity.r, line1Color, halo1);
-                getSegmentHalo(haloIntensity.g, line2Color, halo1);
+                GetSegmentHalo(haloIntensity.r, line1Color, halo1);
+                GetSegmentHalo(haloIntensity.g, line2Color, halo1);
                 vec3 col = glow + halo1 + halo2;
-                float alpha = clamp(length(col), 0.0, 1.0);
+                float alpha = max(max(col.r, col.g), col.b);
                 return vec4(col, alpha);
             }
         )";
