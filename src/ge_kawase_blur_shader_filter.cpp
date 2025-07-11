@@ -467,8 +467,8 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::ScaleAndAddRandomColor
     const std::shared_ptr<Drawing::Image>& image, const std::shared_ptr<Drawing::Image>& blurImage,
     const Drawing::Rect& src, const Drawing::Rect& dst, int& width, int& height) const
 {
-    if (abs(blurScale_) < 1e-6 || blurImage->GetWidth() < 1e-6 || blurImage->GetHeight() < 1e-6 ||
-        image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
+    if (abs(blurScale_) < 1e-6 || blurImage == nullptr || blurImage->GetWidth() < 1e-6 ||
+        blurImage->GetHeight() < 1e-6 || image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
         LOGE("GEKawaseBlurShaderFilter::blurScale is zero.");
         return blurImage;
     }
