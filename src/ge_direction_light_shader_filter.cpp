@@ -62,11 +62,6 @@ inline static const std::string g_shaderStringDirectionLight = R"(
     const float metal = 0.5;
     const float inv_pi = 0.31830988618379067154;
 
-    float saturate(float x)
-    {
-        return clamp(x, 0.0, 1.0);
-    }
-
     float pow2(float x)
     {
         return x * x;
@@ -106,14 +101,14 @@ inline static const std::string g_shaderStringDirectionLight = R"(
         vec3 view_dir = vec3(0.0, 0.0, 1.0);
         vec3 light_dir = normalize(light_direction);
 
-        float cos_N_L = dot(shading_normal, light_direction);
+        float cos_N_L = dot(shading_normal, light_dir);
         if (cos_N_L <= 0.0) return vec4(0.0);
 
-        vec3 half_dir = normalize(view_dir + light_direction);
+        vec3 half_dir = normalize(view_dir + light_dir);
         float cos_N_V = saturate(dot(shading_normal, view_dir));
         float cos_N_H = saturate(dot(shading_normal, half_dir));
         float cos_V_H = saturate(dot(view_dir, half_dir));
-        float cos_L_H = saturate(dot(light_direction, half_dir));
+        float cos_L_H = saturate(dot(light_dir, half_dir));
 
         vec3 in_dir = normalize(refract(-view_dir, displacement_normal, eta));
         float in_t = -pos.z / in_dir.z;
@@ -162,11 +157,6 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
     const float metal = 0.5;
     const float inv_pi = 0.31830988618379067154;
 
-    float saturate(float x)
-    {
-        return clamp(x, 0.0, 1.0);
-    }
-
     float pow2(float x)
     {
         return x * x;
@@ -206,14 +196,14 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
         vec3 view_dir = vec3(0.0, 0.0, 1.0);
         vec3 light_dir = normalize(light_direction);
 
-        float cos_N_L = dot(shading_normal, light_direction);
+        float cos_N_L = dot(shading_normal, light_dir);
         if (cos_N_L <= 0.0) return vec4(0.0);
 
-        vec3 half_dir = normalize(view_dir + light_direction);
+        vec3 half_dir = normalize(view_dir + light_dir);
         float cos_N_V = saturate(dot(shading_normal, view_dir));
         float cos_N_H = saturate(dot(shading_normal, half_dir));
         float cos_V_H = saturate(dot(view_dir, half_dir));
-        float cos_L_H = saturate(dot(light_direction, half_dir));
+        float cos_L_H = saturate(dot(light_dir, half_dir));
 
         vec3 in_dir = normalize(refract(-view_dir, displacement_normal, eta));
         float in_t = -pos.z / in_dir.z;
@@ -301,7 +291,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
         auto normalImage = normalBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
 #endif
         if (normalImage == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage make image failed");
+            LOGE("GEDirectionLightShaderFilter::ProcessImage make normalImage failed");
             return image;
         }
 
@@ -343,7 +333,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     lightingBuilder->SetChild("image", imageShader);
     lightingBuilder->SetUniform("iResolution", width, height);
     lightingBuilder->SetUniform("light_direction",
-        params_.lightDirection.x_, params_.lightDirection.y_, params_.lightDirection.z_);
+        params_.lightDirection.x_, params_.lightDirection.y_, -params_.lightDirection.z_);
     lightingBuilder->SetUniformVec4("light_color",
         params_.lightColor.x_, params_.lightColor.y_, params_.lightColor.z_, params_.lightColor.w_);
     lightingBuilder->SetUniform("light_intensity", params_.lightIntensity);
@@ -357,7 +347,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     auto lightingImage = lightingBuilder->MakeImage(nullptr, nullptr, lightInfo, false);
 #endif
     if (lightingImage == nullptr) {
-        LOGE("GEDirectionLightShaderFilter::ProcessImage make image failed");
+        LOGE("GEDirectionLightShaderFilter::ProcessImage make lightingImage failed");
         return image;
     }
     return lightingImage;

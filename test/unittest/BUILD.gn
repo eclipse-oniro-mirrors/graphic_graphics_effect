@@ -64,6 +64,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_grey_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_kawase_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_linear_gradient_blur_shader_filter.cpp",
+    "${graphics_effect_root}/src/ge_linear_gradient_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_magnifier_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_mask_transition_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_mesa_blur_shader_filter.cpp",
@@ -75,12 +76,14 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_double_ripple_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_sound_wave_filter.cpp",
     "${graphics_effect_root}/src/ge_system_properties.cpp",
+    "${graphics_effect_root}/src/ge_variable_radius_blur_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_visual_effect.cpp",
     "${graphics_effect_root}/src/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/ge_visual_effect_impl.cpp",
     "${graphics_effect_root}/src/ge_water_ripple_filter.cpp",
     "${graphics_effect_root}/src/ge_hps_effect_filter.cpp",
     "${graphics_effect_root}/src/ge_wave_gradient_shader_mask.cpp",
+    "${graphics_effect_root}/src/ge_wavy_ripple_light_shader.cpp",
   ]
 
   external_deps = []
@@ -139,6 +142,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_shader_filter_test.cpp",
     "ge_sound_wave_filter_test.cpp",
     "ge_system_properties_test.cpp",
+    "ge_variable_radius_blur_shader_filter_test.cpp",
     "ge_visual_effect_container_test.cpp",
     "ge_visual_effect_impl_test.cpp",
     "ge_visual_effect_test.cpp",

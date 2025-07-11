@@ -22,7 +22,7 @@ namespace Rosen {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_transitionBlendShader_ = nullptr;
 
 GEMaskTransitionShaderFilter::GEMaskTransitionShaderFilter(const Drawing::GEMaskTransitionShaderFilterParams& params)
-    :params_(params)
+    : params_(params)
 {}
 
 std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawing::Canvas& canvas,
@@ -45,6 +45,15 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
         return image;
     }
 
+    auto imageInfo = image->GetImageInfo();
+    float height = imageInfo.GetHeight();
+    float width = imageInfo.GetWidth();
+    auto maskEffectShader = params_.mask->GenerateDrawingShader(width, height);
+    if (maskEffectShader == nullptr) {
+        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage maskEffectShader generate failed");
+        return image;
+    }
+
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetMaskTransitionEffect();
     if (builder == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage get mask transition effect failed");
@@ -58,15 +67,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     Drawing::Matrix bottomLayerMatrix;
     auto bottomLayer = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), bottomLayerMatrix);
-    auto imageInfo = image->GetImageInfo();
-    float height = imageInfo.GetHeight();
-    float width = imageInfo.GetWidth();
 
-    auto maskEffectShader = params_.mask->GenerateDrawingShader(width, height);
-    if (maskEffectShader == nullptr) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage maskEffectShader generate failed");
-        return image;
-    }
     builder->SetChild("alphaMask", maskEffectShader);
     builder->SetChild("topLayer", topLayer);
     builder->SetChild("bottomLayer", bottomLayer);

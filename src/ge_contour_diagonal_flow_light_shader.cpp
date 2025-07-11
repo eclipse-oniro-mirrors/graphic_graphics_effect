@@ -221,13 +221,13 @@ static constexpr char PRECAL_PROG[] = R"(
     {
         const float EPSILON = 1e-3;
         const float ONE_THIRD = 1.0 / 3.0;
-        bool abEqual = all(lessThan(abs(pountA - pointB), vec2(EPSILON)));
-        bool bcEqual = all(lessThan(abs(pountB - pointC), vec2(EPSILON)));
-        bool acEqual = all(lessThan(abs(pountA - pointC), vec2(EPSILON)));
+        bool abEqual = all(lessThan(abs(pointA - pointB), vec2(EPSILON)));
+        bool bcEqual = all(lessThan(abs(pointB - pointC), vec2(EPSILON)));
+        bool acEqual = all(lessThan(abs(pointA - pointC), vec2(EPSILON)));
         if (abEqual && bcEqual) return distance(pos, pointA);
         if (abEqual || acEqual) return SdfLinePartition(pos, pointB, pointC);
         if (bcEqual) return SdfLinePartition(pos, pointA, pointC);
-        if (abs(dot(normalize(pointB - poimtA), normalize(pointC - poimtB)) - 1.0) < EPSILON)
+        if (abs(dot(normalize(pointB - pointA), normalize(pointC - pointB)) - 1.0) < EPSILON)
             return SdfLinePartition(pos, pointA, pointC);
         vec2 a = pointB - pointA;
         vec2 b = pointA - 2.0 * pointB + pointC;
@@ -1026,14 +1026,14 @@ static constexpr char PRECAL_PROG[] = R"(
     vec4 main(vec2 fragCoord) {
         int size = int(count);
         vec2 p = (2.0 * fragCoord - iResolution.xy) / iResolution.y; // 2.0: normalized screen coordinate
-        float sdf = 0.0; tGlobal = 0.0;
-        GetSDFandTGlobal(p, controlPoints, size, sdf, tGlobal, haloIntensity);
-        return vec4(abs(sdf), tGlobal, haloIntensity, 1.0);
+        float sdf = 0.0, tGlobal = 0.0;
+        GetSDFandTGlobal(p, controlPoints, size, sdf, tGlobal);
+        return vec4(abs(sdf), tGlobal, 0.0, 1.0);
     }
 )";
 
 static constexpr char HALO_ATLAS_PROG[] = R"(
-    uniform shader = precaculationImage;
+    uniform shader precalculationImage;
     uniform vec2 iResolution;
     uniform float line1Start;
     uniform float line1Length;
@@ -1048,10 +1048,10 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
     const float haloArcLenRatio = 1.7;
     float SampleTGlobal(vec2 coord)
     {
-        return precaculationImage.eval(coord).g;
+        return precalculationImage.eval(coord).g;
     }
 
-    vec2 NdcToFragCoord(vec2 ndc, vec res)
+    vec2 NdcToFragCoord(vec2 ndc, vec2 res)
     {
         vec2 uv = 0.5 * (ndc * res.y + res) / res;
         return uv * res;
@@ -1079,7 +1079,7 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
     }
     float InverseDistanceSquared(vec2 p1, vec2 p2, vec2 ndc)
     {
-        const float intergralEpsilon = 0.03; // the lower, the brighter
+        const float integralEpsilon = 0.03; // the lower, the brighter
         vec2 dir = p2 - p1;
         float lenSquared = dot(dir, dir);
         float t = dot(ndc - p1, dir) / lenSquared;
@@ -1089,8 +1089,8 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
         float distSq = dot(d, d);
         return 1.0 / (distSq + intergralEpsilon);
     }
-    void GetAccumulateIndensity(vec2 p, vec2 controlPoints[CAPACITY], int size, float tGlobal, float lineStart,
-        float lineLength, input float accumulateIntensity)
+    void GetAccumulateIntensity(vec2 p, vec2 controlPoints[CAPACITY], int size, float tGlobal, float lineStart,
+        float lineLength, inout float accumulateIntensity)
     {
         float weightedIntensity = 0.0;
         int segmentCount = size / 2;
@@ -1104,570 +1104,570 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
         vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
         vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
         vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        float tgA = SampleTGlobal(coordA);
+        float tbB = SampleTGlobal(coordB);
+        float tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         // i = 2
-        vec2 pointA = controlPoints[1]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[2]; // i
-        vec2 pointC = controlPoints[3]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[1]; // iMidPrev = i - 1
+        pointB = controlPoints[2]; // i
+        pointC = controlPoints[3]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         // i = 4
-        vec2 pointA = controlPoints[3]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[4]; // i
-        vec2 pointC = controlPoints[5]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[3]; // iMidPrev = i - 1
+        pointB = controlPoints[4]; // i
+        pointC = controlPoints[5]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 6) { // 6: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 6
-        vec2 pointA = controlPoints[5]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[6]; // i
-        vec2 pointC = controlPoints[7]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[5]; // iMidPrev = i - 1
+        pointB = controlPoints[6]; // i
+        pointC = controlPoints[7]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 8) { // 8: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 8
-        vec2 pointA = controlPoints[7]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[8]; // i
-        vec2 pointC = controlPoints[9]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[7]; // iMidPrev = i - 1
+        pointB = controlPoints[8]; // i
+        pointC = controlPoints[9]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 10) { // 10: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 10
-        vec2 pointA = controlPoints[9]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[10]; // i
-        vec2 pointC = controlPoints[11]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[9]; // iMidPrev = i - 1
+        pointB = controlPoints[10]; // i
+        pointC = controlPoints[11]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 12) { // 12: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 12
-        vec2 pointA = controlPoints[11]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[12]; // i
-        vec2 pointC = controlPoints[13]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[11]; // iMidPrev = i - 1
+        pointB = controlPoints[12]; // i
+        pointC = controlPoints[13]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 14) { // 14: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 14
-        vec2 pointA = controlPoints[13]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[14]; // i
-        vec2 pointC = controlPoints[15]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[13]; // iMidPrev = i - 1
+        pointB = controlPoints[14]; // i
+        pointC = controlPoints[15]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 16) { // 16: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 16
-        vec2 pointA = controlPoints[15]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[16]; // i
-        vec2 pointC = controlPoints[17]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[15]; // iMidPrev = i - 1
+        pointB = controlPoints[16]; // i
+        pointC = controlPoints[17]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 18) { // 18: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 18
-        vec2 pointA = controlPoints[17]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[18]; // i
-        vec2 pointC = controlPoints[19]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[17]; // iMidPrev = i - 1
+        pointB = controlPoints[18]; // i
+        pointC = controlPoints[19]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 20) { // 20: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 20
-        vec2 pointA = controlPoints[19]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[20]; // i
-        vec2 pointC = controlPoints[21]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[19]; // iMidPrev = i - 1
+        pointB = controlPoints[20]; // i
+        pointC = controlPoints[21]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 22) { // 22: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 22
-        vec2 pointA = controlPoints[21]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[22]; // i
-        vec2 pointC = controlPoints[23]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[21]; // iMidPrev = i - 1
+        pointB = controlPoints[22]; // i
+        pointC = controlPoints[23]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 24) { // 24: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 24
-        vec2 pointA = controlPoints[23]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[24]; // i
-        vec2 pointC = controlPoints[25]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[23]; // iMidPrev = i - 1
+        pointB = controlPoints[24]; // i
+        pointC = controlPoints[25]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 26) { // 26: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 26
-        vec2 pointA = controlPoints[25]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[26]; // i
-        vec2 pointC = controlPoints[27]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[25]; // iMidPrev = i - 1
+        pointB = controlPoints[26]; // i
+        pointC = controlPoints[27]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 28) { // 28: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 28
-        vec2 pointA = controlPoints[27]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[28]; // i
-        vec2 pointC = controlPoints[29]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[27]; // iMidPrev = i - 1
+        pointB = controlPoints[28]; // i
+        pointC = controlPoints[29]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 30) { // 30: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 30
-        vec2 pointA = controlPoints[29]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[30]; // i
-        vec2 pointC = controlPoints[31]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[29]; // iMidPrev = i - 1
+        pointB = controlPoints[30]; // i
+        pointC = controlPoints[31]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 32) { // 32: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 32
-        vec2 pointA = controlPoints[31]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[32]; // i
-        vec2 pointC = controlPoints[33]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[31]; // iMidPrev = i - 1
+        pointB = controlPoints[32]; // i
+        pointC = controlPoints[33]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 34) { // 34: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 34
-        vec2 pointA = controlPoints[33]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[34]; // i
-        vec2 pointC = controlPoints[35]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[33]; // iMidPrev = i - 1
+        pointB = controlPoints[34]; // i
+        pointC = controlPoints[35]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 36) { // 36: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 36
-        vec2 pointA = controlPoints[35]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[36]; // i
-        vec2 pointC = controlPoints[37]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[35]; // iMidPrev = i - 1
+        pointB = controlPoints[36]; // i
+        pointC = controlPoints[37]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 38) { // 38: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 38
-        vec2 pointA = controlPoints[37]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[38]; // i
-        vec2 pointC = controlPoints[39]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[37]; // iMidPrev = i - 1
+        pointB = controlPoints[38]; // i
+        pointC = controlPoints[39]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 40) { // 40: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 40
-        vec2 pointA = controlPoints[39]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[40]; // i
-        vec2 pointC = controlPoints[41]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[39]; // iMidPrev = i - 1
+        pointB = controlPoints[40]; // i
+        pointC = controlPoints[41]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 42) { // 42: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 42
-        vec2 pointA = controlPoints[41]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[42]; // i
-        vec2 pointC = controlPoints[43]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[41]; // iMidPrev = i - 1
+        pointB = controlPoints[42]; // i
+        pointC = controlPoints[43]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 44) { // 44: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 44
-        vec2 pointA = controlPoints[43]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[44]; // i
-        vec2 pointC = controlPoints[45]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[43]; // iMidPrev = i - 1
+        pointB = controlPoints[44]; // i
+        pointC = controlPoints[45]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 46) { // 46: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 46
-        vec2 pointA = controlPoints[45]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[46]; // i
-        vec2 pointC = controlPoints[47]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[45]; // iMidPrev = i - 1
+        pointB = controlPoints[46]; // i
+        pointC = controlPoints[47]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 48) { // 48: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 48
-        vec2 pointA = controlPoints[47]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[48]; // i
-        vec2 pointC = controlPoints[49]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[47]; // iMidPrev = i - 1
+        pointB = controlPoints[48]; // i
+        pointC = controlPoints[49]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 50) { // 50: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 50
-        vec2 pointA = controlPoints[49]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[50]; // i
-        vec2 pointC = controlPoints[51]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[49]; // iMidPrev = i - 1
+        pointB = controlPoints[50]; // i
+        pointC = controlPoints[51]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 52) { // 52: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 52
-        vec2 pointA = controlPoints[51]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[52]; // i
-        vec2 pointC = controlPoints[53]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[51]; // iMidPrev = i - 1
+        pointB = controlPoints[52]; // i
+        pointC = controlPoints[53]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 54) { // 54: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 54
-        vec2 pointA = controlPoints[53]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[54]; // i
-        vec2 pointC = controlPoints[55]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[53]; // iMidPrev = i - 1
+        pointB = controlPoints[54]; // i
+        pointC = controlPoints[55]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 56) { // 56: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 56
-        vec2 pointA = controlPoints[55]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[56]; // i
-        vec2 pointC = controlPoints[57]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[55]; // iMidPrev = i - 1
+        pointB = controlPoints[56]; // i
+        pointC = controlPoints[57]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 58) { // 58: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 58
-        vec2 pointA = controlPoints[57]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[58]; // i
-        vec2 pointC = controlPoints[59]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[57]; // iMidPrev = i - 1
+        pointB = controlPoints[58]; // i
+        pointC = controlPoints[59]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 60) { // 60: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 60
-        vec2 pointA = controlPoints[59]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[60]; // i
-        vec2 pointC = controlPoints[61]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[59]; // iMidPrev = i - 1
+        pointB = controlPoints[60]; // i
+        pointC = controlPoints[61]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         if (size <= 62) { // 62: next i beyond legal size
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
         // i = 62
-        vec2 pointA = controlPoints[61]; // iMidPrev = i - 1
-        vec2 pointB = controlPoints[62]; // i
-        vec2 pointC = controlPoints[63]; // (i + 1) % size
-        vec2 coordA = NdcToFragCoord(pointA, iResolution.xy);
-        vec2 coordB = NdcToFragCoord(pointB, iResolution.xy);
-        vec2 coordC = NdcToFragCoord(pointC, iResolution.xy);
-        vec2 tgA = SampleTGlobal(coordA);
-        vec2 tbB = SampleTGlobal(coordB);
-        vec2 tbC = SampleTGlobal(coordC);
+        pointA = controlPoints[61]; // iMidPrev = i - 1
+        pointB = controlPoints[62]; // i
+        pointC = controlPoints[63]; // (i + 1) % size
+        coordA = NdcToFragCoord(pointA, iResolution.xy);
+        coordB = NdcToFragCoord(pointB, iResolution.xy);
+        coordC = NdcToFragCoord(pointC, iResolution.xy);
+        tgA = SampleTGlobal(coordA);
+        tbB = SampleTGlobal(coordB);
+        tbC = SampleTGlobal(coordC);
         ComputeHaloWindow(tgA, lineStart, lineLength, haloLength, haloBellSigma, haloWeightA);
         ComputeHaloWindow(tbB, lineStart, lineLength, haloLength, haloBellSigma, haloWeightB);
         ComputeHaloWindow(tbC, lineStart, lineLength, haloLength, haloBellSigma, haloWeightC);
-        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightedA + haloWeightC);
+        weightedIntensity += InverseDistanceSquared(pointA, pointC, p) * (haloWeightA + haloWeightC);
         accumulateIntensity = weightedIntensity / float(segmentCount);
     }
     vec4 main(vec2 fragCoord)
     {
         vec2 tileSize = iResolution.xy / TILE_COUNT;
         vec2 tileCoord = floor(fragCoord / tileSize);
-        float zIndex = tileCoord.y * TILE_COUNT * tileCoord.x;
+        float zIndex = tileCoord.y * TILE_COUNT + tileCoord.x;
         float t = (zIndex + 0.5) / (TILE_COUNT * TILE_COUNT); // [0, 1)
         vec2 localXY = mod(fragCoord, tileSize);
         vec2 uv = (localXY + 0.5) / tileSize;
@@ -1676,12 +1676,12 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
         vec2 p = (2.0 * uv - 1.0) * vec2(aspect, 1.0);
         float tGlobal = SampleTGlobal(fragCoord);
         float haloIntensity1 = 0.0, haloIntensity2 = 0.0;
-        GetAccumulateIndensity(p, controlPoints, size, tGlobal,
+        GetAccumulateIntensity(p, controlPoints, size, tGlobal,
             mod(line1Start + t, 1.0), line1Length, haloIntensity1);
-        GetAccumulateIndensity(p, controlPoints, size, tGlobal,
+        GetAccumulateIntensity(p, controlPoints, size, tGlobal,
             mod(line2Start + t, 1.0), line2Length, haloIntensity2);
-        haloIntensity1 = clamp(haloIntensity1 * 0.1, 0.0, 1.0); // 0.1 : scale [0, 1]
-        haloIntensity2 = clamp(haloIntensity2 * 0.1, 0.0, 1.0); // 0.1 : scale [0, 1]
+        haloIntensity1 = clamp(haloIntensity1 * 0.1, 0.0, 1.0); // 0.1 : scale to [0, 1]
+        haloIntensity2 = clamp(haloIntensity2 * 0.1, 0.0, 1.0); // 0.1 : scale to [0, 1]
         return vec4(haloIntensity1, haloIntensity2, mod(line1Start, 1.0), 1.0);
     }
 )";

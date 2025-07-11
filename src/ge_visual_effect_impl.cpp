@@ -175,7 +175,13 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::MASK_TRANSITION);
             impl->MakeMaskTransitionParams();
         }
-     }
+    },
+    { GE_FILTER_VARIABLE_RADIUS_BLUR,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR);
+            impl->MakeVariableRadiusBlurParams();
+        }
+    }
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
@@ -367,6 +373,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::MASK_TRANSITION: {
             SetMaskTransitionParamsFloat(tag, param);
+            break;
+        }
+        case FilterType::VARIABLE_RADIUS_BLUR: {
+            SetVariableRadiusBlurParams(tag, param);
             break;
         }
         default:
@@ -650,6 +660,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_FILTER_MASK_TRANSITION_MASK) {
                 maskTransitionParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::VARIABLE_RADIUS_BLUR: {
+            if (variableRadiusBlurParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_VARIABLE_RADIUS_BLUR_MASK) {
+                variableRadiusBlurParams_->mask = param;
             }
             break;
         }
@@ -1279,6 +1299,15 @@ void GEVisualEffectImpl::SetMaskTransitionParamsFloat(const std::string& tag, fl
     }
 }
 
+void GEVisualEffectImpl::SetVariableRadiusBlurParams(const std::string& tag, float param)
+{
+    if (variableRadiusBlurParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS) {
+        variableRadiusBlurParams_->blurRadius = param;
+    }
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

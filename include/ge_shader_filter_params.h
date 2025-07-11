@@ -236,12 +236,12 @@ struct GEColorGradientShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
 };
 
-constexpr char GE_FILTER_EDGE_LIGHT[] = "Edge_Light";
-constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "Edge_Light_Alpha";
-constexpr char GE_FILTER_EDGE_LIGHT_BLOOM[] = "Edge_Light_Bloom";
-constexpr char GE_FILTER_EDGE_LIGHT_COLOR[] = "Edge_Light_Color";
-constexpr char GE_FILTER_EDGE_LIGHT_MASK[] = "Edge_Light_Mask";
-constexpr char GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR[] = "Edge_Light_UseRawColor";
+constexpr char GE_FILTER_EDGE_LIGHT[] = "EdgeLight";
+constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "EdgeLight_Alpha";
+constexpr char GE_FILTER_EDGE_LIGHT_BLOOM[] = "EdgeLight_Bloom";
+constexpr char GE_FILTER_EDGE_LIGHT_COLOR[] = "EdgeLight_Color";
+constexpr char GE_FILTER_EDGE_LIGHT_MASK[] = "EdgeLight_Mask";
+constexpr char GE_FILTER_EDGE_LIGHT_USE_RAW_COLOR[] = "EdgeLight_UseRawColor";
 struct GEEdgeLightShaderFilterParams {
     float alpha = 1.0f;
     bool bloom = true;
@@ -390,6 +390,23 @@ struct GEMaskTransitionShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     float factor = 1.0f;
     bool inverse = false;
+};
+
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR[] = "VariableRadiusBlur";
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS[] = "VariableRadiusBlur_Radius";
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask";
+struct GEVariableRadiusBlurShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    float blurRadius;
+};
+
+constexpr char GE_MASK_LINEAR_GRADIENT[] = "MaskLinearGradient";
+constexpr char GE_MASK_LINEAR_GRADIENT_START_POSITION[] = "MaskLinearGradient_StartPosition";
+constexpr char GE_MASK_LINEAR_GRADIENT_END_POSITION[] = "MaskLinearGradient_EndPosition";
+struct GELinearGradientShaderMaskParams {
+    std::vector<std::pair<float, float>> fractionStops;
+    Drawing::Point startPosition;
+    Drawing::Point endPosition;
 };
 
 } // namespace Drawing

@@ -76,6 +76,11 @@ public:
         return visualEffectImpl_;
     }
 
+    void SetCanvasInfo(Drawing::CanvasInfo info)
+    {
+        canvasInfo_ = info;
+    }
+
     const Drawing::CanvasInfo GetCanvasInfo() const
     {
         return canvasInfo_;
