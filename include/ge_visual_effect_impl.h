@@ -69,6 +69,7 @@ public:
         AURORA_NOISE,
         PARTICLE_CIRCULAR_HALO,
         DIRECTION_LIGHT,
+        VARIABLE_RADIUS_BLUR,
         MAX
     };
 
@@ -358,6 +359,16 @@ public:
         return waveGradientMaskParams_;
     }
 
+    void MakeVariableRadiusBlurParams()
+    {
+        variableRadiusBlurParams_ = std::make_shared<GEVariableRadiusBlurShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEVariableRadiusBlurShaderFilterParams>& GetVariableRadiusBlurParams() const
+    {
+        return variableRadiusBlurParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -389,6 +400,8 @@ private:
     void SetPixelMapMaskParams(const std::string& tag, const Vector4f& param);
     void SetParticleCircularHaloParams(const std::string& tag, float param);
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetVariableRadiusBlurParams(const std::string& tag, float param);
+
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
     // ShaderFilter Params
@@ -419,6 +432,7 @@ private:
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
+    std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
 };
 
 } // namespace Drawing

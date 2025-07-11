@@ -382,6 +382,22 @@ struct GEParticleCircularHaloShaderParams {
     float noise_ = 0.f;
 };
 
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR[] = "VariableRadiusBlur";
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS[] = "VariableRadiusBlur_Radius";
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask";
+struct GEVariableRadiusBlurShaderFilterParams {
+    std::shared_ptr<GEShaderMask> mask;
+    float blurRadius;
+};
+
+constexpr char GE_MASK_LINEAR_GRADIENT[] = "MaskLinearGradient";
+constexpr char GE_MASK_LINEAR_GRADIENT_START_POSITION[] = "MaskLinearGradient_StartPosition";
+constexpr char GE_MASK_LINEAR_GRADIENT_END_POSITION[] = "MaskLinearGradient_EndPosition";
+struct GELinearGradientShaderMaskParams {
+    std::vector<std::pair<float, float>> fractionStops;
+    Drawing::Point startPosition;
+    Drawing::Point endPosition;
+};
 
 } // namespace Drawing
 } // namespace Rosen

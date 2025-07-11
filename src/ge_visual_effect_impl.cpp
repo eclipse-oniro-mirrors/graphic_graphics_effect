@@ -169,6 +169,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO);
             impl->MakeParticleCircularHaloParams();
         }
+     },
+    { GE_FILTER_VARIABLE_RADIUS_BLUR,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR);
+            impl->MakeVariableRadiusBlurParams();
+        }
      }
 };
 
@@ -347,6 +353,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::PARTICLE_CIRCULAR_HALO: {
             SetParticleCircularHaloParams(tag, param);
+            break;
+        }
+        case FilterType::VARIABLE_RADIUS_BLUR: {
+            SetVariableRadiusBlurParams(tag, param);
             break;
         }
         default:
@@ -619,6 +629,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_FILTER_DIRECTION_LIGHT_MASK) {
                 directionLightParams_->mask = param;
+            }
+            break;
+        }
+        case FilterType::VARIABLE_RADIUS_BLUR: {
+            if (variableRadiusBlurParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_VARIABLE_RADIUS_BLUR_MASK) {
+                variableRadiusBlurParams_->mask = param;
             }
             break;
         }
@@ -1227,6 +1247,16 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
         particleCircularHaloParams_->noise_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetVariableRadiusBlurParams(const std::string& tag, float param)
+{
+    if (variableRadiusBlurParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS) {
+        variableRadiusBlurParams_->blurRadius = param;
     }
 }
 } // namespace Drawing
