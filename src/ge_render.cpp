@@ -161,7 +161,7 @@ bool GERender::ApplyHpsGEImageEffect(
 
     bool hpsContainsBlurOrMesa = false;
     if (hpsSupportedIndexRanges.empty()) {
-        resImage = ApplyGEEffects(canvas, visualEffects, resImage, src, dst, sampling);
+        resImage = ApplyGEEffects(canvas, visualEffects, resImage, src, src, sampling);
         outImage = resImage;
         return hpsContainsBlurOrMesa;
     }
@@ -171,7 +171,7 @@ bool GERender::ApplyHpsGEImageEffect(
         std::vector<std::shared_ptr<Drawing::GEVisualEffect>> subVisualEffects(
             visualEffects.begin() + indexRangeInfo.range[0], visualEffects.begin() + indexRangeInfo.range[1] + 1);
         if (indexRangeInfo.mode == EffectMode::GE) {
-            resImage = ApplyGEEffects(canvas, subVisualEffects, resImage, src, dst, sampling);
+            resImage = ApplyGEEffects(canvas, subVisualEffects, resImage, src, src, sampling);
         } else {
             for (auto vef : subVisualEffects) {
                 auto ve = vef->GetImpl();
