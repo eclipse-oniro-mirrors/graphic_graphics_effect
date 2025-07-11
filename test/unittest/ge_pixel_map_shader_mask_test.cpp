@@ -52,6 +52,26 @@ static std::shared_ptr<Drawing::Image> MakeImage()
 }
 
 /**
+ * @tc.name: Constructor_001
+ * @tc.desc: Verify the constructor function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEPixelMapShaderMaskTest, Constructor_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest Constructor_001 start";
+
+    GEPixelMapMaskParams param{
+        .image=MakeImage(),
+        .src=RectF(-0.5, -0.1, 1.2, 1.7),
+        .dst=RectF(-0.3, -0.2, 1.1, 2.0),
+        .fillColor=Vector4f(0.2, 0.8, 0.1, 0.9),
+    };
+    auto gePixelMapShaderMask = std::make_shared<GEPixelMapShaderMask>(param);
+    EXPECT_EQ(gePixelMapShaderMask->param_, param);
+    GTEST_LOG_(INFO) << "GEVisualEffectTest Constructor_001 end";
+}
+
+/**
  * @tc.name: GenerateBuilder_001
  * @tc.desc: Verify the Get Builder function
  * @tc.type: FUNC

@@ -30,14 +30,6 @@ namespace Rosen {
 namespace Drawing {
 
 GEPixelMapShaderMask::GEPixelMapShaderMask(const GEPixelMapMaskParams& param) : param_(param) {
-    // limit src to (0, 0, 1, 1) or RectF() if it can't be
-    if (!param_.src.Intersect(RectF(0, 0, 1, 1))) {
-        param_.src = RectF();
-    }
-    // limit dst to (0, 0, 1, 1) or RectF() if it can't be
-    if (!param_.dst.Intersect(RectF(0, 0, 1, 1))) {
-        param_.dst = RectF();
-    }
     for (size_t i = 0; i < Vector4f::V4SIZE; ++i) {
         param_.fillColor.data_[i] = std::clamp(param_.fillColor.data_[i], 0.f, 1.f);
     }
