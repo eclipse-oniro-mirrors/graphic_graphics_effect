@@ -48,6 +48,7 @@ public:
         WATER_RIPPLE,
         DISPLACEMENT_DISTORT_FILTER,
         COLOR_GRADIENT,
+        MASK_TRANSITION,
         // Mask
         RIPPLE_MASK,
         DOUBLE_RIPPLE_MASK,
@@ -359,6 +360,16 @@ public:
         return waveGradientMaskParams_;
     }
 
+    void MakeMaskTransitionParams()
+    {
+        maskTransitionParams_ = std::make_shared<GEMaskTransitionShaderFilterParams>();
+    }
+ 
+    const std::shared_ptr<GEMaskTransitionShaderFilterParams>& GetMaskTransitionParams() const
+    {
+        return maskTransitionParams_;
+    }
+    
     void MakeVariableRadiusBlurParams()
     {
         variableRadiusBlurParams_ = std::make_shared<GEVariableRadiusBlurShaderFilterParams>();
@@ -400,6 +411,7 @@ private:
     void SetPixelMapMaskParams(const std::string& tag, const Vector4f& param);
     void SetParticleCircularHaloParams(const std::string& tag, float param);
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
@@ -427,6 +439,7 @@ private:
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
     std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
     std::shared_ptr<GEDirectionLightShaderFilterParams> directionLightParams_ = nullptr;
+    std::shared_ptr<GEMaskTransitionShaderFilterParams> maskTransitionParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;

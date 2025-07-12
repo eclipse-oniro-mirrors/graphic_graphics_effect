@@ -74,6 +74,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_linear_gradient_blur_shader_filter.cpp",
     "src/ge_linear_gradient_shader_mask.cpp",
     "src/ge_magnifier_shader_filter.cpp",
+    "src/ge_mask_transition_shader_filter.cpp",
     "src/ge_mesa_blur_shader_filter.cpp",
     "src/ge_particle_circular_halo_shader.cpp",
     "src/ge_pixel_map_shader_mask.cpp",
