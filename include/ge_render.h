@@ -73,11 +73,18 @@ public:
     bool HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
                           std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);
 
+    struct HpsGEImageEffectContext {
+        std::shared_ptr<Drawing::Image> image;
+        Drawing::Rect src;
+        Drawing::Rect dst;
+        Drawing::SamplingOptions sampling;
+        bool compatibleWithHpsSkipBlur;
+    };
+
     bool ApplyHpsGEImageEffect(
         Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-        const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
-        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush,
-        const Drawing::SamplingOptions& sampling
+        const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage,
+        Drawing::Brush& brush
     );
 
 private:
@@ -86,15 +93,16 @@ private:
     std::vector<IndexRangeInfo> CategorizeRanges(
         const std::vector<IndexRange>& hpsIndexRanges, const int32_t veContainerSize);
 
-    std::shared_ptr<Drawing::Image> ComposeOrApplyEffect(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
-        const std::shared_ptr<GEShaderFilter>& filter, std::shared_ptr<GEFilterComposer>& filterComposer);
+    bool ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+                          std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut);
 
-    std::shared_ptr<Drawing::Image> ApplyGEEffects(Drawing::Canvas& canvas,
+    bool ApplyGEEffects(Drawing::Canvas& canvas,
         std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
-        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
-        const Drawing::SamplingOptions& sampling);
+        const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage);
 
+    void DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
+                      std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
+    
     std::shared_ptr<GEShader> GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve);
 
     std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffect>& ve);

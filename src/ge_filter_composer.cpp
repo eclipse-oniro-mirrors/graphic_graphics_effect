@@ -20,19 +20,28 @@
 namespace OHOS {
 namespace Rosen {
 
-GEFilterComposer::GEFilterComposer(const std::shared_ptr<GEShaderFilter> shaderFilter)
+GEFilterComposer::GEFilterComposer(const std::shared_ptr<GEShaderFilter>& shaderFilter)
     : composedFilter_(shaderFilter), composedType_(shaderFilter->Type())
 {
-    filterParams_[composedType_] = composedFilter_->Params();
+    if (composedFilter_ != nullptr) {
+        filterParams_[composedType_] = composedFilter_->Params();
+    } else {
+        LOGE("GEFilterComposer: ctor with nullptr");
+    }
 }
 
 bool GEFilterComposer::Compose(const std::shared_ptr<GEShaderFilter> other)
 {
+    if (other == nullptr || other == composedFilter_) {
+        LOGE("GEFilterComposer: compose with nullptr or self");
+        return false;
+    }
+
     auto otherFilterType = other->Type();
     std::string composedType = composedType_ + otherFilterType;
     if (composedEffects_.count(composedType)) {
         filterParams_[otherFilterType] = other->Params();
-        if (auto composedFilter = GetComposedFilter(composedType, filterParams_)) {
+        if (auto composedFilter = GenerateComposedFilter(composedType, filterParams_)) {
             composedFilter_ = composedFilter;
             composedType_ = composedType;
             return true;
@@ -41,9 +50,15 @@ bool GEFilterComposer::Compose(const std::shared_ptr<GEShaderFilter> other)
     return false;
 }
 
-std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter(
+std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter()
+{
+    return composedFilter_;
+}
+
+std::shared_ptr<GEShaderFilter> GEFilterComposer::GenerateComposedFilter(
     const std::string composedType, const std::map<std::string, GEShaderFilter::FilterParams> filterParams)
 {
+    // Only support GreyBlur now, support more complex filter in the future
     if (composedType == "GreyBlur") {
         auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
             Drawing::DrawingPaintType::BRUSH);
@@ -51,9 +66,8 @@ std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter(
         if (blurIt == filterParams.end()) {
             return nullptr;
         }
-        if (const auto* blurParams = std::get_if<Drawing::GEKawaseBlurShaderFilterParams>(&blurIt->second.value())) {
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
-        } else {
+        const auto* blurParams = std::get_if<Drawing::GEKawaseBlurShaderFilterParams>(&blurIt->second.value());
+        if (!blurParams) {
             return nullptr;
         }
         auto greyIt = filterParams.find("Grey");
@@ -61,12 +75,20 @@ std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter(
             return nullptr;
         }
 
-        if (const auto* greyParams = std::get_if<Drawing::GEGreyShaderFilterParams>(&greyIt->second.value())) {
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
-        } else {
+        const auto* greyParams = std::get_if<Drawing::GEGreyShaderFilterParams>(&greyIt->second.value());
+        if (!greyParams) {
             return nullptr;
         }
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_X, 0.f);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Y, 0.f);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Z, 0.f);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W, 0.f);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE, 0);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_WIDTH, 0.f);
+        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_HEIGHT, 0.f);
 
         GraphicsEffectEngine::GERender render;
         return render.GenerateShaderFilter(mesaFilter);

@@ -284,7 +284,9 @@ HWTEST_F(GERenderTest, ApplyGEEffects001, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    auto outImage = geRender->ApplyGEEffects(canvas_, visualEffects, image, src, src, sampling);
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
     EXPECT_NE(outImage, image);
  
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects001 end";
@@ -312,7 +314,9 @@ HWTEST_F(GERenderTest, ApplyGEEffects002, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    auto outImage = geRender->ApplyGEEffects(canvas_, visualEffects, image, src, src, sampling);
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
     EXPECT_EQ(outImage, image);
  
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects002 end";
@@ -344,7 +348,9 @@ HWTEST_F(GERenderTest, ApplyGEEffects003, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    auto outImage = geRender->ApplyGEEffects(canvas_, visualEffects, image, src, src, sampling);
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
     EXPECT_EQ(outImage, image);
  
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects003 end";
@@ -383,7 +389,9 @@ HWTEST_F(GERenderTest, ApplyGEEffects004, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest geRender is null";
         return;
     }
-    auto outImage = geRender->ApplyGEEffects(canvas_, visualEffects, image, src, src, sampling);
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
     EXPECT_NE(outImage, image);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects004 end";
@@ -861,20 +869,27 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     auto geRender = std::make_shared<GERender>();
 
     /* image is nullptr */
-    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, image, outImage, src, dst, brush,
-        Drawing::SamplingOptions());
+    GERender::HpsGEImageEffectContext context1 { image, src, dst, Drawing::SamplingOptions(), false };
+    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush);
+ 
 
     /* no filter */
     auto image2 = MakeImage(canvas_);
-    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush,
-        Drawing::SamplingOptions());
-
+    GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions(), false };
+    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush);
+ 
     /* normal case */
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
-    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush,
-        Drawing::SamplingOptions()), false);
+    GERender::HpsGEImageEffectContext context3 { image2, src, dst, Drawing::SamplingOptions(), false };
+    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+
+    /* compatibility */
+    GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions(), true };
+    outImage = nullptr;
+    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+    EXPECT_EQ(outImage, nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
 }

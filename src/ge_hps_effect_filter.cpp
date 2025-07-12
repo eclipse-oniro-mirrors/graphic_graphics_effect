@@ -140,21 +140,25 @@ std::vector<HpsEffectFilter::IndexRange> HpsEffectFilter::HpsSupportedEffectsInd
 {
     std::vector<IndexRange> intervals;
     std::vector<size_t> supportedIndices;
- 
+
+    if (!GetHpsEffectEnabled()) {
+        return intervals;
+    }
+
     for (size_t i = 0; i < filters.size(); ++i) {
         const auto& vef = filters[i];
         if (IsEffectSupported(vef)) {
             supportedIndices.push_back(i);
         }
     }
- 
+
     if (supportedIndices.empty()) {
         return intervals;
     }
- 
+
     size_t start = supportedIndices[0];
     size_t end = start;
- 
+
     for (size_t i = 1; i < supportedIndices.size(); ++i) {
         if (supportedIndices[i] == end + 1) {
             end = supportedIndices[i];
@@ -164,7 +168,7 @@ std::vector<HpsEffectFilter::IndexRange> HpsEffectFilter::HpsSupportedEffectsInd
             end = start;
         }
     }
- 
+
     intervals.push_back({start, end});
     return intervals;
 }
