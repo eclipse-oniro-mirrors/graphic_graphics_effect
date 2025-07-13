@@ -25,6 +25,8 @@ namespace Rosen {
 GEGreyShaderFilter::GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params)
     : greyCoef1_(params.greyCoef1), greyCoef2_(params.greyCoef2)
 {
+    params_ = std::make_optional<Drawing::GEGreyShaderFilterParams>(params);
+    type_ = "Grey";
     if (!InitGreyAdjustmentEffect()) {
         LOGE("GEGreyShaderFilter::GEGreyShaderFilter failed to construct when initializing GreyAdjustmentEffect.");
         return;

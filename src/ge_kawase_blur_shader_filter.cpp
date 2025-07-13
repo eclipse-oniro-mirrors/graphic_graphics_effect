@@ -108,6 +108,8 @@ static const bool IS_ADVANCED_FILTER_USABLE_CHECK_ONCE = IsAdvancedFilterUsable(
 GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params)
     : radius_(params.radius)
 {
+    params_ = std::make_optional<Drawing::GEKawaseBlurShaderFilterParams>(params);
+    type_ = "Blur";
     if (!InitBlurEffect()) {
         LOGE("GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter failed when initializing BlurEffect.");
         return;

@@ -257,6 +257,285 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
 }
 
 /**
+ * @tc.name: ApplyGEEffects001
+ * @tc.desc: Verify the ApplyGEEffects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyGEEffects001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects001 start";
+ 
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+ 
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>> visualEffects;
+    visualEffects.push_back(visualEffect);
+ 
+    auto image = MakeImage(canvas_);
+    if (!image) {
+        GTEST_LOG_(INFO) << "GERenderTest image is null";
+        return;
+    }
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_NE(outImage, image);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects001 end";
+}
+ 
+/**
+ * @tc.name: ApplyGEEffects002
+ * @tc.desc: Verify the ApplyGEEffects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyGEEffects002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects002 start";
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>> visualEffects;
+    auto image = MakeImage(canvas_);
+    if (!image) {
+        GTEST_LOG_(INFO) << "GERenderTest image is null";
+        return;
+    }
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_EQ(outImage, image);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects002 end";
+}
+ 
+/**
+ * @tc.name: ApplyGEEffects003
+ * @tc.desc: Verify the ApplyGEEffects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyGEEffects003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects003 start";
+ 
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect = nullptr;
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>> visualEffects;
+    visualEffects.push_back(visualEffect);
+ 
+    auto image = MakeImage(canvas_);
+    if (!image) {
+        GTEST_LOG_(INFO) << "GERenderTest image is null";
+        return;
+    }
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_EQ(outImage, image);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects003 end";
+}
+
+/**
+ * @tc.name: ApplyGEEffects004
+ * @tc.desc: Verify the ApplyGEEffects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyGEEffects004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects004 start";
+
+    auto visualEffect1 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
+    visualEffect1->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 1.0f);
+    visualEffect1->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 1.0f);
+
+    auto visualEffect2 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect2->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+ 
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>> visualEffects;
+    visualEffects.push_back(visualEffect1);
+    visualEffects.push_back(visualEffect2);
+
+    auto image = MakeImage(canvas_);
+    if (!image) {
+        GTEST_LOG_(INFO) << "GERenderTest image is null";
+        return;
+    }
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    std::shared_ptr<Drawing::Image> outImage;
+    GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
+    geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_NE(outImage, image);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects004 end";
+}
+
+using IndexRange = GERender::IndexRange;
+
+/**
+ * @tc.name: CategorizeRanges001
+ * @tc.desc: Verify the CategorizeRanges
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, CategorizeRanges001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges001 start";
+ 
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    vector<IndexRange> hpsRanges = { { 3, 5 } };
+    int32_t veSize = 10;
+    auto result = geRender->CategorizeRanges(hpsRanges, veSize);
+    EXPECT_EQ(result.size(), 3);
+ 
+    EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[0].range[0], 0);
+    EXPECT_EQ(result[0].range[1], 2);
+ 
+    EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[1].range[0], 3);
+    EXPECT_EQ(result[1].range[1], 5);
+ 
+    EXPECT_EQ(result[2].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[2].range[0], 6);
+    EXPECT_EQ(result[2].range[1], 9);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges001 end";
+}
+ 
+/**
+ * @tc.name: CategorizeRanges002
+ * @tc.desc: Verify the CategorizeRanges
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, CategorizeRanges002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges002 start";
+ 
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    vector<IndexRange> hpsRanges = { { 2, 4 }, { 7, 9 } };
+    int32_t veSize = 10;
+    auto result = geRender->CategorizeRanges(hpsRanges, veSize);
+    EXPECT_EQ(result.size(), 4);
+ 
+    EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[0].range[0], 0);
+    EXPECT_EQ(result[0].range[1], 1);
+ 
+    EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[1].range[0], 2);
+    EXPECT_EQ(result[1].range[1], 4);
+ 
+    EXPECT_EQ(result[2].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[2].range[0], 5);
+    EXPECT_EQ(result[2].range[1], 6);
+ 
+    EXPECT_EQ(result[3].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[3].range[0], 7);
+    EXPECT_EQ(result[3].range[1], 9);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges002 end";
+}
+ 
+/**
+ * @tc.name: CategorizeRanges003
+ * @tc.desc: Verify the CategorizeRanges
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, CategorizeRanges003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges003 start";
+ 
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    vector<IndexRange> hpsRanges = { { 2, 5 }, { 6, 8 } };
+    int32_t veSize = 10;
+    auto result = geRender->CategorizeRanges(hpsRanges, veSize);
+    EXPECT_EQ(result.size(), 4);
+ 
+    EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[0].range[0], 0);
+    EXPECT_EQ(result[0].range[1], 1);
+ 
+    EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[1].range[0], 2);
+    EXPECT_EQ(result[1].range[1], 5);
+ 
+    EXPECT_EQ(result[2].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[2].range[0], 6);
+    EXPECT_EQ(result[2].range[1], 8);
+ 
+    EXPECT_EQ(result[3].mode, GERender::EffectMode::GE);
+    EXPECT_EQ(result[3].range[0], 9);
+    EXPECT_EQ(result[3].range[1], 9);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges003 end";
+}
+ 
+/**
+ * @tc.name: CategorizeRanges004
+ * @tc.desc: Verify the CategorizeRanges
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, CategorizeRanges004, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges004 start";
+ 
+    auto geRender = std::make_shared<GERender>();
+    if (!geRender) {
+        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
+        return;
+    }
+    vector<IndexRange> hpsRanges = { { 0, 0 } };
+    int32_t veSize = 1;
+    auto result = geRender->CategorizeRanges(hpsRanges, veSize);
+    EXPECT_EQ(result.size(), 1);
+ 
+    EXPECT_EQ(result[0].mode, GERender::EffectMode::HPS);
+    EXPECT_EQ(result[0].range[0], 0);
+    EXPECT_EQ(result[0].range[1], 0);
+ 
+    GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges004 end";
+}
+
+/**
  * @tc.name: GenerateShaderFilters_001
  * @tc.desc: Verify the GenerateShaderFilters
  * @tc.type: FUNC
@@ -569,6 +848,50 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     EXPECT_EQ(geRender->ApplyHpsImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush), false);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsImageEffect_001 end";
+}
+
+/**
+ * @tc.name: ApplyHpsGEImageEffect_001
+ * @tc.desc: Verify the ApplyHpsGEImageEffect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 start";
+
+    Drawing::GEVisualEffectContainer veContainer;
+    const std::shared_ptr<Drawing::Image> image = nullptr;
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+
+    /* image is nullptr */
+    GERender::HpsGEImageEffectContext context1 { image, src, dst, Drawing::SamplingOptions(), false };
+    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush);
+ 
+
+    /* no filter */
+    auto image2 = MakeImage(canvas_);
+    GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions(), false };
+    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush);
+ 
+    /* normal case */
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
+    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
+    veContainer.AddToChainedFilter(visualEffect);
+    GERender::HpsGEImageEffectContext context3 { image2, src, dst, Drawing::SamplingOptions(), false };
+    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+
+    /* compatibility */
+    GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions(), true };
+    outImage = nullptr;
+    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+    EXPECT_EQ(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
 }
 
 } // namespace GraphicsEffectEngine
