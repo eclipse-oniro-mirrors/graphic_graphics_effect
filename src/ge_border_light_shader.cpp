@@ -160,7 +160,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                     half dist = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
                     half normalizedDist = dist / (lightWidth + 0.001) + 1.0;
                     shinningColor = (normalizedDist > 0.0 && normalizedDist < 1.0)
-                        ? lightColor * pow(max(normalize(lightPos - half3(uv, 0.0)).z, 0.), 16.0) : half4(0.0);
+                        ? lightColor * pow(max(normalize(lightPos - half3(uv, 0.0)).z, 0.0), 16.0) : half4(0.0);
                     shinningColor *= smoothstep(0.0, 0.1, normalizedDist); // edge smooth
                 } else {
                     mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
