@@ -20,30 +20,31 @@
 namespace OHOS {
 namespace Rosen {
 
-using CacheDataType = std::shared_ptr<Drawing::Image>;
+using CacheDataType = std::pair<std::shared_ptr<Drawing::Image>, std::shared_ptr<Drawing::Image>>;
 
 namespace {
-static constexpr char AURORA_PRECAL_PROG[] = R"(
+std::shared_ptr<CacheDataType> g_cacheImg;
+static constexpr char AURORA_GENERATOR_PROG[] = R"(
     uniform vec2 iResolution;
-    const float TILE_COUNT = 8.0;
-    const float TILE_SIZE = 64.0;
+    uniform float noise;
     const float contrast = 4.64; // contrast constant, 464.0 / 100.0
     const float brightness = -0.17647; // brightness constant, -45.0 / 255.0
+    const float downSampleFactor = 4.0;
     float SNoise(in vec3 v);
     vec4 main(vec2 fragCoord)
     {
-        vec2 tileSize = iResolution.xy / TILE_COUNT;
-        vec2 tileCoord = floor(fragCoord / tileSize);
-        float zIndex = tileCoord.y * TILE_COUNT + tileCoord.x;
-        float t = (zIndex + 0.5) / (TILE_COUNT * TILE_COUNT); // [0,1)
+        vec2 tileSize = iResolution.xy / downSampleFactor;
         vec2 localXY = mod(fragCoord, tileSize);
+        if (floor(fragCoord.x / tileSize.x) > 0.5 || floor(fragCoord.y / tileSize.y) > 0.5) {
+            return vec4(0.0);
+        }
         vec2 uv = (localXY + 0.5) / tileSize;
         float aspect = iResolution.x / iResolution.y;
-        vec2 p = vec2((uv.x / 0.75 - 1.0) * aspect, (uv.y * 2.0 - 1.0));
+        vec2 p = vec2((uv.x / 0.75 - 1.0) * aspect, (uv.y * 2.0 - 1.0)); // horizontal stretch and map uv
         float freqX = 2.0;
         float freqY = mix(freqX, freqX * 0.5, smoothstep(1.0, 0.0, uv.y));
         vec2 dom = vec2(p.x * freqX, p.y * freqY);
-        float n = abs(SNoise(vec3(dom, t)));
+        float n = abs(SNoise(vec3(dom, noise)));
         float alpha = clamp(1.0 - (n * contrast + brightness), 0.0, 1.0);
         return vec4(alpha);
     }
@@ -121,77 +122,41 @@ static constexpr char AURORA_PRECAL_PROG[] = R"(
     }
 )";
 
-static constexpr char AURORA_PROG[] = R"(
-    uniform shader atlasImage;
-    uniform vec2 iResolution;
-    uniform float noise;
-    const float TILE_COUNT = 8.0;
-    vec4 main(vec2 fragCoord) {
-        float TILE_TOTAL = TILE_COUNT * TILE_COUNT;
-        float z = clamp(noise, 0.0, 0.999) * TILE_TOTAL;
-        float z0 = floor(z);
-        float z1 = min(z0 + 1.0, TILE_TOTAL - 1.0);
-        float alpha = smoothstep(0.0, 1.0, fract(z));
-        float tileX0 = mod(z0, TILE_COUNT);
-        float tileY0 = floor(z0 / TILE_COUNT);
-        float tileX1 = mod(z1, TILE_COUNT);
-        float tileY1 = floor(z1 / TILE_COUNT);
-        vec2 tileSize = iResolution.xy / TILE_COUNT;
-        vec2 uvInTile = fragCoord / iResolution.xy;
-        vec2 pixel = uvInTile * (tileSize - 1.0);
-        vec2 texCoord0 = (pixel + vec2(tileX0, tileY0) * tileSize + 0.5);
-        vec2 texCoord1 = (pixel + vec2(tileX1, tileY1) * tileSize + 0.5);
-        vec4 col0 = atlasImage.eval(texCoord0);
-        vec4 col1 = atlasImage.eval(texCoord1);
-        return mix(col0, col1, alpha);
-    }
-)";
-
-static constexpr char AURORA_VERT_PROG[] = R"(
+static constexpr char AURORA_VERT_BLUR_PROG[] = R"(
     uniform shader auroraNoiseTexture;
     uniform vec2 iResolution;
+    const float downSampleFactor = 4.0;
     const int sampleCount = 20;
-    vec2 weights[21]; // precalculated t (i / sampleCount) and weights (1 - t) for the blur
 
-    void initWeights() {
-        weights[0] = vec2(0.0, 1.0);
-        weights[1] = vec2(0.05, 0.95);
-        weights[2] = vec2(0.10, 0.90);
-        weights[3] = vec2(0.15, 0.85);
-        weights[4] = vec2(0.20, 0.80);
-        weights[5] = vec2(0.25, 0.75);
-        weights[6] = vec2(0.30, 0.70);
-        weights[7] = vec2(0.35, 0.65);
-        weights[8] = vec2(0.40, 0.60);
-        weights[9] = vec2(0.45, 0.55);
-        weights[10] = vec2(0.50, 0.50);
-        weights[11] = vec2(0.55, 0.45);
-        weights[12] = vec2(0.60, 0.40);
-        weights[13] = vec2(0.65, 0.35);
-        weights[14] = vec2(0.70, 0.30);
-        weights[15] = vec2(0.75, 0.25);
-        weights[16] = vec2(0.80, 0.20);
-        weights[17] = vec2(0.85, 0.15);
-        weights[18] = vec2(0.90, 0.10);
-        weights[19] = vec2(0.95, 0.05);
-        weights[20] = vec2(1.0, 0.0);
+    vec4 SampleWholeTile(vec2 fragCoord, vec2 res)
+    {
+        vec2 tileSize = res / downSampleFactor;
+        vec2 uvInTile = fragCoord / res;
+        vec2 pixel = uvInTile * (tileSize - 1.0);
+        return auroraNoiseTexture.eval(pixel + 0.5);
     }
 
     vec4 main(vec2 fragCoord)
     {
-        vec2 uv = fragCoord / iResolution.xy;
+        vec2 tileSize = iResolution.xy / downSampleFactor;
+        vec2 localXY = mod(fragCoord, tileSize);
+        if (floor(fragCoord.x / tileSize.x) > 0.5 || floor(fragCoord.y / tileSize.y) > 0.5) {
+            return vec4(0.0);
+        }
+        vec2 uv = (localXY + 0.5) / tileSize;
         float dist = 1.2 - uv.y; // 1.2: origin height of the vertical blur
         float blurRadius = mix(0.0, 0.3, smoothstep(0.0, 1.2, dist)); // 0.3: blur radius on top, 1.2: origin
-        initWeights();
         vec4 col = vec4(0.0);
         float totalWeight = 0.0;
-        for (int i = 0; i <= sampleCount; ++i) {
-            vec2 offset = vec2(0.0, weights[i].r * blurRadius);
+        for (int i = 0; i < sampleCount; ++i) {
+            float s = float(i) / float(sampleCount);
+            vec2 offset = vec2(0.0, s * blurRadius);
             vec2 sampleUV = uv + offset;
             sampleUV = clamp(sampleUV, vec2(0.0), vec2(1.0));
             vec2 sampleCoord = sampleUV * iResolution.xy;
-            col += auroraNoiseTexture.eval(sampleCoord) * weights[i].g;
-            totalWeight += weights[i].g;
+            float weight = 1.0 - abs(s);
+            col += SampleWholeTile(sampleCoord, iResolution.xy) * weight;
+            totalWeight += weight;
         }
         return col / totalWeight;
     }
@@ -217,55 +182,83 @@ void GEAuroraNoiseShader::MakeDrawingShader(const Drawing::Rect& rect, float pro
     drShader_ = MakeAuroraNoiseShader(rect);
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseAtlasPrecalculationBuilder()
-{
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseAtlasShaderPrecalculation_ = nullptr;
-    if (auroraNoiseAtlasShaderPrecalculation_ == nullptr) {
-        auroraNoiseAtlasShaderPrecalculation_ = Drawing::RuntimeEffect::CreateForShader(AURORA_PRECAL_PROG);
-    }
-
-    if (auroraNoiseAtlasShaderPrecalculation_ == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader auroraNoiseAtlasShaderPrecalculation_ is nullptr.");
-        return nullptr;
-    }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(auroraNoiseAtlasShaderPrecalculation_);
-}
-
 void GEAuroraNoiseShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    if (cacheAnyPtr_ == nullptr) {
-        Drawing::ImageInfo cacheImgInf(rect.GetWidth(), rect.GetHeight(),
+    CacheDataType cacheData;
+    Drawing::ImageInfo downSampledImg(rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    auto auroraNoiseDownSampledImg = MakeAuroraNoiseGeneratorShader(canvas, downSampledImg);
+    if (auroraNoiseDownSampledImg) {
+        cacheData.first = auroraNoiseDownSampledImg;
+        cacheData.second = nullptr;
+        g_cacheImg = std::make_shared<CacheDataType>(cacheData);
+    }
+    if (std::any_cast<CacheDataType>(*g_cacheImg).second == nullptr) {
+        Drawing::ImageInfo verticalBlurImgInf(rect.GetWidth(), rect.GetHeight(),
             Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-        auto cacheImg = MakeAuroraNoiseAtlasPrecalculationShader(canvas, cacheImgInf);
-        if (cacheImg) {
-            cacheAnyPtr_ = std::make_shared<std::any>(std::make_any<CacheDataType>(cacheImg));
-            GE_LOGD(" GEAuroraNoiseShader Preprocess OK");
-        } else {
-            GE_LOGD(" GEAuroraNoiseShader Preprocess NG");
+        auto verticalBlurImg = MakeAuroraNoiseVerticalBlurShader(canvas, verticalBlurImgInf);
+        if (verticalBlurImg) {
+            cacheData.second = verticalBlurImg;
+            g_cacheImg = std::make_shared<CacheDataType>(cacheData);
         }
     }
 }
 
-std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseAtlasPrecalculationShader(
+std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseGeneratorShader(
     Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
-    auto builder = GetAuroraNoiseAtlasPrecalculationBuilder();
-    builder->SetUniform("iResolution", width, height);
-    auto auroraNoiseAtlasShader = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
-    if (auroraNoiseAtlasShader == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader auroraNoiseAtlasShader is nullptr.");
+    builder_ = GetAuroraNoiseBuilder();
+    builder_->SetUniform("iResolution", width, height);
+    builder_->SetUniform("noise", auroraNoiseParams_.noise_);
+    auto auroraNoiseGeneratorShader = builder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    if (auroraNoiseGeneratorShader == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader auroraNoiseGeneratorShader is nullptr.");
         return nullptr;
     }
-    return auroraNoiseAtlasShader;
+    return auroraNoiseGeneratorShader;
+}
+
+std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader(
+    Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
+{
+    if (g_cacheImg == nullptr) {
+        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader cache is nullptr.");
+        return nullptr;
+    }
+    if (std::any_cast<CacheDataType>(*g_cacheImg).first == nullptr) {
+        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader first cache is nullptr.");
+        return nullptr;
+    }
+    auto auroraNoiseDownSampledImg = std::any_cast<CacheDataType>(*g_cacheImg).first;
+    float width = imageInfo.GetWidth();
+    float height = imageInfo.GetHeight();
+    verticalBlurBuilder_ = GetAuroraNoiseVerticalBlurBuilder();
+    if (verticalBlurBuilder_ == nullptr) {
+        GE_LOGD("GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader verticalBlurBuilder_ is nullptr.");
+        return nullptr;
+    }
+    Drawing::Matrix matrix;
+    auto auroraNoiseShader = Drawing::ShaderEffect::CreateImageShader(*auroraNoiseDownSampledImg,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    verticalBlurBuilder_->SetChild("auroraNoiseTexture", auroraNoiseShader);
+    verticalBlurBuilder_->SetUniform("iResolution", width, height);
+    auto auroraNoiseVerticalBlurShader =
+        verticalBlurBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    if (auroraNoiseVerticalBlurShader == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader auroraNoiseVerticalBlurShader is nullptr.");
+        return nullptr;
+    }
+    return auroraNoiseVerticalBlurShader;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseShaderEffect_ = nullptr;
     if (auroraNoiseShaderEffect_ == nullptr) {
-        auroraNoiseShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(AURORA_PROG);
+        auroraNoiseShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(AURORA_GENERATOR_PROG);
     }
 
     if (auroraNoiseShaderEffect_ == nullptr) {
@@ -280,7 +273,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
     thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseVerticalBlurShaderEffect_ = nullptr;
 
     if (auroraNoiseVerticalBlurShaderEffect_ == nullptr) {
-        auroraNoiseVerticalBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(AURORA_VERT_PROG);
+        auroraNoiseVerticalBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(AURORA_VERT_BLUR_PROG);
     }
 
     if (auroraNoiseVerticalBlurShaderEffect_ == nullptr) {
@@ -290,37 +283,59 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
     return std::make_shared<Drawing::RuntimeShaderBuilder>(auroraNoiseVerticalBlurShaderEffect_);
 }
 
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoiseUpSamplingBuilder()
+{
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> auroraNoiseUpSamplingShaderEffect_ = nullptr;
+    if (auroraNoiseUpSamplingShaderEffect_ == nullptr) {
+        static constexpr char prog[] = R"(
+            uniform shader verticalBlurTexture;
+            uniform vec2 iResolution;
+
+            const float downSampleFactor = 4.0;
+
+            vec4 main(vec2 fragCoord)
+            {
+                vec2 tileSize = iResolution.xy / downSampleFactor;
+                vec2 uvInTile = fragCoord / iResolution.xy;
+                vec2 pixel = uvInTile * (tileSize - 1.0);
+                return verticalBlurTexture.eval(pixel + 0.5);
+            }
+        )";
+        auroraNoiseUpSamplingShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+    }
+
+    if (auroraNoiseUpSamplingShaderEffect_ == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader auroraNoiseUpSamplingShaderEffect_ is nullptr.");
+        return nullptr;
+    }
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(auroraNoiseUpSamplingShaderEffect_);
+}
+
 std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShader(const Drawing::Rect& rect)
 {
-    if (cacheAnyPtr_ == nullptr) {
+    if (g_cacheImg == nullptr) {
         GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseShader cache is nullptr.");
         return nullptr;
     }
-    auto atlasPrecalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_);
+    auto verticalBlurImage = std::any_cast<CacheDataType>(*g_cacheImg).second;
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-    builder_ = GetAuroraNoiseBuilder();
     Drawing::Matrix matrix;
-    auto atlasShader = Drawing::ShaderEffect::CreateImageShader(*atlasPrecalculationImage, Drawing::TileMode::CLAMP,
+    auto verticalBlurShader = Drawing::ShaderEffect::CreateImageShader(*verticalBlurImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    builder_->SetChild("atlasImage", atlasShader);
-    builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("noise", auroraNoiseParams_.noise_);
-    auto auroraNoiseShader = builder_->MakeShader(nullptr, false);
-
-    verticalBlurBuilder_ = GetAuroraNoiseVerticalBlurBuilder();
-    if (verticalBlurBuilder_ == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader verticalBlurBuilder_ is nullptr.");
+    upSampingBuilder_ = GetAuroraNoiseUpSamplingBuilder();
+    if (upSampingBuilder_ == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader upSampingBuilder_ is nullptr.");
         return nullptr;
     }
-    verticalBlurBuilder_->SetChild("auroraNoiseTexture", auroraNoiseShader);
-    verticalBlurBuilder_->SetUniform("iResolution", width, height);
-    auto auroraNoiseVerticleBlurShader = verticalBlurBuilder_->MakeShader(nullptr, false);
-    if (auroraNoiseVerticleBlurShader == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader auroraNoiseVerticleBlurShader is nullptr.");
+    upSampingBuilder_->SetChild("verticalBlurTexture", verticalBlurShader);
+    upSampingBuilder_->SetUniform("iResolution", width, height);
+    auto auroraNoiseUpSamplingShader = upSampingBuilder_->MakeShader(nullptr, false);
+    if (auroraNoiseUpSamplingShader == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader auroraNoiseUpSamplingShader is nullptr.");
         return nullptr;
     }
-    return auroraNoiseVerticleBlurShader;
+    return auroraNoiseUpSamplingShader;
 }
 
 } // namespace Rosen

@@ -34,13 +34,15 @@ public:
         auroraNoiseParams_ = params;
     }
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
-    std::shared_ptr<Drawing::Image> MakeAuroraNoiseAtlasPrecalculationShader(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::Image> MakeAuroraNoiseGeneratorShader(Drawing::Canvas& canvas,
         const Drawing::ImageInfo& imageInfo);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseAtlasPrecalculationBuilder();
+    std::shared_ptr<Drawing::Image> MakeAuroraNoiseVerticalBlurShader(Drawing::Canvas& canvas,
+        const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::ShaderEffect> MakeAuroraNoiseShader(const Drawing::Rect& rect);
     static std::shared_ptr<GEAuroraNoiseShader> CreateAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseVerticalBlurBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseUpSamplingBuilder();
 private:
     GEAuroraNoiseShader(const GEAuroraNoiseShader&) = delete;
     GEAuroraNoiseShader(const GEAuroraNoiseShader&&) = delete;
@@ -49,6 +51,7 @@ private:
     Drawing::GEAuroraNoiseShaderParams auroraNoiseParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> verticalBlurBuilder_;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> upSampingBuilder_;
 };
 } // namespace Rosen
 } // namespace OHOS
