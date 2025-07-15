@@ -58,7 +58,7 @@ static constexpr char WAVY_PROG[] = R"(
         float maxRadius = max(max(dist0, dist1), max(dist2, dist3));
         float currentRadius = maxRadius * radius;
         float d = abs(shapeSDF(delta, currentRadius));
-        float mask = smoothstep(thickness, 0.0, d);
+        float mask = smoothstep(thickness * (1.0 + currentRadius), 0.0, d);
         vec3 baseColor = vec3(0.8, 0.5, 1.0);
         color = baseColor * mask;
         return vec4(color, mask);
