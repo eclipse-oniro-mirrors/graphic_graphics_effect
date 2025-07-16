@@ -835,8 +835,8 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     uint32_t maskColor = 255;
     float saturationForHPS = 1.0f;
     float brightnessForHPS = 1.0f;
-    GERender::HpsGEImageEffectContext context = {image, src, dst, Drawing::SamplingOptions, true, alpha,
-        colorFilter, makColor, saturationForHPS, brightnessForHPS};
+    GERender::HpsGEImageEffectContext context = {image, src, dst, Drawing::SamplingOptions(), true, alpha,
+        colorFilter, maskColor, saturationForHPS, brightnessForHPS};
 
     auto geRender = std::make_shared<GERender>();
 
@@ -846,7 +846,7 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     /* no filter*/
     auto image2 = MakeImage(canvas_);
     context.image = image2;
-    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImaget);
+    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage);
 
     /* normal case */
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);

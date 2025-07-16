@@ -72,10 +72,10 @@ public:
     struct HpsGEImageEffectContext {
         std::shared_ptr<Drawing::Image> image;
         Drawing::Rect src;
-        Drawing::Rect dst;
-        Drawing::SamplingOptions sampling;
-        bool compatibleWithHpsSkipBlur;
-        float alpha,
+        Drawing::Rect dst {};
+        Drawing::SamplingOptions sampling {};
+        bool compatibleWithHpsSkipBlur {};
+        float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;
         uint32_t maskColor;
         float saturationForHPS;

@@ -42,7 +42,7 @@ public:
     static constexpr size_t INDEX_RANGE_NUM = 2;
     using IndexRange = std::array<int32_t, INDEX_RANGE_NUM>;
     struct HpsEffectContext {
-        float alpha,
+        float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;
         uint32_t maskColor;
     };
@@ -77,8 +77,7 @@ private:
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     bool InitUpEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
-        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, float alpha,
-        std::shared_ptr<Drawing::ColorFilter> colorFilter);
+        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsEffectContext);
 };
 }
 } // namespace OHOS

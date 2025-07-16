@@ -110,7 +110,7 @@ HWTEST_F(GEHpsEffectFilterTest, ApplyHpsEffect_001, TestSize.Level0)
     std::shared_ptr<Drawing::ColorFilter> colorFilter;
     uint32_t maskColor = 255;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
-    HpsEffectFilter::HpsEffectContext hpsEffectContext = {alpha, colorFilter, makColor};
+    HpsEffectFilter::HpsEffectContext hpsEffectContext = {alpha, colorFilter, maskColor};
     EXPECT_EQ(hpsEffectFilter->ApplyHpsEffect(canvas_, image_, outImage, hpsEffectContext), false);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest ApplyHpsEffect_001 end";
