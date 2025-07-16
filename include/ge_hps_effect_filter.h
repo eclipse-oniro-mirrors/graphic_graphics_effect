@@ -77,7 +77,7 @@ private:
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     bool InitUpEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
-        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsEffectContext);
+        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
 };
 }
 } // namespace OHOS

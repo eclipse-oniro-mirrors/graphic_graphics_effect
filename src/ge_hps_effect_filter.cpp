@@ -69,15 +69,15 @@ Drawing::Matrix GetShaderTransform(const Drawing::Rect& blurRect, float scaleW, 
     return matrix;
 }
 
-void ApplyMaskColorFilter(Drawing::Canvas& offscreenCanvas, unit32_t maskColor)
+void ApplyMaskColorFilter(Drawing::Canvas& offscreenCanvas, uint32_t maskColor)
 {
     if (maskColor == 0) {
         return;
     }
     Drawing::Brush maskBrush;
-    maskBrush.setColor(maskColor);
+    maskBrush.SetColor(maskColor);
     LOGD("HpsEffectFilter newMaskColor %{public}#x,", maskColor);
-    offscreenCanvas.DrawBackGround(maskBrush);
+    offscreenCanvas.DrawBackground(maskBrush);
 }
 } // namespace
 
@@ -378,7 +378,7 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     if (hpsContext.colorFilter != nullptr) {
         Drawing::Filter filter;
         filter.SetColorFilter(hpsContext.colorFilter);
-        brush.setFilter(filter);
+        brush.SetFilter(filter);
     }
     brush.SetAlphaF(hpsContext.alpha);
     canvas.AttachBrush(brush);
@@ -437,8 +437,9 @@ bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::sh
     }
 
     Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
-    upscale_matrix_ = GetShaderTransform(dst, dst.GetWidth() / imageCache->GetWidth(),
+    auto upscale_matrix = GetShaderTransform(dst, dst.GetWidth() / imageCache->GetWidth(),
         dst.GetHeight() / imageCache->GetHeight());
+    upscale_matrix_ = upscale_matrix;
     return DrawImageWithHps(canvas, imageCache, outImage, dst, hpsContext);
 }
 

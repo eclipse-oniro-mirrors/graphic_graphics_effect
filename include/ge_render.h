@@ -72,9 +72,9 @@ public:
     struct HpsGEImageEffectContext {
         std::shared_ptr<Drawing::Image> image;
         Drawing::Rect src;
-        Drawing::Rect dst {};
-        Drawing::SamplingOptions sampling {};
-        bool compatibleWithHpsSkipBlur {};
+        Drawing::Rect dst;
+        Drawing::SamplingOptions sampling;
+        bool compatibleWithHpsSkipBlur;
         float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;
         uint32_t maskColor;
@@ -113,6 +113,8 @@ private:
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+    bool ExcuteRangeEmpty(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
 };
 
 } // namespace GraphicsEffectEngine
