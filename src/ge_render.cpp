@@ -153,10 +153,11 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
         return false;
     }
 
-    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>();
+    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas);
     std::vector<IndexRange> hpsSupportedIndexRanges = hpsEffectFilter->HpsSupportedEffectsIndexRanges(visualEffects);
     if (hpsSupportedIndexRanges.empty()) {
-        HpsGEImageEffectContext fullGEContext = { context.image, context.src, context.src, context.sampling, true };
+        HpsGEImageEffectContext fullGEContext = { context.image, context.src, context.src, context.sampling, true,
+            context.alpha, context.colorFilter, context.makColor, context.saturationForHPS, context.brightnessForHPS};
         bool status = ApplyGEEffects(canvas, visualEffects, fullGEContext, outImage);
         if (status) {
             DrawToCanvas(canvas, context, outImage, brush);
@@ -174,7 +175,8 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
         auto currentImage = resImage;
         if (indexRangeInfo.mode == EffectMode::GE) {
             HpsGEImageEffectContext partialGEContext = { currentImage, context.src, context.src,
-                context.sampling, false }; // When hps support exists, don't set compatibility switch
+                context.sampling, false, context.alpha, context.colorFilter, context.makColor,
+                context.saturationForHPS, context.brightnessForHPS}; // When hps support exists, don't set compatibility switch
             ApplyGEEffects(canvas, subVisualEffects, partialGEContext, resImage);
             lastAppliedGE = true;
             continue;
@@ -184,9 +186,11 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
                 continue;
             }
             auto ve = vef->GetImpl();
-            hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst);
+            hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst, context.saturationForHPS,
+                context.brightnessForHPS);
         }
-        appliedBlur = hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, brush);
+        appliedBlur = hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, context.alpha,
+            context.colorFilter, context.makColor);
         lastAppliedGE = false;
     }
     outImage = resImage;
@@ -331,11 +335,10 @@ bool GERender::HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
 bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-    const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& src,
-    const Drawing::Rect& dst, Drawing::Brush& brush)
+    const HpsEffectContext& context, std::shared_ptr<Drawing::Image>& outImage)
 {
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas);
-    if (!image) {
+    if (!context.image) {
         LOGE("GERender::ApplyImageEffect image is null");
         return false;
     }
@@ -347,9 +350,11 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
     if (hpsEffectFilter->HpsSupportEffectGE(veContainer)) {
         for (auto vef : veContainer.GetFilters()) {
             auto ve = vef->GetImpl();
-            hpsEffectFilter->GenerateVisualEffectFromGE(ve, src, dst);
+            hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.saturationForHPS,
+            context.brightnessForHPS);
         }
 
+        HpsEffectFilter::HpsEffectContext hpsEffectContext = {context.alpha, context.colorFilter, context.makColor};
         return hpsEffectFilter->ApplyHpsEffect(canvas, image, outImage, brush);
     }
 

@@ -66,10 +66,6 @@ public:
         Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
         const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
 
-    bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-        const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
-        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
-
     bool HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
                           std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);
 
@@ -79,7 +75,15 @@ public:
         Drawing::Rect dst;
         Drawing::SamplingOptions sampling;
         bool compatibleWithHpsSkipBlur;
+        float alpha,
+        std::shared_ptr<Drawing::ColorFilter> colorFilter;
+        uint32_t maskColor;
+        float saturationForHPS;
+        float brightnessForHPS;
     };
+
+    bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage);
 
     bool ApplyHpsGEImageEffect(
         Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,

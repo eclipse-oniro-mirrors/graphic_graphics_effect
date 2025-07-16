@@ -41,14 +41,19 @@ public:
 
     static constexpr size_t INDEX_RANGE_NUM = 2;
     using IndexRange = std::array<int32_t, INDEX_RANGE_NUM>;
+    struct HpsEffectContext {
+        float alpha,
+        std::shared_ptr<Drawing::ColorFilter> colorFilter;
+        uint32_t maskColor;
+    };
 
     bool HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer);
     std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
-        const Drawing::Rect& src, const Drawing::Rect& dst);
+        const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS);
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
-        std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
+        std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
 
     void InitExtension(Drawing::Canvas& canvas);
 
@@ -60,7 +65,7 @@ private:
     void GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst);
     void GenerateKawaseBlurEffect(const Drawing::GEKawaseBlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst);
+        const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS);
     void GenerateGreyEffect(const Drawing::GEGreyShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst);
     void GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterParams& params,
@@ -69,10 +74,11 @@ private:
         const Drawing::Rect& src, const Drawing::Rect& dst);
     bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
-        std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
+        std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     bool InitUpEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
-        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, Drawing::Brush& brush);
+        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, float alpha,
+        std::shared_ptr<Drawing::ColorFilter> colorFilter);
 };
 }
 } // namespace OHOS
