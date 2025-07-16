@@ -52,6 +52,8 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> verticalBlurBuilder_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> upSampingBuilder_;
+    std::shared_ptr<Drawing::Image> noiseImg_;
+    std::shared_ptr<Drawing::Image> verticalBlurImg_;
 };
 } // namespace Rosen
 } // namespace OHOS

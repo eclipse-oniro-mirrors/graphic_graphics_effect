@@ -310,7 +310,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 6) return minDist; // 6: next i beyond legal size
-        // i = 6
         pointA = controlPoly[5]; // iMidPrev = i - 1
         pointB = controlPoly[6]; // i
         pointC = controlPoly[7]; // iMid = i + 1
@@ -322,7 +321,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 8) return minDist; // 8: next i beyond legal size
-        // i = 8
         pointA = controlPoly[7]; // iMidPrev = i - 1
         pointB = controlPoly[8]; // i
         pointC = controlPoly[9]; // iMid = i + 1
@@ -334,7 +332,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 10) return minDist; // 10: next i beyond legal size
-        // i = 10
         pointA = controlPoly[9]; // iMidPrev = i - 1
         pointB = controlPoly[10]; // i
         pointC = controlPoly[11]; // iMid = i + 1
@@ -346,7 +343,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 12) return minDist; // 12: next i beyond legal size
-        // i = 12
         pointA = controlPoly[11]; // iMidPrev = i - 1
         pointB = controlPoly[12]; // i
         pointC = controlPoly[13]; // iMid = i + 1
@@ -358,7 +354,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 14) return minDist; // 14: next i beyond legal size
-        // i = 14
         pointA = controlPoly[13]; // iMidPrev = i - 1
         pointB = controlPoly[14]; // i
         pointC = controlPoly[15]; // iMid = i + 1
@@ -370,7 +365,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 16) return minDist; // 16: next i beyond legal size
-        // i = 16
         pointA = controlPoly[15]; // iMidPrev = i - 1
         pointB = controlPoly[16]; // i
         pointC = controlPoly[17]; // iMid = i + 1
@@ -382,7 +376,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 18) return minDist; // 18: next i beyond legal size
-        // i = 18
         pointA = controlPoly[17]; // iMidPrev = i - 1
         pointB = controlPoly[18]; // i
         pointC = controlPoly[19]; // iMid = i + 1
@@ -394,7 +387,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 20) return minDist; // 20: next i beyond legal size
-        // i = 20
         pointA = controlPoly[19]; // iMidPrev = i - 1
         pointB = controlPoly[20]; // i
         pointC = controlPoly[21]; // iMid = i + 1
@@ -406,7 +398,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 22) return minDist; // 22: next i beyond legal size
-        // i = 22
         pointA = controlPoly[21]; // iMidPrev = i - 1
         pointB = controlPoly[22]; // i
         pointC = controlPoly[23]; // iMid = i + 1
@@ -418,7 +409,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 24) return minDist; // 24: next i beyond legal size
-        // i = 24
         pointA = controlPoly[23]; // iMidPrev = i - 1
         pointB = controlPoly[24]; // i
         pointC = controlPoly[25]; // iMid = i + 1
@@ -430,7 +420,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 26) return minDist; // 26: next i beyond legal size
-        // i = 26
         pointA = controlPoly[25]; // iMidPrev = i - 1
         pointB = controlPoly[26]; // i
         pointC = controlPoly[27]; // iMid = i + 1
@@ -442,7 +431,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 28) return minDist; // 28: next i beyond legal size
-        // i = 28
         pointA = controlPoly[27]; // iMidPrev = i - 1
         pointB = controlPoly[28]; // i
         pointC = controlPoly[29]; // iMid = i + 1
@@ -454,7 +442,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 30) return minDist; // 30: next i beyond legal size
-        // i = 30
         pointA = controlPoly[29]; // iMidPrev = i - 1
         pointB = controlPoly[30]; // i
         pointC = controlPoly[31]; // iMid = i + 1
@@ -466,7 +453,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 32) return minDist; // 32: next i beyond legal size
-        // i = 32
         pointA = controlPoly[31]; // iMidPrev = i - 1
         pointB = controlPoly[32]; // i
         pointC = controlPoly[33]; // iMid = i + 1
@@ -478,7 +464,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 34) return minDist; // 34: next i beyond legal size
-        // i = 34
         pointA = controlPoly[33]; // iMidPrev = i - 1
         pointB = controlPoly[34]; // i
         pointC = controlPoly[35]; // iMid = i + 1
@@ -490,7 +475,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 36) return minDist; // 36: next i beyond legal size
-        // i = 36
         pointA = controlPoly[35]; // iMidPrev = i - 1
         pointB = controlPoly[36]; // i
         pointC = controlPoly[37]; // iMid = i + 1
@@ -502,7 +486,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 38) return minDist; // 38: next i beyond legal size
-        // i = 38
         pointA = controlPoly[37]; // iMidPrev = i - 1
         pointB = controlPoly[38]; // i
         pointC = controlPoly[39]; // iMid = i + 1
@@ -514,7 +497,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 40) return minDist; // 40: next i beyond legal size
-        // i = 40
         pointA = controlPoly[39]; // iMidPrev = i - 1
         pointB = controlPoly[40]; // i
         pointC = controlPoly[41]; // iMid = i + 1
@@ -526,7 +508,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 42) return minDist; // 42: next i beyond legal size
-        // i = 42
         pointA = controlPoly[41]; // iMidPrev = i - 1
         pointB = controlPoly[42]; // i
         pointC = controlPoly[43]; // iMid = i + 1
@@ -538,7 +519,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 44) return minDist; // 44: next i beyond legal size
-        // i = 44
         pointA = controlPoly[43]; // iMidPrev = i - 1
         pointB = controlPoly[44]; // i
         pointC = controlPoly[45]; // iMid = i + 1
@@ -550,7 +530,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 46) return minDist; // 46: next i beyond legal size
-        // i = 46
         pointA = controlPoly[45]; // iMidPrev = i - 1
         pointB = controlPoly[46]; // i
         pointC = controlPoly[47]; // iMid = i + 1
@@ -562,7 +541,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 48) return minDist; // 48: next i beyond legal size
-        // i = 48
         pointA = controlPoly[47]; // iMidPrev = i - 1
         pointB = controlPoly[48]; // i
         pointC = controlPoly[49]; // iMid = i + 1
@@ -574,7 +552,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 50) return minDist; // 50: next i beyond legal size
-        // i = 50
         pointA = controlPoly[49]; // iMidPrev = i - 1
         pointB = controlPoly[50]; // i
         pointC = controlPoly[51]; // iMid = i + 1
@@ -586,7 +563,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 52) return minDist; // 52: next i beyond legal size
-        // i = 52
         pointA = controlPoly[51]; // iMidPrev = i - 1
         pointB = controlPoly[52]; // i
         pointC = controlPoly[53]; // iMid = i + 1
@@ -598,7 +574,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 54) return minDist; // 54: next i beyond legal size
-        // i = 54
         pointA = controlPoly[53]; // iMidPrev = i - 1
         pointB = controlPoly[54]; // i
         pointC = controlPoly[55]; // iMid = i + 1
@@ -610,7 +585,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 56) return minDist; // 56: next i beyond legal size
-        // i = 56
         pointA = controlPoly[55]; // iMidPrev = i - 1
         pointB = controlPoly[56]; // i
         pointC = controlPoly[57]; // iMid = i + 1
@@ -622,7 +596,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 58) return minDist; // 58: next i beyond legal size
-        // i = 58
         pointA = controlPoly[57]; // iMidPrev = i - 1
         pointB = controlPoly[58]; // i
         pointC = controlPoly[59]; // iMid = i + 1
@@ -634,7 +607,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 60) return minDist; // 60: next i beyond legal size
-        // i = 60
         pointA = controlPoly[59]; // iMidPrev = i - 1
         pointB = controlPoly[60]; // i
         pointC = controlPoly[61]; // iMid = i + 1
@@ -646,7 +618,6 @@ static constexpr char PRECAL_PROG[] = R"(
             closest[2] = pointC;
         }
         if (size <= 62) return minDist; // 62: next i beyond legal size
-        // i = 62
         pointA = controlPoly[61]; // iMidPrev = i - 1
         pointB = controlPoly[62]; // i
         pointC = controlPoly[63]; // iMid = i + 1
@@ -704,7 +675,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 6) return;
-        // i = 6
         pointA = controlPoints[5];
         pointB = controlPoints[6];
         pointC = controlPoints[7];
@@ -715,7 +685,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 8) return;
-        // i = 8
         pointA = controlPoints[7];
         pointB = controlPoints[8];
         pointC = controlPoints[9];
@@ -726,7 +695,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 10)  return;
-        // i = 10
         pointA = controlPoints[9];
         pointB = controlPoints[10];
         pointC = controlPoints[11];
@@ -737,7 +705,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 12) return;
-        // i = 12
         pointA = controlPoints[11];
         pointB = controlPoints[12];
         pointC = controlPoints[13];
@@ -748,7 +715,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 14) return;
-        // i = 14
         pointA = controlPoints[13];
         pointB = controlPoints[14];
         pointC = controlPoints[15];
@@ -759,7 +725,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 16) return;
-        // i = 16
         pointA = controlPoints[15];
         pointB = controlPoints[16];
         pointC = controlPoints[17];
@@ -770,7 +735,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 18) return;
-        // i = 18
         pointA = controlPoints[17];
         pointB = controlPoints[18];
         pointC = controlPoints[19];
@@ -781,7 +745,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 20) return;
-        // i = 20
         pointA = controlPoints[19];
         pointB = controlPoints[20];
         pointC = controlPoints[21];
@@ -792,7 +755,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 22) return;
-        // i = 22
         pointA = controlPoints[21];
         pointB = controlPoints[22];
         pointC = controlPoints[23];
@@ -803,7 +765,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 24) return;
-        // i = 24
         pointA = controlPoints[23];
         pointB = controlPoints[24];
         pointC = controlPoints[25];
@@ -814,7 +775,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 26) return;
-        // i = 26
         pointA = controlPoints[25];
         pointB = controlPoints[26];
         pointC = controlPoints[27];
@@ -825,7 +785,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 28) return;
-        // i = 28
         pointA = controlPoints[27];
         pointB = controlPoints[28];
         pointC = controlPoints[29];
@@ -836,7 +795,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 30) return;
-        // i = 30
         pointA = controlPoints[29];
         pointB = controlPoints[30];
         pointC = controlPoints[31];
@@ -847,7 +805,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 32) return;
-        // i = 32
         pointA = controlPoints[31];
         pointB = controlPoints[32];
         pointC = controlPoints[33];
@@ -858,7 +815,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 34) return;
-        // i = 34
         pointA = controlPoints[33];
         pointB = controlPoints[34];
         pointC = controlPoints[35];
@@ -869,7 +825,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 36) return;
-        // i = 36
         pointA = controlPoints[35];
         pointB = controlPoints[36];
         pointC = controlPoints[37];
@@ -880,7 +835,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 38) return;
-        // i = 38
         pointA = controlPoints[37];
         pointB = controlPoints[38];
         pointC = controlPoints[39];
@@ -891,7 +845,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 40) return;
-        // i = 40
         pointA = controlPoints[39];
         pointB = controlPoints[40];
         pointC = controlPoints[41];
@@ -902,7 +855,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 42) return;
-        // i = 42
         pointA = controlPoints[41];
         pointB = controlPoints[42];
         pointC = controlPoints[43];
@@ -913,7 +865,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 44) return;
-        // i = 44
         pointA = controlPoints[43];
         pointB = controlPoints[44];
         pointC = controlPoints[45];
@@ -924,7 +875,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 46) return;
-        // i = 46
         pointA = controlPoints[45];
         pointB = controlPoints[46];
         pointC = controlPoints[47];
@@ -935,7 +885,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 48) return;
-        // i = 48
         pointA = controlPoints[47];
         pointB = controlPoints[48];
         pointC = controlPoints[49];
@@ -946,7 +895,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 50) return;
-        // i = 50
         pointA = controlPoints[49];
         pointB = controlPoints[50];
         pointC = controlPoints[51];
@@ -957,7 +905,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 52) return;
-        // i = 52
         pointA = controlPoints[51];
         pointB = controlPoints[52];
         pointC = controlPoints[53];
@@ -968,7 +915,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 54) return;
-        // i = 54
         pointA = controlPoints[53];
         pointB = controlPoints[54];
         pointC = controlPoints[55];
@@ -979,7 +925,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 56) return;
-        // i = 56
         pointA = controlPoints[55];
         pointB = controlPoints[56];
         pointC = controlPoints[57];
@@ -990,7 +935,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 58) return;
-        // i = 58
         pointA = controlPoints[57];
         pointB = controlPoints[58];
         pointC = controlPoints[59];
@@ -1001,7 +945,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 60) return;
-        // i = 60
         pointA = controlPoints[59];
         pointB = controlPoints[60];
         pointC = controlPoints[61];
@@ -1012,7 +955,6 @@ static constexpr char PRECAL_PROG[] = R"(
         }
         tGlobal = bestTGlobal;
         if (size <= 62) return;
-        // i = 62
         pointA = controlPoints[61];
         pointB = controlPoints[62];
         pointC = controlPoints[63];
@@ -1144,7 +1086,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 6
         pointA = controlPoints[5]; // iMidPrev = i - 1
         pointB = controlPoints[6]; // i
         pointC = controlPoints[7]; // (i + 1) % size
@@ -1162,7 +1103,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 8
         pointA = controlPoints[7]; // iMidPrev = i - 1
         pointB = controlPoints[8]; // i
         pointC = controlPoints[9]; // (i + 1) % size
@@ -1180,7 +1120,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 10
         pointA = controlPoints[9]; // iMidPrev = i - 1
         pointB = controlPoints[10]; // i
         pointC = controlPoints[11]; // (i + 1) % size
@@ -1198,7 +1137,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 12
         pointA = controlPoints[11]; // iMidPrev = i - 1
         pointB = controlPoints[12]; // i
         pointC = controlPoints[13]; // (i + 1) % size
@@ -1216,7 +1154,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 14
         pointA = controlPoints[13]; // iMidPrev = i - 1
         pointB = controlPoints[14]; // i
         pointC = controlPoints[15]; // (i + 1) % size
@@ -1234,7 +1171,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 16
         pointA = controlPoints[15]; // iMidPrev = i - 1
         pointB = controlPoints[16]; // i
         pointC = controlPoints[17]; // (i + 1) % size
@@ -1252,7 +1188,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 18
         pointA = controlPoints[17]; // iMidPrev = i - 1
         pointB = controlPoints[18]; // i
         pointC = controlPoints[19]; // (i + 1) % size
@@ -1270,7 +1205,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 20
         pointA = controlPoints[19]; // iMidPrev = i - 1
         pointB = controlPoints[20]; // i
         pointC = controlPoints[21]; // (i + 1) % size
@@ -1288,7 +1222,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 22
         pointA = controlPoints[21]; // iMidPrev = i - 1
         pointB = controlPoints[22]; // i
         pointC = controlPoints[23]; // (i + 1) % size
@@ -1306,7 +1239,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 24
         pointA = controlPoints[23]; // iMidPrev = i - 1
         pointB = controlPoints[24]; // i
         pointC = controlPoints[25]; // (i + 1) % size
@@ -1324,7 +1256,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 26
         pointA = controlPoints[25]; // iMidPrev = i - 1
         pointB = controlPoints[26]; // i
         pointC = controlPoints[27]; // (i + 1) % size
@@ -1342,7 +1273,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 28
         pointA = controlPoints[27]; // iMidPrev = i - 1
         pointB = controlPoints[28]; // i
         pointC = controlPoints[29]; // (i + 1) % size
@@ -1360,7 +1290,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 30
         pointA = controlPoints[29]; // iMidPrev = i - 1
         pointB = controlPoints[30]; // i
         pointC = controlPoints[31]; // (i + 1) % size
@@ -1378,7 +1307,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 32
         pointA = controlPoints[31]; // iMidPrev = i - 1
         pointB = controlPoints[32]; // i
         pointC = controlPoints[33]; // (i + 1) % size
@@ -1396,7 +1324,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 34
         pointA = controlPoints[33]; // iMidPrev = i - 1
         pointB = controlPoints[34]; // i
         pointC = controlPoints[35]; // (i + 1) % size
@@ -1414,7 +1341,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 36
         pointA = controlPoints[35]; // iMidPrev = i - 1
         pointB = controlPoints[36]; // i
         pointC = controlPoints[37]; // (i + 1) % size
@@ -1432,7 +1358,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 38
         pointA = controlPoints[37]; // iMidPrev = i - 1
         pointB = controlPoints[38]; // i
         pointC = controlPoints[39]; // (i + 1) % size
@@ -1450,7 +1375,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 40
         pointA = controlPoints[39]; // iMidPrev = i - 1
         pointB = controlPoints[40]; // i
         pointC = controlPoints[41]; // (i + 1) % size
@@ -1468,7 +1392,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 42
         pointA = controlPoints[41]; // iMidPrev = i - 1
         pointB = controlPoints[42]; // i
         pointC = controlPoints[43]; // (i + 1) % size
@@ -1486,7 +1409,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 44
         pointA = controlPoints[43]; // iMidPrev = i - 1
         pointB = controlPoints[44]; // i
         pointC = controlPoints[45]; // (i + 1) % size
@@ -1504,7 +1426,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 46
         pointA = controlPoints[45]; // iMidPrev = i - 1
         pointB = controlPoints[46]; // i
         pointC = controlPoints[47]; // (i + 1) % size
@@ -1522,7 +1443,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 48
         pointA = controlPoints[47]; // iMidPrev = i - 1
         pointB = controlPoints[48]; // i
         pointC = controlPoints[49]; // (i + 1) % size
@@ -1540,7 +1460,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 50
         pointA = controlPoints[49]; // iMidPrev = i - 1
         pointB = controlPoints[50]; // i
         pointC = controlPoints[51]; // (i + 1) % size
@@ -1558,7 +1477,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 52
         pointA = controlPoints[51]; // iMidPrev = i - 1
         pointB = controlPoints[52]; // i
         pointC = controlPoints[53]; // (i + 1) % size
@@ -1576,7 +1494,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 54
         pointA = controlPoints[53]; // iMidPrev = i - 1
         pointB = controlPoints[54]; // i
         pointC = controlPoints[55]; // (i + 1) % size
@@ -1594,7 +1511,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 56
         pointA = controlPoints[55]; // iMidPrev = i - 1
         pointB = controlPoints[56]; // i
         pointC = controlPoints[57]; // (i + 1) % size
@@ -1612,7 +1528,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 58
         pointA = controlPoints[57]; // iMidPrev = i - 1
         pointB = controlPoints[58]; // i
         pointC = controlPoints[59]; // (i + 1) % size
@@ -1630,7 +1545,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 60
         pointA = controlPoints[59]; // iMidPrev = i - 1
         pointB = controlPoints[60]; // i
         pointC = controlPoints[61]; // (i + 1) % size
@@ -1648,7 +1562,6 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
             accumulateIntensity = weightedIntensity / float(segmentCount);
             return;
         }
-        // i = 62
         pointA = controlPoints[61]; // iMidPrev = i - 1
         pointB = controlPoints[62]; // i
         pointC = controlPoints[63]; // (i + 1) % size
@@ -1823,12 +1736,19 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::MakeContourDia
     Drawing::Matrix matrix;
     auto preCalculationShader = Drawing::ShaderEffect::CreateImageShader(*precalculationImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    const float defaultLineLength = 0.3f;
+    float line1Length = (contourDiagonalFlowLightParams_.line1Length_ < 0.0f ||
+        std::abs(contourDiagonalFlowLightParams_.line1Length_) < std::numeric_limits<float>::epsilon()) ?
+        defaultLineLength : contourDiagonalFlowLightParams_.line1Length_;
+    float line2Length = (contourDiagonalFlowLightParams_.line2Length_ < 0.0f ||
+        std::abs(contourDiagonalFlowLightParams_.line2Length_) < std::numeric_limits<float>::epsilon()) ?
+        defaultLineLength : contourDiagonalFlowLightParams_.line2Length_;
     builder->SetChild("precalculationImage", preCalculationShader);
     builder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
     builder_->SetUniform("line1Start", contourDiagonalFlowLightParams_.line1Start_);
-    builder_->SetUniform("line1Length", contourDiagonalFlowLightParams_.line1Length_);
+    builder_->SetUniform("line1Length", std::clamp(line1Length, 0.0f, 1.0f));
     builder_->SetUniform("line2Start", contourDiagonalFlowLightParams_.line2Start_);
-    builder_->SetUniform("line2Length", contourDiagonalFlowLightParams_.line2Length_);
+    builder_->SetUniform("line2Length", std::clamp(line2Length, 0.0f, 1.0f));
     builder_->SetUniform("count", static_cast<float>(pointCnt_));
     builder_->SetUniform("controlPoints", controlPoints_.data(), controlPoints_.size());
     auto contourDiagonalFlowLightShader = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
@@ -2027,17 +1947,26 @@ std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeCont
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     auto haloAtlasShader = Drawing::ShaderEffect::CreateImageShader(*haloAtlasImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    const float defaultLineLength = 0.3f;
+    float line1Length = (contourDiagonalFlowLightParams_.line1Length_ < 0.0f ||
+        std::abs(contourDiagonalFlowLightParams_.line1Length_) < std::numeric_limits<float>::epsilon()) ?
+        defaultLineLength : contourDiagonalFlowLightParams_.line1Length_;
+    float line2Length = (contourDiagonalFlowLightParams_.line2Length_ < 0.0f ||
+        std::abs(contourDiagonalFlowLightParams_.line2Length_) < std::numeric_limits<float>::epsilon()) ?
+        defaultLineLength : contourDiagonalFlowLightParams_.line2Length_;
     builder_->SetChild("precalculationImage", precalculationShader);
     builder_->SetChild("haloAtlasImage", haloAtlasShader);
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("line1Start", contourDiagonalFlowLightParams_.line1Start_);
-    builder_->SetUniform("line1Length", contourDiagonalFlowLightParams_.line1Length_);
-    builder_->SetUniform("line1Color", contourDiagonalFlowLightParams_.line1Color_[NUM0],
-        contourDiagonalFlowLightParams_.line1Color_[NUM1], contourDiagonalFlowLightParams_.line1Color_[NUM2]);
+    builder_->SetUniform("line1Length", std::clamp(line1Length, 0.0f, 1.0f));
+    builder_->SetUniform("line1Color", std::clamp(contourDiagonalFlowLightParams_.line1Color_[NUM0], 0.0f, 1.0f),
+        std::clamp(contourDiagonalFlowLightParams_.line1Color_[NUM1], 0.0f, 1.0f),
+        std::clamp(contourDiagonalFlowLightParams_.line1Color_[NUM2], 0.0f, 1.0f));
     builder_->SetUniform("line2Start", contourDiagonalFlowLightParams_.line2Start_);
-    builder_->SetUniform("line2Length", contourDiagonalFlowLightParams_.line2Length_);
-    builder_->SetUniform("line2Color", contourDiagonalFlowLightParams_.line2Color_[NUM0],
-        contourDiagonalFlowLightParams_.line2Color_[NUM1], contourDiagonalFlowLightParams_.line2Color_[NUM2]);
+    builder_->SetUniform("line2Length", std::clamp(line2Length, 0.0f, 1.0f));
+    builder_->SetUniform("line2Color", std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM0], 0.0f, 1.0f),
+        std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM1], 0.0f, 1.0f),
+        std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM2], 0.0f, 1.0f));
     builder_->SetUniform("lineThickness", std::clamp(contourDiagonalFlowLightParams_.thickness_, 0.0f, 1.0f));
     auto contourDiagonalFlowLightShader = builder_->MakeShader(nullptr, false);
     if (contourDiagonalFlowLightShader == nullptr) {
