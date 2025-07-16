@@ -124,23 +124,6 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
     EXPECT_NE(cache, nullptr);
 }
 
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, MakeContourDiagonalFlowLightShader_001, TestSize.Level1)
-{
-    // Test case for MakeContourDiagonalFlowLightShader method
-    Drawing::Rect rect(0, 0, 100, 100);
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.05f;
-    params.line1Length_ = 0.6f;
-    params.line1Color_ = Vector4f(0.8f, 0.5f, 1.0f, 1.0f);
-    params.line2Start_ = 0.55f;
-    params.line2Length_ = 0.2f;
-    params.line2Color_ = Vector4f(0.2f, 0.6f, 1.0f, 0.8f);
-    params.thickness_ = 0.5f;
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
-    auto effect = shader->MakeContourDiagonalFlowLightShader(rect);
-    EXPECT_NE(effect, nullptr);
-}
-
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilder_001, TestSize.Level1)
 {
     // Test case for GetContourDiagonalFlowLightBuilder method
@@ -155,6 +138,23 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilde
     auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
     auto builder = shader->GetContourDiagonalFlowLightBuilder();
     EXPECT_NE(builder, nullptr);
+}
+
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.Level1)
+{
+    // Test case for MakeContourDiagonalFlowLightShader method
+    Drawing::Rect rect(0, 0, 100, 100);
+    GEContentDiagonalFlowLightShaderParams params;
+    params.line1Start_ = 0.05f;
+    params.line1Length_ = 0.6f;
+    params.line1Color_ = Vector4f(0.8f, 0.5f, 1.0f, 1.0f);
+    params.line2Start_ = 0.55f;
+    params.line2Length_ = 0.2f;
+    params.line2Color_ = Vector4f(0.2f, 0.6f, 1.0f, 0.8f);
+    params.thickness_ = 0.5f;
+    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto img = shader->DrawRuntimeShader(canvas_, rect);
+    EXPECT_NE(img, nullptr);
 }
 }
 }

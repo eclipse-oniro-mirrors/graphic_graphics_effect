@@ -44,7 +44,7 @@ public:
 
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
-    std::shared_ptr<Drawing::ShaderEffect> MakeContourDiagonalFlowLightShader(const Drawing::Rect& rect);
+    void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     static std::shared_ptr<GEContourDiagonalFlowLightShader>
         CreateContourDiagonalFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
@@ -66,6 +66,8 @@ private:
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&&) = delete;
+    std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::vector<float> controlPoints_{}; // fix 64 X 2

@@ -551,15 +551,7 @@ void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffect
             continue;
         }
         geShaderEffect->SetCache(ve->GetCache());
-        geShaderEffect->Preprocess(canvas, bounds); // to calculate your cache data
-        geShaderEffect->MakeDrawingShader(bounds, -1.f); // not use progress
-        auto shader = geShaderEffect->GetDrawingShader();
-        Drawing::Brush brush;
-        brush.SetShaderEffect(shader);
-        canvas.AttachBrush(brush);
-        canvas.DrawRect(bounds);
-        canvas.DetachBrush();
-
+        geShaderEffect->DrawShader(canvas, bounds);
         ve->SetCache(geShaderEffect->GetCache());
     }
 }
