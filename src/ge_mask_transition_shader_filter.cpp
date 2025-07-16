@@ -93,7 +93,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMaskTransitionShaderFilter::Get
 
             vec4 main(float2 fragCoord)
             {
-                float alpha = alphaMask.eval(fragCoord).b * factor;
+                float alpha = alphaMask.eval(fragCoord).a * factor;
                 alpha = mix(alpha, 1.0 - alpha, inverseFlag);
                 vec4 topColor = topLayer.eval(fragCoord);
                 vec4 bottomColor = bottomLayer.eval(fragCoord);

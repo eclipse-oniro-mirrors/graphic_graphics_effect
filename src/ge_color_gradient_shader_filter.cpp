@@ -197,7 +197,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
                 }
 
                 vec4 finalColor = vec4(blendColor / totalWeight);
-                finalColor.a *= maskImageShader.eval(fragCoord).b;
+                finalColor.a *= maskImageShader.eval(fragCoord).a;
                 finalColor.rgb = mix(srcImageShader.eval(fragCoord).rgb, finalColor.rgb, finalColor.a);
                 return vec4(finalColor.rgb, 1.0);
             }

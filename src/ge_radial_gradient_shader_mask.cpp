@@ -152,7 +152,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
             }
 
             vec2 directioinVector = normalize(uv - centerPosition) * color * 0.5 + 0.5;
-            return vec4(directioinVector, color, 1.0);
+            return vec4(directioinVector, 1.0, color);
         }
 
         half4 main(float2 fragCoord)
