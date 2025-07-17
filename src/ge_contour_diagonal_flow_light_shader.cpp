@@ -20,10 +20,18 @@
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
 #include "common/rs_vector2.h"
-
+#ifdef USE_M133_SKIA
+#include "src/core/SkChecksum.h"
+#else
+#include "src/core/SkOpts.h"
+#endif
 namespace OHOS {
 namespace Rosen {
-using CacheDataType = std::pair<std::shared_ptr<Drawing::Image>, std::shared_ptr<Drawing::Image>>;
+using CacheDataType = struct CacheData {
+    std::shared_ptr<Drawing::Image> first = nullptr;
+    std::shared_ptr<Drawing::Image> second = nullptr;
+    uint32_t hash = 0;
+};
 
 using RuntimeShaderBuilderPtr = std::shared_ptr<Drawing::RuntimeShaderBuilder>;
 using namespace Drawing;
@@ -1626,6 +1634,20 @@ void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
     }
 }
 
+uint32_t CalHash(const std::vector<Vector2f>& in)
+{
+#ifdef USE_M133_SKIA
+    const auto hashFunc = SkChecksum::Hash32;
+#else
+    const auto hashFunc = SkOpts::Hash;
+#endif
+    uint32_t hashOut = 0;
+    for (auto& p : in) {
+        hashOut = hashFunc(&p, sizeof(p), hashOut);
+    }
+    return hashOut;
+}
+
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
@@ -1680,15 +1702,18 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
     if (contourDiagonalFlowLightParams_.contour_.size() < MIN_NUM) {
         GE_LOGW("GEContourDiagonalFlowLightShader less point %{public}zu",
             contourDiagonalFlowLightParams_.contour_.size());
+        cacheAnyPtr_ = nullptr;
         return;
     }
     pointCnt_ = contourDiagonalFlowLightParams_.contour_.size();
-    if (cacheAnyPtr_ == nullptr) {
+    auto inHash = CalHash(contourDiagonalFlowLightParams_.contour_);
+    if (cacheAnyPtr_ == nullptr || inHash != std::any_cast<CacheDataType>(*cacheAnyPtr_).hash) {
         GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
         auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_, rect.GetWidth(), rect.GetHeight());
         ConvertPointsTo(ndcPoints, controlPoints_);
         controlPoints_.resize(ARRAY_SIZE * POSITION_CHANNEL);
         CacheDataType cacheData;
+        cacheData.hash = inHash;
         Drawing::ImageInfo cacheImgInf(rect.GetWidth(), rect.GetHeight(),
             Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
         auto cacheImg = MakeContourDiagonalFlowLightPrecalculationShader(canvas, cacheImgInf);
