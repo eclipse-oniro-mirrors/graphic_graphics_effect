@@ -68,6 +68,17 @@ Drawing::Matrix GetShaderTransform(const Drawing::Rect& blurRect, float scaleW, 
     matrix.PostConcat(translateMatrix);
     return matrix;
 }
+
+void ApplyMaskColorFilter(Drawing::Canvas& offscreenCanvas, uint32_t maskColor)
+{
+    if (maskColor == 0) {
+        return;
+    }
+    Drawing::Brush maskBrush;
+    maskBrush.SetColor(maskColor);
+    LOGD("HpsEffectFilter newMaskColor %{public}#x,", maskColor);
+    offscreenCanvas.DrawBackground(maskBrush);
+}
 } // namespace
 
 static std::shared_ptr<Drawing::RuntimeEffect> g_upscaleEffect;
@@ -174,7 +185,7 @@ std::vector<HpsEffectFilter::IndexRange> HpsEffectFilter::HpsSupportedEffectsInd
 }
 
 void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
-    const Drawing::Rect& src, const Drawing::Rect& dst)
+    const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS)
 {
     switch (visualEffectImpl->GetFilterType()) {
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
@@ -186,7 +197,7 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
         case Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR: {
             const auto& kawaseParams = visualEffectImpl->GetKawaseParams();
             isBlur_ = true;
-            GenerateKawaseBlurEffect(*kawaseParams, src, dst);
+            GenerateKawaseBlurEffect(*kawaseParams, src, dst, saturationForHPS, brightnessForHPS);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::GREY: {
@@ -235,7 +246,7 @@ void HpsEffectFilter::GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilt
 }
 
 void HpsEffectFilter::GenerateKawaseBlurEffect(const Drawing::GEKawaseBlurShaderFilterParams& params,
-    const Drawing::Rect& src, const Drawing::Rect& dst)
+    const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS)
 {
     int radius = params.radius;
     if (radius < 1e-6) {
@@ -243,7 +254,7 @@ void HpsEffectFilter::GenerateKawaseBlurEffect(const Drawing::GEKawaseBlurShader
         return;
     }
     auto blurParamPtr = std::make_shared<Drawing::HpsBlurEffectParameter>(src, dst, Drawing::scalar(radius),
-        1.0f, 1.0f);
+        saturationForHPS, brightnessForHPS);
     hpsEffect_.push_back(blurParamPtr);
 }
 
@@ -300,7 +311,7 @@ void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradient
         gra_fractions->push_back(fractionStops[i].second);
         fractionStopsCount++;
     }
-    for (int i = 0; i < GRA_MAT_SIZE; i++) {
+    for (size_t i = 0; i < GRA_MAT_SIZE; i++) {
         gra_mat[i] = mat.Get(i);
     }
     auto graBlurParamPtr = std::make_shared<Drawing::HpsGradientBlurParameter>(
@@ -339,7 +350,7 @@ bool HpsEffectFilter::InitUpEffect() const
 }
 
 bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
-    std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, Drawing::Brush& brush)
+    std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext)
 {
     if (imageCache == nullptr) {
         LOGE("HpsEffectFilter::DrawImageWithHps imageCache is nullptr");
@@ -352,6 +363,7 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     if (g_upscaleEffect == nullptr) {
         return false;
     }
+    Drawing::Brush brush;
     float factor = GetHpsEffectBlurNoiseFactor();
     LOGD("HpsEffectFilter::DrawImageWithHps HpsNoise %{public}f", factor);
     static constexpr float epsilon = 0.1f;
@@ -363,6 +375,12 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     } else {
         brush.SetShaderEffect(blurShader);
     }
+    if (hpsContext.colorFilter != nullptr) {
+        Drawing::Filter filter;
+        filter.SetColorFilter(hpsContext.colorFilter);
+        brush.SetFilter(filter);
+    }
+    brush.SetAlphaF(hpsContext.alpha);
     canvas.AttachBrush(brush);
     canvas.DrawRect(dst);
     canvas.DetachBrush();
@@ -371,7 +389,7 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
 }
 
 bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
-    std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+    std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
     auto surface = canvas.GetSurface();
     if (surface == nullptr || image == nullptr || hpsEffect_.empty()) {
@@ -405,13 +423,13 @@ bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::sh
     }
 
     std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
-    if (offscreenCanvas == nullptr) return false;
 
     Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
     for (auto& effectInfo : hpsEffect_) {
         effectInfo->dst = dimensionRect;
     }
     if (!offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) return false;
+    ApplyMaskColorFilter(*offscreenCanvas, hpsContext.maskColor);
 
     auto imageCache = offscreenSurface->GetImageSnapshot();
     if (imageCache == nullptr) {
@@ -422,15 +440,15 @@ bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::sh
     auto upscale_matrix = GetShaderTransform(dst, dst.GetWidth() / imageCache->GetWidth(),
         dst.GetHeight() / imageCache->GetHeight());
     upscale_matrix_ = upscale_matrix;
-    return DrawImageWithHps(canvas, imageCache, outImage, dst, brush);
+    return DrawImageWithHps(canvas, imageCache, outImage, dst, hpsContext);
 }
 
 bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
-    std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+    std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
     if (isBlur_) {
         isBlur_ = false;
-        return ApplyHpsSmallCanvas(canvas, image, outImage, brush);
+        return ApplyHpsSmallCanvas(canvas, image, outImage, hpsContext);
     }
     auto surface = canvas.GetSurface();
     if (surface == nullptr || image == nullptr || hpsEffect_.empty()) {

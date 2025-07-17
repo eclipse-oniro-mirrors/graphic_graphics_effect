@@ -830,22 +830,29 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     std::shared_ptr<Drawing::Image> outImage = nullptr;
     const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
     const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
-    Drawing::Brush brush;
+    float alpha = 1.0f;
+    std::shared_ptr<Drawing::ColorFilter> colorFilter;
+    uint32_t maskColor = 255;
+    float saturationForHPS = 1.0f;
+    float brightnessForHPS = 1.0f;
+    GERender::HpsGEImageEffectContext context = {image, src, dst, Drawing::SamplingOptions(), true, alpha,
+        colorFilter, maskColor, saturationForHPS, brightnessForHPS};
 
     auto geRender = std::make_shared<GERender>();
 
     /* image is nullptr*/
-    geRender->ApplyHpsImageEffect(canvas_, veContainer, image, outImage, src, dst, brush);
+    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage);
 
     /* no filter*/
     auto image2 = MakeImage(canvas_);
-    geRender->ApplyHpsImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush);
+    context.image = image2;
+    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage);
 
     /* normal case */
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
-    EXPECT_EQ(geRender->ApplyHpsImageEffect(canvas_, veContainer, image2, outImage, src, dst, brush), false);
+    EXPECT_EQ(geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage), false);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsImageEffect_001 end";
 }

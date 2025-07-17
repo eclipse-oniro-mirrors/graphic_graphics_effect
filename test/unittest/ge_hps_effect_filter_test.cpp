@@ -39,6 +39,8 @@ public:
     // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
     Drawing::Rect src_ { 1.0f, 1.0f, 2.0f, 2.0f };
     Drawing::Rect dst_ { 1.0f, 1.0f, 2.0f, 2.0f };
+    float saturationForHPS_ = 1.0f;
+    float brightnessForHPS_ = 1.0f;
 };
 
 void GEHpsEffectFilterTest::SetUpTestCase(void) {}
@@ -69,27 +71,27 @@ HWTEST_F(GEHpsEffectFilterTest, GenerateVisualEffectFromGE_001, TestSize.Level0)
     ASSERT_TRUE(hpsEffectFilter != nullptr);
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR);
     visualEffectImpl->MakeMESAParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR);
     visualEffectImpl->MakeKawaseParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::GREY);
     visualEffectImpl->MakeGreyParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::AIBAR);
     visualEffectImpl->MakeAIBarParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR);
     visualEffectImpl->MakeLinearGradientBlurParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE);
     visualEffectImpl->MakeWaterRippleParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateVisualEffectFromGE_001 end";
 }
@@ -104,9 +106,12 @@ HWTEST_F(GEHpsEffectFilterTest, ApplyHpsEffect_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest ApplyHpsEffect_001 start";
 
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
-    Drawing::Brush brush;
+    float alpha = 1.0f;
+    std::shared_ptr<Drawing::ColorFilter> colorFilter;
+    uint32_t maskColor = 255;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
-    EXPECT_EQ(hpsEffectFilter->ApplyHpsEffect(canvas_, image_, outImage, brush), false);
+    HpsEffectFilter::HpsEffectContext hpsEffectContext = {alpha, colorFilter, maskColor};
+    EXPECT_EQ(hpsEffectFilter->ApplyHpsEffect(canvas_, image_, outImage, hpsEffectContext), false);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest ApplyHpsEffect_001 end";
 }
