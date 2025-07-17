@@ -50,7 +50,7 @@ private:
         {
             vec2 uv = fragCoord.xy/iResolution.xy;
 
-            float maskAlpha = maskEffect.eval(fragCoord).w;
+            float maskAlpha = maskEffect.eval(fragCoord).a;
             vec4 finalColor = vec4(0.0);
             if (maskAlpha > 0.0) {
                 //Distortion Effects

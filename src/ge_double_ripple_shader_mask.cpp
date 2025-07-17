@@ -232,7 +232,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDoubleRippleShaderMask::GetDoub
             float mask = smoothstep(thickness, 0.0, dOuter) * smoothstep(0.0, thickness, dInner);
 
             vec2 directionVector = normalize(p + 1.0 - center1 - center2) * mask * 0.5 + 0.5;
-            return half4(directionVector, mask, 1.0);
+            return half4(directionVector, 1.0, mask);
         }
     )";
 

@@ -26,7 +26,7 @@ inline static const std::string g_shaderStringNormalMask = R"(
 
     float bump(vec2 uv)
     {
-        return mask.eval(uv).b;
+        return mask.eval(uv).a;
     }
 
     vec4 main(vec2 fragCoord)
