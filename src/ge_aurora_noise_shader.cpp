@@ -19,11 +19,7 @@
 
 namespace OHOS {
 namespace Rosen {
-
-using CacheDataType = std::pair<std::shared_ptr<Drawing::Image>, std::shared_ptr<Drawing::Image>>;
-
 namespace {
-std::shared_ptr<CacheDataType> g_cacheImg;
 static constexpr char AURORA_GENERATOR_PROG[] = R"(
     uniform vec2 iResolution;
     uniform float noise;
@@ -184,24 +180,12 @@ void GEAuroraNoiseShader::MakeDrawingShader(const Drawing::Rect& rect, float pro
 
 void GEAuroraNoiseShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    CacheDataType cacheData;
     Drawing::ImageInfo downSampledImg(rect.GetWidth(), rect.GetHeight(),
         Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    auto auroraNoiseDownSampledImg = MakeAuroraNoiseGeneratorShader(canvas, downSampledImg);
-    if (auroraNoiseDownSampledImg) {
-        cacheData.first = auroraNoiseDownSampledImg;
-        cacheData.second = nullptr;
-        g_cacheImg = std::make_shared<CacheDataType>(cacheData);
-    }
-    if (std::any_cast<CacheDataType>(*g_cacheImg).second == nullptr) {
-        Drawing::ImageInfo verticalBlurImgInf(rect.GetWidth(), rect.GetHeight(),
-            Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-        auto verticalBlurImg = MakeAuroraNoiseVerticalBlurShader(canvas, verticalBlurImgInf);
-        if (verticalBlurImg) {
-            cacheData.second = verticalBlurImg;
-            g_cacheImg = std::make_shared<CacheDataType>(cacheData);
-        }
-    }
+    noiseImg_ = MakeAuroraNoiseGeneratorShader(canvas, downSampledImg);
+    Drawing::ImageInfo verticalBlurImgInf(rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    verticalBlurImg_ = MakeAuroraNoiseVerticalBlurShader(canvas, verticalBlurImgInf);
 }
 
 std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseGeneratorShader(
@@ -223,15 +207,10 @@ std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseGeneratorSha
 std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader(
     Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
-    if (g_cacheImg == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader cache is nullptr.");
+    if (noiseImg_ == nullptr) {
+        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader noiseImg_ is nullptr.");
         return nullptr;
     }
-    if (std::any_cast<CacheDataType>(*g_cacheImg).first == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader first cache is nullptr.");
-        return nullptr;
-    }
-    auto auroraNoiseDownSampledImg = std::any_cast<CacheDataType>(*g_cacheImg).first;
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
     verticalBlurBuilder_ = GetAuroraNoiseVerticalBlurBuilder();
@@ -240,7 +219,7 @@ std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlur
         return nullptr;
     }
     Drawing::Matrix matrix;
-    auto auroraNoiseShader = Drawing::ShaderEffect::CreateImageShader(*auroraNoiseDownSampledImg,
+    auto auroraNoiseShader = Drawing::ShaderEffect::CreateImageShader(*noiseImg_,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     verticalBlurBuilder_->SetChild("auroraNoiseTexture", auroraNoiseShader);
@@ -313,15 +292,14 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
 
 std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShader(const Drawing::Rect& rect)
 {
-    if (g_cacheImg == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseShader cache is nullptr.");
+    if (verticalBlurImg_ == nullptr) {
+        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseShader verticalBlurImg_ is nullptr.");
         return nullptr;
     }
-    auto verticalBlurImage = std::any_cast<CacheDataType>(*g_cacheImg).second;
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     Drawing::Matrix matrix;
-    auto verticalBlurShader = Drawing::ShaderEffect::CreateImageShader(*verticalBlurImage, Drawing::TileMode::CLAMP,
+    auto verticalBlurShader = Drawing::ShaderEffect::CreateImageShader(*verticalBlurImg_, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     upSampingBuilder_ = GetAuroraNoiseUpSamplingBuilder();
     if (upSampingBuilder_ == nullptr) {
