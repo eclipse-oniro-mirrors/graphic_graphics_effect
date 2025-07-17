@@ -1731,7 +1731,6 @@ std::shared_ptr<GEContourDiagonalFlowLightShader>GEContourDiagonalFlowLightShade
 void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect,
     float progress)
 {
-    drShader_ = MakeContourDiagonalFlowLightShader(rect);
 }
 
 RuntimeShaderBuilderPtr GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
@@ -1770,11 +1769,10 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
             contourDiagonalFlowLightParams_.contour_.size());
         return;
     }
-
+    pointCnt_ = contourDiagonalFlowLightParams_.contour_.size();
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess start");
         auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_, rect.GetWidth(), rect.GetHeight());
-        pointCnt_ = ndcPoints.size();
         ConvertPointsTo(ndcPoints, controlPoints_);
         controlPoints_.resize(ARRAY_SIZE * POSITION_CHANNEL);
         CacheDataType cacheData;
@@ -1793,6 +1791,9 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
             if (cacheAtlasImg) {
                 cacheData.second = cacheAtlasImg;
                 cacheAnyPtr_ = std::make_shared<std::any>(std::make_any<CacheDataType>(cacheData));
+            } else {
+                cacheAnyPtr_ = nullptr; // next frame to caculate the cache data
+                GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess second NG");
             }
         } else {
             GE_LOGD(" GEContourDiagonalFlowLightShader Preprocess NG");
@@ -2010,15 +2011,20 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffect_);
 }
 
-std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeContourDiagonalFlowLightShader(
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeShader(Drawing::Canvas& canvas,
     const Drawing::Rect& rect)
 {
     if (cacheAnyPtr_ == nullptr) {
-        GE_LOGW("GEContourDiagonalFlowLightShader MakeContourDiagonalFlowLightShader cache is nullptr.");
+        GE_LOGW("GEContourDiagonalFlowLightShader DrawRuntimeShader cache is nullptr.");
         return nullptr;
     }
     auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).first;
     auto haloAtlasImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).second;
+    if (precalculationImage == nullptr || haloAtlasImage == nullptr) {
+        cacheAnyPtr_ = nullptr;
+        GE_LOGW("GEContourDiagonalFlowLightShader DrawRuntimeShader cache img is nullptr.");
+        return nullptr;
+    }
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     builder_ = GetContourDiagonalFlowLightBuilder();
@@ -2039,12 +2045,23 @@ std::shared_ptr<Drawing::ShaderEffect>GEContourDiagonalFlowLightShader::MakeCont
     builder_->SetUniform("line2Color", contourDiagonalFlowLightParams_.line2Color_[NUM0],
         contourDiagonalFlowLightParams_.line2Color_[NUM1], contourDiagonalFlowLightParams_.line2Color_[NUM2]);
     builder_->SetUniform("lineThickness", std::clamp(contourDiagonalFlowLightParams_.thickness_, 0.0f, 1.0f));
-    auto contourDiagonalFlowLightShader = builder_->MakeShader(nullptr, false);
-    if (contourDiagonalFlowLightShader == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShader is nullptr.");
-        return nullptr;
+
+    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    auto img = builder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    return img;
+}
+
+void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    Preprocess(canvas, rect); // to calculate your cache data
+    auto resImg = DrawRuntimeShader(canvas, rect);
+    if (resImg) {
+        Drawing::Brush brush;
+        canvas.AttachBrush(brush);
+        canvas.DrawImageRect(*resImg, rect, rect, Drawing::SamplingOptions());
+        canvas.DetachBrush();
     }
-    return contourDiagonalFlowLightShader;
 }
 } // namespace Rosen
 } // namespace OHOS

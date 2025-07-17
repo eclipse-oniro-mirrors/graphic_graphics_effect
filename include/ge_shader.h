@@ -34,7 +34,7 @@ public:
 
     virtual const std::shared_ptr<Drawing::ShaderEffect>& GetDrawingShader() { return drShader_; }
 
-    virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) {}
+    virtual void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
     uint32_t Hash() const { return hash_; }
 
@@ -47,6 +47,9 @@ public:
     {
         return cacheAnyPtr_;
     }
+
+protected:
+    virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) {}
 
 protected:
     uint32_t hash_ = 0;
