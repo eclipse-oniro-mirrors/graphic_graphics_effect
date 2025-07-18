@@ -20,6 +20,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -36,7 +37,7 @@ GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShade
     useRawColor_ = params.useRawColor;
 }
 
-std::shared_ptr<Drawing::Image>GEEdgeLightShaderFilter::ProcessImage(Drawing::Canvas &canvas,
+std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::ProcessImage(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
     if (image == nullptr) {
@@ -53,6 +54,14 @@ std::shared_ptr<Drawing::Image>GEEdgeLightShaderFilter::ProcessImage(Drawing::Ca
     }
     
     return nullptr;
+}
+
+void GEEdgeLightShaderFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        color_ = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, color_);
+    }
 }
 }
 }

@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -81,6 +82,32 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
     }
 
     return resultImage;
+}
+
+void GEColorGradientShaderFilter::Preprocess(
+    Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        return;
+    }
+
+    float highColor = 1.0f;
+    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
+        if ((indexColors + 1) % COLOR_CHANNEL == 0) {
+            continue;
+        }
+        if (ROSEN_GNE(colors_[indexColors], highColor)) {
+            highColor = colors_[indexColors];
+        }
+    }
+    float compressRatio = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
+    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
+        if ((indexColors + 1) % COLOR_CHANNEL == 0) {
+            continue;
+        }
+        colors_[indexColors] *= compressRatio;
+    }
 }
 
 bool GEColorGradientShaderFilter::CheckInParams(float* color, float* position, float* strength, int tupleSize)
@@ -329,6 +356,5 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::PreP
     }
     return builder;
 }
-
 } // namespace Rosen
 } // namespace OHOS

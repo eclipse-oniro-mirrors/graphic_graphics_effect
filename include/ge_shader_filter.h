@@ -60,6 +60,11 @@ public:
         canvasInfo_ = canvasInfo;
     }
 
+    void SetSupportHeadroom(float supportHeadroom)
+    {
+        supportHeadroom_ = supportHeadroom;
+    }
+
     virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) {}
 
     void SetCache(std::shared_ptr<std::any> cacheData)
@@ -74,6 +79,7 @@ public:
 
 protected:
     Drawing::CanvasInfo canvasInfo_;
+    float supportHeadroom_ = 0.0f;
     uint32_t hash_ = 0;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
     std::string type_ = "";

@@ -86,6 +86,16 @@ public:
         return canvasInfo_;
     }
 
+    void SetSupportHeadroom(float headroom)
+    {
+        supportHeadroom_ = headroom;
+    }
+
+    float GetSupportHeadroom() const
+    {
+        return supportHeadroom_;
+    }
+
     const std::shared_ptr<Drawing::GEShaderMask> GenerateShaderMask() const;
 
 private:
@@ -93,6 +103,7 @@ private:
     DrawingPaintType type_;
     std::shared_ptr<GEVisualEffectImpl> visualEffectImpl_;
     Drawing::CanvasInfo canvasInfo_;
+    float supportHeadroom_ = 0.0f;
 };
 
 } // namespace Drawing

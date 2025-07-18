@@ -36,6 +36,8 @@ public:
     std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+
     bool CheckInParams(float* color, float* position, float* strength, int tupleSize);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeColorGradientBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMaskColorGradientBuilder();
