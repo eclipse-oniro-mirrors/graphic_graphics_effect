@@ -27,9 +27,9 @@ namespace {
 
 namespace OHOS {
 namespace Rosen {
-GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& param)
+GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params)
 {
-    particleCircularHaloParams_ = param;
+    particleCircularHaloParams_ = params;
 }
 
 void GEParticleCircularHaloShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
@@ -56,10 +56,10 @@ void GEParticleCircularHaloShader::SetRandomNoise(const float randomNoise)
 }
 
 std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::CreateParticleCircularHaloShader(
-    Drawing::GEParticleCircularHaloShaderParams& param)
+    Drawing::GEParticleCircularHaloShaderParams& params)
 {
     std::shared_ptr<GEParticleCircularHaloShader> particleCircularHaloShader =
-        std::make_shared<GEParticleCircularHaloShader>(param);
+        std::make_shared<GEParticleCircularHaloShader>(params);
     return particleCircularHaloShader;
 }
 
