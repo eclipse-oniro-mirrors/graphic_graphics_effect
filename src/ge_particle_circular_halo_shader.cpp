@@ -17,17 +17,19 @@
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_visual_effect_impl.h"
 
-constexpr float MIN_CENTER_POSITION = 0.0f;
-constexpr float MAX_CENTER_POSITION = 1.0f;
-constexpr float MIN_RADIUS = 0.0f;
-constexpr float MAX_RADIUS = 1.0f;
-constexpr float MIN_NOISE = 0.0f;
+namespace {
+    constexpr float MIN_CENTER_POSITION = 0.001f;
+    constexpr float MAX_CENTER_POSITION = 1.0f;
+    constexpr float MIN_RADIUS = 0.001f;
+    constexpr float MAX_RADIUS = 1.0f;
+    constexpr float MIN_NOISE = 0.001f;
+}
 
 namespace OHOS {
 namespace Rosen {
 GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& param)
 {
-    ParticleCircularHaloParams_ = param;
+    particleCircularHaloParams_ = param;
 }
 
 void GEParticleCircularHaloShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
@@ -37,47 +39,44 @@ void GEParticleCircularHaloShader::MakeDrawingShader(const Drawing::Rect& rect, 
 
 void GEParticleCircularHaloShader::SetGlobalRadius(const float globalRadius)
 {
-    ParticleCircularHaloParams_.radius_ = globalRadius;
+    particleCircularHaloParams_.radius_ = std::clamp(globalRadius, MIN_RADIUS, MAX_RADIUS);
 }
 
 void GEParticleCircularHaloShader::SetRotationCenter(const std::pair<float, float>& rotationCenter)
 {
-    ParticleCircularHaloParams_.center_ = rotationCenter;
+    particleCircularHaloParams_.center_.first =
+        std::clamp(rotationCenter.first, MIN_CENTER_POSITION, MAX_CENTER_POSITION);
+    particleCircularHaloParams_.center_.second =
+        std::clamp(rotationCenter.second, MIN_CENTER_POSITION, MAX_CENTER_POSITION);
 }
 
 void GEParticleCircularHaloShader::SetRandomNoise(const float randomNoise)
 {
-    ParticleCircularHaloParams_.noise_ = randomNoise;
-}
-
-float GEParticleCircularHaloShader::ClampValue(float x, float minValue, float maxValue)
-{
-    return std::min(std::max(x, minValue), maxValue);
+    particleCircularHaloParams_.noise_ = std::max(randomNoise, MIN_NOISE);
 }
 
 std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::CreateParticleCircularHaloShader(
     Drawing::GEParticleCircularHaloShaderParams& param)
 {
-    std::shared_ptr<GEParticleCircularHaloShader> ParticleCircularHaloShader =
+    std::shared_ptr<GEParticleCircularHaloShader> particleCircularHaloShader =
         std::make_shared<GEParticleCircularHaloShader>(param);
-    return ParticleCircularHaloShader;
+    return particleCircularHaloShader;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::GetParticleCircularHaloBuilder()
 {
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> ParticleCircularHaloShaderEffect_ = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> particleCircularHaloShaderEffect_ = nullptr;
 
-    if (ParticleCircularHaloShaderEffect_ == nullptr) {
+    if (particleCircularHaloShaderEffect_ == nullptr) {
         static constexpr char prog[] = R"(
-            uniform half2 iResolution;
+            uniform vec2 iResolution;
             uniform float globalRadius;   // globalRadius of all circles in animations, range: 0.0 - 0.9
             uniform vec2 rotationCenter;  // Center of the halos or rings, recommended value: (0.5, 0.5)
             uniform float randomNoise;    // randomNoise seed, recommended value: 4.0
 
             vec4 fragColor;
-            const float NUMBER_OF_SAMPLES = 25.;
-            const float width1 = 0.006;  // width of the first halo, low accuracy
-            const float width2 = 0.02;   // width of the second halo, high accuracy
+            const float NUMBER_OF_SAMPLES = 11.;
+            const float width = 0.03;
             const float PI = 3.14159;
             const float PI2 = 6.28318;
             const float SQRTPI2 = 2.50662;
@@ -120,7 +119,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
 
             vec2 simpleHaloRingShape(vec2 uv, vec2 position, float radius, float noiseVariation, float haloThickness)
             {
-                uv = shapePerturbation(uv, noiseVariation, 3.0, radius * 0.3);
+                uv = shapePerturbation(uv, noiseVariation, 3.0, radius * 0.2);
                 vec2 polarCoords = vec2((atan(uv.y, uv.x) + PI) / (2.0 * PI), length(uv - position));
                 polarCoords.y -= radius;
                 float angularRandomVal = smoothRandomNoise11((polarCoords.x) * 10.0);
@@ -165,12 +164,41 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                              step(colorStopPos4, t) * colorStopColor4;                         // t > 1.00
                 return colorValue;
             }
+
+            float centralAmbienceHaloBorder(vec2 uv, vec2 polarCoords, float radius, float animationTime,
+                float rotationTimeScale, float noiseScale, float noiseDisplacement)
+            {
+                polarCoords.x = fract((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8));
+                float screenNoise = noise(vec2(uv + (animationTime * rotationTimeScale)) * noiseScale);
+                float angularRandomVal = smoothRandomNoise11((polarCoords.x) * 10.0);
+                angularRandomVal = mix(angularRandomVal, 0.2, smoothstep(0.5, 0.8, abs(polarCoords.x *2.0 - 1.0)));
+                radius += (screenNoise * noiseDisplacement);
+                polarCoords.y -= radius;
+                float thickness = mix(0.01, 0.035, angularRandomVal);
+                float circleBorder = smoothstep(thickness * radius, 0.0, abs(polarCoords.y));
+                circleBorder *= smoothstep(0.1, 1.0, angularRandomVal);
+                circleBorder *= screenNoise * 0.5 + 0.5;
+                return circleBorder;
+            }
+
+            float centralAmbienceHaloGlow(vec2 polarCoords, float animationTime, float radius, float glowRadius,
+                float glowExposure)
+            {
+                polarCoords.x = fract(((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8)));
+                float angularRandomVal = smoothRandomNoise11(polarCoords.x * 10.);
+                angularRandomVal = mix(angularRandomVal, 0.2, smoothstep(0.5, 0.8, abs(polarCoords.x *2.0 - 1.0)));
+                polarCoords.y -= radius;
+                float circleBorderGlow = smoothstep(glowRadius, 0.0, abs(polarCoords.y)) * glowExposure;
+                return circleBorderGlow;
+            }
             // **************************** Main Functions ****************************
             vec4 main(vec2 fragCoord)
             {
                 float radius = globalRadius * 2.;
-                float innerRadiusEdge = radius * 0.7;
-                float outerRadiusEdge = radius * 1.3;
+                float innerRadiusEdge = step(radius, 0.5) * 0.001 + step(0.5, radius) * 0.7 * radius;
+                float outerRadiusEdge = step(radius, 0.5) * 0.7 + step(0.5, radius) * 1.35 * radius;
+                float haloColor = 0.;
+              	float glowColor = 0.;
 
                 vec2 uv = fragCoord.xy / iResolution.xy;
                 float screenRatio = iResolution.x / iResolution.y;
@@ -179,70 +207,63 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                 vec2 centerPosition = rotationCenter * 2. - 1.0;
                 centerPosition.x *= screenRatio;
                 vec2 directionVector = centeredUVs - centerPosition;
+                vec2 polarCoords = vec2((atan(directionVector.y, directionVector.x) + PI) / (2.0 * PI),
+                    length(directionVector));
+
                 float angle = PI2 * 2.;
                 float blurFactor = 0.10;
-                float sigma = 10.;  // controls the blur spread
-                float normalizationFactor = 1.0 / (sigma * SQRTPI2);
-
-                // Final blurred color accumulator
-                vec4 finalColor = vec4(0.0);
                 float colorRotScale = radius * PI * 0.5;  // make the ring colors rotated.
                 mat2 rotColorRing =
                     mat2(cos(colorRotScale), -sin(colorRotScale), sin(colorRotScale), cos(colorRotScale));
-                // Get the color of each pixel from the colorbar determined by the UX
                 vec3 colorRing = getColorFromColorbar(centeredUVs * rotColorRing, radius);
 
                 if (length(directionVector) >= innerRadiusEdge && length(directionVector) <= outerRadiusEdge) {
-                    vec4 color1 = vec4(0.);
-                    vec4 color2 = vec4(0.);
-                    float rate = blurFactor / float(NUMBER_OF_SAMPLES);
+                    float bgHaloColor1 = 0.;
+                    float rate = blurFactor / NUMBER_OF_SAMPLES;
                     for (float i = -NUMBER_OF_SAMPLES / 2.; i <= NUMBER_OF_SAMPLES / 2.; i++) {
                         float rotationFactor1 = i * rate;
                         float rotAngle = angle * rotationFactor1;
-                        vec2 rotatedDir1 = mat2(cos(rotAngle), -sin(rotAngle),
-                                                sin(rotAngle), cos(rotAngle)) *
-                                           directionVector;
-                        vec2 haloRing1 = simpleHaloRingShape(centerPosition + rotatedDir1, centerPosition, radius,
-                                                             randomNoise, width1 + 0.004 * globalRadius);
-                        color1 += vec4(haloRing1.x);
-
-                        vec2 haloRing2 = simpleHaloRingShape(centerPosition + rotatedDir1, centerPosition,
-                                                             radius * (0.05 * globalRadius + 0.92), randomNoise,
-                                                             width2 + 0.02 * globalRadius);
-                        color2 += vec4(haloRing2.x);
+                        vec2 rotatedDir = mat2(cos(rotAngle), -sin(rotAngle),
+                                                sin(rotAngle), cos(rotAngle)) * directionVector;
+                        vec2 haloRing = simpleHaloRingShape(centerPosition + rotatedDir, centerPosition, radius,
+                                            randomNoise * radius, width + 0.015 * globalRadius);
+                        bgHaloColor1 += haloRing.x;
                     }
-                    color1 /= NUMBER_OF_SAMPLES * 0.6;
-                    finalColor = finalColor + color1 - finalColor * color1;
+                    bgHaloColor1 = bgHaloColor1 / (NUMBER_OF_SAMPLES * 1.5);
+                    haloColor = haloColor + bgHaloColor1 - haloColor * bgHaloColor1;
 
-                    color2 /= NUMBER_OF_SAMPLES * 2.;
-                    finalColor = finalColor + color2 - finalColor * color2;
+                    float ambienceHaloBorder = centralAmbienceHaloBorder(directionVector, polarCoords, radius * 0.82,
+                    globalRadius * 0.1, 1.0, 1.25, 0.05) * 2.5;
+                    ambienceHaloBorder = clamp(ambienceHaloBorder, 0., 1.);
+                    haloColor = haloColor + ambienceHaloBorder - haloColor * ambienceHaloBorder;
+
+                    ambienceHaloBorder = centralAmbienceHaloBorder(directionVector, polarCoords, radius*0.95,
+                        globalRadius * 0.25, 1.0, 0.25, 0.05);
+                    haloColor = haloColor + ambienceHaloBorder - haloColor * ambienceHaloBorder;
+
+                    ambienceHaloBorder = centralAmbienceHaloBorder(directionVector, polarCoords, radius,
+                        globalRadius * 0.35, 1.0, 0.25, 0.05);
+                    haloColor = haloColor + ambienceHaloBorder - haloColor * ambienceHaloBorder;
+                    float ambienceHaloGlow = centralAmbienceHaloGlow(polarCoords, globalRadius * 0.1, radius * 0.83,
+                        0.2 * radius, 0.4 * radius) * 1.3;
+                    float glow = clamp(ambienceHaloGlow, 0., 1.);
+                    glowColor = glowColor + glow - glowColor * glow; // Add a glow circle
                 }
-                vec4 glow = clamp(0.01 / abs(length(directionVector) - radius * (0.05 * radius + 0.90)), 0., 0.3) *
-                            vec4(vec3(1.), 0.4 * radius);
-                finalColor = finalColor + glow - finalColor * glow;  // Add a glow circle
-                fragColor = finalColor * vec4(colorRing, 0.5 * 0.5 * globalRadius);
+
+              	fragColor = vec4(haloColor + glowColor - haloColor * glowColor);
+                fragColor.xyz *= colorRing;
 
                 return fragColor;
             }
         )";
-        ParticleCircularHaloShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        particleCircularHaloShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
     }
 
-    if (ParticleCircularHaloShaderEffect_ == nullptr) {
+    if (particleCircularHaloShaderEffect_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader:: GetParticleCircularHaloBuilder ShaderEffect_ is nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(ParticleCircularHaloShaderEffect_);
-}
-
-void GEParticleCircularHaloShader::ClampInputValue()
-{
-    ParticleCircularHaloParams_.radius_ = ClampValue(ParticleCircularHaloParams_.radius_, MIN_RADIUS, MAX_RADIUS);
-    ParticleCircularHaloParams_.center_.first =
-        ClampValue(ParticleCircularHaloParams_.center_.first, MIN_CENTER_POSITION, MAX_CENTER_POSITION);
-    ParticleCircularHaloParams_.center_.second =
-        ClampValue(ParticleCircularHaloParams_.center_.second, MIN_CENTER_POSITION, MAX_CENTER_POSITION);
-    ParticleCircularHaloParams_.noise_ = std::max(ParticleCircularHaloParams_.noise_, MIN_NOISE);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(particleCircularHaloShaderEffect_);
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticleCircularHaloShader(
@@ -250,7 +271,6 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-    ClampInputValue();
     builder_ = GetParticleCircularHaloBuilder();
     if (builder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader builder_ is nullptr.");
@@ -258,16 +278,16 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
     }
 
     builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("globalRadius", ParticleCircularHaloParams_.radius_);
-    builder_->SetUniform("rotationCenter", ParticleCircularHaloParams_.center_.first,
-                         ParticleCircularHaloParams_.center_.second);
-    builder_->SetUniform("randomNoise", ParticleCircularHaloParams_.noise_);
-    auto ParticleCircularHaloShader = builder_->MakeShader(nullptr, false);
-    if (ParticleCircularHaloShader == nullptr) {
-        GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader ParticleCircularHaloShader is nullptr.");
+    builder_->SetUniform("globalRadius", particleCircularHaloParams_.radius_);
+    builder_->SetUniform("rotationCenter", particleCircularHaloParams_.center_.first,
+                         particleCircularHaloParams_.center_.second);
+    builder_->SetUniform("randomNoise", particleCircularHaloParams_.noise_);
+    auto particleCircularHaloShader = builder_->MakeShader(nullptr, false);
+    if (particleCircularHaloShader == nullptr) {
+        GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader particleCircularHaloShader is nullptr.");
         return nullptr;
     }
-    return ParticleCircularHaloShader;
+    return particleCircularHaloShader;
 }
 }  // namespace Rosen
 }  // namespace OHOS

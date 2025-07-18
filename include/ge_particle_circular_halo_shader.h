@@ -27,7 +27,7 @@ namespace Rosen {
 
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
-    GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& ParticleCircularHaloParams);
+    GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     ~GEParticleCircularHaloShader() override = default;
 
@@ -37,7 +37,7 @@ public:
     
     void SetParticleCircularHaloParams(const Drawing::GEParticleCircularHaloShaderParams& params)
     {
-        ParticleCircularHaloParams_ = params;
+        particleCircularHaloParams_ = params;
     }
 
     void SetGlobalRadius(float globalRadius);
@@ -46,10 +46,8 @@ public:
 
     void SetRandomNoise(float randomNoise);
 
-    float ClampValue(float x, float minValue, float maxValue);
-
     static std::shared_ptr<GEParticleCircularHaloShader>
-        CreateParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& param);
+        CreateParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleCircularHaloBuilder();
 
@@ -61,9 +59,7 @@ private:
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&) = delete;
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&&) = delete;
 
-    void ClampInputValue();
-
-    Drawing::GEParticleCircularHaloShaderParams ParticleCircularHaloParams_;
+    Drawing::GEParticleCircularHaloShaderParams particleCircularHaloParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
 };
 

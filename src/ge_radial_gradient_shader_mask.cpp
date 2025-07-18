@@ -86,7 +86,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
             vec2 centeredUVs = uv * 2.0 - 1.0;
             centeredUVs.x *= screenRatio * (radiusY / radiusX);
             vec2 centerPosition = centerPos * 2 - 1.0 ;
-            centerPosition.x *= screenRatio;
+            centerPosition.x *= screenRatio * (radiusY / radiusX);
 
             float finalColor = radialGradientMask(centeredUVs, centerPosition);
             return half4(finalColor);
@@ -162,7 +162,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
             vec2 centeredUVs = uv * 2.0 - 1.0;
             centeredUVs.x *= screenRatio * (radiusY / radiusX);
             vec2 centerPosition = centerPos * 2 - 1.0 ;
-            centerPosition.x *= screenRatio;
+            centerPosition.x *= screenRatio * (radiusY / radiusX);
 
             vec4 finalColor = radialGradientMask(centeredUVs, centerPosition);
             return half4(finalColor);
