@@ -116,9 +116,6 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest003, 
     }
     EXPECT_NE(shaderEffect, nullptr);
 
-
-
-    
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_003 end";
 }
 
