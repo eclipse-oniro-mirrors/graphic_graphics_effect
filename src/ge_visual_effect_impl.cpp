@@ -1185,6 +1185,8 @@ void GEVisualEffectImpl::SetDirectionLightParamsFloat(const std::string& tag, fl
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_DIRECTION_LIGHT_INTENSITY,
             [](GEVisualEffectImpl* obj, float p) { obj->directionLightParams_->lightIntensity = p; } },
+        { GE_FILTER_DIRECTION_LIGHT_FACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->directionLightParams_->maskFactor = p; } },
     };
 
     auto it = actions.find(tag);
