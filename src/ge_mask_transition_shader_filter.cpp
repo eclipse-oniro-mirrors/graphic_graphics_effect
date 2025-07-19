@@ -46,9 +46,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     }
 
     auto imageInfo = image->GetImageInfo();
-    float height = imageInfo.GetHeight();
-    float width = imageInfo.GetWidth();
-    auto maskEffectShader = params_.mask->GenerateDrawingShader(width, height);
+    auto maskEffectShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     if (maskEffectShader == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage maskEffectShader generate failed");
         return image;
@@ -60,20 +58,24 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
         return image;
     }
 
-    Drawing::Matrix topLayerMatrix;
+    Drawing::Matrix matrix = canvasInfo_.mat_;
+    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix invertMatrix;
+    if (!matrix.Invert(invertMatrix)) {
+        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage Invert matrix failed");
+        return image;
+    }
+    
     auto topLayer = Drawing::ShaderEffect::CreateImageShader(*cacheImage, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), topLayerMatrix);
-
-    Drawing::Matrix bottomLayerMatrix;
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     auto bottomLayer = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), bottomLayerMatrix);
-
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     builder->SetChild("alphaMask", maskEffectShader);
     builder->SetChild("topLayer", topLayer);
     builder->SetChild("bottomLayer", bottomLayer);
-    builder->SetUniform("factor", params_.factor);
+    builder->SetUniform("factor", std::clamp(params_.factor, 0.0f, 1.0f));
     builder->SetUniform("inverseFlag", params_.inverse);
-    auto transitionImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    auto transitionImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (!transitionImage) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage make image failed");
         return image;
