@@ -118,37 +118,78 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
     if (g_colorGradientShaderEffect_ == nullptr) {
         static constexpr char prog[] = R"(
             uniform shader srcImageShader;
-            uniform float2 iResolution;
-            uniform vec4 color[12];
-            uniform vec2 position[12];
-            uniform float strength[12];
+            uniform half2 iResolution;
+            uniform half4 color[12];
+            uniform half2 position[12];
+            uniform half strength[12];
 
-            const float epsilon = 0.001;
-
-            float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
+            half blendMultipleColorsByDistance(half2 uv, half2 positions, half strength)
             {
                 positions.x *= iResolution.x / iResolution.y;
-                float dist = length(uv - positions) + epsilon;
-                float weight = strength / pow(dist, 2.0);
+                half2 dist = uv - positions;
+                half weight = strength / (dot(dist, dist) + 0.0001);
                 return weight;
             }
 
-            vec4 main(float2 fragCoord)
+            half4 main(vec2 fragCoord)
             {
-                vec2 uv = fragCoord / iResolution.xy;
-                float screenRatio = iResolution.x / iResolution.y;
+                half2 uv = fragCoord / iResolution.xy;
+                half screenRatio = iResolution.x / iResolution.y;
                 uv.x *= screenRatio;
-                float totalWeight = 0.0;
-                vec4 blendColor = vec4(0.0);
-                for (int i = 0; i < 12; i++) {
-                    float colorSphereWeight = blendMultipleColorsByDistance(uv, position[i], strength[i]);
-                    totalWeight += colorSphereWeight;
-                    blendColor += color[i] * colorSphereWeight;
-                }
+                half totalWeight = 0.0;
+                half4 blendColor = half4(0.0);
 
-                vec4 finalColor = vec4(blendColor / totalWeight);
+                half colorSphereWeight = blendMultipleColorsByDistance(uv, position[0], strength[0]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[0] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[1], strength[1]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[1] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[2], strength[2]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[2] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[3], strength[3]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[3] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[4], strength[4]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[4] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[5], strength[5]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[5] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[6], strength[6]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[6] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[7], strength[7]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[7] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[8], strength[8]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[8] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[9], strength[9]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[9] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[10], strength[10]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[10] * colorSphereWeight;
+
+                colorSphereWeight = blendMultipleColorsByDistance(uv, position[11], strength[11]);
+                totalWeight += colorSphereWeight;
+                blendColor += color[11] * colorSphereWeight;
+
+                half4 finalColor = half4(blendColor / totalWeight);
                 finalColor.rgb = mix(srcImageShader.eval(fragCoord).rgb, finalColor.rgb, finalColor.a);
-                return vec4(finalColor.rgb, 1.0);
+                return half4(finalColor.rgb, 1.0);
             }
         )";
 
@@ -168,38 +209,83 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
         static constexpr char withMaskProg[] = R"(
             uniform shader srcImageShader;
             uniform shader maskImageShader;
-            uniform float2 iResolution;
-            uniform vec4 color[12];
-            uniform vec2 position[12];
-            uniform float strength[12];
+            uniform half2 iResolution;
+            uniform half4 color[12];
+            uniform half2 position[12];
+            uniform half strength[12];
 
-            const float epsilon = 0.001;
-
-            float blendMultipleColorsByDistance(vec2 uv, vec2 positions, float strength)
+            half blendMultipleColorsByDistance(half2 uv, half2 positions, half strength)
             {
                 positions.x *= iResolution.x / iResolution.y;
-                float dist = length(uv - positions) + epsilon;
-                float weight = strength / pow(dist, 2.0);
+                half2 dist = uv - positions;
+                half weight = strength / (dot(dist, dist) + 0.0001);
                 return weight;
             }
 
-            vec4 main(float2 fragCoord)
+            half4 main(vec2 fragCoord)
             {
-                vec2 uv = fragCoord / iResolution.xy;
-                float screenRatio = iResolution.x / iResolution.y;
+                half2 uv = fragCoord / iResolution.xy;
+                half screenRatio = iResolution.x / iResolution.y;
                 uv.x *= screenRatio;
-                float totalWeight = 0.0;
-                vec4 blendColor = vec4(0.0);
-                for (int i = 0; i < 12; i++) {
-                    float colorSphereWeight = blendMultipleColorsByDistance(uv, position[i], strength[i]);
+                half totalWeight = 0.0;
+                half4 blendColor = half4(0.0);
+                half4 finalColor = half4(0.0);
+                half maskValue = maskImageShader.eval(fragCoord).b;
+                if (maskValue > 0.0) {
+                    half colorSphereWeight = blendMultipleColorsByDistance(uv, position[0], strength[0]);
                     totalWeight += colorSphereWeight;
-                    blendColor += color[i] * colorSphereWeight;
+                    blendColor += color[0] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[1], strength[1]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[1] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[2], strength[2]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[2] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[3], strength[3]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[3] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[4], strength[4]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[4] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[5], strength[5]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[5] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[6], strength[6]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[6] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[7], strength[7]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[7] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[8], strength[8]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[8] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[9], strength[9]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[9] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[10], strength[10]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[10] * colorSphereWeight;
+
+                    colorSphereWeight = blendMultipleColorsByDistance(uv, position[11], strength[11]);
+                    totalWeight += colorSphereWeight;
+                    blendColor += color[11] * colorSphereWeight;
+
+                    finalColor = blendColor / totalWeight;
+                    finalColor.a *= maskValue;
                 }
 
-                vec4 finalColor = vec4(blendColor / totalWeight);
-                finalColor.a *= maskImageShader.eval(fragCoord).a;
                 finalColor.rgb = mix(srcImageShader.eval(fragCoord).rgb, finalColor.rgb, finalColor.a);
-                return vec4(finalColor.rgb, 1.0);
+                return half4(finalColor.rgb, 1.0);
             }
         )";
 
