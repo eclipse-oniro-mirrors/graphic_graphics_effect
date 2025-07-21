@@ -59,27 +59,38 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
         uniform half colors[sizeArray];
         uniform half positions[sizeArray];
 
-        float colorGradient(float colorA, float colorB, float startPos, float endPos, float threshold)
-        {
-            if (startPos <= threshold && threshold < endPos) {
-                return mix(colorA, colorB, smoothstep(startPos, endPos, threshold));
-            }
-            return 0.0;
-        }
-
         float radialGradientMask(vec2 uv, vec2 centerPosition)
         {
             float sdfValue = length(uv - centerPosition) / radiusY;
             sdfValue = clamp(sdfValue, 0.0, 1.0);
 
-            float color = 0.0;
-            for (int i = 0; i < int(sizeArray - 1); i++) {
-                color += colorGradient(colors[i], colors[i + 1], positions[i], positions[i + 1], sdfValue);
-            }
+            half color = 0.0;
+            color = (sdfValue >= positions[0] && sdfValue < positions[1])
+                ? mix(colors[0], colors[1], smoothstep(positions[0], positions[1], sdfValue)) : color;
+            color = (sdfValue >= positions[1] && sdfValue < positions[2])
+                ? mix(colors[1], colors[2], smoothstep(positions[1], positions[2], sdfValue)) : color;
+            color = (sdfValue >= positions[2] && sdfValue < positions[3])
+                ? mix(colors[2], colors[3], smoothstep(positions[2], positions[3], sdfValue)) : color;
+            color = (sdfValue >= positions[3] && sdfValue < positions[4])
+                ? mix(colors[3], colors[4], smoothstep(positions[3], positions[4], sdfValue)) : color;
+            color = (sdfValue >= positions[4] && sdfValue < positions[5])
+                ? mix(colors[4], colors[5], smoothstep(positions[4], positions[5], sdfValue)) : color;
+            color = (sdfValue >= positions[5] && sdfValue < positions[6])
+                ? mix(colors[5], colors[6], smoothstep(positions[5], positions[6], sdfValue)) : color;
+            color = (sdfValue >= positions[6] && sdfValue < positions[7])
+                ? mix(colors[6], colors[7], smoothstep(positions[6], positions[7], sdfValue)) : color;
+            color = (sdfValue >= positions[7] && sdfValue < positions[8])
+                ? mix(colors[7], colors[8], smoothstep(positions[7], positions[8], sdfValue)) : color;
+            color = (sdfValue >= positions[8] && sdfValue < positions[9])
+                ? mix(colors[8], colors[9], smoothstep(positions[8], positions[9], sdfValue)) : color;
+            color = (sdfValue >= positions[9] && sdfValue < positions[10])
+                ? mix(colors[9], colors[10], smoothstep(positions[9], positions[10], sdfValue)) : color;
+            color = (sdfValue >= positions[10] && sdfValue < positions[11])
+                ? mix(colors[10], colors[11], smoothstep(positions[10], positions[11], sdfValue)) : color;
             return color;
         }
 
-        half4 main(float2 fragCoord)
+        half4 main(vec2 fragCoord)
         {
             vec2 uv = fragCoord.xy / iResolution.xy;
             float screenRatio = iResolution.x / iResolution.y;
@@ -88,7 +99,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
             vec2 centerPosition = centerPos * 2 - 1.0 ;
             centerPosition.x *= screenRatio;
 
-            float finalColor = radialGradientMask(centeredUVs, centerPosition);
+            half finalColor = radialGradientMask(centeredUVs, centerPosition);
             return half4(finalColor);
         }
     )";
@@ -143,19 +154,40 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
 
         vec4 radialGradientMask(vec2 uv, vec2 centerPosition)
         {
-            float sdfValue = length(uv - centerPosition) / radiusY;
+            vec2 vector = uv - centerPosition;
+            float distance = length(vector);
+            float sdfValue = distance / radiusY;
             sdfValue = clamp(sdfValue, 0.0, 1.0);
 
-            float color = 0.0;
-            for (int i = 0; i < int(sizeArray - 1); i++) {
-                color += colorGradient(colors[i], colors[i + 1], positions[i], positions[i + 1], sdfValue);
-            }
+            half color = 0.0;
+            color = (sdfValue >= positions[0] && sdfValue < positions[1])
+                ? mix(colors[0], colors[1], smoothstep(positions[0], positions[1], sdfValue)) : color;
+            color = (sdfValue >= positions[1] && sdfValue < positions[2])
+                ? mix(colors[1], colors[2], smoothstep(positions[1], positions[2], sdfValue)) : color;
+            color = (sdfValue >= positions[2] && sdfValue < positions[3])
+                ? mix(colors[2], colors[3], smoothstep(positions[2], positions[3], sdfValue)) : color;
+            color = (sdfValue >= positions[3] && sdfValue < positions[4])
+                ? mix(colors[3], colors[4], smoothstep(positions[3], positions[4], sdfValue)) : color;
+            color = (sdfValue >= positions[4] && sdfValue < positions[5])
+                ? mix(colors[4], colors[5], smoothstep(positions[4], positions[5], sdfValue)) : color;
+            color = (sdfValue >= positions[5] && sdfValue < positions[6])
+                ? mix(colors[5], colors[6], smoothstep(positions[5], positions[6], sdfValue)) : color;
+            color = (sdfValue >= positions[6] && sdfValue < positions[7])
+                ? mix(colors[6], colors[7], smoothstep(positions[6], positions[7], sdfValue)) : color;
+            color = (sdfValue >= positions[7] && sdfValue < positions[8])
+                ? mix(colors[7], colors[8], smoothstep(positions[7], positions[8], sdfValue)) : color;
+            color = (sdfValue >= positions[8] && sdfValue < positions[9])
+                ? mix(colors[8], colors[9], smoothstep(positions[8], positions[9], sdfValue)) : color;
+            color = (sdfValue >= positions[9] && sdfValue < positions[10])
+                ? mix(colors[9], colors[10], smoothstep(positions[9], positions[10], sdfValue)) : color;
+            color = (sdfValue >= positions[10] && sdfValue < positions[11])
+                ? mix(colors[10], colors[11], smoothstep(positions[10], positions[11], sdfValue)) : color;
 
-            vec2 directioinVector = normalize(uv - centerPosition) * color * 0.5 + 0.5;
-            return vec4(directioinVector, 1.0, color);
+            vec2 directionVector = vector / distance * color * 0.5 + 0.5;
+            return vec4(directionVector, color, 1.0);
         }
 
-        half4 main(float2 fragCoord)
+        half4 main(vec2 fragCoord)
         {
             vec2 uv = fragCoord.xy / iResolution.xy;
             float screenRatio = iResolution.x / iResolution.y;
@@ -164,7 +196,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
             vec2 centerPosition = centerPos * 2 - 1.0 ;
             centerPosition.x *= screenRatio;
 
-            vec4 finalColor = radialGradientMask(centeredUVs, centerPosition);
+            half4 finalColor = radialGradientMask(centeredUVs, centerPosition);
             return half4(finalColor);
         }
     )";

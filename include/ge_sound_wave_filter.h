@@ -43,9 +43,9 @@ private:
     void CheckSoundWaveColor4f(Drawing::Color4f& color);
     std::shared_ptr<Drawing::RuntimeEffect> GetSoundWaveEffect();
     // sound wave
-    Drawing::Color4f colorA_ = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorB_ = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorC_ = {1.0, 1.0, 1.0, 1.0};
+    Drawing::Color4f colorA_ = {1.0f, 1.0f, 1.0f, 1.0f};
+    Drawing::Color4f colorB_ = {1.0f, 1.0f, 1.0f, 1.0f};
+    Drawing::Color4f colorC_ = {1.0f, 1.0f, 1.0f, 1.0f};
     float colorProgress_ = 0.0f;
     float soundIntensity_ = 0.0f;
 
@@ -59,9 +59,9 @@ private:
     inline static const std::string shaderStringSoundWave = R"(
         uniform shader image;
         uniform half2 iResolution;
-        uniform vec3 colorA;
-        uniform vec3 colorB;
-        uniform vec3 colorC;
+        uniform half3 colorA;
+        uniform half3 colorB;
+        uniform half3 colorC;
         uniform half colorProgress;
         uniform half soundIntensity;
         uniform half shockWaveAlphaA;
@@ -70,123 +70,114 @@ private:
         uniform half shockWaveProgressB;
         uniform half shockWaveTotalAlpha;
 
-        const float circleRadius = 0.125;
+        const half circleRadius = 0.125;
 
-        float smin(float a, float b, float k)
+        half smin(half a, half b, half k)
         {
-            k *= 6.0;
-            float h = max(k - abs(a - b), 0.0) / k;
-            return min(a, b) - h * h * h * k / 6.0;
+            half k6 = k * 6.0;
+            half h = max(k6 - abs(a - b), 0.0) / k6;
+            return min(a, b) - h * h * h * k;
         }
 
-        // Create a smooth color gradient effect based on the threshold over X or Y or user defined
-        // Ideal for movement, but not for rotation
-        vec3 colorGradient(vec3 colorA, vec3 colorB, float startPos, float endPos, float threshold)
+        half3 colorWheel(half2 uv, half animationTime)
         {
-            float stepValue = (threshold >= startPos && threshold <= endPos) ? 1.0 : 0.0;
-            vec3 returnValue = mix(colorA, colorB, smoothstep(startPos, endPos, threshold)) * stepValue;
-            return returnValue;
-        }
- 
-        vec3 colorWheel(vec2 uv, float animationTime)
-        {
-            float mask = length(uv) / (circleRadius + 2.0);
-            float distanceFromCenter = fract(mask - animationTime);
+            half mask = length(uv) / (circleRadius + 2.0);
+            if (mask >= 1.0) {
+                return half3(0.0);
+            }
+            half distanceFromCenter = fract(mask - animationTime);
 
-            vec3 color = colorGradient(colorA, colorB, 0.0, 0.2, distanceFromCenter) +
-                        colorGradient(colorB, colorC, 0.2, 0.6, distanceFromCenter) +
-                        colorGradient(colorC, colorA, 0.6, 1.0, distanceFromCenter);
-            color *= (1.0 - step(1.0, mask));
+            half3 color = distanceFromCenter < 0.2 ? mix(colorA, colorB, smoothstep(0.0, 0.2, distanceFromCenter))
+                : distanceFromCenter < 0.6 ? mix(colorB, colorC, smoothstep(0.2, 0.6, distanceFromCenter))
+                : mix(colorC, colorA, smoothstep(0.6, 1.0, distanceFromCenter));
+
             return color;
         }
  
-        vec4 soundWaveDistortionEffects(vec2 screenUVs, vec2 centeredUVs, float animationTime)
+        half4 soundWaveDistortionEffects(half2 screenUVs, half2 centeredUVs, half animationTime)
         {
-            vec2 lightPulseUVs = centeredUVs + vec2(0.0, 0.1);        // uv minus pulse center position
-            float frequency = fract(animationTime);  // frequency of distortion waves
-            float radius = mix(0.14, 0.52, frequency);
-            float lightPulseDistance = length(lightPulseUVs) - radius;
+            half2 lightPulseUVs = centeredUVs + half2(0.0, 0.1); // uv minus pulse center position
+            half frequency = fract(animationTime); // frequency of distortion waves
+            half radius = mix(0.14, 0.52, frequency);
+            half lightPulseDistance = length(lightPulseUVs) - radius;
 
-            float lightPulseThickness = 0.12;
-            float lightPulse = smoothstep(lightPulseThickness, -0.025, abs(lightPulseDistance));
+            half lightPulseThickness = 0.12;
+            half lightPulse = smoothstep(lightPulseThickness, -0.025, abs(lightPulseDistance));
             if (lightPulse > 0.0) {
-                float animationMask = smoothstep(1.0, 0.4, frequency);
+                half animationMask = smoothstep(1.0, 0.4, frequency);
  
-                vec2 directionVector = normalize(lightPulseUVs);
-                vec2 normal = directionVector * lightPulseDistance * lightPulse*animationMask;
-                vec2 refractedUVs = clamp(mix(screenUVs, screenUVs - normal * 0.25, 0.3), 0.001, 0.999);
-                return vec4(refractedUVs, max(normal.y,0.0), lightPulse);
+                half2 directionVector = normalize(lightPulseUVs);
+                half2 normal = directionVector * lightPulseDistance * lightPulse * animationMask;
+                half2 refractedUVs = clamp(mix(screenUVs, screenUVs - normal * 0.25, 0.3), 0.001, 0.999);
+                return half4(refractedUVs, max(normal.y, 0.0), pow(lightPulse, 6.0) * 0.3);
             }
-            return vec4(screenUVs, 0.0, 0.0);
+            return half4(screenUVs, 0.0, 0.0);
         }
  
-        vec3 soundWaveLightEffects(vec2 centeredUVs, vec3 currentColor, vec3 centerColor)
+        half soundWaveLightEffects(half2 centeredUVs)
         {
             // Control the height of the circle
-            float circleHeight = mix(-0.4, 0.03, soundIntensity);
+            half circleHeight = mix(-0.4, 0.03, soundIntensity);
 
-            float smoothUnionThreshold = mix(0.0657, 0.09, soundIntensity);
-            vec2 circlePosition = vec2(0.0, circleHeight);
+            half smoothUnionThreshold = mix(0.0657, 0.09, soundIntensity);
+            half2 circlePosition = half2(0.0, circleHeight);
 
-            float barPosition = mix(0.09, 0.0, soundIntensity);
-            float circleSDF = length(centeredUVs - circlePosition) - circleRadius;
+            half barPosition = mix(0.09, 0.0, soundIntensity);
+            half circleSDF = length(centeredUVs - circlePosition) - circleRadius;
             centeredUVs.y += barPosition;
 
             circleSDF += smoothUnionThreshold;
-            float smoothUnionDistance = smin(circleSDF, centeredUVs.y, smoothUnionThreshold);
+            half smoothUnionDistance = smin(circleSDF, centeredUVs.y, smoothUnionThreshold);
 
-            float horizontalGradient = smoothstep(0.75, 0.0, abs(centeredUVs.x));
-            float smoothGap = mix(0.08, 0.1085, horizontalGradient);
-            float smoothUnion = smoothstep(smoothGap, -0.035, mix(0.0, 0.66, smoothUnionDistance));
+            half horizontalGradient = smoothstep(0.75, 0.0, abs(centeredUVs.x));
+            half smoothGap = mix(0.08, 0.1085, horizontalGradient);
+            half smoothUnion = smoothstep(smoothGap, -0.035, mix(0.0, 0.66, smoothUnionDistance));
 
-            float verticalGradient = centeredUVs.y - barPosition;
-			float verticalGap = max(smoothUnionThreshold - barPosition, 1e-5);
+            half verticalGradient = centeredUVs.y - barPosition;
+			half verticalGap = max(smoothUnionThreshold - barPosition, 1e-4); // minEpsilon in half is 2^-14
 			verticalGradient = 1.0 - min(verticalGap, verticalGradient) / verticalGap;
-            float gradient = mix(1.0, horizontalGradient, 1.0 - verticalGradient) * horizontalGradient;
+            half gradient = mix(1.0, horizontalGradient, 1.0 - verticalGradient) * horizontalGradient;
             smoothUnion *= gradient;
 
-            return currentColor + centerColor * smoothUnion;
+            return smoothUnion;
         }
  
         half4 main(float2 fragCoord)
         {
-            vec2 uv = fragCoord.xy / iResolution.xy;
+            half2 uv = fragCoord.xy / iResolution.xy;
             uv.y = 1.0 - uv.y;
 
-            vec2 adjustedResolution = vec2(iResolution.x, iResolution.y * 4.);
-            float screenRatio = adjustedResolution.x / adjustedResolution.y;
-            vec2 centeredUVs = uv * 2.0 - 1.0 + vec2(0.0, 1.0);
-            centeredUVs *= iResolution.xy / adjustedResolution;
+            const half screenHeight = 0.25; // height of sound card in application
+            half screenRatio = screenHeight * iResolution.x / iResolution.y;
+            half2 centeredUVs = uv + uv - half2(1.0, 0.0);
+            centeredUVs.y *= screenHeight;
             centeredUVs.x *= screenRatio;
 
-            vec3 finalColor = vec3(0.0);
-            vec3 centerColor = colorWheel(centeredUVs, colorProgress);
-
             // Shock wave distort
-            vec4 soundWaveDistortionA = vec4(0.0);
-            vec4 soundWaveDistortionB = vec4(0.0);
+            half additionalColorStrength = 0.0;
             if (shockWaveTotalAlpha > 0.0) {
-                soundWaveDistortionA = soundWaveDistortionEffects(uv, centeredUVs, shockWaveProgressA);
-                soundWaveDistortionB =
+                half4 soundWaveDistortionA =
+                    soundWaveDistortionEffects(uv, centeredUVs, shockWaveProgressA);
+                half4 soundWaveDistortionB =
                     soundWaveDistortionEffects(soundWaveDistortionA.xy, centeredUVs, shockWaveProgressB);
                 uv = soundWaveDistortionB.xy;
+                half AlphaA = shockWaveAlphaA * shockWaveTotalAlpha;
+                half AlphaB = shockWaveAlphaB * shockWaveTotalAlpha;
+                additionalColorStrength += (soundWaveDistortionA.z + soundWaveDistortionA.w) * AlphaA;
+                additionalColorStrength += (soundWaveDistortionB.z + soundWaveDistortionB.w) * AlphaB;
             }
 
-            finalColor = image.eval(vec2(uv.x, 1.0 - uv.y) * iResolution.xy).rgb;
             // Sound wave Effect
-            finalColor = soundWaveLightEffects(centeredUVs, finalColor, centerColor);
-
-            if (shockWaveTotalAlpha > 0.0) {
-                // Shock wave Effect: Add sutil light from the refraction distortion
-                float AlphaA = shockWaveAlphaA * shockWaveTotalAlpha;
-                float AlphaB = shockWaveAlphaB * shockWaveTotalAlpha;
-                finalColor += centerColor * soundWaveDistortionA.z * AlphaA;
-                finalColor += centerColor * pow(soundWaveDistortionA.w, 6.0) * 0.3 * AlphaA;
-                finalColor += centerColor * soundWaveDistortionB.z * AlphaB;
-                finalColor += centerColor * pow(soundWaveDistortionB.w, 6.0) * 0.3 * AlphaB;
+            if (centeredUVs.y < 0.214 * soundIntensity + 0.0776) {
+                additionalColorStrength += soundWaveLightEffects(centeredUVs);
             }
 
-            return vec4(finalColor, 1.0);
+            half3 finalColor = image.eval(half2(uv.x, 1.0 - uv.y) * iResolution.xy).rgb;
+            half3 centerColor = additionalColorStrength > 0.0 ?
+                                colorWheel(centeredUVs, colorProgress) : half3(0.0);
+            finalColor += centerColor * additionalColorStrength;
+
+            return half4(finalColor, 1.0);
         }
     )";
 };

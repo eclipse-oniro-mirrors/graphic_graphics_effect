@@ -58,17 +58,17 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
         uniform half rippleWidth;
         uniform half widthCenterOffset;
 
-        half4 main(float2 fragCoord)
+        half4 main(vec2 fragCoord)
         {
-            vec2 uv = fragCoord.xy/iResolution.xy;
-            float screenRatio = iResolution.x/iResolution.y;
+            half2 uv = fragCoord.xy/iResolution.xy;
+            half screenRatio = iResolution.x/iResolution.y;
             // Mask Info
-            vec2 MaskCenterUVs = uv - centerPos;
+            half2 MaskCenterUVs = uv - centerPos;
             MaskCenterUVs.x *= screenRatio;
-            float uvDistance = length(MaskCenterUVs) - rippleRadius - rippleWidth * widthCenterOffset;
-            float maskAlpha = uvDistance > 0.0
-            ? smoothstep(rippleWidth * (1.0 - widthCenterOffset), 0.0, uvDistance)
-            : smoothstep(rippleWidth * (1.0 + widthCenterOffset), 0.0, -uvDistance);
+            half offsetWidth = rippleWidth * widthCenterOffset;
+            half uvDistance = length(MaskCenterUVs) - rippleRadius;
+            half maskAlpha = smoothstep(rippleWidth, offsetWidth, uvDistance)
+                            * smoothstep(-rippleWidth, offsetWidth, uvDistance);
             return half4(maskAlpha);
         }
     )";
@@ -118,23 +118,23 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
         uniform half rippleWidth;
         uniform half widthCenterOffset;
 
-        half4 main(float2 fragCoord)
+        half4 main(vec2 fragCoord)
         {
-            vec2 uv = fragCoord.xy/iResolution.xy;
-            float screenRatio = iResolution.x/iResolution.y;
+            half2 uv = fragCoord.xy/iResolution.xy;
+            half screenRatio = iResolution.x/iResolution.y;
             // Mask Info
-            vec2 MaskCenterUVs = uv - centerPos;
+            half2 MaskCenterUVs = uv - centerPos;
             MaskCenterUVs.x *= screenRatio;
-            float uvDistance = length(MaskCenterUVs) - rippleRadius - rippleWidth * widthCenterOffset;
+            half dist = length(MaskCenterUVs);
+            half offsetWidth = rippleWidth * widthCenterOffset;
+            half uvDistance = dist - rippleRadius - offsetWidth;
             uvDistance = clamp(uvDistance, -1.0, 1.0);
 
-            float maskAlpha = uvDistance > 0.0
-            ? smoothstep(rippleWidth * (1.0 - widthCenterOffset), 0.0, uvDistance)
-            : smoothstep(rippleWidth * (1.0 + widthCenterOffset), 0.0, -uvDistance);
+            half maskB = smoothstep(rippleWidth - offsetWidth, 0.0, uvDistance)
+                        * smoothstep(-rippleWidth - offsetWidth, 0.0, uvDistance);
 
-            vec2 directionVector = normalize(MaskCenterUVs) * uvDistance * 0.5 + 0.5;
-
-            return half4(directionVector, 1.0, maskAlpha);
+            half2 directionVector = MaskCenterUVs * (uvDistance * 0.5 / (dist + 1e-4)) + 0.5;
+            return half4(directionVector, maskB, 1.0);
         }
     )";
 
