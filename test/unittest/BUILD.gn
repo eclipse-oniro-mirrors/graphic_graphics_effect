@@ -138,6 +138,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_linear_gradient_blur_shader_filter_test.cpp",
     "ge_magnifier_shader_filter_test.cpp",
     "ge_mesa_blur_shader_filter_test.cpp",
+    "ge_particle_circular_halo_shader_test.cpp",
     "ge_pixel_map_shader_mask_test.cpp",
     "ge_render_test.cpp",
     "ge_ripple_shader_mask_test.cpp",
