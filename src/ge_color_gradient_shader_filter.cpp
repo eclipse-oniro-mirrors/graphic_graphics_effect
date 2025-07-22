@@ -230,7 +230,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
                 half totalWeight = 0.0;
                 half4 blendColor = half4(0.0);
                 half4 finalColor = half4(0.0);
-                half maskValue = maskImageShader.eval(fragCoord).b;
+                half maskValue = maskImageShader.eval(fragCoord).a;
                 if (maskValue > 0.0) {
                     half colorSphereWeight = blendMultipleColorsByDistance(uv, position[0], strength[0]);
                     totalWeight += colorSphereWeight;

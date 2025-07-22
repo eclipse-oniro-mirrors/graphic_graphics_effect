@@ -184,7 +184,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
                 ? mix(colors[10], colors[11], smoothstep(positions[10], positions[11], sdfValue)) : color;
 
             vec2 directionVector = vector / distance * color * 0.5 + 0.5;
-            return vec4(directionVector, color, 1.0);
+            return vec4(directionVector, 1.0, color);
         }
 
         half4 main(vec2 fragCoord)
