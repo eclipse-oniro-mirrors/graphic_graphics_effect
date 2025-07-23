@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+#include <algorithm>
 #include "ge_log.h"
 #include "ge_wavy_ripple_light_shader.h"
 
@@ -23,12 +23,12 @@ static constexpr char WAVY_PROG[] = R"(
     uniform vec2 iResolution;
     uniform vec2 center;
     uniform float radius;
+    uniform float thickness;
     const float noiseScale = 0.3;
     const float waveScale  = 0.5;
     const float freqX = 4.0;
     const float freqY = 6.0;
     const float freqDiag = 8.0;
-    const float thickness = 0.2;
     float shapeSDF(vec2 p, float radius)
     {
         float dist = length(p);
@@ -55,10 +55,10 @@ static constexpr char WAVY_PROG[] = R"(
         float dist1 = length(c - vec2(-aspect,  1.0));
         float dist2 = length(c - vec2(aspect, -1.0));
         float dist3 = length(c - vec2(aspect,  1.0));
-        float maxRadius = max(max(dist0, dist1), max(dist2, dist3));
+        float maxRadius = thickness + max(max(dist0, dist1), max(dist2, dist3));
         float currentRadius = maxRadius * radius;
         float d = abs(shapeSDF(delta, currentRadius));
-        float mask = smoothstep(thickness * (1.0 + currentRadius), 0.0, d);
+        float mask = smoothstep(thickness, 0.0, d);
         vec3 baseColor = vec3(0.8, 0.5, 1.0);
         color = baseColor * mask;
         return vec4(color, mask);
@@ -106,7 +106,8 @@ std::shared_ptr<Drawing::ShaderEffect> GEWavyRippleLightShader::MakeWavyRippleLi
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("center", wavyRippleLightParams_.center_.first,
         wavyRippleLightParams_.center_.second);
-    builder_->SetUniform("radius", wavyRippleLightParams_.radius_);
+    builder_->SetUniform("radius", std::max(0.0f, wavyRippleLightParams_.radius_));
+    builder_->SetUniform("thickness", std::max(0.01f, wavyRippleLightParams_.thickness_)); // 0.01f: minimum thickness
     auto wavyRippleLightShader = builder_->MakeShader(nullptr, false);
     if (wavyRippleLightShader == nullptr) {
         GE_LOGE("GEWavyRippleLightShader::MakeWavyRippleLightShader wavyRippleLightShader is nullptr.");
