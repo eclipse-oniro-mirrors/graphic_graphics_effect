@@ -28,6 +28,8 @@ namespace Rosen {
 
 namespace {
 static constexpr uint32_t MAX_SURFACE_SIZE = 10000;
+static constexpr size_t EXTENSION_SIZE_LIMIT = 1000;
+static thread_local std::vector<const char *> g_extensionProperties;
 const std::map<Drawing::GEVisualEffectImpl::FilterType, const char *> g_hpsSupportEffectExtensions {
     {Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR, "hps_gaussian_blur_effect"},
     {Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR, "hps_mesa_blur_effect"},
@@ -85,21 +87,22 @@ static std::shared_ptr<Drawing::RuntimeEffect> g_upscaleEffect;
 
 HpsEffectFilter::HpsEffectFilter(Drawing::Canvas& canvas)
 {
-    if (canvas.GetGPUContext() == nullptr) {
-        LOGE("HpsEffectFilter canvas.GetGPUContext is nullptr");
-        return;
+    if (g_extensionProperties.empty()) {
+        if (canvas.GetGPUContext() == nullptr) {
+            LOGE("HpsEffectFilter canvas.GetGPUContext is nullptr");
+            return;
+        }
+        canvas.GetGPUContext()->GetHpsEffectSupport(g_extensionProperties);
+        if (g_extensionProperties.empty()) {
+            // add InitFinish for query once only
+            g_extensionProperties.push_back("InitFinish");
+        }
+        if (g_extensionProperties.size() > EXTENSION_SIZE_LIMIT) {
+            g_extensionProperties.clear();
+            g_extensionProperties.push_back("InitFailed");
+            LOGE("HpsEffectFilter g_extensionProperties is too large");
+        }
     }
-    canvas.GetGPUContext()->GetHpsEffectSupport(extensionProperties_);
-}
-
-void HpsEffectFilter::InitExtension(Drawing::Canvas& canvas)
-{
-    extensionProperties_.clear();
-    if (canvas.GetGPUContext() == nullptr) {
-        LOGE("HpsEffectFilter::InitExtension canvas.GetGPUContext is nullptr");
-        return;
-    }
-    canvas.GetGPUContext()->GetHpsEffectSupport(extensionProperties_);
 }
 
 bool IsGradientSupport(
@@ -120,7 +123,7 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
     if (typeIt == g_hpsSupportEffectExtensions.end()) {
         return false;
     }
-    for (const auto GEExtension : extensionProperties_) {
+    for (const auto GEExtension : g_extensionProperties) {
         if (strcmp(GEExtension, typeIt->second) != 0) {
             continue;
         }

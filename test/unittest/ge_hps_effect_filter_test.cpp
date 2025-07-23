@@ -132,21 +132,5 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_001 end";
 }
 
-/**
- * @tc.name: InitExtension_001
- * @tc.desc: Verify the InitExtension
- * @tc.type: FUNC
- */
-HWTEST_F(GEHpsEffectFilterTest, InitExtension_001, TestSize.Level0)
-{
-    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest InitExtension_001 start";
-
-    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
-    ASSERT_TRUE(hpsEffectFilter != nullptr);
-    hpsEffectFilter->InitExtension(canvas_);
-
-    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest InitExtension_001 end";
-}
-
 } // namespace Rosen
 } // namespace OHOS

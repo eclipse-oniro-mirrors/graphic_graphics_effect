@@ -55,12 +55,9 @@ public:
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
 
-    void InitExtension(Drawing::Canvas& canvas);
-
 private:
     std::vector<std::shared_ptr<Drawing::HpsEffectParameter>> hpsEffect_;
     bool isBlur_ {false};
-    std::vector<const char *> extensionProperties_;
     Drawing::Matrix upscale_matrix_;
     void GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst);
