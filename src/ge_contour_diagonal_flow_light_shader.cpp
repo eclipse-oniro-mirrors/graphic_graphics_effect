@@ -996,7 +996,7 @@ static constexpr char HALO_ATLAS_PROG[] = R"(
     const float TILE_SIZE = 64.0;
     const float haloBellSigma = 0.18;
     const float haloArcLenRatio = 1.7; // halo length with respect to glow length
-    const float haloThicknessFactor = 7.0; // the greater, the thinner
+    const float haloThicknessFactor = 24.0; // the greater, the thinner
     float SampleTGlobal(vec2 coord)
     {
         return precalculationImage.eval(coord).g;

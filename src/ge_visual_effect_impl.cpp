@@ -1239,6 +1239,9 @@ void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, float 
     if (tag == GE_SHADER_WAVY_RIPPLE_LIGHT_RIADIUS) {
         wavyRippleLightParams_->radius_ = param;
     }
+    if (tag == GE_SHADER_WAVY_RIPPLE_LIGHT_THICKNESS) {
+        wavyRippleLightParams_->thickness_ = param;
+    }
 }
 
 void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param)

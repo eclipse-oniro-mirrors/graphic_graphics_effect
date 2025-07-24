@@ -361,9 +361,11 @@ struct GEContentDiagonalFlowLightShaderParams {
 constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT[] = "WavyRippleLight";
 constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT_CENTER[] = "WavyRippleLight_Center";
 constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT_RIADIUS[] = "WavyRippleLight_Radius";
+constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT_THICKNESS[] = "WavyRippleLight_Thickness";
 struct GEWavyRippleLightShaderParams {
     std::pair<float, float> center_ = {0.f, 0.f};
     float radius_ = 0.f;
+    float thickness_ = 0.2f;
 };
 
 // Declare same with in rs_render_shader_base.h

@@ -25,7 +25,7 @@ static constexpr char AURORA_GENERATOR_PROG[] = R"(
     uniform float noise;
     const float contrast = 4.64; // contrast constant, 464.0 / 100.0
     const float brightness = -0.17647; // brightness constant, -45.0 / 255.0
-    const float downSampleFactor = 4.0;
+    const float downSampleFactor = 8.0;
     float SNoise(in vec3 v);
     vec4 main(vec2 fragCoord)
     {
@@ -40,7 +40,7 @@ static constexpr char AURORA_GENERATOR_PROG[] = R"(
         float freqX = 2.0;
         float freqY = mix(freqX, freqX * 0.5, smoothstep(1.0, 0.0, uv.y));
         vec2 dom = vec2(p.x * freqX, p.y * freqY);
-        float n = abs(SNoise(vec3(dom, noise)));
+        float n = abs(SNoise(vec3(dom, noise * 3.0)));
         float alpha = clamp(1.0 - (n * contrast + brightness), 0.0, 1.0);
         return vec4(alpha);
     }
@@ -121,7 +121,7 @@ static constexpr char AURORA_GENERATOR_PROG[] = R"(
 static constexpr char AURORA_VERT_BLUR_PROG[] = R"(
     uniform shader auroraNoiseTexture;
     uniform vec2 iResolution;
-    const float downSampleFactor = 4.0;
+    const float downSampleFactor = 8.0;
     const int sampleCount = 20;
 
     vec4 SampleWholeTile(vec2 fragCoord, vec2 res)
@@ -208,14 +208,14 @@ std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlur
     Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo)
 {
     if (noiseImg_ == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader noiseImg_ is nullptr.");
+        GE_LOGE("GEAuroraNoiseShader MakeAuroraNoiseVerticalBlurShader noiseImg_ is nullptr.");
         return nullptr;
     }
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
     verticalBlurBuilder_ = GetAuroraNoiseVerticalBlurBuilder();
     if (verticalBlurBuilder_ == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader verticalBlurBuilder_ is nullptr.");
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseVerticalBlurShader verticalBlurBuilder_ is nullptr.");
         return nullptr;
     }
     Drawing::Matrix matrix;
@@ -270,7 +270,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
             uniform shader verticalBlurTexture;
             uniform vec2 iResolution;
 
-            const float downSampleFactor = 4.0;
+            const float downSampleFactor = 8.0;
 
             vec4 main(vec2 fragCoord)
             {
@@ -293,7 +293,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
 std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShader(const Drawing::Rect& rect)
 {
     if (verticalBlurImg_ == nullptr) {
-        GE_LOGD("GEAuroraNoiseShader MakeAuroraNoiseShader verticalBlurImg_ is nullptr.");
+        GE_LOGE("GEAuroraNoiseShader MakeAuroraNoiseShader verticalBlurImg_ is nullptr.");
         return nullptr;
     }
     auto width = rect.GetWidth();
@@ -301,14 +301,14 @@ std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShade
     Drawing::Matrix matrix;
     auto verticalBlurShader = Drawing::ShaderEffect::CreateImageShader(*verticalBlurImg_, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    upSampingBuilder_ = GetAuroraNoiseUpSamplingBuilder();
-    if (upSampingBuilder_ == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader upSampingBuilder_ is nullptr.");
+    upSamplingBuilder_ = GetAuroraNoiseUpSamplingBuilder();
+    if (upSamplingBuilder_ == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader upSamplingBuilder_ is nullptr.");
         return nullptr;
     }
-    upSampingBuilder_->SetChild("verticalBlurTexture", verticalBlurShader);
-    upSampingBuilder_->SetUniform("iResolution", width, height);
-    auto auroraNoiseUpSamplingShader = upSampingBuilder_->MakeShader(nullptr, false);
+    upSamplingBuilder_->SetChild("verticalBlurTexture", verticalBlurShader);
+    upSamplingBuilder_->SetUniform("iResolution", width, height);
+    auto auroraNoiseUpSamplingShader = upSamplingBuilder_->MakeShader(nullptr, false);
     if (auroraNoiseUpSamplingShader == nullptr) {
         GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader auroraNoiseUpSamplingShader is nullptr.");
         return nullptr;
