@@ -130,11 +130,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
             half uvDistance = dist - rippleRadius - offsetWidth;
             uvDistance = clamp(uvDistance, -1.0, 1.0);
 
-            half maskB = smoothstep(rippleWidth - offsetWidth, 0.0, uvDistance)
-                        * smoothstep(-rippleWidth - offsetWidth, 0.0, uvDistance);
+            half mask = smoothstep(rippleWidth - offsetWidth, 0.0, uvDistance) *
+                        smoothstep(-rippleWidth - offsetWidth, 0.0, uvDistance);
 
-            half2 directionVector = MaskCenterUVs * (uvDistance * 0.5 / (dist + 1e-4)) + 0.5;
-            return half4(directionVector, maskB, 1.0);
+            half2 directionVector = MaskCenterUVs * (uvDistance * mask * 0.5 / (dist + 1e-4)) + 0.5;
+            return half4(directionVector, 1.0, mask);
         }
     )";
 

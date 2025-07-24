@@ -50,12 +50,12 @@ private:
         {
             vec2 uv = fragCoord.xy/iResolution.xy;
 
-            float maskAlpha = maskEffect.eval(fragCoord).a;
+            vec4 maskColor = maskEffect.eval(fragCoord);
             vec4 finalColor = vec4(0.0);
-            if (maskAlpha > 0.0) {
+            if (maskColor.a > 0.0) {
                 //Distortion Effects
-                vec2 directionVector = 2.0 * (maskEffect.eval(fragCoord).xy - 0.5);
-                vec2 normal = directionVector * maskAlpha * factor;
+                vec2 directionVector = 2.0 * (maskColor.rg - 0.5);
+                vec2 normal = directionVector * factor;
                 vec2 refractedUVs = clamp(mix(uv, uv - normal, 0.05), 0.001, 0.999);
                 finalColor = image.eval(iResolution.xy * refractedUVs);
             } else {
