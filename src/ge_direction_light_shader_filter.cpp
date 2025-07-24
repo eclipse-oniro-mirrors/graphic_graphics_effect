@@ -49,190 +49,181 @@ inline static const std::string g_shaderStringDirectionLight = R"(
     uniform shader image;
     uniform shader mask;
     uniform vec2 iResolution;
-    uniform vec3 light_direction;
-    uniform vec4 light_color;
-    uniform float light_intensity;
+    uniform vec3 lightDirection;
+    uniform vec4 lightColor;
+    uniform float lightIntensity;
 
-    const float scale = 1.0;
-    const float height = 20.0;
+    const float piInv = 0.3183099;
+    const float aspect = 2.17;
+    const float scale = 1.27;
+    const float height = 0.10;
     const float displacement = 20.0;
-    const float eta = 0.2;
-    const float specular = 0.4;
-    const float roughness = 0.6;
-    const float metal = 0.5;
-    const float inv_pi = 0.31830988618379067154;
+    const float opacity = 1.0;
+    const float eta = 0.20;
+    const float specular = 0.40;
+    const float roughness = 0.50;
+    const float metal = 0.50;
 
     float pow2(float x)
     {
         return x * x;
     }
 
-    float roughness_to_alpha(float roughness)
+    float RoughnessToAlpha(float roughness)
     {
-        const float min_roughness = 0.089;
-        const float min_roughness_square = 0.007921;
-        return clamp(pow2(roughness), min_roughness_square, 1.0);
+        const float minRoughness = 0.089;
+        const float minRoughnessSquare = 0.007921;
+        return clamp(pow2(roughness), minRoughnessSquare, 1.0);
     }
 
-    float distribution_GGX(float roughness, float cos_N_H)
+    float DistributionGGX(float roughness, float cosNToH)
     {
-        float alpha = roughness_to_alpha(roughness);
+        float alpha = RoughnessToAlpha(roughness);
         float alpha2 = pow2(alpha);
-        float f = (cos_N_H * alpha2 - cos_N_H) * cos_N_H + 1.0;
-        return alpha2 / pow2(f) * inv_pi;
+        float f = (cosNToH * alpha2 - cosNToH) * cosNToH + 1.0;
+        return alpha2 / pow2(f) * piInv;
     }
 
-    float visibility_Smith_GGX_correlated_approx(float roughness, float cos_N_V, float cos_N_L)
+    float VisibilitySmithGGXCorrelatedApprox(float roughness, float cosNToV, float cosNToL)
     {
-        float alpha = roughness_to_alpha(roughness);
-        float term_V = cos_N_L * (cos_N_V * (1.0 - alpha) + alpha);
-        float term_L = cos_N_V * (cos_N_L * (1.0 - alpha) + alpha);
-        return 0.5 / (term_V + term_L);
+        float alpha = RoughnessToAlpha(roughness);
+        float termV = cosNToL * (cosNToV * (1.0 - alpha) + alpha);
+        float termL = cosNToV * (cosNToL * (1.0 - alpha) + alpha);
+        return 0.5 / (termV + termL);
     }
 
-    vec3 Fresnel_Schlick(vec3 F0, float cos_V_H)
+    vec3 FresnelSchlick(vec3 F0, float cosVToH)
     {
-        float f = pow(1.0 - cos_V_H, 5.0);
+        float f = pow(1.0 - cosVToH, 5.0);
         return saturate(50.0 * F0.g) * f + (1.0 - f) * F0;
     }
 
-    vec4 scatter(vec3 pos, vec3 displacement_normal, vec3 shading_normal, float eta)
+    vec4 scatter(vec3 pos, vec3 displacementNormal, vec3 shadingNormal, float eta)
     {
-        vec3 view_dir = vec3(0.0, 0.0, 1.0);
-        vec3 light_dir = normalize(light_direction);
+        vec3 viewDir = vec3(0.0, 0.0, 1.0);
+        vec3 lightDir = lightDirection;
 
-        float cos_N_L = dot(shading_normal, light_dir);
-        if (cos_N_L <= 0.0) return vec4(0.0);
+        float cosNToL = dot(shadingNormal, lightDir);
+        if (cosNToL <= 0.0) return vec4(0.0);
 
-        vec3 half_dir = normalize(view_dir + light_dir);
-        float cos_N_V = saturate(dot(shading_normal, view_dir));
-        float cos_N_H = saturate(dot(shading_normal, half_dir));
-        float cos_V_H = saturate(dot(view_dir, half_dir));
-        float cos_L_H = saturate(dot(light_dir, half_dir));
+        vec3 halfDir = normalize(viewDir + lightDir);
+        float cosNToV = saturate(dot(shadingNormal, viewDir));
+        float cosNToH = saturate(dot(shadingNormal, halfDir));
+        float cosVToH = saturate(dot(viewDir, halfDir));
 
-        vec3 in_dir = normalize(refract(-view_dir, displacement_normal, eta));
-        float in_t = -pos.z / in_dir.z;
-        vec3 hit_pos = pos + in_dir * in_t;
+        float distribution = DistributionGGX(roughness, cosNToH);
+        float visibility = VisibilitySmithGGXCorrelatedApprox(roughness, cosNToV, cosNToL);
 
-        float distribution = distribution_GGX(roughness, cos_N_H);
-        float visibility = visibility_Smith_GGX_correlated_approx(roughness, cos_N_V, cos_N_L);
-        vec3 albedo = image.eval(hit_pos.xy).rgb;
-        vec3 diffuse_color = mix(albedo, vec3(0.0), metal);
-        vec3 specular_color = mix(vec3(0.08 * specular), albedo, metal);
-        vec3 fresnel = Fresnel_Schlick(specular_color, cos_V_H);
+        vec3 albedo = image.eval(pos.xy).rgb;
+        vec3 diffuseColor = mix(albedo, vec3(0.0), metal);
+        vec3 specularColor = mix(vec3(0.08 * specular), albedo, metal);
+        vec3 fresnel = FresnelSchlick(specularColor, cosVToH);
 
-        vec3 reflected_color = distribution * visibility * fresnel * cos_N_L * light_color.rgb;
-        vec3 refracted_color = diffuse_color * cos_N_L * light_color.rgb;
-        return vec4(reflected_color + refracted_color, 1.0);
+        vec3 reflectedColor = distribution * visibility * fresnel * cosNToL * lightColor.rgb;
+        vec3 refractedColor = diffuseColor * cosNToL * lightColor.rgb;
+        return vec4(reflectedColor + refractedColor, 1.0);
     }
 
     vec4 main(vec2 fragCoord)
     {
-        vec3 pos = vec3(
-            fragCoord.xy,
-            displacement
-        );
-
-        vec3 normal = normalize(mask.eval(fragCoord).xyz);
-        vec3 displacement_normal = normalize(vec3(1.0 / scale, 1.0 / scale,
-            1.0 / (height * light_intensity * displacement)) * normal);
-        vec3 shading_normal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * light_intensity)) * normal);
-        return scatter(pos, displacement_normal, shading_normal, eta);
+        vec3 pos = vec3(fragCoord.xy, displacement);
+        vec3 normal = normalize(mask.eval(fragCoord).xyz * 2.0 - 1.0);
+        if (mask.eval(fragCoord).xyz == vec3(0.0)) {
+            normal = vec3(0.0, 0.0, 1.0);
+        }
+        vec3 displacementNormal =
+            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity * displacement)) * normal);
+        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity)) * normal);
+        return scatter(pos, displacementNormal, shadingNormal, eta);
     }
 )";
 
 inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
     uniform shader image;
     uniform vec2 iResolution;
-    uniform vec3 light_direction;
-    uniform vec4 light_color;
-    uniform float light_intensity;
+    uniform vec3 lightDirection;
+    uniform vec4 lightColor;
+    uniform float lightIntensity;
 
-    const float scale = 1.0;
-    const float height = 20.0;
+    const float piInv = 0.3183099;
+    const float aspect = 2.17;
+    const float scale = 1.27;
+    const float height = 0.10;
     const float displacement = 20.0;
-    const float eta = 0.2;
-    const float specular = 0.4;
-    const float roughness = 0.6;
-    const float metal = 0.5;
-    const float inv_pi = 0.31830988618379067154;
+    const float opacity = 1.0;
+    const float eta = 0.20;
+    const float specular = 0.40;
+    const float roughness = 0.50;
+    const float metal = 0.50;
 
     float pow2(float x)
     {
         return x * x;
     }
 
-    float roughness_to_alpha(float roughness)
+    float RoughnessToAlpha(float roughness)
     {
-        const float min_roughness = 0.089;
-        const float min_roughness_square = 0.007921;
-        return clamp(pow2(roughness), min_roughness_square, 1.0);
+        const float minRoughness = 0.089;
+        const float minRoughnessSquare = 0.007921;
+        return clamp(pow2(roughness), minRoughnessSquare, 1.0);
     }
 
-    float distribution_GGX(float roughness, float cos_N_H)
+    float DistributionGGX(float roughness, float cosNToH)
     {
-        float alpha = roughness_to_alpha(roughness);
+        float alpha = RoughnessToAlpha(roughness);
         float alpha2 = pow2(alpha);
-        float f = (cos_N_H * alpha2 - cos_N_H) * cos_N_H + 1.0;
-        return alpha2 / pow2(f) * inv_pi;
+        float f = (cosNToH * alpha2 - cosNToH) * cosNToH + 1.0;
+        return alpha2 / pow2(f) * piInv;
     }
 
-    float visibility_Smith_GGX_correlated_approx(float roughness, float cos_N_V, float cos_N_L)
+    float VisibilitySmithGGXCorrelatedApprox(float roughness, float cosNToV, float cosNToL)
     {
-        float alpha = roughness_to_alpha(roughness);
-        float term_V = cos_N_L * (cos_N_V * (1.0 - alpha) + alpha);
-        float term_L = cos_N_V * (cos_N_L * (1.0 - alpha) + alpha);
-        return 0.5 / (term_V + term_L);
+        float alpha = RoughnessToAlpha(roughness);
+        float termV = cosNToL * (cosNToV * (1.0 - alpha) + alpha);
+        float termL = cosNToV * (cosNToL * (1.0 - alpha) + alpha);
+        return 0.5 / (termV + termL);
     }
 
-    vec3 Fresnel_Schlick(vec3 F0, float cos_V_H)
+    vec3 FresnelSchlick(vec3 F0, float cosVToH)
     {
-        float f = pow(1.0 - cos_V_H, 5.0);
+        float f = pow(1.0 - cosVToH, 5.0);
         return saturate(50.0 * F0.g) * f + (1.0 - f) * F0;
     }
 
-    vec4 scatter(vec3 pos, vec3 displacement_normal, vec3 shading_normal, float eta)
+    vec4 scatter(vec3 pos, vec3 displacementNormal, vec3 shadingNormal, float eta)
     {
-        vec3 view_dir = vec3(0.0, 0.0, 1.0);
-        vec3 light_dir = normalize(light_direction);
+        vec3 viewDir = vec3(0.0, 0.0, 1.0);
+        vec3 lightDir = lightDirection;
 
-        float cos_N_L = dot(shading_normal, light_dir);
-        if (cos_N_L <= 0.0) return vec4(0.0);
+        float cosNToL = dot(shadingNormal, lightDir);
+        if (cosNToL <= 0.0) return vec4(0.0);
 
-        vec3 half_dir = normalize(view_dir + light_dir);
-        float cos_N_V = saturate(dot(shading_normal, view_dir));
-        float cos_N_H = saturate(dot(shading_normal, half_dir));
-        float cos_V_H = saturate(dot(view_dir, half_dir));
-        float cos_L_H = saturate(dot(light_dir, half_dir));
+        vec3 halfDir = normalize(viewDir + lightDir);
+        float cosNToV = saturate(dot(shadingNormal, viewDir));
+        float cosNToH = saturate(dot(shadingNormal, halfDir));
+        float cosVToH = saturate(dot(viewDir, halfDir));
 
-        vec3 in_dir = normalize(refract(-view_dir, displacement_normal, eta));
-        float in_t = -pos.z / in_dir.z;
-        vec3 hit_pos = pos + in_dir * in_t;
+        float distribution = DistributionGGX(roughness, cosNToH);
+        float visibility = VisibilitySmithGGXCorrelatedApprox(roughness, cosNToV, cosNToL);
 
-        float distribution = distribution_GGX(roughness, cos_N_H);
-        float visibility = visibility_Smith_GGX_correlated_approx(roughness, cos_N_V, cos_N_L);
-        vec3 albedo = image.eval(hit_pos.xy).rgb;
-        vec3 diffuse_color = mix(albedo, vec3(0.0), metal);
-        vec3 specular_color = mix(vec3(0.08 * specular), albedo, metal);
-        vec3 fresnel = Fresnel_Schlick(specular_color, cos_V_H);
+        vec3 albedo = image.eval(pos.xy).rgb;
+        vec3 diffuseColor = mix(albedo, vec3(0.0), metal);
+        vec3 specularColor = mix(vec3(0.08 * specular), albedo, metal);
+        vec3 fresnel = FresnelSchlick(specularColor, cosVToH);
 
-        vec3 reflected_color = distribution * visibility * fresnel * cos_N_L * light_color.rgb;
-        vec3 refracted_color = diffuse_color * cos_N_L * light_color.rgb;
-        return vec4(reflected_color + refracted_color, 1.0);
+        vec3 reflectedColor = distribution * visibility * fresnel * cosNToL * lightColor.rgb;
+        vec3 refractedColor = diffuseColor * cosNToL * lightColor.rgb;
+        return vec4(reflectedColor + refractedColor, 1.0);
     }
 
     vec4 main(vec2 fragCoord)
     {
-        vec3 pos = vec3(
-            fragCoord.xy,
-            displacement
-        );
-
+        vec3 pos = vec3(fragCoord.xy, displacement);
         vec3 normal = vec3(0.0, 0.0, 1.0);
-        vec3 displacement_normal = normalize(vec3(1.0 / scale, 1.0 / scale,
-            1.0 / (height * light_intensity * displacement)) * normal);
-        vec3 shading_normal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * light_intensity)) * normal);
-        return scatter(pos, displacement_normal, shading_normal, eta);
+        vec3 displacementNormal =
+            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity * displacement)) * normal);
+        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity)) * normal);
+        return scatter(pos, displacementNormal, shadingNormal, eta);
     }
 )";
 
@@ -260,42 +251,6 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     std::shared_ptr<Drawing::RuntimeShaderBuilder> lightingBuilder = nullptr;
 
     if (params_.mask != nullptr) {
-        // step 1: bump map to normal map
-        auto normalMaskShader = GetNormalMaskEffect();
-        if (normalMaskShader == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage normalMaskShader init failed");
-            return image;
-        }
-        float imageScale = 8.0;
-        float newWidth =  std::ceil(width/imageScale);
-        float newHeight = std::ceil(height/imageScale);
-        if (newWidth <= 0 || newHeight <= 0) {
-            return image;
-        }
-
-        Drawing::RuntimeShaderBuilder normalBuilder(normalMaskShader);
-        auto maskShader = params_.mask->GenerateDrawingShader(newWidth, newHeight);
-        if (maskShader == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage mask generate failed");
-            return image;
-        }
-        normalBuilder.SetChild("mask", maskShader);
-        normalBuilder.SetUniform("iResolution", newWidth, newHeight);
-
-        auto scaledInfo = Drawing::ImageInfo(newWidth, newHeight,
-            Drawing::ColorType::COLORTYPE_RGBA_F16, imageInfo.GetAlphaType(),
-            std::make_shared<Drawing::ColorSpace>(Drawing::ColorSpace::ColorSpaceType::SRGB_LINEAR));
-#ifdef RS_ENABLE_GPU
-        auto normalImage = normalBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, scaledInfo, false);
-#else
-        auto normalImage = normalBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
-#endif
-        if (normalImage == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage make normalImage failed");
-            return image;
-        }
-
-        // step2: normal map to light effect map
         auto directionLightShader = GetDirectionLightEffect();
         if (directionLightShader == nullptr) {
             LOGE("GEDirectionLightShaderFilter::ProcessImage directionLightShader init failed");
@@ -306,14 +261,12 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
             LOGE("GEDirectionLightShaderFilter::ProcessImage lightingBuilder is nullptr");
             return image;
         }
-        Drawing::Matrix maskMatrix;
-        if (newWidth == 0 || newHeight == 0) {
+        auto maskShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+        if (maskShader == nullptr) {
+            LOGE("GEDirectionLightShaderFilter::ProcessImage mask generate failed");
             return image;
         }
-        maskMatrix.SetScale(std::ceil(width/newWidth), std::ceil(height/newHeight));
-        auto normalShader = Drawing::ShaderEffect::CreateImageShader(*normalImage, Drawing::TileMode::CLAMP,
-            Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), maskMatrix);
-        lightingBuilder->SetChild("mask", normalShader);
+        lightingBuilder->SetChild("mask", maskShader);
     } else {
         auto directionLightNoNormalShader = GetDirectionLightNoNormalEffect();
         if (directionLightNoNormalShader == nullptr) {
@@ -327,24 +280,27 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
         }
     }
 
-    Drawing::Matrix imageMatrix;
+    Drawing::Matrix imageMatrix = canvasInfo_.mat_;
+    imageMatrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix imageInvertMatrix;
+    if (!imageMatrix.Invert(imageInvertMatrix)) {
+        LOGE("GEDirectionLightShaderFilter::ProcessImage Invert imageMatrix failed.");
+        return image;
+    }
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), imageMatrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), imageInvertMatrix);
     lightingBuilder->SetChild("image", imageShader);
-    lightingBuilder->SetUniform("iResolution", width, height);
-    lightingBuilder->SetUniform("light_direction",
+    lightingBuilder->SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    lightingBuilder->SetUniform("lightDirection",
         params_.lightDirection.x_, params_.lightDirection.y_, -params_.lightDirection.z_);
-    lightingBuilder->SetUniformVec4("light_color",
+    lightingBuilder->SetUniformVec4("lightColor",
         params_.lightColor.x_, params_.lightColor.y_, params_.lightColor.z_, params_.lightColor.w_);
-    lightingBuilder->SetUniform("light_intensity", params_.lightIntensity);
+    lightingBuilder->SetUniform("lightIntensity", params_.lightIntensity);
 
-    auto lightInfo = Drawing::ImageInfo(width, height,
-        Drawing::ColorType::COLORTYPE_RGBA_F16, imageInfo.GetAlphaType(),
-        std::make_shared<Drawing::ColorSpace>(Drawing::ColorSpace::ColorSpaceType::SRGB_LINEAR));
 #ifdef RS_ENABLE_GPU
-    auto lightingImage = lightingBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, lightInfo, false);
+    auto lightingImage = lightingBuilder->MakeImage(canvas.GetGPUContext().get(), &imageMatrix, imageInfo, false);
 #else
-    auto lightingImage = lightingBuilder->MakeImage(nullptr, nullptr, lightInfo, false);
+    auto lightingImage = lightingBuilder->MakeImage(nullptr, &imageMatrix, imageInfo, false);
 #endif
     if (lightingImage == nullptr) {
         LOGE("GEDirectionLightShaderFilter::ProcessImage make lightingImage failed");
