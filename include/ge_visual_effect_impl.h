@@ -413,6 +413,7 @@ private:
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
+    void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 

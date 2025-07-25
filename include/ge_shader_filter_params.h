@@ -250,9 +250,21 @@ struct GEEdgeLightShaderFilterParams {
     bool useRawColor = false;
 };
 
-constexpr char GE_FILTER_BEZIER_WARP[] = "BEZIER_WARP";
+constexpr char GE_FILTER_BEZIER_WARP[] = "BezierWarp";
 constexpr char GE_FILTER_BEZIER_WARP_DESTINATION_PATCH[] = "BEZIER_WARP_DESTINATION_PATCH";
 constexpr size_t GE_FILTER_BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT0[] = "BezierWarp_ControlPoint0";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT1[] = "BezierWarp_ControlPoint1";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT2[] = "BezierWarp_ControlPoint2";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT3[] = "BezierWarp_ControlPoint3";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT4[] = "BezierWarp_ControlPoint4";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT5[] = "BezierWarp_ControlPoint5";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT6[] = "BezierWarp_ControlPoint6";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT7[] = "BezierWarp_ControlPoint7";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT8[] = "BezierWarp_ControlPoint8";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT9[] = "BezierWarp_ControlPoint9";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT10[] = "BezierWarp_ControlPoint10";
+constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT11[] = "BezierWarp_ControlPoint11";
 struct GEBezierWarpShaderFilterParams {
     std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM> destinationPatch;
 };
