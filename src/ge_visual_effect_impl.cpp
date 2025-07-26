@@ -181,6 +181,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR);
             impl->MakeVariableRadiusBlurParams();
         }
+    },
+    { GE_SHADER_BORDER_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::BORDER_LIGHT);
+            impl->MakeBorderLightParams();
+        }
     }
 };
 
@@ -378,6 +384,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         case FilterType::VARIABLE_RADIUS_BLUR: {
             SetVariableRadiusBlurParams(tag, param);
             break;
+        }
+        case FilterType::BORDER_LIGHT: {
+            SetBorderLightParams(tag, param);
         }
         default:
             break;
@@ -686,7 +695,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
                 return;
             }
             if (tag == GE_FILTER_CONTENT_LIGHT_POSITION) {
-                contentLightParams_->lightPosition = param;
+                contentLightParams_->position = param;
             }
             if (tag == GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE) {
                 contentLightParams_->rotationAngle = param;
@@ -700,6 +709,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             if (tag == GE_FILTER_DIRECTION_LIGHT_DIRECTION) {
                 directionLightParams_->lightDirection = param;
             }
+            break;
+        }
+        case FilterType::BORDER_LIGHT: {
+            SetBorderLightParams(tag, param);
             break;
         }
         default:
@@ -735,7 +748,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
                 return;
             }
             if (tag == GE_FILTER_DIRECTION_LIGHT_COLOR) {
-                directionLightParams_->lightColor = param;
+                directionLightParams_->color = param;
             }
             break;
         }
@@ -746,6 +759,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             if (tag == GE_FILTER_EDGE_LIGHT_COLOR) {
                 edgeLightParams_->color = param;
             }
+            break;
+        }
+        case FilterType::BORDER_LIGHT: {
+            SetBorderLightParams(tag, param);
             break;
         }
         default:
@@ -1167,7 +1184,7 @@ void GEVisualEffectImpl::SetContentLightParams(const std::string& tag, float par
  
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_CONTENT_LIGHT_INTENSITY,
-            [](GEVisualEffectImpl* obj, float p) { obj->contentLightParams_->lightIntensity = p; } },
+            [](GEVisualEffectImpl* obj, float p) { obj->contentLightParams_->intensity = p; } },
     };
  
     auto it = actions.find(tag);
@@ -1284,6 +1301,45 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
         particleCircularHaloParams_->noise_ = std::max(param, 0.001f);
+    }
+}
+
+void GEVisualEffectImpl::SetBorderLightParams(const std::string& tag, float param)
+{
+    if (borderLightParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_INTENSITY) {
+        borderLightParams_->intensity = param;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_WIDTH) {
+        borderLightParams_->width = param;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_CORNER_RADIUS) {
+        borderLightParams_->cornerRadius = param;
+    }
+}
+
+void GEVisualEffectImpl::SetBorderLightParams(const std::string& tag, const Vector3f& param)
+{
+    if (borderLightParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_POSITION) {
+        borderLightParams_->position = param;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE) {
+        borderLightParams_->rotationAngle = param;
+    }
+}
+
+void GEVisualEffectImpl::SetBorderLightParams(const std::string& tag, const Vector4f& param)
+{
+    if (borderLightParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_BORDER_LIGHT_COLOR) {
+        borderLightParams_->color = param;
     }
 }
 

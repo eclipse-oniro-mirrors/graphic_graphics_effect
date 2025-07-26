@@ -27,30 +27,19 @@ constexpr size_t NUM_4 = 4;
 
 GEBorderLightShader::GEBorderLightShader() {}
 
-GEBorderLightShader::GEBorderLightShader(BorderLightParams& param)
+GEBorderLightShader::GEBorderLightShader(Drawing::GEBorderLightShaderParams& param)
 {
     borderLightParams_ = param;
 }
 
-std::shared_ptr<GEBorderLightShader> GEBorderLightShader::CreateBorderLightShader(BorderLightParams& param)
+std::shared_ptr<GEBorderLightShader> GEBorderLightShader::CreateBorderLightShader(Drawing::GEBorderLightShaderParams& param)
 {
-    std::shared_ptr<GEBorderLightShader> borderLightShader = std::make_shared<GEBorderLightShader>(param);
-    return borderLightShader;
+    return std::make_shared<GEBorderLightShader>(param);
 }
 
 void GEBorderLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeBorderLightShader(rect);
-}
-
-void GEBorderLightShader::SetRotationAngle(const Vector3f& rotationAngle)
-{
-    borderLightParams_.rotationAngle_ = rotationAngle;
-}
-
-void GEBorderLightShader::SetCornerRadius(const float cornerRadius)
-{
-    borderLightParams_.cornerRadius_ = cornerRadius;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLightBuilder()
@@ -187,18 +176,18 @@ std::shared_ptr<Drawing::ShaderEffect> GEBorderLightShader::MakeBorderLightShade
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-    float lightColor[NUM_4] = {borderLightParams_.lightColor_[NUM_0], borderLightParams_.lightColor_[NUM_1],
-        borderLightParams_.lightColor_[NUM_2], borderLightParams_.lightColor_[NUM_3]};
+    float lightColor[NUM_4] = {borderLightParams_.color[NUM_0], borderLightParams_.color[NUM_1],
+        borderLightParams_.color[NUM_2], borderLightParams_.color[NUM_3]};
     builder_ = GetBorderLightBuilder();
     builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("lightPosition", borderLightParams_.lightPosition_[NUM_0],
-        borderLightParams_.lightPosition_[NUM_1], borderLightParams_.lightPosition_[NUM_2]);
+    builder_->SetUniform("lightPosition", borderLightParams_.position[NUM_0],
+        borderLightParams_.position[NUM_1], borderLightParams_.position[NUM_2]);
     builder_->SetUniform("lightColor", lightColor, NUM_4);
-    builder_->SetUniform("lightIntensity", borderLightParams_.lightIntensity_);
-    builder_->SetUniform("lightWidth", borderLightParams_.lightWidth_);
-    builder_->SetUniform("borderLightRotationAngle", borderLightParams_.rotationAngle_[NUM_0],
-        borderLightParams_.rotationAngle_[NUM_1], borderLightParams_.rotationAngle_[NUM_2]);
-    builder_->SetUniform("cornerRadius", borderLightParams_.cornerRadius_);
+    builder_->SetUniform("lightIntensity", borderLightParams_.intensity);
+    builder_->SetUniform("lightWidth", borderLightParams_.width);
+    builder_->SetUniform("borderLightRotationAngle", borderLightParams_.rotationAngle[NUM_0],
+        borderLightParams_.rotationAngle[NUM_1], borderLightParams_.rotationAngle[NUM_2]);
+    builder_->SetUniform("cornerRadius", borderLightParams_.cornerRadius);
     auto borderLightShader = builder_->MakeShader(nullptr, false);
 
     if (borderLightShader == nullptr) {

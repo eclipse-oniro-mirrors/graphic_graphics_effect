@@ -24,19 +24,10 @@
 namespace OHOS {
 namespace Rosen {
 
-struct GE_EXPORT BorderLightParams {
-    Vector3f lightPosition_;
-    Vector4f lightColor_;
-    float lightIntensity_ = 0.0f;
-    float lightWidth_ = 0.0f;
-    Vector3f rotationAngle_;
-    float cornerRadius_ = 0.0f;
-};
-
 class GE_EXPORT GEBorderLightShader : public GEShader {
 public:
     GEBorderLightShader();
-    GEBorderLightShader(BorderLightParams& borderLightParams);
+    GEBorderLightShader(Drawing::GEBorderLightShaderParams& borderLightParams);
 
     ~GEBorderLightShader() override = default;
 
@@ -44,18 +35,14 @@ public:
 
     const std::string GetDescription() const { return "GEBorderLightShader"; }
     
-    void SetBorderLightParams(const BorderLightParams& params)
+    void SetBorderLightParams(const Drawing::GEBorderLightShaderParams& params)
     {
         borderLightParams_ = params;
     }
 
-    void SetRotationAngle(const Vector3f& rotationAngle);
-
-    void SetCornerRadius(float cornerRadius);
-
     std::shared_ptr<Drawing::ShaderEffect> MakeBorderLightShader(const Drawing::Rect& rect);
 
-    static std::shared_ptr<GEBorderLightShader> CreateBorderLightShader(BorderLightParams& param);
+    static std::shared_ptr<GEBorderLightShader> CreateBorderLightShader(Drawing::GEBorderLightShaderParams& param);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetBorderLightBuilder();
 private:
@@ -64,7 +51,7 @@ private:
     GEBorderLightShader& operator=(const GEBorderLightShader&) = delete;
     GEBorderLightShader& operator=(const GEBorderLightShader&&) = delete;
 
-    BorderLightParams borderLightParams_;
+    Drawing::GEBorderLightShaderParams borderLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
 };
 

@@ -380,6 +380,16 @@ public:
         return variableRadiusBlurParams_;
     }
 
+    void MakeBorderLightParams()
+    {
+        borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
+    }
+
+    const std::shared_ptr<GEBorderLightShaderParams>& GetBorderLightParams() const
+    {
+        return borderLightParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -413,6 +423,9 @@ private:
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
+    void SetBorderLightParams(const std::string& tag, const Vector3f& param);
+    void SetBorderLightParams(const std::string& tag, const Vector4f& param);
+    void SetBorderLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -446,6 +459,7 @@ private:
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
+    std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
 };
 
 } // namespace Drawing

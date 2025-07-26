@@ -325,15 +325,15 @@ struct GEWaveGradientShaderMaskParams {
     float turbulenceStrength_ = 0.f;
 };
 
-constexpr char GE_FILTER_CONTENT_LIGHT[] = "CONTENT_LIGHT";
-constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "CONTENT_LIGHT_POSITION";
-constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "CONTENT_LIGHT_COLOR";
-constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "CONTENT_LIGHT_INTENSITY";
-constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "CONTENT_LIGHT_ROTATION_ANGLE";
+constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
+constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLightPosition";
+constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLightColor";
+constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "ContentLightIntensity";
+constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "ContentLightRotationAngle";
 struct GEContentLightFilterParams {
-    Vector3f lightPosition;
-    Vector4f lightColor;
-    float lightIntensity;
+    Vector3f position;
+    Vector4f color;
+    float intensity;
     Vector3f rotationAngle;
 };
 
@@ -412,6 +412,23 @@ struct GELinearGradientShaderMaskParams {
     Drawing::Point startPosition;
     Drawing::Point endPosition;
 };
+
+constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
+constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
+constexpr char GE_SHADER_BORDER_LIGHT_COLOR[] = "BorderLightColor";
+constexpr char GE_SHADER_BORDER_LIGHT_INTENSITY[] = "BorderLightIntensity";
+constexpr char GE_SHADER_BORDER_LIGHT_WIDTH[] = "BorderLightWidth";
+constexpr char GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE[] = "BorderLightRotationAngle";
+constexpr char GE_SHADER_BORDER_LIGHT_CORNER_RADIUS[] = "BorderLightCornerRadius";
+struct GEBorderLightShaderParams {
+    Vector3f position;
+    Vector4f color;
+    float intensity;
+    float width;
+    Vector3f rotationAngle;
+    float cornerRadius;
+};
+
 
 } // namespace Drawing
 } // namespace Rosen
