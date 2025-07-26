@@ -33,19 +33,29 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
         return image;
     }
 
-    auto cache = GetCache();
-    if (cache == nullptr) {
-        SetCache(std::make_shared<std::any>(std::make_any<std::shared_ptr<Drawing::Image>>(image)));
+    Drawing::Matrix matrix = canvasInfo_.mat_;
+    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix invertMatrix;
+    if (!matrix.Invert(invertMatrix)) {
+        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage Invert matrix failed");
         return image;
     }
 
-    auto cacheImage = std::any_cast<std::shared_ptr<Drawing::Image>>(*cache);
+    auto cache = GetCache();
+    if (cache == nullptr) {
+        SetCache(std::make_shared<std::any>(std::make_pair(std::shared_ptr<Drawing::Image>(image), invertMatrix)));
+        return image;
+    }
+
+    auto cachedData = std::any_cast<std::pair<std::shared_ptr<Drawing::Image>, Drawing::Matrix>>(*cache);
+    auto cacheImage = cachedData.first;
+    Drawing::Matrix cacheMatrix = cachedData.second;
+
     if (cacheImage == nullptr || cacheImage.get() == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage cacheImage is nullptr");
         return image;
     }
 
-    auto imageInfo = image->GetImageInfo();
     auto maskEffectShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     if (maskEffectShader == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage maskEffectShader generate failed");
@@ -57,17 +67,9 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage get mask transition effect failed");
         return image;
     }
-
-    Drawing::Matrix matrix = canvasInfo_.mat_;
-    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage Invert matrix failed");
-        return image;
-    }
     
     auto topLayer = Drawing::ShaderEffect::CreateImageShader(*cacheImage, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), cacheMatrix);
     auto bottomLayer = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     builder->SetChild("alphaMask", maskEffectShader);
@@ -75,7 +77,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     builder->SetChild("bottomLayer", bottomLayer);
     builder->SetUniform("factor", std::clamp(params_.factor, 0.0f, 1.0f));
     builder->SetUniform("inverseFlag", params_.inverse);
-    auto transitionImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
+    auto transitionImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
     if (!transitionImage) {
         GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage make image failed");
         return image;
