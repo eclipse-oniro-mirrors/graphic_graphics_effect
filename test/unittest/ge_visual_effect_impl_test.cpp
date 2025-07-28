@@ -689,15 +689,15 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
     geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::CONTENT_LIGHT);
  
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_INTENSITY, lightIntensity);
-    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightIntensity, lightIntensity);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->intensity, lightIntensity);
  
     Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_POSITION, lightPosition);
-    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightPosition, lightPosition);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->position, lightPosition);
  
     Vector4f lightColor = Vector4f(0.3f, 0.6f, 0.9f, 0.0f);
     geVisualEffectImpl.SetParam(Drawing::GE_FILTER_CONTENT_LIGHT_COLOR, lightColor);
-    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->lightColor, lightColor);
+    EXPECT_EQ(geVisualEffectImpl.GetContentLightParams()->color, lightColor);
 }
 
 /**
