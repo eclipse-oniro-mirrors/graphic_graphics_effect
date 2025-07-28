@@ -20,6 +20,7 @@
 #include "common/rs_vector4.h"
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
+#include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
