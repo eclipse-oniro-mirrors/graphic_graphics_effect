@@ -32,11 +32,6 @@ GEBorderLightShader::GEBorderLightShader(Drawing::GEBorderLightShaderParams& par
     borderLightParams_ = param;
 }
 
-std::shared_ptr<GEBorderLightShader> GEBorderLightShader::CreateBorderLightShader(Drawing::GEBorderLightShaderParams& param)
-{
-    return std::make_shared<GEBorderLightShader>(param);
-}
-
 void GEBorderLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeBorderLightShader(rect);
