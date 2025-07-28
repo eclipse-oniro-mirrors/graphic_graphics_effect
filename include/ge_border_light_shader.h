@@ -43,8 +43,6 @@ public:
 
     std::shared_ptr<Drawing::ShaderEffect> MakeBorderLightShader(const Drawing::Rect& rect);
 
-    static std::shared_ptr<GEBorderLightShader> CreateBorderLightShader(Drawing::GEBorderLightShaderParams& param);
-
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetBorderLightBuilder();
 private:
     GEBorderLightShader(const GEBorderLightShader&) = delete;
