@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHIC_2D_GE_COMPOSING_FILTER_H
-#define GRAPHIC_2D_GE_COMPOSING_FILTER_H
+#ifndef GRAPHIC_2D_GE_FILTER_COMPOSER_H
+#define GRAPHIC_2D_GE_FILTER_COMPOSER_H
 
 #include <unordered_set>
-#include <any>
 
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
@@ -30,14 +29,11 @@ public:
     ~GEFilterComposer() = default;
 
     bool Compose(const std::shared_ptr<GEShaderFilter> other);
-    std::shared_ptr<Drawing::Image> ApplyComposedEffect(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst);
-
     std::shared_ptr<GEShaderFilter> GetComposedFilter();
 
 private:
     std::shared_ptr<GEShaderFilter> GenerateComposedFilter(
-        const std::string composedType, const std::map<std::string, GEShaderFilter::FilterParams> filterParams);
+        const std::string& composedType, const std::map<std::string, GEShaderFilter::FilterParams>& filterParams);
     const std::unordered_set<std::string> composedEffects_ = {
         "GreyBlur",
     };
@@ -48,4 +44,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHIC_2D_GE_COMPOSING_FILTER_H
+#endif // GRAPHIC_2D_GE_FILTER_COMPOSER_H

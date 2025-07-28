@@ -70,16 +70,16 @@ public:
                           std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);
 
     struct HpsGEImageEffectContext {
-        std::shared_ptr<Drawing::Image> image;
-        Drawing::Rect src;
-        Drawing::Rect dst;
-        Drawing::SamplingOptions sampling;
-        bool compatibleWithHpsSkipBlur;
-        float alpha;
-        std::shared_ptr<Drawing::ColorFilter> colorFilter;
-        uint32_t maskColor;
-        float saturationForHPS;
-        float brightnessForHPS;
+        std::shared_ptr<Drawing::Image> image {};
+        Drawing::Rect src {};
+        Drawing::Rect dst {};
+        Drawing::SamplingOptions sampling {};
+        bool compatibleWithHpsSkipBlur {};
+        float alpha {};
+        std::shared_ptr<Drawing::ColorFilter> colorFilter {};
+        uint32_t maskColor {};
+        float saturationForHPS {};
+        float brightnessForHPS {};
     };
 
     bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
@@ -97,8 +97,14 @@ private:
     std::vector<IndexRangeInfo> CategorizeRanges(
         const std::vector<IndexRange>& hpsIndexRanges, const int32_t veContainerSize);
 
-    bool ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
-                          std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut);
+    struct ComposeGEEffectsResult
+    {
+        bool anyFilterComposed {};
+        bool anyBlurFilter {};
+    };
+
+    ComposeGEEffectsResult ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+                                            std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut);
 
     bool ApplyGEEffects(Drawing::Canvas& canvas,
         std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,

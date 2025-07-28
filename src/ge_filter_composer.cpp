@@ -14,17 +14,18 @@
  */
 
 #include "ge_filter_composer.h"
-#include "ge_render.h"
 #include "ge_log.h"
+#include "ge_render.h"
 
 namespace OHOS {
 namespace Rosen {
 
 GEFilterComposer::GEFilterComposer(const std::shared_ptr<GEShaderFilter>& shaderFilter)
-    : composedFilter_(shaderFilter), composedType_(shaderFilter->Type())
 {
-    if (composedFilter_ != nullptr) {
-        filterParams_[composedType_] = composedFilter_->Params();
+    if (shaderFilter != nullptr) {
+        composedFilter_ = shaderFilter;
+        composedType_ = shaderFilter->Type();
+        filterParams_[composedType_] = shaderFilter->Params();
     } else {
         LOGE("GEFilterComposer: ctor with nullptr");
     }
@@ -56,7 +57,7 @@ std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter()
 }
 
 std::shared_ptr<GEShaderFilter> GEFilterComposer::GenerateComposedFilter(
-    const std::string composedType, const std::map<std::string, GEShaderFilter::FilterParams> filterParams)
+    const std::string& composedType, const std::map<std::string, GEShaderFilter::FilterParams>& filterParams)
 {
     // Only support GreyBlur now, support more complex filter in the future
     if (composedType == "GreyBlur") {
@@ -95,13 +96,5 @@ std::shared_ptr<GEShaderFilter> GEFilterComposer::GenerateComposedFilter(
     }
     return nullptr;
 }
-
-std::shared_ptr<Drawing::Image> GEFilterComposer::ApplyComposedEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
-{
-    auto resImage = composedFilter_->OnProcessImage(canvas, image, src, dst);
-    return resImage;
-}
-
 } // namespace Rosen
 } // namespace OHOS

@@ -50,7 +50,7 @@ public:
 
     virtual const std::string& Type() const = 0;
  
-    FilterParams& Params()
+    const FilterParams& Params()
     {
         return params_;
     }

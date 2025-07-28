@@ -878,26 +878,44 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
 
     /* image is nullptr */
     GERender::HpsGEImageEffectContext context1 { image, src, dst, Drawing::SamplingOptions(), false };
-    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush);
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush));
  
-
     /* no filter */
     auto image2 = MakeImage(canvas_);
+    if (!image2) {
+        GTEST_LOG_(INFO) << "GERenderTest image2 is null";
+        return;
+    }
+
     GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions(), false };
-    geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush);
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush));
  
     /* normal case */
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
     GERender::HpsGEImageEffectContext context3 { image2, src, dst, Drawing::SamplingOptions(), false };
-    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush));
 
-    /* compatibility */
+    /* compatibility fallback */
     GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions(), true };
     outImage = nullptr;
-    EXPECT_EQ(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush), false);
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context4, outImage, brush));
     EXPECT_EQ(outImage, nullptr);
+
+    /* normal case with composable greyblur */
+    veContainer = {};
+    auto visualEffect1 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
+    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 1.0f); // 1.0 grey blur coff
+    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 1.0f); // 1.0 grey blur coff
+    veContainer.AddToChainedFilter(visualEffect1);
+
+    auto visualEffect2 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect2->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+    veContainer.AddToChainedFilter(visualEffect2);
+
+    GERender::HpsGEImageEffectContext context5 { image2, src, dst, Drawing::SamplingOptions(), true };
+    EXPECT_TRUE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context5, outImage, brush));
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
 }

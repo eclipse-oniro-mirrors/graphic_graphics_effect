@@ -306,7 +306,7 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
                 context.sampling, false, context.alpha, context.colorFilter, context.maskColor,
                 context.saturationForHPS, context.brightnessForHPS };
             // When hps support exists, don't set compatibility switch
-            ApplyGEEffects(canvas, subVisualEffects, partialGEContext, resImage);
+            appliedBlur |= ApplyGEEffects(canvas, subVisualEffects, partialGEContext, resImage);
             lastAppliedGE = true;
             continue;
         }
@@ -319,7 +319,7 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
                 context.brightnessForHPS, context.image);
         }
         HpsEffectFilter::HpsEffectContext hpsEffectContext = {context.alpha, context.colorFilter, context.maskColor};
-        appliedBlur = hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
+        appliedBlur |= hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
         lastAppliedGE = false;
     }
     outImage = resImage;
@@ -381,10 +381,12 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
     return categorizedRanges;
 }
 
-bool GERender::ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
-                                std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut)
+GERender::ComposeGEEffectsResult GERender::ComposeGEEffects(
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+    std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut)
 {
     bool anyFilterComposed = false;
+    bool anyBlurFilter = false;
     std::shared_ptr<GEFilterComposer> filterComposer = nullptr;
     geShaderFiltersOut.clear();
     for (auto vef : visualEffects) {
@@ -393,6 +395,10 @@ bool GERender::ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEff
             continue;
         }
         auto ve = vef->GetImpl();
+        if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR ||
+            ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR) {
+            anyBlurFilter = true; // Compatibility with HpsEffectFilter::ApplyHpsSmallCanvas
+        }
         auto currentFilter = GenerateShaderFilter(vef);
         if (currentFilter == nullptr) {
             continue;
@@ -425,7 +431,7 @@ bool GERender::ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEff
         filterComposer.reset();
     }
 
-    return anyFilterComposed;
+    return ComposeGEEffectsResult{anyFilterComposed, anyBlurFilter};
 }
 
 bool GERender::ApplyGEEffects(Drawing::Canvas& canvas,
@@ -438,11 +444,14 @@ bool GERender::ApplyGEEffects(Drawing::Canvas& canvas,
     auto sampling = context.sampling;
 
     std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
-    bool anyFilterComposed = ComposeGEEffects(visualEffects, geShaderFilters);
+    auto composedResult = ComposeGEEffects(visualEffects, geShaderFilters);
 
     // Compatibility issues with Kawase skip in RSDrawingFilter::DrawImageRectInternal()
-    bool skipKawase = !anyFilterComposed && context.compatibleWithHpsSkipBlur;
+    bool skipKawase = !composedResult.anyFilterComposed && context.compatibleWithHpsSkipBlur;
     if (skipKawase) {
+        // If no filter is composed and compatibility mode is enabled, fallback to
+        // ApplyImageEffect in RSDrawingFilter::ApplyImageEffect to ensure later-applied
+        // kawase and light blur are performed normally
         return false;
     }
 
@@ -450,7 +459,7 @@ bool GERender::ApplyGEEffects(Drawing::Canvas& canvas,
     for (auto filter : geShaderFilters) {
         outImage = filter->ProcessImage(canvas, outImage, src, dst);
     }
-    return true;
+    return composedResult.anyBlurFilter;
 }
 
 bool GERender::HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
