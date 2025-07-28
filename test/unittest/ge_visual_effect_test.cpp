@@ -180,12 +180,12 @@ HWTEST_F(GEVisualEffectTest, SetParam_007, TestSize.Level1)
     
     Vector3f lightPosition = Vector3f(0.0f, 0.f, 0.0f);
     visualEffect->SetParam(GE_FILTER_CONTENT_LIGHT_POSITION, lightPosition);
-    bool ret = visualEffect->visualEffectImpl_->contentLightParams_->lightPosition == lightPosition;
+    bool ret = visualEffect->visualEffectImpl_->contentLightParams_->position == lightPosition;
     EXPECT_TRUE(ret);
  
     Vector4f lightColor = Vector4f(0.2f, 0.4f, 0.6f, 0.5f);
     visualEffect->SetParam(GE_FILTER_CONTENT_LIGHT_COLOR, lightColor);
-    ret = visualEffect->visualEffectImpl_->contentLightParams_->lightColor == lightColor;
+    ret = visualEffect->visualEffectImpl_->contentLightParams_->color == lightColor;
     EXPECT_TRUE(ret);
  
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_007 end";
