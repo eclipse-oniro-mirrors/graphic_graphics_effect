@@ -728,7 +728,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
                 return;
             }
             if (tag == GE_FILTER_CONTENT_LIGHT_COLOR) {
-                contentLightParams_->lightColor = param;
+                contentLightParams_->color = param;
             }
             break;
         }
@@ -748,7 +748,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
                 return;
             }
             if (tag == GE_FILTER_DIRECTION_LIGHT_COLOR) {
-                directionLightParams_->color = param;
+                directionLightParams_->lightColor = param;
             }
             break;
         }
