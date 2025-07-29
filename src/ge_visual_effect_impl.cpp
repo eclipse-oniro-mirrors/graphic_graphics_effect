@@ -488,6 +488,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             SetDispersionParams(tag, param);
             break;
         }
+        case FilterType::BEZIER_WARP: {
+            SetBezierWarpParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -1156,6 +1160,34 @@ void GEVisualEffectImpl::SetDispersionParams(const std::string& tag, const std::
         dispersionParams_->greenOffset = param;
     } else if (tag == GE_FILTER_DISPERSION_BLUE_OFFSET) {
         dispersionParams_->blueOffset = param;
+    }
+}
+
+void GEVisualEffectImpl::SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (bezierWarpParams_ == nullptr) {
+        return;
+    }
+
+    std::array<const char*, GE_FILTER_BEZIER_WARP_POINT_NUM> ctrlPointsName = {
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT0,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT1,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT2,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT3,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT4,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT5,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT6,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT7,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT8,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT9,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT10,
+        GE_FILTER_BEZIER_WARP_CONTROL_POINT11,
+    };
+
+    auto it = std::find(ctrlPointsName.begin(), ctrlPointsName.end(), tag);
+    if (it != ctrlPointsName.end()) {
+        size_t index = std::distance(ctrlPointsName.begin(), it);
+        bezierWarpParams_->destinationPatch[index].Set(param.first, param.second);
     }
 }
 
