@@ -103,11 +103,11 @@ private:
         bool anyBlurFilter {};
     };
 
-    ComposeGEEffectsResult ComposeGEEffects(std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+    ComposeGEEffectsResult ComposeGEEffects(const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
                                             std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut);
 
     bool ApplyGEEffects(Drawing::Canvas& canvas,
-        std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+        const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage);
 
     void DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
@@ -116,10 +116,10 @@ private:
     std::shared_ptr<GEShader> GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve);
 
     std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffect>& ve);
-    std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(Drawing::GEVisualEffectContainer& veContainer);
+    std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(const Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-    bool ExcuteRangeEmpty(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+    bool ExecuteRangeEmpty(Drawing::Canvas& canvas, const Drawing::GEVisualEffectContainer& veContainer,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
 };
 

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHIC_2D_GE_FILTER_COMPOSER_H
-#define GRAPHIC_2D_GE_FILTER_COMPOSER_H
+#ifndef GRAPHICS_EFFECT_GE_FILTER_COMPOSER_H
+#define GRAPHICS_EFFECT_GE_FILTER_COMPOSER_H
 
 #include <unordered_set>
 
@@ -29,7 +29,7 @@ public:
     ~GEFilterComposer() = default;
 
     bool Compose(const std::shared_ptr<GEShaderFilter> other);
-    std::shared_ptr<GEShaderFilter> GetComposedFilter();
+    const std::shared_ptr<GEShaderFilter>& GetComposedFilter();
 
 private:
     std::shared_ptr<GEShaderFilter> GenerateComposedFilter(
@@ -44,4 +44,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHIC_2D_GE_FILTER_COMPOSER_H
+#endif // GRAPHIC_EFFECT_GE_FILTER_COMPOSER_H

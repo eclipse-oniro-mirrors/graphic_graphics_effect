@@ -40,15 +40,14 @@ public:
     HpsEffectFilter(Drawing::Canvas& canvas);
     ~HpsEffectFilter() = default;
 
-    static constexpr size_t INDEX_RANGE_NUM = 2;
-    using IndexRange = std::array<int32_t, INDEX_RANGE_NUM>;
+    using IndexRange = std::pair<int32_t, int32_t>;
     struct HpsEffectContext {
         float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;
         uint32_t maskColor;
     };
 
-    bool HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer);
+    bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer);
     std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
@@ -75,7 +74,7 @@ private:
     bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
-    bool InitUpEffect() const;
+    std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
 };

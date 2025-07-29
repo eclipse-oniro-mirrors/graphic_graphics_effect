@@ -148,8 +148,8 @@ HWTEST_F(GERenderTest, DrawImageEffect_001, TestSize.Level1)
     veContainer->AddToChainedFilter(visualEffect);
 
     const std::shared_ptr<Drawing::Image> image = nullptr;
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -181,8 +181,8 @@ HWTEST_F(GERenderTest, DrawImageEffect_002, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -214,8 +214,8 @@ HWTEST_F(GERenderTest, DrawImageEffect_003, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -243,8 +243,8 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
     veContainer->AddToChainedFilter(visualEffect);
 
     const std::shared_ptr<Drawing::Image> image = nullptr;
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -277,8 +277,8 @@ HWTEST_F(GERenderTest, ApplyGEEffects001, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 100.0f, 100.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 100.0f, 100.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -288,6 +288,7 @@ HWTEST_F(GERenderTest, ApplyGEEffects001, TestSize.Level1)
     std::shared_ptr<Drawing::Image> outImage;
     GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
     geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_NE(outImage, nullptr);
     EXPECT_NE(outImage, image);
  
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects001 end";
@@ -307,8 +308,8 @@ HWTEST_F(GERenderTest, ApplyGEEffects002, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -341,8 +342,8 @@ HWTEST_F(GERenderTest, ApplyGEEffects003, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -382,8 +383,8 @@ HWTEST_F(GERenderTest, ApplyGEEffects004, TestSize.Level1)
         GTEST_LOG_(INFO) << "GERenderTest image is null";
         return;
     }
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     if (!geRender) {
@@ -393,6 +394,7 @@ HWTEST_F(GERenderTest, ApplyGEEffects004, TestSize.Level1)
     std::shared_ptr<Drawing::Image> outImage;
     GERender::HpsGEImageEffectContext context { image, src, src, Drawing::SamplingOptions(), false };
     geRender->ApplyGEEffects(canvas_, visualEffects, context, outImage);
+    EXPECT_NE(outImage, nullptr);
     EXPECT_NE(outImage, image);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyGEEffects004 end";
@@ -420,16 +422,16 @@ HWTEST_F(GERenderTest, CategorizeRanges001, TestSize.Level1)
     EXPECT_EQ(result.size(), 3);
  
     EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[0].range[0], 0);
-    EXPECT_EQ(result[0].range[1], 2);
+    EXPECT_EQ(result[0].range.first, 0);
+    EXPECT_EQ(result[0].range.second, 2);
  
     EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[1].range[0], 3);
-    EXPECT_EQ(result[1].range[1], 5);
+    EXPECT_EQ(result[1].range.first, 3);
+    EXPECT_EQ(result[1].range.second, 5);
  
     EXPECT_EQ(result[2].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[2].range[0], 6);
-    EXPECT_EQ(result[2].range[1], 9);
+    EXPECT_EQ(result[2].range.first, 6);
+    EXPECT_EQ(result[2].range.second, 9);
  
     GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges001 end";
 }
@@ -454,20 +456,20 @@ HWTEST_F(GERenderTest, CategorizeRanges002, TestSize.Level1)
     EXPECT_EQ(result.size(), 4);
  
     EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[0].range[0], 0);
-    EXPECT_EQ(result[0].range[1], 1);
+    EXPECT_EQ(result[0].range.first, 0);
+    EXPECT_EQ(result[0].range.second, 1);
  
     EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[1].range[0], 2);
-    EXPECT_EQ(result[1].range[1], 4);
+    EXPECT_EQ(result[1].range.first, 2);
+    EXPECT_EQ(result[1].range.second, 4);
  
     EXPECT_EQ(result[2].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[2].range[0], 5);
-    EXPECT_EQ(result[2].range[1], 6);
+    EXPECT_EQ(result[2].range.first, 5);
+    EXPECT_EQ(result[2].range.second, 6);
  
     EXPECT_EQ(result[3].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[3].range[0], 7);
-    EXPECT_EQ(result[3].range[1], 9);
+    EXPECT_EQ(result[3].range.first, 7);
+    EXPECT_EQ(result[3].range.second, 9);
  
     GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges002 end";
 }
@@ -492,20 +494,20 @@ HWTEST_F(GERenderTest, CategorizeRanges003, TestSize.Level1)
     EXPECT_EQ(result.size(), 4);
  
     EXPECT_EQ(result[0].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[0].range[0], 0);
-    EXPECT_EQ(result[0].range[1], 1);
+    EXPECT_EQ(result[0].range.first, 0);
+    EXPECT_EQ(result[0].range.second, 1);
  
     EXPECT_EQ(result[1].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[1].range[0], 2);
-    EXPECT_EQ(result[1].range[1], 5);
+    EXPECT_EQ(result[1].range.first, 2);
+    EXPECT_EQ(result[1].range.second, 5);
  
     EXPECT_EQ(result[2].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[2].range[0], 6);
-    EXPECT_EQ(result[2].range[1], 8);
+    EXPECT_EQ(result[2].range.first, 6);
+    EXPECT_EQ(result[2].range.second, 8);
  
     EXPECT_EQ(result[3].mode, GERender::EffectMode::GE);
-    EXPECT_EQ(result[3].range[0], 9);
-    EXPECT_EQ(result[3].range[1], 9);
+    EXPECT_EQ(result[3].range.first, 9);
+    EXPECT_EQ(result[3].range.second, 9);
  
     GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges003 end";
 }
@@ -530,8 +532,8 @@ HWTEST_F(GERenderTest, CategorizeRanges004, TestSize.Level1)
     EXPECT_EQ(result.size(), 1);
  
     EXPECT_EQ(result[0].mode, GERender::EffectMode::HPS);
-    EXPECT_EQ(result[0].range[0], 0);
-    EXPECT_EQ(result[0].range[1], 0);
+    EXPECT_EQ(result[0].range.first, 0);
+    EXPECT_EQ(result[0].range.second, 0);
  
     GTEST_LOG_(INFO) << "GERenderTest CategorizeRanges004 end";
 }
@@ -829,8 +831,8 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     Drawing::GEVisualEffectContainer veContainer;
     const std::shared_ptr<Drawing::Image> image = nullptr;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     float alpha = 1.0f;
     std::shared_ptr<Drawing::ColorFilter> colorFilter;
     uint32_t maskColor = 255;
@@ -870,8 +872,8 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     Drawing::GEVisualEffectContainer veContainer;
     const std::shared_ptr<Drawing::Image> image = nullptr;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     Drawing::Brush brush;
 
     auto geRender = std::make_shared<GERender>();

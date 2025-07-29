@@ -26,9 +26,9 @@
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_grey_shader_filter.h"
+#include "ge_hps_effect_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
-#include "ge_hps_effect_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_mask_transition_shader_filter.h"
@@ -259,10 +259,10 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     return resImage;
 }
 
-bool GERender::ExcuteRangeEmpty(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+bool GERender::ExecuteRangeEmpty(Drawing::Canvas& canvas, const Drawing::GEVisualEffectContainer& veContainer,
     const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
 {
-    auto visualEffects = veContainer.GetFilters();
+    const auto& visualEffects = veContainer.GetFilters();
     if (visualEffects.empty()) {
         return false;
     }
@@ -282,7 +282,7 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
         LOGE("GERender::ApplyHpsGEImageEffect image is null");
         return false;
     }
-    auto visualEffects = veContainer.GetFilters();
+    const auto& visualEffects = veContainer.GetFilters();
     if (visualEffects.empty()) {
         return false;
     }
@@ -290,7 +290,7 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas);
     std::vector<IndexRange> hpsSupportedIndexRanges = hpsEffectFilter->HpsSupportedEffectsIndexRanges(visualEffects);
     if (hpsSupportedIndexRanges.empty()) {
-        return ExcuteRangeEmpty(canvas, veContainer, context, outImage, brush);
+        return ExecuteRangeEmpty(canvas, veContainer, context, outImage, brush);
     }
 
     auto resImage = context.image;
@@ -298,8 +298,9 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     bool lastAppliedGE = true;
     auto indexRangeInfos = CategorizeRanges(hpsSupportedIndexRanges, visualEffects.size());
     for (auto& indexRangeInfo : indexRangeInfos) {
+        auto [left, right] = indexRangeInfo.range;
         std::vector<std::shared_ptr<Drawing::GEVisualEffect>> subVisualEffects(
-            visualEffects.begin() + indexRangeInfo.range[0], visualEffects.begin() + indexRangeInfo.range[1] + 1);
+            visualEffects.begin() + left, visualEffects.begin() + right + 1);
         auto currentImage = resImage;
         if (indexRangeInfo.mode == EffectMode::GE) {
             HpsGEImageEffectContext partialGEContext = { currentImage, context.src, context.src,
@@ -346,7 +347,7 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
     // The first GE range before the first hps range
     if (!hpsIndexRanges.empty()) {
         int start = 0;
-        int end = hpsIndexRanges[0][0] - 1;
+        int end = hpsIndexRanges[0].first - 1;
         if (start <= end) {
             categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
         }
@@ -359,8 +360,8 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
         if (i >= hpsIndexRanges.size() - 1) {
             continue;
         }
-        int start = hpsIndexRanges[i][1] + 1;
-        int end = hpsIndexRanges[i + 1][0] - 1;
+        int start = hpsIndexRanges[i].second + 1;
+        int end = hpsIndexRanges[i + 1].first - 1;
         if (start <= end) {
             categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
         }
@@ -368,7 +369,7 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
 
     // The last GE range after the last hps range
     if (!hpsIndexRanges.empty()) {
-        int start = hpsIndexRanges.back()[1] + 1;
+        int start = hpsIndexRanges.back().second + 1;
         int end = veContainerSize - 1;
         if (start <= end) {
             categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
@@ -382,7 +383,7 @@ std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
 }
 
 GERender::ComposeGEEffectsResult GERender::ComposeGEEffects(
-    std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
     std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut)
 {
     bool anyFilterComposed = false;
@@ -435,7 +436,7 @@ GERender::ComposeGEEffectsResult GERender::ComposeGEEffects(
 }
 
 bool GERender::ApplyGEEffects(Drawing::Canvas& canvas,
-    std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
+    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
     const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage)
 {
     auto image = context.image;
@@ -668,7 +669,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
 }
 
 std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilters(
-    Drawing::GEVisualEffectContainer& veContainer)
+    const Drawing::GEVisualEffectContainer& veContainer)
 {
     LOGD("GERender::shaderFilters %{public}d", (int)veContainer.GetFilters().size());
     std::vector<std::shared_ptr<GEShaderFilter>> shaderFilters;

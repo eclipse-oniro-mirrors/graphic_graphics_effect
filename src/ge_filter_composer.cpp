@@ -51,7 +51,7 @@ bool GEFilterComposer::Compose(const std::shared_ptr<GEShaderFilter> other)
     return false;
 }
 
-std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter()
+const std::shared_ptr<GEShaderFilter>& GEFilterComposer::GetComposedFilter()
 {
     return composedFilter_;
 }
