@@ -441,7 +441,6 @@ struct GEBorderLightShaderParams {
     float cornerRadius;
 };
 
-
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
