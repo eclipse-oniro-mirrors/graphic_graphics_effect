@@ -526,6 +526,42 @@ HWTEST_F(GEVisualEffectImplTest, SetParamEdgelight_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParamBezierWarpTest_001
+ * @tc.desc: Verify function SetParam for action is valid, bezier filter adapt ng filter
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParamBezierWarpTest_001, TestSize.Level1)
+{
+    constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
+    std::array<Drawing::Point, BEZIER_WARP_POINT_NUM> points = {{
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f},
+        {0.0f, 0.0f}
+    }};
+    Drawing::GEVisualEffectImpl geVisualEffectImplTest(Drawing::GE_FILTER_EDGE_LIGHT);
+    EXPECT_EQ(geVisualEffectImplTest.bezierWarpParams_, nullptr);
+    
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_BEZIER_WARP);
+    geVisualEffectImpl.MakeBezierWarpParams();
+    EXPECT_NE(geVisualEffectImpl.bezierWarpParams_, nullptr);
+
+    geVisualEffectImpl.SetBezierWarpParams(Drawing::GE_FILTER_BEZIER_WARP_CONTROL_POINT0, std::make_pair(0.5f, 0.5f));
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetBezierWarpParams()->destinationPatch[0].GetX(), 0.5f);
+
+    geVisualEffectImpl.SetBezierWarpParams(Drawing::GE_FILTER_BEZIER_WARP_CONTROL_POINT11, std::make_pair(1.f, 1.f));
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetBezierWarpParams()->destinationPatch[11].GetY(), 1.f);
+}
+
+/**
  * @tc.name: SetParamDispersion_001
  * @tc.desc: Verify function SetParam for action is invalid
  * @tc.type:FUNC

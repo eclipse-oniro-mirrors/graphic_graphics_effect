@@ -423,6 +423,7 @@ private:
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
+    void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
     void SetBorderLightParams(const std::string& tag, const Vector3f& param);
     void SetBorderLightParams(const std::string& tag, const Vector4f& param);
     void SetBorderLightParams(const std::string& tag, float param);
