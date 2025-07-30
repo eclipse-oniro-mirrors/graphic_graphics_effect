@@ -12,17 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
+#include "ge_sound_wave_filter.h"
+
+#include <algorithm>
 #include <chrono>
  
 #include "ge_log.h"
-#include "ge_sound_wave_filter.h"
+#include "ge_tone_mapping_helper.h"
  
 namespace OHOS {
 namespace Rosen {
 
 namespace {
 constexpr static uint8_t COLOR_CHANNEL = 3; // 3 len of rgb
+
+inline void MultiplyColor4f(Drawing::Color4f& color, float ratio)
+{
+    color.redF_ *= ratio;
+    color.greenF_ *= ratio;
+    color.blueF_ *= ratio;
+}
 } // namespace
 
 GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
@@ -88,6 +98,23 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
         return image;
     }
     return invertedImage;
+}
+
+void GESoundWaveFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        return;
+    }
+
+    bool highColor = std::max({colorA_.redF_, colorA_.greenF_, colorA_.blueF_, colorB_.redF_, colorB_.greenF_,
+        colorB_.blueF_, colorC_.redF_, colorC_.greenF_, colorC_.blueF_});
+    if (ROSEN_GNE(highColor, 1.0f)) {
+        float compressRatio = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
+        MultiplyColor4f(colorA_, compressRatio);
+        MultiplyColor4f(colorB_, compressRatio);
+        MultiplyColor4f(colorC_, compressRatio);
+    }
 }
 
 void GESoundWaveFilter::CheckSoundWaveParams()

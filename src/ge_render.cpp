@@ -132,6 +132,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
             LOGD("GERender::ApplyImageEffect filter is null");
             continue;
         }
+        geShaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
         geShaderFilter->SetCache(ve->GetCache());
         geShaderFilter->Preprocess(canvas, src, dst);
         resImage = geShaderFilter->ProcessImage(canvas, resImage, src, dst);
@@ -535,6 +536,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
     }
     if (shaderFilter) {
         shaderFilter->SetShaderFilterCanvasinfo(vef->GetCanvasInfo());
+        shaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
     }
     return shaderFilter;
 }
