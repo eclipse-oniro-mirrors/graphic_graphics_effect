@@ -26,17 +26,23 @@ constexpr size_t NUM_3 = 3;
 constexpr size_t NUM_4 = 4;
 
 std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShaderEffect_ = nullptr;
+const std::string GEContentLightFilter::type_ = Drawing::GE_FILTER_CONTENT_LIGHT;
 
 GEContentLightFilter::GEContentLightFilter(const Drawing::GEContentLightFilterParams& params)
     : lightPosition_(params.lightPosition), lightColor_(params.lightColor), lightIntensity_(params.lightIntensity),
     rotationAngle_(params.rotationAngle)
 {}
 
-std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string& GEContentLightFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GEContentLightFilter::ProcessImage input is invalid");
+        LOGE("GEContentLightFilter::OnProcessImage input is invalid");
         return nullptr;
     }
 
@@ -65,7 +71,7 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::ProcessImage(Drawing::Canv
     auto invertedImage = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
     if (invertedImage == nullptr) {
-        LOGE("GEContentLightFilter::ProcessImage make image failed");
+        LOGE("GEContentLightFilter::OnProcessImage make image failed");
         return nullptr;
     }
     return invertedImage;

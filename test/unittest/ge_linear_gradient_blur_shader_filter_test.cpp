@@ -126,11 +126,11 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, GetDetailedDescription_003, TestS
 }
 
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -139,15 +139,15 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_001, TestSize.Level0
     ASSERT_TRUE(filter != nullptr);
 
     std::shared_ptr<Drawing::Image> image = nullptr;
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -155,15 +155,15 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_002, TestSize.Level0
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
-    EXPECT_NE(filter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
 
 /**
- * @tc.name: ProcessImage_003
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_003
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_003, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -174,60 +174,60 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_003, TestSize.Level0
     // 1.0f, 1.0f, 200.0f, 200.0f is left top right bottom
     Drawing::Rect src { 1.0f, 1.0f, 200.0f, 200.0f };
     Drawing::Rect dst { 1.0f, 1.0f, 2.0f, 2.0f };
-    EXPECT_NE(filter->ProcessImage(canvas_, image_, src, dst), nullptr);
+    EXPECT_NE(filter->OnProcessImage(canvas_, image_, src, dst), nullptr);
 }
 
 /**
- * @tc.name: ProcessImage_004
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_004, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 0 direction LEFT, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 0, 1.f, 1.f,
         Drawing::Matrix(), 1.f, 1.f, true, false};
     auto filter0 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter0 != nullptr);
-    EXPECT_NE(filter0->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter0->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 2; // RIGHT
     auto filter2 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter2 != nullptr);
-    EXPECT_NE(filter2->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter2->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 3; // BOTTOM
     auto filter3 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter3 != nullptr);
-    EXPECT_NE(filter3->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter3->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 4; // LEFT_TOP
     auto filter4 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter4 != nullptr);
-    EXPECT_NE(filter4->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter4->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 5; // LEFT_BOTTOM
     auto filter5 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter5 != nullptr);
-    EXPECT_NE(filter5->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter5->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 6; // RIGHT_TOP
     auto filter6 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter6 != nullptr);
-    EXPECT_NE(filter6->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter6->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     params.direction = 7; // RIGHT_BOTTOM
     auto filter7 = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter7 != nullptr);
-    EXPECT_NE(filter7->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter7->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
 
 /**
- * @tc.name: ProcessImage_005
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_005
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_005, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_005, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -236,15 +236,15 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_005, TestSize.Level0
     ASSERT_TRUE(filter != nullptr);
 
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
- * @tc.name: ProcessImage_006
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_006
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_006, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_006, TestSize.Level0)
 {
     // blur params: -1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{-1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -254,19 +254,19 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_006, TestSize.Level0
 
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     // test para's blurRadius <= 0
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
     
-        // test ProcessImage with para being nullptr
+        // test OnProcessImage with para being nullptr
     filter->linearGradientBlurPara_ = nullptr;
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
- * @tc.name: ProcessImage_007
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_007
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_007, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_007, TestSize.Level0)
 {
     // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -275,17 +275,17 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_007, TestSize.Level0
     ASSERT_TRUE(filter != nullptr);
 
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
-    // test ProcessImage with para's linearGradientBlurPara being nullptr
+    // test OnProcessImage with para's linearGradientBlurPara being nullptr
     filter->linearGradientBlurPara_->linearGradientBlurFilter_ = nullptr;
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
- * @tc.name: ProcessImage_008
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_008
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_008, TestSize.Level0)
+HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_008, TestSize.Level0)
 {
     // blur params: 10.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
     Drawing::GELinearGradientBlurShaderFilterParams params{10.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
@@ -293,7 +293,7 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImage_008, TestSize.Level0
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
-    EXPECT_NE(filter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
 
 /**
@@ -541,6 +541,20 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, TransformGradientBlurDirection_00
     direction = 3; // 3 direction value
     filter->TransformGradientBlurDirection(direction, 0); // 4 bias
     EXPECT_EQ(direction, 3); // 3 value after transform
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify function Type
+ * @tc.type:FUNC
+ */
+HWTEST_F(GELinearGradientBlurShaderFilterTest, Type_001, TestSize.Level1)
+{
+    // blur params: 1.f blurRadius, {0.1f, 0.1f} fractionStops, 1 direction, 1.f geoWidth, geoHeight, tranX, tranY
+    Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
+    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
 }
 
 } // namespace GraphicsEffectEngine

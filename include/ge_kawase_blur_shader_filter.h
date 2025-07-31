@@ -43,8 +43,10 @@ public:
     ~GEKawaseBlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
+
+    const std::string& Type() const override;
 
 private:
     static Drawing::Matrix GetShaderTransform(
@@ -80,6 +82,7 @@ private:
     int radius_;
     float blurRadius_ = 0.0f;
     float blurScale_ = 0.25f;
+    static const std::string type_;
 };
 
 } // namespace Rosen

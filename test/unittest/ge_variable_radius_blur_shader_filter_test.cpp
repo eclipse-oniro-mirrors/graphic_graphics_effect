@@ -122,15 +122,29 @@ HWTEST_F(GEVariableRadiusBlurShaderFilterTest, ProcessImageTest001, TestSize.Lev
     auto variableRadiusBlurShaderFilter = CreateVariableRadiusBlurShaderFilter();
     ASSERT_NE(variableRadiusBlurShaderFilter, nullptr);
 
-    EXPECT_EQ(variableRadiusBlurShaderFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(variableRadiusBlurShaderFilter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 
     variableRadiusBlurShaderFilter->params_.mask = nullptr;
-    EXPECT_EQ(variableRadiusBlurShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(variableRadiusBlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     variableRadiusBlurShaderFilter->params_.mask = CreateRippleShaderMask();
-    EXPECT_EQ(variableRadiusBlurShaderFilter->ProcessImage(canvas_, imageEmpty_, src_, dst_), imageEmpty_);
+    EXPECT_EQ(variableRadiusBlurShaderFilter->OnProcessImage(canvas_, imageEmpty_, src_, dst_), imageEmpty_);
 
-    EXPECT_NE(variableRadiusBlurShaderFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_NE(variableRadiusBlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
+}
+
+/**
+ * @tc.name: TypeTest001
+ * @tc.desc: GEVariableRadiusBlurShaderFilterTest.TypeTest001
+ * @tc.type:FUNC
+ * @tc.require:
+ */
+HWTEST_F(GEVariableRadiusBlurShaderFilterTest, TypeTest001, TestSize.Level1)
+{
+    auto variableRadiusBlurShaderFilter = CreateVariableRadiusBlurShaderFilter();
+    ASSERT_NE(variableRadiusBlurShaderFilter, nullptr);
+
+    EXPECT_EQ(variableRadiusBlurShaderFilter->Type(), Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
 }
 
 }  // namespace Rosen

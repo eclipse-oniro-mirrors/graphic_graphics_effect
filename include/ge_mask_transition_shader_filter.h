@@ -26,12 +26,15 @@ public:
     GE_EXPORT GEMaskTransitionShaderFilter(const Drawing::GEMaskTransitionShaderFilterParams& params);
     ~GEMaskTransitionShaderFilter() override = default;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
+
+    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetMaskTransitionEffect();
     Drawing::GEMaskTransitionShaderFilterParams params_;
+    static const std::string type_;
 };
 
 } // namespace Rosen

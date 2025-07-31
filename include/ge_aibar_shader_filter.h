@@ -31,10 +31,12 @@ public:
     GEAIBarShaderFilter operator=(const GEAIBarShaderFilter&) = delete;
     ~GEAIBarShaderFilter() override = default;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
     const GE_EXPORT std::string GetDescription() const;
+
+    const std::string& Type() const override;
 
 private:
     float aiBarLow_;
@@ -42,10 +44,10 @@ private:
     float aiBarThreshold_;
     float aiBarOpacity_;
     float aiBarSaturation_;
+    static const std::string type_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeBinarizationShader(
         float imageWidth, float imageHeight, std::shared_ptr<Drawing::ShaderEffect> imageShader);
 };
-
 } // namespace Rosen
 } // namespace OHOS
 

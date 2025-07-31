@@ -60,10 +60,12 @@ public:
     GEMagnifierShaderFilter operator=(const GEMagnifierShaderFilter&) = delete;
     ~GEMagnifierShaderFilter() override = default;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
     const GE_EXPORT std::string GetDescription() const;
+
+    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMagnifierShader(
@@ -73,6 +75,7 @@ private:
 
     std::shared_ptr<GEMagnifierParams> magnifierPara_ = nullptr;
     static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffect;
+    static const std::string type_;
 };
 
 } // namespace Rosen

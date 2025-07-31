@@ -229,12 +229,18 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
 
 }
 
+const std::string GEDirectionLightShaderFilter::type_ = Drawing::GE_FILTER_DIRECTION_LIGHT;
+
 GEDirectionLightShaderFilter::GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params)
     : params_(params)
+{}
+
+const std::string& GEDirectionLightShaderFilter::Type() const
 {
+    return type_;
 }
 
-std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
@@ -253,29 +259,29 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     if (params_.mask != nullptr) {
         auto directionLightShader = GetDirectionLightEffect();
         if (directionLightShader == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage directionLightShader init failed");
+            LOGE("GEDirectionLightShaderFilter::OnProcessImage directionLightShader init failed");
             return image;
         }
         lightingBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(directionLightShader);
         if (lightingBuilder == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage lightingBuilder is nullptr");
+            LOGE("GEDirectionLightShaderFilter::OnProcessImage lightingBuilder is nullptr");
             return image;
         }
         auto maskShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
         if (maskShader == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage mask generate failed");
+            LOGE("GEDirectionLightShaderFilter::OnProcessImage mask generate failed");
             return image;
         }
         lightingBuilder->SetChild("mask", maskShader);
     } else {
         auto directionLightNoNormalShader = GetDirectionLightNoNormalEffect();
         if (directionLightNoNormalShader == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage directionLightNoNormalShader init failed");
+            LOGE("GEDirectionLightShaderFilter::OnProcessImage directionLightNoNormalShader init failed");
             return image;
         }
         lightingBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(directionLightNoNormalShader);
         if (lightingBuilder == nullptr) {
-            LOGE("GEDirectionLightShaderFilter::ProcessImage lightingBuilder is nullptr");
+            LOGE("GEDirectionLightShaderFilter::OnProcessImage lightingBuilder is nullptr");
             return image;
         }
     }
@@ -284,7 +290,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     imageMatrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
     Drawing::Matrix imageInvertMatrix;
     if (!imageMatrix.Invert(imageInvertMatrix)) {
-        LOGE("GEDirectionLightShaderFilter::ProcessImage Invert imageMatrix failed.");
+        LOGE("GEDirectionLightShaderFilter::OnProcessImage Invert imageMatrix failed.");
         return image;
     }
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
@@ -303,7 +309,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::ProcessImage(Drawi
     auto lightingImage = lightingBuilder->MakeImage(nullptr, &imageMatrix, imageInfo, false);
 #endif
     if (lightingImage == nullptr) {
-        LOGE("GEDirectionLightShaderFilter::ProcessImage make lightingImage failed");
+        LOGE("GEDirectionLightShaderFilter::OnProcessImage make lightingImage failed");
         return image;
     }
     return lightingImage;

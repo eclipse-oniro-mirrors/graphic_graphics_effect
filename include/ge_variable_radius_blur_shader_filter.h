@@ -33,12 +33,12 @@ public:
     GEVariableRadiusBlurShaderFilter operator=(const GEVariableRadiusBlurShaderFilter&) = delete;
     ~GEVariableRadiusBlurShaderFilter() override = default;
 
-    virtual std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
+    virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     std::string GetDescription();
     std::string GetDetailedDescription();
-
+    const std::string& Type() const override;
 
 protected:
     Drawing::GEVariableRadiusBlurShaderFilterParams params_;
@@ -54,6 +54,8 @@ private:
     static std::shared_ptr<Drawing::Image> BuildBoxLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         Drawing::Matrix blurMatrix);
+
+    static const std::string type_;
 };
 
 } // namespace Rosen

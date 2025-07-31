@@ -35,6 +35,8 @@ inline void MultiplyColor4f(Drawing::Color4f& color, float ratio)
 }
 } // namespace
 
+const std::string GESoundWaveFilter::type_ = Drawing::GE_FILTER_SOUND_WAVE;
+
 GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
@@ -46,12 +48,16 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
     colorC_ = params.colorC;
 }
 
+const std::string& GESoundWaveFilter::Type() const
+{
+    return type_;
+}
  
-std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage input is invalid");
+        LOGE("GESoundWaveFilter::OnProcessImage input is invalid");
         return nullptr;
     }
  
@@ -69,7 +75,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
     }
     auto soundWaveShader = GetSoundWaveEffect();
     if (soundWaveShader == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage g_SoundWaveEffect init failed");
+        LOGE("GESoundWaveFilter::OnProcessImage g_SoundWaveEffect init failed");
         return image;
     }
 
@@ -94,7 +100,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
  
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (invertedImage == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage make image failed");
+        LOGE("GESoundWaveFilter::OnProcessImage make image failed");
         return image;
     }
     return invertedImage;
@@ -144,7 +150,5 @@ std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
     }
     return g_soundWaveShader;
 }
-
-
 } // namespace Rosen
 } // namespace OHOS

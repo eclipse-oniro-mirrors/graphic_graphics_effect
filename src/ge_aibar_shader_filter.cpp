@@ -30,16 +30,24 @@ GEAIBarShaderFilter::GEAIBarShaderFilter(const Drawing::GEAIBarShaderFilterParam
     aiBarOpacity_(params.aiBarOpacity), aiBarSaturation_(params.aiBarSaturation)
 {}
 
-const std::string GEAIBarShaderFilter::GetDescription() const
+const std::string GEAIBarShaderFilter::type_ = Drawing::GE_FILTER_AI_BAR;
+
+const std::string& GEAIBarShaderFilter::Type() const
 {
-    return "GEAIBarShaderFilter";
+    return type;
 }
 
-std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string GEAIBarShaderFilter::GetDescription() const
+{
+    static const std::string description = "GEAIBarShaderFilter";
+    return description;
+}
+
+std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GEAIBarShaderFilter::ProcessImage image is null");
+        LOGE("GEAIBarShaderFilter::OnProcessImage image is null");
         return image;
     }
 
@@ -55,7 +63,7 @@ std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::ProcessImage(Drawing::Canva
     auto invertedImage = builder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
     if (invertedImage == nullptr) {
-        LOGE("GEAIBarShaderFilter::ProcessImage invertedImage is null");
+        LOGE("GEAIBarShaderFilter::OnProcessImage invertedImage is null");
         return image;
     }
 

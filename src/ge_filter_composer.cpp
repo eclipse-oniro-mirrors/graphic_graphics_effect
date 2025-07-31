@@ -99,7 +99,7 @@ std::shared_ptr<GEShaderFilter> GEFilterComposer::GenerateComposedFilter(
 std::shared_ptr<Drawing::Image> GEFilterComposer::ApplyComposedEffect(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    auto resImage = composedFilter_->ProcessImage(canvas, image, src, dst);
+    auto resImage = composedFilter_->OnProcessImage(canvas, image, src, dst);
     return resImage;
 }
 

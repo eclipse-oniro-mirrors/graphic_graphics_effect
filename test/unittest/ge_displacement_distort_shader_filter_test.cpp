@@ -57,28 +57,28 @@ void GEDisplacementDistortShaderFilterTest::SetUp()
 void GEDisplacementDistortShaderFilterTest::TearDown() { image_ = nullptr; }
  
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEDisplacementDistortShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_NE(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
  
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEDisplacementDistortShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     geDisplacementDistortFilterParams.factor_ = {0.5f, 0.5f};
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_NE(geDisplacementDistortFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -107,6 +107,18 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, Cache_001, TestSize.Level2)
     auto cache = std::make_shared<std::any>(std::make_any<float>(1.0));
     geDisplacementDistortFilter->SetCache(cache);
     EXPECT_EQ(std::any_cast<float>(*geDisplacementDistortFilter->GetCache()), 1.0);
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify type function
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEDisplacementDistortShaderFilterTest, Type_001, TestSize.Level2)
+{
+    Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
+    auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
+    EXPECT_EQ(geDisplacementDistortFilter->Type(), Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
 }
 
 } // namespace GraphicsEffectEngine

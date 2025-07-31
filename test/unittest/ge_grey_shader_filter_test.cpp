@@ -58,111 +58,129 @@ void GEGreyShaderFilterTest::SetUp()
 void GEGreyShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
- * @tc.name: ProcessImage_001
+ * @tc.name: OnProcessImage_001
  * @tc.desc: Verify the DrawImageEffect: image is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_001 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_001 start";
 
     // 0.0, 0.0   invalid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 0.0, 0.0 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_001 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_001 end";
 }
 
 /**
- * @tc.name: ProcessImage_002
+ * @tc.name: OnProcessImage_002
  * @tc.desc: Verify the DrawImageEffect: filter params is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_002 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_002 start";
 
     // -1.0, -1.0   invalid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { -1.0, -1.0 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_002 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_002 end";
 }
 
 /**
- * @tc.name: ProcessImage_003
+ * @tc.name: OnProcessImage_003
  * @tc.desc: Verify the DrawImageEffect: filter params is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_003, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_003, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_003 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_003 start";
 
     // 128.0, 128.0   invalid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 128.0, 128.0 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_003 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_003 end";
 }
 
 /**
- * @tc.name: ProcessImage_004
+ * @tc.name: OnProcessImage_004
  * @tc.desc: Verify the DrawImageEffect: filter params is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_004, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_004 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_004 start";
 
     // 0.0, 0.0   invalid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 0.0, 0.0 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_004 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_004 end";
 }
 
 /**
- * @tc.name: ProcessImage_005
+ * @tc.name: OnProcessImage_005
  * @tc.desc: Verify the DrawImageEffect: filter params is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_005, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_005, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_005 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_005 start";
 
     // 1.0, 1.0   valid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 1.0, 1.0 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_005 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_005 end";
 }
 
 /**
- * @tc.name: ProcessImage_006
+ * @tc.name: OnProcessImage_006
  * @tc.desc: Verify the DrawImageEffect: filter params is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEGreyShaderFilterTest, ProcessImage_006, TestSize.Level0)
+HWTEST_F(GEGreyShaderFilterTest, OnProcessImage_006, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_006 start";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_006 start";
 
     // 0.5, 0.5   invalid Grey blur params
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 0.5, 0.5 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geGreyShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest ProcessImage_006 end";
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest OnProcessImage_006 end";
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEGreyShaderFilterTest, Type_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest Type_001 start";
+
+    // 0.5, 0.5   invalid Grey blur params
+    Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 0.5, 0.5 };
+    std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
+        std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
+    EXPECT_EQ(geGreyShaderFilter->Type(), Drawing::GE_FILTER_GREY);
+
+    GTEST_LOG_(INFO) << "GEGreyShaderFilterTest Type_001 end";
 }
 
 } // namespace Rosen

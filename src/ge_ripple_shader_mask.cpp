@@ -17,6 +17,7 @@
  
 #include "ge_log.h"
 #include "ge_ripple_shader_mask.h"
+#include "utils/ge_trace.h"
  
 namespace OHOS {
 namespace Rosen {
@@ -26,6 +27,8 @@ GERippleShaderMask::GERippleShaderMask(const GERippleShaderMaskParams& param) : 
 
 std::shared_ptr<ShaderEffect> GERippleShaderMask::GenerateDrawingShader(float width, float height) const
 {
+    GE_TRACE_NAME_FMT("GERippleShaderMask::GenerateDrawingShader, Type: %s, Width: %g, Height: %g",
+        Drawing::GE_MASK_RIPPLE, width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
     builder = GetRippleShaderMaskBuilder();
     if (!builder) {
@@ -85,6 +88,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
 
 std::shared_ptr<ShaderEffect> GERippleShaderMask::GenerateDrawingShaderHasNormal(float width, float height) const
 {
+    GE_TRACE_NAME_FMT("GERippleShaderMask::GenerateDrawingShaderHasNormal, Type: %s, Width: %g, Height: %g",
+        Drawing::GE_MASK_RIPPLE, width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
     builder = GetRippleShaderNormalMaskBuilder();
     if (!builder) {
@@ -102,7 +107,6 @@ std::shared_ptr<ShaderEffect> GERippleShaderMask::GenerateDrawingShaderHasNormal
     }
     return rippleMaskEffectShader;
 }
-
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShaderNormalMaskBuilder() const
 {

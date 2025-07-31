@@ -27,14 +27,17 @@ public:
     GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params);
     ~GEBezierWarpShaderFilter() override = default;
 
-    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     Drawing::Brush GetBrush(const std::shared_ptr<Drawing::Image>& image) const;
 
+    const std::string& Type() const override;
+
 private:
     Drawing::GEBezierWarpShaderFilterParams params_;
     std::array<Drawing::Point, BEZIER_WARP_POINT_NUM> destinationPatch_;
+    static const std::string type_;
 
     void InitCtrlPoints(std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;
     void SetPathTo(Drawing::Path &path, std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;

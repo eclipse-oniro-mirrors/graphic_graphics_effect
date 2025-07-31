@@ -24,6 +24,7 @@ constexpr static uint8_t COLOR_CHANNEL = 4; // 4 len of rgba
 } // namespace
 
 std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffect = nullptr;
+const std::string GEMagnifierShaderFilter::type_ = Drawing::GE_FILTER_MAGNIFIER;
 
 GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params)
 {
@@ -47,11 +48,16 @@ GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShade
     magnifierPara_->rotateDegree_ = params.rotateDegree;
 }
 
-std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string& GEMagnifierShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr || magnifierPara_ == nullptr) {
-        LOGE("GEMagnifierShaderFilter::ProcessImage image or para is null");
+        LOGE("GEMagnifierShaderFilter::OnProcessImage image or para is null");
         return image;
     }
 
@@ -64,7 +70,7 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::ProcessImage(Drawing::C
     float imageHeight = image->GetHeight();
     auto builder = MakeMagnifierShader(imageShader, imageWidth, imageHeight);
     if (builder == nullptr) {
-        LOGE("GEMagnifierShaderFilter::ProcessImage builder is null");
+        LOGE("GEMagnifierShaderFilter::OnProcessImage builder is null");
         return image;
     }
 
@@ -77,7 +83,7 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::ProcessImage(Drawing::C
     auto resultImage = builder->MakeImage(nullptr, &invMatrix, image->GetImageInfo(), false);
 #endif
     if (resultImage == nullptr) {
-        LOGE("GEMagnifierShaderFilter::ProcessImage resultImage is null");
+        LOGE("GEMagnifierShaderFilter::OnProcessImage resultImage is null");
         return image;
     }
 
