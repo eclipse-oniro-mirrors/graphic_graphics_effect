@@ -1301,8 +1301,8 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, c
         return;
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_CENTER) {
-        particleCircularHaloParams_->center_.first = std::clamp(param.first, 0.001f, 1.0f);
-        particleCircularHaloParams_->center_.second = std::clamp(param.second, 0.001f, 1.0f);
+        particleCircularHaloParams_->center_.first = std::clamp(param.first, 0.0f, 1.0f);
+        particleCircularHaloParams_->center_.second = std::clamp(param.second, 0.0f, 1.0f);
     }
 }
 
@@ -1312,10 +1312,10 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
         return;
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_RADIUS) {
-        particleCircularHaloParams_->radius_ = std::clamp(param, 0.001f, 1.0f);
+        particleCircularHaloParams_->radius_ = std::clamp(param, 0.0f, 1.0f);
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
-        particleCircularHaloParams_->noise_ = std::max(param, 0.001f);
+        particleCircularHaloParams_->noise_ = std::max(param, 0.0f);
     }
 }
 

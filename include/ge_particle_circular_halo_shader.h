@@ -40,12 +40,6 @@ public:
         particleCircularHaloParams_ = params;
     }
 
-    void SetGlobalRadius(float globalRadius);
-
-    void SetRotationCenter(const std::pair<float, float>& rotationCenter);
-
-    void SetRandomNoise(float randomNoise);
-
     static std::shared_ptr<GEParticleCircularHaloShader>
         CreateParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
