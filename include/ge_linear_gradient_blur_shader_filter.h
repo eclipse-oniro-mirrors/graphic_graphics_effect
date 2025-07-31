@@ -28,6 +28,9 @@
 
 namespace OHOS {
 namespace Rosen {
+
+REGISTER_GEFILTER_TYPEINFO(LINEAR_GRADIENT_BLUR, GELinearGradientBlurShaderFilter, 
+                           Drawing::GELinearGradientBlurShaderFilterParams);
 class GELinearGradientBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GELinearGradientBlurShaderFilter(const Drawing::GELinearGradientBlurShaderFilterParams& params);

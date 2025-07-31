@@ -30,11 +30,16 @@
 
 namespace OHOS {
 namespace Rosen {
+
+REGISTER_GEFILTER_TYPEINFO(MESA_BLUR, GEMESABlurShaderFilter, Drawing::GEMESABlurShaderFilterParams);
+
 class GEMESABlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFilterParams& params);
     ~GEMESABlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEMESABlurShaderFilter);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

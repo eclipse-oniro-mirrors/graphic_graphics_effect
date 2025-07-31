@@ -21,10 +21,15 @@
 namespace OHOS {
 namespace Rosen {
 
+REGISTER_GEFILTER_TYPEINFO(GREY, GEGreyShaderFilter, Drawing::GEGreyShaderFilterParams);
 class GEGreyShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params);
     ~GEGreyShaderFilter() override = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEGreyShaderFilter);
+
+    std::shared_ptr<Drawing::GEFilterParams> Params() const override;
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

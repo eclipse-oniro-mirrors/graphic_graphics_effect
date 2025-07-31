@@ -37,11 +37,15 @@ namespace Rosen {
 
 struct OffsetInfo;
 
+REGISTER_GEFILTER_TYPEINFO(KAWASE_BLUR, GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams);
 class GEKawaseBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params);
     ~GEKawaseBlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter);
+    std::shared_ptr<Drawing::GEFilterParams> Params() const override;
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

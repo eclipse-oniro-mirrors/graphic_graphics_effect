@@ -27,16 +27,14 @@ const std::string GEGreyShaderFilter::type_ = Drawing::GE_FILTER_GREY;
 GEGreyShaderFilter::GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params)
     : greyCoef1_(params.greyCoef1), greyCoef2_(params.greyCoef2)
 {
-    params_ = std::make_optional<Drawing::GEGreyShaderFilterParams>(params);
     if (!InitGreyAdjustmentEffect()) {
         LOGE("GEGreyShaderFilter::GEGreyShaderFilter failed to construct when initializing GreyAdjustmentEffect.");
         return;
     }
 }
 
-const std::string& GEGreyShaderFilter::Type() const
-{
-    return type_;
+std::shared_ptr<Drawing::GEFilterParams> GEGreyShaderFilter::Params() const {
+    return Drawing::GEFilterParams::Box(Drawing::GEGreyShaderFilterParams {greyCoef1_, greyCoef2_});
 }
 
 static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
