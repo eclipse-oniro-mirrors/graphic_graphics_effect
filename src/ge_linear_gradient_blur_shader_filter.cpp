@@ -24,7 +24,6 @@ namespace {
 constexpr static float FLOAT_ZERO_THRESHOLD = 0.001f;
 constexpr static uint8_t DIRECTION_NUM = 4;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> maskBlurShaderEffect_ = nullptr;
-const std::string GELinearGradientBlurShaderFilter::type_ = Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR;
 
 static bool GetMaskLinearBlurEnabled()
 {
@@ -39,6 +38,8 @@ static bool GetMaskLinearBlurEnabled()
 #endif
 }
 } // namespace
+
+const std::string GELinearGradientBlurShaderFilter::type_ = Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR;
 
 GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     const Drawing::GELinearGradientBlurShaderFilterParams& params)
