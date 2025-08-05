@@ -40,7 +40,7 @@ class GEOptionalTrace {
 public:
     GEOptionalTrace(std::string traceStr)
     {
-        static bool debugTraceEnable = 
+        static bool debugTraceEnable =
             (std::atoi(GESystemProperties::GetEventProperty("persist.sys.graphic.openDebugTrace").c_str()) != 0);
         if (LIKELY(debugTraceEnable)) {
             return;
@@ -52,7 +52,7 @@ public:
 
     ~GEOptionalTrace()
     {
-        static bool debugTraceEnable = 
+        static bool debugTraceEnable =
             (std::atoi(GESystemProperties::GetEventProperty("persist.sys.graphic.openDebugTrace").c_str()) != 0);
         if (UNLIKELY(debugTraceEnable)) {
             FinishTrace(HITRACE_TAG_GRAPHIC_AGP | HITRACE_TAG_COMMERCIAL);
