@@ -34,7 +34,7 @@ const std::string GEAIBarShaderFilter::type_ = Drawing::GE_FILTER_AI_BAR;
 
 const std::string& GEAIBarShaderFilter::Type() const
 {
-    return type;
+    return type_;
 }
 
 const std::string GEAIBarShaderFilter::GetDescription() const
