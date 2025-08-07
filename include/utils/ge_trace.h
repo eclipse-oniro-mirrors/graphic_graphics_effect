@@ -26,20 +26,20 @@ namespace OHOS::Rosen {
 #define UNLIKELY(exp) (__builtin_expect((exp) != 0, false))
 #define GE_TRACE(name)                                                                                                  \
     static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);       \
-    auto geNameTrace = (UNLIEKLY(debugTraceEnable)) ?                                                                   \
+    auto geNameTrace = (UNLIKELY(debugTraceEnable)) ?                                                                   \
                         std::make_unique<GEOptionalTrace>(name) :                                                       \
                         nullptr
 
 #define GE_TRACE_FUNC()                                                                                                 \
     static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);       \
-    auto geNameTrace = (UNLIEKLY(debugTraceEnable)) ?                                                                   \
+    auto geNameTrace = (UNLIKELY(debugTraceEnable)) ?                                                                   \
                         std::make_unique<GEOptionalTrace>(__func__) :                                                   \
                         nullptr
 
 #define GE_TRACE_NAME_FMT(fmt, ...)                                                                                     \
     do {                                                                                                                \
         static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);   \
-        if (UNLIEKLY(debugTraceEnable)) {                                                                               \
+        if (UNLIKELY(debugTraceEnable)) {                                                                               \
             std::string name { "GE#" };                                                                                 \
             name.append(fmt);                                                                                           \
             HITRACE_METER_FMT(HITRACE_TAG_GRAPHIC_AGP, name.c_str(), ##__VA_ARGS__);                                    \
