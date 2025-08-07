@@ -57,63 +57,75 @@ void GEWaterRippleFilterTest::SetUp()
 void GEWaterRippleFilterTest::TearDown() { image_ = nullptr; }
  
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_001, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.7f, 1.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_NE(geWaterRippleFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geWaterRippleFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
  
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_002, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.7f, 1.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_EQ(geWaterRippleFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(geWaterRippleFilter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 }
 
 /**
- * @tc.name: ProcessImage_003
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_003
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage_003, TestSize.Level0)
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_003, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.0f, 2.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_NE(geWaterRippleFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geWaterRippleFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
- * @tc.name: ProcessImage_004
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage_004, TestSize.Level0)
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_004, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2.0f, 0.5f, 0.0f, 0.0f };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_NE(geWaterRippleFilter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geWaterRippleFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
- * @tc.name: ProcessImage_005
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_005
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEWaterRippleFilterTest, ProcessImage_005, TestSize.Level0)
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_005, TestSize.Level0)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2, 0.5f, 0.0f, 3 };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_EQ(geWaterRippleFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_EQ(geWaterRippleFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify function Type
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEWaterRippleFilterTest, Type_001, TestSize.Level2)
+{
+    Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2, 0.5f, 0.0f, 3 };
+    auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
+    EXPECT_EQ(geWaterRippleFilter->Type(), Drawing::GE_FILTER_WATER_RIPPLE);
 }
 
 } // namespace GraphicsEffectEngine

@@ -36,9 +36,11 @@ public:
     ~GEMESABlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
     static GE_EXPORT void SetMesaModeByCCM(int mode);
+
+    const std::string& Type() const override;
 
 protected:
     struct NewBlurParams {
@@ -145,6 +147,8 @@ private:
     Drawing::Matrix BuildStretchMatrixFull(const Drawing::Rect& src,
         const Drawing::Rect& dst, int inputWidth, int inputHeight) const;
     void CalculatePixelStretch(int width, int height);
+
+    static const std::string type_;
 };
 
 } // namespace Rosen

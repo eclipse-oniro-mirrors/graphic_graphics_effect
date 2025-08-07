@@ -75,11 +75,11 @@ HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level3)
 }
 
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -87,30 +87,30 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_001, TestSize.Level0)
     ASSERT_TRUE(filter != nullptr);
 
     std::shared_ptr<Drawing::Image> image = nullptr;
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
-    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
- * @tc.name: ProcessImage_003
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_003
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_003, TestSize.Level0)
+HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_003, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
@@ -120,25 +120,25 @@ HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_003, TestSize.Level0)
     // 1.0f, 1.0f, 200.0f, 200.0f is left top right bottom
     Drawing::Rect src { 1.0f, 1.0f, 200.0f, 200.0f };
     Drawing::Rect dst { 1.0f, 1.0f, 2.0f, 2.0f };
-    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src, dst), image_);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src, dst), image_);
 }
 
 /**
- * @tc.name: ProcessImage_004
- * @tc.desc: Verify function ProcessImage
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify function OnProcessImage
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, ProcessImage_004, TestSize.Level0)
+HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 {
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
-    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
     EXPECT_TRUE(filter->InitMagnifierEffect());
 }
 
@@ -197,6 +197,19 @@ HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader_001, TestSize.Level1)
     float imageHeight = image_->GetHeight();
     auto builder = filter->MakeMagnifierShader(imageShader, imageWidth, imageHeight);
     EXPECT_EQ(builder, nullptr);
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify function Type
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_MAGNIFIER);
 }
 
 } // namespace GraphicsEffectEngine

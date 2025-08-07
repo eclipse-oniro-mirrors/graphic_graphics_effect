@@ -16,6 +16,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -26,23 +27,29 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> verticalBoxBlurShade
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> textureShaderEffect_ = nullptr;
 } // namespace
 
+const std::string GEVariableRadiusBlurShaderFilter::type_ = Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR;
+
 GEVariableRadiusBlurShaderFilter::GEVariableRadiusBlurShaderFilter(
     const Drawing::GEVariableRadiusBlurShaderFilterParams &params)
     : params_(params)
+{}
+
+const std::string& GEVariableRadiusBlurShaderFilter::Type() const
 {
+    return type_;
 }
 
-std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image || params_.blurRadius <= 0 || !params_.mask) {
         return image;
     }
-    LOGD("GEVariableRadiusBlurShaderFilter::ProcessImage radius: %{public}f", params_.blurRadius);
+    LOGD("GEVariableRadiusBlurShaderFilter::OnProcessImage radius: %{public}f", params_.blurRadius);
     auto imageInfo = image->GetImageInfo();
     auto maskShader = params_.mask->GenerateDrawingShader(imageInfo.GetWidth(), imageInfo.GetHeight());
     if (maskShader == nullptr) {
-        LOGE("GEVariableRadiusBlurShaderFilter::ProcessImage mask generate failed");
+        LOGE("GEVariableRadiusBlurShaderFilter::OnProcessImage mask generate failed");
         return image;
     }
     float radius = std::clamp(params_.blurRadius, 0.0f, 60.0f); // 60.0 represents largest blur radius
@@ -154,6 +161,8 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::DrawBoxLinearG
     const std::shared_ptr<Drawing::Image>& image, Drawing::Canvas& canvas, float radius,
     std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader, const Drawing::Rect& dst)
 {
+    GE_TRACE_NAME_FMT("GEVariableRadiusBlurShaderFilter::DrawBoxLinearGradientBlur, Type: %s, radius: %g "\
+        "Width: %g, Height: %g", Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR, radius, dst.GetWidth(), dst.GetHeight());
     if (!horizontalBoxBlurShaderEffect_ || !verticalBoxBlurShaderEffect_ || !image) {
         return image;
     }

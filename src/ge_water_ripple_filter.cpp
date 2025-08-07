@@ -31,18 +31,24 @@ const int SMALL2SMALL = 2;
 const int MINI_RECV = 3;
 
 } // namespace
- 
+
+const std::string GEWaterRippleFilter::type_ = Drawing::GE_FILTER_WATER_RIPPLE;
  
 GEWaterRippleFilter::GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params)
     : progress_(params.progress), waveCount_(params.waveCount), rippleCenterX_(params.rippleCenterX),
     rippleCenterY_(params.rippleCenterY), rippleMode_(params.rippleMode)
 {}
+
+const std::string& GEWaterRippleFilter::Type() const
+{
+    return type_;
+}
  
-std::shared_ptr<Drawing::Image> GEWaterRippleFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEWaterRippleFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GEWaterRippleFilter::ProcessImage input is invalid");
+        LOGE("GEWaterRippleFilter::OnProcessImage input is invalid");
         return nullptr;
     }
  
@@ -57,7 +63,7 @@ std::shared_ptr<Drawing::Image> GEWaterRippleFilter::ProcessImage(Drawing::Canva
     }
     auto waterRipple = GetWaterRippleEffect();
     if (waterRipple == nullptr) {
-        LOGE("GEWaterRippleFilter::ProcessImage g_waterRippleEffect init failed");
+        LOGE("GEWaterRippleFilter::OnProcessImage g_waterRippleEffect init failed");
         return nullptr;
     }
     Drawing::RuntimeShaderBuilder builder(waterRipple);
@@ -72,7 +78,7 @@ std::shared_ptr<Drawing::Image> GEWaterRippleFilter::ProcessImage(Drawing::Canva
     auto invertedImage = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
     if (invertedImage == nullptr) {
-        LOGE("GEWaterRippleFilter::ProcessImage make image failed");
+        LOGE("GEWaterRippleFilter::OnProcessImage make image failed");
         return nullptr;
     }
     return invertedImage;
@@ -94,7 +100,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
             return GetWaterRippleEffectMR();
         }
         default: {
-            LOGE("GEWaterRippleFilter::ProcessImage: Not support current ripple mode");
+            LOGE("GEWaterRippleFilter::OnProcessImage: Not support current ripple mode");
             return nullptr;
         }
     }

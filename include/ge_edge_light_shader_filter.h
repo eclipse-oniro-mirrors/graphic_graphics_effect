@@ -31,10 +31,12 @@ public:
     GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
     ~GEEdgeLightShaderFilter() override = default;
 
-    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+
+    const std::string& Type() const override;
 
 protected:
     float alpha_ = 1.0f;
@@ -42,6 +44,8 @@ protected:
     Vector4f color_ = {0.2f, 0.7f, 0.1f, 0.0f};
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
     bool useRawColor_ = false;
+
+    static const std::string type_;
 };
 
 } // namespace Rosen

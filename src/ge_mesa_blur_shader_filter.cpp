@@ -86,6 +86,7 @@ static const std::vector<std::vector<float>> offsetTableFivePasses = {
 };
 
 } // namespace
+const std::string GEMESABlurShaderFilter::type_ = Drawing::GE_FILTER_MESA_BLUR;
 
 static bool GetKawaseOriginalEnabled()
 {
@@ -130,6 +131,11 @@ GEMESABlurShaderFilter::GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFi
             return;
         }
     }
+}
+
+const std::string& GEMESABlurShaderFilter::Type() const
+{
+    return type_;
 }
 
 void GEMESABlurShaderFilter::SetMesaModeByCCM(int mode)
@@ -494,7 +500,7 @@ Drawing::ImageInfo GEMESABlurShaderFilter::ComputeImageInfo(const Drawing::Image
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
 }
 
-std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!IsInputValid(canvas, image, src, dst)) {
@@ -525,7 +531,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::ProcessImage(Drawing::Ca
     // Step2. Apply downsampling and fuzed effect such as grey adjustment and pixel stretch
     auto tmpBlur = DownSamplingFuzedBlur(canvas, blurBuilder, input, src, scaledInfo, width, height, linear, blur);
     if (!tmpBlur) {
-        LOGE("GEMESABlurShaderFilter::ProcessImage make image error when downsampling");
+        LOGE("GEMESABlurShaderFilter::OnProcessImage make image error when downsampling");
         return image;
     }
 
@@ -533,7 +539,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::ProcessImage(Drawing::Ca
     Drawing::RuntimeShaderBuilder simpleBlurBuilder(g_simpleFilter);
     tmpBlur = PingPongBlur(canvas, blurBuilder, simpleBlurBuilder, tmpBlur, input, scaledInfo, linear, blur);
     if (!tmpBlur) {
-        LOGE("GEMESABlurShaderFilter::ProcessImage make image error in PingPongBlur");
+        LOGE("GEMESABlurShaderFilter::OnProcessImage make image error in PingPongBlur");
         return image;
     }
 

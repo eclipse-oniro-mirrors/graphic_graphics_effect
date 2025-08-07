@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_radial_gradient_shader_mask.h"
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -32,6 +33,8 @@ GERadialGradientShaderMask::GERadialGradientShaderMask(GERadialGradientShaderMas
 
 std::shared_ptr<ShaderEffect> GERadialGradientShaderMask::GenerateDrawingShader(float width, float height) const
 {
+    GE_TRACE_NAME_FMT("GERadialGradientShaderMask::GenerateDrawingShader, Type: %s, Width: %g, Height: %g",
+        Drawing::GE_MASK_RADIAL_GRADIENT, width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
     builder = GetRadialGradientShaderMaskBuilder();
     if (!builder) {
@@ -117,6 +120,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
 std::shared_ptr<ShaderEffect> GERadialGradientShaderMask::GenerateDrawingShaderHasNormal(float width,
     float height) const
 {
+    GE_TRACE_NAME_FMT("GERadialGradientShaderMask::GenerateDrawingShaderHasNormal, Type: %s, Width: %g, Height: %g",
+        Drawing::GE_MASK_RADIAL_GRADIENT, width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
     builder = GetRadialGradientNormalMaskBuilder();
     if (!builder) {

@@ -39,6 +39,8 @@ static bool GetMaskLinearBlurEnabled()
 }
 } // namespace
 
+const std::string GELinearGradientBlurShaderFilter::type_ = Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR;
+
 GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     const Drawing::GELinearGradientBlurShaderFilterParams& params)
 {
@@ -52,6 +54,11 @@ GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     tranX_ = params.tranX;
     tranY_ = params.tranY;
     isOffscreenCanvas_ = params.isOffscreenCanvas;
+}
+
+const std::string& GELinearGradientBlurShaderFilter::Type() const
+{
+    return type_;
 }
 
 std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImageDDGR(
@@ -86,7 +93,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImageDD
     return image;
 }
 
-std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     auto& para = linearGradientBlurPara_;
@@ -275,7 +282,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::DrawMaskLinear
         return image;
     }
     auto srcRect = Drawing::Rect(0, 0, imageInfo.GetWidth(), imageInfo.GetHeight());
-    auto blurImage = blurFilter->ProcessImage(canvas, image, srcRect, dst);
+    auto blurImage = blurFilter->OnProcessImage(canvas, image, srcRect, dst);
 
     Drawing::Matrix matrix;
     Drawing::Matrix inputMatrix;

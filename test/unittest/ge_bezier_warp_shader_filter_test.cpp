@@ -61,19 +61,19 @@ void GEBezierWarpShaderFilterTest::SetUp()
 void GEBezierWarpShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify the ProcessImage: image is nullptr
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify the OnProcessImage: image is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(GEBezierWarpShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEBezierWarpShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEBezierWarpShaderFilterTest ProcessImage_001 start";
+    GTEST_LOG_(INFO) << "GEBezierWarpShaderFilterTest OnProcessImage_001 start";
 
     Drawing::GEBezierWarpShaderFilterParams geBezierWarpShaderFilterParams;
     auto geBezierWarpShaderFilter = std::make_unique<GEBezierWarpShaderFilter>(geBezierWarpShaderFilterParams);
-    EXPECT_EQ(geBezierWarpShaderFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_EQ(geBezierWarpShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GEBezierWarpShaderFilterTest ProcessImage_001 end";
+    GTEST_LOG_(INFO) << "GEBezierWarpShaderFilterTest OnProcessImage_001 end";
 }
 
 /**
@@ -134,6 +134,18 @@ HWTEST_F(GEBezierWarpShaderFilterTest, SetPathTo_001, TestSize.Level1)
     auto geBezierWarpShaderFilter = std::make_unique<GEBezierWarpShaderFilter>(geBezierWarpShaderFilterParams);
     geBezierWarpShaderFilter->SetPathTo(path, bezierPatch);
     EXPECT_NE(path.GetLength(true), 0.0f);
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBezierWarpShaderFilterTest, Type_001, TestSize.Level2)
+{
+    Drawing::GEBezierWarpShaderFilterParams geBezierWarpShaderFilterParams;
+    auto geBezierWarpShaderFilter = std::make_unique<GEBezierWarpShaderFilter>(geBezierWarpShaderFilterParams);
+    EXPECT_EQ(geBezierWarpShaderFilter->Type(), Drawing::GE_FILTER_BEZIER_WARP);
 }
 } // namespace Rosen
 } // namespace OHOS

@@ -28,6 +28,8 @@ namespace {
     static constexpr float MIN_IMAGE_SIZE = 1e-6;
 }
 
+const std::string GEEdgeLightShaderFilter::type_ = Drawing::GE_FILTER_EDGE_LIGHT;
+
 GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params)
 {
     alpha_ = params.alpha;
@@ -37,11 +39,16 @@ GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShade
     useRawColor_ = params.useRawColor;
 }
 
-std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::ProcessImage(Drawing::Canvas &canvas,
+const std::string& GEEdgeLightShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::OnProcessImage(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
     if (image == nullptr) {
-        LOGE("GEEdgeLightShaderFilter:: ProcessImage input image is invalid.");
+        LOGE("GEEdgeLightShaderFilter:: OnProcessImage input image is invalid.");
         return nullptr;
     }
 
@@ -65,5 +72,3 @@ void GEEdgeLightShaderFilter::Preprocess(Drawing::Canvas& canvas, const Drawing:
 }
 }
 }
-
- 

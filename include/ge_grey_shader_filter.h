@@ -26,14 +26,17 @@ public:
     GE_EXPORT GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params);
     ~GEGreyShaderFilter() override = default;
 
-    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
+
+    const std::string& Type() const override;
 
 private:
     bool InitGreyAdjustmentEffect();
 
     float greyCoef1_;
     float greyCoef2_;
+    static const std::string type_;
 };
 
 } // namespace Rosen

@@ -58,31 +58,31 @@ void GESoundWaveFilterTest::SetUp()
 void GESoundWaveFilterTest::TearDown() { image_ = nullptr; }
 
 /**
- * @tc.name: ProcessImage001
- * @tc.desc: Verify the ProcessImage: image is nullptr
+ * @tc.name: OnProcessImage001
+ * @tc.desc: Verify the OnProcessImage: image is nullptr
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, ProcessImage001, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, OnProcessImage001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage001 start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage001 start";
 
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage001 end";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage001 end";
 }
 
 
 /**
- * @tc.name: ProcessImage002
- * @tc.desc: Verify the ProcessImage
+ * @tc.name: OnProcessImage002
+ * @tc.desc: Verify the OnProcessImage
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, ProcessImage002, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, OnProcessImage002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage002 start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage002 start";
 
     // init data
     Drawing::Bitmap bmp;
@@ -94,19 +94,19 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage002, TestSize.Level1)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->OnProcessImage(canvas_, image, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage002 end";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage002 end";
 }
 
 /**
- * @tc.name: ProcessImage003
- * @tc.desc: Verify the ProcessImage
+ * @tc.name: OnProcessImage003
+ * @tc.desc: Verify the OnProcessImage
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, ProcessImage003, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, OnProcessImage003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage003 start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage003 start";
 
     // init data
     Drawing::Bitmap bmp;
@@ -118,26 +118,26 @@ HWTEST_F(GESoundWaveFilterTest, ProcessImage003, TestSize.Level1)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->OnProcessImage(canvas_, image, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage003 end";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage003 end";
 }
 
 /**
- * @tc.name: ProcessImage004
- * @tc.desc: Verify the ProcessImage
+ * @tc.name: OnProcessImage004
+ * @tc.desc: Verify the OnProcessImage
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, ProcessImage004, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, OnProcessImage004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage004 start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage004 start";
 
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->ProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_EQ(geSoundWaveFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ProcessImage004 end";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage004 end";
 }
 
 /**
@@ -187,6 +187,23 @@ HWTEST_F(GESoundWaveFilterTest, CheckSoundWaveColor4f, TestSize.Level1)
     EXPECT_EQ(colorA.alphaF_, 1.0f);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest CheckSoundWaveColor4f end";
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, Type_001, TestSize.Level2)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest Type_001 start";
+
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    EXPECT_EQ(geSoundWaveFilter->Type(), Drawing::GE_FILTER_SOUND_WAVE);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest Type_001 end";
 }
 
 } // namespace Rosen

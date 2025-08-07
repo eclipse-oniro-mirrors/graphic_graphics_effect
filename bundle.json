@@ -1,49 +1,54 @@
 {
-    "name": "@ohos/graphics_effect",
-    "description": "graphics_effect",
-    "version": "1.0",
-    "license": "Apache License 2.0",
-    "publishAs": "code-segment",
-    "segment": {
-      "destPath": "foundation/graphic/graphics_effect"
-    },
-    "dirs": {},
-    "scripts": {},
-    "component": {
-      "name": "graphics_effect",
-      "subsystem": "graphic",
-      "syscap": [ ],
-      "adapted_system_type": [ "standard" ],
-      "features": [ "graphics_effect_feature_upgrade_skia" ],
-      "rom": "",
-      "ram": "",
-      "deps": {
-        "components": [
-          "bounds_checking_function",
-          "c_utils",
-          "graphic_2d",
-          "hilog",
-          "init",
-          "skia"
-        ]
-      },
-      "build": {
-        "sub_component": [
-          "//foundation/graphic/graphics_effect:graphics_effect_core"
-        ],
-        "inner_kits": [
-          {
-            "type": "so",
-            "name": "//foundation/graphic/graphics_effect:graphics_effect_core",
-            "header": {
-              "header_files": [ ],
-              "header_base": "//foundation/graphic/graphics_effect/include"
-            }
-          }
-        ],
-        "test": [
-          "//foundation/graphic/graphics_effect/test:test"
-        ]
-      }
-    }
-  }
+	"name": "@ohos/graphics_effect",
+	"description": "graphics_effect",
+	"version": "1.0",
+	"license": "Apache License 2.0",
+	"publishAs": "code-segment",
+	"segment": {
+	"destPath": "foundation/graphic/graphics_effect"
+	},
+	"dirs": {},
+	"scripts": {},
+	"component": {
+	"name": "graphics_effect",
+	"subsystem": "graphic",
+	"syscap": [],
+	"adapted_system_type": [
+	  "standard"
+	],
+	"features": [
+	  "graphics_effect_feature_upgrade_skia"
+	],
+	"rom": "",
+	"ram": "",
+	"deps": {
+	  "components": [
+		"bounds_checking_function",
+		"c_utils",
+		"graphic_2d",
+		"hilog",
+		"hitrace",
+		"init",
+		"skia"
+	  ]
+	},
+	"build": {
+	  "sub_component": [
+		"//foundation/graphic/graphics_effect:graphics_effect_core"
+	  ],
+	  "inner_kits": [
+		{
+		  "type": "so",
+		  "name": "//foundation/graphic/graphics_effect:graphics_effect_core",
+		  "header": {
+			"header_files": [],
+			"header_base": "//foundation/graphic/graphics_effect/include"
+		  }
+		}
+	  ],
+	  "test": [
+		"//foundation/graphic/graphics_effect/test:test"
+	  ]
+	}
+	}
+}
