@@ -24,27 +24,32 @@ namespace OHOS::Rosen {
 
 #define LIKELY(exp) (__builtin_expect((exp) != 0, true))
 #define UNLIKELY(exp) (__builtin_expect((exp) != 0, false))
-#define GE_TRACE(name) OHOS::Rosen::GEOptionalTrace optionalTrace(name)
-#define GE_TRACE_FUNC() OHOS::Rosen::GEOptionalTrace optionalTrace(__PRETTY_FUNCTION__)
-#define GE_TRACE_NAME_FMT(fmt, ...)                                                                                   \
-    do {                                                                                                              \
-        static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0); \
-        if (debugTraceEnable) {                                                                                       \
-            std::string name { "GE#" };                                                                               \
-            name.append(fmt);                                                                                         \
-            HITRACE_METER_FMT(HITRACE_TAG_GRAPHIC_AGP, name.c_str(), ##__VA_ARGS__);                                  \
-        }                                                                                                             \
+#define GE_TRACE(name)                                                                                                  \
+    static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);       \
+    auto geNameTrace = (UNLIEKLY(debugTraceEnable)) ?                                                                   \
+                        std::make_unique<GEOptionalTrace>(name) :                                                       \
+                        nullptr
+
+#define GE_TRACE_FUNC()                                                                                                 \
+    static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);       \
+    auto geNameTrace = (UNLIEKLY(debugTraceEnable)) ?                                                                   \
+                        std::make_unique<GEOptionalTrace>(__func__) :                                                   \
+                        nullptr
+
+#define GE_TRACE_NAME_FMT(fmt, ...)                                                                                     \
+    do {                                                                                                                \
+        static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);   \
+        if (UNLIEKLY(debugTraceEnable)) {                                                                               \
+            std::string name { "GE#" };                                                                                 \
+            name.append(fmt);                                                                                           \
+            HITRACE_METER_FMT(HITRACE_TAG_GRAPHIC_AGP, name.c_str(), ##__VA_ARGS__);                                    \
+        }                                                                                                               \
     } while (0)
 
 class GEOptionalTrace {
 public:
     GEOptionalTrace(std::string traceStr)
     {
-        static bool debugTraceEnable =
-            (std::atoi(GESystemProperties::GetEventProperty("persist.sys.graphic.openDebugTrace").c_str()) != 0);
-        if (LIKELY(debugTraceEnable)) {
-            return;
-        }
         std::string name { "GE#" };
         name.append(traceStr);
         StartTrace(HITRACE_TAG_GRAPHIC_AGP | HITRACE_TAG_COMMERCIAL, name);
@@ -52,11 +57,7 @@ public:
 
     ~GEOptionalTrace()
     {
-        static bool debugTraceEnable =
-            (std::atoi(GESystemProperties::GetEventProperty("persist.sys.graphic.openDebugTrace").c_str()) != 0);
-        if (UNLIKELY(debugTraceEnable)) {
-            FinishTrace(HITRACE_TAG_GRAPHIC_AGP | HITRACE_TAG_COMMERCIAL);
-        }
+        FinishTrace(HITRACE_TAG_GRAPHIC_AGP | HITRACE_TAG_COMMERCIAL);
     }
 };
 } // namespace OHOS::Rosen
@@ -65,6 +66,6 @@ public:
 #define GE_TRACE(name)
 #define GE_TRACE_FUNC()
 #define GE_TRACE_NAME_FMT(fmt, ...)
-#endif
+#endif // NOT_BUILD_FOR_OHOS_SDK
 
-#endif
+#endif // GE_TRACE_H
