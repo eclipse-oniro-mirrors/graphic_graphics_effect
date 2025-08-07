@@ -15,7 +15,7 @@
 
 #include <chrono>
 #include "ge_double_ripple_shader_mask.h"
- 
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
@@ -36,6 +36,7 @@ std::shared_ptr<ShaderEffect> GEDoubleRippleShaderMask::GenerateDrawingShader(fl
     builder->SetUniform("rippleRadius", param_.radius_);
     builder->SetUniform("rippleWidth", param_.width_);
     builder->SetUniform("turbulence", param_.turbulence_);
+    builder->SetUniform("haloThickness", param_.haloThickness_);
     auto rippleMaskEffectShader = builder->MakeShader(nullptr, false);
     if (!rippleMaskEffectShader) {
         LOGE("GEDoubleRippleShaderMask::GenerateDrawingShaderHas effect error");
@@ -57,20 +58,25 @@ static constexpr char prog[] = R"(
         uniform half rippleRadius;
         uniform half rippleWidth;
         uniform half turbulence;
+        uniform half haloThickness;
 
         const float waveScale  = 0.5;
         const float freqX = 4.0;
         const float freqY = 6.0;
         const float freqDiag = 8.0;
 
-        float ShapeSDF(vec2 p, float radius, float noiseScale)
+        float ShapeSDF(vec2 p, float radius, float noiseScale, vec2 center)
         {
             float dist = length(p);
+            float phaseX = center.x * 1.0;
+            float phaseY = center.y * 1.0;
+            float phaseDiag = dot(center, vec2(1.0)) * 0.4;
 
-            float noise = noiseScale;
-            noise += sin(p.x * freqX) * 0.15; // 0.25: reduce the strength of noise on x axis
-            noise += sin(p.y * freqY) * 0.15; // 0.35: reduce the strength of noise on y axis
-            noise += sin((p.x + p.y) * freqDiag) * 0.075; // 0.1: reduce the strength of noise on diagonal axis
+            float noise = 0.;
+            noise += sin(p.x * freqX + phaseX) * 0.15; // 0.15: reduce the strength of noise on x axis
+            noise += sin(p.y * freqY + phaseY) * 0.15; // 0.15: reduce the strength of noise on y axis
+            // 0.075: reduce the strength of noise in the diagonal direction
+            noise += sin((p.x + p.y) * freqDiag + phaseDiag) * 0.075;
 
             float distortedDist = dist + noise * noiseScale;
             float attenuation = waveScale / (1.0 + distortedDist * 5.0); // 5.0: control the falloff speed of the wave
@@ -85,8 +91,8 @@ static constexpr char prog[] = R"(
 
         half4 main(float2 fragCoord)
         {
-            float thickness = rippleWidth;      // 0.1
-            float noiseScale = turbulence;      // 0.2
+            float thickness = rippleWidth;
+            float noiseScale = turbulence;
 
             vec2 center1 = centerPos1;
             vec2 center2 = centerPos2;
@@ -108,18 +114,20 @@ static constexpr char prog[] = R"(
 
             float currentRadius1 = rippleRadius;
             float currentRadius2 = rippleRadius;
-        
-            float d1Outer = ShapeSDF(delta1, currentRadius1, noiseScale);
-            float d2Outer = ShapeSDF(delta2, currentRadius2, noiseScale);
-            float d1Inner = ShapeSDF(delta1, currentRadius1 * (1.0 - thickness), noiseScale);
-            float d2Inner = ShapeSDF(delta2, currentRadius2 * (1.0 - thickness), noiseScale);
 
-            float smoothness = 0.35;
+            float d1Outer = ShapeSDF(delta1, currentRadius1, noiseScale, c1);
+            float d2Outer = ShapeSDF(delta2, currentRadius2, noiseScale, c2);
+            float d1Inner = ShapeSDF(delta1, currentRadius1 * (1.0 - thickness), noiseScale, c1);
+            float d2Inner = ShapeSDF(delta2, currentRadius2 * (1.0 - thickness), noiseScale, c2);
+
+            float smoothness = 0.4;
             float dOuter = SmoothUnion(d1Outer, d2Outer, smoothness);
             float dInner = SmoothUnion(d1Inner, d2Inner, smoothness);
+            float ring = max(-dInner, dOuter);
+            ring = smoothstep(0.001 + haloThickness * length(uv - center),
+                -0.001 - haloThickness * length(uv - center) * 0.5, ring);
 
-            float mask = smoothstep(thickness, 0.0, dOuter) * smoothstep(0.0, thickness, dInner);
-            return half4(mask);
+            return half4(clamp(ring, 0., 1.));
         }
     )";
 
@@ -146,6 +154,7 @@ std::shared_ptr<ShaderEffect> GEDoubleRippleShaderMask::GenerateDrawingShaderHas
     builder->SetUniform("rippleRadius", param_.radius_);
     builder->SetUniform("rippleWidth", param_.width_);
     builder->SetUniform("turbulence", param_.turbulence_);
+    builder->SetUniform("haloThickness", param_.haloThickness_);
     auto rippleMaskEffectShader = builder->MakeShader(nullptr, false);
     if (!rippleMaskEffectShader) {
         LOGE("GEDoubleRippleShaderMask::GenerateDrawingShaderHasNormal effect error");
@@ -168,20 +177,25 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDoubleRippleShaderMask::GetDoub
         uniform half rippleRadius;
         uniform half rippleWidth;
         uniform half turbulence;
+        uniform half haloThickness;
 
         const float waveScale  = 0.5;
         const float freqX = 4.0;
         const float freqY = 6.0;
         const float freqDiag = 8.0;
 
-        float ShapeSDF(vec2 p, float radius, float noiseScale)
+        float ShapeSDF(vec2 p, float radius, float noiseScale, vec2 center)
         {
             float dist = length(p);
+            float phaseX = center.x * 1.0;
+            float phaseY = center.y * 1.0;
+            float phaseDiag = dot(center, vec2(1.0)) * 0.4;
 
-            float noise = noiseScale;
-            noise += sin(p.x * freqX) * 0.15; // 0.25: reduce the strength of noise on x axis
-            noise += sin(p.y * freqY) * 0.15; // 0.35: reduce the strength of noise on y axis
-            noise += sin((p.x + p.y) * freqDiag) * 0.075; // 0.1: reduce the strength of noise on diagonal axis
+            float noise = 0.;
+            noise += sin(p.x * freqX + phaseX) * 0.15; // 0.15: reduce the strength of noise on x axis
+            noise += sin(p.y * freqY + phaseY) * 0.15; // 0.15: reduce the strength of noise on y axis
+            // 0.075: reduce the strength of noise in the diagonal direction
+            noise += sin((p.x + p.y) * freqDiag + phaseDiag) * 0.075;
 
             float distortedDist = dist + noise * noiseScale;
             float attenuation = waveScale / (1.0 + distortedDist * 5.0); // 5.0: control the falloff speed of the wave
@@ -196,8 +210,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDoubleRippleShaderMask::GetDoub
 
         half4 main(float2 fragCoord)
         {
-            float thickness = rippleWidth;      // 0.1
-            float noiseScale = turbulence;      // 0.2
+            float thickness = rippleWidth;
+            float noiseScale = turbulence;
 
             vec2 center1 = centerPos1;
             vec2 center2 = centerPos2;
@@ -219,17 +233,20 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDoubleRippleShaderMask::GetDoub
 
             float currentRadius1 = rippleRadius;
             float currentRadius2 = rippleRadius;
-        
-            float d1Outer = ShapeSDF(delta1, currentRadius1, noiseScale);
-            float d2Outer = ShapeSDF(delta2, currentRadius2, noiseScale);
-            float d1Inner = ShapeSDF(delta1, currentRadius1 * (1.0 - thickness), noiseScale);
-            float d2Inner = ShapeSDF(delta2, currentRadius2 * (1.0 - thickness), noiseScale);
 
-            float smoothness = 0.35;
+            float d1Outer = ShapeSDF(delta1, currentRadius1, noiseScale, c1);
+            float d2Outer = ShapeSDF(delta2, currentRadius2, noiseScale, c2);
+            float d1Inner = ShapeSDF(delta1, currentRadius1 * (1.0 - thickness), noiseScale, c1);
+            float d2Inner = ShapeSDF(delta2, currentRadius2 * (1.0 - thickness), noiseScale, c2);
+
+            float smoothness = 0.4;
             float dOuter = SmoothUnion(d1Outer, d2Outer, smoothness);
             float dInner = SmoothUnion(d1Inner, d2Inner, smoothness);
+            float ring = max(-dInner, dOuter);
+            ring = smoothstep(0.001 + haloThickness * length(uv - center),
+                -0.001 - haloThickness * length(uv - center) * 0.5, ring);
 
-            float mask = smoothstep(thickness, 0.0, dOuter) * smoothstep(0.0, thickness, dInner);
+            float mask = clamp(ring, 0., 1.);
 
             vec2 directionVector = normalize(p + 1.0 - center1 - center2) * mask * 0.5 + 0.5;
             return half4(directionVector, 1.0, mask);

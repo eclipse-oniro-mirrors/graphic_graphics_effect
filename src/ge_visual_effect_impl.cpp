@@ -989,7 +989,9 @@ void GEVisualEffectImpl::SetDoubleRippleMaskParamsFloat(const std::string& tag, 
         { GE_MASK_DOUBLE_RIPPLE_WIDTH,
             [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->width_ = p; } },
         { GE_MASK_DOUBLE_RIPPLE_TURBULENCE,
-            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->turbulence_ = p; } }
+            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->turbulence_ = p; } },
+        { GE_MASK_DOUBLE_RIPPLE_HALOTHICKNESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->doubleRippleMaskParams_->haloThickness_ = p; } }
     };
 
     auto it = actions.find(tag);
@@ -1196,12 +1198,12 @@ void GEVisualEffectImpl::SetContentLightParams(const std::string& tag, float par
     if (contentLightParams_ == nullptr) {
         return;
     }
- 
+
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         { GE_FILTER_CONTENT_LIGHT_INTENSITY,
             [](GEVisualEffectImpl* obj, float p) { obj->contentLightParams_->lightIntensity = p; } },
     };
- 
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);

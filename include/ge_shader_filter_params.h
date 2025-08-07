@@ -208,12 +208,14 @@ constexpr char GE_MASK_DOUBLE_RIPPLE_CENTER2[] = "DoubleRippleMask_Center2";
 constexpr char GE_MASK_DOUBLE_RIPPLE_RADIUS[] = "DoubleRippleMask_Radius";
 constexpr char GE_MASK_DOUBLE_RIPPLE_WIDTH[] = "DoubleRippleMask_Width";
 constexpr char GE_MASK_DOUBLE_RIPPLE_TURBULENCE[] = "DoubleRippleMask_Turbulence";
+constexpr char GE_MASK_DOUBLE_RIPPLE_HALOTHICKNESS[] = "DoubleRippleMask_HaloThickness";
 struct GEDoubleRippleShaderMaskParams {
     std::pair<float, float> center1_ = {0.f, 0.f};
     std::pair<float, float> center2_ = {0.f, 0.f};
     float radius_ = 0.f;
     float width_ = 0.f;
     float turbulence_ = 0.0f;
+    float haloThickness_ = 0.0f;
 };
 
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DispDistort";
