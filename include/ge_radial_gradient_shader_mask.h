@@ -26,11 +26,14 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+REGISTER_GEFILTER_TYPEINFO(RIPPLE_MASK, GERadialGradientShaderMask, GERadialGradientShaderMaskParams);
 class GE_EXPORT GERadialGradientShaderMask : public GEShaderMask {
 public:
     GERadialGradientShaderMask(GERadialGradientShaderMaskParams param);
     GERadialGradientShaderMask(const GERadialGradientShaderMask&) = delete;
     virtual ~GERadialGradientShaderMask() = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GERadialGradientShaderMask);
 
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

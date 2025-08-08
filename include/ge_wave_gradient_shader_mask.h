@@ -26,13 +26,17 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+REGISTER_GEFILTER_TYPEINFO(WAVE_GRADIENT_MASK, GEWaveGradientShaderMask,
+                           GEWaveGradientShaderMaskParams);
 class GE_EXPORT GEWaveGradientShaderMask : public GEShaderMask {
 public:
     GEWaveGradientShaderMask(GEWaveGradientShaderMaskParams param);
     GEWaveGradientShaderMask(const GEWaveGradientShaderMask&) = delete;
     GEWaveGradientShaderMask& operator=(const GEWaveGradientShaderMask&) = delete;
     virtual ~GEWaveGradientShaderMask() = default;
- 
+    
+    DECLARE_GEFILTER_TYPEFUNC(GEWaveGradientShaderMask);
+
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 

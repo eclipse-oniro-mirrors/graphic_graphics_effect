@@ -43,7 +43,6 @@ public:
     GE_EXPORT GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params);
     ~GEKawaseBlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
-
     DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter);
     std::shared_ptr<Drawing::GEFilterParams> Params() const override;
 

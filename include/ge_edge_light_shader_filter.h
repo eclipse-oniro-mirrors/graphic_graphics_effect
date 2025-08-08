@@ -26,10 +26,13 @@
 namespace OHOS {
 namespace Rosen {
 
+REGISTER_GEFILTER_TYPEINFO(EDGE_LIGHT, GEEdgeLightShaderFilter,
+                           Drawing::GEEdgeLightShaderFilterParams);
 class GE_EXPORT GEEdgeLightShaderFilter : public GEShaderFilter {
 public:
     GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
     ~GEEdgeLightShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEEdgeLightShaderFilter);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

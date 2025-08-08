@@ -37,6 +37,7 @@ public:
     GELinearGradientBlurShaderFilter(const GELinearGradientBlurShaderFilter&) = delete;
     GELinearGradientBlurShaderFilter operator=(const GELinearGradientBlurShaderFilter&) = delete;
     ~GELinearGradientBlurShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GELinearGradientBlurShaderFilter);
 
     virtual GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;

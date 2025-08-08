@@ -26,7 +26,6 @@ class GEGreyShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params);
     ~GEGreyShaderFilter() override = default;
-
     DECLARE_GEFILTER_TYPEFUNC(GEGreyShaderFilter);
 
     std::shared_ptr<Drawing::GEFilterParams> Params() const override;

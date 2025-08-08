@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Rosen {
-class GEShaderFilter {
+class GEShaderFilter : public Drawing::IGEFilterType {
 public:
 
     GEShaderFilter() = default;
@@ -43,16 +43,6 @@ public:
     uint32_t Hash() const
     {
         return hash_;
-    }
-
-    virtual Drawing::GEFilterType Type() const
-    {
-        return Drawing::GEFilterType::NONE;
-    }
- 
-    virtual std::shared_ptr<Drawing::GEFilterParams> Params() const
-    {
-        return nullptr;
     }
 
     void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)

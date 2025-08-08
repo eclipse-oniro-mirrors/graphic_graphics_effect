@@ -26,13 +26,16 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+REGISTER_GEFILTER_TYPEINFO(DOUBLE_RIPPLE_MASK, GEDoubleRippleShaderMask,
+                           GEDoubleRippleShaderMaskParams);
 class GE_EXPORT GEDoubleRippleShaderMask : public GEShaderMask {
 public:
     GEDoubleRippleShaderMask(GEDoubleRippleShaderMaskParams param);
     GEDoubleRippleShaderMask(const GEDoubleRippleShaderMask&) = delete;
     GEDoubleRippleShaderMask& operator=(const GEDoubleRippleShaderMask&) = delete;
     virtual ~GEDoubleRippleShaderMask() = default;
- 
+    DECLARE_GEFILTER_TYPEFUNC(GEDoubleRippleShaderMask);
+
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 

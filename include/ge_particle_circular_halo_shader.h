@@ -24,7 +24,8 @@
 
 namespace OHOS {
 namespace Rosen {
-
+REGISTER_GEFILTER_TYPEINFO(PARTICLE_CIRCULAR_HALO, GEParticleCircularHaloShader,
+                           Drawing::GEParticleCircularHaloShaderParams);
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();

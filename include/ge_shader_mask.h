@@ -18,13 +18,14 @@
  
 #include "draw/canvas.h"
 #include "ge_common.h"
+#include "ge_filter_type.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
  
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-class GE_EXPORT GEShaderMask {
+class GE_EXPORT GEShaderMask : public Drawing::IGEFilterType {
 public:
     GEShaderMask() = default;
     GEShaderMask(const GEShaderMask&) = delete;

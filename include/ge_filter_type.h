@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -67,69 +67,153 @@ enum class GEFilterType {
 
 template<typename T>
 struct GEFilterTypeInfo { 
-    static constexpr GEFilterType id = GEFilterType::NONE;
-    using param_type = void;
+    static constexpr GEFilterType ID = GEFilterType::NONE;
+    using ParamType = void;
 };
 
 template<typename T>
 struct GEFilterParamsTypeInfo {
-    using type = void;
+    static constexpr GEFilterType ID = GEFilterType::NONE;
+    using FilterType = void;
 };
 
-#define REGISTER_GEFILTER_TYPEINFO(EnumValue, ActualType, ParamType) \
-    class ActualType; \
-    template<> struct ::OHOS::Rosen::Drawing::GEFilterTypeInfo<ActualType> { \
-        static constexpr GEFilterType id = GEFilterType::EnumValue; \
-        using param_type = ParamType; \
+// Register type info for certain GE Filter type (Non-instructive)
+#define REGISTER_GEFILTER_TYPEINFO(ENUM_VALUE, FILTER_TYPE, PARAM_TYPE) \
+    class FILTER_TYPE; \
+    template<> struct ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FILTER_TYPE> { \
+        static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
+        using ParamType = PARAM_TYPE; \
     }; \
-    template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<ParamType> { \
-        using type = ActualType; \
-    }; 
+    template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
+        static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
+        using FilterType = FILTER_TYPE; \
+    };
 
-#define DECLARE_GEFILTER_TYPEFUNC(Self) \
-    ::OHOS::Rosen::Drawing::GEFilterType Type() const override { \
-        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::id; \
-    }
+// Register type info for certain GE Filter Param type without Filter type (Non-instructive)
+// Used on extension filter only
+#define REGISTER_GEFILTERPARAM_TYPEINFO(ENUM_VALUE, PARAM_TYPE) \
+    template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
+        static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
+        using FilterType = void; \
+    };
 
+// Type-erasured params class
 class GEFilterParams {
 public:
     template<typename T>
-    static std::optional<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
+    struct OptionalTypeTrait { using Type = std::optional<T>; };
+    template<typename T>
+    struct OptionalTypeTrait<std::shared_ptr<T>> { using Type = std::shared_ptr<T>; };
+    template<typename T>
+    using OptionalType = typename OptionalTypeTrait<T>::Type;
+
+    template<typename T>
+    static constexpr bool IsRegisteredFilterTypeInfo = GEFilterTypeInfo<T>::ID != GEFilterType::NONE;
+    template<typename T>
+    static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfo<T>::ID != GEFilterType::NONE;
+
+    template<typename T>
+    static OptionalType<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
 
     template<typename T>
     static std::shared_ptr<GEFilterParams> Box(T&& params);
 
     GEFilterParams(GEFilterType type) : id(type) {}
+    virtual ~GEFilterParams() = default;
 protected:
     GEFilterType id;
 };
 
-template <typename T>
+// Type-specific proxy wrapper of params
+template<typename T>
 class GEFilterParamsWrapper: public GEFilterParams {
 public:
-    static_assert(!std::is_void_v<typename GEFilterParamsTypeInfo<T>::type>, "Unregistered GEFilter type");
+    using ParamType = T;
+    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
+    static constexpr std::nullopt_t Null = std::nullopt;
+    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
+                  "FilterType wrongly registered");
+    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
     GEFilterParamsWrapper(T&& params) :
-        GEFilterParams(GEFilterTypeInfo<typename GEFilterParamsTypeInfo<T>::type>::id), data(std::move(params)) {}
+        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::move(params)) {}
 
     T data;
 };
 
+// Type-specific proxy wrapper of params, specialization of std::shared_ptr<T> for handy use
 template<typename T>
-std::optional<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
+class GEFilterParamsWrapper<std::shared_ptr<T>>: public GEFilterParams {
+public:
+    using ParamType = T;
+    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
+    static constexpr std::nullptr_t Null = nullptr;
+    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
+                  "FilterType wrongly registered");
+    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
+    GEFilterParamsWrapper(const std::shared_ptr<T>& params) :
+        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(params) {}
+
+    std::shared_ptr<T> data;
+};
+
+// Checked downcast from GEFilterParams to specific params type
+template<typename T>
+GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
 {
-    static_assert(!std::is_void_v<typename GEFilterTypeInfo<T>::param_type>, "Unbox an unregistered GEFilter type");
-    return GEFilterTypeInfo<T>::id == params->id ? 
-        std::static_pointer_cast<GEFilterParamsWrapper<typename GEFilterTypeInfo<T>::param_type>>(params)->data 
-        : std::nullopt;
+    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
+    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
+    if (GEFilterParamsTypeInfo<T>::ID == params->id) {
+        return std::static_pointer_cast<GEFilterParamsWrapper<T>>(params)->data;
+    }
+    return GEFilterParamsWrapper<T>::Null;
 }
 
+// Upcast from specific params type to type-erasured GEFilterParams
 template<typename T>
 std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
 {
-    static_assert(!std::is_void_v<typename GEFilterParamsTypeInfo<T>::type>, "Box a unregistered GEFilter type");
-    auto p = std::make_shared<GEFilterParamsWrapper<T>>(std::move(params));
+    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
+    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
+    auto p = std::make_shared<GEFilterParamsWrapper<T>>(std::forward<T>(params));
     return std::static_pointer_cast<GEFilterParams>(p);
 }
+
+// Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
+// DO NOT add member varaibles
+struct IGEFilterType {
+    virtual GEFilterType Type() const 
+    {
+        return Drawing::GEFilterType::NONE;
+    }
+
+    virtual std::shared_ptr<GEFilterParams> Params() const
+    {
+        return nullptr;
+    }
+};
+
+template<typename T>
+struct GEFilterTypeInfoStaticCheck {
+    using ParamType = typename GEFilterTypeInfo<T>::ParamType;
+    static constexpr bool IsGEFilterType = std::is_base_of_v<IGEFilterType, T>;
+    static_assert(IsGEFilterType, "T must implement IGEFilterType");
+
+    static_assert(!std::is_void_v<typename GEFilterTypeInfo<T>::ParamType>, "Unregistered GEFilter type");
+    static_assert(std::is_same_v<typename GEFilterParamsWrapper<ParamType>::ParamType, ParamType>);
+    static_assert(std::is_same_v<typename GEFilterParamsWrapper<ParamType>::FilterType, T>);
+    static_assert(std::is_same_v<typename GEFilterParamsWrapper<std::shared_ptr<ParamType>>::ParamType, ParamType>);
+    static_assert(std::is_same_v<typename GEFilterParamsWrapper<std::shared_ptr<ParamType>>::FilterType, T>);
+    using UnboxValueType = decltype(GEFilterParams::Unbox<ParamType>(std::shared_ptr<GEFilterParams>()));
+    using UnboxPtrType = decltype(GEFilterParams::Unbox<std::shared_ptr<ParamType>>(std::shared_ptr<GEFilterParams>()));
+    static_assert(std::is_same_v<UnboxValueType, std::optional<ParamType>>);
+    static_assert(std::is_same_v<UnboxPtrType, std::shared_ptr<ParamType>>);
+};
+
+#define DECLARE_GEFILTER_TYPEFUNC(Self) \
+    ::OHOS::Rosen::Drawing::GEFilterType Type() const override { \
+        static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
+        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID; \
+    }
 
 }
 }

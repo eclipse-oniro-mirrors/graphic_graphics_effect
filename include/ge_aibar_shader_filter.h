@@ -31,7 +31,6 @@ public:
     GEAIBarShaderFilter(const GEAIBarShaderFilter&) = delete;
     GEAIBarShaderFilter operator=(const GEAIBarShaderFilter&) = delete;
     ~GEAIBarShaderFilter() override = default;
-
     DECLARE_GEFILTER_TYPEFUNC(GEAIBarShaderFilter);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,

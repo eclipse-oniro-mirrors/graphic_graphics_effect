@@ -53,12 +53,16 @@ public:
     int32_t rotateDegree_ = 0;
 };
 
+REGISTER_GEFILTER_TYPEINFO(MAGNIFIER, GEMagnifierShaderFilter,
+                           Drawing::GEMagnifierShaderFilterParams);
 class GEMagnifierShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params);
     GEMagnifierShaderFilter(const GEMagnifierShaderFilter&) = delete;
     GEMagnifierShaderFilter operator=(const GEMagnifierShaderFilter&) = delete;
     ~GEMagnifierShaderFilter() override = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEMagnifierShaderFilter);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

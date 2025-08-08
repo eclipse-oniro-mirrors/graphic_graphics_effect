@@ -30,10 +30,14 @@
  
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(WATER_RIPPLE, GEWaterRippleFilter,
+                           Drawing::GEWaterRippleFilterParams);
 class GEWaterRippleFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params);
     ~GEWaterRippleFilter() override = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEWaterRippleFilter);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

@@ -30,10 +30,14 @@
  
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(SOUND_WAVE, GESoundWaveFilter,
+                           Drawing::GESoundWaveFilterParams);
 class GESoundWaveFilter : public GEShaderFilter {
 public:
     GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params);
     ~GESoundWaveFilter() override = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GESoundWaveFilter);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

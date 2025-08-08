@@ -25,13 +25,14 @@
 namespace OHOS {
 namespace Rosen {
 
+REGISTER_GEFILTER_TYPEINFO(BORDER_LIGHT, GEBorderLightShader, BorderLightParams);
 class GE_EXPORT GEBorderLightShader : public GEShader {
 public:
     GEBorderLightShader();
     GEBorderLightShader(Drawing::GEBorderLightShaderParams& borderLightParams);
 
     ~GEBorderLightShader() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEBorderLightShader);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const { return "GEBorderLightShader"; }

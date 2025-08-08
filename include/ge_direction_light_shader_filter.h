@@ -25,10 +25,13 @@
 namespace OHOS {
 namespace Rosen {
 
+REGISTER_GEFILTER_TYPEINFO(DIRECTION_LIGHT, GEDirectionLightShaderFilter,
+                           Drawing::GEDirectionLightShaderFilterParams);
 class GE_EXPORT GEDirectionLightShaderFilter : public GEShaderFilter {
 public:
     GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params);
     ~GEDirectionLightShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEDirectionLightShaderFilter);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

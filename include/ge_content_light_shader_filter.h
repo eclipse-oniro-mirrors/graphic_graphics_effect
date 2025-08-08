@@ -30,11 +30,12 @@
 
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(CONTENT_LIGHT, GEContentLightFilter, Drawing::GEContentLightFilterParams);
 class GEContentLightFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEContentLightFilter(const Drawing::GEContentLightFilterParams& params);
     ~GEContentLightFilter() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEContentLightFilter);
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 

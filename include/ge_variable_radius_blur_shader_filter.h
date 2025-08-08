@@ -25,14 +25,15 @@
 
 namespace OHOS {
 namespace Rosen {
-
+REGISTER_GEFILTER_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilter,
+                           Drawing::GEVariableRadiusBlurShaderFilterParams);
 class GE_EXPORT GEVariableRadiusBlurShaderFilter : public GEShaderFilter {
 public:
     GEVariableRadiusBlurShaderFilter(const Drawing::GEVariableRadiusBlurShaderFilterParams& params);
     GEVariableRadiusBlurShaderFilter(const GEVariableRadiusBlurShaderFilter&) = delete;
     GEVariableRadiusBlurShaderFilter operator=(const GEVariableRadiusBlurShaderFilter&) = delete;
     ~GEVariableRadiusBlurShaderFilter() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEVariableRadiusBlurShaderFilter);
     virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 

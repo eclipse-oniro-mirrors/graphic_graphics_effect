@@ -22,11 +22,13 @@
 #include "utils/matrix.h"
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(AURORA_NOISE, GEAuroraNoiseShader, Drawing::GEAuroraNoiseShaderParams);
 class GE_EXPORT GEAuroraNoiseShader : public GEShader {
 public:
     GEAuroraNoiseShader();
     GEAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& auroraNoiseParams);
     ~GEAuroraNoiseShader() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEAuroraNoiseShader);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const { return "GEAuroraNoiseShader"; }
     void SetAuroraNoiseParams(const Drawing::GEAuroraNoiseShaderParams& params)

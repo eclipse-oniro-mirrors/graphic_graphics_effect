@@ -21,10 +21,11 @@
 #include "utils/rect.h"
 #include "effect/shader_effect.h"
 #include "ge_common.h"
+#include "ge_filter_type.h"
 
 namespace OHOS {
 namespace Rosen {
-class GE_EXPORT GEShader {
+class GE_EXPORT GEShader : public Drawing::IGEFilterType {
 public:
     GEShader() = default;
     GEShader(const GEShader&) = delete;
