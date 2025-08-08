@@ -181,7 +181,13 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR);
             impl->MakeVariableRadiusBlurParams();
         }
-    }
+    },
+    { GEX_SHADER_COLOR_GRADIENT_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT);
+            impl->MakeColorGradientEffectParams();
+        }
+    },
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
@@ -379,6 +385,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetVariableRadiusBlurParams(tag, param);
             break;
         }
+        case FilterType::COLOR_GRADIENT_EFFECT: {
+            SetColorGradientEffectParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -490,6 +500,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::BEZIER_WARP: {
             SetBezierWarpParams(tag, param);
+            break;
+        }
+        case FilterType::COLOR_GRADIENT_EFFECT: {
+            SetColorGradientEffectParams(tag, param);
             break;
         }
         default:
@@ -677,6 +691,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::COLOR_GRADIENT_EFFECT: {
+            if (colorGradientEffectParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GEX_SHADER_COLOR_GRADIENT_EFFECT_MASK) {
+                colorGradientEffectParams_->mask_ = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -711,7 +735,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
+void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param) 
 {
     switch (filterType_) {
         case FilterType::CONTENT_LIGHT: {
@@ -750,6 +774,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             if (tag == GE_FILTER_EDGE_LIGHT_COLOR) {
                 edgeLightParams_->color = param;
             }
+            break;
+        }
+        case FilterType::COLOR_GRADIENT_EFFECT: {
+            SetColorGradientEffectParams(tag, param);
             break;
         }
         default:
@@ -1346,6 +1374,135 @@ void GEVisualEffectImpl::SetVariableRadiusBlurParams(const std::string& tag, flo
         variableRadiusBlurParams_->blurRadius = param;
     }
 }
+void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, float param)
+{
+    if (colorGradientEffectParams_ == nullptr) {
+        return;
+    }
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->colorNum_ = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH0,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[0] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH1,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[1] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH2,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[2] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH3,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[3] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH4,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[4] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH5,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[5] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH6,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[6] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH7,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[7] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH8,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[8] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH9,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[9] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH10,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[10] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH11,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[11] = p;}},
+    };
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, const Vector4f& param)
+{
+    if (colorGradientEffectParams_ == nullptr) {
+        return;
+    }
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, Vector4f)>> actions = {
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR0, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[0] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR1, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[1] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR2, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[2] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR3, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[3] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR4, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[4] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR5, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[5] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR6, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[6] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR7, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[7] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR8, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[8] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR9, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[9] = Drawing::Color4f{param[0], param[1], param[2], param[3]};}
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR10, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[10] = Drawing::Color4f{param[0], param[1], param[2], param[3]};
+            }
+        },
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR11, [](GEVisualEffectImpl* obj, Vector4f param) {
+                obj->colorGradientEffectParams_->colors_[11] = Drawing::Color4f{param[0], param[1], param[2], param[3]};
+            }
+        },
+       
+    };
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (colorGradientEffectParams_ == nullptr) {
+        return;
+    }
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, std::pair<float, float> params)>>
+        actions = {
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS0, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[0] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS1, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[1] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS2, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[2] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS3, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[3] = Drawing::Point{param.first, param.second};} },
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS4, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[4] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS5, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[5] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS6, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[6] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS7, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[7] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS8, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[8] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS9, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[9] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS10, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[10] = Drawing::Point{param.first, param.second};}},
+            {GEX_SHADER_COLOR_GRADIENT_EFFECT_POS11, [](GEVisualEffectImpl* obj, std::pair<float, float> param) {
+                obj->colorGradientEffectParams_->positions_[11] = Drawing::Point{param.first, param.second};}}
+        };
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
