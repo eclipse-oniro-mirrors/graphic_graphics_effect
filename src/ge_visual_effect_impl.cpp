@@ -336,7 +336,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::SOUND_WAVE: {
-            SetSoundWaveParamsFloat(tag, param);
+            SetSoundWaveParams(tag, param);
             break;
         }
         case FilterType::EDGE_LIGHT: {
@@ -752,6 +752,11 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             }
             break;
         }
+        case FilterType::SOUND_WAVE: {
+            Drawing::Color4f color {param.x_, param.y_, param.z_, param.w_};
+            SetSoundWaveParams(tag, color);
+            break;
+        }
         default:
             break;
     }
@@ -804,18 +809,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Color4f
 {
     switch (filterType_) {
         case FilterType::SOUND_WAVE: {
-            if (soundWaveParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_SOUND_WAVE_COLOR_A) {
-                soundWaveParams_->colorA = param;
-            }
-            if (tag == GE_FILTER_SOUND_WAVE_COLOR_B) {
-                soundWaveParams_->colorB = param;
-            }
-            if (tag == GE_FILTER_SOUND_WAVE_COLOR_C) {
-                soundWaveParams_->colorC = param;
-            }
+            SetSoundWaveParams(tag, param);
             break;
         }
         default:
@@ -1083,7 +1077,7 @@ void GEVisualEffectImpl::SetWaterRippleParams(const std::string& tag, float para
     }
 }
 
-void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float param)
+void GEVisualEffectImpl::SetSoundWaveParams(const std::string& tag, float param)
 {
     if (soundWaveParams_ == nullptr) {
         return;
@@ -1113,6 +1107,27 @@ void GEVisualEffectImpl::SetSoundWaveParamsFloat(const std::string& tag, float p
     }
 }
 
+void GEVisualEffectImpl::SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param)
+{
+    if (soundWaveParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, const Drawing::Color4f&)>>
+        actions = {
+            { GE_FILTER_SOUND_WAVE_COLOR_A,
+                [](GEVisualEffectImpl* obj, const Drawing::Color4f& p) { obj->soundWaveParams_->colorA = p; } },
+            { GE_FILTER_SOUND_WAVE_COLOR_B,
+                [](GEVisualEffectImpl* obj, const Drawing::Color4f& p) { obj->soundWaveParams_->colorB = p; } },
+            { GE_FILTER_SOUND_WAVE_COLOR_C,
+                [](GEVisualEffectImpl* obj, const Drawing::Color4f& p) { obj->soundWaveParams_->colorC = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
 
 void GEVisualEffectImpl::SetEdgeLightParams(const std::string& tag, float param)
 {
