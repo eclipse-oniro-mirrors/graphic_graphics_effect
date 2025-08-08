@@ -51,7 +51,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
             half4 fragColor;
             const int NUMBER_OF_SAMPLES = 11;
             const float NUMBER_OF_SAMPLES_F = 11.;
-            const float WIDTH = 0.08;
+            const float WIDTH = 0.07;
             const float PI = 3.14159;
             const float PI2 = 6.28318;
 
@@ -107,7 +107,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
 
             float SimpleHaloRingShape(half2 uv, float radius, float noiseVariation, float haloThickness)
             {
-                uv = ShapePerturbation(uv, noiseVariation, 2.0, radius * 0.2);
+                uv = ShapePerturbation(uv, noiseVariation, 2.0, radius * 0.25);
                 half2 polarCoords = half2((atan(uv.y, uv.x) + PI) / (2.0 * PI), length(uv));
                 polarCoords.y -= radius;
                 float angularRandomVal = Noise1((polarCoords.x) * 10.0);
@@ -208,7 +208,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                     particleHalo = particleHalo / NUMBER_OF_SAMPLES_F;
                     haloColor = haloColor + particleHalo - haloColor * particleHalo;
 
-                    float ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius * 0.82,
+                    float ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius * 0.85,
                     globalRadius * 0.1, 1.0, 1.25, 0.05) * 2.5;
                     ambienceHaloBorder = clamp(ambienceHaloBorder, 0., 1.);
                     haloColor = haloColor + ambienceHaloBorder - haloColor * ambienceHaloBorder;
@@ -220,9 +220,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                     ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius,
                         globalRadius * 0.35, 1.0, 0.25, 0.05);
                     haloColor = haloColor + ambienceHaloBorder - haloColor * ambienceHaloBorder;
-                    float ambienceHaloGlow = CentralAmbienceHaloGlow(polarCoords, globalRadius * 0.1, radius * 0.83,
-                        0.2 * radius, 0.4 * radius) * 1.3;
-                    float glow = clamp(ambienceHaloGlow, 0., 1.);
+                    float ambienceHaloGlow = CentralAmbienceHaloGlow(polarCoords, globalRadius * 0.1, radius * 0.86,
+                        0.3 * radius, 0.6) * 1.3;
+                    float glow = ambienceHaloGlow;
                     glowColor = glowColor + glow - glowColor * glow; // Add a glow circle
                 }
 
