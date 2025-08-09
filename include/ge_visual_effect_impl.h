@@ -407,7 +407,8 @@ private:
     void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
-    void SetSoundWaveParamsFloat(const std::string& tag, float param);
+    void SetSoundWaveParams(const std::string& tag, float param);
+    void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
     void SetDirectionLightParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
