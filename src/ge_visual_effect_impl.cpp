@@ -739,10 +739,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
 {
     switch (filterType_) {
         case FilterType::CONTENT_LIGHT: {
-            if (contentLightParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_CONTENT_LIGHT_COLOR) {
+            if (contentLightParams_ != nullptr && tag == GE_FILTER_CONTENT_LIGHT_COLOR) {
                 contentLightParams_->lightColor = param;
             }
             break;
@@ -759,19 +756,13 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             break;
         }
         case FilterType::DIRECTION_LIGHT: {
-            if (directionLightParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_DIRECTION_LIGHT_COLOR) {
+            if (directionLightParams_ != nullptr && tag == GE_FILTER_DIRECTION_LIGHT_COLOR) {
                 directionLightParams_->lightColor = param;
             }
             break;
         }
         case FilterType::EDGE_LIGHT: {
-            if (edgeLightParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_EDGE_LIGHT_COLOR) {
+            if (edgeLightParams_ != nullptr && tag == GE_FILTER_EDGE_LIGHT_COLOR) {
                 edgeLightParams_->color = param;
             }
             break;
