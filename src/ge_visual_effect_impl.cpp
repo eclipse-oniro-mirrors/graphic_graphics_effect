@@ -1389,6 +1389,7 @@ void GEVisualEffectImpl::SetVariableRadiusBlurParams(const std::string& tag, flo
         variableRadiusBlurParams_->blurRadius = param;
     }
 }
+
 void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, float param)
 {
     if (colorGradientEffectParams_ == nullptr) {
