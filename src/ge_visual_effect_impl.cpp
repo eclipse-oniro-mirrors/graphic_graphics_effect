@@ -735,7 +735,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param) 
+void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
 {
     switch (filterType_) {
         case FilterType::CONTENT_LIGHT: {
