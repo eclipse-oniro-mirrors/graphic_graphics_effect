@@ -181,6 +181,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR);
             impl->MakeVariableRadiusBlurParams();
         }
+    },
+    {GEX_SHADER_LIGHT_CAVE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
+            impl->MakeVariableRadiusBlurParams();
+        }
     }
 };
 
@@ -379,6 +385,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetVariableRadiusBlurParams(tag, param);
             break;
         }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -490,6 +500,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::BEZIER_WARP: {
             SetBezierWarpParams(tag, param);
+            break;
+        }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
             break;
         }
         default:
@@ -750,6 +764,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             if (tag == GE_FILTER_EDGE_LIGHT_COLOR) {
                 edgeLightParams_->color = param;
             }
+            break;
+        }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
             break;
         }
         default:
@@ -1344,6 +1362,67 @@ void GEVisualEffectImpl::SetVariableRadiusBlurParams(const std::string& tag, flo
     }
     if (tag == GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS) {
         variableRadiusBlurParams_->blurRadius = param;
+    }
+}
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, const Vector4f& param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, const Vector4f&)>> actions = {
+        { GEX_SHADER_LIGHT_CAVE_COLORA,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorA = p; }
+        },
+        { GEX_SHADER_LIGHT_CAVE_COLORB,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorB = p; }
+        },
+        { GEX_SHADER_LIGHT_CAVE_COLORC,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorC = p; }
+        }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*,
+        const std::pair<float, float>&)>> actions = {
+        { GEX_SHADER_LIGHT_CAVE_POSITION,
+            [](GEVisualEffectImpl* obj, const std::pair<float, float>& p) {
+                obj->lightCaveShaderParams_->position = Vector2f(p.first, p.second);
+            }
+        },
+        { GEX_SHADER_LIGHT_CAVE_RADIUSXY,
+            [](GEVisualEffectImpl* obj, const std::pair<float, float>& p) {
+                obj->lightCaveShaderParams_->radiusXY = Vector2f(p.first, p.second);
+            }
+        }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GEX_SHADER_LIGHT_CAVE_PROGRESS) {
+        lightCaveShaderParams_->progress = param;
     }
 }
 } // namespace Drawing

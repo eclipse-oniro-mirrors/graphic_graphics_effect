@@ -71,6 +71,7 @@ public:
         PARTICLE_CIRCULAR_HALO,
         DIRECTION_LIGHT,
         VARIABLE_RADIUS_BLUR,
+        LIGHT_CAVE,
         MAX
     };
 
@@ -380,6 +381,16 @@ public:
         return variableRadiusBlurParams_;
     }
 
+    void MakeLightCaveParams()
+    {
+        lightCaveShaderParams_ = std::make_shared<GEXLightCaveShaderParams>();
+    }
+
+    const std::shared_ptr<GEXLightCaveShaderParams>& GetLightCaveParams() const
+    {
+        return lightCaveShaderParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -414,6 +425,9 @@ private:
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetLightCaveParams(const std::string& tag, const Vector4f& param);
+    void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetLightCaveParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -447,6 +461,7 @@ private:
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
+    std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
 };
 
 } // namespace Drawing
