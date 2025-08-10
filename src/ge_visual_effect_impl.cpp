@@ -1270,6 +1270,14 @@ void GEVisualEffectImpl::SetContentDiagonalFlowParams(const std::string& tag, fl
             [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Start_ = p; } },
         { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH,
             [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Length_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->thickness_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->radius_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT1,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->weight1 = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT2,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->weight2 = p; } }
     };
 
     auto it = actions.find(tag);

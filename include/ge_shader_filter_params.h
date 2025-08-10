@@ -358,6 +358,10 @@ constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR[] = "ContourDia
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START[] = "ContourDiagonalFlowLight_Line2Start";
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH[] = "ContourDiagonalFlowLight_Line2Length";
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR[] = "ContourDiagonalFlowLight_Line2Color";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS[] = "ContourDiagonalFlowLight_Thickness";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_RADIUS[] = "ContourDiagonalFlowLight_Radius";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT1[] = "ContourDiagonalFlowLight_Weight1";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT2[] = "ContourDiagonalFlowLight_Weight2";
 struct GEContentDiagonalFlowLightShaderParams {
     std::vector<Vector2f> contour_{};
     float line1Start_ = 0.f;
@@ -366,7 +370,10 @@ struct GEContentDiagonalFlowLightShaderParams {
     float line2Start_ = 0.f;
     float line2Length_ = 0.f;
     Vector4f line2Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);
-    float thickness_ = 0.5f;
+    float thickness_ = 0.0f;
+    float radius_ = 25.f;
+    float weight1 = 1.f;
+    float weight2 = 2.f;
 };
 
 // Declare same with in rs_render_shader_base.h
