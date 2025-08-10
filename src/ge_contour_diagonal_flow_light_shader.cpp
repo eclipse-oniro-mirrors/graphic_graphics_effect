@@ -853,11 +853,10 @@ std::vector<int> GEContourDiagonalFlowLightShader::SelectTopCurves(
         iouIndexPairs.begin() + safeTopK,
         iouIndexPairs.end(),
         [](const auto& a,
-           const auto& b) {  // 对齐Lambda参数，右括号移至末尾
+           const auto& b) {
             return a.first > b.first;
-        });  // 右括号紧贴Lambda表达式结尾
+        });
 
-        
     std::vector<int> topIndices;
     topIndices.reserve(safeTopK);
     
