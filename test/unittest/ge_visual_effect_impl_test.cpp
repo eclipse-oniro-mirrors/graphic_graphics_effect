@@ -343,6 +343,34 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_011, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_026
+ * @tc.desc: Verify function SetParam for action is invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_026, TestSize.Level1)
+{
+    float paramFloat = 1.0f;
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GEX_SHADER_COLOR_GRADIENT_EFFECT);
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER, paramFloat);
+
+    Vector4f c4 = {0.0f, 0.0f, 0.0f, 0.0f};
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR0, c4);
+
+    std::pair<float, float> p2 = {0.0f, 0.0f};
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_COLOR_GRADIENT_EFFECT_POS0, p2);
+
+    ASSERT_NE(geVisualEffectImpl.GetColorGradientEffectParams(), nullptr);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->colorNum_, paramFloat);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->colors_[0].redF_, c4[0]);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->colors_[0].greenF_, c4[1]);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->colors_[0].blueF_, c4[2]);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->colors_[0].alphaF_, c4[3]);
+
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->positions_[0].GetX(), p2.first);
+    EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->positions_[0].GetY(), p2.second);
+}
+
+/**
  * @tc.name: SetSoundWaveParams001
  * @tc.desc: Verify function SetSoundWaveParams for float
  * @tc.type:FUNC

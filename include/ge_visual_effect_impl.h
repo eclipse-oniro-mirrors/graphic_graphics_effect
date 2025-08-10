@@ -71,6 +71,7 @@ public:
         PARTICLE_CIRCULAR_HALO,
         DIRECTION_LIGHT,
         VARIABLE_RADIUS_BLUR,
+        COLOR_GRADIENT_EFFECT,
         MAX
     };
 
@@ -380,6 +381,16 @@ public:
         return variableRadiusBlurParams_;
     }
 
+    void MakeColorGradientEffectParams()
+    {
+        colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
+    }
+
+    const std::shared_ptr<GEXColorGradientEffectParams>& GetColorGradientEffectParams() const
+    {
+        return colorGradientEffectParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -414,6 +425,9 @@ private:
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
+    void SetColorGradientEffectParams(const std::string& tag, float param);
+    void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
+    void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
@@ -448,6 +462,8 @@ private:
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
+
+    std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
 };
 
 } // namespace Drawing

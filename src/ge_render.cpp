@@ -88,7 +88,28 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             out = std::make_shared<GEParticleCircularHaloShader>(*params);
             return out;
         }
-    }
+    },
+    {GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetColorGradientEffectParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXColorGradientEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXColorGradientEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
 };
 
 GERender::GERender() {}
