@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Rosen {
 
-const int box4fSize;
+const int box4fSize = 4;
 using Box4f = std::array<float, box4fSize>;
 
 struct Grid {
@@ -50,9 +50,9 @@ public:
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
     void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
     static std::shared_ptr<GEContourDiagonalFlowLightShader>
-        CreateContourDiagonalFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
+        CreateFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightPrecalculationBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
     Box4f ComputeCurveBoundingBox(int curveIndex, float maxThickness, int width, int height);
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void PreCalculateRegion(Drawing::Canvas& canvas, int gridIndex,
@@ -69,7 +69,7 @@ private:
         std::shared_ptr<Drawing::Image> img1, std::shared_ptr<Drawing::Image> img2);
     void AutoPartitionCal(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void AutoGridPartition(int width, int height, float maxThickness);
-    void ComputeAllCurveBoundingBoxes(int width, int height, float maxThickness, 
+    void ComputeAllCurveBoundingBoxes(int width, int height, float maxThickness,
                                       Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
     void InitializeWorkQueue(const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes,
                             std::queue<Grid>& workQueue);

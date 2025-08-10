@@ -54,7 +54,7 @@ const int YMIN_I = 2;
 const int YMAX_I = 3;
 
 // shader
-static constexpr char flowLightProg[] = R"(
+static constexpr char FLOW_LIGHT_PROG[] = R"(
     uniform shader precalculationImage;
     uniform vec2 iResolution;
     uniform float line1Start;
@@ -134,7 +134,7 @@ static constexpr char flowLightProg[] = R"(
     }
 )";
 
-static constexpr char precalculationProg[] = R"(
+static constexpr char PRECALCULATION_PROG[] = R"(
     uniform vec2 iResolution;
     uniform float count;
     const int capacity = 48; // 48 control points for 16 Bezier curves
@@ -501,7 +501,7 @@ static constexpr char precalculationProg[] = R"(
     }
 )";
 
-static constexpr char blendImgProg[] = R"(
+static constexpr char BLEND_IMG_PROG[] = R"(
     uniform shader precalculationImage;
     uniform shader image1;
     uniform shader image2;
@@ -530,8 +530,12 @@ static constexpr char blendImgProg[] = R"(
 std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, float width, float height)
 {
     std::vector<Vector2f> ndcPoints;
-    ndcPoints.reserve(uvPoints.size());    
-    float aspect = height > 1.0 ? width / height : 1.0;
+    ndcPoints.reserve(uvPoints.size());
+    float aspect = 1.0;
+
+    if (height > 1.0) {
+        aspect = width / height;
+    }
 
     for (const auto& uv : uvPoints) {
         float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
@@ -603,7 +607,7 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiag
     blurShader_ = std::make_shared<GEKawaseBlurShaderFilter>(blurParas);
 }
 
-std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(
+std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShader::CreateFlowLightShader(
     GEContentDiagonalFlowLightShaderParams& param)
 {
     std::shared_ptr<GEContourDiagonalFlowLightShader> contourDiagonalFlowLightShader =
@@ -613,11 +617,12 @@ std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShad
 
 void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress) {}
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetContourDiagonalFlowLightPrecalculationBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetFlowLightPrecalBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
     if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
-        contourDiagonalFlowLightShaderEffectPrecalculation_ = Drawing::RuntimeEffect::CreateForShader(precalculationProg);
+        contourDiagonalFlowLightShaderEffectPrecalculation_ = Drawing::RuntimeEffect::CreateForShader(
+            PRECALCULATION_PROG);
     }
 
     if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
@@ -842,16 +847,18 @@ std::vector<int> GEContourDiagonalFlowLightShader::SelectTopCurves(
         iouIndexPairs.emplace_back(BBoxOverLap(curveBBoxes[idx], current.bbox), idx);
     }
     const size_t safeTopK = std::min<size_t>(topK, iouIndexPairs.size());
+
     // Topk Sort
     std::partial_sort(
         iouIndexPairs.begin(),
         iouIndexPairs.begin() + safeTopK,
-        iouIndexPairs(),
+        iouIndexPairs.end(),
         [](const auto& a,
-        const auto& b) {
+           const auto& b) {  // 对齐Lambda参数，右括号移至末尾
             return a.first > b.first;
-        }
-    );
+        });  // 右括号紧贴Lambda表达式结尾
+
+        
     std::vector<int> topIndices;
     topIndices.reserve(safeTopK);
     
@@ -865,7 +872,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffect_ = nullptr;
     if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
-        contourDiagonalFlowLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(flowLightProg);
+        contourDiagonalFlowLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(FLOW_LIGHT_PROG);
     }
 
     if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
@@ -927,7 +934,7 @@ void GEContourDiagonalFlowLightShader::PreCalculateRegion(Drawing::Canvas& canva
     int curveValueCount = 6;
     curvesInGrid_[gridIndex].first.resize(MAX_CURVES_PER_GRID * curveValueCount, -2.0); // -2.0:unused control points
     segmentIndex_[gridIndex].resize(MAX_CURVES_PER_GRID, 0.0);
-    auto builder = GetContourDiagonalFlowLightPrecalculationBuilder();
+    auto builder = GetFlowLightPrecalBuilder();
     builder->SetUniform("iResolution", wholeRect.GetWidth(), wholeRect.GetHeight());
     builder->SetUniform("count", static_cast<float>(pointCnt_));
     builder->SetUniform("controlPoints", curvesInGrid_[gridIndex].first.data(), curvesInGrid_[gridIndex].first.size());
@@ -969,7 +976,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     }
     thread_local std::shared_ptr<Drawing::RuntimeEffect> blendShaderEffect_ = nullptr;
     if (blendShaderEffect_ == nullptr) {
-        blendShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(blendImgProg);
+        blendShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(BLEND_IMG_PROG);
     }
     if (blendShaderEffect_ == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffect_ is nullptr.");
