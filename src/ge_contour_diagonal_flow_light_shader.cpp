@@ -529,16 +529,12 @@ static constexpr char BLEND_IMG_PROG[] = R"(
 
 std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, float width, float height)
 {
+    if (height < 1) {
+        return {};
+    }
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
-    float aspect = 1.0;
-    float safeHeight = 1.0;
-    
-    if (height > 1.0) {
-        safeHeight = height;
-    }
-    
-    aspect = width / safeHeight;
+    float aspect = static_cast<float>(width) / static_cast<float>(height);
 
     for (const auto& uv : uvPoints) {
         float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
