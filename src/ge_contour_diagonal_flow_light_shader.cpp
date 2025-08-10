@@ -532,10 +532,13 @@ std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, floa
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
     float aspect = 1.0;
-
+    float safeHeight = 1.0;
+    
     if (height > 1.0) {
-        aspect = width / height;
+        safeHeight = height;
     }
+    
+    aspect = width / safeHeight;
 
     for (const auto& uv : uvPoints) {
         float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
