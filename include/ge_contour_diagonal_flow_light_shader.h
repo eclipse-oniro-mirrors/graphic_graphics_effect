@@ -15,51 +15,48 @@
  
 #ifndef GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
-#include <any>
 
-#include "ge_shader.h"
-#include "ge_shader_filter_params.h"
+#include <queue>
 #include "common/rs_vector4.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_shader.h"
+#include "ge_shader_filter_params.h"
 #include "utils/matrix.h"
 
 namespace OHOS {
 namespace Rosen {
 
+const int box4fSize = 4;
+using Box4f = std::array<float, box4fSize>;
+
+struct Grid {
+    Box4f bbox;
+    std::vector<int> curveIndices;
+};
+
+class GEKawaseBlurShaderFilter;
 class GE_EXPORT GEContourDiagonalFlowLightShader : public GEShader {
+
 public:
     GEContourDiagonalFlowLightShader();
     GEContourDiagonalFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& contourDiagonalFlowLightParams);
-
     ~GEContourDiagonalFlowLightShader() override = default;
-
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
-
     const std::string GetDescription() const { return "GEContourDiagonalFlowLightShader"; }
-
     void SetGEContentDiagonalFlowLightShaderParams(const Drawing::GEContentDiagonalFlowLightShaderParams& params)
     {
         contourDiagonalFlowLightParams_ = params;
     }
-
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
-
     void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
-
     static std::shared_ptr<GEContourDiagonalFlowLightShader>
-        CreateContourDiagonalFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
-
+        CreateFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
-
-    std::shared_ptr<Drawing::Image> MakeContourDiagonalFlowLightPrecalculationShader(Drawing::Canvas& canvas,
-        const Drawing::ImageInfo& imageInfo);
-
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightPrecalculationBuilder();
-
-    std::shared_ptr<Drawing::Image> MakeContourDiagonalFlowLightHaloAtlasShader(Drawing::Canvas& canvas,
-        const Drawing::ImageInfo& imageInfo);
-
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightHaloAtlasBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
+    Box4f ComputeCurveBoundingBox(int curveIndex, float maxThickness, int width, int height);
+    void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void PreCalculateRegion(Drawing::Canvas& canvas, int gridIndex,
+        const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
 
 private:
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&) = delete;
@@ -67,12 +64,38 @@ private:
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&&) = delete;
     std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas,
+        std::shared_ptr<Drawing::Image> precalculationImg,
+        std::shared_ptr<Drawing::Image> img1, std::shared_ptr<Drawing::Image> img2);
+    void AutoPartitionCal(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void AutoGridPartition(int width, int height, float maxThickness);
+    void ComputeAllCurveBoundingBoxes(int width, int height, float maxThickness,
+                                      Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
+    void InitializeWorkQueue(const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes,
+                            std::queue<Grid>& workQueue);
+    void SplitGrid(const Grid& current, const std::vector<Box4f>& curveBBoxes,
+                  std::queue<Grid>& workQueue, float minGridSize);
+    std::vector<int> SelectTopCurves(const Grid& current, const std::vector<Box4f>& curveBBoxes,
+                                    size_t topK);
+    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, bool shouldSelectTopCurves);
 
+private:
+    int numCurves_ = 0;
+    int capacity_ = 0;
+    std::shared_ptr<Drawing::Surface> offscreenSurface_;
+    std::shared_ptr<Drawing::Canvas> offscreenCanvas_;
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::vector<float> controlPoints_{}; // fix 64 X 2
     size_t pointCnt_ = 0; // real input Point Cnt
+    std::shared_ptr<GEKawaseBlurShaderFilter> blurShader_ = nullptr;
+    
+    // grid : curves, boundingbox(xmin, xmax, ymin, ymax)
+    std::vector<std::pair<std::vector<float>, Box4f>> curvesInGrid_{};
+    std::vector<std::vector<float>> segmentIndex_{};
+
 };
+
 } // namespace Rosen
 } // namespace OHOS
 #endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
