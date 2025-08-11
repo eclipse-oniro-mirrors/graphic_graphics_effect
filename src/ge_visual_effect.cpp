@@ -31,11 +31,7 @@ GEVisualEffect::GEVisualEffect(
     const std::string& name, DrawingPaintType type, const std::optional<Drawing::CanvasInfo>& canvasInfo)
     : visualEffectName_(name), type_(type), visualEffectImpl_(std::make_unique<GEVisualEffectImpl>(name))
 {
-    if (canvasInfo) {
-        canvasInfo_ = canvasInfo.value();
-    } else {
-        canvasInfo_ = Drawing::CanvasInfo();
-    }
+    canvasInfo_ = canvasInfo.value_or(Drawing::CanvasInfo());
 }
 
 GEVisualEffect::~GEVisualEffect() {}

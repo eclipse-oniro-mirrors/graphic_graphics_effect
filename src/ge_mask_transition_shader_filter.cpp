@@ -39,8 +39,8 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
         return image;
     }
 
-    Drawing::Matrix matrix = canvasInfo_.mat_;
-    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
     if (!matrix.Invert(invertMatrix)) {
         GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage Invert matrix failed");
@@ -62,7 +62,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
         return image;
     }
 
-    auto maskEffectShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    auto maskEffectShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (maskEffectShader == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage maskEffectShader generate failed");
         return image;

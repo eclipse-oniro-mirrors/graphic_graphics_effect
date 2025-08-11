@@ -104,13 +104,13 @@ HWTEST_F(GEColorGradientShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions of xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     Drawing::GEColorGradientShaderFilterParams params;
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
     EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    Drawing::GEColorGradientShaderFilterParams params1 { colors, poitions, strengths, nullptr };
+    Drawing::GEColorGradientShaderFilterParams params1 { colors, positions, strengths, nullptr };
     auto filter1 = std::make_unique<GEColorGradientShaderFilter>(params1);
     EXPECT_EQ(filter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
  
@@ -138,7 +138,7 @@ HWTEST_F(GEColorGradientShaderFilterTest, CheckInParams_001, TestSize.Level0)
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions of xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     Drawing::GEColorGradientShaderFilterParams params { colors, positions, strengths, nullptr };
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
@@ -174,11 +174,11 @@ HWTEST_F(GEColorGradientShaderFilterTest, PreProcessColorGradientBuilder_001, Te
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions of xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     float geoWidth = 100;
     float geoHeight = 100;
-    Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
+    Drawing::GEColorGradientShaderFilterParams params { colors, positions, strengths, nullptr };
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
     EXPECT_NE(filter->PreProcessColorGradientBuilder(geoWidth, geoHeight), nullptr);
 
