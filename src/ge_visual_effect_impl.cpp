@@ -1312,7 +1312,7 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
         return;
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_RADIUS) {
-        particleCircularHaloParams_->radius_ = std::clamp(param, 0.0f, 1.0f);
+        particleCircularHaloParams_->radius_ = std::clamp(param, 0.001f, 10.0f);
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
         particleCircularHaloParams_->noise_ = std::max(param, 0.0f);
