@@ -111,7 +111,7 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
-        {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
             if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
