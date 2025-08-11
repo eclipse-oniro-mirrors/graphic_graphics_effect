@@ -72,6 +72,7 @@ public:
         DIRECTION_LIGHT,
         VARIABLE_RADIUS_BLUR,
         COLOR_GRADIENT_EFFECT,
+        LIGHT_CAVE,
         MAX
     };
 
@@ -391,6 +392,16 @@ public:
         return colorGradientEffectParams_;
     }
 
+    void MakeLightCaveParams()
+    {
+        lightCaveShaderParams_ = std::make_shared<GEXLightCaveShaderParams>();
+    }
+
+    const std::shared_ptr<GEXLightCaveShaderParams>& GetLightCaveParams() const
+    {
+        return lightCaveShaderParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -429,6 +440,9 @@ private:
     void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
     void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetLightCaveParams(const std::string& tag, const Vector4f& param);
+    void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetLightCaveParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -464,6 +478,7 @@ private:
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
 
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
+    std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
 };
 
 } // namespace Drawing

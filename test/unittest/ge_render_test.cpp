@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_render.h"
+#include "ge_visual_effect_impl.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -901,5 +902,23 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
 }
 
+
+/**
+ * @tc.name: GenerateShaderEffectTest_LightCave
+ * @tc.desc: Verify the GenerateShaderEffect with LightCave
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderEffectTest_LightCave, TestSize.Level1)
+{
+    auto geVisualEffectImpl = std::make_shared<Drawing::GEVisualEffectImpl>("");
+    geVisualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
+    auto geRender = std::make_shared<GERender>();
+    auto shader = geRender->GenerateShaderEffect(geVisualEffectImpl);
+    EXPECT_EQ(shader, nullptr);
+
+    geVisualEffectImpl->MakeLightCaveParams();
+    shader = geRender->GenerateShaderEffect(geVisualEffectImpl);
+    EXPECT_NE(shader, nullptr);
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

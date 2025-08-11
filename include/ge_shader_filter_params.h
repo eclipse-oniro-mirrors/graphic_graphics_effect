@@ -480,6 +480,22 @@ struct GEXColorGradientEffectParams {
     std::shared_ptr<GEShaderMask> mask_;
 };
 
+constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORC[] = "LightCave_ColorC";
+constexpr char GEX_SHADER_LIGHT_CAVE_POSITION[] = "LightCave_Position";
+constexpr char GEX_SHADER_LIGHT_CAVE_RADIUSXY[] = "LightCave_RadiusXY";
+constexpr char GEX_SHADER_LIGHT_CAVE_PROGRESS[] = "LightCave_Progress";
+struct GEXLightCaveShaderParams {
+    Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorC = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector2f position = Vector2f(0.0f, 0.0f);
+    Vector2f radiusXY = Vector2f(0.0f, 0.0f);
+    float progress = 0.0f;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
