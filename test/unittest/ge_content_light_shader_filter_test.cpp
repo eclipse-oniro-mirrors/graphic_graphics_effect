@@ -57,49 +57,49 @@ void GEContentLightShaderFilterTest::SetUp()
 void GEContentLightShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify the ProcessImage: image is invalid
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify the OnProcessImage: image is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEContentLightShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEContentLightShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest ProcessImage_001 start";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest OnProcessImage_001 start";
     Drawing::GEContentLightFilterParams params;
     auto filter = std::make_unique<GEContentLightFilter>(params);
-    EXPECT_EQ(filter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
  
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(1, 0, format); // 0, 1  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto image1 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image1, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image1, src_, dst_), nullptr);
 
     bmp.Build(0, 1, format); // 1, 0  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLACK);
     auto image2 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image2, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image2, src_, dst_), nullptr);
 
     bmp.Build(0, 0, format); // 1, 0  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto image3 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image3, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image3, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest ProcessImage_001 end";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest OnProcessImage_001 end";
 }
 
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify the ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify the OnProcessImage
  * @tc.type: FUNC
  */
-HWTEST_F(GEContentLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEContentLightShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest ProcessImage_002 start";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest OnProcessImage_002 start";
 
     Drawing::GEContentLightFilterParams params;
     auto filter = std::make_unique<GEContentLightFilter>(params);
-    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
     Vector4f lightColor = Vector4f(0.2f, 0.4f, 0.6f, 0.5f);
@@ -108,9 +108,9 @@ HWTEST_F(GEContentLightShaderFilterTest, ProcessImage_002, TestSize.Level0)
 
     Drawing::GEContentLightFilterParams params1 { lightPosition, lightColor, lightIntentsity, rotateAngle };
     auto filter1 = std::make_unique<GEContentLightFilter>(params1);
-    EXPECT_EQ(filter1->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
-    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest ProcessImage_002 end";
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest OnProcessImage_002 end";
 }
 
 /**
@@ -128,6 +128,22 @@ HWTEST_F(GEContentLightShaderFilterTest, GenerateContentLightEffect_001, TestSiz
     EXPECT_NE(filter->contentLightShaderEffect_, nullptr);
 
     GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest GenerateContentLightEffect_001 end";
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContentLightShaderFilterTest, Type_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest Type_001 start";
+
+    Drawing::GEContentLightFilterParams params;
+    auto filter = std::make_unique<GEContentLightFilter>(params);
+    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_CONTENT_LIGHT);
+
+    GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest Type_001 end";
 }
 } // namespace Rosen
 } // namespace OHOS

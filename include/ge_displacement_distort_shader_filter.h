@@ -31,14 +31,17 @@ public:
     GEDisplacementDistortFilter operator=(const GEDisplacementDistortFilter&) = delete;
     ~GEDisplacementDistortFilter() override = default;
  
-    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
  
     const std::string GetDescription() const;
 
+    const std::string& Type() const override;
+
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetDisplacementDistortEffect();
     Drawing::GEDisplacementDistortFilterParams params_;
+    static const std::string type_;
 
     inline static const std::string shaderStringDisplacementDistort = R"(
         uniform shader image;

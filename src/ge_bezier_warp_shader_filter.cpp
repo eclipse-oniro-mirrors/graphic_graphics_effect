@@ -32,22 +32,29 @@ constexpr size_t BOTTOM_LEFT_INDEX   = 9;
 constexpr size_t LEFT_TWO_THIRDS     = 10;
 constexpr size_t LEFT_ONE_THIRD      = 11;
 
+const std::string GEBezierWarpShaderFilter::type_ = Drawing::GE_FILTER_BEZIER_WARP;
+
 GEBezierWarpShaderFilter::GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params)
     :destinationPatch_(params.destinationPatch)
 {}
 
-std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string& GEBezierWarpShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage input is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage input is invalid");
         return nullptr;
     }
 
     int imageHeight = image->GetHeight();
     int imageWidth = image->GetWidth();
     if (imageHeight <= 0 || imageWidth <= 0) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage imageinfo is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage imageinfo is invalid");
         return nullptr;
     }
 
@@ -65,19 +72,19 @@ std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::ProcessImage(Drawing::
 
     auto surface = canvas.GetSurface();
     if (surface == nullptr) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage surface is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage surface is invalid");
         return nullptr;
     }
     auto offscreenRect = dst;
     std::shared_ptr<Drawing::Surface> offscreenSurface = surface->MakeSurface(offscreenRect.GetWidth(),
         offscreenRect.GetHeight());
     if (offscreenSurface == nullptr) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage offscreenSurface is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage offscreenSurface is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
     if (offscreenCanvas == nullptr) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage offscreenCanvas is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage offscreenCanvas is invalid");
         return nullptr;
     }
 
@@ -87,7 +94,7 @@ std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::ProcessImage(Drawing::
     // Update the cache state with the filtered snapshot.
     auto filteredSnapshot = offscreenSurface->GetImageSnapshot();
     if (filteredSnapshot == nullptr) {
-        LOGE("GEBezierWarpShaderFilter::ProcessImage filteredSnapshot is invalid");
+        LOGE("GEBezierWarpShaderFilter::OnProcessImage filteredSnapshot is invalid");
     }
     offscreenCanvas->DetachBrush();
     return filteredSnapshot;

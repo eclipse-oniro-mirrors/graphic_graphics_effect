@@ -20,12 +20,15 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace {
     static constexpr float MIN_IMAGE_SIZE = 1e-6;
 }
+
+const std::string GEEdgeLightShaderFilter::type_ = Drawing::GE_FILTER_EDGE_LIGHT;
 
 GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params)
 {
@@ -36,11 +39,16 @@ GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShade
     useRawColor_ = params.useRawColor;
 }
 
-std::shared_ptr<Drawing::Image>GEEdgeLightShaderFilter::ProcessImage(Drawing::Canvas &canvas,
+const std::string& GEEdgeLightShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::OnProcessImage(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
     if (image == nullptr) {
-        LOGE("GEEdgeLightShaderFilter:: ProcessImage input image is invalid.");
+        LOGE("GEEdgeLightShaderFilter:: OnProcessImage input image is invalid.");
         return nullptr;
     }
 
@@ -54,7 +62,13 @@ std::shared_ptr<Drawing::Image>GEEdgeLightShaderFilter::ProcessImage(Drawing::Ca
     
     return nullptr;
 }
-}
-}
 
- 
+void GEEdgeLightShaderFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        color_ = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, color_);
+    }
+}
+}
+}

@@ -90,7 +90,28 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return out;
         }
     },
-    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+    {GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetColorGradientEffectParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXColorGradientEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXColorGradientEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
+        {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
             if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
@@ -100,7 +121,7 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             out = std::make_shared<GEBorderLightShader>(*params);
             return out;
         }
-    }
+    },
 };
 
 GERender::GERender() {}
@@ -144,6 +165,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
             LOGD("GERender::ApplyImageEffect filter is null");
             continue;
         }
+        geShaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
         geShaderFilter->SetCache(ve->GetCache());
         geShaderFilter->Preprocess(canvas, src, dst);
         resImage = geShaderFilter->ProcessImage(canvas, resImage, src, dst);
@@ -547,6 +569,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
     }
     if (shaderFilter) {
         shaderFilter->SetShaderFilterCanvasinfo(vef->GetCanvasInfo());
+        shaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
     }
     return shaderFilter;
 }

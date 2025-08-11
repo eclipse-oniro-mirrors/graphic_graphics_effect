@@ -71,6 +71,7 @@ public:
         PARTICLE_CIRCULAR_HALO,
         DIRECTION_LIGHT,
         VARIABLE_RADIUS_BLUR,
+        COLOR_GRADIENT_EFFECT,
         MAX
     };
 
@@ -380,6 +381,16 @@ public:
         return variableRadiusBlurParams_;
     }
 
+    void MakeColorGradientEffectParams()
+    {
+        colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
+    }
+
+    const std::shared_ptr<GEXColorGradientEffectParams>& GetColorGradientEffectParams() const
+    {
+        return colorGradientEffectParams_;
+    }
+
     void MakeBorderLightParams()
     {
         borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
@@ -406,7 +417,8 @@ private:
     void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
-    void SetSoundWaveParamsFloat(const std::string& tag, float param);
+    void SetSoundWaveParams(const std::string& tag, float param);
+    void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
     void SetDirectionLightParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
@@ -423,6 +435,9 @@ private:
     void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
     void SetMaskTransitionParamsFloat(const std::string& tag, float param);
     void SetVariableRadiusBlurParams(const std::string& tag, float param);
+    void SetColorGradientEffectParams(const std::string& tag, float param);
+    void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
+    void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
     void SetBorderLightParams(const std::string& tag, const Vector3f& param);
     void SetBorderLightParams(const std::string& tag, const Vector4f& param);
@@ -460,6 +475,7 @@ private:
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
+    std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
 };
 

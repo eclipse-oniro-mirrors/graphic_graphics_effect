@@ -37,18 +37,18 @@ public:
     GEShaderFilter(const GEShaderFilter&) = delete;
     virtual ~GEShaderFilter() = default;
 
-    virtual std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
+    virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) = 0;
+
+    GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst);
 
     uint32_t Hash() const
     {
         return hash_;
     }
 
-    std::string Type() const
-    {
-        return type_;
-    }
+    virtual const std::string& Type() const = 0;
  
     FilterParams& Params()
     {
@@ -58,6 +58,11 @@ public:
     void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
     {
         canvasInfo_ = canvasInfo;
+    }
+
+    void SetSupportHeadroom(float supportHeadroom)
+    {
+        supportHeadroom_ = supportHeadroom;
     }
 
     virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) {}
@@ -74,9 +79,9 @@ public:
 
 protected:
     Drawing::CanvasInfo canvasInfo_;
+    float supportHeadroom_ = 0.0f;
     uint32_t hash_ = 0;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
-    std::string type_ = "";
     FilterParams params_;
 };
 } // namespace Rosen

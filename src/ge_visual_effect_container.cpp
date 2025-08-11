@@ -66,6 +66,28 @@ std::shared_ptr<GEVisualEffect> GEVisualEffectContainer::GetGEVisualEffect(const
     }
     return nullptr;
 }
+
+
+void GEVisualEffectContainer::SetGeometry(const Drawing::Canvas& canvas, float geoWidth, float geoHeight)
+{
+    auto dst = canvas.GetDeviceClipBounds();
+    Drawing::CanvasInfo info { std::ceil(geoWidth), std::ceil(geoHeight),
+        dst.GetLeft(), dst.GetTop(), canvas.GetTotalMatrix() };
+    for (auto vef : GetFilters()) {
+        if (vef) {
+            vef->SetCanvasInfo(info);
+        }
+    }
+}
+
+void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
+{
+    for (auto vef : GetFilters()) {
+        if (vef) {
+            vef->SetSupportHeadroom(headroom);
+        }
+    }
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -35,7 +35,7 @@ public:
     GELinearGradientBlurShaderFilter operator=(const GELinearGradientBlurShaderFilter&) = delete;
     ~GELinearGradientBlurShaderFilter() override = default;
 
-    virtual GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
+    virtual GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     GE_EXPORT std::string GetDescription();
@@ -45,6 +45,8 @@ public:
         geoWidth_ = geoWidth;
         geoHeight_ = geoHeight;
     }
+
+    const std::string& Type() const override;
 
 protected:
     std::shared_ptr<GELinearGradientBlurPara> linearGradientBlurPara_ = nullptr;
@@ -72,6 +74,8 @@ private:
         std::shared_ptr<Drawing::ShaderEffect> gradientShader);
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImageDDGR(
         Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, uint8_t directionBias);
+
+    static const std::string type_;
 };
 
 } // namespace Rosen

@@ -48,11 +48,17 @@ public:
         return cacheAnyPtr_;
     }
 
+    void SetSupportHeadroom(float supportHeadroom)
+    {
+        supportHeadroom_ = supportHeadroom;
+    }
+
 protected:
     virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) {}
 
 protected:
     uint32_t hash_ = 0;
+    float supportHeadroom_ = 0.0f;
     std::shared_ptr<Drawing::ShaderEffect> drShader_ = nullptr;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
 };

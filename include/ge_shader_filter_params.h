@@ -65,17 +65,17 @@ struct GEWaterRippleFilterParams {
     uint32_t rippleMode = 1;
 };
 
-constexpr char GE_FILTER_SOUND_WAVE[] = "SOUND_WAVE";
-constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "COLORA";
-constexpr char GE_FILTER_SOUND_WAVE_COLOR_B[] = "COLORB";
-constexpr char GE_FILTER_SOUND_WAVE_COLOR_C[] = "COLORC";
-constexpr char GE_FILTER_SOUND_WAVE_COLORPROGRESS[] = "COLORPROGRESS";
-constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SOUNDINTENSITY";
-constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A[] = "SHOCKWAVEALPHAA";
-constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SHOCKWAVEALPHAB";
-constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SHOCKWAVEPROGRESSA";
-constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SHOCKWAVEPROGRESSB";
-constexpr char GE_FILTER_SOUND_WAVE_TOTAL_ALPHA[] = "SHOCKWAVETOTALALPHA";
+constexpr char GE_FILTER_SOUND_WAVE[] = "SoundWave";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "SoundWave_ColorA";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_B[] = "SoundWave_ColorB";
+constexpr char GE_FILTER_SOUND_WAVE_COLOR_C[] = "SoundWave_ColorC";
+constexpr char GE_FILTER_SOUND_WAVE_COLORPROGRESS[] = "SoundWave_ColorProgress";
+constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SoundWave_Intersity";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A[] = "SoundWave_AlphaA";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SoundWave_AlphaB";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SoundWave_ProgressA";
+constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SoundWave_ProgressB";
+constexpr char GE_FILTER_SOUND_WAVE_TOTAL_ALPHA[] = "SoundWave_TotalAlpha";
 struct GESoundWaveFilterParams {
     // sound wave
     Drawing::Color4f colorA = {1.0, 1.0, 1.0, 1.0};
@@ -423,6 +423,54 @@ struct GELinearGradientShaderMaskParams {
     std::vector<std::pair<float, float>> fractionStops;
     Drawing::Point startPosition;
     Drawing::Point endPosition;
+};
+
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT[] = "ColorGradientEffect";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR0[] = "ColorGradientEffect_Color0";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR1[] = "ColorGradientEffect_Color1";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR2[] = "ColorGradientEffect_Color2";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR3[] = "ColorGradientEffect_Color3";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR4[] = "ColorGradientEffect_Color4";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR5[] = "ColorGradientEffect_Color5";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR6[] = "ColorGradientEffect_Color6";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR7[] = "ColorGradientEffect_Color7";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR8[] = "ColorGradientEffect_Color8";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR9[] = "ColorGradientEffect_Color9";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR10[] = "ColorGradientEffect_Color10";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR11[] = "ColorGradientEffect_Color11";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS0[] = "ColorGradientEffect_Position0";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS1[] = "ColorGradientEffect_Position1";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS2[] = "ColorGradientEffect_Position2";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS3[] = "ColorGradientEffect_Position3";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS4[] = "ColorGradientEffect_Position4";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS5[] = "ColorGradientEffect_Position5";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS6[] = "ColorGradientEffect_Position6";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS7[] = "ColorGradientEffect_Position7";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS8[] = "ColorGradientEffect_Position8";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS9[] = "ColorGradientEffect_Position9";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS10[] = "ColorGradientEffect_Position10";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_POS11[] = "ColorGradientEffect_Position11";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH0[] = "ColorGradientEffect_Strength0";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH1[] = "ColorGradientEffect_Strength1";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH2[] = "ColorGradientEffect_Strength2";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH3[] = "ColorGradientEffect_Strength3";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH4[] = "ColorGradientEffect_Strength4";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH5[] = "ColorGradientEffect_Strength5";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH6[] = "ColorGradientEffect_Strength6";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH7[] = "ColorGradientEffect_Strength7";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH8[] = "ColorGradientEffect_Strength8";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH9[] = "ColorGradientEffect_Strength9";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH10[] = "ColorGradientEffect_Strength10";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH11[] = "ColorGradientEffect_Strength11";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_MASK[] = "ColorGradientEffect_Mask";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER[] = "ColorGradientEffect_ColorNumber";
+constexpr int COLOR_GRADIENT_ARRAY_SIZE = 12;
+struct GEXColorGradientEffectParams {
+    std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE> colors_;
+    std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE> positions_;
+    std::array<float, COLOR_GRADIENT_ARRAY_SIZE> strengths_;
+    float colorNum_ = 0.0f;
+    std::shared_ptr<GEShaderMask> mask_;
 };
 
 constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";

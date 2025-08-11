@@ -20,16 +20,22 @@ namespace OHOS {
 namespace Rosen {
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_transitionBlendShader_ = nullptr;
+const std::string GEMaskTransitionShaderFilter::type_ = Drawing::GE_FILTER_MASK_TRANSITION;
 
 GEMaskTransitionShaderFilter::GEMaskTransitionShaderFilter(const Drawing::GEMaskTransitionShaderFilterParams& params)
     : params_(params)
 {}
 
-std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string& GEMaskTransitionShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr || params_.mask == nullptr) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage input parameter is invalid");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage input parameter is invalid");
         return image;
     }
 
@@ -37,7 +43,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
     Drawing::Matrix invertMatrix;
     if (!matrix.Invert(invertMatrix)) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage Invert matrix failed");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage Invert matrix failed");
         return image;
     }
 
@@ -52,19 +58,19 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     Drawing::Matrix cacheMatrix = cachedData.second;
 
     if (cacheImage == nullptr || cacheImage.get() == nullptr) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage cacheImage is nullptr");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage cacheImage is nullptr");
         return image;
     }
 
     auto maskEffectShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     if (maskEffectShader == nullptr) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage maskEffectShader generate failed");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage maskEffectShader generate failed");
         return image;
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetMaskTransitionEffect();
     if (builder == nullptr) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage get mask transition effect failed");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage get mask transition effect failed");
         return image;
     }
     
@@ -79,7 +85,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::ProcessImage(Drawi
     builder->SetUniform("inverseFlag", params_.inverse);
     auto transitionImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
     if (!transitionImage) {
-        GE_LOGE("GEMaskTransitionShaderFilter::ProcessImage make image failed");
+        GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage make image failed");
         return image;
     }
     return transitionImage;

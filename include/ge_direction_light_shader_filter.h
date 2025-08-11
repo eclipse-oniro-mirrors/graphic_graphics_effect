@@ -30,14 +30,17 @@ public:
     GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params);
     ~GEDirectionLightShaderFilter() override = default;
 
-    std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas &canvas,
+    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
+
+    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetNormalMaskEffect();
     std::shared_ptr<Drawing::RuntimeEffect> GetDirectionLightEffect();
     std::shared_ptr<Drawing::RuntimeEffect> GetDirectionLightNoNormalEffect();
     Drawing::GEDirectionLightShaderFilterParams params_;
+    static const std::string type_;
 };
 
 } // namespace Rosen

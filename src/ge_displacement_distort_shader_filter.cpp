@@ -21,16 +21,22 @@
 namespace OHOS {
 namespace Rosen {
 
+const std::string GEDisplacementDistortFilter::type_ = Drawing::GE_FILTER_DISPLACEMENT_DISTORT;
+
 GEDisplacementDistortFilter::GEDisplacementDistortFilter(const Drawing::GEDisplacementDistortFilterParams& params)
     :params_(params)
 {}
 
+const std::string& GEDisplacementDistortFilter::Type() const
+{
+    return type_;
+}
  
-std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image) {
-        LOGE("GEDisplacementDistortFilter::ProcessImage input is invalid");
+        LOGE("GEDisplacementDistortFilter::OnProcessImage input is invalid");
         return nullptr;
     }
 
@@ -50,13 +56,13 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::ProcessImage(Drawin
     auto maskEffectShader =
         params_.mask_->GenerateDrawingShaderHasNormal(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     if (!maskEffectShader) {
-        LOGE("GEDisplacementDistortFilter::ProcessImage maskEffectShader generate failed");
+        LOGE("GEDisplacementDistortFilter::OnProcessImage maskEffectShader generate failed");
         return image;
     }
 
     auto displacementDistortShader = GetDisplacementDistortEffect();
     if (!displacementDistortShader) {
-        LOGE("GEDisplacementDistortFilter::ProcessImage g_displacementdistortShader init failed");
+        LOGE("GEDisplacementDistortFilter::OnProcessImage g_displacementdistortShader init failed");
         return image;
     }
 
@@ -68,7 +74,7 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::ProcessImage(Drawin
 
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (!invertedImage) {
-        LOGE("GEDisplacementDistortFilter::ProcessImage make image failed");
+        LOGE("GEDisplacementDistortFilter::OnProcessImage make image failed");
         return image;
     }
     return invertedImage;

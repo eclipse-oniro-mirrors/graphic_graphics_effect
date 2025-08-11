@@ -12,18 +12,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
+#include "ge_sound_wave_filter.h"
+
+#include <algorithm>
 #include <chrono>
  
 #include "ge_log.h"
-#include "ge_sound_wave_filter.h"
+#include "ge_tone_mapping_helper.h"
  
 namespace OHOS {
 namespace Rosen {
 
 namespace {
 constexpr static uint8_t COLOR_CHANNEL = 3; // 3 len of rgb
+
+inline void MultiplyColor4f(Drawing::Color4f& color, float ratio)
+{
+    color.redF_ *= ratio;
+    color.greenF_ *= ratio;
+    color.blueF_ *= ratio;
+}
 } // namespace
+
+const std::string GESoundWaveFilter::type_ = Drawing::GE_FILTER_SOUND_WAVE;
 
 GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
@@ -36,12 +48,16 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
     colorC_ = params.colorC;
 }
 
+const std::string& GESoundWaveFilter::Type() const
+{
+    return type_;
+}
  
-std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage input is invalid");
+        LOGE("GESoundWaveFilter::OnProcessImage input is invalid");
         return nullptr;
     }
  
@@ -59,7 +75,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
     }
     auto soundWaveShader = GetSoundWaveEffect();
     if (soundWaveShader == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage g_SoundWaveEffect init failed");
+        LOGE("GESoundWaveFilter::OnProcessImage g_SoundWaveEffect init failed");
         return image;
     }
 
@@ -84,10 +100,27 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::ProcessImage(Drawing::Canvas&
  
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (invertedImage == nullptr) {
-        LOGE("GESoundWaveFilter::ProcessImage make image failed");
+        LOGE("GESoundWaveFilter::OnProcessImage make image failed");
         return image;
     }
     return invertedImage;
+}
+
+void GESoundWaveFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        return;
+    }
+
+    bool highColor = std::max({colorA_.redF_, colorA_.greenF_, colorA_.blueF_, colorB_.redF_, colorB_.greenF_,
+        colorB_.blueF_, colorC_.redF_, colorC_.greenF_, colorC_.blueF_});
+    if (ROSEN_GNE(highColor, 1.0f)) {
+        float compressRatio = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
+        MultiplyColor4f(colorA_, compressRatio);
+        MultiplyColor4f(colorB_, compressRatio);
+        MultiplyColor4f(colorC_, compressRatio);
+    }
 }
 
 void GESoundWaveFilter::CheckSoundWaveParams()
@@ -117,7 +150,5 @@ std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
     }
     return g_soundWaveShader;
 }
-
-
 } // namespace Rosen
 } // namespace OHOS

@@ -62,45 +62,45 @@ void GEColorGradientShaderFilterTest::SetUp()
 void GEColorGradientShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
- * @tc.name: ProcessImage_001
- * @tc.desc: Verify the ProcessImage: image is invalid
+ * @tc.name: OnProcessImage_001
+ * @tc.desc: Verify the OnProcessImage: image is invalid
  * @tc.type: FUNC
  */
-HWTEST_F(GEColorGradientShaderFilterTest, ProcessImage_001, TestSize.Level0)
+HWTEST_F(GEColorGradientShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest ProcessImage_001 start";
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest OnProcessImage_001 start";
     Drawing::GEColorGradientShaderFilterParams params;
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
-    EXPECT_EQ(filter->ProcessImage(canvas_, nullptr, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
  
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(1, 0, format); // 0, 1  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto image1 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image1, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image1, src_, dst_), nullptr);
 
     bmp.Build(0, 1, format); // 1, 0  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLACK);
     auto image2 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image2, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image2, src_, dst_), nullptr);
 
     bmp.Build(0, 0, format); // 1, 0  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto image3 = bmp.MakeImage();
-    EXPECT_EQ(filter->ProcessImage(canvas_, image3, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image3, src_, dst_), nullptr);
 
-    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest ProcessImage_001 end";
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest OnProcessImage_001 end";
 }
 
 /**
- * @tc.name: ProcessImage_002
- * @tc.desc: Verify the ProcessImage
+ * @tc.name: OnProcessImage_002
+ * @tc.desc: Verify the OnProcessImage
  * @tc.type: FUNC
  */
-HWTEST_F(GEColorGradientShaderFilterTest, ProcessImage_002, TestSize.Level0)
+HWTEST_F(GEColorGradientShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest ProcessImage_002 start";
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest OnProcessImage_002 start";
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -108,16 +108,16 @@ HWTEST_F(GEColorGradientShaderFilterTest, ProcessImage_002, TestSize.Level0)
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     Drawing::GEColorGradientShaderFilterParams params;
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
-    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     Drawing::GEColorGradientShaderFilterParams params1 { colors, poitions, strengths, nullptr };
     auto filter1 = std::make_unique<GEColorGradientShaderFilter>(params1);
-    EXPECT_EQ(filter1->ProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
  
     auto str = filter1->GetDescription();
     EXPECT_TRUE(str.length() > 0);
 
-    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest ProcessImage_002 end";
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest OnProcessImage_002 end";
 }
 
 /**
@@ -183,6 +183,26 @@ HWTEST_F(GEColorGradientShaderFilterTest, PreProcessColorGradientBuilder_001, Te
     EXPECT_NE(filter->PreProcessColorGradientBuilder(geoWidth, geoHeight), nullptr);
 
     GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest PreProcessColorGradientBuilder_001 end";
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEColorGradientShaderFilterTest, Type_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest Type_001 start";
+
+    // 1.0, 0.0, 0.0, 1.0 is the color rgba params
+    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
+    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
+    Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
+    auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
+    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_COLOR_GRADIENT);
+
+    GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest Type_001 end";
 }
 } // namespace Rosen
 } // namespace OHOS

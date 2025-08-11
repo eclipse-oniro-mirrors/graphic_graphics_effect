@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -29,6 +30,7 @@ constexpr static uint8_t ARRAY_SIZE = 12;  // 12 len of array
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_maskColorGradientShaderEffect_ = nullptr;
+const std::string GEColorGradientShaderFilter::type_ = Drawing::GE_FILTER_COLOR_GRADIENT;
 
 GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params)
 {
@@ -38,11 +40,16 @@ GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorG
     mask_ = params.mask;
 }
 
-std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawing::Canvas& canvas,
+const std::string& GEColorGradientShaderFilter::Type() const
+{
+    return type_;
+}
+
+std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr || image->GetWidth() < 1e-6 || image->GetWidth() < 1e-6) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage input is invalid.");
+        LOGE("GEColorGradientShaderFilter::OnProcessImage input is invalid.");
         return nullptr;
     }
 
@@ -58,14 +65,14 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     if (srcImageShader == nullptr) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage srcImageShader is null");
+        LOGE("GEColorGradientShaderFilter::OnProcessImage srcImageShader is null");
         return image;
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         PreProcessColorGradientBuilder(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
     if (!builder) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage mask builder error\n");
+        LOGE("GEColorGradientShaderFilter::OnProcessImage mask builder error\n");
         return image;
     }
     
@@ -76,11 +83,37 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::ProcessImage(Drawin
     builder->SetUniform("strength", strength, ARRAY_SIZE);
     auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
     if (resultImage == nullptr) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage resultImage is null");
+        LOGE("GEColorGradientShaderFilter::OnProcessImage resultImage is null");
         return image;
     }
 
     return resultImage;
+}
+
+void GEColorGradientShaderFilter::Preprocess(
+    Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    // Do tone mapping when enable edr effect
+    if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        return;
+    }
+
+    float highColor = 1.0f;
+    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
+        if ((indexColors + 1) % COLOR_CHANNEL == 0) {
+            continue;
+        }
+        if (ROSEN_GNE(colors_[indexColors], highColor)) {
+            highColor = colors_[indexColors];
+        }
+    }
+    float compressRatio = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
+    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
+        if ((indexColors + 1) % COLOR_CHANNEL == 0) {
+            continue;
+        }
+        colors_[indexColors] *= compressRatio;
+    }
 }
 
 bool GEColorGradientShaderFilter::CheckInParams(float* color, float* position, float* strength, int tupleSize)
@@ -329,6 +362,5 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::PreP
     }
     return builder;
 }
-
 } // namespace Rosen
 } // namespace OHOS
