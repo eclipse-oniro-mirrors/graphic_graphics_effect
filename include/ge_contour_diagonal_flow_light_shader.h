@@ -16,11 +16,11 @@
 #ifndef GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 
+#include <queue>
 #include "common/rs_vector4.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
-#include <queue>
 #include "utils/matrix.h"
 
 namespace OHOS {
@@ -80,7 +80,7 @@ private:
     void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, bool shouldSelectTopCurves);
 
 private:
-    int numCurves = 0;
+    int numCurves_ = 0;
     int capacity_ = 0;
     std::shared_ptr<Drawing::Surface> offscreenSurface_;
     std::shared_ptr<Drawing::Canvas> offscreenCanvas_;

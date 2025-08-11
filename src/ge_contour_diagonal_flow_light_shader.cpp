@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "ge_contour_diagonal_flow_light_shader.h"
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <array>
 #include <iomanip>
+#include "ge_contour_diagonal_flow_light_shader.h"
 #include "draw/surface.h"
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
@@ -572,7 +572,6 @@ bool FEqual(float a, float b)
 {
     return std::abs(a - b) <= std::numeric_limits<float>::epsilon();
 }
-} // anonymous namespace
 
 bool intersectBBox(const Box4f& a, const Box4f& b)
 {
@@ -596,6 +595,7 @@ float BBoxOverLap(const Box4f& a, const Box4f& b)
         return overlapArea / areaA;
     }
 }
+} // anonymous namespace
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 
@@ -654,7 +654,7 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
             return;
         }
         ConvertPointsTo(ndcPoints, controlPoints_);
-        numCurves = pointCnt_ / 2; // one segment need 2 point
+        numCurves_ = pointCnt_ / 2; // one segment need 2 point
         capacity_ = pointCnt_;
         controlPoints_.resize(pointCnt_ * POSITION_CHANNEL);
 
@@ -752,7 +752,7 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
     std::vector<Box4f>& curveBBoxes)
 {
     curveBBoxes.clear();
-    curveBBoxes.reserve(numCurves);
+    curveBBoxes.reserve(numCurves_);
     // calculate the Minimum Bounding Box of the contour
     canvasBBox = {
         static_cast<float>(width),
@@ -760,7 +760,7 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
         static_cast<float>(height),
         0.0f,
     };
-    for (int i = 0; i < numCurves; ++i) {
+    for (int i = 0; i < numCurves_; ++i) {
         Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, width, height);
         curveBBoxes.push_back(bbox);
         canvasBBox[XMIN_I] = std::min(bbox[XMIN_I], canvasBBox[XMIN_I]);
@@ -803,7 +803,7 @@ void GEContourDiagonalFlowLightShader::InitializeWorkQueue(
 {
     // init root grid
     std::vector<int> initialCurves;
-    for (int i = 0; i < numCurves; ++i) {
+    for (int i = 0; i < numCurves_; ++i) {
         if (intersectBBox(canvasBBox, curveBBoxes[i])) {
             initialCurves.push_back(i);
         }
@@ -1029,6 +1029,9 @@ void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const
         canvas.AttachBrush(brush);
         canvas.DrawImageRect(*resImg, rect, rect, Drawing::SamplingOptions());
         canvas.DetachBrush();
+    } else {
+        GE_LOGW("GEContourDiagonalFlowLightShader DrawShader blendimg is nullptr.");
+        return;
     }
 }
 
