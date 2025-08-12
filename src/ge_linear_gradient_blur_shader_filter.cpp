@@ -65,7 +65,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImageDD
     Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, uint8_t directionBias)
 {
     auto& para = linearGradientBlurPara_;
-    auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth_ * imageScale_, canvasInfo_.geoHeight_ * imageScale_);
+    auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth * imageScale_, canvasInfo_.geoHeight * imageScale_);
     uint8_t direction = static_cast<uint8_t>(para->direction_);
     TransformGradientBlurDirection(direction, directionBias);
     float radius = para->blurRadius_;
@@ -101,13 +101,13 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::OnProcessImage
         return image;
     }
     LOGD("GELinearGradientBlurShaderFilter::DrawImageRect%{public}f,  %{public}f, %{public}f, %{public}f, %{public}f "
-         "%{public}d", para->blurRadius_, canvasInfo_.geoWidth_, canvasInfo_.geoHeight_, canvasInfo_.tranX_,
-         canvasInfo_.tranY_, (int)isOffscreenCanvas_);
+         "%{public}d", para->blurRadius_, canvasInfo_.geoWidth, canvasInfo_.geoHeight, canvasInfo_.tranX,
+         canvasInfo_.tranY, (int)isOffscreenCanvas_);
 
     ComputeScale(dst.GetWidth(), dst.GetHeight(), !para->isRadiusGradient_);
     Drawing::Point pts[2];
     uint8_t direction = static_cast<uint8_t>(para->direction_);
-    auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth_ * imageScale_, canvasInfo_.geoHeight_ * imageScale_);
+    auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth * imageScale_, canvasInfo_.geoHeight * imageScale_);
     bool result = GetGEGradientDirectionPoints(pts, clipIPadding, static_cast<GEGradientDirection>(direction));
     if (!result) {
         return image;
@@ -125,7 +125,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::OnProcessImage
         const auto& RSFilter = para->linearGradientBlurFilter_;
         auto filter = RSFilter;
         auto alphaGradientShader =
-            mask->GenerateDrawingShader(canvasInfo_.geoWidth_ * imageScale_, canvasInfo_.geoHeight_ * imageScale_);
+            mask->GenerateDrawingShader(canvasInfo_.geoWidth * imageScale_, canvasInfo_.geoHeight * imageScale_);
         if (alphaGradientShader == nullptr) {
             LOGE("GELinearGradientBlurShaderFilter::alphaGradientShader null");
             return image;
@@ -257,9 +257,9 @@ bool GELinearGradientBlurShaderFilter::ProcessGradientDirectionPoints(
         default: {
         }
     }
-    Drawing::Matrix pointsMat = canvasInfo_.mat_;
+    Drawing::Matrix pointsMat = canvasInfo_.mat;
     if (isOffscreenCanvas_) {
-        pointsMat.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+        pointsMat.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     }
     std::vector<Drawing::Point> points(pts, pts + 2); // 2 size of pts
     pointsMat.MapPoints(points, points, points.size());

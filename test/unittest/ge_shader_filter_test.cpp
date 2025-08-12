@@ -48,8 +48,6 @@ void GEShaderFilterTest::TearDownTestCase(void) {}
 
 void GEShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
-
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -57,7 +55,7 @@ void GEShaderFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GEShaderFilterTest::TearDown() {}
+void GEShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: SetShaderFilterCanvasinfo_001
@@ -67,18 +65,26 @@ void GEShaderFilterTest::TearDown() {}
 HWTEST_F(GEShaderFilterTest, SetShaderFilterCanvasinfo_001, TestSize.Level0)
 {
     GTEST_LOG_(INFO) << "GEShaderFilterTest SetShaderFilterCanvasinfo_001 start";
-    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 0.0f, 0.0f, Drawing::Matrix()};
+    Drawing::Matrix matrix = Drawing::Matrix();
+    matrix.SetMatrix(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix};
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions of xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
-    Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
+    Drawing::GEColorGradientShaderFilterParams params { colors, positions, strengths, nullptr };
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
 
-    EXPECT_NE(filter->canvasInfo_.geoHeight_, canvasInfo.geoHeight_);
+    EXPECT_NE(filter->canvasInfo_.geoHeight, canvasInfo.geoHeight);
+    EXPECT_NE(filter->canvasInfo_.geoWidth, canvasInfo.geoWidth);
+    EXPECT_NE(filter->canvasInfo_.tranX, canvasInfo.tranX);
+    EXPECT_NE(filter->canvasInfo_.tranY, canvasInfo.tranY);
     filter->SetShaderFilterCanvasinfo(canvasInfo);
-    EXPECT_EQ(filter->canvasInfo_.geoHeight_, canvasInfo.geoHeight_);
+    EXPECT_FLOAT_EQ(filter->canvasInfo_.geoHeight, canvasInfo.geoHeight);
+    EXPECT_FLOAT_EQ(filter->canvasInfo_.geoWidth, canvasInfo.geoWidth);
+    EXPECT_FLOAT_EQ(filter->canvasInfo_.tranX, canvasInfo.tranX);
+    EXPECT_FLOAT_EQ(filter->canvasInfo_.tranY, canvasInfo.tranY);
 
     GTEST_LOG_(INFO) << "GEShaderFilterTest SetShaderFilterCanvasinfo_001 end";
 }

@@ -267,7 +267,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Dra
             LOGE("GEDirectionLightShaderFilter::OnProcessImage lightingBuilder is nullptr");
             return image;
         }
-        auto maskShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+        auto maskShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
         if (maskShader == nullptr) {
             LOGE("GEDirectionLightShaderFilter::OnProcessImage mask generate failed");
             return image;
@@ -286,8 +286,8 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Dra
         }
     }
 
-    Drawing::Matrix imageMatrix = canvasInfo_.mat_;
-    imageMatrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix imageMatrix = canvasInfo_.mat;
+    imageMatrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix imageInvertMatrix;
     if (!imageMatrix.Invert(imageInvertMatrix)) {
         LOGE("GEDirectionLightShaderFilter::OnProcessImage Invert imageMatrix failed.");
@@ -296,7 +296,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Dra
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), imageInvertMatrix);
     lightingBuilder->SetChild("image", imageShader);
-    lightingBuilder->SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    lightingBuilder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     lightingBuilder->SetUniform("lightDirection",
         params_.lightDirection.x_, params_.lightDirection.y_, -params_.lightDirection.z_);
     lightingBuilder->SetUniformVec4("lightColor",

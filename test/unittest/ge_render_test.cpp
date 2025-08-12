@@ -725,7 +725,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_007, TestSize.Level1)
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_COLOR_GRADIENT);
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions of xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_COLOR, colors);
     visualEffect->SetParam(Drawing::GE_FILTER_COLOR_GRADIENT_POSITION, positions);

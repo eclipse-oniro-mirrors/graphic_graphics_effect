@@ -202,13 +202,21 @@ HWTEST_F(GEVisualEffectTest, GetCanvasInfo_001, TestSize.Level1)
  
     auto visualEffect1 = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     Drawing::CanvasInfo canvasInfo1 = visualEffect1->GetCanvasInfo();
-    EXPECT_EQ(canvasInfo1.geoWidth_, 0.0f);
+    EXPECT_FLOAT_EQ(canvasInfo1.geoWidth, 0.0f);
+    EXPECT_FLOAT_EQ(canvasInfo1.geoHeight, 0.0f);
+    EXPECT_FLOAT_EQ(canvasInfo1.tranX, 0.0f);
+    EXPECT_FLOAT_EQ(canvasInfo1.tranY, 0.0f);
 
-    Drawing::CanvasInfo canvasInfo2 = {100.0f, 100.0f, 0.0f, 0.0f, Drawing::Matrix()};
+    Drawing::Matrix matrix = Drawing::Matrix();
+    matrix.SetMatrix(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    Drawing::CanvasInfo canvasInfo2 = {100.0f, 100.0f, 1.0f, -1.0f, matrix};
     auto visualEffect2 =
         std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR, Drawing::DrawingPaintType::BRUSH, canvasInfo2);
     Drawing::CanvasInfo canvasInfo3 = visualEffect2->GetCanvasInfo();
-    EXPECT_EQ(canvasInfo3.geoWidth_, canvasInfo2.geoWidth_);
+    EXPECT_FLOAT_EQ(canvasInfo3.geoWidth, canvasInfo2.geoWidth);
+    EXPECT_FLOAT_EQ(canvasInfo3.geoHeight, canvasInfo2.geoHeight);
+    EXPECT_FLOAT_EQ(canvasInfo3.tranX, canvasInfo2.tranX);
+    EXPECT_FLOAT_EQ(canvasInfo3.tranY, canvasInfo2.tranY);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GetCanvasInfo_001 end";
 }

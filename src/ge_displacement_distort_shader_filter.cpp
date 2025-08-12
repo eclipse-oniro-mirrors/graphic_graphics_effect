@@ -40,8 +40,8 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Draw
         return nullptr;
     }
 
-    Drawing::Matrix matrix = canvasInfo_.mat_;
-    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
     matrix.Invert(invertMatrix);
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
@@ -54,7 +54,7 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Draw
     }
 
     auto maskEffectShader =
-        params_.mask_->GenerateDrawingShaderHasNormal(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+        params_.mask_->GenerateDrawingShaderHasNormal(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (!maskEffectShader) {
         LOGE("GEDisplacementDistortFilter::OnProcessImage maskEffectShader generate failed");
         return image;
@@ -69,7 +69,7 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Draw
     Drawing::RuntimeShaderBuilder builder(displacementDistortShader);
     builder.SetChild("image", shader);
     builder.SetChild("maskEffect", maskEffectShader);
-    builder.SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     builder.SetUniform("factor", params_.factor_.first, params_.factor_.second);
 
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);

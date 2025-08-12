@@ -30,11 +30,11 @@ namespace Rosen {
 namespace Drawing {
 
 struct CanvasInfo {
-    float geoWidth_ = 0.0f;
-    float geoHeight_ = 0.0f;
-    float tranX_ = 0.0f;
-    float tranY_ = 0.0f;
-    Drawing::Matrix mat_;
+    float geoWidth = 0.0f;
+    float geoHeight = 0.0f;
+    float tranX = 0.0f;
+    float tranY = 0.0f;
+    Drawing::Matrix mat;
 };
 
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";

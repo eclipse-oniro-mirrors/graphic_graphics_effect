@@ -58,10 +58,15 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Draw
     float strength[ARRAY_SIZE] = {0.0}; // 0.0 default
     if (!CheckInParams(color, position, strength, ARRAY_SIZE)) { return image; }
 
-    Drawing::Matrix matrix = canvasInfo_.mat_;
-    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
-    matrix.Invert(invertMatrix);
+
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEColorGradientShaderFilter::ProcessImage Invert matrix failed.");
+        return image;
+    }
+
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     if (srcImageShader == nullptr) {
@@ -70,14 +75,14 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Draw
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
-        PreProcessColorGradientBuilder(canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+        PreProcessColorGradientBuilder(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (!builder) {
         LOGE("GEColorGradientShaderFilter::OnProcessImage mask builder error\n");
         return image;
     }
     
     builder->SetChild("srcImageShader", srcImageShader);
-    builder->SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    builder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     builder->SetUniform("color", color, ARRAY_SIZE * COLOR_CHANNEL);
     builder->SetUniform("position", position, ARRAY_SIZE * POSITION_CHANNEL);
     builder->SetUniform("strength", strength, ARRAY_SIZE);
