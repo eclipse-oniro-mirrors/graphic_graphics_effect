@@ -22,16 +22,8 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-bool GEVisualEffectContainerFuzzTest001(const uint8_t* data, size_t size)
+bool GEVisualEffectContainerFuzzTest001()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
     int32_t nameLen = GETest::GetPlainData<int32_t>();
     std::string name = GETest::GetStringFromData(nameLen);
@@ -42,16 +34,8 @@ bool GEVisualEffectContainerFuzzTest001(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectContainerFuzzTest002(const uint8_t* data, size_t size)
+bool GEVisualEffectContainerFuzzTest002()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
     auto visualEffect = nullptr;
     veContainer->AddToChainedFilter(visualEffect);
@@ -65,8 +49,15 @@ bool GEVisualEffectContainerFuzzTest002(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::Drawing::GEVisualEffectContainerFuzzTest001(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectContainerFuzzTest002(data, size);
+    OHOS::Rosen::Drawing::GEVisualEffectContainerFuzzTest001();
+    OHOS::Rosen::Drawing::GEVisualEffectContainerFuzzTest002();
     return 0;
 }

@@ -21,16 +21,8 @@
 namespace OHOS {
 namespace Rosen {
 
-std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     Drawing::Rect src = GETest::GetPlainData<Drawing::Rect>();
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
     uint32_t radius = GETest::GetPlainData<uint32_t>();
@@ -43,16 +35,8 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t
     return res;
 }
 
-std::shared_ptr<Drawing::Image> ScaleAndAddRandomColorFuzzTest(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ScaleAndAddRandomColorFuzzTest()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
     auto shaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
 
@@ -81,9 +65,6 @@ std::shared_ptr<Drawing::Image> ScaleAndAddRandomColorFuzzTest(const uint8_t *da
 
 int GetRadiusFuzzTest(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
-        return 0;
-    }
     FuzzedDataProvider fdp(data, size);
     int radius = fdp.ConsumeIntegral<int32_t>();
     Drawing::GEMESABlurShaderFilterParams params{radius, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
@@ -97,9 +78,16 @@ int GetRadiusFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::ProcessImageFuzzTest(data, size);
-    OHOS::Rosen::ScaleAndAddRandomColorFuzzTest(data, size);
+    OHOS::Rosen::ProcessImageFuzzTest();
+    OHOS::Rosen::ScaleAndAddRandomColorFuzzTest();
     OHOS::Rosen::GetRadiusFuzzTest(data, size);
     return 0;
 }

@@ -27,16 +27,8 @@ namespace {
 constexpr size_t STR_LEN = 10;
 }
 
-std::shared_ptr<GEVisualEffectImpl> GEVisualEffectFuzzTest001(const uint8_t* data, size_t size)
+std::shared_ptr<GEVisualEffectImpl> GEVisualEffectFuzzTest001()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     int32_t nameLen = GETest::GetPlainData<int32_t>();
     std::string name = GETest::GetStringFromData(nameLen);
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
@@ -46,16 +38,8 @@ std::shared_ptr<GEVisualEffectImpl> GEVisualEffectFuzzTest001(const uint8_t* dat
     return impl;
 }
 
-std::shared_ptr<GEVisualEffect> GEVisualEffectFuzzTest002(const uint8_t* data, size_t size)
+std::shared_ptr<GEVisualEffect> GEVisualEffectFuzzTest002()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     int32_t nameLen = GETest::GetPlainData<int32_t>();
     std::string name = GETest::GetStringFromData(nameLen);
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
@@ -65,9 +49,6 @@ std::shared_ptr<GEVisualEffect> GEVisualEffectFuzzTest002(const uint8_t* data, s
 
 bool GEVisualEffectFuzzTest003(const uint8_t* data, size_t size)
 {
-    if (data == nullptr) {
-        return false;
-    }
     FuzzedDataProvider fdp(data, size);
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test");
     std::string tag = fdp.ConsumeRandomLengthString(STR_LEN);
@@ -76,16 +57,8 @@ bool GEVisualEffectFuzzTest003(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest004(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest004()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -94,16 +67,8 @@ bool GEVisualEffectFuzzTest004(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest005(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest005()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -112,16 +77,8 @@ bool GEVisualEffectFuzzTest005(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest006(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest006()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -130,16 +87,8 @@ bool GEVisualEffectFuzzTest006(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest007(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest007()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -148,16 +97,8 @@ bool GEVisualEffectFuzzTest007(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest008(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest008()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -166,16 +107,8 @@ bool GEVisualEffectFuzzTest008(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest009(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest009()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -186,16 +119,8 @@ bool GEVisualEffectFuzzTest009(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest010(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest010()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -204,16 +129,8 @@ bool GEVisualEffectFuzzTest010(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest011(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest011()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -222,16 +139,8 @@ bool GEVisualEffectFuzzTest011(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest012(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest012()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -240,16 +149,8 @@ bool GEVisualEffectFuzzTest012(const uint8_t* data, size_t size)
     return true;
 }
 
-bool GEVisualEffectFuzzTest013(const uint8_t* data, size_t size)
+bool GEVisualEffectFuzzTest013()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
     auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
     std::string tag = GETest::GetStringFromData(STR_LEN);
@@ -258,16 +159,8 @@ bool GEVisualEffectFuzzTest013(const uint8_t* data, size_t size)
     return true;
 }
 
-std::string GEVisualEffectFuzzTest014(const uint8_t* data, size_t size)
+std::string GEVisualEffectFuzzTest014()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     int32_t nameLen = GETest::GetPlainData<int32_t>();
     std::string name = GETest::GetStringFromData(nameLen);
     DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
@@ -283,20 +176,27 @@ std::string GEVisualEffectFuzzTest014(const uint8_t* data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest001(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest002(data, size);
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest001();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest002();
     OHOS::Rosen::Drawing::GEVisualEffectFuzzTest003(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest004(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest005(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest006(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest007(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest008(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest009(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest010(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest011(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest012(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest013(data, size);
-    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest014(data, size);
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest004();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest005();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest006();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest007();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest008();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest009();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest010();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest011();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest012();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest013();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest014();
     return 0;
 }

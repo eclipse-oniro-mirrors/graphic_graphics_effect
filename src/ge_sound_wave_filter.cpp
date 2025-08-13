@@ -65,7 +65,8 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
     matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
     if (!matrix.Invert(invertMatrix)) {
-        LOGE("GESoundWaveFilter::ProcessImage Invert matrix");
+        LOGE("GESoundWaveFilter::ProcessImage Invert matrix failed");
+        return image;
     }
     
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,

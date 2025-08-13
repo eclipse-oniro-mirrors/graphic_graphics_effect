@@ -22,16 +22,8 @@
 namespace OHOS {
 namespace Rosen {
 
-std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     Drawing::Rect src = GETest::GetPlainData<Drawing::Rect>();
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
 
@@ -54,16 +46,8 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t
     return res;
 }
 
-int GetRadiusFuzzTest(const uint8_t *data, size_t size)
+int GetRadiusFuzzTest()
 {
-    if (data == nullptr) {
-        return 0;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     int radius = GETest::GetPlainData<int>();
 
     Drawing::GEKawaseBlurShaderFilterParams params = {radius};
@@ -76,9 +60,6 @@ int GetRadiusFuzzTest(const uint8_t *data, size_t size)
 
 std::shared_ptr<Drawing::Image> ScaleAndAddRandomColorFuzzTest(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
     FuzzedDataProvider fdp(data, size);
 
     Drawing::GEKawaseBlurShaderFilterParams params { 1 };
@@ -106,16 +87,8 @@ std::shared_ptr<Drawing::Image> ScaleAndAddRandomColorFuzzTest(const uint8_t *da
     return res;
 }
 
-void OutputOriginalImageFuzzTest(const uint8_t *data, size_t size)
+void OutputOriginalImageFuzzTest()
 {
-    if (data == nullptr) {
-        return;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     Drawing::GEKawaseBlurShaderFilterParams params { 1 };
     auto shaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(params);
     Drawing::Canvas canvas;
@@ -135,10 +108,17 @@ void OutputOriginalImageFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::ProcessImageFuzzTest(data, size);
-    OHOS::Rosen::GetRadiusFuzzTest(data, size);
+    OHOS::Rosen::ProcessImageFuzzTest();
+    OHOS::Rosen::GetRadiusFuzzTest();
     OHOS::Rosen::ScaleAndAddRandomColorFuzzTest(data, size);
-    OHOS::Rosen::OutputOriginalImageFuzzTest(data, size);
+    OHOS::Rosen::OutputOriginalImageFuzzTest();
     return 0;
 }
