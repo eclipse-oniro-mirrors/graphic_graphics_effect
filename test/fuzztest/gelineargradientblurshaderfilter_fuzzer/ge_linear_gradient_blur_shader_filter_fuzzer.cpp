@@ -21,16 +21,8 @@
 namespace OHOS {
 namespace Rosen {
 
-std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     GEGradientDirection direction = GETest::GetPlainData<GEGradientDirection>();
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, static_cast<int>(direction),
         1.f, 1.f, Drawing::Matrix(), 1.f, 1.f, true};
@@ -53,16 +45,8 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest(const uint8_t *data, size_t
     return res;
 }
 
-std::string GetDescriptionFuzzTest(const uint8_t *data, size_t size)
+std::string GetDescriptionFuzzTest()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     float radius = GETest::GetPlainData<float>();
     std::vector<std::pair<float, float>> fractionStops = {{1.0, 0.0}, {0.0, 1.0}};
     Drawing::Matrix mat;
@@ -76,9 +60,6 @@ std::string GetDescriptionFuzzTest(const uint8_t *data, size_t size)
 
 std::shared_ptr<Drawing::Image> ProcessImageDDGRFuzzTest(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
     FuzzedDataProvider fdp(data, size);
     float blurDegree = fdp.ConsumeFloatingPoint<float>();
     float positionScale = fdp.ConsumeFloatingPoint<float>();
@@ -104,9 +85,16 @@ std::shared_ptr<Drawing::Image> ProcessImageDDGRFuzzTest(const uint8_t *data, si
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::ProcessImageFuzzTest(data, size);
-    OHOS::Rosen::GetDescriptionFuzzTest(data, size);
+    OHOS::Rosen::ProcessImageFuzzTest();
+    OHOS::Rosen::GetDescriptionFuzzTest();
     OHOS::Rosen::ProcessImageDDGRFuzzTest(data, size);
     return 0;
 }

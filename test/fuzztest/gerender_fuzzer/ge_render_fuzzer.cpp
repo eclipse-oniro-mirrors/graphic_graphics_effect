@@ -25,16 +25,8 @@ namespace GraphicsEffectEngine {
 using namespace Rosen;
 
 // fuzz src & dst for DrawImageEffect
-bool GERenderFuzzTest001(const uint8_t *data, size_t size)
+bool GERenderFuzzTest001()
 {
-    if (data == nullptr) {
-        return false;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto geRender = std::make_shared<GERender>();
     Drawing::Canvas canvas;
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
@@ -57,16 +49,8 @@ bool GERenderFuzzTest001(const uint8_t *data, size_t size)
 }
 
 // fuzz src & dst for ApplyImageEffect
-std::shared_ptr<Drawing::Image> GERenderFuzzTest002(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> GERenderFuzzTest002()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-    
     auto geRender = std::make_shared<GERender>();
     Drawing::Canvas canvas;
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
@@ -88,9 +72,6 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest002(const uint8_t *data, size_t 
 
 std::shared_ptr<Drawing::Image> GERenderFuzzTest003(const uint8_t *data, size_t size)
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
     FuzzedDataProvider fdp(data, size);
 
     auto geRender = std::make_shared<GERender>();
@@ -104,16 +85,8 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest003(const uint8_t *data, size_t 
     return resImg;
 }
 
-std::shared_ptr<Drawing::Image> GERenderFuzzTest004(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> GERenderFuzzTest004()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto geRender = std::make_shared<GERender>();
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     auto visualEffectGrey = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
@@ -148,16 +121,8 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest004(const uint8_t *data, size_t 
     return resImg;
 }
 
-std::shared_ptr<Drawing::Image> GERenderFuzzTest005(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> GERenderFuzzTest005()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto geRender = std::make_shared<GERender>();
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     auto visualEffectMagnifier = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MAGNIFIER);
@@ -189,16 +154,8 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest005(const uint8_t *data, size_t 
     return resImg;
 }
 
-std::shared_ptr<Drawing::Image> GERenderFuzzTest006(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> GERenderFuzzTest006()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     auto geRender = std::make_shared<GERender>();
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     auto visualEffectWaterRipple = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_WATER_RIPPLE);
@@ -240,12 +197,19 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest006(const uint8_t *data, size_t 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest001(data, size);
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest002(data, size);
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest001();
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest002();
     OHOS::GraphicsEffectEngine::GERenderFuzzTest003(data, size);
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest004(data, size);
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest005(data, size);
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest006(data, size);
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest004();
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest005();
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest006();
     return 0;
 }

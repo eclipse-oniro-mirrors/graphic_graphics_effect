@@ -63,7 +63,7 @@ std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Draw
     Drawing::Matrix invertMatrix;
 
     if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage Invert matrix failed.");
+        LOGE("GEColorGradientShaderFilter::ProcessImage Invert matrix failed");
         return image;
     }
 

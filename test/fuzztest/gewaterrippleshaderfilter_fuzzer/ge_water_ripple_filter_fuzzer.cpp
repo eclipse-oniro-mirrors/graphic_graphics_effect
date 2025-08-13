@@ -21,16 +21,8 @@
 namespace OHOS {
 namespace Rosen {
 
-std::shared_ptr<Drawing::Image> ProcessImageFuzzTest001(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ProcessImageFuzzTest001()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     float fLeft = GETest::GetPlainData<float>();
     float fTop = GETest::GetPlainData<float>();
     float fWidth = GETest::GetPlainData<float>();
@@ -48,16 +40,8 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest001(const uint8_t *data, siz
     return res;
 }
 
-std::shared_ptr<Drawing::Image> ProcessImageFuzzTest002(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> ProcessImageFuzzTest002()
 {
-    if (data == nullptr) {
-        return nullptr;
-    }
-    // initialize
-    GETest::g_data = data;
-    GETest::g_size = size;
-    GETest::g_pos = 0;
-
     float fLeft = GETest::GetPlainData<float>();
     float fTop = GETest::GetPlainData<float>();
     float fWidth = GETest::GetPlainData<float>();
@@ -82,8 +66,15 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest002(const uint8_t *data, siz
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
+    if (data == nullptr) {
+        return 0;
+    }
+    // initialize
+    OHOS::Rosen::GETest::g_data = data;
+    OHOS::Rosen::GETest::g_size = size;
+    OHOS::Rosen::GETest::g_pos = 0;
     /* Run your code on data */
-    OHOS::Rosen::ProcessImageFuzzTest001(data, size);
-    OHOS::Rosen::ProcessImageFuzzTest002(data, size);
+    OHOS::Rosen::ProcessImageFuzzTest001();
+    OHOS::Rosen::ProcessImageFuzzTest002();
     return 0;
 }
