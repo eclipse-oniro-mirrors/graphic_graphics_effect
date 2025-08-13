@@ -241,7 +241,7 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
             }
             auto ve = vef->GetImpl();
             hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst, context.saturationForHPS,
-                context.brightnessForHPS);
+                context.brightnessForHPS, context.image);
         }
         HpsEffectFilter::HpsEffectContext hpsEffectContext = {context.alpha, context.colorFilter, context.maskColor};
         appliedBlur = hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
@@ -405,7 +405,7 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
         for (auto vef : veContainer.GetFilters()) {
             auto ve = vef->GetImpl();
             hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst, context.saturationForHPS,
-                context.brightnessForHPS);
+                context.brightnessForHPS, context.image);
         }
 
         HpsEffectFilter::HpsEffectContext hpsEffectContext = {context.alpha, context.colorFilter, context.maskColor};

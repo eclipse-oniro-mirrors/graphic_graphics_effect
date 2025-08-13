@@ -51,7 +51,8 @@ public:
     std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
-        const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS);
+        const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
+        const std::shared_ptr<Drawing::Image>& image);
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
 
@@ -68,7 +69,7 @@ private:
     void GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst);
     void GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst);
+        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image);
     bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
