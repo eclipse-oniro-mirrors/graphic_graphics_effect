@@ -51,9 +51,9 @@ private:
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas,
-                                                                    const Drawing::ImageInfo& imageInfo);
+        const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::Image> MakeParticleHaloShader(Drawing::Canvas& canvas,
-                                                                  const Drawing::ImageInfo& imageInfo);
+        const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::ShaderEffect> MakeParticleCircularHaloShader(const Drawing::Rect& rect);
 
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&) = delete;
