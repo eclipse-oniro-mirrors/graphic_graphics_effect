@@ -450,12 +450,12 @@ private:
     void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
     void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetBorderLightParams(const std::string& tag, const Vector3f& param);
-    void SetBorderLightParams(const std::string& tag, const Vector4f& param);
-    void SetBorderLightParams(const std::string& tag, float param);
     void SetLightCaveParams(const std::string& tag, const Vector4f& param);
     void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
     void SetLightCaveParams(const std::string& tag, float param);
+    void SetBorderLightParams(const std::string& tag, const Vector3f& param);
+    void SetBorderLightParams(const std::string& tag, const Vector4f& param);
+    void SetBorderLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -490,8 +490,8 @@ private:
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
-    std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
+    std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
 };
 
 } // namespace Drawing
