@@ -29,11 +29,11 @@ class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();
 
-    GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams &params);
+    GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     ~GEParticleCircularHaloShader() override = default;
 
-    void MakeDrawingShader(const Drawing::Rect &rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const
     {
@@ -58,8 +58,8 @@ private:
 
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&) = delete;
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&&) = delete;
-    GEParticleCircularHaloShader &operator=(const GEParticleCircularHaloShader&) = delete;
-    GEParticleCircularHaloShader &operator=(const GEParticleCircularHaloShader&&) = delete;
+    GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&) = delete;
+    GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&&) = delete;
 
     Drawing::GEParticleCircularHaloShaderParams particleCircularHaloParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> glowHaloBuilder_ = nullptr;
