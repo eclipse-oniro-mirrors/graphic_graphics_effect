@@ -666,12 +666,12 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
     const Drawing::Rect& rect)
 {
     if (particleHaloImg_ == nullptr) {
-        GE_LOGD("GEParticleCircularHaloShader MakeParticleCircularHaloShader particleHaloImg_ is nullptr.");
+        GE_LOGE("GEParticleCircularHaloShader MakeParticleCircularHaloShader particleHaloImg_ is nullptr.");
         return nullptr;
     }
 
     if (cacheAnyPtr_ == nullptr) {
-        GE_LOGD("GEParticleCircularHaloShader MakeParticleCircularHaloShader cacheAnyPtr_ is nullptr.");
+        GE_LOGE("GEParticleCircularHaloShader MakeParticleCircularHaloShader cacheAnyPtr_ is nullptr.");
         return nullptr;
     }
 
@@ -681,7 +681,7 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
     Drawing::Matrix matrix;
     auto preCalcImg_ = std::any_cast<CacheDataType>(*cacheAnyPtr_).cacheImg;
     if (preCalcImg_ == nullptr) {
-        GE_LOGD("GEParticleCircularHaloShader MakeParticleCircularHaloShader preCalcImg_ is nullptr.");
+        GE_LOGE("GEParticleCircularHaloShader MakeParticleCircularHaloShader preCalcImg_ is nullptr.");
         return nullptr;
     }
     auto preCalcImgShader = Drawing::ShaderEffect::CreateImageShader(*preCalcImg_, Drawing::TileMode::CLAMP,
