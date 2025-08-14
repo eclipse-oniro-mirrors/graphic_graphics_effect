@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -401,6 +401,16 @@ public:
     {
         return lightCaveShaderParams_;
     }
+    
+    void MakeBorderLightParams()
+    {
+        borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
+    }
+
+    const std::shared_ptr<GEBorderLightShaderParams>& GetBorderLightParams() const
+    {
+        return borderLightParams_;
+    }
 
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
@@ -443,6 +453,9 @@ private:
     void SetLightCaveParams(const std::string& tag, const Vector4f& param);
     void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
     void SetLightCaveParams(const std::string& tag, float param);
+    void SetBorderLightParams(const std::string& tag, const Vector3f& param);
+    void SetBorderLightParams(const std::string& tag, const Vector4f& param);
+    void SetBorderLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -476,9 +489,9 @@ private:
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
-
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
+    std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
 };
 
 } // namespace Drawing

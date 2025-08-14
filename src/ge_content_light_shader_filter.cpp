@@ -29,7 +29,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShader
 const std::string GEContentLightFilter::type_ = Drawing::GE_FILTER_CONTENT_LIGHT;
 
 GEContentLightFilter::GEContentLightFilter(const Drawing::GEContentLightFilterParams& params)
-    : lightPosition_(params.lightPosition), lightColor_(params.lightColor), lightIntensity_(params.lightIntensity),
+    : lightPosition_(params.position), lightColor_(params.color), lightIntensity_(params.intensity),
     rotationAngle_(params.rotationAngle)
 {}
 

@@ -17,6 +17,7 @@
 #include "ge_aibar_shader_filter.h"
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
+#include "ge_border_light_shader.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -129,6 +130,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetBorderLightParams();
+            out = std::make_shared<GEBorderLightShader>(*params);
+            return out;
         }
     }
 };

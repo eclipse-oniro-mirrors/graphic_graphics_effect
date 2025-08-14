@@ -339,16 +339,16 @@ struct GEWaveGradientShaderMaskParams {
     float turbulenceStrength_ = 0.f;
 };
 
-constexpr char GE_FILTER_CONTENT_LIGHT[] = "CONTENT_LIGHT";
-constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "CONTENT_LIGHT_POSITION";
-constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "CONTENT_LIGHT_COLOR";
-constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "CONTENT_LIGHT_INTENSITY";
-constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "CONTENT_LIGHT_ROTATION_ANGLE";
+constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
+constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLightPosition";
+constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLightColor";
+constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "ContentLightIntensity";
+constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "ContentLightRotationAngle";
 struct GEContentLightFilterParams {
-    Vector3f lightPosition;
-    Vector4f lightColor;
-    float lightIntensity;
-    Vector3f rotationAngle;
+    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float intensity = 0.0f;
+    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 // Declare same with in rs_render_shader_base.h
@@ -496,6 +496,23 @@ struct GEXLightCaveShaderParams {
     Vector2f position = Vector2f(0.0f, 0.0f);
     Vector2f radiusXY = Vector2f(0.0f, 0.0f);
     float progress = 0.0f;
+};
+
+
+constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
+constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
+constexpr char GE_SHADER_BORDER_LIGHT_COLOR[] = "BorderLightColor";
+constexpr char GE_SHADER_BORDER_LIGHT_INTENSITY[] = "BorderLightIntensity";
+constexpr char GE_SHADER_BORDER_LIGHT_WIDTH[] = "BorderLightWidth";
+constexpr char GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE[] = "BorderLightRotationAngle";
+constexpr char GE_SHADER_BORDER_LIGHT_CORNER_RADIUS[] = "BorderLightCornerRadius";
+struct GEBorderLightShaderParams {
+    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float intensity = 0.0f;
+    float width = 0.0f;
+    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
+    float cornerRadius = 0.0f;
 };
 
 } // namespace Drawing
