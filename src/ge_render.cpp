@@ -111,17 +111,6 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
-    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
-            std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
-                return out;
-            }
-            const auto& params = ve->GetBorderLightParams();
-            out = std::make_shared<GEBorderLightShader>(*params);
-            return out;
-        }
-    },
     {GEVisualEffectImpl::FilterType::LIGHT_CAVE, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
@@ -141,6 +130,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetBorderLightParams();
+            out = std::make_shared<GEBorderLightShader>(*params);
+            return out;
         }
     }
 };
