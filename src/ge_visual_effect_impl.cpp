@@ -188,16 +188,16 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeColorGradientEffectParams();
         }
     },
-    { GE_SHADER_BORDER_LIGHT,
-        [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::BORDER_LIGHT);
-            impl->MakeBorderLightParams();
-        }
-    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
             impl->MakeLightCaveParams();
+        }
+    },
+    { GE_SHADER_BORDER_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::BORDER_LIGHT);
+            impl->MakeBorderLightParams();
         }
     }
 };
