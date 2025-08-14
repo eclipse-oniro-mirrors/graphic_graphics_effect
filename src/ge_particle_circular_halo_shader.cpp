@@ -47,10 +47,10 @@ namespace {
             half2 f = fract(st);
             half2 u = smoothstep(0.0, 1.0, f);
             return mix(mix(dot(Random2D(i + half2(0.0, 0.0)), f - half2(0.0, 0.0)),
-                            dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
-                        mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
-                            dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
-                        u.y);
+                           dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
+                       mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
+                           dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
+                       u.y);
         }
 
         // Simple 1D pseudo-random hash value
@@ -69,7 +69,7 @@ namespace {
 
         // Create animated, noisy halo border lines
         float CentralAmbienceHaloBorder(half2 uv, half2 polarCoords, float radius, float animationTime,
-                                        float rotationTimeScale, float noiseScale, float noiseDisplacement)
+            float rotationTimeScale, float noiseScale, float noiseDisplacement)
         {
             polarCoords.x = fract((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8));
             float screenNoise = Noise2D(half2(uv + (animationTime * rotationTimeScale)) * noiseScale);
@@ -86,7 +86,7 @@ namespace {
 
         // Create soft glow inside halo
         float CentralAmbienceHaloGlow(half2 polarCoords, float animationTime, float radius, float glowRadius,
-                                    float glowExposure)
+            float glowExposure)
         {
             polarCoords.x = fract(((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8)));
             float angularRandomVal = Noise1D(polarCoords.x * 10.);
@@ -126,21 +126,21 @@ namespace {
             half2 polarCoords =
                 half2((atan(directionVector.y, directionVector.x) + PI) / (2.0 * PI), lenDirVec);
 
-            if (lenDirVec > 0.6) {
+            if (lenDirVec > 0.5) {
                 fragColor = vec4(0.);
             } else {
                 float ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius * 0.82,
-                                                                    globalRadius * 0.1, 1.0, 1.25, 0.05) * 2.5;
+                    globalRadius * 0.1, 1.0, 1.25, 0.05) * 2.5;
                 ambienceHaloBorder = clamp(ambienceHaloBorder, 0., 1.);
                 solidColor = BlendScreen(solidColor, ambienceHaloBorder);
                 ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius * 0.95,
-                                                            globalRadius * 0.25, 1.0, 0.25, 0.05);
+                    globalRadius * 0.25, 1.0, 0.25, 0.05);
                 solidColor = BlendScreen(solidColor, ambienceHaloBorder);
                 ambienceHaloBorder = CentralAmbienceHaloBorder(directionVector, polarCoords, radius,
-                                                            globalRadius * 0.35, 1.0, 0.25, 0.05);
+                    globalRadius * 0.35, 1.0, 0.25, 0.05);
                 solidColor = BlendScreen(solidColor, ambienceHaloBorder);
                 float ambienceHaloGlow = CentralAmbienceHaloGlow(polarCoords, 1.0, radius * 0.83, 0.2 * radius,
-                                                                    0.4);
+                    0.4);
                 float glow = clamp(ambienceHaloGlow, 0., 1.);
                 glowColor = BlendScreen(glowColor, glow);  // Add a glow circle
             }
@@ -179,10 +179,10 @@ namespace {
             half2 f = fract(st);
             half2 u = smoothstep(0.0, 1.0, f);
             return mix(mix(dot(Random2D(i + half2(0.0, 0.0)), f - half2(0.0, 0.0)),
-                            dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
-                        mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
-                            dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
-                        u.y);
+                           dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
+                       mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
+                           dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
+                       u.y);
         }
 
         half Random1D(half x)
@@ -231,7 +231,7 @@ namespace {
             centeredUVs.x *= screenRatio;
             half2 directionVector = centeredUVs;
             half lenDir = length(directionVector);
-            if (lenDir > 0.6) {
+            if (lenDir > 0.5) {
                 fragColor = vec4(0.);
             } else {
                 half2 polarCoords =
@@ -315,10 +315,10 @@ namespace {
             half2 f = fract(st);
             half2 u = smoothstep(0.0, 1.0, f);
             return mix(mix(dot(Random2D(i + half2(0.0, 0.0)), f - half2(0.0, 0.0)),
-                            dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
-                        mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
-                            dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
-                        u.y);
+                           dot(Random2D(i + half2(1.0, 0.0)), f - half2(1.0, 0.0)), u.x),
+                       mix(dot(Random2D(i + half2(0.0, 1.0)), f - half2(0.0, 1.0)),
+                           dot(Random2D(i + half2(1.0, 1.0)), f - half2(1.0, 1.0)), u.x),
+                       u.y);
         }
 
         // Simple 1D pseudo-random hash value
@@ -336,7 +336,7 @@ namespace {
 
         // Create animated, noisy halo border lines
         float CentralAmbienceHaloBorder(half2 uv, half2 polarCoords, float radius, float animationTime,
-                                        float rotationTimeScale, float noiseScale, float noiseDisplacement)
+            float rotationTimeScale, float noiseScale, float noiseDisplacement)
         {
             polarCoords.x = fract((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8));
             float screenNoise = Noise2D(half2(uv + (animationTime * rotationTimeScale)) * noiseScale);
@@ -353,7 +353,7 @@ namespace {
 
         // Create soft glow inside halo
         float CentralAmbienceHaloGlow(half2 polarCoords, float animationTime, float radius, float glowRadius,
-                                    float glowExposure)
+            float glowExposure)
         {
             polarCoords.x = fract(((polarCoords.x - animationTime * 4.0) - (polarCoords.y * 0.8)));
             float angularRandomVal = Noise1D(polarCoords.x * 10.);
