@@ -343,10 +343,10 @@ constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLightColor";
 constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "ContentLightIntensity";
 constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "ContentLightRotationAngle";
 struct GEContentLightFilterParams {
-    Vector3f position;
-    Vector4f color;
-    float intensity;
-    Vector3f rotationAngle;
+    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float intensity = 0.0f;
+    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
 };
 
 // Declare same with in rs_render_shader_base.h
@@ -505,12 +505,12 @@ constexpr char GE_SHADER_BORDER_LIGHT_WIDTH[] = "BorderLightWidth";
 constexpr char GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE[] = "BorderLightRotationAngle";
 constexpr char GE_SHADER_BORDER_LIGHT_CORNER_RADIUS[] = "BorderLightCornerRadius";
 struct GEBorderLightShaderParams {
-    Vector3f position;
-    Vector4f color;
-    float intensity;
-    float width;
-    Vector3f rotationAngle;
-    float cornerRadius;
+    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float intensity = 0.0f;
+    float width = 0.0f;
+    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
+    float cornerRadius = 0.0f;
 };
 
 } // namespace Drawing
