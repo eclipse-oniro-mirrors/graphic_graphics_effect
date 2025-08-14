@@ -21,8 +21,8 @@
 #include <variant>
 
 #include "draw/canvas.h"
-#include "image/image.h"
 #include "ge_shader_filter_params.h"
+#include "image/image.h"
 
 namespace OHOS {
 namespace Rosen {

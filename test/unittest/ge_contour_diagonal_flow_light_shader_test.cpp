@@ -45,9 +45,9 @@ public:
     static inline Canvas canvas_;
 };
 
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateContourDiagonalFlowLightShader_001, TestSize.Level1)
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateFlowLightShader_001, TestSize.Level1)
 {
-    // Test case for static CreateContourDiagonalFlowLightShader method
+    // Test case for static CreateFlowLightShader method
     GEContentDiagonalFlowLightShaderParams params;
     params.line1Start_ = 0.0f;
     params.line1Length_ = 0.3f;
@@ -57,7 +57,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateContourDiagonalFlowLightSha
     params.line2Color_ = Vector4f(0.5f, 0.6f, 0.7f, 0.8f);
     params.thickness_ = 0.02f;
 
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     EXPECT_NE(shader, nullptr);
 }
 
@@ -101,7 +101,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, MakeDrawingShader_001, TestSize.L
     params.line2Length_ = 0.2f;
     params.line2Color_ = Vector4f(0.67f, 0.24f, 0.35f, 0.8f);
     params.thickness_ = 0.25f;
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     shader->MakeDrawingShader(rect, progress);
     EXPECT_NE(shader->GetDrawingShader(), nullptr);
 }
@@ -118,7 +118,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
     params.line2Length_ = 0.2f;
     params.line2Color_ = Vector4f(0.67f, 0.24f, 0.9f, 0.8f);
     params.thickness_ = 0.25f;
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     shader->Preprocess(canvas_, rect);
     auto cache = shader->GetCache();
     EXPECT_NE(cache, nullptr);
@@ -135,7 +135,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilde
     params.line2Length_ = 0.3f;
     params.line2Color_ = Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
     params.thickness_ = 0.4f;
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     auto builder = shader->GetContourDiagonalFlowLightBuilder();
     EXPECT_NE(builder, nullptr);
 }
@@ -152,7 +152,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.L
     params.line2Length_ = 0.2f;
     params.line2Color_ = Vector4f(0.2f, 0.6f, 1.0f, 0.8f);
     params.thickness_ = 0.5f;
-    auto shader = GEContourDiagonalFlowLightShader::CreateContourDiagonalFlowLightShader(params);
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     auto img = shader->DrawRuntimeShader(canvas_, rect);
     EXPECT_NE(img, nullptr);
 }

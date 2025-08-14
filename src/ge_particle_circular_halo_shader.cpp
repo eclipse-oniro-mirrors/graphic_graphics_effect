@@ -44,7 +44,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     if (particleCircularHaloShaderEffect_ == nullptr) {
         static constexpr char prog[] = R"(
             uniform half2 iResolution;
-            uniform float globalRadius;   // globalRadius of all circles in animations, range: 0.0 - 1.0
+            uniform float globalRadius;   // globalRadius of all circles in animations, range: 0.0 - 10.0
             uniform half2 rotationCenter;  // Center of the halos or rings, recommended value: (0.5, 0.5)
             uniform float randomNoise;    // randomNoise seed
 
@@ -107,7 +107,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
 
             float SimpleHaloRingShape(half2 uv, float radius, float noiseVariation, float haloThickness)
             {
-                uv = ShapePerturbation(uv, noiseVariation, 2.0, radius * 0.25);
+                uv = ShapePerturbation(uv, noiseVariation, 2.0, clamp(radius * 0.25, 0.0, 0.25));
                 half2 polarCoords = half2((atan(uv.y, uv.x) + PI) / (2.0 * PI), length(uv));
                 polarCoords.y -= radius;
                 float angularRandomVal = Noise1((polarCoords.x) * 10.0);

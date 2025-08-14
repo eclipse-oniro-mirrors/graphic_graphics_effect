@@ -61,10 +61,14 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
         return nullptr;
     }
  
-    Drawing::Matrix matrix = canvasInfo_.mat_;
-    matrix.PostTranslate(-canvasInfo_.tranX_, -canvasInfo_.tranY_);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
-    matrix.Invert(invertMatrix);
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GESoundWaveFilter::ProcessImage Invert matrix failed");
+        return image;
+    }
+    
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     auto imageInfo = image->GetImageInfo();
@@ -86,7 +90,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
 
     Drawing::RuntimeShaderBuilder builder(soundWaveShader);
     builder.SetChild("image", shader);
-    builder.SetUniform("iResolution", canvasInfo_.geoWidth_, canvasInfo_.geoHeight_);
+    builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
     builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
     builder.SetUniform("colorC", colorC, COLOR_CHANNEL);

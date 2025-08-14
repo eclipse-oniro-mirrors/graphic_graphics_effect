@@ -1,4 +1,4 @@
-/*
+./*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,7 @@ public:
         DIRECTION_LIGHT,
         VARIABLE_RADIUS_BLUR,
         COLOR_GRADIENT_EFFECT,
+        LIGHT_CAVE,
         MAX
     };
 
@@ -391,6 +392,16 @@ public:
         return colorGradientEffectParams_;
     }
 
+    void MakeLightCaveParams()
+    {
+        lightCaveShaderParams_ = std::make_shared<GEXLightCaveShaderParams>();
+    }
+
+    const std::shared_ptr<GEXLightCaveShaderParams>& GetLightCaveParams() const
+    {
+        return lightCaveShaderParams_;
+    }
+    
     void MakeBorderLightParams()
     {
         borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
@@ -442,6 +453,9 @@ private:
     void SetBorderLightParams(const std::string& tag, const Vector3f& param);
     void SetBorderLightParams(const std::string& tag, const Vector4f& param);
     void SetBorderLightParams(const std::string& tag, float param);
+    void SetLightCaveParams(const std::string& tag, const Vector4f& param);
+    void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetLightCaveParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
@@ -477,6 +491,7 @@ private:
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
+    std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
 };
 
 } // namespace Drawing

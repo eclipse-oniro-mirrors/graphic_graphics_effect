@@ -30,11 +30,11 @@ namespace Rosen {
 namespace Drawing {
 
 struct CanvasInfo {
-    float geoWidth_ = 0.0f;
-    float geoHeight_ = 0.0f;
-    float tranX_ = 0.0f;
-    float tranY_ = 0.0f;
-    Drawing::Matrix mat_;
+    float geoWidth = 0.0f;
+    float geoHeight = 0.0f;
+    float tranX = 0.0f;
+    float tranY = 0.0f;
+    Drawing::Matrix mat;
 };
 
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
@@ -358,6 +358,10 @@ constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR[] = "ContourDia
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START[] = "ContourDiagonalFlowLight_Line2Start";
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH[] = "ContourDiagonalFlowLight_Line2Length";
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR[] = "ContourDiagonalFlowLight_Line2Color";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS[] = "ContourDiagonalFlowLight_Thickness";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_RADIUS[] = "ContourDiagonalFlowLight_Radius";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT1[] = "ContourDiagonalFlowLight_Weight1";
+constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT2[] = "ContourDiagonalFlowLight_Weight2";
 struct GEContentDiagonalFlowLightShaderParams {
     std::vector<Vector2f> contour_{};
     float line1Start_ = 0.f;
@@ -366,7 +370,10 @@ struct GEContentDiagonalFlowLightShaderParams {
     float line2Start_ = 0.f;
     float line2Length_ = 0.f;
     Vector4f line2Color_ = Vector4f(0.f, 0.f, 0.f, 0.f);
-    float thickness_ = 0.5f;
+    float thickness_ = 0.0f;
+    float radius_ = 25.f;
+    float weight1 = 1.f;
+    float weight2 = 2.f;
 };
 
 // Declare same with in rs_render_shader_base.h
@@ -472,6 +479,23 @@ struct GEXColorGradientEffectParams {
     float colorNum_ = 0.0f;
     std::shared_ptr<GEShaderMask> mask_;
 };
+
+constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORC[] = "LightCave_ColorC";
+constexpr char GEX_SHADER_LIGHT_CAVE_POSITION[] = "LightCave_Position";
+constexpr char GEX_SHADER_LIGHT_CAVE_RADIUSXY[] = "LightCave_RadiusXY";
+constexpr char GEX_SHADER_LIGHT_CAVE_PROGRESS[] = "LightCave_Progress";
+struct GEXLightCaveShaderParams {
+    Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorC = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector2f position = Vector2f(0.0f, 0.0f);
+    Vector2f radiusXY = Vector2f(0.0f, 0.0f);
+    float progress = 0.0f;
+};
+
 
 constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
 constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";

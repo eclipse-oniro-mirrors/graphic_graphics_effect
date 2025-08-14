@@ -194,6 +194,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeBorderLightParams();
         }
     },
+    { GEX_SHADER_LIGHT_CAVE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
+            impl->MakeLightCaveParams();
+        }
+    }
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
@@ -395,6 +401,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetColorGradientEffectParams(tag, param);
             break;
         }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
+            break;
+        }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
             break;
@@ -514,6 +524,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::COLOR_GRADIENT_EFFECT: {
             SetColorGradientEffectParams(tag, param);
+            break;
+        }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
             break;
         }
         default:
@@ -792,6 +806,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
+            break;
+        }
+        case FilterType::LIGHT_CAVE: {
+            SetLightCaveParams(tag, param);
             break;
         }
         default:
@@ -1307,6 +1325,14 @@ void GEVisualEffectImpl::SetContentDiagonalFlowParams(const std::string& tag, fl
             [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Start_ = p; } },
         { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH,
             [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->line2Length_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->thickness_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_RADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->radius_ = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT1,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->weight1 = p; } },
+        { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_WEIGHT2,
+            [](GEVisualEffectImpl* obj, float p) { obj->contentDiagonalParams_->weight2 = p; } }
     };
 
     auto it = actions.find(tag);
@@ -1364,7 +1390,7 @@ void GEVisualEffectImpl::SetParticleCircularHaloParams(const std::string& tag, f
         return;
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_RADIUS) {
-        particleCircularHaloParams_->radius_ = std::clamp(param, 0.0f, 1.0f);
+        particleCircularHaloParams_->radius_ = std::clamp(param, 0.001f, 10.0f);
     }
     if (tag == GE_SHADER_PARTICLE_CIRCULAR_HALO_NOISE) {
         particleCircularHaloParams_->noise_ = std::max(param, 0.0f);
@@ -1567,6 +1593,67 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, co
     }
 }
 
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, const Vector4f& param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, const Vector4f&)>> actions = {
+        { GEX_SHADER_LIGHT_CAVE_COLORA,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorA = p; }
+        },
+        { GEX_SHADER_LIGHT_CAVE_COLORB,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorB = p; }
+        },
+        { GEX_SHADER_LIGHT_CAVE_COLORC,
+            [](GEVisualEffectImpl* obj, const Vector4f& p) { obj->lightCaveShaderParams_->colorC = p; }
+        }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*,
+        const std::pair<float, float>&)>> actions = {
+        { GEX_SHADER_LIGHT_CAVE_POSITION,
+            [](GEVisualEffectImpl* obj, const std::pair<float, float>& p) {
+                obj->lightCaveShaderParams_->position = Vector2f(p.first, p.second);
+            }
+        },
+        { GEX_SHADER_LIGHT_CAVE_RADIUSXY,
+            [](GEVisualEffectImpl* obj, const std::pair<float, float>& p) {
+                obj->lightCaveShaderParams_->radiusXY = Vector2f(p.first, p.second);
+            }
+        }
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
+{
+    if (lightCaveShaderParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GEX_SHADER_LIGHT_CAVE_PROGRESS) {
+        lightCaveShaderParams_->progress = param;
+    }
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

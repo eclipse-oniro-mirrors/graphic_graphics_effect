@@ -79,6 +79,9 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
 
     Drawing::GEVisualEffectImpl geVisualEffectImplDispersion(Drawing::GE_FILTER_DISPERSION);
     EXPECT_EQ(geVisualEffectImplDispersion.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::DISPERSION);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImplLightCave(Drawing::GEX_SHADER_LIGHT_CAVE);
+    EXPECT_EQ(geVisualEffectImplLightCave.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
 }
 
 /**
@@ -1050,6 +1053,59 @@ HWTEST_F(GEVisualEffectImplTest, SetContentLightParams_001, TestSize.Level1)
     geVisualEffectImpl1.MakeContentLightParams();
     geVisualEffectImpl.SetParam("", param);
     EXPECT_NE(geVisualEffectImpl1.GetContentLightParams(), nullptr);
+}
+
+/**
+ * @tc.name: SetLightCaveParamsTest
+ * @tc.desc: Verify function Set LightCave Param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetLightCaveParamsTest, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
+    EXPECT_EQ(geVisualEffectImpl.GetLightCaveParams(), nullptr);
+
+    // init param data
+    Vector4f color = Vector4f(0.5f, 0.5f, 0.5f, 1.0f); // 0.5f, 0.5f, 0.5f, 1.0f is RGBA
+    std::pair<float, float> position = {0.5f, 0.5f}; // 0.5f, 0.5f is random number
+    std::pair<float, float> randerXY = {0.6f, 0.7f}; // 0.6f, 0.7f is random number
+    float progress = 0.5f; // 0.5f is random number
+
+    geVisualEffectImpl.SetLightCaveParams("", color);
+    geVisualEffectImpl.SetLightCaveParams("", position);
+    geVisualEffectImpl.SetLightCaveParams("", progress);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_, nullptr);
+
+    geVisualEffectImpl.MakeLightCaveParams();
+    ASSERT_NE(geVisualEffectImpl.GetLightCaveParams(), nullptr);
+
+    geVisualEffectImpl.SetParam("", color);
+    EXPECT_NE(geVisualEffectImpl.lightCaveShaderParams_->colorA, color);
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_COLORA, color);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->colorA, color);
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_COLORB, color);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->colorB, color);
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_COLORC, color);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->colorC, color);
+
+    geVisualEffectImpl.SetParam("", position);
+    EXPECT_NE(geVisualEffectImpl.lightCaveShaderParams_->position, Vector2f(position.first, position.second));
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_POSITION, position);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->position, Vector2f(position.first, position.second));
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_RADIUSXY, randerXY);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->radiusXY, Vector2f(randerXY.first, randerXY.second));
+
+    geVisualEffectImpl.SetParam("", progress);
+    EXPECT_NE(geVisualEffectImpl.lightCaveShaderParams_->progress, progress);
+
+    geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_PROGRESS, progress);
+    EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->progress, progress);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
