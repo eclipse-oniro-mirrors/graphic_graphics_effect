@@ -188,7 +188,8 @@ std::vector<HpsEffectFilter::IndexRange> HpsEffectFilter::HpsSupportedEffectsInd
 }
 
 void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
-    const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS)
+    const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
+    const std::shared_ptr<Drawing::Image>& image)
 {
     switch (visualEffectImpl->GetFilterType()) {
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
@@ -215,7 +216,7 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
         }
         case Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR: {
             const auto& linearGradientBlurParams = visualEffectImpl->GetLinearGradientBlurParams();
-            GenerateGradientBlurEffect(*linearGradientBlurParams, src, dst);
+            GenerateGradientBlurEffect(*linearGradientBlurParams, src, dst, image);
             break;
         }
         default:
@@ -284,7 +285,7 @@ void HpsEffectFilter::GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterPara
 }
 
 void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
-    const Drawing::Rect& src, const Drawing::Rect& dst)
+    const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image)
 {
     float blurRadius = params.blurRadius;
     std::vector<std::pair<float, float>> fractionStops = params.fractionStops;
@@ -313,6 +314,20 @@ void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradient
         gra_fractions->push_back(fractionStops[i].first);
         gra_fractions->push_back(fractionStops[i].second);
         fractionStopsCount++;
+    }
+
+    auto imageInfo = image->GetImageInfo();
+    if (geoWidth != imageInfo.GetWidth() && geoHeight != imageInfo.GetHeight()) {
+        //geoWidth != image.width means width and height switch, need swap width and height
+        float sx = 1.0;
+        float sy = 1.0;
+        if (imageInfo.GetWidth() > 0) {
+            sx = static_cast<float>(imageInfo.GetHeight()) / static_cast<float>(imageInfo.GetWidth());
+        }
+        if (imageInfo.GetHeight() > 0) {
+            sy = static_cast<float>(imageInfo.GetWidth()) / static_cast<float>(imageInfo.GetHeight());
+        }
+        mat.PreScale(sx, sy);
     }
     for (size_t i = 0; i < GRA_MAT_SIZE; i++) {
         gra_mat[i] = mat.Get(i);
@@ -395,7 +410,7 @@ bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::sh
     std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
     auto surface = canvas.GetSurface();
-    if (surface == nullptr || image == nullptr || hpsEffect_.empty()) {
+    if (surface == nullptr) {
         return false;
     }
     std::shared_ptr<const Drawing::HpsBlurParameter> blurParams = nullptr;
@@ -449,12 +464,22 @@ bool HpsEffectFilter::ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::sh
 bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
     std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
+    if (image == nullptr || hpsEffect_.empty()) {
+        LOGE("HpsEffectFilter::ApplyHpsEffect image is null or hpsEffect_ is empty");
+        return false;
+    }
+
+    auto imageInfo = image->GetImageInfo();
+    if (imageInfo.GetWidth() <= 0 || imageInfo.GetHeight() <= 0) {
+        LOGE("HpsEffectFilter::ApplyHpsEffect image size is zero");
+        return false;
+    }
     if (isBlur_) {
         isBlur_ = false;
         return ApplyHpsSmallCanvas(canvas, image, outImage, hpsContext);
     }
     auto surface = canvas.GetSurface();
-    if (surface == nullptr || image == nullptr || hpsEffect_.empty()) {
+    if (surface == nullptr) {
         return false;
     }
     std::shared_ptr<Drawing::Surface> offscreenSurface = surface->MakeSurface(static_cast<int>(image->GetWidth()),

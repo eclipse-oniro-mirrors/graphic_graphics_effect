@@ -71,27 +71,33 @@ HWTEST_F(GEHpsEffectFilterTest, GenerateVisualEffectFromGE_001, TestSize.Level0)
     ASSERT_TRUE(hpsEffectFilter != nullptr);
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR);
     visualEffectImpl->MakeMESAParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR);
     visualEffectImpl->MakeKawaseParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::GREY);
     visualEffectImpl->MakeGreyParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::AIBAR);
     visualEffectImpl->MakeAIBarParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR);
     visualEffectImpl->MakeLinearGradientBlurParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::WATER_RIPPLE);
     visualEffectImpl->MakeWaterRippleParams();
-    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_, brightnessForHPS_);
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateVisualEffectFromGE_001 end";
 }
