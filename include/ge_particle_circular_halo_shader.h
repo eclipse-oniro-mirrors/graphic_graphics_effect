@@ -27,36 +27,50 @@ namespace Rosen {
 
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
+    GEParticleCircularHaloShader();
+
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     ~GEParticleCircularHaloShader() override = default;
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
-    const std::string GetDescription() const { return "GEParticleCircularHaloShader"; }
-    
-    void SetParticleCircularHaloParams(const Drawing::GEParticleCircularHaloShaderParams& params)
+    const std::string GetDescription() const
     {
-        particleCircularHaloParams_ = params;
+        return "GEParticleCircularHaloShader";
     }
 
-    static std::shared_ptr<GEParticleCircularHaloShader>
-        CreateParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
+private:
+    static std::shared_ptr<GEParticleCircularHaloShader> CreateParticleCircularHaloShader(
+        Drawing::GEParticleCircularHaloShaderParams& params);
 
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetGlowHaloBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleHaloBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleCircularHaloBuilder();
 
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
+    std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas,
+        const Drawing::ImageInfo& imageInfo);
+    std::shared_ptr<Drawing::Image> MakeParticleHaloShader(Drawing::Canvas& canvas,
+        const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::ShaderEffect> MakeParticleCircularHaloShader(const Drawing::Rect& rect);
 
-private:
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&) = delete;
     GEParticleCircularHaloShader(const GEParticleCircularHaloShader&&) = delete;
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&) = delete;
     GEParticleCircularHaloShader& operator=(const GEParticleCircularHaloShader&&) = delete;
 
     Drawing::GEParticleCircularHaloShaderParams particleCircularHaloParams_;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> glowHaloBuilder_ = nullptr;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> particleHaloBuilder_ = nullptr;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
+    std::shared_ptr<Drawing::Image> particleHaloImg_ = nullptr;
+
+    float lastCenterX_ = 0.0f;
+    float lastCenterY_ = 0.0f;
 };
 
-} // namespace Rosen
-} // namespace OHOS
-#endif // GRAPHICS_EFFECT_PRTICLE_CIRCULAR_HALO_SHADER_H
+}  // namespace Rosen
+}  // namespace OHOS
+#endif  // GRAPHICS_EFFECT_PRTICLE_CIRCULAR_HALO_SHADER_H
