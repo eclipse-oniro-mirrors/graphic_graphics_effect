@@ -1398,6 +1398,10 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, fl
     static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
         {GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER,
             [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->colorNum_ = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->blend_ = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND_K,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->blendk_ = p;}},
         {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH0,
             [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[0] = p;}},
         {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH1,

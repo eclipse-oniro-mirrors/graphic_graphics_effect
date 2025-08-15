@@ -370,7 +370,6 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_026, TestSize.Level1)
     EXPECT_EQ(geVisualEffectImpl.GetColorGradientEffectParams()->positions_[0].GetY(), p2.second);
 }
 
-/**
  * @tc.name: SetSoundWaveParams001
  * @tc.desc: Verify function SetSoundWaveParams for float
  * @tc.type:FUNC
