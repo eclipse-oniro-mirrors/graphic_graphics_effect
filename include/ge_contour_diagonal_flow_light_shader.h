@@ -22,6 +22,7 @@
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "utils/matrix.h"
+#include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -32,6 +33,7 @@ using Box4f = std::array<float, box4fSize>;
 struct Grid {
     Box4f bbox;
     std::vector<int> curveIndices;
+    bool curvesNumExceedLimit = false;
 };
 
 class GEKawaseBlurShaderFilter;
@@ -49,15 +51,6 @@ public:
     }
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
     void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
-    static std::shared_ptr<GEContourDiagonalFlowLightShader>
-        CreateFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
-    Box4f ComputeCurveBoundingBox(int curveIndex, float maxThickness, int width, int height);
-    void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
-    void PreCalculateRegion(Drawing::Canvas& canvas, int gridIndex,
-        const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
-
 private:
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&&) = delete;
@@ -66,7 +59,18 @@ private:
     std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::Image> precalculationImg,
-        std::shared_ptr<Drawing::Image> img1, std::shared_ptr<Drawing::Image> img2);
+        std::shared_ptr<Drawing::Image> lightImg, std::shared_ptr<Drawing::Image> haloImg);
+    static std::shared_ptr<GEContourDiagonalFlowLightShader>
+        CreateFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();
+    Box4f ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, int width, int height);
+    void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void PreCalculateRegion(Drawing::Canvas& canvas, int gridIndex,
+        const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
+    void PreCalculateRegionForMoreCurves(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
+        const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
     void AutoPartitionCal(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void AutoGridPartition(int width, int height, float maxThickness);
     void ComputeAllCurveBoundingBoxes(int width, int height, float maxThickness,
@@ -77,8 +81,15 @@ private:
                   std::queue<Grid>& workQueue, float minGridSize);
     std::vector<int> SelectTopCurves(const Grid& current, const std::vector<Box4f>& curveBBoxes,
                                     size_t topK);
-    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, bool shouldSelectTopCurves);
-
+    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, bool shouldLoopCurves);
+    std::shared_ptr<Drawing::Image> CreateImg(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    std::shared_ptr<Drawing::Image> CreateDrawImg(Drawing::Canvas& canvas, const Drawing::Rect& wholeRect,
+        const Drawing::Rect& rect, const Drawing::Brush& brush);
+    void ConvertImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+        std::shared_ptr<Drawing::Image> sdfImg);
+    std::shared_ptr<Drawing::Image> LoopAllCurvesInBatches(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas,
+        int gridIndex, const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
+    void ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize);
 private:
     int numCurves_ = 0;
     int capacity_ = 0;

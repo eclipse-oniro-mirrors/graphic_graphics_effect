@@ -13,12 +13,14 @@
  * limitations under the License.
  */
 
+#include "ge_contour_diagonal_flow_light_shader.h"
+
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <array>
 #include <iomanip>
-#include "ge_contour_diagonal_flow_light_shader.h"
+
 #include "draw/surface.h"
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
@@ -632,6 +634,22 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffectPrecalculation_);
 }
 
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::FlowLightConvertBuilder()
+{
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> convertShader = nullptr;
+    if (convertShader == nullptr) {
+        convertShader = Drawing::RuntimeEffect::CreateForShader(
+            PRECALCULATION_PROG); // replace CONVERT_IMG_PROG
+    }
+
+    if (convertShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader convertShader is nullptr.");
+        return nullptr;
+    }
+
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(convertShader);
+}
+
 void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     if (contourDiagonalFlowLightParams_.contour_.size() < MIN_NUM) {
@@ -674,6 +692,10 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
 
 void GEContourDiagonalFlowLightShader::AutoPartitionCal(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
+    if (offscreenCanvas_ == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::AutoPartitionCal offscreenCanvas canvas failed");
+        return;
+    }
     float blurRadiusBound = 2.0f * // convert pixel scale to ndc scale
         contourDiagonalFlowLightParams_.radius_ / (FEqual(rect.GetHeight(), 0.0f) ? 1.0f : rect.GetHeight());
     float maxThickness = 0.05 + blurRadiusBound; // 0.05: max thickness of the curve
@@ -771,7 +793,7 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
 }
 
 Box4f GEContourDiagonalFlowLightShader::ComputeCurveBoundingBox(
-    int curveIndex, float maxThickness, int width, int height)
+    size_t curveIndex, float maxThickness, int width, int height)
 {
     float x0 = controlPoints_[4 * curveIndex];      // startPoint x
     float y0 = controlPoints_[4 * curveIndex + 1];  // startPoint y
@@ -948,21 +970,181 @@ void GEContourDiagonalFlowLightShader::PreCalculateRegion(Drawing::Canvas& canva
     canvas.DetachBrush();
 }
 
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches(
+    Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex, const Drawing::Rect& wholeRect,
+    const Drawing::Rect& rect)
+{
+    if (!wholeRect.IsValid() || !rect.IsValid()) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches rect is invalid");
+        return nullptr;
+    }
+    auto sdfImg = CreateImg(mainCanvas, wholeRect);
+    auto builder = GetFlowLightPrecalBuilder(); // replace FlowLightPrecalBuilderForMoreCurves()
+    if (builder == nullptr || offscreenSurface_ == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches builder or offscreenSurface is nullptr");
+        return nullptr;
+    }
+    constexpr size_t curveValueCount = 6; // one curve have 3 point - 6 float
+    auto perSubCurveSize = static_cast<size_t>(MAX_CURVES_PER_GRID) * curveValueCount; // 16 * 6
+    auto subCurveCnt = curvesInGrid_[gridIndex].first.size() / perSubCurveSize + 1;
+
+    ResizeCurvesData(gridIndex, subCurveCnt, perSubCurveSize);
+
+    Drawing::Matrix matrix;
+    for (size_t i = 0; i < subCurveCnt; i++) {
+        std::vector<float> curvesPoints(curvesInGrid_[gridIndex].first.begin() + i * perSubCurveSize,
+            curvesInGrid_[gridIndex].first.begin() + (i + 1) * perSubCurveSize);
+        std::vector<float> curvesIndex(segmentIndex_[gridIndex].begin() + i * MAX_CURVES_PER_GRID,
+            segmentIndex_[gridIndex].begin() + (i + 1) * MAX_CURVES_PER_GRID);
+        if (sdfImg == nullptr) {
+            GE_LOGW("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches sdfImg is nullptr");
+            return nullptr;
+        }
+        auto sdfImgShader = Drawing::ShaderEffect::CreateImageShader(*sdfImg, Drawing::TileMode::CLAMP,
+            Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::NEAREST), matrix);
+        builder->SetChild("loopImage", sdfImgShader);
+        builder->SetUniform("iResolution", wholeRect.GetWidth(), wholeRect.GetHeight());
+        builder->SetUniform("count", static_cast<float>(pointCnt_));
+        builder->SetUniform("controlPoints", curvesPoints.data(), curvesPoints.size());
+        builder->SetUniform("segmentIndex", curvesIndex.data(), curvesIndex.size());
+        auto flowLightShader = builder->MakeShader(nullptr, false);
+        if (flowLightShader == nullptr) {
+            GE_LOGE("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches FlowLightShader is nullptr.");
+            return nullptr;
+        }
+        Drawing::Brush brush;
+        brush.SetShaderEffect(flowLightShader);
+        if (i != subCurveCnt - 1) {
+            sdfImg = CreateDrawImg(mainCanvas, wholeRect, rect, brush);
+        } else {
+            canvas.AttachBrush(brush);
+            canvas.DrawRect(rect);
+            canvas.DetachBrush();
+            sdfImg = offscreenSurface_->GetImageSnapshot();
+        }
+    }
+    return sdfImg;
+}
+
+void GEContourDiagonalFlowLightShader::ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize)
+{
+    curvesInGrid_[gridIndex].first.resize(subCurveCnt * perSubCurveSize, -5.0f); // unused Points fill invalid value
+    segmentIndex_[gridIndex].resize(subCurveCnt * MAX_CURVES_PER_GRID, 0.0f);
+}
+
+void GEContourDiagonalFlowLightShader::PreCalculateRegionForMoreCurves(
+    Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
+    const Drawing::Rect& wholeRect, const Drawing::Rect& rect)
+{
+    auto sdfImg = LoopAllCurvesInBatches(mainCanvas, canvas, gridIndex, wholeRect, rect);
+    ConvertImg(canvas, rect, sdfImg);
+}
+
+void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+    std::shared_ptr<Drawing::Image> sdfImg)
+{
+    if (sdfImg == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg sdfImg is nullptr.");
+        return;
+    }
+    auto convertBuilder = FlowLightConvertBuilder();
+    if (convertBuilder == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg convertBuilder is nullptr.");
+        return;
+    }
+    Drawing::Matrix matrix;
+    auto sdfImgShader = Drawing::ShaderEffect::CreateImageShader(*sdfImg,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::NEAREST),
+        matrix);
+    convertBuilder->SetChild("loopImage", sdfImgShader);
+    convertBuilder->SetUniform("count", static_cast<float>(pointCnt_));
+    auto convertShader = convertBuilder->MakeShader(nullptr, false);
+    if (convertShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg convertShader is nullptr.");
+        return;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(convertShader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(rect);
+    canvas.DetachBrush();
+}
+
 void GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     auto surface = canvas.GetSurface();
     if (surface == nullptr) {
-        LOGE("GEContourDiagonalFlowLightShader::ProcessImage surface is invalid");
+        GE_LOGW("GEContourDiagonalFlowLightShader::ProcessImage surface is invalid");
+        return;
     }
     offscreenSurface_ = surface->MakeSurface(rect.GetWidth(),
         rect.GetHeight());
     if (offscreenSurface_ == nullptr) {
-        LOGE("GEContourDiagonalFlowLightShader::ProcessImage offscreenSurface is invalid");
+        GE_LOGW("GEContourDiagonalFlowLightShader::ProcessImage offscreenSurface is invalid");
+        return;
     }
     offscreenCanvas_ = offscreenSurface_->GetCanvas();
     if (offscreenCanvas_ == nullptr) {
-        LOGE("GEContourDiagonalFlowLightShader::ProcessImage offscreenCanvas is invalid");
+        GE_LOGW("GEContourDiagonalFlowLightShader::ProcessImage offscreenCanvas is invalid");
     }
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateImg(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect)
+{
+    if (!rect.IsValid()) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg rect is invalid");
+        return nullptr;
+    }
+    auto surface = canvas.GetSurface();
+    if (surface == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg surface is invalid");
+        return nullptr;
+    }
+    auto offscreenSurface = surface->MakeSurface(rect.GetWidth(), rect.GetHeight());
+    if (offscreenSurface == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg offscreenSurface is invalid");
+        return nullptr;
+    }
+    auto offscreenCanvas = offscreenSurface->GetCanvas();
+    if (offscreenCanvas == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg offscreenCanvas is invalid");
+        return nullptr;
+    }
+    Drawing::Brush brush;
+    brush.SetColor(0xFFFFFFFF);
+    offscreenCanvas->AttachBrush(brush);
+    offscreenCanvas->DrawRect(Drawing::Rect{0, 0, rect.GetWidth(), rect.GetHeight()});
+    offscreenCanvas->DetachBrush();
+    return offscreenSurface->GetImageSnapshot();
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateDrawImg(Drawing::Canvas& canvas,
+    const Drawing::Rect& wholeRect, const Drawing::Rect& rect, const Drawing::Brush& brush)
+{
+    if (!rect.IsValid()) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateDrawImg rect is invalid");
+        return nullptr;
+    }
+    auto surface = canvas.GetSurface();
+    if (surface == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateDrawImg surface is invalid");
+        return nullptr;
+    }
+    auto offscreenSurface = surface->MakeSurface(rect.GetWidth(), rect.GetHeight());
+    if (offscreenSurface == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenSurface is invalid");
+        return nullptr;
+    }
+    auto offscreenCanvas = offscreenSurface->GetCanvas();
+    if (offscreenCanvas == nullptr) {
+        GE_LOGW("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenCanvas is invalid");
+        return nullptr;
+    }
+    offscreenCanvas->AttachBrush(brush);
+    offscreenCanvas->DrawRect(rect);
+    offscreenCanvas->DetachBrush();
+    return offscreenSurface->GetImageSnapshot();
 }
 
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawing::Canvas& canvas,
