@@ -33,13 +33,16 @@ public:
  
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
- 
+    bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush) override;
     const std::string GetDescription() const;
 
     const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetDisplacementDistortEffect();
+    bool SetBuilderParams(Drawing::RuntimeShaderBuilder& builder, const Drawing::Image& image,
+        const Drawing::Matrix& localMatrix);
     Drawing::GEDisplacementDistortFilterParams params_;
     static const std::string type_;
 

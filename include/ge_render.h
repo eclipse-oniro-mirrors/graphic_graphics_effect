@@ -62,9 +62,14 @@ public:
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::SamplingOptions& sampling);
 
+    bool DrawImageEffectToCanvas(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
+        const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
+
     std::shared_ptr<Drawing::Image> ApplyImageEffect(Drawing::Canvas& canvas,
         Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
+        const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling,
+        bool skipFinalFilter=false);
 
     bool HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
                           std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);

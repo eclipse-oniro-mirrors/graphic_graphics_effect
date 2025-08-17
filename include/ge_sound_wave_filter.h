@@ -42,10 +42,14 @@ public:
 
     const std::string& Type() const override;
  
+    bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush) override;
 private:
     void CheckSoundWaveParams();
     void CheckSoundWaveColor4f(Drawing::Color4f& color);
     std::shared_ptr<Drawing::RuntimeEffect> GetSoundWaveEffect();
+    bool SetBuilderParams(Drawing::RuntimeShaderBuilder& builder, const Drawing::Image& image,
+        const Drawing::Matrix& localMatrix);
     // sound wave
     Drawing::Color4f colorA_ = {1.0f, 1.0f, 1.0f, 1.0f};
     Drawing::Color4f colorB_ = {1.0f, 1.0f, 1.0f, 1.0f};
