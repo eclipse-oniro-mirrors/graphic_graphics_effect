@@ -26,13 +26,16 @@
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_grey_shader_filter.h"
+#include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
+#include "ge_hps_build_pass.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
 #include "ge_magnifier_shader_filter.h"
 #include "ge_mask_transition_shader_filter.h"
 #include "ge_mesa_blur_shader_filter.h"
+#include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_visual_effect_impl.h"
@@ -238,41 +241,32 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     }
     std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
     auto resImage = image;
-    for (auto vef : veContainer.GetFilters()) {
-        if (vef == nullptr) {
-            LOGD("GERender::ApplyImageEffect vef is null");
-            continue;
-        }
-        auto ve = vef->GetImpl();
-        std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(vef);
-        if (geShaderFilter == nullptr) {
-            LOGD("GERender::ApplyImageEffect filter is null");
-            continue;
-        }
-        geShaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
-        geShaderFilter->SetCache(ve->GetCache());
-        geShaderFilter->Preprocess(canvas, src, dst);
-        resImage = geShaderFilter->ProcessImage(canvas, resImage, src, dst);
-        ve->SetCache(geShaderFilter->GetCache());
+    for (auto vef: veContainer.GetFilters()) {
+        ShaderFilterEffectContext context {resImage, src, dst};
+        ApplyShaderFilter(canvas, vef, resImage, context);
     }
 
     return resImage;
 }
 
-bool GERender::ExecuteRangeEmpty(Drawing::Canvas& canvas, const Drawing::GEVisualEffectContainer& veContainer,
-    const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+void GERender::ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
+                                 std::shared_ptr<Drawing::Image>& resImage, const ShaderFilterEffectContext& context)
 {
-    const auto& visualEffects = veContainer.GetFilters();
-    if (visualEffects.empty()) {
-        return false;
+    if (visualEffect == nullptr) {
+        LOGD("GERender::ApplyShaderFilter visualEffect is null");
+        return;
     }
-    HpsGEImageEffectContext fullGEContext = { context.image, context.src, context.src, context.sampling, true,
-        context.alpha, context.colorFilter, context.maskColor, context.saturationForHPS, context.brightnessForHPS };
-    bool status = ApplyGEEffects(canvas, visualEffects, fullGEContext, outImage);
-    if (status) {
-        DrawToCanvas(canvas, context, outImage, brush);
+    auto ve = visualEffect->GetImpl();
+    std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
+    if (geShaderFilter == nullptr) {
+        LOGD("GERender::ApplyShaderFilter visualEffect is null");
+        return;
     }
-    return status;
+    geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
+    geShaderFilter->SetCache(ve->GetCache());
+    geShaderFilter->Preprocess(canvas, context.src, context.dst);
+    resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
+    ve->SetCache(geShaderFilter->GetCache());
 }
 
 bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
@@ -286,42 +280,37 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     if (visualEffects.empty()) {
         return false;
     }
-
-    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas);
-    std::vector<IndexRange> hpsSupportedIndexRanges = hpsEffectFilter->HpsSupportedEffectsIndexRanges(visualEffects);
-    if (hpsSupportedIndexRanges.empty()) {
-        return ExecuteRangeEmpty(canvas, veContainer, context, outImage, brush);
+    GEFilterComposer composer;
+    auto hpsCompatiblePass = std::make_shared<GEHpsCompatiblePass>();
+    composer.Add(hpsCompatiblePass);
+    composer.Add<GEMesaFusionPass>();
+    composer.Add<GEHpsBuildPass>(canvas, context);
+    auto composables = GEFilterComposer::BuildComposables(visualEffects);
+    auto composerResult = composer.Run(composables);
+    if (!composerResult.anyPassChanged) {
+        return false; // No pass has changed the effect sequence, fallback to original route to ensure compatibility
     }
 
     auto resImage = context.image;
-    bool appliedBlur = false; // compatibility with HPS
+    bool appliedBlur = hpsCompatiblePass->IsBlurFilterExists();
+    bool appliedBlurAtRuntime = false;
     bool lastAppliedGE = true;
-    auto indexRangeInfos = CategorizeRanges(hpsSupportedIndexRanges, visualEffects.size());
-    for (auto& indexRangeInfo : indexRangeInfos) {
-        auto [left, right] = indexRangeInfo.range;
-        std::vector<std::shared_ptr<Drawing::GEVisualEffect>> subVisualEffects(
-            visualEffects.begin() + left, visualEffects.begin() + right + 1);
+    for (auto& composable: composables) {
         auto currentImage = resImage;
-        if (indexRangeInfo.mode == EffectMode::GE) {
-            HpsGEImageEffectContext partialGEContext = { currentImage, context.src, context.src,
-                context.sampling, false, context.alpha, context.colorFilter, context.maskColor,
-                context.saturationForHPS, context.brightnessForHPS };
-            // When hps support exists, don't set compatibility switch
-            appliedBlur |= ApplyGEEffects(canvas, subVisualEffects, partialGEContext, resImage);
-            lastAppliedGE = true;
-            continue;
+        if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
+            // dst assigned with src because GE doesn't apply downsample like HPS
+            ShaderFilterEffectContext geContext {resImage, context.src, context.src, true};
+            ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
+        } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
+            HpsEffectFilter::HpsEffectContext hpsEffectContext = {
+                context.alpha, context.colorFilter, context.maskColor};
+            appliedBlurAtRuntime |= hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
+            lastAppliedGE = false;
         }
-        for (auto vef : subVisualEffects) {
-            if (vef == nullptr) {
-                continue;
-            }
-            auto ve = vef->GetImpl();
-            hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst, context.saturationForHPS,
-                context.brightnessForHPS, context.image);
-        }
-        HpsEffectFilter::HpsEffectContext hpsEffectContext = {context.alpha, context.colorFilter, context.maskColor};
-        appliedBlur |= hpsEffectFilter->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
-        lastAppliedGE = false;
+    }
+
+    if (appliedBlur != appliedBlurAtRuntime) {
+        LOGE("GERender::ApplyHpsGEImageEffect compatiblity check failed, runtime applied blur flag != checked blur");
     }
     outImage = resImage;
     if (lastAppliedGE) { // ApplyHpsEffect have done canvas sync
@@ -338,129 +327,6 @@ void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectConte
         canvas.DrawImageRect(*outImage, context.src, context.dst, context.sampling);
         canvas.DetachBrush();
     }
-}
-
-std::vector<GERender::IndexRangeInfo> GERender::CategorizeRanges(
-    const std::vector<IndexRange>& hpsIndexRanges, const int32_t veContainerSize)
-{
-    std::vector<IndexRangeInfo> categorizedRanges;
-    // The first GE range before the first hps range
-    if (!hpsIndexRanges.empty()) {
-        int start = 0;
-        int end = hpsIndexRanges[0].first - 1;
-        if (start <= end) {
-            categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
-        }
-    }
-
-    for (size_t i = 0; i < hpsIndexRanges.size(); ++i) {
-        categorizedRanges.emplace_back(EffectMode::HPS, hpsIndexRanges[i]);
-
-        // If it is not the last HPS range，deal with middle GE ranges
-        if (i >= hpsIndexRanges.size() - 1) {
-            continue;
-        }
-        int start = hpsIndexRanges[i].second + 1;
-        int end = hpsIndexRanges[i + 1].first - 1;
-        if (start <= end) {
-            categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
-        }
-    }
-
-    // The last GE range after the last hps range
-    if (!hpsIndexRanges.empty()) {
-        int start = hpsIndexRanges.back().second + 1;
-        int end = veContainerSize - 1;
-        if (start <= end) {
-            categorizedRanges.emplace_back(EffectMode::GE, IndexRange{start, end});
-        }
-    } else {
-        // No hps ranges, the full veContainer are GE ranges
-        categorizedRanges.emplace_back(EffectMode::GE, IndexRange{0, veContainerSize - 1});
-    }
-
-    return categorizedRanges;
-}
-
-GERender::ComposeGEEffectsResult GERender::ComposeGEEffects(
-    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
-    std::vector<std::shared_ptr<GEShaderFilter>>& geShaderFiltersOut)
-{
-    bool anyFilterComposed = false;
-    bool anyBlurFilter = false;
-    std::shared_ptr<GEFilterComposer> filterComposer = nullptr;
-    geShaderFiltersOut.clear();
-    for (auto vef : visualEffects) {
-        if (vef == nullptr) {
-            LOGE("GERender::ComposeGEEffects vef is null");
-            continue;
-        }
-        auto ve = vef->GetImpl();
-        if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR ||
-            ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR) {
-            anyBlurFilter = true; // Compatibility with HpsEffectFilter::ApplyHpsSmallCanvas
-        }
-        auto currentFilter = GenerateShaderFilter(vef);
-        if (currentFilter == nullptr) {
-            continue;
-        }
-        auto& filterParams = currentFilter->Params();
-        if (currentFilter->Type().empty() || !filterParams || !filterParams.has_value()) {
-            // Current filter not supported, save current composed filter
-            if (filterComposer) {
-                geShaderFiltersOut.push_back(filterComposer->GetComposedFilter());
-                filterComposer.reset();
-            }
-            geShaderFiltersOut.push_back(currentFilter);
-        } else if (filterComposer == nullptr) {
-            // Create a new composer for potential composion
-            filterComposer = std::make_shared<GEFilterComposer>(currentFilter);
-        } else if (filterComposer->Compose(currentFilter)) {
-            // Compose success
-            anyFilterComposed = true;
-            continue;
-        } else {
-            // Compose fail, save current composed filter and create a new composer for potential composion
-            geShaderFiltersOut.push_back(filterComposer->GetComposedFilter());
-            filterComposer = std::make_shared<GEFilterComposer>(currentFilter);
-        }
-    }
-
-    if (filterComposer) {
-        // Save any filter left in composer
-        geShaderFiltersOut.push_back(filterComposer->GetComposedFilter());
-        filterComposer.reset();
-    }
-
-    return ComposeGEEffectsResult{anyFilterComposed, anyBlurFilter};
-}
-
-bool GERender::ApplyGEEffects(Drawing::Canvas& canvas,
-    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects,
-    const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage)
-{
-    auto image = context.image;
-    auto src = context.src;
-    auto dst = context.dst;
-    auto sampling = context.sampling;
-
-    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
-    auto composedResult = ComposeGEEffects(visualEffects, geShaderFilters);
-
-    // Compatibility issues with Kawase skip in RSDrawingFilter::DrawImageRectInternal()
-    bool skipKawase = !composedResult.anyFilterComposed && context.compatibleWithHpsSkipBlur;
-    if (skipKawase) {
-        // If no filter is composed and compatibility mode is enabled, fallback to
-        // ApplyImageEffect in RSDrawingFilter::ApplyImageEffect to ensure later-applied
-        // kawase and light blur are performed normally
-        return false;
-    }
-
-    outImage = image;
-    for (auto filter : geShaderFilters) {
-        outImage = filter->ProcessImage(canvas, outImage, src, dst);
-    }
-    return composedResult.anyBlurFilter;
 }
 
 bool GERender::HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,

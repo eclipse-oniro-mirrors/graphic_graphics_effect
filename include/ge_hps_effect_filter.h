@@ -48,8 +48,8 @@ public:
     };
 
     bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer);
-    std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
-        const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
+    bool IsHpsEffectEnabled() const;
+    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
         const std::shared_ptr<Drawing::Image>& image);
@@ -71,7 +71,6 @@ private:
     void GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
         Drawing::CanvasInfo info);
-    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;

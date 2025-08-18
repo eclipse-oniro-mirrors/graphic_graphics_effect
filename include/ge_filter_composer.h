@@ -16,8 +16,10 @@
 #ifndef GRAPHICS_EFFECT_GE_FILTER_COMPOSER_H
 #define GRAPHICS_EFFECT_GE_FILTER_COMPOSER_H
 
-#include <unordered_set>
+#include <memory>
+#include <vector>
 
+#include "ge_filter_composer_pass.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -25,21 +27,39 @@ namespace OHOS {
 namespace Rosen {
 class GEFilterComposer {
 public:
-    GEFilterComposer(const std::shared_ptr<GEShaderFilter>& shaderFilter);
+    GEFilterComposer() = default;
     ~GEFilterComposer() = default;
 
-    bool Compose(const std::shared_ptr<GEShaderFilter> other);
-    const std::shared_ptr<GEShaderFilter>& GetComposedFilter();
+    // Add a GEFilterComposerPass with its constructor
+    template <typename Pass, typename... Args> void Add(Args&&... args)
+    {
+        static_assert(std::is_base_of_v<GEFilterComposerPass, Pass>, "Pass should be subtype of GEFilterComposerPass");
+        Add(std::make_shared<Pass>(std::forward<Args>(args)...));
+    }
+
+    // Add a GEFilterComposerPass
+    template <typename Pass> void Add(std::shared_ptr<Pass> pass)
+    {
+        static_assert(std::is_base_of_v<GEFilterComposerPass, Pass>, "Pass should be subtype of GEFilterComposerPass");
+        Add(std::static_pointer_cast<GEFilterComposerPass>(pass));
+    }
+
+    // Add a GEFilterComposerPass
+    void Add(std::shared_ptr<GEFilterComposerPass> pass);
+    
+    struct ComposerRunResult {
+        bool anyPassChanged;
+    };
+
+    // Transform composables with GEFilterComposerPass
+    ComposerRunResult Run(std::vector<GEFilterComposable>& composables) const;
+    
+    // Convert GEVisualEffects into GEFilterComposables
+    static std::vector<GEFilterComposable> BuildComposables(
+        const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>&);
 
 private:
-    std::shared_ptr<GEShaderFilter> GenerateComposedFilter(
-        const std::string& composedType, const std::map<std::string, GEShaderFilter::FilterParams>& filterParams);
-    const std::unordered_set<std::string> composedEffects_ = {
-        "GreyBlur",
-    };
-    std::shared_ptr<GEShaderFilter> composedFilter_ = nullptr;
-    std::string composedType_ = "";
-    std::map<std::string, GEShaderFilter::FilterParams> filterParams_;
+    std::vector<std::shared_ptr<GEFilterComposerPass>> passes_;
 };
 } // namespace Rosen
 } // namespace OHOS
