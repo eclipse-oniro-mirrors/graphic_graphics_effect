@@ -33,7 +33,7 @@ public:
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     ~GEParticleCircularHaloShader() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEParticleCircularHaloShader);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const
