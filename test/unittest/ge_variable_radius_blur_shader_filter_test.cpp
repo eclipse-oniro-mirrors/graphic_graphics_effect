@@ -144,7 +144,7 @@ HWTEST_F(GEVariableRadiusBlurShaderFilterTest, TypeTest001, TestSize.Level1)
     auto variableRadiusBlurShaderFilter = CreateVariableRadiusBlurShaderFilter();
     ASSERT_NE(variableRadiusBlurShaderFilter, nullptr);
 
-    EXPECT_EQ(variableRadiusBlurShaderFilter->Type(), Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
+    EXPECT_EQ(variableRadiusBlurShaderFilter->TypeName(), Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
 }
 
 }  // namespace Rosen

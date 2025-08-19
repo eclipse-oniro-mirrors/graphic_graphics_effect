@@ -28,7 +28,8 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-
+REGISTER_GEFILTER_TYPEINFO(LINEAR_GRADIENT_MASK, GELinearGradientShaderMask,
+                           GELinearGradientShaderMaskParams, GE_MASK_LINEAR_GRADIENT);
 class GE_EXPORT GELinearGradientShaderMask : public GEShaderMask {
 public:
     GELinearGradientShaderMask(const GELinearGradientShaderMaskParams& param);

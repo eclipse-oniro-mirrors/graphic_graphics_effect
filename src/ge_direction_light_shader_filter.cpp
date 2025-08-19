@@ -230,16 +230,9 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
 
 }
 
-const std::string GEDirectionLightShaderFilter::type_ = Drawing::GE_FILTER_DIRECTION_LIGHT;
-
 GEDirectionLightShaderFilter::GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params)
     : params_(params)
 {}
-
-const std::string& GEDirectionLightShaderFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

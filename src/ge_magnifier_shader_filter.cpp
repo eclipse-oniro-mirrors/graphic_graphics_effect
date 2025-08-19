@@ -24,7 +24,6 @@ constexpr static uint8_t COLOR_CHANNEL = 4; // 4 len of rgba
 } // namespace
 
 std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffect = nullptr;
-const std::string GEMagnifierShaderFilter::type_ = Drawing::GE_FILTER_MAGNIFIER;
 
 GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params)
 {
@@ -46,11 +45,6 @@ GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShade
     magnifierPara_->outerContourColor1_ = params.outerContourColor1;
     magnifierPara_->outerContourColor2_ = params.outerContourColor2;
     magnifierPara_->rotateDegree_ = params.rotateDegree;
-}
-
-const std::string& GEMagnifierShaderFilter::Type() const
-{
-    return type_;
 }
 
 std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing::Canvas& canvas,

@@ -24,7 +24,8 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-REGISTER_GEFILTER_TYPEINFO(PIXEL_MAP_MASK, GEPixelMapShaderMask, GEPixelMapMaskParams);
+REGISTER_GEFILTER_TYPEINFO(PIXEL_MAP_MASK, GEPixelMapShaderMask,
+                           GEPixelMapMaskParams, GE_MASK_PIXEL_MAP);
 class GE_EXPORT GEPixelMapShaderMask : public GEShaderMask {
 public:
     GEPixelMapShaderMask(const GEPixelMapMaskParams& param);

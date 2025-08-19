@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Rosen {
 REGISTER_GEFILTER_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilter,
-                           Drawing::GEVariableRadiusBlurShaderFilterParams);
+                           Drawing::GEVariableRadiusBlurShaderFilterParams, Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
 class GE_EXPORT GEVariableRadiusBlurShaderFilter : public GEShaderFilter {
 public:
     GEVariableRadiusBlurShaderFilter(const Drawing::GEVariableRadiusBlurShaderFilterParams& params);
@@ -39,7 +39,6 @@ public:
 
     std::string GetDescription();
     std::string GetDetailedDescription();
-    const std::string& Type() const override;
 
 protected:
     Drawing::GEVariableRadiusBlurShaderFilterParams params_;

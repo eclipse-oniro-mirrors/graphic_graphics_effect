@@ -27,7 +27,7 @@ namespace Rosen {
 namespace Drawing {
 
 REGISTER_GEFILTER_TYPEINFO(WAVE_GRADIENT_MASK, GEWaveGradientShaderMask,
-                           GEWaveGradientShaderMaskParams);
+                           GEWaveGradientShaderMaskParams, GE_MASK_WAVE_GRADIENT);
 class GE_EXPORT GEWaveGradientShaderMask : public GEShaderMask {
 public:
     GEWaveGradientShaderMask(GEWaveGradientShaderMaskParams param);

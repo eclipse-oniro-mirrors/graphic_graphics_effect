@@ -38,7 +38,7 @@ struct Grid {
 
 class GEKawaseBlurShaderFilter;
 REGISTER_GEFILTER_TYPEINFO(CONTOUR_DIAGONAL_FLOW_LIGHT, GEContourDiagonalFlowLightShader,
-                           Drawing::GEContentDiagonalFlowLightShaderParams);
+                           Drawing::GEContentDiagonalFlowLightShaderParams, Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
 class GE_EXPORT GEContourDiagonalFlowLightShader : public GEShader {
 
 public:
@@ -111,4 +111,4 @@ private:
 
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
+#endif // GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H

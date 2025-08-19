@@ -201,7 +201,7 @@ HWTEST_F(GESoundWaveFilterTest, Type_001, TestSize.Level2)
     Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
     std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
         std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
-    EXPECT_EQ(geSoundWaveFilter->Type(), Drawing::GE_FILTER_SOUND_WAVE);
+    EXPECT_EQ(geSoundWaveFilter->TypeName(), Drawing::GE_FILTER_SOUND_WAVE);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest Type_001 end";
 }

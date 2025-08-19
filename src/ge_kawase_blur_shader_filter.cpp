@@ -43,8 +43,6 @@ static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
 
 } // namespace
 
-const std::string GEKawaseBlurShaderFilter::type_ = Drawing::GE_FILTER_KAWASE_BLUR;
-
 // Advanced Filter: we can get normalized uv offset from width and height
 struct OffsetInfo {
     float offsetX;

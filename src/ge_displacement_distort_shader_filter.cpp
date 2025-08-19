@@ -21,17 +21,10 @@
 namespace OHOS {
 namespace Rosen {
 
-const std::string GEDisplacementDistortFilter::type_ = Drawing::GE_FILTER_DISPLACEMENT_DISTORT;
-
 GEDisplacementDistortFilter::GEDisplacementDistortFilter(const Drawing::GEDisplacementDistortFilterParams& params)
     :params_(params)
 {}
 
-const std::string& GEDisplacementDistortFilter::Type() const
-{
-    return type_;
-}
- 
 std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {

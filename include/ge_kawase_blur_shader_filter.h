@@ -37,7 +37,8 @@ namespace Rosen {
 
 struct OffsetInfo;
 
-REGISTER_GEFILTER_TYPEINFO(KAWASE_BLUR, GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams);
+REGISTER_GEFILTER_TYPEINFO(KAWASE_BLUR, GEKawaseBlurShaderFilter,
+                           Drawing::GEKawaseBlurShaderFilterParams, Drawing::GE_FILTER_KAWASE_BLUR);
 class GEKawaseBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params);
@@ -48,8 +49,6 @@ public:
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
-
-    const std::string& Type() const override;
 
     // set noise factor
     void SetFactor(float factor);
@@ -89,7 +88,6 @@ private:
     float blurRadius_ = 0.0f;
     float blurScale_ = 0.25f;
     float factor_ = 1.75f; // 1.75 from experience
-    static const std::string type_;
 };
 
 } // namespace Rosen

@@ -22,8 +22,6 @@
 namespace OHOS {
 namespace Rosen {
 
-const std::string GEGreyShaderFilter::type_ = Drawing::GE_FILTER_GREY;
-
 GEGreyShaderFilter::GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params)
     : greyCoef1_(params.greyCoef1), greyCoef2_(params.greyCoef2)
 {

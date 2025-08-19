@@ -21,7 +21,8 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(GREY, GEGreyShaderFilter, Drawing::GEGreyShaderFilterParams);
+REGISTER_GEFILTER_TYPEINFO(GREY, GEGreyShaderFilter,
+                           Drawing::GEGreyShaderFilterParams, Drawing::GE_FILTER_GREY);
 class GEGreyShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params);
@@ -33,14 +34,11 @@ public:
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
-    const std::string& Type() const override;
-
 private:
     bool InitGreyAdjustmentEffect();
 
     float greyCoef1_;
     float greyCoef2_;
-    static const std::string type_;
 };
 
 } // namespace Rosen

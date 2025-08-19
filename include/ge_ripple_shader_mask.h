@@ -26,7 +26,8 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-REGISTER_GEFILTER_TYPEINFO(RIPPLE_MASK, GERippleShaderMask, GERippleShaderMaskParams);
+REGISTER_GEFILTER_TYPEINFO(RIPPLE_MASK, GERippleShaderMask,
+                           GERippleShaderMaskParams, GE_MASK_RIPPLE);
 class GE_EXPORT GERippleShaderMask : public GEShaderMask {
 public:
     GERippleShaderMask(const GERippleShaderMaskParams& param);

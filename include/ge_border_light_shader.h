@@ -25,7 +25,8 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(BORDER_LIGHT, GEBorderLightShader, BorderLightParams);
+REGISTER_GEFILTER_TYPEINFO(BORDER_LIGHT, GEBorderLightShader,
+                           Drawing::GEBorderLightShaderParams, Drawing::GE_SHADER_BORDER_LIGHT);
 class GE_EXPORT GEBorderLightShader : public GEShader {
 public:
     GEBorderLightShader();
@@ -57,4 +58,4 @@ private:
 
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
+#endif // GRAPHICS_EFFECT_BORDER_LIGHT_SHADER_H

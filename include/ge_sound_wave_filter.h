@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace Rosen {
 REGISTER_GEFILTER_TYPEINFO(SOUND_WAVE, GESoundWaveFilter,
-                           Drawing::GESoundWaveFilterParams);
+                           Drawing::GESoundWaveFilterParams, Drawing::GE_FILTER_SOUND_WAVE);
 class GESoundWaveFilter : public GEShaderFilter {
 public:
     GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params);
@@ -43,8 +43,6 @@ public:
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) override;
-
-    const std::string& Type() const override;
  
 private:
     void CheckSoundWaveParams();

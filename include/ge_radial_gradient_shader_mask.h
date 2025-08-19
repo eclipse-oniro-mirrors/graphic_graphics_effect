@@ -26,7 +26,8 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-REGISTER_GEFILTER_TYPEINFO(RIPPLE_MASK, GERadialGradientShaderMask, GERadialGradientShaderMaskParams);
+REGISTER_GEFILTER_TYPEINFO(RADIAL_GRADIENT_MASK, GERadialGradientShaderMask,
+                           GERadialGradientShaderMaskParams, GE_MASK_RADIAL_GRADIENT);
 class GE_EXPORT GERadialGradientShaderMask : public GEShaderMask {
 public:
     GERadialGradientShaderMask(GERadialGradientShaderMaskParams param);

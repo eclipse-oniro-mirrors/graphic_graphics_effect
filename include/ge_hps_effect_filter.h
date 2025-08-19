@@ -40,7 +40,6 @@ public:
     HpsEffectFilter(Drawing::Canvas& canvas);
     ~HpsEffectFilter() = default;
 
-    using IndexRange = std::pair<int32_t, int32_t>;
     struct HpsEffectContext {
         float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;

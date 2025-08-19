@@ -17,6 +17,7 @@
 #include <memory>
 #include <optional>
 #include <type_traits>
+#include <string_view>
 
 namespace OHOS {
 namespace Rosen {
@@ -41,6 +42,7 @@ enum class GEFilterType {
     RADIAL_GRADIENT_MASK,
     WAVE_GRADIENT_MASK,
     FRAME_GRADIENT_MASK,
+    LINEAR_GRADIENT_MASK,
     // Shader
     DOT_MATRIX,
     FLOW_LIGHT_SWEEP,
@@ -68,6 +70,7 @@ enum class GEFilterType {
 template<typename T>
 struct GEFilterTypeInfo { 
     static constexpr GEFilterType ID = GEFilterType::NONE;
+    static constexpr std::string_view Name = "";
     using ParamType = void;
 };
 
@@ -78,10 +81,11 @@ struct GEFilterParamsTypeInfo {
 };
 
 // Register type info for certain GE Filter type (Non-instructive)
-#define REGISTER_GEFILTER_TYPEINFO(ENUM_VALUE, FILTER_TYPE, PARAM_TYPE) \
+#define REGISTER_GEFILTER_TYPEINFO(ENUM_VALUE, FILTER_TYPE, PARAM_TYPE, TYPE_NAME) \
     class FILTER_TYPE; \
     template<> struct ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FILTER_TYPE> { \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
+        static constexpr std::string_view Name = TYPE_NAME; \
         using ParamType = PARAM_TYPE; \
     }; \
     template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
@@ -181,11 +185,18 @@ std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
 // DO NOT add member varaibles
 struct IGEFilterType {
+    // For runtime-type identification
     virtual GEFilterType Type() const 
     {
         return Drawing::GEFilterType::NONE;
     }
 
+    // Use for tracing only, not intended for serialization
+    virtual std::string_view TypeName() const 
+    {
+        return "IGEFilterType";
+    }
+    
     virtual std::shared_ptr<GEFilterParams> Params() const
     {
         return nullptr;
@@ -213,6 +224,10 @@ struct GEFilterTypeInfoStaticCheck {
     ::OHOS::Rosen::Drawing::GEFilterType Type() const override { \
         static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
         return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID; \
+    } \
+    std::string_view TypeName() const override { \
+        static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
+        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::Name; \
     }
 
 }

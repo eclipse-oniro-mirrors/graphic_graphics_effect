@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(AIBAR, GEAIBarShaderFilter, Drawing::GEAIBarShaderFilterParams);
+REGISTER_GEFILTER_TYPEINFO(AIBAR, GEAIBarShaderFilter, Drawing::GEAIBarShaderFilterParams, Drawing::GE_FILTER_AI_BAR);
 class GEAIBarShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEAIBarShaderFilter(const Drawing::GEAIBarShaderFilterParams& params);
@@ -37,8 +37,6 @@ public:
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
     const GE_EXPORT std::string GetDescription() const;
-
-    const std::string& Type() const override;
 
 private:
     float aiBarLow_;

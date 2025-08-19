@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Rosen {
 
 REGISTER_GEFILTER_TYPEINFO(DISPLACEMENT_DISTORT_FILTER, GEDisplacementDistortFilter,
-                           Drawing::GEDisplacementDistortFilterParams);
+                           Drawing::GEDisplacementDistortFilterParams, Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
 class GEDisplacementDistortFilter : public GEShaderFilter {
 public:
     GEDisplacementDistortFilter(const Drawing::GEDisplacementDistortFilterParams& params);
@@ -38,8 +38,6 @@ public:
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
  
     const std::string GetDescription() const;
-
-    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetDisplacementDistortEffect();

@@ -22,7 +22,8 @@
 #include "utils/matrix.h"
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(AURORA_NOISE, GEAuroraNoiseShader, Drawing::GEAuroraNoiseShaderParams);
+REGISTER_GEFILTER_TYPEINFO(AURORA_NOISE, GEAuroraNoiseShader,
+                           Drawing::GEAuroraNoiseShaderParams, Drawing::GE_SHADER_AURORA_NOISE);
 class GE_EXPORT GEAuroraNoiseShader : public GEShader {
 public:
     GEAuroraNoiseShader();
@@ -59,4 +60,4 @@ private:
 };
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
+#endif // GRAPHICS_EFFECT_AURORA_NOISE_SHADER_H

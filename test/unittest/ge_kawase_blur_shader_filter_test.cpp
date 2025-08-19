@@ -634,7 +634,7 @@ HWTEST_F(GEKawaseBlurShaderFilterTest, Type_001, TestSize.Level2)
 {
     Drawing::GEKawaseBlurShaderFilterParams params { 1 }; // 1 blur radius
     auto geKawaseBlurShaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(params);
-    EXPECT_EQ(geKawaseBlurShaderFilter->Type(), Drawing::GE_FILTER_KAWASE_BLUR);
+    EXPECT_EQ(geKawaseBlurShaderFilter->TypeName(), Drawing::GE_FILTER_KAWASE_BLUR);
 }
 
 } // namespace GraphicsEffectEngine

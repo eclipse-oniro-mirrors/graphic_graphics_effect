@@ -17,10 +17,15 @@
 
 #include "ge_shader_filter_params.h"
 
+// This header registers known GEFilterParams without filter implementation inside this repo
+// Known unregistered types due to non-existent params in ge_shader_filter_params.h:
+// - COMPLEX_SHADER
+// - DOT_MATRIX
+// - FLOW_LIGHT_SWEEP
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-// Register GEFilterParams without Filter Implementation
 REGISTER_GEFILTERPARAM_TYPEINFO(DISPERSION, GEDispersionShaderFilterParams);
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams);
 REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams);

@@ -15,6 +15,7 @@
 #include <map>
 
 #include "ge_shader_filter_params.h"
+#include "ge_filter_params_registers_ext.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_log.h"
 #include "ge_external_dynamic_loader.h"

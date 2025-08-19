@@ -27,7 +27,7 @@ namespace Rosen {
 namespace Drawing {
 
 REGISTER_GEFILTER_TYPEINFO(DOUBLE_RIPPLE_MASK, GEDoubleRippleShaderMask,
-                           GEDoubleRippleShaderMaskParams);
+                           GEDoubleRippleShaderMaskParams, GE_MASK_DOUBLE_RIPPLE);
 class GE_EXPORT GEDoubleRippleShaderMask : public GEShaderMask {
 public:
     GEDoubleRippleShaderMask(GEDoubleRippleShaderMaskParams param);

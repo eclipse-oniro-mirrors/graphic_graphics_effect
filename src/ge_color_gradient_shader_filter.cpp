@@ -30,7 +30,6 @@ constexpr static uint8_t ARRAY_SIZE = 12;  // 12 len of array
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_maskColorGradientShaderEffect_ = nullptr;
-const std::string GEColorGradientShaderFilter::type_ = Drawing::GE_FILTER_COLOR_GRADIENT;
 
 GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params)
 {
@@ -38,11 +37,6 @@ GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorG
     positions_ = params.positions;
     strengths_ = params.strengths;
     mask_ = params.mask;
-}
-
-const std::string& GEColorGradientShaderFilter::Type() const
-{
-    return type_;
 }
 
 std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Drawing::Canvas& canvas,

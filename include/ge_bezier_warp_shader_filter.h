@@ -23,7 +23,7 @@ namespace Rosen {
 constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
 
 REGISTER_GEFILTER_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilter, 
-                           Drawing::GEBezierWarpShaderFilterParams);
+                           Drawing::GEBezierWarpShaderFilterParams, Drawing::GE_FILTER_BEZIER_WARP);
 class GEBezierWarpShaderFilter : public GEShaderFilter {
 public:
     GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params);
@@ -34,8 +34,6 @@ public:
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     Drawing::Brush GetBrush(const std::shared_ptr<Drawing::Image>& image) const;
-
-    const std::string& Type() const override;
 
 private:
     Drawing::GEBezierWarpShaderFilterParams params_;

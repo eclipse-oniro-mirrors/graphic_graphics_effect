@@ -32,16 +32,9 @@ constexpr size_t BOTTOM_LEFT_INDEX   = 9;
 constexpr size_t LEFT_TWO_THIRDS     = 10;
 constexpr size_t LEFT_ONE_THIRD      = 11;
 
-const std::string GEBezierWarpShaderFilter::type_ = Drawing::GE_FILTER_BEZIER_WARP;
-
 GEBezierWarpShaderFilter::GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params)
     :destinationPatch_(params.destinationPatch)
 {}
-
-const std::string& GEBezierWarpShaderFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

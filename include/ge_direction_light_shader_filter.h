@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Rosen {
 
 REGISTER_GEFILTER_TYPEINFO(DIRECTION_LIGHT, GEDirectionLightShaderFilter,
-                           Drawing::GEDirectionLightShaderFilterParams);
+                           Drawing::GEDirectionLightShaderFilterParams, Drawing::GE_FILTER_DIRECTION_LIGHT);
 class GE_EXPORT GEDirectionLightShaderFilter : public GEShaderFilter {
 public:
     GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params);
@@ -36,14 +36,11 @@ public:
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
-    const std::string& Type() const override;
-
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetNormalMaskEffect();
     std::shared_ptr<Drawing::RuntimeEffect> GetDirectionLightEffect();
     std::shared_ptr<Drawing::RuntimeEffect> GetDirectionLightNoNormalEffect();
     Drawing::GEDirectionLightShaderFilterParams params_;
-    static const std::string type_;
 };
 
 } // namespace Rosen

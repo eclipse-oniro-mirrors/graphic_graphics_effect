@@ -200,7 +200,7 @@ HWTEST_F(GEColorGradientShaderFilterTest, Type_001, TestSize.Level0)
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
     Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
-    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_COLOR_GRADIENT);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_COLOR_GRADIENT);
 
     GTEST_LOG_(INFO) << "GEColorGradientShaderFilterTest Type_001 end";
 }

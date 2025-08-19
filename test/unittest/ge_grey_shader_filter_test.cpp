@@ -178,7 +178,7 @@ HWTEST_F(GEGreyShaderFilterTest, Type_001, TestSize.Level2)
     Drawing::GEGreyShaderFilterParams geGreyShaderFilterParams { 0.5, 0.5 };
     std::unique_ptr<GEGreyShaderFilter> geGreyShaderFilter =
         std::make_unique<GEGreyShaderFilter>(geGreyShaderFilterParams);
-    EXPECT_EQ(geGreyShaderFilter->Type(), Drawing::GE_FILTER_GREY);
+    EXPECT_EQ(geGreyShaderFilter->TypeName(), Drawing::GE_FILTER_GREY);
 
     GTEST_LOG_(INFO) << "GEGreyShaderFilterTest Type_001 end";
 }
