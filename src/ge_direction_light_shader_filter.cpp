@@ -121,19 +121,20 @@ inline static const std::string g_shaderStringDirectionLight = R"(
 
         vec3 reflectedColor = distribution * visibility * fresnel * cosNToL * lightColor.rgb;
         vec3 refractedColor = diffuseColor * cosNToL * lightColor.rgb;
-        return vec4(reflectedColor + refractedColor, 1.0);
+        return vec4((reflectedColor + refractedColor) * lightIntensity, 1.0);
     }
 
     vec4 main(vec2 fragCoord)
     {
         vec3 pos = vec3(fragCoord.xy, displacement);
-        vec3 normal = normalize(mask.eval(fragCoord).xyz * 2.0 - 1.0);
-        if (mask.eval(fragCoord).xyz == vec3(0.0)) {
+        vec3 tempNormalValue = mask.eval(fragCoord).xyz;
+        vec3 normal = normalize(tempNormalValue * 2.0 - 1.0);
+        if (all(lessThan(abs(tempNormalValue), vec3(1e-6)))) {
             normal = vec3(0.0, 0.0, 1.0);
         }
         vec3 displacementNormal =
-            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity * displacement)) * normal);
-        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity)) * normal);
+            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * displacement)) * normal);
+        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / height) * normal);
         return scatter(pos, displacementNormal, shadingNormal, eta);
     }
 )";
@@ -213,7 +214,7 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
 
         vec3 reflectedColor = distribution * visibility * fresnel * cosNToL * lightColor.rgb;
         vec3 refractedColor = diffuseColor * cosNToL * lightColor.rgb;
-        return vec4(reflectedColor + refractedColor, 1.0);
+        return vec4((reflectedColor + refractedColor) * lightIntensity, 1.0);
     }
 
     vec4 main(vec2 fragCoord)
@@ -221,8 +222,8 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
         vec3 pos = vec3(fragCoord.xy, displacement);
         vec3 normal = vec3(0.0, 0.0, 1.0);
         vec3 displacementNormal =
-            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity * displacement)) * normal);
-        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * lightIntensity)) * normal);
+            normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / (height * displacement)) * normal);
+        vec3 shadingNormal = normalize(vec3(1.0 / scale, 1.0 / scale, 1.0 / height) * normal);
         return scatter(pos, displacementNormal, shadingNormal, eta);
     }
 )";
