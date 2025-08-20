@@ -67,24 +67,21 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();
     Box4f ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, int width, int height);
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
-    void PreCalculateRegion(Drawing::Canvas& canvas, int gridIndex,
-        const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
-    void PreCalculateRegionForMoreCurves(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
+    void PreCalculateRegion(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
         const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
     void AutoPartitionCal(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void AutoGridPartition(int width, int height, float maxThickness);
     void ComputeAllCurveBoundingBoxes(int width, int height, float maxThickness,
-                                      Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
+        Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
     void InitializeWorkQueue(const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes,
-                            std::queue<Grid>& workQueue);
+        std::queue<Grid>& workQueue);
     void SplitGrid(const Grid& current, const std::vector<Box4f>& curveBBoxes,
-                  std::queue<Grid>& workQueue, float minGridSize);
-    std::vector<int> SelectTopCurves(const Grid& current, const std::vector<Box4f>& curveBBoxes,
-                                    size_t topK);
-    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, bool shouldLoopCurves);
+        std::queue<Grid>& workQueue, float minGridSize);
+    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes);
     std::shared_ptr<Drawing::Image> CreateImg(Drawing::Canvas& canvas, const Drawing::Rect& rect);
-    std::shared_ptr<Drawing::Image> CreateDrawImg(Drawing::Canvas& canvas, const Drawing::Rect& wholeRect,
-        const Drawing::Rect& rect, const Drawing::Brush& brush);
+    std::shared_ptr<Drawing::Image> CreateDrawImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+        const Drawing::Brush& brush);
+
     void ConvertImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
         std::shared_ptr<Drawing::Image> sdfImg);
     std::shared_ptr<Drawing::Image> LoopAllCurvesInBatches(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas,
