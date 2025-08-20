@@ -94,7 +94,7 @@ struct GEFilterParamsTypeInfo {
     };
 
 // Register type info for certain GE Filter Param type without Filter type (Non-instructive)
-// Used on extension filter only
+// Used on extension filter only when its param type is known and possibly used in GEVisualEffectImpl
 #define REGISTER_GEFILTERPARAM_TYPEINFO(ENUM_VALUE, PARAM_TYPE) \
     template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
@@ -118,13 +118,12 @@ public:
 
     template<typename T>
     static OptionalType<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
-
     template<typename T>
     static std::shared_ptr<GEFilterParams> Box(T&& params);
 
-    GEFilterParams(GEFilterType type) : id(type) {}
     virtual ~GEFilterParams() = default;
 protected:
+    GEFilterParams(GEFilterType type) : id(type) {}
     GEFilterType id;
 };
 
@@ -183,26 +182,32 @@ std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
 }
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
-// DO NOT add member varaibles
+// Currently, you SHOULD NOT add member varaibles or any stateful data members to this class.
 struct IGEFilterType {
+    // Safeguard for type-safety, but generally you should not cast derived into IGEFilterType
+    // since this interface acts only as a contract/trait for type queries
+    virtual ~IGEFilterType() = default;
+
     // For runtime-type identification
     virtual GEFilterType Type() const 
     {
         return Drawing::GEFilterType::NONE;
     }
 
-    // Use for tracing only, not intended for serialization
-    virtual std::string_view TypeName() const 
+    // Readonly type string for tracing/logging only, NOT INTENTED for serialization
+    virtual const std::string_view TypeName() const 
     {
         return "IGEFilterType";
     }
     
+    // Convert unpacked params back into original params type, used in GEFilterComposer
     virtual std::shared_ptr<GEFilterParams> Params() const
     {
         return nullptr;
     }
 };
 
+// Compile time static check to ensure DECLARE_GEFILTER_TYPEFUNC is used correctly
 template<typename T>
 struct GEFilterTypeInfoStaticCheck {
     using ParamType = typename GEFilterTypeInfo<T>::ParamType;
@@ -220,13 +225,17 @@ struct GEFilterTypeInfoStaticCheck {
     static_assert(std::is_same_v<UnboxPtrType, std::shared_ptr<ParamType>>);
 };
 
+// Declare the Type and TypeName functions for a given GEFilter class
+// Notice: Self parameter is techincally not required since Self can be deduced from *this. Current implementation 
+// requires Self to be manually specified to prevent hard-to-read compile errors when the macro is wrongly used.
 #define DECLARE_GEFILTER_TYPEFUNC(Self) \
     ::OHOS::Rosen::Drawing::GEFilterType Type() const override { \
+        static_assert(std::is_same_v<Self, std::remove_cv_t<std::remove_reference_t<decltype(*this)>>>, \
+            "DECLARE_GEFILTER_TYPEFUNC: Macro used outside class scope or incorrect Self type"); \
         static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
         return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID; \
     } \
-    std::string_view TypeName() const override { \
-        static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
+    const std::string_view TypeName() const override { \
         return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::Name; \
     }
 
