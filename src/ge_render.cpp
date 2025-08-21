@@ -142,7 +142,61 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             out = std::make_shared<GEBorderLightShader>(*params);
             return out;
         }
-    }
+    },
+    {GEVisualEffectImpl::FilterType::AIBAR_GLOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            const auto& params = ve->GetAIBarGlowEffectParams();
+            if (!ve || !params) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::AIBAR_GLOW);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXAIBarGlowEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXAIBarGlowEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            const auto& params = ve->GetRoundedRectFlowlightEffectParams();
+            if (!ve || !params) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXRoundedRectFlowlightEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXRoundedRectFlowlightEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::GRADIENT_FLOW_COLORS, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            const auto& params = ve->GetFrameGradientMaskParams();
+            if (!ve || !params) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GRADIENT_FLOW_COLORS);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXGradientFlowColorsEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXGradientFlowColorsEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
 };
 
 GERender::GERender() {}

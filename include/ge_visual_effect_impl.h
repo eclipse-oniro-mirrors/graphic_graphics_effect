@@ -15,7 +15,11 @@
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 
+#include <string>
+#include <map>
+#include <functional>
 #include <memory>
+#include <array>
 #include <vector>
 #include <any>
 
@@ -23,6 +27,7 @@
 #include "ge_shader_filter.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
+#include "ge_log.h"
 
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
@@ -55,6 +60,7 @@ public:
         PIXEL_MAP_MASK,
         RADIAL_GRADIENT_MASK,
         WAVE_GRADIENT_MASK,
+        FRAME_GRADIENT_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
@@ -73,12 +79,28 @@ public:
         VARIABLE_RADIUS_BLUR,
         COLOR_GRADIENT_EFFECT,
         LIGHT_CAVE,
+        AIBAR_GLOW,
+        ROUNDED_RECT_FLOWLIGHT,
+        GRADIENT_FLOW_COLORS,
         MAX
     };
 
     GEVisualEffectImpl(const std::string& name);
 
     ~GEVisualEffectImpl();
+
+    template <typename T>
+    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const auto&)>>;
+
+    template <typename T>
+    void applyPropertyParams(const std::string& tag, const auto& value, std::shared_ptr<T>& params, const TagMap<T>& tagMap) {
+        auto it = tagMap.find(tag);
+        if (it != tagMap.end()) {
+            it->second(params, value);
+        } else {
+            GE_LOGE("GEVisualEffectImpl Tag %{public}c not found", tag.c_str());
+        }
+    }
 
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
@@ -412,6 +434,46 @@ public:
         return borderLightParams_;
     }
 
+    void MakeAIBarGlowEffectParams()
+    {
+        AIBarGlowEffectParams_ = std::make_shared<GEXAIBarGlowEffectParams>();
+    }
+
+    const std::shared_ptr<GEXAIBarGlowEffectParams>& GetAIBarGlowEffectParams() const
+    {
+        return AIBarGlowEffectParams_;
+    }
+
+    void MakeRoundedRectFlowlightEffectParams()
+    {
+        roundedRectFlowlightEffectParams_ = std::make_shared<GEXRoundedRectFlowlightEffectParams>();
+    }
+
+    const std::shared_ptr<GEXRoundedRectFlowlightEffectParams>& GetRoundedRectFlowlightEffectParams() const
+    {
+        return roundedRectFlowlightEffectParams_;
+    }
+    
+    void MakeGradientFlowColorsEffectParams()
+    {
+        gradientFlowColorsEffectParams_ = std::make_shared<GEXGradientFlowColorsEffectParams>();
+    }
+
+    const std::shared_ptr<GEXGradientFlowColorsEffectParams>& GetGradientFlowColorsEffectParams() const
+    {
+        return gradientFlowColorsEffectParams_;
+    }
+
+    void MakeFrameGradientMaskParams()
+    {
+        frameGradientMaskParams_ = std::make_shared<GEFrameGradientMaskParams>();
+    }
+
+    const std::shared_ptr<GEFrameGradientMaskParams>& GetFrameGradientMaskParams() const
+    {
+        return frameGradientMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -457,6 +519,65 @@ private:
     void SetBorderLightParams(const std::string& tag, const Vector4f& param);
     void SetBorderLightParams(const std::string& tag, float param);
 
+    #define ADD_TAG_HANDLER(type, tag, member) \
+        tagMap[tag] = [](std::shared_ptr<type>&params, const auto& value) { \
+            params->member = value;\
+        }
+
+    TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_LTWH, LTWH),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR, stretchFactor),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_BAR_ANGLE, barAngle),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR0, colors[0]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR1, colors[1]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR2, colors[2]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR3, colors[3]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS0, positions[0]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS1, positions[1]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS2, positions[2]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS3, positions[3]),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_BRIGHTNESS, brightness),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_PROGRESS, progress),
+        ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRENGTH, strengths),
+    }
+
+    TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS, startEndPosition),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH, waveLength),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP, waveTop),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS, cornerRadius),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS, brightness),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE, scale),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING, sharping),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING, feathering),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS,
+            featheringBezierControlPoints),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS,
+            gradientBezierControlPoints),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR, color),
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS, progress),
+    }
+
+    TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0, colors[0]),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1, colors[1]),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2, colors[2]),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3, colors[3]),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN, gradientBegin),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END, gradientEnd),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA, effectAlpha),
+        ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS, progress),
+    }
+
+    TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
+        ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS,
+            gradientBezierControlPoints),
+        ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius),
+        ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth),
+    }
+
+    #undef ADD_TAG_HANDLER
+
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
     // ShaderFilter Params
@@ -492,10 +613,13 @@ private:
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
+    std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
+    std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
+    std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
+    std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 };
 
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
-
 #endif // GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H

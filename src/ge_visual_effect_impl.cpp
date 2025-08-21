@@ -16,7 +16,6 @@
 
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
-#include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
 #include "common/rs_vector4.h"
 #include "common/rs_vector3.h"
@@ -199,7 +198,32 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::BORDER_LIGHT);
             impl->MakeBorderLightParams();
         }
-    }
+    },
+    { GEX_SHADER_AIBAR_GLOW,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::AIBAR_GLOW);
+            impl->MakeAIBarGlowEffectParams();
+        }
+    },
+    { GEX_SHADER_ROUNDED_RECT_FLOWLIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT);
+            impl->MakeRoundedRectFlowlightEffectParams();
+        }
+    },
+    { GEX_SHADER_GRADIENT_FLOW_COLORS,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GRADIENT_FLOW_COLORS);
+            impl->MakeGradientFlowColorsEffectParams();
+        }
+    },
+    { GEX_MASK_FRAME_GRADIENT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK);
+            impl->MakeFrameGradientMaskParams();
+        }
+    },
+
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
@@ -409,6 +433,34 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetBorderLightParams(tag, param);
             break;
         }
+        case FilterType::FRAME_GRADIENT_MASK: {
+            if (frameGradientMaskParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
+            break;
+        }
+        case FilterType::AIBAR_GLOW: {
+            if (AIBarGlowEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            break;
+        }
+        case FilterType::ROUNDED_RECT_FLOWLIGHT: {
+            if (roundedRectFlowlightEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::GRADIENT_FLOW_COLORS: {
+            if (gradientFlowColorsEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -528,6 +580,20 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::LIGHT_CAVE: {
             SetLightCaveParams(tag, param);
+            break;
+        }
+        case FilterType::AIBAR_GLOW: {
+            if (AIBarGlowEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            break;
+        }
+        case FilterType::ROUNDED_RECT_FLOWLIGHT: {
+            if (roundedRectFlowlightEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         default:
@@ -810,6 +876,34 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::LIGHT_CAVE: {
             SetLightCaveParams(tag, param);
+            break;
+        }
+        case FilterType::FRAME_GRADIENT_MASK: {
+            if (frameGradientMaskParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
+            break;
+        }
+        case FilterType::AIBAR_GLOW: {
+            if (AIBarGlowEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            break;
+        }
+        case FilterType::ROUNDED_RECT_FLOWLIGHT: {
+            if (roundedRectFlowlightEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::GRADIENT_FLOW_COLORS: {
+            if (gradientFlowColorsEffectParams_ == nullptr) {
+                return;
+            }
+            applyPropertyParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
         default:

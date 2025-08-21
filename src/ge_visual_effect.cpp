@@ -22,6 +22,7 @@
 #include "ge_ripple_shader_mask.h"
 #include "ge_double_ripple_shader_mask.h"
 #include "ge_wave_gradient_shader_mask.h"
+#include "ge_frame_gradient_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -169,6 +170,13 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
                 return nullptr;
             }
             return std::make_shared<GEWaveGradientShaderMask>(*waveParams);
+        }
+        case GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK: {
+            auto frameParams = impl->GetFrameGradientMaskParams();
+            if (frameParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
         }
         default:
             return nullptr;
