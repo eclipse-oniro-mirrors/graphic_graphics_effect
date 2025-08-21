@@ -217,7 +217,7 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGradientFlowColorsEffectParams();
         }
     },
-    { GEX_MASK_FRAME_GRADIENT,
+    { GE_MASK_FRAME_GRADIENT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK);
             impl->MakeFrameGradientMaskParams();
