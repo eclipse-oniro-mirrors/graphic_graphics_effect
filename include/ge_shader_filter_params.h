@@ -545,7 +545,7 @@ struct GEXAIBarGlowEffectParams {
     Vector4f strengths;
     float brightness;
     float progress;
-}
+};
 
 const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
 const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
@@ -575,7 +575,7 @@ struct GEXRoundedRectFlowlightEffectParams {
     Vector4f gradientBezierControlPoints;
     Vector4f color;
     float progress = 0.0f;
-}
+};
 
 const char GEX_SHADER_GRADIENT_FLOW_COLORS[] = "GradientFlowColors";
 const char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0[] = "GradientFlowColors_Color0";
@@ -592,7 +592,7 @@ struct GEXGradientFlowColorsEffectParams {
     float gradientEnd = 0.0f;
     float effectAlpha = 0.0f;
     float progress = 0.0f;
-}
+};
 
 const char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
 const char GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS[] =
@@ -603,7 +603,7 @@ struct GEFrameGradientMaskParams {
     Vector4f gradientBezierControlPoints;
     float cornerRadius = 0.0f;
     float frameWidth = 0.0f;
-}
+};
 
 } // namespace Drawing
 } // namespace Rosen
