@@ -59,7 +59,7 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShaderHa
     auto maskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(frameGradientMaskShaderEffect_);
     maskBuilder->SetUniform("iResolution", width, height);
     std::array<float, 4> gradientBezier = {gradientBezierControlPoints_[0], gradientBezierControlPoints_[1],
-        gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]}
+        gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
     maskBuilder->SetUniform("gradientBezierControlPoints", gradientBezier.data(), 4);
     maskBuilder->SetUniform("cornerRadius", cornerRadius_);
     maskBuilder->SetUniform("frameWidth", frameWidth_);
