@@ -98,7 +98,7 @@ public:
         if (it != tagMap.end()) {
             it->second(params, value);
         } else {
-            GE_LOGE("GEVisualEffectImpl Tag %{public}c not found", tag.c_str());
+            GE_LOGE("GEVisualEffectImpl Tag %{public}s not found", tag.c_str());
         }
     }
 
