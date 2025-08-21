@@ -47,6 +47,10 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
             context_.src, context_.dst, context_.saturationForHPS, context_.brightnessForHPS, context_.image);
         composed = true;
     }
+    if (composedHpsFilter != nullptr) {
+        resultComposables.push_back(composedHpsFilter);
+        composedHpsFilter = nullptr;
+    }
     if (composed) {
         composables.swap(resultComposables);
     }

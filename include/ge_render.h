@@ -96,8 +96,6 @@ private:
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(const Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-    bool ExecuteRangeEmpty(Drawing::Canvas& canvas, const Drawing::GEVisualEffectContainer& veContainer,
-        const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
 };
 
 } // namespace GraphicsEffectEngine
