@@ -26,6 +26,7 @@
 #include "utils/rect.h"
 
 #include "ge_shader_filter.h"
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_container.h"
 #include "ge_visual_effect_impl.h"
@@ -69,7 +70,8 @@ private:
     void GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst);
     void GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image);
+        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
+        Drawing::CanvasInfo info);
     bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
