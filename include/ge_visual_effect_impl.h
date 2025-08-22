@@ -513,7 +513,7 @@ private:
     void SetBorderLightParams(const std::string& tag, float param);
 
     #define ADD_TAG_HANDLER(type, tag, member, valueType) \
-        {#tag, [](std::shared_ptr<type>&params, const std::any& value) { \
+        {tag, [](std::shared_ptr<type>&params, const std::any& value) { \
             params->member = std::any_cast<valueType>(value); \
         }}
     
