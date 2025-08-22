@@ -40,7 +40,7 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShader(f
     maskBuilder->SetUniform("iResolution", width, height);
     std::array<float, ARRAY_SIZE_FOUR> gradientBezier = {gradientBezierControlPoints_[0], gradientBezierControlPoints_[1],
         gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
-    maskBuilder->SetUniform("gradientBezierControlPoints", gradientBezier.data(), 4);
+    maskBuilder->SetUniform("gradientBezierControlPoints", gradientBezier.data(), ARRAY_SIZE_FOUR);
     maskBuilder->SetUniform("cornerRadius", cornerRadius_);
     maskBuilder->SetUniform("frameWidth", frameWidth_);
     auto maskShader = maskBuilder->MakeShader(nullptr, false);
