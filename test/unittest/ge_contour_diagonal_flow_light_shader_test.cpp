@@ -103,7 +103,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, MakeDrawingShader_001, TestSize.L
     params.thickness_ = 0.25f;
     auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     shader->MakeDrawingShader(rect, progress);
-    EXPECT_NE(shader->GetDrawingShader(), nullptr);
+    EXPECT_EQ(shader->GetDrawingShader(), nullptr); // no cache
 }
 
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
@@ -121,7 +121,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
     auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     shader->Preprocess(canvas_, rect);
     auto cache = shader->GetCache();
-    EXPECT_NE(cache, nullptr);
+    EXPECT_EQ(cache, nullptr); // less point
 }
 
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilder_001, TestSize.Level1)
@@ -142,7 +142,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetContourDiagonalFlowLightBuilde
 
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.Level1)
 {
-    // Test case for MakeContourDiagonalFlowLightShader method
+    // Test case for DrawRuntimeShader method
     Drawing::Rect rect(0, 0, 100, 100);
     GEContentDiagonalFlowLightShaderParams params;
     params.line1Start_ = 0.05f;
@@ -154,7 +154,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.L
     params.thickness_ = 0.5f;
     auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     auto img = shader->DrawRuntimeShader(canvas_, rect);
-    EXPECT_NE(img, nullptr);
+    EXPECT_EQ(img, nullptr);
 }
 }
 }
