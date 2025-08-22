@@ -521,6 +521,8 @@ struct GEBorderLightShaderParams {
     float cornerRadius = 0.0f;
 };
 
+constexpr int ARRAY_SIZE_FOUR = 4;
+
 const char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
 const char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
 const char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";
@@ -540,8 +542,8 @@ struct GEXAIBarGlowEffectParams {
     Vector4f LTWH;
     float stretchFactor = 0.0f;
     float barAngle = 0.0f;
-    std::array<Vector4f, 4> colors;
-    std::array<std::pair<float, float>, 4> positions;
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
     Vector4f strengths;
     float brightness;
     float progress;
@@ -587,7 +589,7 @@ const char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END[] = "GradientFlowColors_
 const char GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA[] = "GradientFlowColors_EffectAlpha";
 const char GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS[] = "GradientFlowColors_Progress";
 struct GEXGradientFlowColorsEffectParams {
-    std::array<Vector4f, 4> colors;
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
     float gradientBegin = 0.0f;
     float gradientEnd = 0.0f;
     float effectAlpha = 0.0f;
