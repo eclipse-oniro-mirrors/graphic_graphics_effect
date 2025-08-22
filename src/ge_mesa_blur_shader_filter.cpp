@@ -716,8 +716,9 @@ bool GEMESABlurShaderFilter::InitGreyAdjustmentEffect()
             float B = -93;      // 3 * (c - 2 * b);
             float p = 0.816240163988;                   // (3 * A * C - pow(B, 2)) / (3 * pow(A, 2));
             float s1 = rgb / 213.0 - 0.5 * 0.262253485943;    // -rgb/A - B*C/(3*pow(A,2)) + 2*pow(B,3)/(27*pow(A,3))
-            float s2 = sqrt(pow(s1, 2) + pow(p / 3, 3));
-            return pow((s1 + s2), 1.0 / 3) - pow((s2 - s1), 1.0 / 3) - (B / (3 * A));
+            float s2 = sqrt(s1 * s1 + pow(p / 3, 3));
+            float res = pow((s1 + s2), 1.0 / 3) - pow((s2 - s1), 1.0 / 3) - (B / (3 * A));
+            return min(res, 1.0);
         }
 
         float calculateGreyAdjustY(float rgb) {
