@@ -21,12 +21,13 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-namespace{
+namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> frameGradientMaskShaderEffect_ = nullptr;
 constexpr int ARRAY_SIZE_FOUR = 4;
 }
 GEFrameGradientShaderMask::GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param) :
-    gradientBezierControlPoints_(param.gradientBezierControlPoints), cornerRadius_(param.cornerRadius), frameWidth_(param.frameWidth)
+    gradientBezierControlPoints_(param.gradientBezierControlPoints),
+    cornerRadius_(param.cornerRadius), frameWidth_(param.frameWidth)
     {}
 
 std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShader(float width, float height) const
@@ -114,7 +115,6 @@ void GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect() const
     if (frameGradientMaskShaderEffect_ == nullptr) {
         LOGE("GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect error");
     }
-
 }
 
 } // namespace Drawing
