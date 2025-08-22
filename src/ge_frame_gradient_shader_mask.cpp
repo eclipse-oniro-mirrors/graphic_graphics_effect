@@ -24,9 +24,10 @@ namespace Drawing {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> frameGradientMaskShaderEffect_ = nullptr;
 }
-GEFrameGradientShaderMask::GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param) :
-    gradientBezierControlPoints_(param.gradientBezierControlPoints),
-    cornerRadius_(param.cornerRadius), frameWidth_(param.frameWidth)
+GEFrameGradientShaderMask::GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param)
+    : gradientBezierControlPoints_(param.gradientBezierControlPoints),
+    cornerRadius_(param.cornerRadius),
+    frameWidth_(param.frameWidth)
     {}
 
 std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShader(float width, float height) const
@@ -38,8 +39,8 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShader(f
     }
     auto maskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(frameGradientMaskShaderEffect_);
     maskBuilder->SetUniform("iResolution", width, height);
-    std::array<float, ARRAY_SIZE_FOUR> gradientBezier = {gradientBezierControlPoints_[0], gradientBezierControlPoints_[1],
-        gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
+    std::array<float, ARRAY_SIZE_FOUR> gradientBezier = {gradientBezierControlPoints_[0],
+        gradientBezierControlPoints_[1], gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
     maskBuilder->SetUniform("gradientBezierControlPoints", gradientBezier.data(), ARRAY_SIZE_FOUR);
     maskBuilder->SetUniform("cornerRadius", cornerRadius_);
     maskBuilder->SetUniform("frameWidth", frameWidth_);
@@ -59,8 +60,8 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::GenerateDrawingShaderHa
     }
     auto maskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(frameGradientMaskShaderEffect_);
     maskBuilder->SetUniform("iResolution", width, height);
-    std::array<float, ARRAY_SIZE_FOUR> gradientBezier = {gradientBezierControlPoints_[0], gradientBezierControlPoints_[1],
-        gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
+    std::array<float, ARRAY_SIZE_FOUR> gradientBezier = {gradientBezierControlPoints_[0],
+        gradientBezierControlPoints_[1], gradientBezierControlPoints_[2], gradientBezierControlPoints_[3]};
     maskBuilder->SetUniform("gradientBezierControlPoints", gradientBezier.data(), ARRAY_SIZE_FOUR);
     maskBuilder->SetUniform("cornerRadius", cornerRadius_);
     maskBuilder->SetUniform("frameWidth", frameWidth_);
