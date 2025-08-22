@@ -93,7 +93,7 @@ public:
     using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
 
     template <typename T>
-    void applyPropertyParams(const std::string& tag, const auto& value, std::shared_ptr<T>& params, const TagMap<T>& tagMap) {
+    void applyPropertyParams(const std::string& tag, const std::any& value, std::shared_ptr<T>& params, const TagMap<T>& tagMap) {
         auto it = tagMap.find(tag);
         if (it != tagMap.end()) {
             it->second(params, value);
@@ -542,7 +542,7 @@ private:
         ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_BRIGHTNESS, brightness, float),
         ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_PROGRESS, progress, float),
         ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRENGTH, strengths, Vector4f),
-    }
+    };
 
     TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
         ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS,
@@ -569,7 +569,7 @@ private:
             color, Vector4f),
         ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS,
             progress, float),
-    }
+    };
 
     TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
         ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0, colors[0], Vector4f),
@@ -583,14 +583,14 @@ private:
         ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA,
             effectAlpha, float),
         ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS, progress, float),
-    }
+    };
 
     TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
         ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS,
             gradientBezierControlPoints, Vector4f),
         ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
         ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
-    }
+    };
 
     #undef ADD_TAG_HANDLER
 
