@@ -27,7 +27,6 @@
 #include "ge_shader_filter.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
-#include "ge_log.h"
 
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
@@ -91,16 +90,6 @@ public:
 
     template <typename T>
     using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
-
-    template <typename T>
-    void applyPropertyParams(const std::string& tag, const std::any& value, std::shared_ptr<T>& params, const TagMap<T>& tagMap) {
-        auto it = tagMap.find(tag);
-        if (it != tagMap.end()) {
-            it->second(params, value);
-        } else {
-            GE_LOGE("GEVisualEffectImpl Tag %{public}s not found", tag.c_str());
-        }
-    }
 
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
@@ -521,7 +510,7 @@ private:
 
     #define ADD_TAG_HANDLER(type, tag, member, valueType) \
         {#tag, [](std::shared_ptr<type>&params, const std::any& value) { \
-            params->member = std::any_cast<valueType>(value);\
+            params->member = std::any_cast<valueType>(value); \
         }}
     
     using PairFloat = std::pair<float, float>;
@@ -561,9 +550,11 @@ private:
             sharping, float),
         ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING,
             feathering, float),
-        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS,
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams,
+            GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS,
             featheringBezierControlPoints, Vector4f),
-        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS,
+        ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams,
+            GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS,
             gradientBezierControlPoints, Vector4f),
         ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR,
             color, Vector4f),
