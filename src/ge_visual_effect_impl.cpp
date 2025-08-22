@@ -236,6 +236,18 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}
 
+template <typename T>
+    void GEVisualEffectImpl::applyPropertyParams(const std::string& tag, const std::any& value,
+        std::shared_ptr<T>& params, const TagMap<T>& tagMap) {
+        auto it = tagMap.find(tag);
+        if (it != tagMap.end()) {
+            it->second(params, value);
+        } else {
+            GE_LOGE("GEVisualEffectImpl Tag %{public}s not found", tag.c_str());
+        }
+    }
+
+
 void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
 {
     switch (filterType_) {
