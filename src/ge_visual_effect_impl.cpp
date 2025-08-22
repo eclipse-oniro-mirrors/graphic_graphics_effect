@@ -241,11 +241,15 @@ template <typename T>
 void GEVisualEffectImpl::applyTagParams(const std::string& tag, const std::any& value,
     std::shared_ptr<T>& params, const TagMap<T>& tagMap)
 {
+    if (!params) {
+        GE_LOGE("GEVisualEffectImpl params for tag %{public}s not found", tag.c_str());
+        return;
+    }
     auto it = tagMap.find(tag);
     if (it != tagMap.end()) {
         it->second(params, value);
     } else {
-        GE_LOGE("GEVisualEffectImpl Tag %{public}s not found", tag.c_str());
+        GE_LOGE("GEVisualEffectImpl tag %{public}s not found", tag.c_str());
     }
 }
 
@@ -448,30 +452,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::FRAME_GRADIENT_MASK: {
-            if (frameGradientMaskParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            if (AIBarGlowEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            if (roundedRectFlowlightEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         case FilterType::GRADIENT_FLOW_COLORS: {
-            if (gradientFlowColorsEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
@@ -597,16 +589,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            if (AIBarGlowEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            if (roundedRectFlowlightEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
@@ -893,30 +879,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             break;
         }
         case FilterType::FRAME_GRADIENT_MASK: {
-            if (frameGradientMaskParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            if (AIBarGlowEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            if (roundedRectFlowlightEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         case FilterType::GRADIENT_FLOW_COLORS: {
-            if (gradientFlowColorsEffectParams_ == nullptr) {
-                return;
-            }
             applyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
