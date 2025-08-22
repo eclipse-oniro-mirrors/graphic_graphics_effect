@@ -23,7 +23,6 @@ namespace Rosen {
 namespace Drawing {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> frameGradientMaskShaderEffect_ = nullptr;
-constexpr int ARRAY_SIZE_FOUR = 4;
 }
 GEFrameGradientShaderMask::GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param) :
     gradientBezierControlPoints_(param.gradientBezierControlPoints),
