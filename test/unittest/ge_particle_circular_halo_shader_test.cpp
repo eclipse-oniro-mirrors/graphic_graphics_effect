@@ -18,6 +18,7 @@
 #include "ge_external_dynamic_loader.h"
 #include "ge_visual_effect_impl.h"
 #include "draw/path.h"
+#include "draw/canvas.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -65,6 +66,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest001, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -86,6 +88,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest002, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -107,6 +110,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest003, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -128,6 +132,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest004, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -149,6 +154,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest005, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -170,6 +176,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest006, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -191,6 +198,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest007, 
     params.noise_ = 4.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -212,6 +220,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest008, 
     params.noise_ = -2.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -233,6 +242,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest009, 
     params.noise_ = -2.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -253,6 +263,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest010, 
     params.noise_ = 2.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
@@ -274,6 +285,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest011, 
     params.noise_ = 2.0f;
 
     auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvas_, rect_);
     auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
 
     if (shaderEffect) {
