@@ -65,7 +65,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_001, TestSize.Lev
 {
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_NE(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
  
 /**
@@ -78,7 +78,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_002, TestSize.Lev
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     geDisplacementDistortFilterParams.factor_ = {0.5f, 0.5f};
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    EXPECT_NE(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**

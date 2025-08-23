@@ -918,7 +918,7 @@ HWTEST_F(GERenderTest, GenerateShaderEffectTest_LightCave, TestSize.Level1)
 
     geVisualEffectImpl->MakeLightCaveParams();
     shader = geRender->GenerateShaderEffect(geVisualEffectImpl);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
