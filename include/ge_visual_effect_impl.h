@@ -92,7 +92,7 @@ public:
     using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
 
     template <typename T>
-    void applyTagParams(const std::string& tag, const std::any& value,
+    void ApplyTagParams(const std::string& tag, const std::any& value,
         std::shared_ptr<T>& params, const TagMap<T>& tagMap);
 
     void SetParam(const std::string& tag, int32_t param);
