@@ -238,7 +238,7 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
 GEVisualEffectImpl::~GEVisualEffectImpl() {}
 
 template <typename T>
-void GEVisualEffectImpl::applyTagParams(const std::string& tag, const std::any& value,
+void GEVisualEffectImpl::ApplyTagParams(const std::string& tag, const std::any& value,
     std::shared_ptr<T>& params, const TagMap<T>& tagMap)
 {
     if (!params) {
