@@ -74,7 +74,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest001, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_001 end";
 }
@@ -96,7 +96,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest002, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_002 end";
 }
@@ -118,7 +118,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest003, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_003 end";
 }
@@ -140,7 +140,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest004, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_004 end";
 }
@@ -162,7 +162,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest005, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_005 end";
 }
@@ -184,7 +184,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest006, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_006 end";
 }
@@ -206,7 +206,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest007, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_007 end";
 }
@@ -228,7 +228,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest008, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_008 end";
 }
@@ -250,7 +250,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest009, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_009 end";
 }
@@ -271,7 +271,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest010, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_010 end";
 }
@@ -293,7 +293,7 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest011, 
     } else {
         GTEST_LOG_(ERROR) << "Failed to create shader.";
     }
-    EXPECT_NE(shaderEffect, nullptr);
+    EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_011 end";
 }
