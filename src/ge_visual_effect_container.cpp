@@ -88,6 +88,17 @@ void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
         }
     }
 }
+
+void GEVisualEffectContainer::RemoveFilterWithType(int32_t typeToRemove)
+{
+    filterVec_.erase(
+        std::remove_if(filterVec_.begin(), filterVec_.end(),
+            [&](const std::shared_ptr<Drawing::GEVisualEffect>& ptr) {
+                return ptr && ptr->GetImpl() && static_cast<int32_t>(ptr->GetImpl()->GetFilterType()) == typeToRemove;
+            }),
+        filterVec_.end()
+    );
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -216,7 +216,8 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
         }
         case Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR: {
             const auto& linearGradientBlurParams = visualEffectImpl->GetLinearGradientBlurParams();
-            GenerateGradientBlurEffect(*linearGradientBlurParams, src, dst, image);
+            auto canvasInfo = visualEffectImpl->GetCanvasInfo();
+            GenerateGradientBlurEffect(*linearGradientBlurParams, src, dst, image, canvasInfo);
             break;
         }
         default:
@@ -285,16 +286,17 @@ void HpsEffectFilter::GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterPara
 }
 
 void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
-    const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image)
+    const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
+    Drawing::CanvasInfo info)
 {
     float blurRadius = params.blurRadius;
     std::vector<std::pair<float, float>> fractionStops = params.fractionStops;
     int direction = params.direction;
-    float geoWidth = params.geoWidth;
-    float geoHeight = params.geoHeight;
-    Drawing::Matrix mat = params.mat;
-    float tranX = params.tranX;
-    float tranY = params.tranY;
+    float geoWidth = info.geoWidth;
+    float geoHeight = info.geoHeight;
+    Drawing::Matrix mat = info.mat;
+    float tranX = info.tranX;
+    float tranY = info.tranY;
     bool isOffscreenCanvas = params.isOffscreenCanvas;
 
     if (isOffscreenCanvas) {
@@ -317,15 +319,15 @@ void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradient
     }
 
     auto imageInfo = image->GetImageInfo();
-    if (geoWidth != imageInfo.GetWidth() && geoHeight != imageInfo.GetHeight()) {
-        //geoWidth != image.width means width and height switch, need swap width and height
+    if (abs(geoWidth - imageInfo.GetWidth()) > 1e-3 || abs(geoHeight - imageInfo.GetHeight()) > 1e-3) {
+        // width or height not equal, needs mat to scale width and height
         float sx = 1.0;
         float sy = 1.0;
         if (imageInfo.GetWidth() > 0) {
-            sx = static_cast<float>(imageInfo.GetHeight()) / static_cast<float>(imageInfo.GetWidth());
+            sx = static_cast<float>(geoWidth) / static_cast<float>(imageInfo.GetWidth());
         }
         if (imageInfo.GetHeight() > 0) {
-            sy = static_cast<float>(imageInfo.GetWidth()) / static_cast<float>(imageInfo.GetHeight());
+            sy = static_cast<float>(geoHeight) / static_cast<float>(imageInfo.GetHeight());
         }
         mat.PreScale(sx, sy);
     }
