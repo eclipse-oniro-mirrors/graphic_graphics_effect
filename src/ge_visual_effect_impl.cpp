@@ -531,19 +531,19 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::FRAME_GRADIENT_MASK: {
-            applyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
+            ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         case FilterType::GRADIENT_FLOW_COLORS: {
-            applyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
+            ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
         default:
@@ -668,11 +668,11 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         default:
@@ -958,19 +958,19 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             break;
         }
         case FilterType::FRAME_GRADIENT_MASK: {
-            applyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
+            ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
         case FilterType::AIBAR_GLOW: {
-            applyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
-            applyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
         case FilterType::GRADIENT_FLOW_COLORS: {
-            applyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
+            ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
         default:
