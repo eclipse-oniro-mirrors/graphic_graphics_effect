@@ -34,7 +34,6 @@ public:
     GEFrameGradientShaderMask& operator=(GEFrameGradientShaderMask&&) = delete;
     ~GEFrameGradientShaderMask() override = default;
 
-
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
