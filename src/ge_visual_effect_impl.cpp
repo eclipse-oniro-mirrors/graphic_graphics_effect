@@ -227,12 +227,13 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
 
 };
 
-GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name)
+GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
 {
     auto iter = g_initialMap.find(name);
     if (iter != g_initialMap.end()) {
         iter->second(this);
     }
+    canvasInfo_ = canvasInfo.value_or(Drawing::CanvasInfo());
 }
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}

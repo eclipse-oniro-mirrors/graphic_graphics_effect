@@ -39,6 +39,8 @@ public:
 
     void SetDisplayHeadroom(float headroom);
 
+    void RemoveFilterWithType(int32_t typeToRemove);
+
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 
