@@ -146,8 +146,11 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
     {GEVisualEffectImpl::FilterType::AIBAR_GLOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
+            if (!ve) {
+                return out;
+            }
             const auto& params = ve->GetAIBarGlowEffectParams();
-            if (!ve || !params) {
+            if (params == nullptr) {
                 return out;
             }
             auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::AIBAR_GLOW);
@@ -164,8 +167,11 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
     {GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
+            if (!ve) {
+                return out;
+            }
             const auto& params = ve->GetRoundedRectFlowlightEffectParams();
-            if (!ve || !params) {
+            if (params == nullptr) {
                 return out;
             }
             auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT);
@@ -182,8 +188,11 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
     {GEVisualEffectImpl::FilterType::GRADIENT_FLOW_COLORS, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
-            const auto& params = ve->GetFrameGradientMaskParams();
-            if (!ve || !params) {
+            if (!ve) {
+                return out;
+            }
+            const auto& params = ve->GetGradientFlowColorsEffectParams();
+            if (params == nullptr) {
                 return out;
             }
             auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GRADIENT_FLOW_COLORS);
