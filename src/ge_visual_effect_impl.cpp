@@ -24,6 +24,84 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+namespace{
+#define ADD_TAG_HANDLER(type, tag, member, valueType) \
+    {tag, [](std::shared_ptr<type>&params, const std::any& value) { \
+        params->member = std::any_cast<valueType>(value); \
+    }}
+
+using PairFloat = std::pair<float, float>;
+
+GEVisualEffectImpl::TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_LTWH, LTWH, Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR,
+        stretchFactor, float),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_BAR_ANGLE, barAngle, float),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR0, colors[0], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR1, colors[1], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR2, colors[2], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_COLOR3, colors[3], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS0, positions[0], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS1, positions[1], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS2, positions[2], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_POS3, positions[3], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_BRIGHTNESS, brightness, float),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRENGTH, strengths, Vector4f),
+};
+
+GEVisualEffectImpl::TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS,
+        startEndPosition, PairFloat),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH,
+        waveLength, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP,
+        waveTop, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS,
+        cornerRadius, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS,
+        brightness, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE,
+        scale, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING,
+        sharping, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING,
+        feathering, float),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams,
+        GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS,
+        featheringBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams,
+        GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS,
+        gradientBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR,
+        color, Vector4f),
+    ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS,
+        progress, float),
+};
+
+GEVisualEffectImpl::TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0, colors[0], Vector4f),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1, colors[1], Vector4f),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2, colors[2], Vector4f),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3, colors[3], Vector4f),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN,
+        gradientBegin, float),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END,
+        gradientEnd, float),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA,
+        effectAlpha, float),
+    ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS, progress, float),
+};
+
+GEVisualEffectImpl::TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS,
+        gradientBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
+};
+
+#undef ADD_TAG_HANDLER
+}
 
 std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEffectImpl::g_initialMap = {
     { GE_FILTER_KAWASE_BLUR,
