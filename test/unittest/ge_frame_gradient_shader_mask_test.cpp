@@ -55,7 +55,7 @@ HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShader_001, TestSize.Leve
     param.frameWidth = 0.0f;
 
     GEFrameGradientShaderMask mask(param);
-    auto shaderEffect = mask.GenerateDrawingShader(50.f, 50.f);
+    auto shaderEffect = mask.GenerateDrawingShader(0.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_001 end";
@@ -118,7 +118,7 @@ HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormal_001, Test
     param.frameWidth = 0.0f;
 
     GEFrameGradientShaderMask mask(param);
-    auto shaderEffect = mask.GenerateDrawingShaderHasNormal(50.f, 50.f);
+    auto shaderEffect = mask.GenerateDrawingShaderHasNormal(0.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_001 end";
