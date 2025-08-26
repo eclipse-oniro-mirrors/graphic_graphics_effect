@@ -27,7 +27,7 @@ namespace Drawing {
 
 class GE_EXPORT GEFrameGradientShaderMask : public GEShaderMask {
 public:
-    GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param);
+    explicit GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param);
     GEFrameGradientShaderMask(const GEFrameGradientShaderMask&) = delete;
     GEFrameGradientShaderMask operator=(const GEFrameGradientShaderMask&) = delete;
     GEFrameGradientShaderMask(GEFrameGradientShaderMask&&) = delete;
