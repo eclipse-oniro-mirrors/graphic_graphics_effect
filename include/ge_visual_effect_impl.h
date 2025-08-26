@@ -16,6 +16,7 @@
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 
 #include <memory>
+#include <optional>
 #include <vector>
 #include <any>
 
@@ -76,7 +77,7 @@ public:
         MAX
     };
 
-    GEVisualEffectImpl(const std::string& name);
+    GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
 
     ~GEVisualEffectImpl();
 
@@ -412,6 +413,16 @@ public:
         return borderLightParams_;
     }
 
+    void SetCanvasInfo(Drawing::CanvasInfo info)
+    {
+        canvasInfo_ = info;
+    }
+
+    const Drawing::CanvasInfo& GetCanvasInfo() const
+    {
+        return canvasInfo_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -458,6 +469,7 @@ private:
     void SetBorderLightParams(const std::string& tag, float param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
+    Drawing::CanvasInfo canvasInfo_;
 
     // ShaderFilter Params
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;

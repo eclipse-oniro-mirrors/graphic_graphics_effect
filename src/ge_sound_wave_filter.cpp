@@ -61,16 +61,11 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
         return nullptr;
     }
  
-    Drawing::Matrix matrix = canvasInfo_.mat;
-    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        LOGE("GESoundWaveFilter::ProcessImage Invert matrix failed");
+    if (isSkipProcessImage_) {
         return image;
     }
-    
-    auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     auto imageInfo = image->GetImageInfo();
     float height = imageInfo.GetHeight();
     float width = imageInfo.GetWidth();
@@ -82,13 +77,68 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
         LOGE("GESoundWaveFilter::OnProcessImage g_SoundWaveEffect init failed");
         return image;
     }
+    Drawing::RuntimeShaderBuilder builder(soundWaveShader);
+    if (!SetBuilderParams(builder, *image, matrix)) {
+        LOGE("GESoundWaveFilter::OnProcessImage make shaderBuilder failed");
+        return image;
+    }
+
+    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
+    if (invertedImage == nullptr) {
+        LOGE("GESoundWaveFilter::OnProcessImage make image failed");
+        return image;
+    }
+    return invertedImage;
+}
+
+bool GESoundWaveFilter::OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
+{
+    if (image == nullptr) {
+        LOGE("GESoundWaveFilter::OnDrawImage input is invalid");
+        return false;
+    }
+    auto soundWaveShader = GetSoundWaveEffect();
+    if (soundWaveShader == nullptr) {
+        LOGE("GESoundWaveFilter::OnDrawImage g_SoundWaveEffect init failed");
+        return false;
+    }
+    Drawing::RuntimeShaderBuilder builder(soundWaveShader);
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
+    if (!SetBuilderParams(builder, *image, matrix)) {
+        LOGE("GESoundWaveFilter::OnDrawImage make shaderBuilder failed");
+        return false;
+    }
+
+    Drawing::Matrix translateMatrix;
+    translateMatrix.Translate(dst.GetLeft(), dst.GetTop());
+    matrix.PostConcat(translateMatrix);
+
+    auto tmpShader = builder.MakeShader(&(matrix), false);
+    brush.SetShaderEffect(tmpShader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(dst);
+    canvas.DetachBrush();
+    return true;
+}
+
+bool GESoundWaveFilter::SetBuilderParams(Drawing::RuntimeShaderBuilder& builder,
+    const Drawing::Image& image, const Drawing::Matrix& localMatrix)
+{
+    Drawing::Matrix invertMatrix;
+    if (!localMatrix.Invert(invertMatrix)) {
+        LOGE("GESoundWaveFilter::SetBuilderParams Invert matrix failed");
+        return false;
+    }
+    auto shader = Drawing::ShaderEffect::CreateImageShader(image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
 
     CheckSoundWaveParams();
     float colorA[COLOR_CHANNEL] = {colorA_.redF_, colorA_.greenF_, colorA_.blueF_};
     float colorB[COLOR_CHANNEL] = {colorB_.redF_, colorB_.greenF_, colorB_.blueF_};
     float colorC[COLOR_CHANNEL] = {colorC_.redF_, colorC_.greenF_, colorC_.blueF_};
 
-    Drawing::RuntimeShaderBuilder builder(soundWaveShader);
     builder.SetChild("image", shader);
     builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
@@ -101,13 +151,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
     builder.SetUniform("shockWaveProgressA", shockWaveProgressA_);
     builder.SetUniform("shockWaveProgressB", shockWaveProgressB_);
     builder.SetUniform("shockWaveTotalAlpha", shockWaveTotalAlpha_);
- 
-    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
-    if (invertedImage == nullptr) {
-        LOGE("GESoundWaveFilter::OnProcessImage make image failed");
-        return image;
-    }
-    return invertedImage;
+    return true;
 }
 
 void GESoundWaveFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)

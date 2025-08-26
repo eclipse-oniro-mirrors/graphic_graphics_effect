@@ -29,10 +29,8 @@ namespace Drawing {
 
 GEVisualEffect::GEVisualEffect(
     const std::string& name, DrawingPaintType type, const std::optional<Drawing::CanvasInfo>& canvasInfo)
-    : visualEffectName_(name), type_(type), visualEffectImpl_(std::make_unique<GEVisualEffectImpl>(name))
-{
-    canvasInfo_ = canvasInfo.value_or(Drawing::CanvasInfo());
-}
+    : visualEffectName_(name), type_(type), visualEffectImpl_(std::make_unique<GEVisualEffectImpl>(name, canvasInfo))
+{}
 
 GEVisualEffect::~GEVisualEffect() {}
 
@@ -125,6 +123,16 @@ void GEVisualEffect::SetParam(const std::string& tag, const Vector3f& param)
 void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
 {
     visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetCanvasInfo(Drawing::CanvasInfo info)
+{
+    visualEffectImpl_->SetCanvasInfo(info);
+}
+
+const Drawing::CanvasInfo& GEVisualEffect::GetCanvasInfo() const
+{
+    return visualEffectImpl_->GetCanvasInfo();
 }
 
 const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask() const

@@ -473,12 +473,17 @@ constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH10[] = "ColorGradientEff
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH11[] = "ColorGradientEffect_Strength11";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_MASK[] = "ColorGradientEffect_Mask";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER[] = "ColorGradientEffect_ColorNumber";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND[] = "ColorGradientEffect_Blend";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND_K[] = "ColorGradientEffect_BlendK";
+
 constexpr int COLOR_GRADIENT_ARRAY_SIZE = 12;
 struct GEXColorGradientEffectParams {
     std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE> colors_;
     std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE> positions_;
     std::array<float, COLOR_GRADIENT_ARRAY_SIZE> strengths_;
     float colorNum_ = 0.0f;
+    float blend_ = 0.0f;
+    float blendk_ = 0.0f;
     std::shared_ptr<GEShaderMask> mask_;
 };
 

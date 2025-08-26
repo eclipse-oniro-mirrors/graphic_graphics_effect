@@ -141,6 +141,34 @@ HWTEST_F(GESoundWaveFilterTest, OnProcessImage004, TestSize.Level1)
 }
 
 /**
+ * @tc.name: OnDrawImage001
+ * @tc.desc: Verify the OnDrawImage: image is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, OnDrawImage001, TestSize.Level1)
+{
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    Drawing::Brush brush;
+    EXPECT_FALSE(geSoundWaveFilter->OnDrawImage(canvas_, nullptr, src_, dst_, brush));
+}
+
+/**
+ * @tc.name: OnDrawImage002
+ * @tc.desc: Verify the OnDrawImage
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, OnDrawImage002, TestSize.Level1)
+{
+    Drawing::GESoundWaveFilterParams geSoundWaveFilterParams;
+    std::unique_ptr<GESoundWaveFilter> geSoundWaveFilter =
+        std::make_unique<GESoundWaveFilter>(geSoundWaveFilterParams);
+    Drawing::Brush brush;
+    EXPECT_TRUE(geSoundWaveFilter->OnDrawImage(canvas_, image_, src_, dst_, brush));
+}
+
+/**
  * @tc.name: CheckSoundWaveParams
  * @tc.desc: Verify the CheckSoundWaveParams
  * @tc.type: FUNC

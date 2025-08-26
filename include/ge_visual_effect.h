@@ -16,7 +16,6 @@
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_H
 
 #include <memory>
-#include <optional>
 #include <vector>
 
 #include "common/rs_vector2.h"
@@ -76,15 +75,9 @@ public:
         return visualEffectImpl_;
     }
 
-    void SetCanvasInfo(Drawing::CanvasInfo info)
-    {
-        canvasInfo_ = info;
-    }
+    void SetCanvasInfo(Drawing::CanvasInfo info);
 
-    const Drawing::CanvasInfo GetCanvasInfo() const
-    {
-        return canvasInfo_;
-    }
+    const Drawing::CanvasInfo& GetCanvasInfo() const;
 
     void SetSupportHeadroom(float headroom)
     {
@@ -102,7 +95,6 @@ private:
     std::string visualEffectName_;
     DrawingPaintType type_;
     std::shared_ptr<GEVisualEffectImpl> visualEffectImpl_;
-    Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;
 };
 

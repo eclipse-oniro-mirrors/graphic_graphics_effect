@@ -158,15 +158,15 @@ private:
 
         float calcBLight(float dis, float freq)
         {
-            float currentX = pow(dis + (6.2832 / freq), 2.);
-            return 1.2 * exp(-55. * currentX);
+            float currentX = dis + (6.2832 / freq);
+            return 1.2 * exp(-55. * currentX * currentX);
         }
 
         float calcSLight(float dis, float freq, float yShift)
         {
-            float pivot1 = pow(dis + (9.4248 / freq) - 0.14, 2.);
-            float pivot2 = pow(dis + (9.4248 / freq) + 0.01, 2.);
-            return 2. * yShift * (exp(-1000. * pivot2) + exp(-1000. * pivot1));
+            float pivot1 = dis + (9.4248 / freq) - 0.14;
+            float pivot2 = dis + (9.4248 / freq) + 0.01;
+            return 2. * yShift * (exp(-1000. * pivot2 * pivot2) + exp(-1000. * pivot1 * pivot1));
         }
 
         vec2 waveGenerator(float propDis, float t, float count, float freq, float prop, float yShift)
