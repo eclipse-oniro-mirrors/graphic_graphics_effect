@@ -36,7 +36,6 @@ enum class GexComplexShaderType: uint32_t {
     SDF_SNOW,
     SDF_MID_SNOW,
     SDF_HEAVY_SNOW,
-    LIGHT_CAVE,
     BACKGROUND_GRADIENT,
     BACKGROUND_GRADIENT_RIPPLE,
     WAVY_RIPPLE_LIGHT,
