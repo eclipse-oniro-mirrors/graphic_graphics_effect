@@ -360,6 +360,10 @@ bool GEXComplexShaderParams::Unmarshalling(Parcel& parcel)
             return false;
         }
         uint32_t paramsSize = intVal;
+        if (paramsSize > 1000) {
+            GE_LOGE("GEXComplexShaderParams::Unmarshalling invalid paramsSize!");
+            return false;
+        }
         for (auto i = 0u; i < paramsSize; i++) {
             if (!parcel.ReadFloat(floatVal)) {
                 GE_LOGE("GEXComplexShaderParams::Unmarshalling Read float failed!");
