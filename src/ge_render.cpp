@@ -228,48 +228,17 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
     canvas.DetachBrush();
 }
 
-bool GERender::DrawImageEffectToCanvas(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-    const std::shared_ptr<Drawing::Image>& image, std::shared_ptr<Drawing::Image>& outImage,
-    const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
-{
-    auto tmpDst = src;
-    outImage = ApplyImageEffect(canvas, veContainer, image, src, tmpDst, Drawing::SamplingOptions(), true);
-    int filterLength = veContainer.GetFilters().size();
-    if (filterLength > 0) {
-        auto vef = veContainer.GetFilters()[filterLength-1];
-        if (vef == nullptr) {
-            LOGD("GERender::DrawImageEffectToCanvas vef is null");
-            return false;
-        }
-        auto ve = vef->GetImpl();
-        std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(vef);
-        if (geShaderFilter == nullptr) {
-            LOGD("GERender::DrawImageEffectToCanvas filter is null");
-            return false;
-        }
-        if (geShaderFilter->OnDrawImage(canvas, image, src, dst, brush)) {
-            LOGD("GERender::DrawImageEffectToCanvas %{public}s drawn to Canvas successfully",
-                geShaderFilter->Type().c_str());
-            return true;
-        }
-    }
-    return false;
-}
-
 std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canvas,
     Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
-    const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling,
-    bool skipFinalFilter)
+    const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling)
 {
     if (!image) {
         LOGE("GERender::ApplyImageEffect image is null");
         return nullptr;
     }
-    auto& filters = veContainer.GetFilters();
-    size_t filterLength = filters.size();
+    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
     auto resImage = image;
-    for (size_t i = 0; i < filterLength; ++i) {
-        auto vef = filters[i];
+    for (auto vef : veContainer.GetFilters()) {
         if (vef == nullptr) {
             LOGD("GERender::ApplyImageEffect vef is null");
             continue;
@@ -283,8 +252,6 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
         geShaderFilter->SetSupportHeadroom(vef->GetSupportHeadroom());
         geShaderFilter->SetCache(ve->GetCache());
         geShaderFilter->Preprocess(canvas, src, dst);
-        bool isFinal = skipFinalFilter && (i == (filterLength - 1));
-        geShaderFilter->SetSkipProcessImageFlag(isFinal);
         resImage = geShaderFilter->ProcessImage(canvas, resImage, src, dst);
         ve->SetCache(geShaderFilter->GetCache());
     }
