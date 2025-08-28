@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_hps_effect_filter.h"
+#include "ge_shader_filter_params.h"
 #include "draw/color.h"
 #include "image/bitmap.h"
 
@@ -132,8 +133,14 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_001 start";
 
     Drawing::GEVisualEffectContainer veContainer;
+    std::pair<float, float> factor = {0.5f, 0.5f};
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_MASK_RIPPLE);
+    visualEffect->visualEffectImpl_->rippleMaskParams_ = std::make_shared<Drawing::GERippleShaderMaskParams>();
+    visualEffect->visualEffectImpl_->filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+    visualEffect->SetParam(Drawing::GE_MASK_RIPPLE_CENTER, factor);
+    veContainer.AddToChainedFilter(visualEffect);
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
-    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer), true);
+    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer), false);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_001 end";
 }
