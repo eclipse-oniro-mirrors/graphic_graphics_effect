@@ -70,6 +70,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_edge_light_shader_filter.cpp",
     "src/ge_external_dynamic_loader.cpp",
     "src/ge_filter_composer.cpp",
+    "src/ge_frame_gradient_shader_mask.cpp",
     "src/ge_grey_shader_filter.cpp",
     "src/ge_kawase_blur_shader_filter.cpp",
     "src/ge_linear_gradient_blur_shader_filter.cpp",

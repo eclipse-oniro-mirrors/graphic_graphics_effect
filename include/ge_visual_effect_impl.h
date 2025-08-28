@@ -15,7 +15,11 @@
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 
+#include <string>
+#include <map>
+#include <functional>
 #include <memory>
+#include <array>
 #include <optional>
 #include <vector>
 #include <any>
@@ -56,6 +60,7 @@ public:
         PIXEL_MAP_MASK,
         RADIAL_GRADIENT_MASK,
         WAVE_GRADIENT_MASK,
+        FRAME_GRADIENT_MASK,
         // Shader
         DOT_MATRIX,
         FLOW_LIGHT_SWEEP,
@@ -74,12 +79,22 @@ public:
         VARIABLE_RADIUS_BLUR,
         COLOR_GRADIENT_EFFECT,
         LIGHT_CAVE,
+        AIBAR_GLOW,
+        ROUNDED_RECT_FLOWLIGHT,
+        GRADIENT_FLOW_COLORS,
         MAX
     };
 
     GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
 
     ~GEVisualEffectImpl();
+
+    template <typename T>
+    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
+
+    template <typename T>
+    void ApplyTagParams(const std::string& tag, const std::any& value,
+        std::shared_ptr<T>& params, const TagMap<T>& tagMap);
 
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
@@ -423,6 +438,46 @@ public:
         return canvasInfo_;
     }
 
+    void MakeAIBarGlowEffectParams()
+    {
+        AIBarGlowEffectParams_ = std::make_shared<GEXAIBarGlowEffectParams>();
+    }
+
+    const std::shared_ptr<GEXAIBarGlowEffectParams>& GetAIBarGlowEffectParams() const
+    {
+        return AIBarGlowEffectParams_;
+    }
+
+    void MakeRoundedRectFlowlightEffectParams()
+    {
+        roundedRectFlowlightEffectParams_ = std::make_shared<GEXRoundedRectFlowlightEffectParams>();
+    }
+
+    const std::shared_ptr<GEXRoundedRectFlowlightEffectParams>& GetRoundedRectFlowlightEffectParams() const
+    {
+        return roundedRectFlowlightEffectParams_;
+    }
+    
+    void MakeGradientFlowColorsEffectParams()
+    {
+        gradientFlowColorsEffectParams_ = std::make_shared<GEXGradientFlowColorsEffectParams>();
+    }
+
+    const std::shared_ptr<GEXGradientFlowColorsEffectParams>& GetGradientFlowColorsEffectParams() const
+    {
+        return gradientFlowColorsEffectParams_;
+    }
+
+    void MakeFrameGradientMaskParams()
+    {
+        frameGradientMaskParams_ = std::make_shared<GEFrameGradientMaskParams>();
+    }
+
+    const std::shared_ptr<GEFrameGradientMaskParams>& GetFrameGradientMaskParams() const
+    {
+        return frameGradientMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -504,10 +559,13 @@ private:
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
+    std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
+    std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
+    std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
+    std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 };
 
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
-
 #endif // GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
