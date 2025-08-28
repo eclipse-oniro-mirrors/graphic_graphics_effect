@@ -254,41 +254,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
     auto outImage = geRender->ApplyImageEffect(canvas_, *veContainer, image, src, dst, sampling);
     EXPECT_TRUE(outImage == image);
 
-    auto outImage2 = geRender->ApplyImageEffect(canvas_, *veContainer, image, src, dst, sampling, true);
-    EXPECT_TRUE(outImage2 == image);
-
     GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_001 end";
-}
-
-/**
- * @tc.name: DrawImageEffectToCanvas_001
- * @tc.desc: Verify the DrawImageEffectToCanvas
- * @tc.type: FUNC
- */
-HWTEST_F(GERenderTest, DrawImageEffectToCanvas001, TestSize.Level0)
-{
-    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
-    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
-
-    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
-    veContainer->AddToChainedFilter(visualEffect);
-
-    const std::shared_ptr<Drawing::Image> image = nullptr;
-    auto outImage = std::make_shared<Drawing::Image>();
-    const Drawing::Rect src(1.0f, 1.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(1.0f, 1.0f, 1.0f, 1.0f);
-    Drawing::Brush brush;
-    auto geRender = std::make_shared<GERender>();
-    if (!geRender) {
-        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
-        return;
-    }
-    bool result = geRender->DrawImageEffectToCanvas(canvas_, *veContainer, image, outImage, src, dst, brush);
-    EXPECT_FALSE(result);
-
-    outImage = nullptr;
-    bool result2 = geRender->DrawImageEffectToCanvas(canvas_, *veContainer, image, outImage, src, dst, brush);
-    EXPECT_FALSE(result2);
 }
 
 /**

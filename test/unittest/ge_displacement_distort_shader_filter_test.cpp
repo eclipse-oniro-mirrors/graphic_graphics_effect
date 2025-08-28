@@ -82,19 +82,6 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_002, TestSize.Lev
 }
 
 /**
- * @tc.name: OnDrawImage_001
- * @tc.desc: Verify function OnDrawImage
- * @tc.type:FUNC
- */
-HWTEST_F(GEDisplacementDistortShaderFilterTest, OnDrawImage_001, TestSize.Level0)
-{
-    Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
-    auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
-    Drawing::Brush brush;
-    EXPECT_FALSE(geDisplacementDistortFilter->OnDrawImage(canvas_, nullptr, src_, dst_, brush));
-}
-
-/**
  * @tc.name: GetDisplacementDistortEffect_001
  * @tc.desc: Verify function GetDisplacementDistortEffect
  * @tc.type:FUNC

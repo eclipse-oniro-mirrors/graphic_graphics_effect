@@ -43,11 +43,6 @@ public:
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst);
 
-    virtual bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
-        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
-    {
-        return false;
-    }
     uint32_t Hash() const
     {
         return hash_;
@@ -82,14 +77,9 @@ public:
         return cacheAnyPtr_;
     }
 
-    void SetSkipProcessImageFlag(bool isSkipProcessImage)
-    {
-        isSkipProcessImage_ = isSkipProcessImage;
-    }
 protected:
     Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;
-    bool isSkipProcessImage_ = false;
     uint32_t hash_ = 0;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
     FilterParams params_;
