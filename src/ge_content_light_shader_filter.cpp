@@ -150,6 +150,11 @@ void GEContentLightFilter::GenerateContentLightEffect()
         half4 main(in vec2 fragCoord)
         {
             half4 inputImage = image.eval(fragCoord);
+            if (inputImage.w > 0.0) {
+                inputImage.rgb /= inputImage.w;
+            } else {
+                return inputImage;
+            }
             half2 uv = fragCoord / iResolution.xy;
             uv = uv + uv - 1.0;
             half screenRatio = iResolution.x / iResolution.y;
@@ -160,8 +165,7 @@ void GEContentLightFilter::GenerateContentLightEffect()
 
             if (dot(contentRotationAngle, contentRotationAngle) < 0.01) {
                 half3 fragPos = half3(uv, 0.0);
-                shinningColor = inputImage.w > 0.0
-                    ? lightColor * pow(max(normalize(lightPos - fragPos).z, 0.), 36.0) : half4(0.0);
+                shinningColor = lightColor * pow(max(normalize(lightPos - fragPos).z, 0.), 36.0);
             } else {
                 mat3 rotM = GetRotationMatrix(contentRotationAngle);
                 half4 specularColor = lightColor;
@@ -175,7 +179,7 @@ void GEContentLightFilter::GenerateContentLightEffect()
             shinningColor.rgb *= intensity;
             shinningColor.rgb += inputImage.rgb - inputImage.rgb * shinningColor.rgb * 0.85;
 
-            return half4(shinningColor.rgb, inputImage.w);
+            return half4(shinningColor.rgb * inputImage.w, inputImage.w);
         }
     )";
     if (contentLightShaderEffect_ == nullptr) {
