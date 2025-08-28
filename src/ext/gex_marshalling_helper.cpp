@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Rosen {
 
 constexpr uint32_t MARSHALLING_SIZE_MAX_LIMIT = 100;  // 100 max length
+constexpr uint32_t MARSHALLING_SIZE_ONE_THOUSAND = 1000;  // 1000 max length
 
 bool RotateEffectParams::Marshalling(Parcel& parcel)
 {
@@ -360,7 +361,7 @@ bool GEXComplexShaderParams::Unmarshalling(Parcel& parcel)
             return false;
         }
         uint32_t paramsSize = intVal;
-        if (paramsSize > 1000) {
+        if (paramsSize > MARSHALLING_SIZE_ONE_THOUSAND) {
             GE_LOGE("GEXComplexShaderParams::Unmarshalling invalid paramsSize!");
             return false;
         }
