@@ -101,7 +101,7 @@ inline static const std::string g_shaderStringDirectionLight = R"(
     vec4 scatter(vec3 pos, vec3 displacementNormal, vec3 shadingNormal, float eta)
     {
         vec3 viewDir = vec3(0.0, 0.0, 1.0);
-        vec3 lightDir = lightDirection;
+        vec3 lightDir = normalize(lightDirection);
 
         float cosNToL = dot(shadingNormal, lightDir);
         if (cosNToL <= 0.0) return vec4(0.0);
@@ -194,7 +194,7 @@ inline static const std::string g_shaderStringDirectionLightNoNormal = R"(
     vec4 scatter(vec3 pos, vec3 displacementNormal, vec3 shadingNormal, float eta)
     {
         vec3 viewDir = vec3(0.0, 0.0, 1.0);
-        vec3 lightDir = lightDirection;
+        vec3 lightDir = normalize(lightDirection);
 
         float cosNToL = dot(shadingNormal, lightDir);
         if (cosNToL <= 0.0) return vec4(0.0);
