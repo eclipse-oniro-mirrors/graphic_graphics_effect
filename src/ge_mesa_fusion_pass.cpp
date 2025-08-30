@@ -64,12 +64,14 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
             resultComposables.push_back(mesaFilter);
             i = j; // consumed 2 effects, skip composed j
             composed = true;
+            LOGD("GEMesaFusionPass::Run Grey kawase fused");
         } else {
             resultComposables.push_back(composables[i]);
         }
     }
     if (composed) {
         composables.swap(resultComposables);
+        LOGD("GEHpsBuildPass::Run HPS filter composed");
     }
     return GEFilterComposerPassResult {composed};
 }

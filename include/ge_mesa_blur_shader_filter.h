@@ -151,8 +151,6 @@ private:
     Drawing::Matrix BuildStretchMatrixFull(const Drawing::Rect& src,
         const Drawing::Rect& dst, int inputWidth, int inputHeight) const;
     void CalculatePixelStretch(int width, int height);
-
-    static const std::string type_;
 };
 
 } // namespace Rosen

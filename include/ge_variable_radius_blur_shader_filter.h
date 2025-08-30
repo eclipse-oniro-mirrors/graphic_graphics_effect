@@ -54,8 +54,6 @@ private:
     static std::shared_ptr<Drawing::Image> BuildBoxLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         Drawing::Matrix blurMatrix);
-
-    static const std::string type_;
 };
 
 } // namespace Rosen

@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-enum class GEFilterType {
+enum class GEFilterType : int32_t {
     NONE,
     KAWASE_BLUR,
     MESA_BLUR,

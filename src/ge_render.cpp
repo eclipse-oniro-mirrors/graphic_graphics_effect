@@ -259,7 +259,7 @@ void GERender::ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawin
     auto ve = visualEffect->GetImpl();
     std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
     if (geShaderFilter == nullptr) {
-        LOGD("GERender::ApplyShaderFilter visualEffect is null");
+        LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
         return;
     }
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
@@ -283,8 +283,8 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     GEFilterComposer composer;
     auto hpsCompatiblePass = std::make_shared<GEHpsCompatiblePass>();
     composer.Add(hpsCompatiblePass);
-    composer.Add<GEMesaFusionPass>();
     composer.Add<GEHpsBuildPass>(canvas, context);
+    composer.Add<GEMesaFusionPass>();
     auto composables = GEFilterComposer::BuildComposables(visualEffects);
     auto composerResult = composer.Run(composables);
     if (!composerResult.anyPassChanged) {
@@ -292,31 +292,32 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     }
 
     auto resImage = context.image;
-    bool appliedBlur = hpsCompatiblePass->IsBlurFilterExists();
-    bool appliedBlurAtRuntime = false;
+    bool blurExists = hpsCompatiblePass->IsBlurFilterExists();
+    bool appliedHpsBlur = false;
     bool lastAppliedGE = true;
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
             // dst assigned with src because GE doesn't apply downsample like HPS
-            ShaderFilterEffectContext geContext {resImage, context.src, context.src, true};
+            ShaderFilterEffectContext geContext {resImage, context.src, context.src};
             ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
+            lastAppliedGE = true;
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
-            appliedBlurAtRuntime |= hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
+            appliedHpsBlur |= hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
             lastAppliedGE = false;
         }
     }
 
-    if (appliedBlur != appliedBlurAtRuntime) {
+    if (blurExists != appliedHpsBlur) {
         LOGE("GERender::ApplyHpsGEImageEffect compatiblity check failed, runtime applied blur flag != checked blur");
     }
     outImage = resImage;
     if (lastAppliedGE) { // ApplyHpsEffect have done canvas sync
         DrawToCanvas(canvas, context, outImage, brush);
     }
-    return appliedBlur;
+    return blurExists; // TODO: how to deal with appliedHpsBlur runtime compat?
 }
 
 void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,

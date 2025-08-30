@@ -38,7 +38,6 @@ public:
 private:
     Drawing::GEBezierWarpShaderFilterParams params_;
     std::array<Drawing::Point, BEZIER_WARP_POINT_NUM> destinationPatch_;
-    static const std::string type_;
 
     void InitCtrlPoints(std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;
     void SetPathTo(Drawing::Path &path, std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;

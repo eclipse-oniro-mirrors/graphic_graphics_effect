@@ -43,7 +43,6 @@ public:
 private:
     void GenerateContentLightEffect();
     static std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_;
-    static const std::string type_;
 
     Vector3f lightPosition_;
     Vector4f lightColor_;

@@ -53,8 +53,6 @@ private:
     float rippleCenterY_ = 0.7f;
     uint32_t rippleMode_ = 1;
 
-    static const std::string type_;
-
     inline static const std::string shaderStringSMsend = R"(
         uniform shader image;
         uniform half2 iResolution;

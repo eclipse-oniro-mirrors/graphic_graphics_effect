@@ -42,7 +42,6 @@ public:
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetDisplacementDistortEffect();
     Drawing::GEDisplacementDistortFilterParams params_;
-    static const std::string type_;
 
     inline static const std::string shaderStringDisplacementDistort = R"(
         uniform shader image;

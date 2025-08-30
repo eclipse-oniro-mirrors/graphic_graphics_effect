@@ -61,7 +61,6 @@ private:
     float shockWaveProgressA_ = 0.0f;
     float shockWaveProgressB_ = 0.0f;
     float shockWaveTotalAlpha_ = 1.0f;
-    static const std::string type_;
 
     inline static const std::string shaderStringSoundWave = R"(
         uniform shader image;

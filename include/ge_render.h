@@ -79,9 +79,9 @@ public:
 
 private:
     struct ShaderFilterEffectContext {
-        std::shared_ptr<Drawing::Image> image;
-        Drawing::Rect src;
-        Drawing::Rect dst;
+        std::shared_ptr<Drawing::Image> image {};
+        Drawing::Rect src {};
+        Drawing::Rect dst {};
     };
 
     void ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
