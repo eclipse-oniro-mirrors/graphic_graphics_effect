@@ -65,7 +65,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();
-    Box4f ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, int width, int height);
+    Box4f ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, int width, int height, float& approxLenPixels);
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void PreCalculateRegion(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
         const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
@@ -94,14 +94,15 @@ private:
     std::shared_ptr<Drawing::Canvas> offscreenCanvas_;
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
-    std::vector<float> controlPoints_{}; // fix 64 X 2
+    std::vector<float> controlPoints_{}; // fix 256 X 2 floats for 128 curves
     size_t pointCnt_ = 0; // real input Point Cnt
     std::shared_ptr<GEKawaseBlurShaderFilter> blurShader_ = nullptr;
-    
+
     // grid : curves, boundingbox(xmin, xmax, ymin, ymax)
     std::vector<std::pair<std::vector<float>, Box4f>> curvesInGrid_{};
     std::vector<std::vector<float>> segmentIndex_{};
-
+    std::vector<float> curveWeightPrefix_{};
+    std::vector<float> curveWeightCurrent_{};
 };
 
 } // namespace Rosen
