@@ -16,7 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_FILTER_COMPOSER_PASS_H
 #define GRAPHICS_EFFECT_GE_FILTER_COMPOSER_PASS_H
 #include <memory>
-#include <string>
+#include <string_view>
 #include <vector>
 #include <variant>
 
@@ -65,7 +65,7 @@ class GEFilterComposerPass {
 public:
     virtual ~GEFilterComposerPass() = default;
     // Log only, DO NOT use it for serialization
-    virtual std::string GetLogName() const = 0;
+    virtual std::string_view GetLogName() const = 0;
     // Execute the transform pass for effects
     virtual GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) = 0;
 };

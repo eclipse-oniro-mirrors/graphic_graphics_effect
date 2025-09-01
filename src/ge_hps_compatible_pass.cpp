@@ -16,7 +16,7 @@
 
 namespace OHOS {
 namespace Rosen {
-std::string GEHpsCompatiblePass::GetLogName() const
+std::string_view GEHpsCompatiblePass::GetLogName() const
 {
     return "GEHpsCompatiblePass";
 }

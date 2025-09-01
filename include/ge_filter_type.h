@@ -137,8 +137,9 @@ public:
     static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
                   "FilterType wrongly registered");
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
-    GEFilterParamsWrapper(T&& params) :
-        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::move(params)) {}
+    template<typename U>
+    GEFilterParamsWrapper(U&& params) :
+        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::forward<U>(params)) {}
 
     T data;
 };
@@ -163,6 +164,7 @@ public:
 template<typename T>
 GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
 {
+    static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
     using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
     if (GEFilterParamsTypeInfo<T>::ID == params->id) {
@@ -175,9 +177,11 @@ GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFi
 template<typename T>
 std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
 {
-    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
+    // As the type parameter of an universal reference, T may be U&/const U&, so removing qualifiers is necessary  
+    using TValue = std::remove_cv_t<std::remove_reference_t<T>>; 
+    using ParamType = typename GEFilterParamsWrapper<TValue>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    auto p = std::make_shared<GEFilterParamsWrapper<T>>(std::forward<T>(params));
+    auto p = std::make_shared<GEFilterParamsWrapper<TValue>>(std::forward<T>(params));
     return std::static_pointer_cast<GEFilterParams>(p);
 }
 

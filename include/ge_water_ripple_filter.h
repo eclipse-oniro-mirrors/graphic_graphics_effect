@@ -31,7 +31,7 @@
 namespace OHOS {
 namespace Rosen {
 REGISTER_GEFILTER_TYPEINFO(WATER_RIPPLE, GEWaterRippleFilter,
-                           Drawing::GEWaterRippleFilterParams, Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
+                           Drawing::GEWaterRippleFilterParams, Drawing::GE_FILTER_WATER_RIPPLE);
 class GEWaterRippleFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params);

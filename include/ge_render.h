@@ -18,7 +18,6 @@
 
 #include <memory>
 
-#include "ge_filter_composer.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
@@ -52,9 +51,6 @@ public:
     std::shared_ptr<Drawing::Image> ApplyImageEffect(Drawing::Canvas& canvas,
         Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
         const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
-
-    bool HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
-                          std::shared_ptr<HpsEffectFilter>& hpsEffectFilter);
 
     struct HpsGEImageEffectContext {
         std::shared_ptr<Drawing::Image> image {};

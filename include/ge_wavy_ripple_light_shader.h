@@ -25,7 +25,7 @@
 namespace OHOS {
 namespace Rosen {
 REGISTER_GEFILTER_TYPEINFO(WAVY_RIPPLE_LIGHT, GEWavyRippleLightShader,
-                           Drawing::GEWavyRippleLightShaderParams, Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
+                           Drawing::GEWavyRippleLightShaderParams, Drawing::GE_SHADER_WAVY_RIPPLE_LIGHT);
 class GE_EXPORT GEWavyRippleLightShader : public GEShader {
 
 public:

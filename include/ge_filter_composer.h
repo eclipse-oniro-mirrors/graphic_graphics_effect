@@ -22,7 +22,6 @@
 #include "ge_filter_composer_pass.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
-
 namespace OHOS {
 namespace Rosen {
 class GEFilterComposer {

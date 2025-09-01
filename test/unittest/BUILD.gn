@@ -139,6 +139,8 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_contour_diagonal_flow_light_shader_test.cpp",
     "ge_displacement_distort_shader_filter_test.cpp",
     "ge_edge_light_shader_filter_test.cpp",
+    "ge_filter_composer_test.cpp",
+    "ge_filter_type_test.cpp",
     "ge_frame_gradient_shader_mask_test.cpp",
     "ge_grey_shader_filter_test.cpp",
     "ge_kawase_blur_shader_filter_test.cpp",

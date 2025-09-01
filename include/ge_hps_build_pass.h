@@ -29,7 +29,7 @@ public:
 
     GEHpsBuildPass(Drawing::Canvas& canvas, const HpsGEImageEffectContext &context)
         : canvas_(canvas), context_(context){}
-    std::string GetLogName() const override;
+    std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
 private:
     std::reference_wrapper<Drawing::Canvas> canvas_; // observer only, used for build HpsEffectFilter

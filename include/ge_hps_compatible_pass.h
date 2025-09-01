@@ -20,7 +20,7 @@ namespace OHOS {
 namespace Rosen {
 class GEHpsCompatiblePass : public GEFilterComposerPass {
 public:
-    std::string GetLogName() const override;
+    std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
     bool IsBlurFilterExists() const;
 

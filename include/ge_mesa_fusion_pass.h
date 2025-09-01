@@ -23,7 +23,7 @@ namespace Rosen {
 // Grey + KawaseBlur = MESABlur
 class GEMesaFusionPass : public GEFilterComposerPass {
 public:
-    std::string GetLogName() const override;
+    std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
 };
 }

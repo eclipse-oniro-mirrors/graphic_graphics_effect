@@ -16,7 +16,7 @@
 
 namespace OHOS {
 namespace Rosen {
-std::string GEHpsBuildPass::GetLogName() const
+std::string_view GEHpsBuildPass::GetLogName() const
 {
     return "GEHpsBuildPass";
 }
@@ -53,6 +53,7 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
     }
     if (composed) {
         composables.swap(resultComposables);
+        LOGD("GEHpsBuildPass::Run HPS filter composed");
     }
     return GEFilterComposerPassResult {composed};
 }

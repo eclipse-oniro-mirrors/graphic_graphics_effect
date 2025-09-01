@@ -25,6 +25,7 @@
 #include "ge_displacement_distort_shader_filter.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
+#include "ge_filter_composer.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
@@ -239,7 +240,6 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
         LOGE("GERender::ApplyImageEffect image is null");
         return nullptr;
     }
-    std::vector<std::shared_ptr<GEShaderFilter>> geShaderFilters;
     auto resImage = image;
     for (auto vef: veContainer.GetFilters()) {
         ShaderFilterEffectContext context {resImage, src, dst};
@@ -292,7 +292,6 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     }
 
     auto resImage = context.image;
-    bool blurExists = hpsCompatiblePass->IsBlurFilterExists();
     bool appliedHpsBlur = false;
     bool lastAppliedGE = true;
     for (auto& composable: composables) {
@@ -310,14 +309,13 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
         }
     }
 
-    if (blurExists != appliedHpsBlur) {
-        LOGE("GERender::ApplyHpsGEImageEffect compatiblity check failed, runtime applied blur flag != checked blur");
-    }
     outImage = resImage;
-    if (lastAppliedGE) { // ApplyHpsEffect have done canvas sync
+    if (lastAppliedGE) { // ApplyShaderFilter does not draw to canvas by default
         DrawToCanvas(canvas, context, outImage, brush);
+        return hpsCompatiblePass->IsBlurFilterExists();
+    } else { // ApplyHpsEffect have done canvas sync
+        return appliedHpsBlur; // If false, fallback to HPS 1.0 late-applied kawase blur
     }
-    return blurExists; // TODO: how to deal with appliedHpsBlur runtime compat?
 }
 
 void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
@@ -328,15 +326,6 @@ void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectConte
         canvas.DrawImageRect(*outImage, context.src, context.dst, context.sampling);
         canvas.DetachBrush();
     }
-}
-
-bool GERender::HpsSupportEffect(Drawing::GEVisualEffectContainer& veContainer,
-                                std::shared_ptr<HpsEffectFilter>& hpsEffectFilter)
-{
-    if (hpsEffectFilter == nullptr) {
-        return false;
-    }
-    return hpsEffectFilter->HpsSupportEffectGE(veContainer);
 }
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa

@@ -30,11 +30,12 @@ GEFilterComposer::ComposerRunResult GEFilterComposer::Run(std::vector<GEFilterCo
     ComposerRunResult runResult {false};
     for (auto& pass : passes_) {
         auto result = pass->Run(composables);
+        auto name = pass->GetLogName();
         if (result.changed) {
             runResult.anyPassChanged = true;
+            LOGD("GEFilterComposer::Transform Pass %s changed the effects", name.data());
         } else {
-            auto name = pass->GetLogName();
-            LOGD("GEFilterComposer::Transform Pass %s does not change effects", name.c_str());
+            LOGD("GEFilterComposer::Transform Pass %s does not change effects", name.data());
         }
     }
     return runResult;

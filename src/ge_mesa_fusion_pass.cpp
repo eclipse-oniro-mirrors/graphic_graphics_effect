@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace Rosen {
 
-std::string GEMesaFusionPass::GetLogName() const
+std::string_view GEMesaFusionPass::GetLogName() const
 {
     return "GEMesaFusionPass";
 }
@@ -71,7 +71,6 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
     }
     if (composed) {
         composables.swap(resultComposables);
-        LOGD("GEHpsBuildPass::Run HPS filter composed");
     }
     return GEFilterComposerPassResult {composed};
 }
