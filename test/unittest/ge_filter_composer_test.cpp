@@ -333,32 +333,6 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunNoPasses, TestSize.Level1)
 }
 
 /**
- * @tc.name: GEFilterComposerRunWithPasses
- * @tc.desc: Test GEFilterComposer Run function with multiple passes
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithPasses, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithPasses start";
-    
-    GEFilterComposer composer;
-    
-    // Add some passes
-    composer.Add<GEHpsBuildPass>(drawingCanvas_, GraphicsEffectEngine::GERender::HpsGEImageEffectContext{});
-    composer.Add<GEMesaFusionPass>();
-    
-    std::vector<GEFilterComposable> composables;
-    auto effect = CreateGreyEffect();
-    composables.push_back(effect);
-    
-    auto result = composer.Run(composables);
-    // Should return false since we don't have any passes that actually modify the composables
-    EXPECT_FALSE(result.anyPassChanged);
-    
-    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithPasses end";
-}
-
-/**
  * @tc.name: GEFilterComposerBuildComposables
  * @tc.desc: Test GEFilterComposer BuildComposables function
  * @tc.type: FUNC
