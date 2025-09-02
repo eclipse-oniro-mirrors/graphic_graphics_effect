@@ -159,7 +159,8 @@ static constexpr char PRECALCULATION_PROG[] = R"(
     
     float AbsMin(float a, float b) { return abs(a) < abs(b) ? a : b; }
     
-    vec2 GetElement(vec2 arr[capacity], int index) {
+    vec2 GetElement(vec2 arr[capacity], int index)
+    {
         for (int i = 0; i < capacity; ++i) {
             if (i == index) return arr[i];
         }
@@ -537,6 +538,8 @@ static constexpr char CONVERT_IMG_PROG[] = R"(
     uniform float count;
     uniform float leftGridBoundary;
     uniform float topGridBoundary;
+    uniform float curveWeightPrefix[128]; // 128: the max number of segments
+    uniform float curveWeightCurrent[128]; // 128: the max number of segments
 
     vec4 SampleLocalImage(vec2 coord)
     {
@@ -552,15 +555,25 @@ static constexpr char CONVERT_IMG_PROG[] = R"(
         return vec2(hi, lo);
     }
 
-     vec4 main(vec2 fragCoord)
+    float GetElement(float arr[128], int index) // 128: the max number of segments
+    {
+        for (int i = 0; i < 128; ++i) { // 128: the max number of segments
+            if (i == index) return arr[i];
+        }
+        return 0.0;
+    }
+
+    vec4 main(vec2 fragCoord)
     {
         float segmentCount = 0.5 * count; // 0.5: half amount of the control point count
         vec4 precalculationData = SampleLocalImage(fragCoord);
         vec2 encodedSdf = precalculationData.rg;
-        float closestSegmentIndex = precalculationData.b * 200.0; // 200.0:decode the closestSegmentIndex
+        float decodedIndex = floor(precalculationData.b * 200.0 + 0.5); // 200.0:decode the closestSegmentIndex
+        int closestSegmentIndex = int(decodedIndex);
         float tLocal = precalculationData.a;
 
-        float tGlobal = (closestSegmentIndex + tLocal) / segmentCount;
+        float tGlobal = GetElement(curveWeightPrefix, closestSegmentIndex) +
+            tLocal * GetElement(curveWeightCurrent, closestSegmentIndex);
         return vec4(encodedSdf, tGlobal, 1.0);
     }
 )";
@@ -578,7 +591,7 @@ static constexpr char BLEND_IMG_PROG[] = R"(
     }
     vec4 main(vec2 fragCoord)
     {
-        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg);
+        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg) * 3.0; // 3.0: decode the sdf
         vec4 c1 = image1.eval(fragCoord).rgba;
         vec4 c2 = image2.eval(fragCoord).rgba;
         float totalWeight = (weight1 + weight2 < 1e-5) ? 1.0 : weight1 + weight2;
@@ -821,18 +834,46 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
         static_cast<float>(height),
         0.0f,
     };
-    for (int i = 0; i < numCurves_; ++i) {
-        Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, width, height);
+
+    curveWeightPrefix_.assign(MIN_GRID_SIZE, 0.0f);
+    curveWeightCurrent_.assign(MIN_GRID_SIZE, 0.0f);
+    std::vector<float> rawWeight(numCurves_, 0.0f);
+    float approxLen = 0.0f;
+    float sumWeight = 0.0f;
+
+    for (size_t i = 0; i < numCurves_; ++i) {
+        Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, width, height, approxLen);
         curveBBoxes.push_back(bbox);
         canvasBBox[XMIN_I] = std::min(bbox[XMIN_I], canvasBBox[XMIN_I]);
         canvasBBox[XMAX_I] = std::max(bbox[XMAX_I], canvasBBox[XMAX_I]);
         canvasBBox[YMIN_I] = std::min(bbox[YMIN_I], canvasBBox[YMIN_I]);
         canvasBBox[YMAX_I] = std::max(bbox[YMAX_I], canvasBBox[YMAX_I]);
+
+        rawWeight[i] = approxLen;
+        sumWeight += rawWeight[i];
+    }
+
+    if (!FEqual(sumWeight, 0.0f)) {
+        float acc = 0.0f;
+        for (size_t i = 0; i < numCurves_; ++i) {
+            float weight = rawWeight[i] / sumWeight;
+            curveWeightPrefix_[i] = acc;
+            curveWeightCurrent_[i] = weight;
+            acc += weight;
+        }
+    } else if (numCurves_ != 0) {
+        const float uniformWeight = 1.0f / static_cast<float>(numCurves_);
+        float acc = 0.0f;
+        for (size_t i = 0; i < numCurves_; ++i) {
+            curveWeightPrefix_[i] = acc;
+            curveWeightCurrent_[i] = uniformWeight;
+            acc += uniformWeight;
+        }
     }
 }
 
 Box4f GEContourDiagonalFlowLightShader::ComputeCurveBoundingBox(
-    size_t curveIndex, float maxThickness, int width, int height)
+    size_t curveIndex, float maxThickness, int width, int height, float& approxLenPixels)
 {
     float x0 = controlPoints_[4 * curveIndex];      // startPoint x
     float y0 = controlPoints_[4 * curveIndex + 1];  // startPoint y
@@ -845,7 +886,28 @@ Box4f GEContourDiagonalFlowLightShader::ComputeCurveBoundingBox(
     float minY = std::min({y0, cy, y1}) - maxThickness;
     float maxY = std::max({y0, cy, y1}) + maxThickness;
     // map ndc to [0, 1]
-    float aspect = width / (FEqual(height, 0.0f) ? 1.0f : height);
+    float aspect;
+    if (height == 0 || width == 0) {
+        aspect = 1.0f;
+    } else {
+        aspect = static_cast<float>(width) / static_cast<float>(height);
+    }
+
+    auto NdcToPix = [&aspect, &width, &height](float xNdc, float yNdc) -> std::pair<float, float> {
+        float xPix = ((xNdc / aspect) + 1.0f) * 0.5f * static_cast<float>(width);
+        float yPix = (yNdc + 1.0f) * 0.5f * static_cast<float>(height);
+        return {xPix, yPix};
+    };
+
+    auto dist = [](float ax, float ay, float bx, float by) {
+        return std::hypot(bx - ax, by - ay);
+    };
+
+    auto [x0p, y0p] = NdcToPix(x0, y0);
+    auto [cxp, cyp] = NdcToPix(cx, cy);
+    auto [x1p, y1p] = NdcToPix(x1, y1);
+    approxLenPixels = dist(x0p, y0p, cxp, cyp) + dist(cxp, cyp, x1p, y1p);
+
     minX = std::floor((minX / aspect + 1.0f) / 2.0f * width);
     maxX = std::ceil((maxX / aspect + 1.0f) / 2.0f * width);
     minY = std::floor((minY + 1.0f) / 2.0f * height);
@@ -1038,6 +1100,8 @@ void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const
     convertBuilder->SetUniform("count", static_cast<float>(pointCnt_));
     convertBuilder->SetUniform("leftGridBoundary", static_cast<float>(rect.GetLeft()));
     convertBuilder->SetUniform("topGridBoundary", static_cast<float>(rect.GetTop()));
+    convertBuilder->SetUniform("curveWeightPrefix", curveWeightPrefix_.data(), curveWeightPrefix_.size());
+    convertBuilder->SetUniform("curveWeightCurrent", curveWeightCurrent_.data(), curveWeightCurrent_.size());
     auto convertShader = convertBuilder->MakeShader(nullptr, false);
     if (convertShader == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg convertShader is nullptr.");
