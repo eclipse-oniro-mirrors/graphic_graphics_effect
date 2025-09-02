@@ -173,7 +173,7 @@ GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFi
     static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
     using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    if (GEFilterParamsTypeInfo<T>::ID == params->id) {
+    if (GEFilterParamsTypeInfo<ParamType>::ID == params->id) {
         return std::static_pointer_cast<GEFilterParamsWrapper<T>>(params)->data;
     }
     return GEFilterParamsWrapper<T>::Null;

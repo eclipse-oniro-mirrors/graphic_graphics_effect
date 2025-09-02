@@ -75,7 +75,7 @@ std::shared_ptr<Drawing::GEVisualEffect> GEFilterComposerTest::CreateKawaseBlurE
 
 std::shared_ptr<Drawing::GEVisualEffect> GEFilterComposerTest::CreateMesaBlurEffect()
 {
-    auto effect = CreateVisualEffect(Drawing::GE_FILTER_GREY);
+    auto effect = CreateVisualEffect(Drawing::GE_FILTER_MESA_BLUR);
     Drawing::GEMESABlurShaderFilterParams params { 2, 0.5f, 0.5f };
     effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, params.radius);
     effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, params.greyCoef1);

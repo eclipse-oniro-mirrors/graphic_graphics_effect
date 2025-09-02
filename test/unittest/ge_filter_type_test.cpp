@@ -50,11 +50,11 @@ HWTEST_F(GEFilterTypeTest, BoxUnboxGreyShader, TestSize.Level1)
     
     // Box the params into type-erased GEFilterParams
     auto boxedParams = GEFilterParams::Box(params);
-    EXPECT_NE(boxedParams, nullptr);
+    ASSERT_NE(boxedParams, nullptr);
     
     // Unbox back to original type
     auto unboxedParams = GEFilterParams::Unbox<Drawing::GEGreyShaderFilterParams>(boxedParams);
-    EXPECT_TRUE(unboxedParams.has_value());
+    ASSERT_TRUE(unboxedParams.has_value());
     
     // Verify values match
     EXPECT_EQ(unboxedParams->greyCoef1, params.greyCoef1);
@@ -77,11 +77,11 @@ HWTEST_F(GEFilterTypeTest, BoxUnboxKawaseBlur, TestSize.Level1)
     
     // Box the params into type-erased GEFilterParams
     auto boxedParams = GEFilterParams::Box(params);
-    EXPECT_NE(boxedParams, nullptr);
+    ASSERT_NE(boxedParams, nullptr);
     
     // Unbox back to original type
     auto unboxedParams = GEFilterParams::Unbox<Drawing::GEKawaseBlurShaderFilterParams>(boxedParams);
-    EXPECT_TRUE(unboxedParams.has_value());
+    ASSERT_TRUE(unboxedParams.has_value());
     
     // Verify values match
     EXPECT_EQ(unboxedParams->radius, params.radius);
@@ -103,11 +103,11 @@ HWTEST_F(GEFilterTypeTest, BoxUnboxSharedPtr, TestSize.Level1)
     
     // Box the shared_ptr params into type-erased GEFilterParams
     auto boxedParams = GEFilterParams::Box(params);
-    EXPECT_NE(boxedParams, nullptr);
+    ASSERT_NE(boxedParams, nullptr);
     
     // Unbox back to original shared_ptr type
     auto unboxedParams = GEFilterParams::Unbox<std::shared_ptr<Drawing::GEGreyShaderFilterParams>>(boxedParams);
-    EXPECT_NE(unboxedParams, nullptr);
+    ASSERT_NE(unboxedParams, nullptr);
     
     // Verify values match
     EXPECT_EQ(unboxedParams->greyCoef1, params->greyCoef1);
@@ -130,7 +130,7 @@ HWTEST_F(GEFilterTypeTest, InvalidUnbox, TestSize.Level1)
     
     // Box the params
     auto boxedParams = GEFilterParams::Box(params);
-    EXPECT_NE(boxedParams, nullptr);
+    ASSERT_NE(boxedParams, nullptr);
     
     // Try to unbox with wrong type - should return empty optional
     auto unboxedParams = GEFilterParams::Unbox<Drawing::GEKawaseBlurShaderFilterParams>(boxedParams);
