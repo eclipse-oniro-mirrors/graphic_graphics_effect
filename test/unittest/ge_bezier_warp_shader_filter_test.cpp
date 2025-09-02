@@ -145,6 +145,7 @@ HWTEST_F(GEBezierWarpShaderFilterTest, Type_001, TestSize.Level2)
 {
     Drawing::GEBezierWarpShaderFilterParams geBezierWarpShaderFilterParams;
     auto geBezierWarpShaderFilter = std::make_unique<GEBezierWarpShaderFilter>(geBezierWarpShaderFilterParams);
+    EXPECT_EQ(geBezierWarpShaderFilter->Type(), Drawing::GEFilterType::BEZIER_WARP);
     EXPECT_EQ(geBezierWarpShaderFilter->TypeName(), Drawing::GE_FILTER_BEZIER_WARP);
 }
 } // namespace Rosen

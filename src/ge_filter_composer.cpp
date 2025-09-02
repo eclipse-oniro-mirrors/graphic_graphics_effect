@@ -22,7 +22,11 @@ namespace Rosen {
 
 void GEFilterComposer::Add(std::shared_ptr<GEFilterComposerPass> pass)
 {
-    passes_.push_back(pass);
+    if (pass != nullptr) {
+        passes_.push_back(pass);
+    } else {
+        LOGE("GEFilterComposer::Add nullptr pass found");
+    }
 }
 
 GEFilterComposer::ComposerRunResult GEFilterComposer::Run(std::vector<GEFilterComposable>& composables) const

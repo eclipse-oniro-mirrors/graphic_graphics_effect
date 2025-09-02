@@ -236,7 +236,7 @@ struct GEFilterTypeInfoStaticCheck {
 };
 
 // Declare the Type and TypeName functions for a given GEFilter class
-// Notice: Self parameter is techincally not required since Self can be deduced from *this. Current implementation
+// Macro hint: Self parameter is techincally not required since Self can be deduced from *this. Current implementation
 // requires Self to be manually specified to prevent hard-to-read compile errors when the macro is wrongly used.
 #define DECLARE_GEFILTER_TYPEFUNC(Self) \
     ::OHOS::Rosen::Drawing::GEFilterType Type() const override \

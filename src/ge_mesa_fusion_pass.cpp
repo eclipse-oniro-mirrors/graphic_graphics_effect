@@ -31,8 +31,8 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
     using Drawing::GEFilterType;
     std::vector<GEFilterComposable> resultComposables;
     bool composed = false;
-    for (size_t i = 0; i < composables.size() - 1; ++i) {
-        size_t j = i + 1;
+    for (size_t i = 0; i < composables.size() - 1; ++i) { 
+        size_t j = i + 1; // The reason why i < composables.size() - 1. 2 objects are processed every loop.
         auto iEffect = composables[i].GetEffect();
         auto jEffect = composables[j].GetEffect();
         if (iEffect == nullptr || jEffect == nullptr) {

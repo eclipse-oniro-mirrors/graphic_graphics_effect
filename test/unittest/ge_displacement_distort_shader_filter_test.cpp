@@ -118,6 +118,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, Type_001, TestSize.Level2)
 {
     Drawing::GEDisplacementDistortFilterParams geDisplacementDistortFilterParams;
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
+    EXPECT_EQ(geDisplacementDistortFilter->Type(), Drawing::GEFilterType::DISPLACEMENT_DISTORT_FILTER);
     EXPECT_EQ(geDisplacementDistortFilter->TypeName(), Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
 }
 

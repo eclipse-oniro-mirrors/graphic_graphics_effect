@@ -209,6 +209,7 @@ HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
     Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
         0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::MAGNIFIER);
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_MAGNIFIER);
 }
 

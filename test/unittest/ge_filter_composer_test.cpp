@@ -19,6 +19,7 @@
 
 #include "ge_filter_type.h"
 #include "ge_filter_composer_pass.h"
+#include "ge_filter_composer.h"
 #include "ge_hps_build_pass.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_hps_compatible_pass.h"
@@ -311,6 +312,136 @@ HWTEST_F(GEFilterComposerTest, HpsCompatiblePassRunWithoutBlur, TestSize.Level1)
     EXPECT_FALSE(exists);
     
     GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithoutBlur end";
+}
+
+/**
+ * @tc.name: GEFilterComposerRunNoPasses
+ * @tc.desc: Test GEFilterComposer Run function with no passes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerRunNoPasses, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunNoPasses start";
+    
+    GEFilterComposer composer;
+    std::vector<GEFilterComposable> composables;
+    
+    auto result = composer.Run(composables);
+    EXPECT_FALSE(result.anyPassChanged);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunNoPasses end";
+}
+
+/**
+ * @tc.name: GEFilterComposerRunWithPasses
+ * @tc.desc: Test GEFilterComposer Run function with multiple passes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithPasses, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithPasses start";
+    
+    GEFilterComposer composer;
+    
+    // Add some passes
+    composer.Add<GEHpsBuildPass>(drawingCanvas_, GraphicsEffectEngine::GERender::HpsGEImageEffectContext{});
+    composer.Add<GEMesaFusionPass>();
+    
+    std::vector<GEFilterComposable> composables;
+    auto effect = CreateGreyEffect();
+    composables.push_back(effect);
+    
+    auto result = composer.Run(composables);
+    // Should return false since we don't have any passes that actually modify the composables
+    EXPECT_FALSE(result.anyPassChanged);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithPasses end";
+}
+
+/**
+ * @tc.name: GEFilterComposerBuildComposables
+ * @tc.desc: Test GEFilterComposer BuildComposables function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerBuildComposables, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerBuildComposables start";
+    
+    // Create some visual effects
+    std::vector<std::shared_ptr<Drawing::GEVisualEffect>> effects;
+    auto greyEffect = CreateGreyEffect();
+    effects.push_back(greyEffect);
+    auto kawaseBlurEffect = CreateKawaseBlurEffect();
+    effects.push_back(kawaseBlurEffect);
+    
+    auto composables = GEFilterComposer::BuildComposables(effects);
+    
+    EXPECT_EQ(composables.size(), 2);
+    
+    // Check that the composables contain the expected effects
+    EXPECT_EQ(composables[0].GetEffect(), greyEffect);
+    EXPECT_EQ(composables[1].GetEffect(), kawaseBlurEffect);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerBuildComposables end";
+}
+
+/**
+ * @tc.name: GEFilterComposerAddNullPass
+ * @tc.desc: Test GEFilterComposer Add function with null pass
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerAddNullPass, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerAddNullPass start";
+    
+    GEFilterComposer composer;
+    
+    // This should not crash and should just ignore the null pass
+    std::shared_ptr<GEFilterComposerPass> nullPass = nullptr;
+    composer.Add(nullPass);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerAddNullPass end";
+}
+
+/**
+ * @tc.name: GEFilterComposerTemplateAdd
+ * @tc.desc: Test GEFilterComposer template Add function with pass constructor args
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerTemplateAdd, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerTemplateAdd start";
+    
+    GEFilterComposer composer;
+    
+    // Test template Add with constructor arguments
+    GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
+    context.image = nullptr; // Not used in this test
+    composer.Add<GEHpsBuildPass>(drawingCanvas_, context);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerTemplateAdd end";
+}
+
+/**
+ * @tc.name: GEFilterComposerRunWithChanges
+ * @tc.desc: Test GEFilterComposer Run function when passes make changes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges start";
+    
+    GEFilterComposer composer;
+    composer.Add<GEMesaFusionPass>();
+    
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(CreateGreyEffect());
+    composables.push_back(CreateKawaseBlurEffect());
+    
+    auto result = composer.Run(composables);
+    EXPECT_TRUE(result.anyPassChanged);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges end";
 }
 
 } // namespace Rosen

@@ -232,6 +232,7 @@ HWTEST_F(GEAIBarShaderFilterTest, Type_001, TestSize.Level3)
     Drawing::GEAIBarShaderFilterParams geAIBarShaderFilterParams { 0.0, 0.0, 0.0, 0.0, 0.0 };
     std::unique_ptr<GEAIBarShaderFilter> geAIBarShaderFilter =
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
+    EXPECT_EQ(geAIBarShaderFilter->Type(), Drawing::GEFilterType::AIBAR);
     EXPECT_EQ(geAIBarShaderFilter->TypeName(), Drawing::GE_FILTER_AI_BAR);
 
     GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest Type_001 end";

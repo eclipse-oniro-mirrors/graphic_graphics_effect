@@ -119,6 +119,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, Type_001, TestSize.Level0)
     Rosen::Drawing::GEEdgeLightShaderFilterParams
         geEdgeLightShaderParams{ 1.0f, true, color, nullptr, false };
     auto geEdgeLightShaderFilter = std::make_shared<Rosen::GEEdgeLightShaderFilter>(geEdgeLightShaderParams);
+    EXPECT_EQ(geEdgeLightShaderFilter->Type(), Drawing::GEFilterType::EDGE_LIGHT);
     EXPECT_EQ(geEdgeLightShaderFilter->TypeName(), Drawing::GE_FILTER_EDGE_LIGHT);
 }
 
