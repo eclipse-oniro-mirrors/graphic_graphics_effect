@@ -32,8 +32,8 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
     bool composed = false;
     for (auto& composable: composables) {
         auto effect = composable.GetEffect();
-        if (effect == nullptr) { // save the composed hps filter and leave non-VisualEffects as is
-            if (composedHpsFilter != nullptr) {
+        if (effect == nullptr || !hpsEffectFilter->IsEffectSupported(effect)) { 
+            if (composedHpsFilter != nullptr) { // save the composed hps filter and leave non-VisualEffects as is
                 resultComposables.push_back(composedHpsFilter);
                 composedHpsFilter = nullptr;
             }
