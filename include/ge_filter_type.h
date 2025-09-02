@@ -101,96 +101,6 @@ struct GEFilterParamsTypeInfo {
         using FilterType = void; \
     }
 
-// Type-erasured params class
-class GEFilterParams {
-public:
-    template<typename T>
-    struct OptionalTypeTrait { using Type = std::optional<T>; };
-    template<typename T>
-    struct OptionalTypeTrait<std::shared_ptr<T>> { using Type = std::shared_ptr<T>; };
-    template<typename T>
-    using OptionalType = typename OptionalTypeTrait<T>::Type;
-
-    template<typename T>
-    static constexpr bool IsRegisteredFilterTypeInfo = GEFilterTypeInfo<T>::ID != GEFilterType::NONE;
-    template<typename T>
-    static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfo<T>::ID != GEFilterType::NONE;
-
-    template<typename T>
-    static OptionalType<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
-    template<typename T>
-    static std::shared_ptr<GEFilterParams> Box(T&& params);
-
-    virtual ~GEFilterParams() = default;
-protected:
-    GEFilterParams(GEFilterType type) : id(type) {}
-    GEFilterType id;
-};
-
-// Type-specific proxy wrapper of params
-template<typename T>
-class GEFilterParamsWrapper : public GEFilterParams {
-public:
-    using ParamType = T;
-    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
-    static constexpr std::nullopt_t Null = std::nullopt;
-    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
-                  "FilterType wrongly registered");
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
-    template<typename U>
-    GEFilterParamsWrapper(U&& params) :
-        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID),
-        data(std::forward<U>(params)) 
-    {
-    }
-
-    T data;
-};
-
-// Type-specific proxy wrapper of params, specialization of std::shared_ptr<T> for handy use
-template<typename T>
-class GEFilterParamsWrapper<std::shared_ptr<T>>: public GEFilterParams {
-public:
-    using ParamType = T;
-    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
-    static constexpr std::nullptr_t Null = nullptr;
-    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
-                  "FilterType wrongly registered");
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
-    GEFilterParamsWrapper(const std::shared_ptr<T>& params) :
-        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID),
-        data(params)
-    {
-    }
-
-    std::shared_ptr<T> data;
-};
-
-// Checked downcast from GEFilterParams to specific params type
-template<typename T>
-GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
-{
-    static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
-    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    if (GEFilterParamsTypeInfo<ParamType>::ID == params->id) {
-        return std::static_pointer_cast<GEFilterParamsWrapper<T>>(params)->data;
-    }
-    return GEFilterParamsWrapper<T>::Null;
-}
-
-// Upcast from specific params type to type-erasured GEFilterParams
-template<typename T>
-std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
-{
-    // As the type parameter of an universal reference, T may be U&/const U&, so removing qualifiers is necessary  
-    using TValue = std::remove_cv_t<std::remove_reference_t<T>>; 
-    using ParamType = typename GEFilterParamsWrapper<TValue>::ParamType;
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    auto p = std::make_shared<GEFilterParamsWrapper<TValue>>(std::forward<T>(params));
-    return std::static_pointer_cast<GEFilterParams>(p);
-}
-
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
 // Currently, you SHOULD NOT add member varaibles or any stateful data members to this class.
 struct IGEFilterType {
@@ -209,12 +119,6 @@ struct IGEFilterType {
     {
         return "IGEFilterType";
     }
-    
-    // Convert unpacked params back into original params type, used in GEFilterComposer
-    virtual std::shared_ptr<GEFilterParams> Params() const
-    {
-        return nullptr;
-    }
 };
 
 // Compile time static check to ensure DECLARE_GEFILTER_TYPEFUNC is used correctly
@@ -225,14 +129,6 @@ struct GEFilterTypeInfoStaticCheck {
     static_assert(IsGEFilterType, "T must implement IGEFilterType");
 
     static_assert(!std::is_void_v<typename GEFilterTypeInfo<T>::ParamType>, "Unregistered GEFilter type");
-    static_assert(std::is_same_v<typename GEFilterParamsWrapper<ParamType>::ParamType, ParamType>);
-    static_assert(std::is_same_v<typename GEFilterParamsWrapper<ParamType>::FilterType, T>);
-    static_assert(std::is_same_v<typename GEFilterParamsWrapper<std::shared_ptr<ParamType>>::ParamType, ParamType>);
-    static_assert(std::is_same_v<typename GEFilterParamsWrapper<std::shared_ptr<ParamType>>::FilterType, T>);
-    using UnboxValueType = decltype(GEFilterParams::Unbox<ParamType>(std::shared_ptr<GEFilterParams>()));
-    using UnboxPtrType = decltype(GEFilterParams::Unbox<std::shared_ptr<ParamType>>(std::shared_ptr<GEFilterParams>()));
-    static_assert(std::is_same_v<UnboxValueType, std::optional<ParamType>>);
-    static_assert(std::is_same_v<UnboxPtrType, std::shared_ptr<ParamType>>);
 };
 
 // Declare the Type and TypeName functions for a given GEFilter class

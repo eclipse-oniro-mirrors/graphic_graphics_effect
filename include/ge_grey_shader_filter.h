@@ -29,8 +29,6 @@ public:
     ~GEGreyShaderFilter() override = default;
     DECLARE_GEFILTER_TYPEFUNC(GEGreyShaderFilter);
 
-    std::shared_ptr<Drawing::GEFilterParams> Params() const override;
-
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 

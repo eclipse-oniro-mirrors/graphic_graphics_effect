@@ -31,11 +31,6 @@ GEGreyShaderFilter::GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& 
     }
 }
 
-std::shared_ptr<Drawing::GEFilterParams> GEGreyShaderFilter::Params() const
-{
-    return Drawing::GEFilterParams::Box(Drawing::GEGreyShaderFilterParams {greyCoef1_, greyCoef2_});
-}
-
 static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
 
 std::shared_ptr<Drawing::Image> GEGreyShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
