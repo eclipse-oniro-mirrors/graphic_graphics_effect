@@ -49,7 +49,7 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
             && jImpl->GetFilterType() == GEFilterType::KAWASE_BLUR) {
             auto&& greyParams = iImpl->GetGreyParams();
             auto&& blurParams = jImpl->GetKawaseParams();
-            auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR, 
+            auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
                 Drawing::DrawingPaintType::BRUSH);
             mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
             mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
@@ -64,7 +64,7 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
             resultComposables.push_back(mesaFilter);
             i = j; // consumed 2 effects, skip composed j
             composed = true;
-            LOGD("GEMesaFusionPass::Run Grey kawase fused");
+            LOGD("GEMesaFusionPass::Run Grey Kawase fused");
         } else {
             resultComposables.push_back(composables[i]);
         }

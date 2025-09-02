@@ -68,7 +68,7 @@ enum class GEFilterType : int32_t {
 };
 
 template<typename T>
-struct GEFilterTypeInfo { 
+struct GEFilterTypeInfo {
     static constexpr GEFilterType ID = GEFilterType::NONE;
     static constexpr std::string_view Name = "";
     using ParamType = void;
@@ -91,7 +91,7 @@ struct GEFilterParamsTypeInfo {
     template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
         using FilterType = FILTER_TYPE; \
-    };
+    }
 
 // Register type info for certain GE Filter Param type without Filter type (Non-instructive)
 // Used on extension filter only when its param type is known and possibly used in GEVisualEffectImpl
@@ -99,7 +99,7 @@ struct GEFilterParamsTypeInfo {
     template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
         using FilterType = void; \
-    };
+    }
 
 // Type-erasured params class
 class GEFilterParams {
@@ -129,7 +129,7 @@ protected:
 
 // Type-specific proxy wrapper of params
 template<typename T>
-class GEFilterParamsWrapper: public GEFilterParams {
+class GEFilterParamsWrapper : public GEFilterParams {
 public:
     using ParamType = T;
     using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
@@ -139,7 +139,10 @@ public:
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
     template<typename U>
     GEFilterParamsWrapper(U&& params) :
-        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::forward<U>(params)) {}
+        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID),
+        data(std::forward<U>(params)) 
+    {
+    }
 
     T data;
 };
@@ -155,7 +158,10 @@ public:
                   "FilterType wrongly registered");
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
     GEFilterParamsWrapper(const std::shared_ptr<T>& params) :
-        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(params) {}
+        GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID),
+        data(params)
+    {
+    }
 
     std::shared_ptr<T> data;
 };
@@ -193,13 +199,13 @@ struct IGEFilterType {
     virtual ~IGEFilterType() = default;
 
     // For runtime-type identification
-    virtual GEFilterType Type() const 
+    virtual GEFilterType Type() const
     {
         return Drawing::GEFilterType::NONE;
     }
 
     // Readonly type string for tracing/logging only, NOT INTENTED for serialization
-    virtual const std::string_view TypeName() const 
+    virtual const std::string_view TypeName() const
     {
         return "IGEFilterType";
     }
@@ -230,16 +236,18 @@ struct GEFilterTypeInfoStaticCheck {
 };
 
 // Declare the Type and TypeName functions for a given GEFilter class
-// Notice: Self parameter is techincally not required since Self can be deduced from *this. Current implementation 
+// Notice: Self parameter is techincally not required since Self can be deduced from *this. Current implementation
 // requires Self to be manually specified to prevent hard-to-read compile errors when the macro is wrongly used.
 #define DECLARE_GEFILTER_TYPEFUNC(Self) \
-    ::OHOS::Rosen::Drawing::GEFilterType Type() const override { \
+    ::OHOS::Rosen::Drawing::GEFilterType Type() const override \
+    { \
         static_assert(std::is_same_v<Self, std::remove_cv_t<std::remove_reference_t<decltype(*this)>>>, \
-            "DECLARE_GEFILTER_TYPEFUNC: Macro used outside class scope or incorrect Self type"); \
+            "DECLARE_GEFILTER_TYPEFUNC: Macro is used outside class scope / Incorrect Self type"); \
         static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
         return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID; \
     } \
-    const std::string_view TypeName() const override { \
+    const std::string_view TypeName() const override \
+    { \
         return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::Name; \
     }
 

@@ -141,7 +141,8 @@ GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurSh
     }
 }
 
-std::shared_ptr<Drawing::GEFilterParams> GEKawaseBlurShaderFilter::Params() const {
+std::shared_ptr<Drawing::GEFilterParams> GEKawaseBlurShaderFilter::Params() const
+{
     return Drawing::GEFilterParams::Box(Drawing::GEKawaseBlurShaderFilterParams {radius_});
 }
 

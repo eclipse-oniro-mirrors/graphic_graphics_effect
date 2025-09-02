@@ -28,7 +28,7 @@ public:
     using HpsGEImageEffectContext = GraphicsEffectEngine::GERender::HpsGEImageEffectContext;
 
     GEHpsBuildPass(Drawing::Canvas& canvas, const HpsGEImageEffectContext &context)
-        : canvas_(canvas), context_(context){}
+        : canvas_(canvas), context_(context) {}
     std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
 private:

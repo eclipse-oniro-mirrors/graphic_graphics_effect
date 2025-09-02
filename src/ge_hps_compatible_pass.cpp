@@ -33,8 +33,11 @@ GEFilterComposerPassResult GEHpsCompatiblePass::Run(std::vector<GEFilterComposab
     for (auto& composable: composables) {
         if (auto effect = composable.GetEffect(); effect != nullptr) {
             auto ve = effect->GetImpl();
-            if (ve != nullptr && (ve->GetFilterType() == GEFilterType::KAWASE_BLUR 
-                                  || ve->GetFilterType() == GEFilterType::MESA_BLUR)) {
+            if (ve == nullptr) {
+                continue;
+            }
+            auto type = ve->GetFilterType();
+            if (type == GEFilterType::KAWASE_BLUR || type == GEFilterType::MESA_BLUR) {
                 blurFilterExists_ = true;
                 break;
             }

@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Rosen {
 constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
 
-REGISTER_GEFILTER_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilter, 
+REGISTER_GEFILTER_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilter,
                            Drawing::GEBezierWarpShaderFilterParams, Drawing::GE_FILTER_BEZIER_WARP);
 class GEBezierWarpShaderFilter : public GEShaderFilter {
 public:

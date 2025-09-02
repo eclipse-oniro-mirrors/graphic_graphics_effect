@@ -160,10 +160,10 @@ HWTEST_F(GEFilterTypeTest, TypeRegistration, TestSize.Level1)
     
     // Test type info access
     EXPECT_EQ(Drawing::GEFilterTypeInfo<GEGreyShaderFilter>::ID, Drawing::GEFilterType::GREY);
-    EXPECT_EQ(Drawing::GEFilterParamsTypeInfo<Drawing::GEGreyShaderFilterParams>::ID, Drawing::GEFilterType::GREY);    
+    EXPECT_EQ(Drawing::GEFilterParamsTypeInfo<Drawing::GEGreyShaderFilterParams>::ID, Drawing::GEFilterType::GREY);
     EXPECT_EQ(Drawing::GEFilterTypeInfo<GEKawaseBlurShaderFilter>::ID, Drawing::GEFilterType::KAWASE_BLUR);
-    EXPECT_EQ(Drawing::GEFilterParamsTypeInfo<Drawing::GEKawaseBlurShaderFilterParams>::ID, 
-              Drawing::GEFilterType::KAWASE_BLUR);    
+    EXPECT_EQ(Drawing::GEFilterParamsTypeInfo<Drawing::GEKawaseBlurShaderFilterParams>::ID,
+              Drawing::GEFilterType::KAWASE_BLUR);
 
     GTEST_LOG_(INFO) << "GEFilterTypeTest GEFilterParamsTypeRegistration end";
 }

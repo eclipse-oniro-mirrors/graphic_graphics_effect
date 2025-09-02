@@ -43,7 +43,7 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
         if (composedHpsFilter == nullptr) {
             composedHpsFilter = std::make_shared<HpsEffectFilter>(canvas_);
         }
-        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(), 
+        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(),
             context_.src, context_.dst, context_.saturationForHPS, context_.brightnessForHPS, context_.image);
         composed = true;
     }
