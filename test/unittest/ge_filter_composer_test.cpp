@@ -81,6 +81,13 @@ std::shared_ptr<Drawing::GEVisualEffect> GEFilterComposerTest::CreateMesaBlurEff
     effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, params.radius);
     effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, params.greyCoef1);
     effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, params.greyCoef2);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_X, 0.f);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Y, 0.f);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Z, 0.f);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W, 0.f);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE, 0);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_WIDTH, 0.f);
+    effect->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_HEIGHT, 0.f);
     return effect;
 }
 

@@ -20,7 +20,6 @@
 namespace OHOS {
 namespace Rosen {
 
-// Grey + KawaseBlur = MESABlur
 class GEMesaFusionPass : public GEFilterComposerPass {
 public:
     std::string_view GetLogName() const override;
