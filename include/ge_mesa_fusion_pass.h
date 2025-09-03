@@ -25,6 +25,11 @@ class GEMesaFusionPass : public GEFilterComposerPass {
 public:
     std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
+private:
+    static std::shared_ptr<Drawing::GEVisualEffect> ComposeGreyKawase(
+        const std::shared_ptr<Drawing::GEGreyShaderFilterParams>& greyParams,
+        const std::shared_ptr<Drawing::GEKawaseBlurShaderFilterParams>& blurParams
+    );
 };
 }
 }

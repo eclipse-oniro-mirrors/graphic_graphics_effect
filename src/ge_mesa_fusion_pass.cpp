@@ -31,8 +31,12 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
     using Drawing::GEFilterType;
     std::vector<GEFilterComposable> resultComposables;
     bool composed = false;
-    for (size_t i = 0; i < composables.size() - 1; ++i) {
-        size_t j = i + 1; // The reason why i < composables.size() - 1. 2 objects are processed every loop.
+    for (size_t i = 0; i < composables.size(); ++i) {
+        if (i == composables.size() - 1) { // The last one when composables.size() is odd
+            resultComposables.push_back(composables[i]);
+            continue;
+        }
+        size_t j = i + 1;
         auto iEffect = composables[i].GetEffect();
         auto jEffect = composables[j].GetEffect();
         if (iEffect == nullptr || jEffect == nullptr) {
@@ -49,20 +53,8 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
             && jImpl->GetFilterType() == GEFilterType::KAWASE_BLUR) {
             auto&& greyParams = iImpl->GetGreyParams();
             auto&& blurParams = jImpl->GetKawaseParams();
-            auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
-                Drawing::DrawingPaintType::BRUSH);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_X, 0.f);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Y, 0.f);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Z, 0.f);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W, 0.f);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE, 0);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_WIDTH, 0.f);
-            mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_HEIGHT, 0.f);
-            resultComposables.push_back(mesaFilter);
-            i = j; // consumed 2 effects, skip composed j
+            resultComposables.push_back(ComposeGreyKawase(greyParams, blurParams));
+            i = j; // consumed 2 effects, skip composed j, next loop will be j+1
             composed = true;
             LOGD("GEMesaFusionPass::Run Grey Kawase fused");
         } else {
@@ -73,6 +65,25 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
         composables.swap(resultComposables);
     }
     return GEFilterComposerPassResult {composed};
+}
+
+std::shared_ptr<Drawing::GEVisualEffect> GEMesaFusionPass::ComposeGreyKawase(
+    const std::shared_ptr<Drawing::GEGreyShaderFilterParams>& greyParams,
+    const std::shared_ptr<Drawing::GEKawaseBlurShaderFilterParams>& blurParams)
+{
+    auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
+        Drawing::DrawingPaintType::BRUSH);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_X, 0.f);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Y, 0.f);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Z, 0.f);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W, 0.f);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE, 0);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_WIDTH, 0.f);
+    mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_HEIGHT, 0.f);
+    return mesaFilter;
 }
 
 }
