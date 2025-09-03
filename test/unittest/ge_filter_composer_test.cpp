@@ -253,6 +253,40 @@ HWTEST_F(GEFilterComposerTest, MesaFusionPassRunWithFusion, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MesaFusionPassRunOddSize
+ * @tc.desc: Test GEMesaFusionPass Run function with odd number of composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, MesaFusionPassRunOddSize, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassRunOddSize start";
+    
+    GEMesaFusionPass pass;
+    
+    std::vector<GEFilterComposable> composables;
+    // Add 3 effects: grey -> kawase blur -> grey (no fusion)
+    auto greyEffect1 = CreateGreyEffect();
+    auto kawaseEffect = CreateKawaseBlurEffect();
+    auto greyEffect2 = CreateGreyEffect();
+    composables.push_back(greyEffect1);
+    composables.push_back(kawaseEffect);
+    composables.push_back(greyEffect2);
+    
+    auto result = pass.Run(composables);
+    // Should have fused first two (grey + kawase) but leave last one alone
+    EXPECT_TRUE(result.changed);
+    ASSERT_EQ(composables.size(), 2); // Should be reduced to two effects
+    auto effect1 = composables[0].GetEffect();
+    ASSERT_NE(effect1, nullptr);
+    EXPECT_EQ(effect1->GetImpl()->GetFilterType(), Drawing::GEFilterType::MESA_BLUR);
+    auto effect2 = composables[1].GetEffect();
+    ASSERT_NE(effect2, nullptr);
+    EXPECT_EQ(effect2->GetImpl()->GetFilterType(), Drawing::GEFilterType::GREY); // Should be left as grey
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassRunOddSize end";
+}
+
+/**
  * @tc.name: HpsCompatiblePassGetLogName
  * @tc.desc: Test GEHpsCompatiblePass GetLogName function
  * @tc.type: FUNC
@@ -380,6 +414,7 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerAddNullPass, TestSize.Level1)
     // This should not crash and should just ignore the null pass
     std::shared_ptr<GEFilterComposerPass> nullPass = nullptr;
     composer.Add(nullPass);
+    EXPECT_TRUE(composer.passes_.empty());
     
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerAddNullPass end";
 }
@@ -399,6 +434,7 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerTemplateAdd, TestSize.Level1)
     GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
     context.image = nullptr; // Not used in this test
     composer.Add<GEHpsBuildPass>(drawingCanvas_, context);
+    EXPECT_EQ(composer.passes_.size(), 1);
     
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerTemplateAdd end";
 }
