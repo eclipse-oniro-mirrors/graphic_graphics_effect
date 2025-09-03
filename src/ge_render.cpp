@@ -290,7 +290,6 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     if (!composerResult.anyPassChanged) {
         return false; // No pass has changed the effect sequence, fallback to original route to ensure compatibility
     }
-
     auto resImage = context.image;
     bool appliedHpsBlur = false;
     bool lastAppliedGE = true;
@@ -306,6 +305,8 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
                 context.alpha, context.colorFilter, context.maskColor};
             appliedHpsBlur |= hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
             lastAppliedGE = false;
+        } else {
+            LOGE("GERender::ApplyHpsGEImageEffect unhandled composable type");
         }
     }
 
