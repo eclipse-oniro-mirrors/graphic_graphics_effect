@@ -49,6 +49,7 @@ std::vector<GEFilterComposable> GEFilterComposer::BuildComposables(
     const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& effects)
 {
     std::vector<GEFilterComposable> composables;
+    composables.reserve(effects.size());
     for (const auto& effect: effects) {
         composables.emplace_back(effect);
     }
