@@ -70,16 +70,18 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest002()
     return resImg;
 }
 
-std::shared_ptr<Drawing::Image> GERenderFuzzTest003(const uint8_t *data, size_t size)
+std::shared_ptr<Drawing::Image> GERenderFuzzTest003()
 {
-    FuzzedDataProvider fdp(data, size);
-
     auto geRender = std::make_shared<GERender>();
     Drawing::Canvas canvas;
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     std::shared_ptr<Drawing::Image> image = nullptr;
-    Drawing::Rect src{0.0, 0.0, 100.0, 100.0};
-    Drawing::Rect dst{0.0, 0.0, 100.0, 100.0};
+    float fLeft = GETest::GetPlainData<float>();
+    float fTop = GETest::GetPlainData<float>();
+    float fWidth = GETest::GetPlainData<float>();
+    float fHeight = GETest::GetPlainData<float>();
+    Drawing::Rect src{fLeft, fTop, fWidth, fHeight};
+    Drawing::Rect dst{fLeft, fTop, fWidth, fHeight};
     Drawing::SamplingOptions sampling;
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
     return resImg;
@@ -207,7 +209,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     /* Run your code on data */
     OHOS::GraphicsEffectEngine::GERenderFuzzTest001();
     OHOS::GraphicsEffectEngine::GERenderFuzzTest002();
-    OHOS::GraphicsEffectEngine::GERenderFuzzTest003(data, size);
+    OHOS::GraphicsEffectEngine::GERenderFuzzTest003();
     OHOS::GraphicsEffectEngine::GERenderFuzzTest004();
     OHOS::GraphicsEffectEngine::GERenderFuzzTest005();
     OHOS::GraphicsEffectEngine::GERenderFuzzTest006();

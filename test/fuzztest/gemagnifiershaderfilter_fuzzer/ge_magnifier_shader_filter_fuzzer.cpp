@@ -42,7 +42,17 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
 
 std::string GetDescriptionFuzzTest()
 {
-    Drawing::GEMagnifierShaderFilterParams params = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    float factor = GETest::GetPlainData<float>();
+    float width = GETest::GetPlainData<float>();
+    float height = GETest::GetPlainData<float>();
+    float cornerRadius = GETest::GetPlainData<float>();
+    float borderWidth = GETest::GetPlainData<float>();
+    float shadowOffsetX = GETest::GetPlainData<float>();
+    float shadowOffsetY = GETest::GetPlainData<float>();
+    float shadowSize = GETest::GetPlainData<float>();
+    float shadowStrength = GETest::GetPlainData<float>();
+    Drawing::GEMagnifierShaderFilterParams params = {factor, width, height, cornerRadius, borderWidth,
+        shadowOffsetX, shadowOffsetY, shadowSize, shadowStrength};
     std::unique_ptr<GEMagnifierShaderFilter> shaderFilter =
         std::make_unique<GEMagnifierShaderFilter>(params);
     std::string res = shaderFilter->GetDescription();

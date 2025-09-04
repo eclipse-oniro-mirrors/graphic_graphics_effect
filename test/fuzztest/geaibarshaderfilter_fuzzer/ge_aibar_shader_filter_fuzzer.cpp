@@ -23,7 +23,12 @@ namespace Rosen {
 
 std::string GetDescriptionFuzzTest()
 {
-    Drawing::GEAIBarShaderFilterParams params { 2.0, 2.0, 2.0, 2.0, 3.0 };
+    float aiBarLow = GETest::GetPlainData<float>();
+    float aiBarHigh = GETest::GetPlainData<float>();
+    float aiBarThreshold = GETest::GetPlainData<float>();
+    float aiBarOpacity = GETest::GetPlainData<float>();
+    float aiBarSaturation = GETest::GetPlainData<float>();
+    Drawing::GEAIBarShaderFilterParams params { aiBarLow, aiBarHigh, aiBarThreshold, aiBarOpacity, aiBarSaturation };
     std::unique_ptr<GEAIBarShaderFilter> shaderFilter =
         std::make_unique<GEAIBarShaderFilter>(params);
     std::string res = shaderFilter->GetDescription();

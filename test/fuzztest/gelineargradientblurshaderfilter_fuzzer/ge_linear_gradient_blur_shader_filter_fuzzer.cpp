@@ -25,12 +25,16 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
 {
     GEGradientDirection direction = GETest::GetPlainData<GEGradientDirection>();
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, static_cast<int>(direction),
-        1.f, 1.f, Drawing::Matrix(), 1.f, 1.f, true};
+        1.f, 1.f, Drawing::Matrix(), 1.f, 1.f, true, false};
     std::unique_ptr<GELinearGradientBlurShaderFilter> shaderFilter =
         std::make_unique<GELinearGradientBlurShaderFilter>(params);
 
-    Drawing::Rect src { 1.0f, 1.0f, 2.0f, 2.0f };
-    Drawing::Rect dst { 1.0f, 1.0f, 2.0f, 2.0f };
+    float fLeft = GETest::GetPlainData<float>();
+    float fTop = GETest::GetPlainData<float>();
+    float fWidth = GETest::GetPlainData<float>();
+    float fHeight = GETest::GetPlainData<float>();
+    Drawing::Rect src{fLeft, fTop, fWidth, fHeight};
+    Drawing::Rect dst{fLeft, fTop, fWidth, fHeight};
     Drawing::Canvas canvas;
     std::shared_ptr<Drawing::Image> image { nullptr };
     auto res = shaderFilter->ProcessImage(canvas, image, src, dst);
@@ -50,7 +54,13 @@ std::string GetDescriptionFuzzTest()
     float radius = GETest::GetPlainData<float>();
     std::vector<std::pair<float, float>> fractionStops = {{1.0, 0.0}, {0.0, 1.0}};
     Drawing::Matrix mat;
-    Drawing::GELinearGradientBlurShaderFilterParams params{radius, fractionStops, 2, 10.0, 10.0, mat, 1.0, 1.0, false};
+    int direction = GETest::GetPlainData<int>();
+    float geoWidth = GETest::GetPlainData<float>();
+    float geoHeight = GETest::GetPlainData<float>();
+    float tranX = GETest::GetPlainData<float>();
+    float tranY = GETest::GetPlainData<float>();
+    Drawing::GELinearGradientBlurShaderFilterParams params{radius, fractionStops, direction, geoWidth,
+        geoHeight, mat, tranX, tranY, false, false};
     std::unique_ptr<GELinearGradientBlurShaderFilter> shaderFilter =
         std::make_unique<GELinearGradientBlurShaderFilter>(params);
     std::string res = shaderFilter->GetDescription();
@@ -65,7 +75,14 @@ std::shared_ptr<Drawing::Image> ProcessImageDDGRFuzzTest(const uint8_t *data, si
     float positionScale = fdp.ConsumeFloatingPoint<float>();
     std::vector<std::pair<float, float>> fractionStops = {{blurDegree, positionScale}};
     Drawing::Matrix mat;
-    Drawing::GELinearGradientBlurShaderFilterParams params = {5.0, fractionStops, 2, 10.0, 10.0, mat, 1.0, 1.0, false};
+    float radius = GETest::GetPlainData<float>();
+    int direction = GETest::GetPlainData<int>();
+    float geoWidth = GETest::GetPlainData<float>();
+    float geoHeight = GETest::GetPlainData<float>();
+    float tranX = GETest::GetPlainData<float>();
+    float tranY = GETest::GetPlainData<float>();
+    Drawing::GELinearGradientBlurShaderFilterParams params{radius, fractionStops, direction, geoWidth,
+        geoHeight, mat, tranX, tranY, false, false};
     std::unique_ptr<GELinearGradientBlurShaderFilter> shaderFilter =
         std::make_unique<GELinearGradientBlurShaderFilter>(params);
 
