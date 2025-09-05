@@ -464,5 +464,11 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
     return false;
 }
 
+void HpsEffectFilter::UnitTestSetExtensionProperties(const std::vector<const char *>& extensionProperties)
+{
+    // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
+    g_extensionProperties = extensionProperties;
+}
+
 } // namespace Rosen
 } // namespace OHOS

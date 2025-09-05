@@ -36,7 +36,13 @@ using Drawing::GEFilterType;
 
 class GEFilterComposerTest : public testing::Test {
 public:
-    static void SetUpTestCase() {}
+    static void SetUpTestCase()
+    {
+        std::vector<const char*> extensionProperties {
+            "hps_gaussian_blur_effect", "hps_mesa_blur_effect", "hps_gray_effect"
+        };
+        HpsEffectFilter::UnitTestSetExtensionProperties(extensionProperties); // valid because -Dprivate=public
+    }
     static void TearDownTestCase() {}
     void SetUp() override {}
     void TearDown() override {}
@@ -47,7 +53,7 @@ public:
     std::shared_ptr<Drawing::GEVisualEffect> CreateKawaseBlurEffect();
     std::shared_ptr<Drawing::GEVisualEffect> CreateMesaBlurEffect();
     
-    static inline Drawing::Canvas drawingCanvas_;
+    static inline Drawing::Canvas canvas_;
 };
 
 std::shared_ptr<Drawing::GEVisualEffect> GEFilterComposerTest::CreateVisualEffect(
@@ -120,7 +126,7 @@ HWTEST_F(GEFilterComposerTest, GetHpsEffect, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GetHpsEffect start";
     
     // Create a HpsEffectFilter (this would normally be created by GEHpsBuildPass)
-    auto hpsEffect = std::make_shared<HpsEffectFilter>(drawingCanvas_);
+    auto hpsEffect = std::make_shared<HpsEffectFilter>(canvas_);
     GEFilterComposable composable(hpsEffect);
     
     auto retrievedHpsEffect = composable.GetHpsEffect();
@@ -141,7 +147,7 @@ HWTEST_F(GEFilterComposerTest, HpsBuildPassGetLogName, TestSize.Level1)
     
     GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
     context.image = nullptr; // Not used in this test
-    GEHpsBuildPass pass(drawingCanvas_, context);
+    GEHpsBuildPass pass(canvas_, context);
     
     auto name = pass.GetLogName();
     EXPECT_EQ(name, "GEHpsBuildPass");
@@ -160,13 +166,73 @@ HWTEST_F(GEFilterComposerTest, HpsBuildPassRunNoEffects, TestSize.Level1)
     
     GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
     context.image = nullptr; // Not used in this test
-    GEHpsBuildPass pass(drawingCanvas_, context);
+    GEHpsBuildPass pass(canvas_, context);
     
     std::vector<GEFilterComposable> composables;
     auto result = pass.Run(composables);
     EXPECT_FALSE(result.changed);
     
     GTEST_LOG_(INFO) << "GEFilterComposerTest HpsBuildPassRunNoEffects end";
+}
+
+/**
+ * @tc.name: HpsBuildPassRunUnsupportedEffect
+ * @tc.desc: Test GEHpsBuildPass Run function with no effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, HpsBuildPassRunUnsupportedEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsBuildPassRunUnsupportedEffect start";
+    
+    GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
+    context.image = nullptr; // Not used in this test
+    GEHpsBuildPass pass(canvas_, context);
+    
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(CreateVisualEffect(Drawing::GE_FILTER_WATER_RIPPLE));
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+    
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsBuildPassRunUnsupportedEffect end";
+}
+
+HWTEST_F(GEFilterComposerTest, HpsBuildPassRunWithComposableEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithComposableEffect start";
+    
+    // Create a bitmap to use as image
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format);
+    auto image = bmp.MakeImage();
+    
+    GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
+    context.image = image;
+    context.src = Drawing::Rect{0.0f, 0.0f, 50.0f, 50.0f};
+    context.dst = Drawing::Rect{0.0f, 0.0f, 50.0f, 50.0f};
+    context.saturationForHPS = 1.0f;
+    context.brightnessForHPS = 1.0f;
+    
+    GEHpsBuildPass pass(canvas_, context);
+    
+    std::vector<GEFilterComposable> composables;
+    auto mesaEffect = CreateMesaBlurEffect();
+    auto greyEffect = CreateGreyEffect();
+    auto kawaseBlurEffect = CreateKawaseBlurEffect();
+    composables.push_back(mesaEffect);
+    composables.push_back(greyEffect);
+    composables.push_back(kawaseBlurEffect);
+    
+    auto result = pass.Run(composables);
+    // Should compose the effect into a HpsEffectFilter
+    EXPECT_TRUE(result.changed);
+    ASSERT_EQ(composables.size(), 1);
+    
+    // Check that the result is a HpsEffectFilter (not a regular GEVisualEffect)
+    auto hpsEffect = composables[0].GetHpsEffect();
+    EXPECT_NE(hpsEffect, nullptr);
+    
+    GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithComposableEffect end";
 }
 
 /**
@@ -433,7 +499,7 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerTemplateAdd, TestSize.Level1)
     // Test template Add with constructor arguments
     GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
     context.image = nullptr; // Not used in this test
-    composer.Add<GEHpsBuildPass>(drawingCanvas_, context);
+    composer.Add<GEHpsBuildPass>(canvas_, context);
     EXPECT_EQ(composer.passes_.size(), 1);
     
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerTemplateAdd end";
@@ -449,6 +515,7 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges start";
     
     GEFilterComposer composer;
+    composer.Add<GEHpsCompatiblePass>();
     composer.Add<GEMesaFusionPass>();
     
     std::vector<GEFilterComposable> composables;

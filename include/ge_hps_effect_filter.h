@@ -75,6 +75,8 @@ private:
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
+    // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
+    static void UnitTestSetExtensionProperties(const std::vector<const char *>& extensionProperties);
 };
 }
 } // namespace OHOS
