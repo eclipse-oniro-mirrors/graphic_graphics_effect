@@ -37,7 +37,11 @@ bool GEVisualEffectContainerFuzzTest001()
 bool GEVisualEffectContainerFuzzTest002()
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
-    auto visualEffect = nullptr;
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect = nullptr;
+    if (GETest::GetPlainData<bool>()) {
+        DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
+        visualEffect = std::make_shared<GEVisualEffect>("", type);
+    }
     veContainer->AddToChainedFilter(visualEffect);
     return true;
 }
