@@ -129,6 +129,9 @@ struct GEFilterTypeInfoStaticCheck {
     static_assert(IsGEFilterType, "T must implement IGEFilterType");
 
     static_assert(!std::is_void_v<typename GEFilterTypeInfo<T>::ParamType>, "Unregistered GEFilter type");
+    static_assert(!std::is_void_v<typename GEFilterParamsTypeInfo<ParamType>::FilterType>,
+        "Unregistered GEFilterParams type");
+    static_assert(GEFilterTypeInfo<T>::ID == GEFilterParamsTypeInfo<ParamType>::ID, "Inconsistent type id");
 };
 
 // Declare the Type and TypeName functions for a given GEFilter class
