@@ -48,6 +48,9 @@ public:
 
     const std::string& Type() const override;
 
+    // set noise factor
+    void SetFactor(float factor);
+
 private:
     static Drawing::Matrix GetShaderTransform(
         const Drawing::Canvas* canvas, const Drawing::Rect& blurRect, float scaleW = 1.0f, float scaleH = 1.0f);
@@ -82,6 +85,7 @@ private:
     int radius_;
     float blurRadius_ = 0.0f;
     float blurScale_ = 0.25f;
+    float factor_ = 1.75f; // 1.75 from experience
     static const std::string type_;
 };
 

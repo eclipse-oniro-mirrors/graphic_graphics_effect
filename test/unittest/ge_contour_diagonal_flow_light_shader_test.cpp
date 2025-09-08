@@ -22,6 +22,7 @@
 #include "draw/color.h"
 #include "draw/path.h"
 #include "ge_shader_filter_params.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -104,6 +105,48 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, MakeDrawingShader_001, TestSize.L
     auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
     shader->MakeDrawingShader(rect, progress);
     EXPECT_EQ(shader->GetDrawingShader(), nullptr); // no cache
+}
+
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateSurfaceAndCanvas_001, TestSize.Level1)
+{
+    // Test case for MakeDrawingShader method
+    Drawing::Rect rect(0, 0, 100, 100);
+    GEContentDiagonalFlowLightShaderParams params{};
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
+    shader->CreateSurfaceAndCanvas(canvas_, Drawing::Rect{0.0f, 0.0f, 0.0f, 0.0f});
+    canvas_.gpuContext_ = nullptr;
+    shader->CreateSurfaceAndCanvas(canvas_, rect);
+
+    auto renderContext = std::make_shared<RenderContext>();
+    renderContext->InitializeEglContext();
+    renderContext->SetUpGpuContext();
+    canvas_.gpuContext_ = renderContext->GetSharedDrGPUContext();
+
+    shader->CreateSurfaceAndCanvas(canvas_, rect);
+    EXPECT_NE(shader->offscreenSurface_, nullptr);
+    canvas_.gpuContext_ = nullptr;
+}
+
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateImg_001, TestSize.Level1)
+{
+    // Test case for MakeDrawingShader method
+    Drawing::Rect rect(0, 0, 100, 100);
+    GEContentDiagonalFlowLightShaderParams params{};
+    auto shader = GEContourDiagonalFlowLightShader::CreateFlowLightShader(params);
+    auto img = shader->CreateImg(canvas_, Drawing::Rect{0.0f, 0.0f, 0.0f, 0.0f});
+    EXPECT_EQ(img, nullptr);
+    canvas_.gpuContext_ = nullptr;
+    img = shader->CreateImg(canvas_, rect);
+    EXPECT_EQ(img, nullptr);
+
+    auto renderContext = std::make_shared<RenderContext>();
+    renderContext->InitializeEglContext();
+    renderContext->SetUpGpuContext();
+    canvas_.gpuContext_ = renderContext->GetSharedDrGPUContext();
+
+    img = shader->CreateImg(canvas_, rect);
+    EXPECT_NE(img, nullptr);
+    canvas_.gpuContext_ = nullptr;
 }
 
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
