@@ -14,6 +14,7 @@
  */
 
 #include "ge_filter_composer.h"
+
 #include "ge_log.h"
 #include "ge_render.h"
 
@@ -31,7 +32,7 @@ void GEFilterComposer::Add(std::shared_ptr<GEFilterComposerPass> pass)
 
 GEFilterComposer::ComposerRunResult GEFilterComposer::Run(std::vector<GEFilterComposable>& composables) const
 {
-    ComposerRunResult runResult {false};
+    ComposerRunResult runResult { false };
     for (auto& pass : passes_) {
         auto result = pass->Run(composables);
         auto name = pass->GetLogName();
@@ -50,7 +51,7 @@ std::vector<GEFilterComposable> GEFilterComposer::BuildComposables(
 {
     std::vector<GEFilterComposable> composables;
     composables.reserve(effects.size());
-    for (const auto& effect: effects) {
+    for (const auto& effect : effects) {
         composables.emplace_back(effect);
     }
     return composables;

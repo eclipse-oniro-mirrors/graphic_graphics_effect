@@ -22,22 +22,20 @@
 namespace OHOS {
 namespace Rosen {
 
-
 class GEHpsBuildPass : public GEFilterComposerPass {
 public:
     using HpsGEImageEffectContext = GraphicsEffectEngine::GERender::HpsGEImageEffectContext;
 
-    GEHpsBuildPass(Drawing::Canvas& canvas, const HpsGEImageEffectContext &context)
-        : canvas_(canvas), context_(context) {}
+    GEHpsBuildPass(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context) : canvas_(canvas), context_(context)
+    {}
     std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
+
 private:
     std::reference_wrapper<Drawing::Canvas> canvas_; // observer only, used for build HpsEffectFilter
     HpsGEImageEffectContext context_;
 };
-}
-}
-
+} // namespace Rosen
+} // namespace OHOS
 
 #endif // GRAPHICS_EFFECT_GE_HPS_BUILD_PASS_H
-

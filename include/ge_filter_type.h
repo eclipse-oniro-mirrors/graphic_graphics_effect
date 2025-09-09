@@ -16,8 +16,8 @@
 #define GRAPHICS_EFFECT_GE_FILTER_TYPE_H
 #include <memory>
 #include <optional>
-#include <type_traits>
 #include <string_view>
+#include <type_traits>
 
 namespace OHOS {
 namespace Rosen {
@@ -81,24 +81,27 @@ struct GEFilterParamsTypeInfo {
 };
 
 // Register type info for certain GE Filter type (Non-instructive)
-#define REGISTER_GEFILTER_TYPEINFO(ENUM_VALUE, FILTER_TYPE, PARAM_TYPE, TYPE_NAME) \
-    class FILTER_TYPE; \
-    template<> struct ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FILTER_TYPE> { \
+#define REGISTER_GEFILTER_TYPEINFO(ENUM_VALUE, FILTER_TYPE, PARAM_TYPE, TYPE_NAME)           \
+    class FILTER_TYPE;                                                                       \
+    template<>                                                                               \
+    struct ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FILTER_TYPE> {                           \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
-        static constexpr std::string_view Name = TYPE_NAME; \
-        using ParamType = PARAM_TYPE; \
-    }; \
-    template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
+        static constexpr std::string_view Name = TYPE_NAME;                                  \
+        using ParamType = PARAM_TYPE;                                                        \
+    };                                                                                       \
+    template<>                                                                               \
+    struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> {                      \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
-        using FilterType = FILTER_TYPE; \
+        using FilterType = FILTER_TYPE;                                                      \
     }
 
 // Register type info for certain GE Filter Param type without Filter type (Non-instructive)
 // Used on extension filter only when its param type is known and possibly used in GEVisualEffectImpl
-#define REGISTER_GEFILTERPARAM_TYPEINFO(ENUM_VALUE, PARAM_TYPE) \
-    template<> struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> { \
+#define REGISTER_GEFILTERPARAM_TYPEINFO(ENUM_VALUE, PARAM_TYPE)                              \
+    template<>                                                                               \
+    struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> {                      \
         static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
-        using FilterType = void; \
+        using FilterType = void;                                                             \
     }
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
@@ -129,29 +132,29 @@ struct GEFilterTypeInfoStaticCheck {
     static_assert(IsGEFilterType, "T must implement IGEFilterType");
 
     static_assert(!std::is_void_v<typename GEFilterTypeInfo<T>::ParamType>, "Unregistered GEFilter type");
-    static_assert(!std::is_void_v<typename GEFilterParamsTypeInfo<ParamType>::FilterType>,
-        "Unregistered GEFilterParams type");
+    static_assert(
+        !std::is_void_v<typename GEFilterParamsTypeInfo<ParamType>::FilterType>, "Unregistered GEFilterParams type");
     static_assert(GEFilterTypeInfo<T>::ID == GEFilterParamsTypeInfo<ParamType>::ID, "Inconsistent type id");
 };
 
 // Declare the Type and TypeName functions for a given GEFilter class
 // Macro hint: Self parameter is techincally not required since Self can be deduced from *this. Current implementation
 // requires Self to be manually specified to prevent hard-to-read compile errors when the macro is wrongly used.
-#define DECLARE_GEFILTER_TYPEFUNC(Self) \
-    ::OHOS::Rosen::Drawing::GEFilterType Type() const override \
-    { \
+#define DECLARE_GEFILTER_TYPEFUNC(Self)                                                                 \
+    ::OHOS::Rosen::Drawing::GEFilterType Type() const override                                          \
+    {                                                                                                   \
         static_assert(std::is_same_v<Self, std::remove_cv_t<std::remove_reference_t<decltype(*this)>>>, \
-            "DECLARE_GEFILTER_TYPEFUNC: Macro is used outside class scope / Incorrect Self type"); \
-        static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType); \
-        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID; \
-    } \
-    const std::string_view TypeName() const override \
-    { \
-        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::Name; \
+            "DECLARE_GEFILTER_TYPEFUNC: Macro is used outside class scope / Incorrect Self type");      \
+        static_assert(::OHOS::Rosen::Drawing::GEFilterTypeInfoStaticCheck<Self>::IsGEFilterType);       \
+        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::ID;                                      \
+    }                                                                                                   \
+    const std::string_view TypeName() const override                                                    \
+    {                                                                                                   \
+        return ::OHOS::Rosen::Drawing::GEFilterTypeInfo<Self>::Name;                                    \
     }
 
-}
-}
-}
+} // namespace Drawing
+} // namespace Rosen
+} // namespace OHOS
 
 #endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_H

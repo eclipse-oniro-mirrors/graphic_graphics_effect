@@ -25,12 +25,12 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
 {
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas_);
     if (!hpsEffectFilter->IsHpsEffectEnabled()) {
-        return GEFilterComposerPassResult {false};
+        return GEFilterComposerPassResult { false };
     }
     std::vector<GEFilterComposable> resultComposables;
     std::shared_ptr<HpsEffectFilter> composedHpsFilter = nullptr;
     bool composed = false;
-    for (auto& composable: composables) {
+    for (auto& composable : composables) {
         auto effect = composable.GetEffect();
         if (effect == nullptr || !hpsEffectFilter->IsEffectSupported(effect)) {
             if (composedHpsFilter != nullptr) { // save the composed hps filter and leave non-VisualEffects as is
@@ -43,8 +43,8 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
         if (composedHpsFilter == nullptr) {
             composedHpsFilter = std::make_shared<HpsEffectFilter>(canvas_);
         }
-        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(),
-            context_.src, context_.dst, context_.saturationForHPS, context_.brightnessForHPS, context_.image);
+        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(), context_.src, context_.dst,
+            context_.saturationForHPS, context_.brightnessForHPS, context_.image);
         composed = true;
     }
     if (composedHpsFilter != nullptr) {
@@ -55,8 +55,8 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
         composables.swap(resultComposables);
         LOGD("GEHpsBuildPass::Run HPS filter composed");
     }
-    return GEFilterComposerPassResult {composed};
+    return GEFilterComposerPassResult { composed };
 }
 
-}
-}
+} // namespace Rosen
+} // namespace OHOS

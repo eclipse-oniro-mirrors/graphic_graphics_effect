@@ -30,7 +30,7 @@ GEFilterComposerPassResult GEHpsCompatiblePass::Run(std::vector<GEFilterComposab
 {
     using Drawing::GEFilterType;
     blurFilterExists_ = false;
-    for (auto& composable: composables) {
+    for (auto& composable : composables) {
         if (auto effect = composable.GetEffect(); effect != nullptr) {
             auto ve = effect->GetImpl();
             if (ve == nullptr) {
@@ -43,8 +43,8 @@ GEFilterComposerPassResult GEHpsCompatiblePass::Run(std::vector<GEFilterComposab
             }
         }
     }
-    return GEFilterComposerPassResult {false}; // This pass does not modify composables
+    return GEFilterComposerPassResult { false }; // This pass does not modify composables
 }
 
-}
-}
+} // namespace Rosen
+} // namespace OHOS

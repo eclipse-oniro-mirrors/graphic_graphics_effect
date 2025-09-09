@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "ge_mesa_fusion_pass.h"
+
 #include <memory>
 
-#include "ge_mesa_fusion_pass.h"
 #include "ge_filter_type.h"
 #include "ge_shader_filter_params.h"
 
@@ -49,8 +50,7 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
             resultComposables.push_back(composables[i]);
             continue;
         }
-        if (iImpl->GetFilterType() == GEFilterType::GREY
-            && jImpl->GetFilterType() == GEFilterType::KAWASE_BLUR) {
+        if (iImpl->GetFilterType() == GEFilterType::GREY && jImpl->GetFilterType() == GEFilterType::KAWASE_BLUR) {
             auto&& greyParams = iImpl->GetGreyParams();
             auto&& blurParams = jImpl->GetKawaseParams();
             resultComposables.push_back(ComposeGreyKawase(greyParams, blurParams));
@@ -64,15 +64,15 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
     if (composed) {
         composables.swap(resultComposables);
     }
-    return GEFilterComposerPassResult {composed};
+    return GEFilterComposerPassResult { composed };
 }
 
 std::shared_ptr<Drawing::GEVisualEffect> GEMesaFusionPass::ComposeGreyKawase(
     const std::shared_ptr<Drawing::GEGreyShaderFilterParams>& greyParams,
     const std::shared_ptr<Drawing::GEKawaseBlurShaderFilterParams>& blurParams)
 {
-    auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
-        Drawing::DrawingPaintType::BRUSH);
+    auto mesaFilter =
+        std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR, Drawing::DrawingPaintType::BRUSH);
     mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
     mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
     mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
@@ -87,5 +87,5 @@ std::shared_ptr<Drawing::GEVisualEffect> GEMesaFusionPass::ComposeGreyKawase(
     return mesaFilter;
 }
 
-}
-}
+} // namespace Rosen
+} // namespace OHOS

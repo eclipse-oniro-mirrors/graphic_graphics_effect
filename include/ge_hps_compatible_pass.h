@@ -27,8 +27,7 @@ public:
 private:
     bool blurFilterExists_ = false;
 };
-}
-}
-
+} // namespace Rosen
+} // namespace OHOS
 
 #endif // GE_HPS_COMPATIBLE_PASS_H

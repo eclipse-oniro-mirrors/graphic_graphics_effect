@@ -17,8 +17,8 @@
 #define GRAPHICS_EFFECT_GE_FILTER_COMPOSER_PASS_H
 #include <memory>
 #include <string_view>
-#include <vector>
 #include <variant>
+#include <vector>
 
 #include "ge_hps_effect_filter.h"
 #include "ge_visual_effect.h"
@@ -28,10 +28,11 @@ namespace Rosen {
 
 class GEFilterComposable {
     using GEViusalEffect = Drawing::GEVisualEffect;
+
 public:
     GEFilterComposable(const std::shared_ptr<GEViusalEffect>& effect) : effect_(effect) {}
     GEFilterComposable(const std::shared_ptr<HpsEffectFilter>& effect) : effect_(effect) {}
-    
+
     template<typename T>
     std::shared_ptr<T> Get()
     {
@@ -53,8 +54,7 @@ public:
     }
 
 private:
-    std::variant<std::shared_ptr<Drawing::GEVisualEffect>,
-                 std::shared_ptr<HpsEffectFilter>> effect_;
+    std::variant<std::shared_ptr<Drawing::GEVisualEffect>, std::shared_ptr<HpsEffectFilter>> effect_;
 };
 
 struct GEFilterComposerPassResult {
@@ -70,8 +70,7 @@ public:
     virtual GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) = 0;
 };
 
-}
-}
-
+} // namespace Rosen
+} // namespace OHOS
 
 #endif // GRAPHICS_EFFECT_GE_FILTER_COMPOSER_PASS_H
