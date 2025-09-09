@@ -188,5 +188,21 @@ HWTEST_F(GEAuroraNoiseShaderTest, GEAuroraNoiseShaderTest009, TestSize.Level1)
     auto effect = shader->MakeAuroraNoiseShader(rect);
     EXPECT_EQ(effect, nullptr);
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEAuroraNoiseShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEAuroraNoiseShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEAuroraNoiseShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::AURORA_NOISE);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_AURORA_NOISE);
+
+    GTEST_LOG_(INFO) << "GEAuroraNoiseShaderTest Type_001 end";
+}
 }  // namespace Rosen
 }  // namespace OHOS

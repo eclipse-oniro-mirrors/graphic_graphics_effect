@@ -109,5 +109,21 @@ HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest005, TestSize.L
     shader->GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
     ASSERT_NE(shader, nullptr);
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWavyRippleLightShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEWavyRippleLightShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEWavyRippleLightShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::WAVY_RIPPLE_LIGHT);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_WAVY_RIPPLE_LIGHT);
+
+    GTEST_LOG_(INFO) << "GEWavyRippleLightShaderTest Type_001 end";
+}
 }  // namespace Rosen
 }  // namespace OHOS

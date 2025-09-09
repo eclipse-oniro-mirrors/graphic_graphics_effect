@@ -96,5 +96,21 @@ HWTEST_F(GEBorderLightShaderTest, GEBorderLightShaderTest006, TestSize.Level1)
     shader.MakeDrawingShader(rect, 0.75f);
     shader.SetBorderLightParams(params);
 }
+
+/**
+ * @tc.name: Type
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderLightShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEBorderLightShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEBorderLightShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::BORDER_LIGHT);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_BORDER_LIGHT);
+
+    GTEST_LOG_(INFO) << "GEBorderLightShaderTest Type_001 end";
+}
 }  // namespace Rosen
 }  // namespace OHOS

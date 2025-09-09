@@ -136,6 +136,22 @@ HWTEST_F(GEPixelMapShaderMaskTest, GenerateDrawingShader_002, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_002 end";
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEPixelMapShaderMaskTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEPixelMapShaderMaskTest Type_001 start";
+    GEPixelMapMaskParams param {};
+    auto filter = std::make_unique<GEPixelMapShaderMask>(param);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::PIXEL_MAP_MASK);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_MASK_PIXEL_MAP);
+
+    GTEST_LOG_(INFO) << "GEPixelMapShaderMaskTest Type_001 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

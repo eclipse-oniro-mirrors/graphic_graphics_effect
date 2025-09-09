@@ -298,5 +298,20 @@ HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest011, 
     GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_011 end";
 }
 
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEParticleCircularHaloShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEParticleCircularHaloShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::PARTICLE_CIRCULAR_HALO);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
+
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 end";
+}
 }  // namespace Rosen
 }  // namespace OHOS

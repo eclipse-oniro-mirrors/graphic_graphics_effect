@@ -107,6 +107,22 @@ HWTEST_F(GERippleShaderMaskTest, GetRippleShaderNormalMaskBuilder_001, TestSize.
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GetRippleShaderNormalMaskBuilder_001 end";
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERippleShaderMaskTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERippleShaderMaskTest Type_001 start";
+    GERippleShaderMaskParams param {};
+    auto filter = std::make_unique<GERippleShaderMask>(param);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::RIPPLE_MASK);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_MASK_RIPPLE);
+
+    GTEST_LOG_(INFO) << "GERippleShaderMaskTest Type_001 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
