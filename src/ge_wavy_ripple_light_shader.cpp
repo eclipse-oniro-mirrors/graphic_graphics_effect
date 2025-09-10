@@ -103,6 +103,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEWavyRippleLightShader::MakeWavyRippleLi
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     builder_ = GetWavyRippleLightBuilder();
+    if (builder_ == nullptr) {
+        GE_LOGE("GEWavyRippleLightShader::MakeWavyRippleLightShader builder_ is nullptr.");
+        return nullptr;
+    }
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("center", wavyRippleLightParams_.center_.first,
         wavyRippleLightParams_.center_.second);

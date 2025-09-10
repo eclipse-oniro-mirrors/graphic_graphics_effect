@@ -194,6 +194,10 @@ std::shared_ptr<Drawing::Image> GEAuroraNoiseShader::MakeAuroraNoiseGeneratorSha
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
     builder_ = GetAuroraNoiseBuilder();
+    if (builder_ == nullptr) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseGeneratorShader builder_ is nullptr.");
+        return nullptr;
+    }
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("noise", auroraNoiseParams_.noise_);
     auto auroraNoiseGeneratorShader = builder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
