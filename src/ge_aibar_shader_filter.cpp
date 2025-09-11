@@ -57,6 +57,10 @@ std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::OnProcessImage(Drawing::Can
     float imageWidth = image->GetWidth();
     float imageHeight = image->GetHeight();
     auto builder = MakeBinarizationShader(imageWidth, imageHeight, imageShader);
+    if (builder == nullptr) {
+        LOGE("GEAIBarShaderFilter::OnProcessImage builder is null");
+        return image;
+    }
 #ifdef RS_ENABLE_GPU
     auto invertedImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 #else
