@@ -287,6 +287,10 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::DrawMaskLinear
     auto blurImageShader = Drawing::ShaderEffect::CreateImageShader(*blurImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     auto builder = MakeMaskLinearGradientBlurShader(srcImageShader, blurImageShader, alphaGradientShader);
+    if (builder == nullptr) {
+        LOGE("GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur builder is null");
+        return image;
+    }
     auto outImageInfo = Drawing::ImageInfo(dst.GetWidth(), dst.GetHeight(), blurImage->GetImageInfo().GetColorType(),
         blurImage->GetImageInfo().GetAlphaType(), blurImage->GetImageInfo().GetColorSpace());
 #ifdef RS_ENABLE_GPU

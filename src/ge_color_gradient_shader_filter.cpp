@@ -42,7 +42,7 @@ GEColorGradientShaderFilter::GEColorGradientShaderFilter(const Drawing::GEColorG
 std::shared_ptr<Drawing::Image> GEColorGradientShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (image == nullptr || image->GetWidth() < 1e-6 || image->GetWidth() < 1e-6) {
+    if (image == nullptr || image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
         LOGE("GEColorGradientShaderFilter::OnProcessImage input is invalid.");
         return nullptr;
     }
