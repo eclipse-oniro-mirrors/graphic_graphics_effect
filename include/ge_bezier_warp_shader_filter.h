@@ -22,22 +22,22 @@ namespace OHOS {
 namespace Rosen {
 constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
 
+REGISTER_GEFILTER_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilter,
+                           Drawing::GEBezierWarpShaderFilterParams, Drawing::GE_FILTER_BEZIER_WARP);
 class GEBezierWarpShaderFilter : public GEShaderFilter {
 public:
     GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params);
     ~GEBezierWarpShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEBezierWarpShaderFilter);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     Drawing::Brush GetBrush(const std::shared_ptr<Drawing::Image>& image) const;
 
-    const std::string& Type() const override;
-
 private:
     Drawing::GEBezierWarpShaderFilterParams params_;
     std::array<Drawing::Point, BEZIER_WARP_POINT_NUM> destinationPatch_;
-    static const std::string type_;
 
     void InitCtrlPoints(std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;
     void SetPathTo(Drawing::Path &path, std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>& bezierPatch) const;

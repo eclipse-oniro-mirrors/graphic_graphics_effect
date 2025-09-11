@@ -40,17 +40,15 @@ public:
     HpsEffectFilter(Drawing::Canvas& canvas);
     ~HpsEffectFilter() = default;
 
-    static constexpr size_t INDEX_RANGE_NUM = 2;
-    using IndexRange = std::array<int32_t, INDEX_RANGE_NUM>;
     struct HpsEffectContext {
         float alpha;
         std::shared_ptr<Drawing::ColorFilter> colorFilter;
         uint32_t maskColor;
     };
 
-    bool HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer);
-    std::vector<IndexRange> HpsSupportedEffectsIndexRanges(
-        const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& visualEffects);
+    bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer);
+    bool IsHpsEffectEnabled() const;
+    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
         const std::shared_ptr<Drawing::Image>& image);
@@ -72,12 +70,13 @@ private:
     void GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
         const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
         Drawing::CanvasInfo info);
-    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef);
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
-    bool InitUpEffect() const;
+    std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
+    // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
+    static void UnitTestSetExtensionProperties(const std::vector<const char *>& extensionProperties);
 };
 }
 } // namespace OHOS

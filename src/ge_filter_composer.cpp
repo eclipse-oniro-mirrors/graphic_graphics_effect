@@ -14,93 +14,47 @@
  */
 
 #include "ge_filter_composer.h"
-#include "ge_render.h"
+
 #include "ge_log.h"
+#include "ge_render.h"
 
 namespace OHOS {
 namespace Rosen {
 
-GEFilterComposer::GEFilterComposer(const std::shared_ptr<GEShaderFilter>& shaderFilter)
-    : composedFilter_(shaderFilter), composedType_(shaderFilter->Type())
+void GEFilterComposer::Add(std::shared_ptr<GEFilterComposerPass> pass)
 {
-    if (composedFilter_ != nullptr) {
-        filterParams_[composedType_] = composedFilter_->Params();
+    if (pass != nullptr) {
+        passes_.push_back(pass);
     } else {
-        LOGE("GEFilterComposer: ctor with nullptr");
+        LOGE("GEFilterComposer::Add nullptr pass found");
     }
 }
 
-bool GEFilterComposer::Compose(const std::shared_ptr<GEShaderFilter> other)
+GEFilterComposer::ComposerRunResult GEFilterComposer::Run(std::vector<GEFilterComposable>& composables) const
 {
-    if (other == nullptr || other == composedFilter_) {
-        LOGE("GEFilterComposer: compose with nullptr or self");
-        return false;
-    }
-
-    auto otherFilterType = other->Type();
-    std::string composedType = composedType_ + otherFilterType;
-    if (composedEffects_.count(composedType)) {
-        filterParams_[otherFilterType] = other->Params();
-        if (auto composedFilter = GenerateComposedFilter(composedType, filterParams_)) {
-            composedFilter_ = composedFilter;
-            composedType_ = composedType;
-            return true;
+    ComposerRunResult runResult { false };
+    for (auto& pass : passes_) {
+        auto result = pass->Run(composables);
+        auto name = pass->GetLogName();
+        if (result.changed) {
+            runResult.anyPassChanged = true;
+            LOGD("GEFilterComposer::Transform Pass %s changed the effects", name.data());
+        } else {
+            LOGD("GEFilterComposer::Transform Pass %s does not change effects", name.data());
         }
     }
-    return false;
+    return runResult;
 }
 
-std::shared_ptr<GEShaderFilter> GEFilterComposer::GetComposedFilter()
+std::vector<GEFilterComposable> GEFilterComposer::BuildComposables(
+    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& effects)
 {
-    return composedFilter_;
-}
-
-std::shared_ptr<GEShaderFilter> GEFilterComposer::GenerateComposedFilter(
-    const std::string composedType, const std::map<std::string, GEShaderFilter::FilterParams> filterParams)
-{
-    // Only support GreyBlur now, support more complex filter in the future
-    if (composedType == "GreyBlur") {
-        auto mesaFilter = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR,
-            Drawing::DrawingPaintType::BRUSH);
-        auto blurIt = filterParams.find("Blur");
-        if (blurIt == filterParams.end()) {
-            return nullptr;
-        }
-        const auto* blurParams = std::get_if<Drawing::GEKawaseBlurShaderFilterParams>(&blurIt->second.value());
-        if (!blurParams) {
-            return nullptr;
-        }
-        auto greyIt = filterParams.find("Grey");
-        if (greyIt == filterParams.end()) {
-            return nullptr;
-        }
-
-        const auto* greyParams = std::get_if<Drawing::GEGreyShaderFilterParams>(&greyIt->second.value());
-        if (!greyParams) {
-            return nullptr;
-        }
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, blurParams->radius);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, greyParams->greyCoef1);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, greyParams->greyCoef2);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_X, 0.f);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Y, 0.f);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_Z, 0.f);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W, 0.f);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE, 0);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_WIDTH, 0.f);
-        mesaFilter->SetParam(Drawing::GE_FILTER_MESA_BLUR_STRETCH_HEIGHT, 0.f);
-
-        GraphicsEffectEngine::GERender render;
-        return render.GenerateShaderFilter(mesaFilter);
+    std::vector<GEFilterComposable> composables;
+    composables.reserve(effects.size());
+    for (const auto& effect : effects) {
+        composables.emplace_back(effect);
     }
-    return nullptr;
-}
-
-std::shared_ptr<Drawing::Image> GEFilterComposer::ApplyComposedEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
-{
-    auto resImage = composedFilter_->OnProcessImage(canvas, image, src, dst);
-    return resImage;
+    return composables;
 }
 
 } // namespace Rosen

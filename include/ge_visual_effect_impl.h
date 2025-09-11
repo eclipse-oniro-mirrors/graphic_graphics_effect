@@ -24,6 +24,7 @@
 #include <vector>
 #include <any>
 
+#include "ge_filter_type.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
 #include "ge_shader_filter_params.h"
@@ -42,48 +43,7 @@ namespace Drawing {
 
 class GE_EXPORT GEVisualEffectImpl {
 public:
-    enum class FilterType {
-        NONE,
-        KAWASE_BLUR,
-        MESA_BLUR,
-        GREY,
-        AIBAR,
-        LINEAR_GRADIENT_BLUR,
-        MAGNIFIER,
-        WATER_RIPPLE,
-        DISPLACEMENT_DISTORT_FILTER,
-        COLOR_GRADIENT,
-        MASK_TRANSITION,
-        // Mask
-        RIPPLE_MASK,
-        DOUBLE_RIPPLE_MASK,
-        PIXEL_MAP_MASK,
-        RADIAL_GRADIENT_MASK,
-        WAVE_GRADIENT_MASK,
-        FRAME_GRADIENT_MASK,
-        // Shader
-        DOT_MATRIX,
-        FLOW_LIGHT_SWEEP,
-        COMPLEX_SHADER,
-        SOUND_WAVE,
-        EDGE_LIGHT,
-        BEZIER_WARP,
-        DISPERSION,
-        CONTENT_LIGHT,
-        BORDER_LIGHT,
-        CONTOUR_DIAGONAL_FLOW_LIGHT,
-        WAVY_RIPPLE_LIGHT,
-        AURORA_NOISE,
-        PARTICLE_CIRCULAR_HALO,
-        DIRECTION_LIGHT,
-        VARIABLE_RADIUS_BLUR,
-        COLOR_GRADIENT_EFFECT,
-        LIGHT_CAVE,
-        AIBAR_GLOW,
-        ROUNDED_RECT_FLOWLIGHT,
-        GRADIENT_FLOW_COLORS,
-        MAX
-    };
+    using FilterType = GEFilterType;
 
     GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
 

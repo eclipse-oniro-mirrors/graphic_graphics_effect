@@ -265,7 +265,8 @@ HWTEST_F(GEMESABlurShaderFilterTest, Type_001, TestSize.Level1)
     // 0, 0.f, 1.f: valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params{0, 0.f, 0.f, 1.f, 1.f, 1.f, 1.f, 0, 0.f, 0.f};
     auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
-    EXPECT_EQ(geMESABlurShaderFilter->Type(), Drawing::GE_FILTER_MESA_BLUR);
+    EXPECT_EQ(geMESABlurShaderFilter->Type(), Drawing::GEFilterType::MESA_BLUR);
+    EXPECT_EQ(geMESABlurShaderFilter->TypeName(), Drawing::GE_FILTER_MESA_BLUR);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

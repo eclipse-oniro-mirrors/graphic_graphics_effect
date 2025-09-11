@@ -28,12 +28,16 @@
 
 namespace OHOS {
 namespace Rosen {
+
+REGISTER_GEFILTER_TYPEINFO(LINEAR_GRADIENT_BLUR, GELinearGradientBlurShaderFilter,
+                           Drawing::GELinearGradientBlurShaderFilterParams, Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
 class GELinearGradientBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GELinearGradientBlurShaderFilter(const Drawing::GELinearGradientBlurShaderFilterParams& params);
     GELinearGradientBlurShaderFilter(const GELinearGradientBlurShaderFilter&) = delete;
     GELinearGradientBlurShaderFilter operator=(const GELinearGradientBlurShaderFilter&) = delete;
     ~GELinearGradientBlurShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GELinearGradientBlurShaderFilter);
 
     virtual GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
@@ -45,8 +49,6 @@ public:
         geoWidth_ = geoWidth;
         geoHeight_ = geoHeight;
     }
-
-    const std::string& Type() const override;
 
 protected:
     std::shared_ptr<GELinearGradientBlurPara> linearGradientBlurPara_ = nullptr;
@@ -74,8 +76,6 @@ private:
         std::shared_ptr<Drawing::ShaderEffect> gradientShader);
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImageDDGR(
         Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, uint8_t directionBias);
-
-    static const std::string type_;
 };
 
 } // namespace Rosen

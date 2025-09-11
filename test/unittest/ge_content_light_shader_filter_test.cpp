@@ -141,7 +141,8 @@ HWTEST_F(GEContentLightShaderFilterTest, Type_001, TestSize.Level0)
 
     Drawing::GEContentLightFilterParams params;
     auto filter = std::make_unique<GEContentLightFilter>(params);
-    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_CONTENT_LIGHT);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::CONTENT_LIGHT);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_CONTENT_LIGHT);
 
     GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest Type_001 end";
 }

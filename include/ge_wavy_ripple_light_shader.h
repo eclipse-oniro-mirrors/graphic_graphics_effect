@@ -24,13 +24,15 @@
 
 namespace OHOS {
 namespace Rosen {
-
+REGISTER_GEFILTER_TYPEINFO(WAVY_RIPPLE_LIGHT, GEWavyRippleLightShader,
+                           Drawing::GEWavyRippleLightShaderParams, Drawing::GE_SHADER_WAVY_RIPPLE_LIGHT);
 class GE_EXPORT GEWavyRippleLightShader : public GEShader {
 
 public:
     GEWavyRippleLightShader();
     GEWavyRippleLightShader(Drawing::GEWavyRippleLightShaderParams& wavyRippleLightParams);
     ~GEWavyRippleLightShader() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEWavyRippleLightShader);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const { return "GEWavyRippleLightShader"; }
     void SetWavyRippleLightParams(const Drawing::GEWavyRippleLightShaderParams& params)
@@ -54,4 +56,4 @@ private:
 
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_EXT_DOT_MATRIX_SHADER_H
+#endif // GRAPHICS_EFFECT_WAVY_RIPPLE_LIGHT_SHADER_H

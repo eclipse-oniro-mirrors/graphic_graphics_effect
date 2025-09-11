@@ -554,7 +554,8 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, Type_001, TestSize.Level1)
     Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
         Drawing::Matrix(), 1.f, 1.f, true, false};
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
-    EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::LINEAR_GRADIENT_BLUR);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
 }
 
 } // namespace GraphicsEffectEngine

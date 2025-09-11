@@ -30,13 +30,6 @@ GEAIBarShaderFilter::GEAIBarShaderFilter(const Drawing::GEAIBarShaderFilterParam
     aiBarOpacity_(params.aiBarOpacity), aiBarSaturation_(params.aiBarSaturation)
 {}
 
-const std::string GEAIBarShaderFilter::type_ = Drawing::GE_FILTER_AI_BAR;
-
-const std::string& GEAIBarShaderFilter::Type() const
-{
-    return type_;
-}
-
 const std::string GEAIBarShaderFilter::GetDescription() const
 {
     static const std::string description = "GEAIBarShaderFilter";

@@ -83,8 +83,6 @@ void ApplyMaskColorFilter(Drawing::Canvas& offscreenCanvas, uint32_t maskColor)
 }
 } // namespace
 
-static std::shared_ptr<Drawing::RuntimeEffect> g_upscaleEffect;
-
 HpsEffectFilter::HpsEffectFilter(Drawing::Canvas& canvas)
 {
     if (g_extensionProperties.empty()) {
@@ -115,7 +113,7 @@ bool IsGradientSupport(
     return linearGradientBlurParams->isRadiusGradient;
 }
 
-bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect> vef)
+bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef)
 {
     auto ve = vef->GetImpl();
     auto veType = ve->GetFilterType();
@@ -136,12 +134,12 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
     return false;
 }
 
-bool HpsEffectFilter::HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veContainer)
+bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer)
 {
     if (!GetHpsEffectEnabled()) {
         return false;
     }
-    for (auto vef : veContainer.GetFilters()) {
+    for (const auto& vef : veContainer.GetFilters()) {
         if (!IsEffectSupported(vef)) {
             return false;
         }
@@ -149,42 +147,9 @@ bool HpsEffectFilter::HpsSupportEffectGE(Drawing::GEVisualEffectContainer& veCon
     return true;
 }
 
-std::vector<HpsEffectFilter::IndexRange> HpsEffectFilter::HpsSupportedEffectsIndexRanges(
-    const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>& filters)
+bool HpsEffectFilter::IsHpsEffectEnabled() const
 {
-    std::vector<IndexRange> intervals;
-    std::vector<size_t> supportedIndices;
-
-    if (!GetHpsEffectEnabled()) {
-        return intervals;
-    }
-
-    for (size_t i = 0; i < filters.size(); ++i) {
-        const auto& vef = filters[i];
-        if (IsEffectSupported(vef)) {
-            supportedIndices.push_back(i);
-        }
-    }
-
-    if (supportedIndices.empty()) {
-        return intervals;
-    }
-
-    size_t start = supportedIndices[0];
-    size_t end = start;
-
-    for (size_t i = 1; i < supportedIndices.size(); ++i) {
-        if (supportedIndices[i] == end + 1) {
-            end = supportedIndices[i];
-        } else {
-            intervals.push_back({start, end});
-            start = supportedIndices[i];
-            end = start;
-        }
-    }
-
-    intervals.push_back({start, end});
-    return intervals;
+    return GetHpsEffectEnabled();
 }
 
 void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
@@ -339,13 +304,10 @@ void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradient
     hpsEffect_.push_back(graBlurParamPtr);
 }
 
-bool HpsEffectFilter::InitUpEffect() const
+std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() const
 {
-    if (g_upscaleEffect != nullptr) {
-        return true;
-    }
-
-    static const std::string mixString(R"(
+    static std::shared_ptr<Drawing::RuntimeEffect> s_upscaleEffect = [] {
+        static const std::string mixString(R"(
         uniform shader blurredInput;
         uniform float inColorFactor;
 
@@ -360,13 +322,10 @@ bool HpsEffectFilter::InitUpEffect() const
             finalColor.rgb += noise;
             return finalColor;
         }
-    )");
-    g_upscaleEffect = Drawing::RuntimeEffect::CreateForShader(mixString);
-    if (g_upscaleEffect == nullptr) {
-        return false;
-    }
-
-    return true;
+        )");
+        return Drawing::RuntimeEffect::CreateForShader(mixString);
+    }();
+    return s_upscaleEffect;
 }
 
 bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
@@ -379,8 +338,8 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
     const auto blurShader = Drawing::ShaderEffect::CreateImageShader(*imageCache, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, linear, upscale_matrix_);
-    InitUpEffect();
-    if (g_upscaleEffect == nullptr) {
+    auto upscaleEffect = GetUpscaleEffect();
+    if (upscaleEffect == nullptr) {
         return false;
     }
     Drawing::Brush brush;
@@ -388,7 +347,7 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     LOGD("HpsEffectFilter::DrawImageWithHps HpsNoise %{public}f", factor);
     static constexpr float epsilon = 0.1f;
     if (!ROSEN_LE(factor, epsilon)) {
-        Drawing::RuntimeShaderBuilder mixBuilder(g_upscaleEffect);
+        Drawing::RuntimeShaderBuilder mixBuilder(upscaleEffect);
         mixBuilder.SetChild("blurredInput", blurShader);
         mixBuilder.SetUniform("inColorFactor", factor);
         brush.SetShaderEffect(mixBuilder.MakeShader(nullptr, imageCache->IsOpaque()));
@@ -503,6 +462,12 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
     auto imageCache = offscreenSurface->GetImageSnapshot();
     outImage = imageCache;
     return false;
+}
+
+void HpsEffectFilter::UnitTestSetExtensionProperties(const std::vector<const char *>& extensionProperties)
+{
+    // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
+    g_extensionProperties = extensionProperties;
 }
 
 } // namespace Rosen

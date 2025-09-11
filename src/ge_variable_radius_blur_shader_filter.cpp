@@ -27,17 +27,10 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> verticalBoxBlurShade
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> textureShaderEffect_ = nullptr;
 } // namespace
 
-const std::string GEVariableRadiusBlurShaderFilter::type_ = Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR;
-
 GEVariableRadiusBlurShaderFilter::GEVariableRadiusBlurShaderFilter(
     const Drawing::GEVariableRadiusBlurShaderFilterParams &params)
     : params_(params)
 {}
-
-const std::string& GEVariableRadiusBlurShaderFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

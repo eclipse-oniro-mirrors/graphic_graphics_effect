@@ -28,10 +28,13 @@
 
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilter,
+                           Drawing::GEColorGradientShaderFilterParams, Drawing::GE_FILTER_COLOR_GRADIENT);
 class GEColorGradientShaderFilter : public GEShaderFilter {
 public:
     GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params);
     ~GEColorGradientShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEColorGradientShaderFilter);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
@@ -42,7 +45,6 @@ public:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeColorGradientBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMaskColorGradientBuilder();
     std::string GetDescription();
-    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> PreProcessColorGradientBuilder(float geoWidth, float geoHeight);
@@ -51,7 +53,6 @@ private:
     std::vector<float> positions_;
     std::vector<float> strengths_;
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
-    static const std::string type_;
 };
 
 } // namespace Rosen

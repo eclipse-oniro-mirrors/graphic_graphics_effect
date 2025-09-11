@@ -53,6 +53,8 @@ public:
     int32_t rotateDegree_ = 0;
 };
 
+REGISTER_GEFILTER_TYPEINFO(MAGNIFIER, GEMagnifierShaderFilter,
+                           Drawing::GEMagnifierShaderFilterParams, Drawing::GE_FILTER_MAGNIFIER);
 class GEMagnifierShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params);
@@ -60,12 +62,12 @@ public:
     GEMagnifierShaderFilter operator=(const GEMagnifierShaderFilter&) = delete;
     ~GEMagnifierShaderFilter() override = default;
 
+    DECLARE_GEFILTER_TYPEFUNC(GEMagnifierShaderFilter);
+
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
     const GE_EXPORT std::string GetDescription() const;
-
-    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMagnifierShader(
@@ -75,7 +77,6 @@ private:
 
     std::shared_ptr<GEMagnifierParams> magnifierPara_ = nullptr;
     static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffect;
-    static const std::string type_;
 };
 
 } // namespace Rosen

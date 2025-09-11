@@ -26,17 +26,11 @@ constexpr size_t NUM_3 = 3;
 constexpr size_t NUM_4 = 4;
 
 std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShaderEffect_ = nullptr;
-const std::string GEContentLightFilter::type_ = Drawing::GE_FILTER_CONTENT_LIGHT;
 
 GEContentLightFilter::GEContentLightFilter(const Drawing::GEContentLightFilterParams& params)
     : lightPosition_(params.position), lightColor_(params.color), lightIntensity_(params.intensity),
     rotationAngle_(params.rotationAngle)
 {}
-
-const std::string& GEContentLightFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

@@ -30,15 +30,17 @@
  
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(WATER_RIPPLE, GEWaterRippleFilter,
+                           Drawing::GEWaterRippleFilterParams, Drawing::GE_FILTER_WATER_RIPPLE);
 class GEWaterRippleFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params);
     ~GEWaterRippleFilter() override = default;
 
+    DECLARE_GEFILTER_TYPEFUNC(GEWaterRippleFilter);
+
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
-
-    const std::string& Type() const override;
  
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetWaterRippleEffect();
@@ -50,8 +52,6 @@ private:
     float rippleCenterX_ = 0.5f;
     float rippleCenterY_ = 0.7f;
     uint32_t rippleMode_ = 1;
-
-    static const std::string type_;
 
     inline static const std::string shaderStringSMsend = R"(
         uniform shader image;

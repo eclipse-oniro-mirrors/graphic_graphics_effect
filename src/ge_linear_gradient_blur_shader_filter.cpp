@@ -39,8 +39,6 @@ static bool GetMaskLinearBlurEnabled()
 }
 } // namespace
 
-const std::string GELinearGradientBlurShaderFilter::type_ = Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR;
-
 GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     const Drawing::GELinearGradientBlurShaderFilterParams& params)
 {
@@ -54,11 +52,6 @@ GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
     tranX_ = params.tranX;
     tranY_ = params.tranY;
     isOffscreenCanvas_ = params.isOffscreenCanvas;
-}
-
-const std::string& GELinearGradientBlurShaderFilter::Type() const
-{
-    return type_;
 }
 
 std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImageDDGR(

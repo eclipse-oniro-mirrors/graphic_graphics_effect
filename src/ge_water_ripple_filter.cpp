@@ -31,18 +31,11 @@ const int SMALL2SMALL = 2;
 const int MINI_RECV = 3;
 
 } // namespace
-
-const std::string GEWaterRippleFilter::type_ = Drawing::GE_FILTER_WATER_RIPPLE;
  
 GEWaterRippleFilter::GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params)
     : progress_(params.progress), waveCount_(params.waveCount), rippleCenterX_(params.rippleCenterX),
     rippleCenterY_(params.rippleCenterY), rippleMode_(params.rippleMode)
 {}
-
-const std::string& GEWaterRippleFilter::Type() const
-{
-    return type_;
-}
  
 std::shared_ptr<Drawing::Image> GEWaterRippleFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

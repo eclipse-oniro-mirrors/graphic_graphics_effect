@@ -269,6 +269,22 @@ HWTEST_F(GERadialGradientShaderMaskTest, GetRadialGradientNormalMaskBuilder_001,
 
     GTEST_LOG_(INFO) << "GERadialGradientShaderMaskTest GetRadialGradientNormalMaskBuilder_001 end";
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERadialGradientShaderMaskTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 start";
+    GERadialGradientShaderMaskParams param {};
+    auto filter = std::make_unique<GERadialGradientShaderMask>(param);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::RADIAL_GRADIENT_MASK);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_MASK_RADIAL_GRADIENT);
+
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

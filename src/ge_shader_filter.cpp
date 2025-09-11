@@ -22,7 +22,7 @@ std::shared_ptr<Drawing::Image> GEShaderFilter::ProcessImage(Drawing::Canvas& ca
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     GE_TRACE_NAME_FMT("GEShaderFilter::ProcessImage, Type: %s, dst Rect Width: %g, Height: %g",
-        Type().c_str(), dst.GetWidth(), dst.GetHeight());
+        TypeName().data(), dst.GetWidth(), dst.GetHeight());
     return OnProcessImage(canvas, image, src, dst);
 }
 } // namespace Rosen

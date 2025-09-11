@@ -125,7 +125,8 @@ HWTEST_F(GEWaterRippleFilterTest, Type_001, TestSize.Level2)
 {
     Drawing::GEWaterRippleFilterParams geWaterRippleFilterParams { 0.5f, 2, 0.5f, 0.0f, 3 };
     auto geWaterRippleFilter = std::make_shared<GEWaterRippleFilter>(geWaterRippleFilterParams);
-    EXPECT_EQ(geWaterRippleFilter->Type(), Drawing::GE_FILTER_WATER_RIPPLE);
+    EXPECT_EQ(geWaterRippleFilter->Type(), Drawing::GEFilterType::WATER_RIPPLE);
+    EXPECT_EQ(geWaterRippleFilter->TypeName(), Drawing::GE_FILTER_WATER_RIPPLE);
 }
 
 } // namespace GraphicsEffectEngine

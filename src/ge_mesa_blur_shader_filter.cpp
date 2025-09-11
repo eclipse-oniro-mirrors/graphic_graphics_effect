@@ -86,7 +86,6 @@ static const std::vector<std::vector<float>> offsetTableFivePasses = {
 };
 
 } // namespace
-const std::string GEMESABlurShaderFilter::type_ = Drawing::GE_FILTER_MESA_BLUR;
 
 static bool GetKawaseOriginalEnabled()
 {
@@ -131,11 +130,6 @@ GEMESABlurShaderFilter::GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFi
             return;
         }
     }
-}
-
-const std::string& GEMESABlurShaderFilter::Type() const
-{
-    return type_;
 }
 
 void GEMESABlurShaderFilter::SetMesaModeByCCM(int mode)

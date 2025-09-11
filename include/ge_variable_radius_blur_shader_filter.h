@@ -25,20 +25,20 @@
 
 namespace OHOS {
 namespace Rosen {
-
+REGISTER_GEFILTER_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilter,
+                           Drawing::GEVariableRadiusBlurShaderFilterParams, Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
 class GE_EXPORT GEVariableRadiusBlurShaderFilter : public GEShaderFilter {
 public:
     GEVariableRadiusBlurShaderFilter(const Drawing::GEVariableRadiusBlurShaderFilterParams& params);
     GEVariableRadiusBlurShaderFilter(const GEVariableRadiusBlurShaderFilter&) = delete;
     GEVariableRadiusBlurShaderFilter operator=(const GEVariableRadiusBlurShaderFilter&) = delete;
     ~GEVariableRadiusBlurShaderFilter() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEVariableRadiusBlurShaderFilter);
     virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     std::string GetDescription();
     std::string GetDetailedDescription();
-    const std::string& Type() const override;
 
 protected:
     Drawing::GEVariableRadiusBlurShaderFilterParams params_;
@@ -54,8 +54,6 @@ private:
     static std::shared_ptr<Drawing::Image> BuildBoxLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         Drawing::Matrix blurMatrix);
-
-    static const std::string type_;
 };
 
 } // namespace Rosen

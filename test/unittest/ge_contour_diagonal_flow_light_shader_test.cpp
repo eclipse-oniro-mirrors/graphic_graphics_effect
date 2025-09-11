@@ -199,5 +199,21 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.L
     auto img = shader->DrawRuntimeShader(canvas_, rect);
     EXPECT_EQ(img, nullptr);
 }
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEContourDiagonalFlowLightShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
+
+    GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest Type_001 end";
 }
-}
+} // namespace Rosen
+} // namespace OHOS

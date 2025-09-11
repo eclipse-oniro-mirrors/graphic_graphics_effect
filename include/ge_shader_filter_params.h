@@ -523,21 +523,21 @@ struct GEBorderLightShaderParams {
 
 constexpr int ARRAY_SIZE_FOUR = 4;
 
-const char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
-const char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
-const char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";
-const char GEX_SHADER_AIBAR_GLOW_BAR_ANGLE[] = "AIBarGlow_BarAngle";
-const char GEX_SHADER_AIBAR_GLOW_COLOR0[] = "AIBarGlow_Color0";
-const char GEX_SHADER_AIBAR_GLOW_COLOR1[] = "AIBarGlow_Color1";
-const char GEX_SHADER_AIBAR_GLOW_COLOR2[] = "AIBarGlow_Color2";
-const char GEX_SHADER_AIBAR_GLOW_COLOR3[] = "AIBarGlow_Color3";
-const char GEX_SHADER_AIBAR_GLOW_POS0[] = "AIBarGlow_Position0";
-const char GEX_SHADER_AIBAR_GLOW_POS1[] = "AIBarGlow_Position1";
-const char GEX_SHADER_AIBAR_GLOW_POS2[] = "AIBarGlow_Position2";
-const char GEX_SHADER_AIBAR_GLOW_POS3[] = "AIBarGlow_Position3";
-const char GEX_SHADER_AIBAR_GLOW_STRENGTH[] = "AIBarGlow_Strength";
-const char GEX_SHADER_AIBAR_GLOW_BRIGHTNESS[] = "AIBarGlow_Brightness";
-const char GEX_SHADER_AIBAR_GLOW_PROGRESS[] = "AIBarGlow_Progress";
+constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
+constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
+constexpr char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";
+constexpr char GEX_SHADER_AIBAR_GLOW_BAR_ANGLE[] = "AIBarGlow_BarAngle";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR0[] = "AIBarGlow_Color0";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR1[] = "AIBarGlow_Color1";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR2[] = "AIBarGlow_Color2";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR3[] = "AIBarGlow_Color3";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS0[] = "AIBarGlow_Position0";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS1[] = "AIBarGlow_Position1";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS2[] = "AIBarGlow_Position2";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS3[] = "AIBarGlow_Position3";
+constexpr char GEX_SHADER_AIBAR_GLOW_STRENGTH[] = "AIBarGlow_Strength";
+constexpr char GEX_SHADER_AIBAR_GLOW_BRIGHTNESS[] = "AIBarGlow_Brightness";
+constexpr char GEX_SHADER_AIBAR_GLOW_PROGRESS[] = "AIBarGlow_Progress";
 struct GEXAIBarGlowEffectParams {
     Vector4f LTWH;
     float stretchFactor = 0.0f;
@@ -549,21 +549,21 @@ struct GEXAIBarGlowEffectParams {
     float progress;
 };
 
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH[] = "RoundedRectFlowlight_WaveLength";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP[] = "RoundedRectFlowlight_WaveTop";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS[] = "RoundedRectFlowlight_CornerRadius";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS[] = "RoundedRectFlowlight_Brightness";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE[] = "RoundedRectFlowlight_Scale";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING[] = "RoundedRectFlowlight_Sharping";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING[] = "RoundedRectFlowlight_Feathering";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS[] =
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH[] = "RoundedRectFlowlight_WaveLength";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP[] = "RoundedRectFlowlight_WaveTop";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS[] = "RoundedRectFlowlight_CornerRadius";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS[] = "RoundedRectFlowlight_Brightness";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE[] = "RoundedRectFlowlight_Scale";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING[] = "RoundedRectFlowlight_Sharping";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING[] = "RoundedRectFlowlight_Feathering";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS[] =
     "RoundedRectFlowlight_FeatheringBezierControlPoints";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS[] =
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS[] =
     "RoundedRectFlowlight_GradientBezierControlPoints";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR[] = "RoundedRectFlowlight_Color";
-const char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS[] = "RoundedRectFlowlight_Progress";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR[] = "RoundedRectFlowlight_Color";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS[] = "RoundedRectFlowlight_Progress";
 struct GEXRoundedRectFlowlightEffectParams {
     std::pair<float, float> startEndPosition;
     float waveLength = 0.0f;
@@ -579,15 +579,15 @@ struct GEXRoundedRectFlowlightEffectParams {
     float progress = 0.0f;
 };
 
-const char GEX_SHADER_GRADIENT_FLOW_COLORS[] = "GradientFlowColors";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0[] = "GradientFlowColors_Color0";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1[] = "GradientFlowColors_Color1";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2[] = "GradientFlowColors_Color2";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3[] = "GradientFlowColors_Color3";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN[] = "GradientFlowColors_GradientBegin";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END[] = "GradientFlowColors_GradientEnd";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA[] = "GradientFlowColors_EffectAlpha";
-const char GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS[] = "GradientFlowColors_Progress";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS[] = "GradientFlowColors";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0[] = "GradientFlowColors_Color0";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1[] = "GradientFlowColors_Color1";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2[] = "GradientFlowColors_Color2";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3[] = "GradientFlowColors_Color3";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN[] = "GradientFlowColors_GradientBegin";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END[] = "GradientFlowColors_GradientEnd";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA[] = "GradientFlowColors_EffectAlpha";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS[] = "GradientFlowColors_Progress";
 struct GEXGradientFlowColorsEffectParams {
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
     float gradientBegin = 0.0f;
@@ -596,11 +596,11 @@ struct GEXGradientFlowColorsEffectParams {
     float progress = 0.0f;
 };
 
-const char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
-const char GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS[] =
+constexpr char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
+constexpr char GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS[] =
     "FrameGradientMask_GradientBezierControlPoints";
-const char GE_MASK_FRAME_GRADIENT_CORNER_RADIUS[] = "FrameGradientMask_CornerRadius";
-const char GE_MASK_FRAME_GRADIENT_FRAME_WIDTH[] = "FrameGradientMask_FrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_CORNER_RADIUS[] = "FrameGradientMask_CornerRadius";
+constexpr char GE_MASK_FRAME_GRADIENT_FRAME_WIDTH[] = "FrameGradientMask_FrameWidth";
 struct GEFrameGradientMaskParams {
     Vector4f gradientBezierControlPoints;
     float cornerRadius = 0.0f;

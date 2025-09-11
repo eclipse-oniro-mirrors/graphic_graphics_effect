@@ -24,7 +24,8 @@
 
 namespace OHOS {
 namespace Rosen {
-
+REGISTER_GEFILTER_TYPEINFO(PARTICLE_CIRCULAR_HALO, GEParticleCircularHaloShader,
+                           Drawing::GEParticleCircularHaloShaderParams, Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();
@@ -32,7 +33,7 @@ public:
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
 
     ~GEParticleCircularHaloShader() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEParticleCircularHaloShader);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const

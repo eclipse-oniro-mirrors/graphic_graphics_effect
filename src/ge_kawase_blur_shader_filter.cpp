@@ -43,8 +43,6 @@ static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
 
 } // namespace
 
-const std::string GEKawaseBlurShaderFilter::type_ = Drawing::GE_FILTER_KAWASE_BLUR;
-
 // Advanced Filter: we can get normalized uv offset from width and height
 struct OffsetInfo {
     float offsetX;
@@ -110,7 +108,6 @@ static const bool IS_ADVANCED_FILTER_USABLE_CHECK_ONCE = IsAdvancedFilterUsable(
 GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params)
     : radius_(params.radius)
 {
-    params_ = std::make_optional<Drawing::GEKawaseBlurShaderFilterParams>(params);
     if (!InitBlurEffect()) {
         LOGE("GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter failed when initializing BlurEffect.");
         return;
@@ -142,11 +139,6 @@ GEKawaseBlurShaderFilter::GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurSh
             return;
         }
     }
-}
-
-const std::string& GEKawaseBlurShaderFilter::Type() const
-{
-    return type_;
 }
 
 int GEKawaseBlurShaderFilter::GetRadius() const

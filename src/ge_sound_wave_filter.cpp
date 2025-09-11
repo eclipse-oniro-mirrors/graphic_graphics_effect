@@ -35,8 +35,6 @@ inline void MultiplyColor4f(Drawing::Color4f& color, float ratio)
 }
 } // namespace
 
-const std::string GESoundWaveFilter::type_ = Drawing::GE_FILTER_SOUND_WAVE;
-
 GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params)
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
@@ -46,11 +44,6 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
     colorA_ = params.colorA;
     colorB_ = params.colorB;
     colorC_ = params.colorC;
-}
-
-const std::string& GESoundWaveFilter::Type() const
-{
-    return type_;
 }
  
 std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canvas& canvas,

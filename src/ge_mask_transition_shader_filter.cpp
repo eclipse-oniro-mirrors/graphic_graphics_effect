@@ -20,16 +20,10 @@ namespace OHOS {
 namespace Rosen {
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_transitionBlendShader_ = nullptr;
-const std::string GEMaskTransitionShaderFilter::type_ = Drawing::GE_FILTER_MASK_TRANSITION;
 
 GEMaskTransitionShaderFilter::GEMaskTransitionShaderFilter(const Drawing::GEMaskTransitionShaderFilterParams& params)
     : params_(params)
 {}
-
-const std::string& GEMaskTransitionShaderFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

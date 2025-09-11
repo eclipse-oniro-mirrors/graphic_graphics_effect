@@ -21,20 +21,19 @@
 
 namespace OHOS {
 namespace Rosen {
+REGISTER_GEFILTER_TYPEINFO(MASK_TRANSITION, GEMaskTransitionShaderFilter,
+                           Drawing::GEMaskTransitionShaderFilterParams, Drawing::GE_FILTER_MASK_TRANSITION);
 class GEMaskTransitionShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEMaskTransitionShaderFilter(const Drawing::GEMaskTransitionShaderFilterParams& params);
     ~GEMaskTransitionShaderFilter() override = default;
-
+    DECLARE_GEFILTER_TYPEFUNC(GEMaskTransitionShaderFilter);
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
-
-    const std::string& Type() const override;
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetMaskTransitionEffect();
     Drawing::GEMaskTransitionShaderFilterParams params_;
-    static const std::string type_;
 };
 
 } // namespace Rosen
