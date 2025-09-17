@@ -26,6 +26,7 @@ namespace Rosen {
 
 namespace {
 constexpr static uint8_t COLOR_CHANNEL = 3; // 3 len of rgb
+constexpr static float COLOR_LIMIT_MULT = 3.5f; // Ratio for color limit increase
 
 inline void MultiplyColor4f(Drawing::Color4f& color, float ratio)
 {
@@ -87,6 +88,7 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
     builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
     builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
     builder.SetUniform("colorC", colorC, COLOR_CHANNEL);
+    builder.SetUniform("colorLimit", colorLimit_);
     builder.SetUniform("colorProgress", colorProgress_);
     builder.SetUniform("soundIntensity", soundIntensity_);
     builder.SetUniform("shockWaveAlphaA", shockWaveAlphaA_);
@@ -105,13 +107,15 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
 
 void GESoundWaveFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
+    bool highColor = std::max({colorA_.redF_, colorA_.greenF_, colorA_.blueF_, colorB_.redF_, colorB_.greenF_,
+        colorB_.blueF_, colorC_.redF_, colorC_.greenF_, colorC_.blueF_});
+    colorLimit_ = std::max((highColor - 1.0f) * COLOR_LIMIT_MULT + 1.0f, 1.0f);
+
     // Do tone mapping when enable edr effect
     if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
         return;
     }
 
-    bool highColor = std::max({colorA_.redF_, colorA_.greenF_, colorA_.blueF_, colorB_.redF_, colorB_.greenF_,
-        colorB_.blueF_, colorC_.redF_, colorC_.greenF_, colorC_.blueF_});
     if (ROSEN_GNE(highColor, 1.0f)) {
         float compressRatio = GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
         MultiplyColor4f(colorA_, compressRatio);

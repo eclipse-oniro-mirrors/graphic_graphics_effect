@@ -54,6 +54,7 @@ private:
     Drawing::Color4f colorC_ = {1.0f, 1.0f, 1.0f, 1.0f};
     float colorProgress_ = 0.0f;
     float soundIntensity_ = 0.0f;
+    float colorLimit_ = 1.0f;
 
     // shock wave
     float shockWaveAlphaA_ = 1.0f;
@@ -68,6 +69,7 @@ private:
         uniform half3 colorA;
         uniform half3 colorB;
         uniform half3 colorC;
+        uniform half colorLimit;
         uniform half colorProgress;
         uniform half soundIntensity;
         uniform half shockWaveAlphaA;
@@ -181,7 +183,7 @@ private:
             half3 finalColor = image.eval(half2(uv.x, 1.0 - uv.y) * iResolution.xy).rgb;
             half3 centerColor = additionalColorStrength > 0.0 ?
                                 colorWheel(centeredUVs, colorProgress) : half3(0.0);
-            finalColor += centerColor * additionalColorStrength;
+            finalColor = clmap(finalColor + centerColor * additionalColorStrength, 0.0, colorLimit);
 
             return half4(finalColor, 1.0);
         }
