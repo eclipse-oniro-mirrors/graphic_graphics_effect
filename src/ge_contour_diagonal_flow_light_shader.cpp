@@ -50,6 +50,7 @@ constexpr size_t MIN_NUM = 6;
 constexpr static uint8_t POSITION_CHANNEL = 2; // 2 floats per point
 constexpr int MAX_CURVES_PER_GRID = 16;
 constexpr int MIN_GRID_SIZE = 128;
+constexpr int CURVE_CAPACITY = 128;
 constexpr int XMIN_I = 0;
 constexpr int XMAX_I = 1;
 constexpr int YMIN_I = 2;
@@ -842,8 +843,8 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
         0.0f,
     };
 
-    curveWeightPrefix_.assign(MIN_GRID_SIZE, 0.0f);
-    curveWeightCurrent_.assign(MIN_GRID_SIZE, 0.0f);
+    curveWeightPrefix_.assign(numCurves_, 0.0f);
+    curveWeightCurrent_.assign(numCurves_, 0.0f);
     std::vector<float> rawWeight(numCurves_, 0.0f);
     float approxLen = 0.0f;
     float sumWeight = 0.0f;
@@ -877,6 +878,8 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
             acc += uniformWeight;
         }
     }
+    curveWeightPrefix_.resize(CURVE_CAPACITY, 0.0f);
+    curveWeightCurrent_.resize(CURVE_CAPACITY, 0.0f);
 }
 
 Box4f GEContourDiagonalFlowLightShader::ComputeCurveBoundingBox(
