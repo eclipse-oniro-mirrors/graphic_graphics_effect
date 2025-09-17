@@ -183,7 +183,7 @@ private:
             half3 finalColor = image.eval(half2(uv.x, 1.0 - uv.y) * iResolution.xy).rgb;
             half3 centerColor = additionalColorStrength > 0.0 ?
                                 colorWheel(centeredUVs, colorProgress) : half3(0.0);
-            finalColor = clmap(finalColor + centerColor * additionalColorStrength, 0.0, colorLimit);
+            finalColor = clamp(finalColor + centerColor * additionalColorStrength, 0.0, colorLimit);
 
             return half4(finalColor, 1.0);
         }

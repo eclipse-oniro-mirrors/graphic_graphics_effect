@@ -226,6 +226,10 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
     }
 
     auto resImage = ApplyImageEffect(canvas, veContainer, image, src, dst, sampling);
+    if (!resImage) {
+        LOGE("GERender::DrawImageRect resImage is null");
+        return;
+    }
     Drawing::Brush brush;
     canvas.AttachBrush(brush);
     canvas.DrawImageRect(*resImage, src, dst, Drawing::SamplingOptions());
