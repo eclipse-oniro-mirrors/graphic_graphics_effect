@@ -61,26 +61,28 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing:
         return image;
     }
 
-    Drawing::Matrix matrix;
-    matrix.Rotate(magnifierPara_->rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
-        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
+    Drawing::Matrix invertMatrix;
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEMagnifierShaderFilter::OnProcessImage Invert matrix failed");
+        return image;
+    }
+
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    float imageWidth = image->GetWidth();
-    float imageHeight = image->GetHeight();
-    auto builder = MakeMagnifierShader(imageShader, imageWidth, imageHeight);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    Drawing::Rect imageRect(0, 0, image->GetWidth(), image->GetHeight());
+    matrix.MapRect(imageRect, imageRect);
+    auto builder = MakeMagnifierShader(imageShader, imageRect.GetWidth(), imageRect.GetHeight());
     if (builder == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage builder is null");
         return image;
     }
 
-    Drawing::Matrix invMatrix;
-    invMatrix.Rotate(-magnifierPara_->rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
-        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
 #ifdef RS_ENABLE_GPU
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &invMatrix, image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
 #else
-    auto resultImage = builder->MakeImage(nullptr, &invMatrix, image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(nullptr, &(matrix), image->GetImageInfo(), false);
 #endif
     if (resultImage == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage resultImage is null");
