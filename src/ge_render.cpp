@@ -22,6 +22,7 @@
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
 #include "ge_direction_light_shader_filter.h"
+#include "ge_dispersion_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
@@ -408,9 +409,9 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
                 static_cast<uint32_t>(type), sizeof(Drawing::GEDispersionShaderFilterParams),
                 static_cast<void*>(dispersionParams.get()));
             if (!object) {
-                return nullptr;
+                return std::make_shared<GEDispersionShaderFilter>(*dispersionParams);
             }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter*>(object));
+            std::shared_ptr<GEDispersionShaderFilter> dmShader(static_cast<GEDispersionShaderFilter*>(object));
             return dmShader;
         }
         case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
