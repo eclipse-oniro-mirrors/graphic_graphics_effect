@@ -21,16 +21,9 @@
 namespace OHOS {
 namespace Rosen {
 
-const std::string GEDispersionShaderFilter::type_ = Drawing::GE_FILTER_DISPERSION;
-
 GEDispersionShaderFilter::GEDispersionShaderFilter(const Drawing::GEDispersionShaderFilterParams& params)
     : params_(params)
 {}
-
-const std::string& GEDispersionShaderFilter::Type() const
-{
-    return type_;
-}
 
 std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

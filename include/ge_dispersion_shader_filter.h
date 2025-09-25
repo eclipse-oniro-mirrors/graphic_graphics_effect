@@ -33,14 +33,11 @@ public:
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
-    const std::string& Type() const override;
-
 protected:
     virtual std::shared_ptr<Drawing::RuntimeEffect> GetDispersionEffect();
     Drawing::GEDispersionShaderFilterParams params_;
 
 private:
-    static const std::string type_;
 
     inline static const std::string g_shaderStringDispersion = R"(
         uniform shader image;
