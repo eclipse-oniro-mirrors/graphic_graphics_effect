@@ -43,13 +43,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
 
     if (borderLightShaderEffect_ == nullptr) {
         static constexpr char prog[] = R"(
-            uniform half2 iResolution;
-            uniform half3 lightPosition;
+            uniform vec2 iResolution;
+            uniform vec3 lightPosition;
             uniform half4 lightColor;
             uniform half lightIntensity;
-            uniform half lightWidth;
+            uniform float lightWidth;
             uniform half3 borderLightRotationAngle;
-            uniform half cornerRadius;
+            uniform float cornerRadius;
 
             half sdRoundedBox(half2 p, half2 b, half r)
             {
@@ -130,22 +130,23 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
 
             half4 main(vec2 fragCoord)
             {
-                half2 uv = fragCoord / iResolution.xy;
+                vec2 uv = fragCoord / iResolution.xy;
                 uv = uv + uv - 1.0;
-                half screenRatio = iResolution.x / iResolution.y;
+                float screenRatio = iResolution.x / iResolution.y;
                 uv.x *= screenRatio;
 
                 half4 shinningColor = half4(0.0);
-                half3 lightPos = half3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
+                vec3 lightPos = vec3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
                 if (dot(borderLightRotationAngle, borderLightRotationAngle) < 0.01) {
-                    half r = min(cornerRadius * 2.0, min(iResolution.x, iResolution.y));
-                    half2 q = abs(fragCoord + fragCoord - iResolution.xy) - iResolution.xy + r;
-                    half dist = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
-                    half normalizedDist = dist / (lightWidth + 0.001) + 1.0;
-                    shinningColor = (normalizedDist > 0.0 && normalizedDist < 1.0)
-                        ? lightColor * pow(max(normalize(lightPos - half3(uv, 0.0)).z, 0.0), 16.0) : half4(0.0);
-                    shinningColor *= smoothstep(0.0, 0.1, normalizedDist); // edge smooth
+                    float r = min(cornerRadius * 2.0, min(iResolution.x, iResolution.y));
+                    vec2 q = abs(fragCoord + fragCoord - iResolution.xy + vec2(1.0)) - iResolution.xy + r;
+                    float dist = min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
+                    float normalizedDist = dist / max(lightWidth, 0.0001) + 1.0;
+                    const float thres = 0.2;
+                    shinningColor = (normalizedDist > -thres)
+                        ? lightColor * pow(max(normalize(lightPos - vec3(uv, 0.0)).z, 0.0), 16.0) : half4(0.0);
+                    shinningColor *= smoothstep(-thres, thres, normalizedDist); // edge smooth
                 } else {
                     mat3 rotM = GetRotationMatrix(borderLightRotationAngle);
                     half4 specularColor = lightColor;
