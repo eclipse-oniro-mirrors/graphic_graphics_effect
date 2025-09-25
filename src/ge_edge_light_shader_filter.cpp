@@ -574,12 +574,17 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::OnProcessImage(Drawing:
         return image;
     }
 
-    auto type = image->GetImageInfo().GetColorSpace();
-    if (type->Equals(std::make_shared<Drawing::ColorSpace>(Drawing::ColorSpace::ColorSpaceType::NO_TYPE))) {
-        type = Drawing::ColorSpace::CreateSRGB(); // Dont delete!! Stay consistent with skia: SkColorSpaceXformSteps.
+    auto colorSpace = image->GetImageInfo().GetColorSpace();
+    if (colorSpace == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::OnProcessImage image GetColorSpace failed.");
+        return image;
+    }
+    // Don't delete!! Stay consistent with skia: SkColorSpaceXformSteps.
+    if (colorSpace->Equals(std::make_shared<Drawing::ColorSpace>(Drawing::ColorSpace::ColorSpaceType::NO_TYPE))) {
+        colorSpace = Drawing::ColorSpace::CreateSRGB();
     }
 
-    auto retImage = ConvertColorSpace(canvas, mergeImage, type);
+    auto retImage = ConvertColorSpace(canvas, mergeImage, colorSpace);
     if (retImage == nullptr) {
         LOGE("GEEdgeLightShaderFilter::OnProcessImage ConvertColorSpace failed.");
         return image;
