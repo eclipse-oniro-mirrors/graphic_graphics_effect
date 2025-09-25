@@ -45,6 +45,26 @@ protected:
     Vector4f color_ = {0.2f, 0.7f, 0.1f, 0.0f};
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
     bool useRawColor_ = false;
+
+private:
+    bool InitConvertFragShaderEffect();
+    bool InitDetectFragShaderEffect();
+    bool InitGaussShaderEffect();
+    bool InitCompositeShaderEffect();
+    bool InitMaskShaderEffect();
+    bool InitMergeImageShaderEffect();
+    bool IsShaderEffectInitValid();
+    bool IsInputImageValid(const std::shared_ptr<Drawing::Image> image);
+
+    std::shared_ptr<Drawing::Image> ConvertColorSpace(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image, std::shared_ptr<Drawing::ColorSpace> dstColorSpace);
+    std::shared_ptr<Drawing::Image> DetectEdge(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image);
+    std::shared_ptr<Drawing::Image> GaussianBlur(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image);
+    std::shared_ptr<Drawing::Image> MergeImage(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image,
+        const std::shared_ptr<Drawing::Image> compositeImage);
 };
 
 } // namespace Rosen
