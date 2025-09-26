@@ -65,6 +65,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_color_gradient_shader_filter.cpp",
     "src/ge_content_light_shader_filter.cpp",
     "src/ge_contour_diagonal_flow_light_shader.cpp",
+    "src/ge_dispersion_shader_filter.cpp",
     "src/ge_displacement_distort_shader_filter.cpp",
     "src/ge_direction_light_shader_filter.cpp",
     "src/ge_double_ripple_shader_mask.cpp",
