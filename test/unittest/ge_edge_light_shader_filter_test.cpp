@@ -87,7 +87,7 @@ std::shared_ptr<GEEdgeLightShaderFilter> CreateEdgeLightShaderFilter()
 /**
  * @tc.name: Type_001
  * @tc.desc: Verify function Type
- * @tc.type:FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, Type_001, TestSize.Level0)
 {
@@ -102,8 +102,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, Type_001, TestSize.Level0)
 /**
  * @tc.name: GEEdgeLightShaderFilterCreateTest
  * @tc.desc: GEEdgeLightShaderFilterTest.GEEdgeLightShaderFilterCreateTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, GEEdgeLightShaderFilterCreateTest, TestSize.Level1)
 {
@@ -122,8 +121,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, GEEdgeLightShaderFilterCreateTest, TestSiz
 /**
  * @tc.name: IsShaderEffectInitValidTest
  * @tc.desc: GEEdgeLightShaderFilterTest.IsShaderEffectInitValidTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, IsShaderEffectInitValidTest, TestSize.Level1)
 {
@@ -144,8 +142,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, IsShaderEffectInitValidTest, TestSize.Leve
 /**
  * @tc.name: SubFunctionTest
  * @tc.desc: GEEdgeLightShaderFilterTest.SubFunctionTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, SubFunctionTest, TestSize.Level1)
 {
@@ -163,8 +160,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, SubFunctionTest, TestSize.Level1)
 /**
  * @tc.name: IsInputImageValidTest
  * @tc.desc: GEEdgeLightShaderFilterTest.IsInputImageValidTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, IsInputImageValidTest, TestSize.Level1)
 {
@@ -179,8 +175,7 @@ HWTEST_F(GEEdgeLightShaderFilterTest, IsInputImageValidTest, TestSize.Level1)
 /**
  * @tc.name: OnProcessImageTest
  * @tc.desc: GEEdgeLightShaderFilterTest.OnProcessImageTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEEdgeLightShaderFilterTest, OnProcessImageTest, TestSize.Level1)
 {

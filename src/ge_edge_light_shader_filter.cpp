@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Rosen {
 
 namespace {
-static constexpr uint32_t MIP_LEVEL = 3;  // blur
+static constexpr uint32_t MIP_LEVEL = 3;  // blur times
 static constexpr float MIN_IMAGE_SIZE = 1.0;
 static constexpr float MIN_IMAGE_BLOOM_SIZE = 16.0; // < MIN_IMAGE_BLOOM_SIZE, not bloom, return edgeImage.
 static constexpr float ALPHA_MIN = 0.0;
@@ -175,16 +175,16 @@ inline static const std::string g_shaderStringAlphaGradient = R"(
 
 // for init shader effect only once.
 // thread_local for thread safety and freeing variables.
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_convertShaderEffect;
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_detectShaderEffect;
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_gaussShaderEffect;
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_compShaderEffect;
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_addMaskEffect;
-static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_alphaShaderEffect;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_convertShaderEffect = nullptr;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_detectShaderEffect = nullptr;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_gaussShaderEffect = nullptr;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_compShaderEffect = nullptr;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_addMaskEffect = nullptr;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_alphaShaderEffect = nullptr;
 static thread_local uint32_t g_originalImageID = 0; // When the ID is the same as the last one, the cached image is used
 static thread_local std::shared_ptr<Drawing::Image> g_afterCompositeImage = nullptr; // cache calculated image
 static thread_local Vector4f g_color; // support Hdr, maybe > 1
-}
+} // namespace
 
 bool GEEdgeLightShaderFilter::InitConvertFragShaderEffect()
 {
@@ -358,9 +358,6 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
         return edgeImage;
     }
 
-    auto makeImageInfo = Drawing::ImageInfo(imageInfo.GetWidth(), imageInfo.GetHeight(), imageInfo.GetColorType(),
-        imageInfo.GetAlphaType(), imageInfo.GetColorSpace());
-
     auto gaussianBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_gaussShaderEffect);
     auto compositeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_compShaderEffect);
 
@@ -418,10 +415,12 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
             Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), imageBlurShaderMatrix);
         compositeBuilder->SetChild("imageBlur" + std::to_string(i), imageBlurShader);
     }
+    auto compImageInfo = Drawing::ImageInfo(imageInfo.GetWidth(), imageInfo.GetHeight(), imageInfo.GetColorType(),
+        imageInfo.GetAlphaType(), imageInfo.GetColorSpace());
 #ifdef RS_ENABLE_GPU
-    auto compImage = compositeBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, makeImageInfo, false);
+    auto compImage = compositeBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, compImageInfo, false);
 #else
-    auto compImage = compositeBuilder->MakeImage(nullptr, nullptr, makeImageInfo, false);
+    auto compImage = compositeBuilder->MakeImage(nullptr, nullptr, compImageInfo, false);
 #endif
     LOGD("GEEdgeLightShaderFilter::GaussianBlur finished."); // if nullptr in ProcessImage;
     return compImage;
@@ -480,12 +479,12 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::MergeImage(Drawing::Can
     // mergeBuilder set uniforms
     mergeBuilder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     mergeBuilder->SetUniform("alphaProgress", std::clamp(alpha_, ALPHA_MIN, ALPHA_MAX));
-    auto makeImageInfo = Drawing::ImageInfo(imageWidth, imageHeight, imageInfo.GetColorType(),
+    auto retImageInfo = Drawing::ImageInfo(imageWidth, imageHeight, imageInfo.GetColorType(),
         imageInfo.GetAlphaType(), Drawing::ColorSpace::CreateSRGBLinear());
 #ifdef RS_ENABLE_GPU
-    auto retImage = mergeBuilder->MakeImage(canvas.GetGPUContext().get(), &(mergeMatrix), makeImageInfo, false);
+    auto retImage = mergeBuilder->MakeImage(canvas.GetGPUContext().get(), &(mergeMatrix), retImageInfo, false);
 #else
-    auto retImage = mergeBuilder->MakeImage(nullptr, &(mergeMatrix), makeImageInfo, false);
+    auto retImage = mergeBuilder->MakeImage(nullptr, &(mergeMatrix), retImageInfo, false);
 #endif
     LOGD("GEEdgeLightShaderFilter::MergeImage finished."); // if nullptr in ProcessImage;
     return retImage;

@@ -38,7 +38,6 @@ protected:
     Drawing::GEDispersionShaderFilterParams params_;
 
 private:
-
     inline static const std::string g_shaderStringDispersion = R"(
         uniform shader image;
         uniform shader mask;
@@ -51,25 +50,25 @@ private:
 
         vec4 main(vec2 fragCoord)
         {
-            vec2 frag_uv = fragCoord.xy / iResolution.xy;
-            vec4 mask_color = mask.eval(fragCoord);
+            vec2 fragUV = fragCoord.xy / iResolution.xy;
+            vec4 maskColor = mask.eval(fragCoord);
 
-            vec2 sdf = (mask_color.rg - 0.5) * 2.0;
-            float alpha = mask_color.a * opacity;
+            vec2 sdf = (maskColor.rg - 0.5) * 2.0;
+            float alpha = maskColor.a * opacity;
             vec3 dispersedColor = vec3(0.0);
 
             vec2 offset = redOffset * sdf;
-            dispersedColor[0] = image.eval((frag_uv + offset) * iResolution).r;
+            dispersedColor[0] = image.eval((fragUV + offset) * iResolution).r;
             offset = greenOffset * sdf;
-            dispersedColor[1] = image.eval((frag_uv + offset) * iResolution).g;
+            dispersedColor[1] = image.eval((fragUV + offset) * iResolution).g;
             offset = blueOffset * sdf;
-            dispersedColor[2] = image.eval((frag_uv + offset) * iResolution).b;
+            dispersedColor[2] = image.eval((fragUV + offset) * iResolution).b;
 
-            vec4 image_color = image.eval(fragCoord.xy);
-            vec3 final_color = mix(image_color.rgb, dispersedColor, alpha);
+            vec4 imageColor = image.eval(fragCoord.xy);
+            vec3 finalColor = mix(imageColor.rgb, dispersedColor, alpha);
 
             // Final Image
-            return vec4(final_color, image_color.a);
+            return vec4(finalColor, imageColor.a);
         }
     )";
 };

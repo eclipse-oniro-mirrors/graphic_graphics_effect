@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
+#include "ge_dispersion_shader_filter.h"
+
 #include <typeinfo>
 #include "ge_log.h"
-#include "ge_dispersion_shader_filter.h"
 #include "effect/runtime_effect.h"
 
 namespace OHOS {
@@ -51,8 +52,8 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
     }
 
     float lowValue = std::min(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
-    float aspectX = ROSEN_NE(lowValue, 0.0f) ? (canvasInfo_.geoWidth / lowValue) : 1.0f;
-    float aspectY = ROSEN_NE(lowValue, 0.0f) ? (-canvasInfo_.geoHeight / lowValue) : 1.0f;
+    float aspectX = (std::abs(lowValue) > 1e-6f) ? (canvasInfo_.geoWidth / lowValue) : 1.0f;
+    float aspectY = (std::abs(lowValue) > 1e-6f) ? (-canvasInfo_.geoHeight / lowValue) : 1.0f;
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
@@ -84,11 +85,11 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDispersionShaderFilter::GetDispersionEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_dispersionShader = nullptr;
-    if (g_dispersionShader == nullptr) {
-        g_dispersionShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDispersion);
+    static std::shared_ptr<Drawing::RuntimeEffect> dispersionShader = nullptr;
+    if (dispersionShader == nullptr) {
+        dispersionShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDispersion);
     }
-    return g_dispersionShader;
+    return dispersionShader;
 }
 
 } // namespace Rosen

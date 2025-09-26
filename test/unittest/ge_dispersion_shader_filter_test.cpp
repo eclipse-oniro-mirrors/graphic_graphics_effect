@@ -86,20 +86,18 @@ std::shared_ptr<GEDispersionShaderFilter> CreateDispersionShaderFilter()
 /**
  * @tc.name: GEDispersionShaderFilterCreateTest
  * @tc.desc: GEDispersionShaderFilterTest.GEDispersionShaderFilterCreateTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEDispersionShaderFilterTest, GEDispersionShaderFilterCreateTest, TestSize.Level1)
 {
     auto dispersionShaderFilter = CreateDispersionShaderFilter();
-    ASSERT_NE(dispersionShaderFilter, nullptr);
+    EXPECT_NE(dispersionShaderFilter, nullptr);
 }
 
 /**
  * @tc.name: GetDispersionEffectTest
  * @tc.desc: GEDispersionShaderFilterTest.GetDispersionEffectTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEDispersionShaderFilterTest, GetDispersionEffectTest, TestSize.Level1)
 {
@@ -113,8 +111,7 @@ HWTEST_F(GEDispersionShaderFilterTest, GetDispersionEffectTest, TestSize.Level1)
 /**
  * @tc.name: OnProcessImageTest
  * @tc.desc: GEDispersionShaderFilterTest.OnProcessImageTest
- * @tc.type:FUNC
- * @tc.require:
+ * @tc.type: FUNC
  */
 HWTEST_F(GEDispersionShaderFilterTest, OnProcessImageTest, TestSize.Level1)
 {
