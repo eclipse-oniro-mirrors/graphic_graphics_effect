@@ -73,6 +73,7 @@ public:
         Drawing::Brush& brush
     );
 
+    static void SetMesablurAllEnabledByCCM(bool flag);
 private:
     struct ShaderFilterEffectContext {
         std::shared_ptr<Drawing::Image> image {};
@@ -93,6 +94,10 @@ private:
         const Drawing::GEVisualEffectContainer& veContainer);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+
+    std::shared_ptr<GEShaderFilter> GenerateShaderKawaseBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+
+    static bool isMesablurAllEnable_;
 };
 
 } // namespace GraphicsEffectEngine
