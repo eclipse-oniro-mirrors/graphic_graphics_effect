@@ -41,6 +41,7 @@ using CacheDataType = struct CacheData {
     uint32_t hash = 0;
     float blurRadius = 0.0f;
 };
+
 using namespace Drawing;
 namespace {
 constexpr size_t NUM0 = 0;
@@ -55,7 +56,7 @@ constexpr int XMIN_I = 0;
 constexpr int XMAX_I = 1;
 constexpr int YMIN_I = 2;
 constexpr int YMAX_I = 3;
-constexpr ColorType RGBA_F16 = ColorType::COLORTYPE_RGBA_F16;
+constexpr Drawing::ColorType RGBA_F16 = Drawing::ColorType::COLORTYPE_RGBA_F16;
 constexpr bool NOT_BUDGETED = false;
 // shader
 static constexpr char FLOW_LIGHT_PROG[] = R"(
@@ -72,9 +73,9 @@ static constexpr char FLOW_LIGHT_PROG[] = R"(
     const float thickness = 0.04;
     const float glowBellSigma = 0.28;
     const float distMin = 1e-4;
-    const float intensity = 1.8;
-    const float glowRadius = 0.005;
-    const float intensityFactor = 0.002;
+    const float intensity = 1.75;
+    const float glowRadius = 0.004;
+    const float intensityFactor = 0.0045;
 
     // Gaussian bell-shaped profile centered at t = 0.5
     float BellShape(float t, float sigma)
@@ -88,7 +89,7 @@ static constexpr char FLOW_LIGHT_PROG[] = R"(
     {
         float w = BellShape(tLocal, glowBellSigma); // tLocal: [0,1]
         float th = thickness * w * lineThickness;
-        return weight * pow(glowRadius / max(sdfData - th, distMin), intensity) * intensityFactor;
+        return log(1.0 + weight * pow(glowRadius / max(sdfData - th, distMin), intensity) * intensityFactor);
     }
 
     void ComputeArcWindow(float tGlobal, float tStart, float windowLen, float sigma,
@@ -119,6 +120,7 @@ static constexpr char FLOW_LIGHT_PROG[] = R"(
         if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard transparent pixels
             return vec4(0.0, 0.0, 0.0, 0.0);
         }
+
         // === Sliding window for glow arcs ===
         float weight1 = 0.0;
         float tLocal1 = 0.0;
@@ -126,6 +128,7 @@ static constexpr char FLOW_LIGHT_PROG[] = R"(
         float tLocal2 = 0.0;
         ComputeArcWindow(tGlobal, line1Start, line1Length, glowBellSigma, tLocal1, weight1);
         ComputeArcWindow(tGlobal, line2Start, line2Length, glowBellSigma, tLocal2, weight2);
+
         // === Glow color composition ===
         float line1Intensity = GetSegmentGlowIntensity(sdf, weight1, tLocal1);
         float line2Intensity = GetSegmentGlowIntensity(sdf, weight2, tLocal2);
@@ -138,27 +141,21 @@ static constexpr char FLOW_LIGHT_PROG[] = R"(
     }
 )";
 
-static constexpr char PRECALCULATION_PROG[] = R"(
+static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
     uniform shader loopImage;
     uniform vec2 iResolution;
     uniform float count;
     const int capacity = 48; // 48 control points for 16 Bezier curves
     uniform vec2 controlPoints[capacity];
     uniform float segmentIndex[16]; // 16: maximum 16 segments per grid
-    uniform float leftGridBoundary;
-    uniform float topGridBoundary;
-
     // ===== Constant =====
     const float INF = 1e10; // infinity, i.e., 1.0 / 0.0
     const float SQRT3 = 1.7320508;
     
     // ===== Vector Math Utilities =====
     float Cross2(vec2 a, vec2 b) { return a.x * b.y - a.y * b.x; }
-    
     float SaturateFloat(float a) { return clamp(a, 0.0, 1.0); }
-    
     vec3 SaturateVec3(vec3 a) { return clamp(a, 0.0, 1.0); }
-    
     float AbsMin(float a, float b) { return abs(a) < abs(b) ? a : b; }
     
     vec2 GetElement(vec2 arr[capacity], int index)
@@ -200,19 +197,14 @@ static constexpr char PRECALCULATION_PROG[] = R"(
         bool abEqual = all(lessThan(abs(pointA - pointB), vec2(EPSILON)));
         bool bcEqual = all(lessThan(abs(pointB - pointC), vec2(EPSILON)));
         bool acEqual = all(lessThan(abs(pointA - pointC), vec2(EPSILON)));
-        
         if (abEqual && bcEqual) {
             closestPoint = pointA;
             return distance(pos, pointA);
         }
-        
         if (abEqual || acEqual) return SdfLinePartition(pos, pointB, pointC, closestPoint, bestTLocal);
-        
         if (bcEqual) return SdfLinePartition(pos, pointA, pointC, closestPoint, bestTLocal);
-        
         if (abs(dot(normalize(pointB - pointA), normalize(pointC - pointB)) - 1.0) < EPSILON)
             return SdfLinePartition(pos, pointA, pointC, closestPoint, bestTLocal);
-        
         vec2 a = pointB - pointA;
         vec2 b = pointA - 2.0 * pointB + pointC;
         vec2 c = a * 2.0;
@@ -226,7 +218,6 @@ static constexpr char PRECALCULATION_PROG[] = R"(
         float p = ky - kx * kx;
         float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
         float h = q * q + 4.0 * p * p * p;
-        
         if (h >= 0.0) {
             h = sqrt(h);
             vec2 x = 0.5 * (vec2(h, -h) - q);
@@ -240,7 +231,6 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             sgn = Cross2(c + 2.0 * b * t, qv);
             return (sgn > 0.0 ? 1.0 : -1.0) * sqrt(res);
         }
-        
         float z = sqrt(-p);
         float v = acos(q / (p * z * 2.0)) * ONE_THIRD;
         float m = cos(v);
@@ -261,7 +251,6 @@ static constexpr char PRECALCULATION_PROG[] = R"(
     }
     
     // ================= SDF Polygon =================
-    
     float SdfControlSegment(vec2 p, vec2 pointA, vec2 pointB, vec2 pointC)
     {
         return AbsMin(SdfLine(p, pointA, pointB), SdfLine(p, pointB, pointC));
@@ -285,6 +274,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[0];
         }
+
         // i = 1
         pointA = controlPoly[3]; // iMidPrev = i - 1
         pointB = controlPoly[4]; // i
@@ -297,6 +287,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[1];
         }
+
         // i = 2
         pointA = controlPoly[6]; // iMidPrev = i - 1
         pointB = controlPoly[7]; // i
@@ -309,6 +300,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[2];
         }
+
         // i = 3
         if (size < 9) return minDist; // 9: next i beyond legal size
         pointA = controlPoly[9]; // iMidPrev = i - 1
@@ -322,6 +314,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[3];
         }
+
         // i = 4
         if (size < 12) return minDist; // 12: next i beyond legal size
         pointA = controlPoly[12]; // iMidPrev = i - 1
@@ -335,6 +328,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[4];
         }
+
         // i = 5
         if (size < 15) return minDist; // 15: next i beyond legal size
         pointA = controlPoly[15]; // iMidPrev = i - 1
@@ -348,6 +342,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[5];
         }
+
         // i = 6
         if (size < 18) return minDist; // 18: next i beyond legal size
         pointA = controlPoly[18]; // iMidPrev = i - 1
@@ -361,6 +356,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[6];
         }
+
         // i = 7
         if (size < 21) return minDist; // 21: next i beyond legal size
         pointA = controlPoly[21]; // iMidPrev = i - 1
@@ -374,6 +370,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[7];
         }
+
         // i = 8
         if (size < 24) return minDist; // 24: next i beyond legal size
         pointA = controlPoly[24]; // iMidPrev = i - 1
@@ -387,6 +384,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[8];
         }
+
         // i = 9
         if (size < 27) return minDist; // 27: next i beyond legal size
         pointA = controlPoly[27]; // iMidPrev = i - 1
@@ -400,6 +398,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[9];
         }
+
         // i = 10
         if (size < 30) return minDist; // 30: next i beyond legal size
         pointA = controlPoly[30]; // iMidPrev = i - 1
@@ -413,6 +412,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[10];
         }
+
         // i = 11
         if (size < 33) return minDist; // 33: next i beyond legal size
         pointA = controlPoly[33]; // iMidPrev = i - 1
@@ -426,6 +426,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[11];
         }
+
         // i = 12
         if (size < 36) return minDist; // 36: next i beyond legal size
         pointA = controlPoly[36]; // iMidPrev = i - 1
@@ -439,6 +440,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[12];
         }
+
         // i = 13
         if (size < 39) return minDist; // 39: next i beyond legal size
         pointA = controlPoly[39]; // iMidPrev = i - 1
@@ -452,6 +454,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[13];
         }
+
         // i = 14
         if (size < 42) return minDist; // 42: next i beyond legal size
         pointA = controlPoly[42]; // iMidPrev = i - 1
@@ -465,6 +468,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
             closest[2] = pointC;
             closestSegmentIndex = segmentIndex[14];
         }
+
         // i = 15
         if (size < 45) return minDist; // 45: next i beyond legal size
         pointA = controlPoly[45]; // iMidPrev = i - 1
@@ -489,7 +493,7 @@ static constexpr char PRECALCULATION_PROG[] = R"(
         return SdfBezier(p, closest[0], closest[1], closest[2], closestPoint, bestTLocal);
     }
 
-    vec4 SamplePrecalculationImage(vec2 coord)
+    vec4 SampleLoopImage(vec2 coord)
     {
         return loopImage.eval(coord);
     }
@@ -510,10 +514,9 @@ static constexpr char PRECALCULATION_PROG[] = R"(
     vec4 main(vec2 fragCoord)
     {
         int size = int(count);
-        vec2 mapCoord = vec2(fragCoord.x + leftGridBoundary, fragCoord.y + topGridBoundary);
-        vec2 p = (2.0 * mapCoord - iResolution.xy) / iResolution.y; // 2.0: normalized screen coordinates
+        vec2 p = (2.0 * fragCoord - iResolution.xy) / iResolution.y; // 2.0: normalized screen coordinates
 
-        vec4 precalculationData = SamplePrecalculationImage(fragCoord);
+        vec4 precalculationData = SampleLoopImage(fragCoord);
         float formerSdf = DecodeFloat(precalculationData.rg) * 3.0; // 3.0: decode the former sdf
         float formerSegmentIndex = precalculationData.b;
         float formerLocalT = precalculationData.a;
@@ -522,21 +525,53 @@ static constexpr char PRECALCULATION_PROG[] = R"(
         float tLocal = 0.0;
         float closestSegmentIndex = 0.0;
         float sdf = SdfBezierShape(p, controlPoints, size, closestPoint, tLocal, closestSegmentIndex);
-        closestSegmentIndex = closestSegmentIndex * 0.005;
+        closestSegmentIndex = closestSegmentIndex * 0.005; // 0.005: encode the segmentIndex
         float absSdf = abs(sdf);
         if (formerSdf < absSdf) {
             absSdf = formerSdf;
             closestSegmentIndex = formerSegmentIndex;
             tLocal = formerLocalT;
         }
-
         vec2 encodedSdf = EncodeFloat(absSdf / 3.0); // 3.0: compress sdf to [0,1]
         return vec4(encodedSdf, closestSegmentIndex, tLocal);
     }
 )";
 
+static constexpr char BLEND_IMG_PROG[] = R"(
+    uniform shader precalculationImage;
+    uniform shader image1;
+    uniform shader image2;
+    uniform float lightWeight;
+    uniform float haloWeight;
+    uniform float blurRadius;
+    uniform float headRoom;
+
+    float DecodeFloat(vec2 rg)
+    {
+        return rg.x + rg.y / 255.0; // 255.0 = maximum value representable in 8-bit channel
+    }
+
+    vec4 main(vec2 fragCoord)
+    {
+        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg) * 3.0; // 3.0: decode the sdf
+        vec4 c1 = image1.eval(fragCoord).rgba;
+        vec4 c2 = image2.eval(fragCoord).rgba;
+        float totalWeight = (lightWeight + haloWeight < 1e-5) ? 1.0 : lightWeight + haloWeight;
+        float contourWeight = exp(-sdf * 20.0); // 20.0: the greater, the thinner core
+        contourWeight *= blurRadius / 50.0; // 50.0: default blur radius
+        if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard the transparent pixels
+            contourWeight = 0.0;
+        }
+        vec4 blendColor = c1 + c2 * haloWeight * haloWeight / (totalWeight * lightWeight) * contourWeight;
+        vec4 lnValue = log(blendColor + vec4(1.0, 1.0, 1.0, 1.0));
+        vec4 c_out = max(2.0, headRoom) * 2.0 * lnValue / (lnValue + 1);
+        return vec4(c_out.rgb, clamp(c_out.a, 0.0, 1.0));
+    }
+)";
+
 static constexpr char CONVERT_IMG_PROG[] = R"(
-    uniform shader loopImage;
+    uniform shader sdfImage;
+    uniform shader progressImage;
     uniform float count;
     uniform float leftGridBoundary;
     uniform float topGridBoundary;
@@ -546,7 +581,7 @@ static constexpr char CONVERT_IMG_PROG[] = R"(
     vec4 SampleLocalImage(vec2 coord)
     {
         vec2 mapCoord = vec2(coord.x - leftGridBoundary, coord.y - topGridBoundary);
-        return loopImage.eval(mapCoord);
+        return vec4(sdfImage.eval(mapCoord).rg, progressImage.eval(mapCoord).ba);
     }
 
     vec2 EncodeFloat(float x)
@@ -567,10 +602,10 @@ static constexpr char CONVERT_IMG_PROG[] = R"(
 
     vec4 main(vec2 fragCoord)
     {
-        float segmentCount = 0.5 * count; // 0.5: half amount of the control point count
+        float segmentCount = 0.5 * count;
         vec4 precalculationData = SampleLocalImage(fragCoord);
         vec2 encodedSdf = precalculationData.rg;
-        float decodedIndex = floor(precalculationData.b * 200.0 + 0.5); // 200.0:decode the closestSegmentIndex
+        float decodedIndex = floor(precalculationData.b * 200.0 + 0.5); // 200.0: decode the closestSegmentIndex
         int closestSegmentIndex = int(decodedIndex);
         float tLocal = precalculationData.a;
 
@@ -580,40 +615,10 @@ static constexpr char CONVERT_IMG_PROG[] = R"(
     }
 )";
 
-static constexpr char BLEND_IMG_PROG[] = R"(
-    uniform shader precalculationImage;
-    uniform shader image1;
-    uniform shader image2;
-    uniform float weight1;
-    uniform float weight2;
-    uniform float blurRadius;
-    uniform float headRoom;
-
-    float DecodeFloat(vec2 rg)
-    {
-        return rg.x + rg.y / 255.0; // 255.0 = maximum value representable in 8-bit channel
-    }
-    vec4 main(vec2 fragCoord)
-    {
-        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg) * 3.0; // 3.0: decode the sdf
-        vec4 c1 = image1.eval(fragCoord).rgba;
-        vec4 c2 = image2.eval(fragCoord).rgba;
-        float totalWeight = (weight1 + weight2 < 1e-5) ? 1.0 : weight1 + weight2;
-        float contourWeight = exp(-sdf * 20.0); // 20.0: the greater, the thinner core
-        contourWeight *= blurRadius / 50.0; // 50.0: default blur radius
-        if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard the transparent pixels
-            contourWeight = 0.0;
-        }
-        vec4 blendColor = c1 + c2 * weight2 * weight2 / (totalWeight * weight1) * contourWeight;
-        vec4 lnValue = log(blendColor + vec4(1.0, 1.0, 1.0, 1.0));
-        vec4 c_out = max(2.0, headRoom) * 2.0 * lnValue / (lnValue + 1);
-        return vec4(c_out.rgb, clamp(c_out.a, 0.0, 1.0));
-    }
-)";
-
-std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, float width, float height)
+std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int width, int height)
 {
-    if (height < 1) {
+    // canvas rect must width > 1 and height >1
+    if (height < 1 || width < 1 || uvPoints.empty()) {
         return {};
     }
     std::vector<Vector2f> ndcPoints;
@@ -657,52 +662,42 @@ bool FEqual(float a, float b)
     return std::abs(a - b) <= std::numeric_limits<float>::epsilon();
 }
 
-bool intersectBBox(const Box4f& a, const Box4f& b)
+bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
-    return !(a[XMAX_I] < b[XMIN_I] || a[XMIN_I] > b[XMAX_I] ||
-        a[YMAX_I] < b[YMIN_I] || a[YMIN_I] > b[YMAX_I]);
+    return !(a[XMAX_I] < b[XMIN_I] || a[XMIN_I] > b[XMAX_I] || a[YMAX_I] < b[YMIN_I] || a[YMIN_I] > b[YMAX_I]);
 }
 } // anonymous namespace
 
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
-
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
     contourDiagonalFlowLightParams_ = param;
-    Drawing::GEKawaseBlurShaderFilterParams blurParas{contourDiagonalFlowLightParams_.radius_};
+    Drawing::GEKawaseBlurShaderFilterParams blurParas{contourDiagonalFlowLightParams_.haloRadius_};
     blurShader_ = std::make_shared<GEKawaseBlurShaderFilter>(blurParas);
-    blurShader_->SetFactor(0.0f); // Set zero noise
-}
-
-std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShader::CreateFlowLightShader(
-    GEContentDiagonalFlowLightShaderParams& param)
-{
-    std::shared_ptr<GEContourDiagonalFlowLightShader> contourDiagonalFlowLightShader =
-        std::make_shared<GEContourDiagonalFlowLightShader>(param);
-    return contourDiagonalFlowLightShader;
+    blurShader_->SetFactor(0.0f); // not need noise
 }
 
 void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress) {}
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::GetFlowLightPrecalBuilder()
 {
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffectPrecalculation_ = nullptr;
-    if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
-        contourDiagonalFlowLightShaderEffectPrecalculation_ = Drawing::RuntimeEffect::CreateForShader(
-            PRECALCULATION_PROG);
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> precalculationShaderForMoreCurves = nullptr;
+
+    if (precalculationShaderForMoreCurves == nullptr) {
+        precalculationShaderForMoreCurves = Drawing::RuntimeEffect::CreateForShader(PRECALCULATIONFORMORECURVES_PROG);
     }
 
-    if (contourDiagonalFlowLightShaderEffectPrecalculation_ == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffectPrecalculation_ is nullptr.");
+    if (precalculationShaderForMoreCurves == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader precalculationShaderForMoreCurves is nullptr.");
         return nullptr;
     }
-
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffectPrecalculation_);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(precalculationShaderForMoreCurves);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::FlowLightConvertBuilder()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> convertShader = nullptr;
+
     if (convertShader == nullptr) {
         convertShader = Drawing::RuntimeEffect::CreateForShader(CONVERT_IMG_PROG);
     }
@@ -711,7 +706,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
         GE_LOGE("GEContourDiagonalFlowLightShader convertShader is nullptr.");
         return nullptr;
     }
-
     return std::make_shared<Drawing::RuntimeShaderBuilder>(convertShader);
 }
 
@@ -723,13 +717,17 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
         cacheAnyPtr_ = nullptr;
         return;
     }
+    if (!rect.IsValid()) {
+        GE_LOGE("GEContourDiagonalFlowLightShader canvas not valid");
+        return;
+    }
+
     pointCnt_ = contourDiagonalFlowLightParams_.contour_.size();
     auto inHash = CalHash(contourDiagonalFlowLightParams_.contour_);
-    float inRadius = contourDiagonalFlowLightParams_.radius_;
+    float inRadius = contourDiagonalFlowLightParams_.haloRadius_;
     if (cacheAnyPtr_ == nullptr ||  inHash != std::any_cast<CacheDataType>(*cacheAnyPtr_).hash ||
         !FEqual(inRadius, std::any_cast<CacheDataType>(*cacheAnyPtr_).blurRadius)) {
-        auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_,
-            static_cast<float>(rect.GetWidth()), static_cast<float>(rect.GetHeight()));
+        auto ndcPoints = ConvertUVToNDC(contourDiagonalFlowLightParams_.contour_, rect.GetWidth(), rect.GetHeight());
         CreateSurfaceAndCanvas(canvas, rect);
         if (offscreenSurface_ == nullptr || offscreenCanvas_ == nullptr) {
             GE_LOGE("GEContourDiagonalFlowLightShader create surface or canvas failed");
@@ -737,10 +735,14 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
             return;
         }
         ConvertPointsTo(ndcPoints, controlPoints_);
+        constexpr int minValidPointSize = 6; // 3 line - 6 point
+        bool isCurveValid = pointCnt_ > minValidPointSize && pointCnt_ % 2 == 0; // valid curves have 2n point
+        if (!isCurveValid) {
+            GE_LOGE("GEContourDiagonalFlowLightShader curve is not enough");
+            return;
+        }
         numCurves_ = pointCnt_ / 2; // one segment need 2 point
-        capacity_ = pointCnt_;
         controlPoints_.resize(pointCnt_ * POSITION_CHANNEL);
-
         AutoPartitionCal(canvas, rect);
 
         CacheDataType cacheData;
@@ -762,13 +764,13 @@ void GEContourDiagonalFlowLightShader::AutoPartitionCal(Drawing::Canvas& canvas,
         return;
     }
     float blurRadiusBound = 2.0f * // convert pixel scale to ndc scale
-        contourDiagonalFlowLightParams_.radius_ / (FEqual(rect.GetHeight(), 0.0f) ? 1.0f : rect.GetHeight());
+        contourDiagonalFlowLightParams_.haloRadius_ / (FEqual(rect.GetHeight(), 0.0f) ? 1.0f : rect.GetHeight());
     float maxThickness = 0.05f + blurRadiusBound; // 0.05: max thickness of the curve
     AutoGridPartition(rect.GetWidth(), rect.GetHeight(), maxThickness);
     // gpu cal
-    for (size_t i = 0; i < curvesInGrid_.size(); i++) {
+    for (int i = 0; i < static_cast<int>(curvesInGrid_.size()); i++) {
         if (curvesInGrid_[i].first.size() > 0) {
-            Box4f area = curvesInGrid_[i].second;
+            Box4f area = curvesInGrid_[i].second.bbox;
             const Drawing::Rect rectN = Drawing::Rect(area[0], area[2], area[1], area[3]);
             PreCalculateRegion(canvas, *offscreenCanvas_, i, rect, rectN);
         }
@@ -777,6 +779,10 @@ void GEContourDiagonalFlowLightShader::AutoPartitionCal(Drawing::Canvas& canvas,
 
 void GEContourDiagonalFlowLightShader::AutoGridPartition(int width, int height, float maxThickness)
 {
+    if (width <= 1 || height <= 1) {
+        GE_LOGE("GEContourDiagonalFlowLightShader surface size not valid");
+        return;
+    }
     curvesInGrid_.clear();
     // calculate the bounding box of all curves
     std::vector<Box4f> curveBBoxes;
@@ -798,28 +804,28 @@ void GEContourDiagonalFlowLightShader::AutoGridPartition(int width, int height, 
         if (needsSplit) {
             SplitGrid(current, curveBBoxes, workQueue, MIN_GRID_SIZE);
         } else {
-            ProcessFinalGrid(current, curveBBoxes);
+            ProcessFinalGrid(current, curveBBoxes, height);
         }
     }
 }
 
-void GEContourDiagonalFlowLightShader::SplitGrid(const Grid& current,
-    const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue, float minGridSize)
+void GEContourDiagonalFlowLightShader::SplitGrid(const Grid& current, const std::vector<Box4f>& curveBBoxes,
+    std::queue<Grid>& workQueue, float minGridSize)
 {
     // partition grid - quadtree
-    float midX = (current.bbox[0] + current.bbox[1]) * 0.5f;
-    float midY = (current.bbox[2] + current.bbox[3]) * 0.5f;
+    float midX = (current.bbox[XMIN_I] + current.bbox[XMAX_I]) * 0.5f;
+    float midY = (current.bbox[YMIN_I] + current.bbox[YMAX_I]) * 0.5f;
     Box4f quadrants[4] = {
-        {current.bbox[0], midX, current.bbox[2], midY}, // Top-Left
-        {midX, current.bbox[1], current.bbox[2], midY}, // Top-Right
-        {current.bbox[0], midX, midY, current.bbox[3]}, // Bottom-Left
-        {midX, current.bbox[1], midY, current.bbox[3]}  // Bottom-Right
+        {current.bbox[XMIN_I], midX, current.bbox[YMIN_I], midY}, // Top-Left
+        {midX, current.bbox[XMAX_I], current.bbox[YMIN_I], midY}, // Top-Right
+        {current.bbox[XMIN_I], midX, midY, current.bbox[YMAX_I]}, // Bottom-Left
+        {midX, current.bbox[XMAX_I], midY, current.bbox[YMAX_I]}  // Bottom-Right
     };
     for (const auto& quad : quadrants) {
         Grid child{quad, {}};
         // find intersecting curves
         for (int idx : current.curveIndices) {
-            if (intersectBBox(child.bbox, curveBBoxes[idx])) {
+            if (IntersectBBox(child.bbox, curveBBoxes[idx])) {
                 child.curveIndices.push_back(idx);
             }
         }
@@ -931,37 +937,42 @@ Box4f GEContourDiagonalFlowLightShader::ComputeCurveBoundingBox(
 }
 
 void GEContourDiagonalFlowLightShader::InitializeWorkQueue(
-    const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes,
-    std::queue<Grid>& workQueue)
+    const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue)
 {
     // init root grid
     std::vector<int> initialCurves;
-    for (int i = 0; i < numCurves_; ++i) {
-        if (intersectBBox(canvasBBox, curveBBoxes[i])) {
+    for (size_t i = 0; i < numCurves_; ++i) {
+        if (IntersectBBox(canvasBBox, curveBBoxes[i])) {
             initialCurves.push_back(i);
         }
     }
     workQueue.push({canvasBBox, initialCurves});
 }
 
-void GEContourDiagonalFlowLightShader::ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes)
+void GEContourDiagonalFlowLightShader::ProcessFinalGrid(
+    Grid& current, const std::vector<Box4f>& curveBBoxes, int height)
 {
     Grid processedGrid = current;
 
     std::vector<float> gridCurves;
     std::vector<float> inOrderSeg;
-    const int slidingWindowLen = 4; // curve 3 point(6 value), slidingWindowLen is 4
+    constexpr int slidingWindowLen = 4; // curve 3 point(6 value), slidingWindowLen is 4
+    // since only a partial image is captured, the following shifts need to be applied.
+    float xShift = 2*processedGrid.bbox[0] / static_cast<float>(height);
+    float yShift = 2*processedGrid.bbox[2] / static_cast<float>(height);
     for (int idx : processedGrid.curveIndices) {
-        gridCurves.push_back(controlPoints_[slidingWindowLen * idx]);      // start point x
-        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 1]);  // start point y
-        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 2]);  // 2:control point x
-        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 3]);  // 3:control point y
-        gridCurves.push_back(controlPoints_[(slidingWindowLen * idx + 4) % controlPoints_.size()]); // 4:end point x
-        gridCurves.push_back(controlPoints_[(slidingWindowLen * idx + 5) % controlPoints_.size()]); // 5:end point y
+        gridCurves.push_back(controlPoints_[slidingWindowLen * idx] - xShift);      // start point x
+        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 1] - yShift);  // start point y
+        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 2] - xShift);  // 2:control point x
+        gridCurves.push_back(controlPoints_[slidingWindowLen * idx + 3] - yShift);  // 3:control point y
+        gridCurves.push_back(controlPoints_[(slidingWindowLen * idx + 4) % // 4:end point x
+            controlPoints_.size()] - xShift);
+        gridCurves.push_back(controlPoints_[(slidingWindowLen * idx + 5) % // 5:end point y
+            controlPoints_.size()] - yShift);
         
         inOrderSeg.push_back(static_cast<float>(idx));
     }
-    curvesInGrid_.push_back(std::make_pair(gridCurves, processedGrid.bbox));
+    curvesInGrid_.push_back(std::make_pair(gridCurves, processedGrid));
     segmentIndex_.push_back(inOrderSeg);
 }
 
@@ -976,13 +987,15 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
         GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffect_ is nullptr.");
         return nullptr;
     }
-
     return std::make_shared<Drawing::RuntimeShaderBuilder>(contourDiagonalFlowLightShaderEffect_);
 }
 
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeShader(Drawing::Canvas& canvas,
     const Drawing::Rect& rect)
 {
+    if (!rect.IsValid()) {
+        return nullptr;
+    }
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawRuntimeShader cache is nullptr.");
         return nullptr;
@@ -1006,6 +1019,10 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeSha
     float line2Length = (contourDiagonalFlowLightParams_.line2Length_ < 0.0f ||
         FEqual(contourDiagonalFlowLightParams_.line2Length_, 0.0f)) ?
         defaultLineLength : contourDiagonalFlowLightParams_.line2Length_;
+    if (precalculationShader == nullptr || builder_ == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader precalculationShader cache img is nullptr.");
+        return nullptr;
+    }
     builder_->SetChild("precalculationImage", precalculationShader);
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("line1Start", contourDiagonalFlowLightParams_.line1Start_);
@@ -1024,26 +1041,29 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeSha
     return img;
 }
 
-std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches(
-    Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex, const Drawing::Rect& wholeRect,
-    const Drawing::Rect& rect)
+void GEContourDiagonalFlowLightShader::ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize)
+{
+    curvesInGrid_[gridIndex].first.resize(subCurveCnt * perSubCurveSize, -5.0f); // -5.0:unused points
+    segmentIndex_[gridIndex].resize(subCurveCnt * MAX_CURVES_PER_GRID, 0.0f);
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches(Drawing::Canvas& mainCanvas,
+    Drawing::Canvas& canvas, int gridIndex, const Drawing::Rect& wholeRect, const Drawing::Rect& rect)
 {
     if (!wholeRect.IsValid() || !rect.IsValid()) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches rect is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::PreCalculateRegion drawing rect is nullptr.");
         return nullptr;
     }
     auto builder = GetFlowLightPrecalBuilder();
     if (builder == nullptr || offscreenSurface_ == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches builder or offscreenSurface is nullptr");
+        GE_LOGE("GEContourDiagonalFlowLightShader::builder or offscreenSurface is nullptr.");
         return nullptr;
     }
     auto sdfImg = CreateImg(mainCanvas, rect);
     constexpr size_t curveValueCount = 6; // one curve have 3 point - 6 float
-    auto perSubCurveSize = static_cast<size_t>(MAX_CURVES_PER_GRID) * curveValueCount; // 16 * 6
+    auto perSubCurveSize = static_cast<size_t>(MAX_CURVES_PER_GRID) * curveValueCount;
     auto subCurveCnt = (curvesInGrid_[gridIndex].first.size() + perSubCurveSize - 1) / perSubCurveSize;
-
     ResizeCurvesData(gridIndex, subCurveCnt, perSubCurveSize);
-
     Drawing::Matrix matrix;
     for (size_t i = 0; i < subCurveCnt; i++) {
         std::vector<float> curvesPoints(curvesInGrid_[gridIndex].first.begin() + i * perSubCurveSize,
@@ -1051,61 +1071,49 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::LoopAllCurvesI
         std::vector<float> curvesIndex(segmentIndex_[gridIndex].begin() + i * MAX_CURVES_PER_GRID,
             segmentIndex_[gridIndex].begin() + (i + 1) * MAX_CURVES_PER_GRID);
         if (sdfImg == nullptr) {
-            GE_LOGE("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches sdfImg is nullptr");
+            GE_LOGE("GEContourDiagonalFlowLightShader::sdfImg is nullptr.");
             return nullptr;
         }
         auto sdfImgShader = Drawing::ShaderEffect::CreateImageShader(*sdfImg, Drawing::TileMode::CLAMP,
-            Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::NEAREST), matrix);
+            Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
         builder->SetChild("loopImage", sdfImgShader);
         builder->SetUniform("iResolution", wholeRect.GetWidth(), wholeRect.GetHeight());
         builder->SetUniform("count", static_cast<float>(pointCnt_));
         builder->SetUniform("controlPoints", curvesPoints.data(), curvesPoints.size());
         builder->SetUniform("segmentIndex", curvesIndex.data(), curvesIndex.size());
-        builder->SetUniform("leftGridBoundary", static_cast<float>(rect.GetLeft()));
-        builder->SetUniform("topGridBoundary", static_cast<float>(rect.GetTop()));
-        auto flowLightShader = builder->MakeShader(nullptr, false);
-        if (flowLightShader == nullptr) {
-            GE_LOGE("GEContourDiagonalFlowLightShader::LoopAllCurvesInBatches FlowLightShader is nullptr.");
+        auto contourDiagonalFlowLightShader = builder->MakeShader(nullptr, false);
+        if (contourDiagonalFlowLightShader == nullptr) {
+            GE_LOGE("GEContourDiagonalFlowLightShader::PreCalculateRegion contourDiagonalFlowLightShader is nullptr.");
             return nullptr;
         }
         Drawing::Brush brush;
-        brush.SetShaderEffect(flowLightShader);
+        brush.SetShaderEffect(contourDiagonalFlowLightShader);
         sdfImg = CreateDrawImg(mainCanvas, rect, brush);
     }
     return sdfImg;
 }
 
-void GEContourDiagonalFlowLightShader::ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize)
-{
-    curvesInGrid_[gridIndex].first.resize(subCurveCnt * perSubCurveSize, -5.0f); // unused Points fill invalid value
-    segmentIndex_[gridIndex].resize(subCurveCnt * MAX_CURVES_PER_GRID, 0.0f);
-}
-
-void GEContourDiagonalFlowLightShader::PreCalculateRegion(
-    Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,
-    const Drawing::Rect& wholeRect, const Drawing::Rect& rect)
-{
-    auto sdfImg = LoopAllCurvesInBatches(mainCanvas, canvas, gridIndex, wholeRect, rect);
-    ConvertImg(canvas, rect, sdfImg);
-}
-
-void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
-    std::shared_ptr<Drawing::Image> sdfImg)
+void GEContourDiagonalFlowLightShader::ConvertImage(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+    const std::shared_ptr<Drawing::Image>& sdfImg)
 {
     if (sdfImg == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg sdfImg is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader::sdfImg is nullptr in ConvertImage.");
         return;
     }
     auto convertBuilder = FlowLightConvertBuilder();
     if (convertBuilder == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg convertBuilder is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader::PreCalculateRegion convertBuilder is nullptr.");
         return;
     }
     Drawing::Matrix matrix;
     auto sdfImgShader = Drawing::ShaderEffect::CreateImageShader(*sdfImg,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR),
+        matrix);
+    auto globalTShader = Drawing::ShaderEffect::CreateImageShader(*sdfImg,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::NEAREST),
         matrix);
-    convertBuilder->SetChild("loopImage", sdfImgShader);
+    convertBuilder->SetChild("sdfImage", sdfImgShader);
+    convertBuilder->SetChild("progressImage", globalTShader);
     convertBuilder->SetUniform("count", static_cast<float>(pointCnt_));
     convertBuilder->SetUniform("leftGridBoundary", static_cast<float>(rect.GetLeft()));
     convertBuilder->SetUniform("topGridBoundary", static_cast<float>(rect.GetTop()));
@@ -1113,7 +1121,7 @@ void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const
     convertBuilder->SetUniform("curveWeightCurrent", curveWeightCurrent_.data(), curveWeightCurrent_.size());
     auto convertShader = convertBuilder->MakeShader(nullptr, false);
     if (convertShader == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::ConvertSDFImg convertShader is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader::PreCalculateRegion convertShader is nullptr.");
         return;
     }
     Drawing::Brush brush;
@@ -1123,21 +1131,29 @@ void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const
     canvas.DetachBrush();
 }
 
+void GEContourDiagonalFlowLightShader::PreCalculateRegion(Drawing::Canvas& mainCanvas,
+    Drawing::Canvas& canvas, int gridIndex, const Drawing::Rect& wholeRect, const Drawing::Rect& rect)
+{
+    auto sdfImg = LoopAllCurvesInBatches(mainCanvas, canvas, gridIndex, wholeRect, rect);
+    ConvertImage(canvas, rect, sdfImg);
+}
+
 void GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     if (!rect.IsValid()) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas rect is invalid.");
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas rect is nullptr.");
         return;
     }
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
     offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
     if (offscreenSurface_ == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::ProcessImage offscreenSurface is invalid");
+        LOGE("GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas offscreenSurface is invalid");
         return;
     }
     offscreenCanvas_ = offscreenSurface_->GetCanvas();
     if (offscreenCanvas_ == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::ProcessImage offscreenCanvas is invalid");
+        LOGE("GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas offscreenCanvas is invalid");
+        return;
     }
 }
 
@@ -1145,18 +1161,18 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateImg(Draw
     const Drawing::Rect& rect)
 {
     if (!rect.IsValid()) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateImg rect is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::rect Is not Valid.");
         return nullptr;
     }
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    auto offscreenSurface  = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
+    auto offscreenSurface = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
     if (offscreenSurface == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateImg offscreenSurface is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::offscreenSurface Is not Valid.");
         return nullptr;
     }
     auto offscreenCanvas = offscreenSurface->GetCanvas();
     if (offscreenCanvas == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateImg offscreenCanvas is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::offscreenCanvas Is not Valid.");
         return nullptr;
     }
     Drawing::Brush brush;
@@ -1171,22 +1187,22 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateDrawImg(
     const Drawing::Rect& rect, const Drawing::Brush& brush)
 {
     if (!rect.IsValid()) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg rect is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg rect Is not Valid.");
         return nullptr;
     }
     auto surface = canvas.GetSurface();
     if (surface == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg surface is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg surface Is not Valid.");
         return nullptr;
     }
     auto offscreenSurface = surface->MakeSurface(rect.GetWidth(), rect.GetHeight());
     if (offscreenSurface == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenSurface is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenSurface Is not Valid.");
         return nullptr;
     }
     auto offscreenCanvas = offscreenSurface->GetCanvas();
     if (offscreenCanvas == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenCanvas is invalid");
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateDrawImg offscreenCanvas Is not Valid.");
         return nullptr;
     }
     offscreenCanvas->AttachBrush(brush);
@@ -1197,10 +1213,11 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateDrawImg(
 
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::Image> precalculationImg,
-    std::shared_ptr<Drawing::Image> img1, std::shared_ptr<Drawing::Image> img2)
+    std::shared_ptr<Drawing::Image> lightImg, std::shared_ptr<Drawing::Image> haloImg)
 {
-    if (precalculationImg == nullptr || img1 == nullptr || img2 == nullptr) {
-        return img1 == nullptr ? img2 : img1;
+    if (precalculationImg == nullptr || lightImg == nullptr || haloImg == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::BlendImg:invalid precalculation result.");
+        return nullptr;
     }
     thread_local std::shared_ptr<Drawing::RuntimeEffect> blendShaderEffect_ = nullptr;
     if (blendShaderEffect_ == nullptr) {
@@ -1225,23 +1242,27 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     auto precalculationImgShader = Drawing::ShaderEffect::CreateImageShader(*precalculationImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    auto image1Shader = Drawing::ShaderEffect::CreateImageShader(*img1, Drawing::TileMode::CLAMP,
+    auto lightShader = Drawing::ShaderEffect::CreateImageShader(*lightImg, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    auto image2Shader = Drawing::ShaderEffect::CreateImageShader(*img2, Drawing::TileMode::CLAMP,
+    auto haloShader = Drawing::ShaderEffect::CreateImageShader(*haloImg, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     blendBuilder->SetChild("precalculationImage", precalculationImgShader);
-    blendBuilder->SetChild("image1", image1Shader);
-    blendBuilder->SetChild("image2", image2Shader);
-    blendBuilder->SetUniform("weight1", contourDiagonalFlowLightParams_.weight1);
-    blendBuilder->SetUniform("weight2", contourDiagonalFlowLightParams_.weight2);
-    blendBuilder->SetUniform("blurRadius", contourDiagonalFlowLightParams_.radius_);
+    blendBuilder->SetChild("image1", lightShader);
+    blendBuilder->SetChild("image2", haloShader);
+    blendBuilder->SetUniform("lightWeight", contourDiagonalFlowLightParams_.lightWeight_);
+    blendBuilder->SetUniform("haloWeight", contourDiagonalFlowLightParams_.haloWeight_);
+    blendBuilder->SetUniform("blurRadius", contourDiagonalFlowLightParams_.haloRadius_);
     blendBuilder->SetUniform("headRoom", std::max(supportHeadroom_, 1.0f));
-    auto imageInfo = img1->GetImageInfo();
+    auto imageInfo = lightImg->GetImageInfo();
     return blendBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 }
 
 void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
+    if (!rect.IsValid()) {
+        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader canvas is nullptr.");
+        return;
+    }
     Preprocess(canvas, rect); // to calculate your cache data
     if (cacheAnyPtr_ == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader cache is nullptr.");
@@ -1253,18 +1274,24 @@ void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const
         return;
     }
     auto lightImg = DrawRuntimeShader(canvas, rect);
+    if (!lightImg) {
+        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader light img is nullptr.");
+        return;
+    }
     auto blurImg = blurShader_->ProcessImage(canvas, lightImg, rect, rect);
+    if (!blurImg) {
+        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader halo img is nullptr.");
+        return;
+    }
     auto resImg = BlendImg(canvas, precalculationImage, lightImg, blurImg);
-    if (resImg) {
-        Drawing::Brush brush;
-        canvas.AttachBrush(brush);
-        canvas.DrawImageRect(*resImg, rect, rect, Drawing::SamplingOptions());
-        canvas.DetachBrush();
-    } else {
+    if (!resImg) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader blendimg is nullptr.");
         return;
     }
+    Drawing::Brush brush;
+    canvas.AttachBrush(brush);
+    canvas.DrawImageRect(*resImg, rect, rect, Drawing::SamplingOptions());
+    canvas.DetachBrush();
 }
-
 } // namespace Rosen
 } // namespace OHOS
