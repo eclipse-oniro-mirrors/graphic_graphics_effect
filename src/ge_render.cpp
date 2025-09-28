@@ -48,10 +48,10 @@
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
-const char* const propertyMesaBlurAllEnabled = "persist.sys.graphic.kawaseDisable";
+const char* const PROPERTY_MESA_BLUR_ALL_ENABLED = "persist.sys.graphic.kawaseDisable";
 #ifdef GE_OHOS
 bool GERender::isMesablurAllEnable_ = (std::atoi(
-    GESystemProperties::GetEventProperty(propertyMesaBlurAllEnabled).c_str()));
+    GESystemProperties::GetEventProperty(PROPERTY_MESA_BLUR_ALL_ENABLED).c_str()));
 #else
 bool GERender::isMesablurAllEnable_ = false;
 #endif
