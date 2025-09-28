@@ -48,10 +48,10 @@
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
-#define PROPERTY_MESA_BLUR_ALL_ENABLED "persist.sys.graphic.kawaseDisable"
+const char* const propertyMesaBlurAllEnabled = "persist.sys.graphic.kawaseDisable";
 #ifdef GE_OHOS
 bool GERender::isMesablurAllEnable_ = (std::atoi(
-    GESystemProperties::GetEventProperty(PROPERTY_MESA_BLUR_ALL_ENABLED).c_str()));
+    GESystemProperties::GetEventProperty(propertyMesaBlurAllEnabled).c_str()));
 #else
 bool GERender::isMesablurAllEnable_ = false;
 #endif
@@ -449,7 +449,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderKawaseBlur(
     if (!isMesablurAllEnable_) {
         return std::make_shared<GEKawaseBlurShaderFilter>(*kawaseParams);
     }
-    //Transfer the kawaseParams to mesaParams
+    // Transfer the kawaseParams to mesaParams
     auto mesaParams = std::make_shared<GEMESABlurShaderFilterParams>();
     mesaParams->radius = kawaseParams->radius;
     auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
