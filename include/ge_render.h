@@ -72,7 +72,7 @@ public:
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage,
         Drawing::Brush& brush
     );
-    
+
     static void SetMesablurAllEnabledByCCM(bool flag);
 private:
     struct ShaderFilterEffectContext {
