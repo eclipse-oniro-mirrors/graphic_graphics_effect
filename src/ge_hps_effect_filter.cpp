@@ -113,7 +113,7 @@ bool IsGradientSupport(
     return linearGradientBlurParams->isRadiusGradient;
 }
 
-bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef)
+bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef, bool isMaterial)
 {
     auto ve = vef->GetImpl();
     auto veType = ve->GetFilterType();
@@ -129,18 +129,21 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
             const auto& linearGradientBlurParams = ve->GetLinearGradientBlurParams();
             return IsGradientSupport(linearGradientBlurParams);
         }
+        if (veType == Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR) {
+            return isMaterial;
+        }
         return true;
     }
     return false;
 }
 
-bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer)
+bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer, bool isMaterial)
 {
     if (!GetHpsEffectEnabled()) {
         return false;
     }
     for (const auto& vef : veContainer.GetFilters()) {
-        if (!IsEffectSupported(vef)) {
+        if (!IsEffectSupported(vef, isMaterial)) {
             return false;
         }
     }
