@@ -35,6 +35,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_sound_wave_filter.h"
+#include "ge_system_properties.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_water_ripple_filter.h"
@@ -42,6 +43,13 @@
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
+#define PROPERTY_MESA_BLUR_ALL_ENABLED "persist.sys.graphic.kawaseDisable"
+#ifdef GE_OHOS
+bool GERender::isMesablurAllEnable_ = (std::atoi(
+    GESystemProperties::GetEventProperty(PROPERTY_MESA_BLUR_ALL_ENABLED).c_str()));
+#else
+bool GERender::isMesablurAllEnable_ = false;
+#endif
 using namespace Rosen::Drawing;
 using ShaderCreator = std::function<std::shared_ptr<GEShader>(std::shared_ptr<GEVisualEffectImpl>)>;
 
@@ -498,6 +506,28 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
     return nullptr;
 }
 
+std::shared_ptr<GEShaderFilter> GERender::GenerateShaderKawaseBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto& kawaseParams = ve->GetKawaseParams();
+    // Choose to use mesa blur algorithm or kawase blur algorithm
+    if (!isMesablurAllEnable_) {
+        return std::make_shared<GEKawaseBlurShaderFilter>(*kawaseParams);
+    }
+    // Transfer the kawaseParams to mesaParams
+    auto mesaParams = std::make_shared<GEMESABlurShaderFilterParams>();
+    mesaParams->radius = kawaseParams->radius;
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR),
+        sizeof(Drawing::GEMESABlurShaderFilterParams),
+        static_cast<void*>(mesaParams.get()));
+    if (!object) {
+        return std::make_shared<GEMESABlurShaderFilter>(*mesaParams);
+    }
+    std::shared_ptr<GEMESABlurShaderFilter> dmShader(static_cast<GEMESABlurShaderFilter*>(object));
+    return dmShader;
+}
+
 std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
     const std::shared_ptr<Drawing::GEVisualEffect>& vef)
 {
@@ -506,8 +536,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
     LOGD("GERender::GenerateShaderFilter %{public}d", (int)ve->GetFilterType());
     switch (ve->GetFilterType()) {
         case Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR: {
-            const auto& kawaseParams = ve->GetKawaseParams();
-            shaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(*kawaseParams);
+            shaderFilter = GenerateShaderKawaseBlur(ve);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
@@ -632,6 +661,11 @@ std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<D
 {
     auto it = g_shaderCreatorLUT.find(ve->GetFilterType());
     return it != g_shaderCreatorLUT.end() ? it->second(ve) : nullptr;
+}
+
+void GERender::SetMesablurAllEnabledByCCM(bool flag)
+{
+    isMesablurAllEnable_ = isMesablurAllEnable_ || flag;
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
