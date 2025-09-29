@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
 #ifndef GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
 
@@ -33,7 +32,6 @@ using Box4f = std::array<float, box4fSize>;
 struct Grid {
     Box4f bbox;
     std::vector<int> curveIndices;
-    bool curvesNumExceedLimit = false;
 };
 
 class GEKawaseBlurShaderFilter;
@@ -62,11 +60,8 @@ private:
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&&) = delete;
     std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
-    std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas,
-        std::shared_ptr<Drawing::Image> precalculationImg,
+    std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> precalculationImg,
         std::shared_ptr<Drawing::Image> lightImg, std::shared_ptr<Drawing::Image> haloImg);
-    static std::shared_ptr<GEContourDiagonalFlowLightShader>
-        CreateFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();
@@ -82,34 +77,31 @@ private:
         std::queue<Grid>& workQueue);
     void SplitGrid(const Grid& current, const std::vector<Box4f>& curveBBoxes,
         std::queue<Grid>& workQueue, float minGridSize);
-    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes);
+    void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes, int height);
     std::shared_ptr<Drawing::Image> CreateImg(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     std::shared_ptr<Drawing::Image> CreateDrawImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
         const Drawing::Brush& brush);
-
-    void ConvertImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
-        std::shared_ptr<Drawing::Image> sdfImg);
+    void ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize);
     std::shared_ptr<Drawing::Image> LoopAllCurvesInBatches(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas,
         int gridIndex, const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
-    void ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize);
+    void ConvertImage(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+        const std::shared_ptr<Drawing::Image>& sdfImg);
 private:
-    int numCurves_ = 0;
-    int capacity_ = 0;
+    size_t numCurves_ = 0;
     std::shared_ptr<Drawing::Surface> offscreenSurface_;
     std::shared_ptr<Drawing::Canvas> offscreenCanvas_;
     Drawing::GEContentDiagonalFlowLightShaderParams contourDiagonalFlowLightParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
-    std::vector<float> controlPoints_{}; // fix 256 X 2 floats for 128 curves
+    std::vector<float> controlPoints_{};
     size_t pointCnt_ = 0; // real input Point Cnt
     std::shared_ptr<GEKawaseBlurShaderFilter> blurShader_ = nullptr;
 
     // grid : curves, boundingbox(xmin, xmax, ymin, ymax)
-    std::vector<std::pair<std::vector<float>, Box4f>> curvesInGrid_{};
+    std::vector<std::pair<std::vector<float>, Grid>> curvesInGrid_{};
     std::vector<std::vector<float>> segmentIndex_{};
     std::vector<float> curveWeightPrefix_{};
     std::vector<float> curveWeightCurrent_{};
 };
-
 } // namespace Rosen
 } // namespace OHOS
 #endif // GRAPHICS_EFFECT_CONTOUR_DIAGONAL_FLOW_LIGHT_SHADER_H
