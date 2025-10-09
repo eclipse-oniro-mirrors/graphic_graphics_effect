@@ -272,7 +272,7 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT);
             impl->MakeHarmoniumEffectParams();
         }
-    }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -386,12 +386,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             }
             break;
         }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-            break;
-        }
         default:
             break;
     }
@@ -433,15 +427,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             if (tag == GE_FILTER_MASK_TRANSITION_INVERSE) {
                 maskTransitionParams_->inverse = param;
-            }
-            break;
-        }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE) {
-                harmoniumEffectParams_->blurImage = param;
             }
             break;
         }
@@ -590,6 +575,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_MASK_PIXEL_MAP_PIXEL_MAP) {
                 pixelMapMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE) {
+                harmoniumEffectParams_->blurImage = param;
             }
             break;
         }
@@ -787,16 +781,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<floa
             }
             break;
         }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
-                harmoniumEffectParams_->mask = param;
-            }
-            break;
-        }
         default:
             break;
     }
@@ -903,6 +887,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GEX_SHADER_COLOR_GRADIENT_EFFECT_MASK) {
                 colorGradientEffectParams_->mask_ = param;
+            }
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
+                harmoniumEffectParams_->mask = param;
             }
             break;
         }

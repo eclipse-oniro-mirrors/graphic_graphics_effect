@@ -393,7 +393,7 @@ public:
         harmoniumEffectParams_ = std::make_shared<GEHarmoniumEffectShaderParams>();
     }
         
-    const std::shared_ptr<GEHarmoniumEffectShaderParams>& GetHarmoniumEffectParams() const 
+    const std::shared_ptr<GEHarmoniumEffectShaderParams>& GetHarmoniumEffectParams() const
     {
         return harmoniumEffectParams_;
     }
