@@ -220,7 +220,7 @@ void HpsEffectFilter::GenerateKawaseBlurEffect(const Drawing::GEKawaseBlurShader
 {
     int radius = params.radius;
     if (radius < 1e-6) {
-        LOGE("HpsEffectFilter::GenerateVisualEffectFromGE KAWASE_BLUR sigma is zero");
+        LOGD("HpsEffectFilter::GenerateVisualEffectFromGE KAWASE_BLUR sigma is zero");
         return;
     }
     auto blurParamPtr = std::make_shared<Drawing::HpsBlurEffectParameter>(src, dst, Drawing::scalar(radius),
@@ -426,7 +426,7 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
     std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
     if (image == nullptr || hpsEffect_.empty()) {
-        LOGE("HpsEffectFilter::ApplyHpsEffect image is null or hpsEffect_ is empty");
+        LOGD("HpsEffectFilter::ApplyHpsEffect image is null or hpsEffect_ is empty");
         return false;
     }
 
