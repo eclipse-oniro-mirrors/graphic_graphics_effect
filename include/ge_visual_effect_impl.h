@@ -328,6 +328,16 @@ public:
         return pixelMapMaskParams_;
     }
 
+    void MakeHarmoniumEffectMaskParams()
+    {
+        harmoniumEffectMaskParams_ = std::make_shared<GEHarmoniumEffectMaskParams>();
+    }
+
+    const std::shared_ptr<GEHarmoniumEffectMaskParams>& GetHarmoniumEffectMaskParams() const
+    {
+        return harmoniumEffectMaskParams_;
+    }
+
     void MakeWaveGradientMaskParams()
     {
         waveGradientMaskParams_ = std::make_shared<GEWaveGradientShaderMaskParams>();
@@ -499,6 +509,7 @@ private:
 
     std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
     std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
+    std::shared_ptr<GEHarmoniumEffectMaskParams> harmoniumEffectMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
     std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;

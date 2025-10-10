@@ -607,6 +607,12 @@ struct GEFrameGradientMaskParams {
     float frameWidth = 0.0f;
 };
 
+constexpr char GE_MASK_HARMONIUM_EFFECT[] = "HarmoniumEffectMask";
+constexpr char GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP[] = "HarmoniumEffectMask_Image";
+struct GEHarmoniumEffectMaskParams {
+    std::shared_ptr<Drawing::Image> image = nullptr;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

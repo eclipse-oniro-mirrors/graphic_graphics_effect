@@ -86,6 +86,7 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_mesa_fusion_pass.cpp",
     "src/ge_particle_circular_halo_shader.cpp",
     "src/ge_pixel_map_shader_mask.cpp",
+    "src/ge_harmonium_effect_shader_mask.cpp",
     "src/ge_render.cpp",
     "src/ge_radial_gradient_shader_mask.cpp",
     "src/ge_ripple_shader_mask.cpp",
