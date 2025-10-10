@@ -178,6 +178,10 @@ ohos_unittest("GraphicsEffectTest") {
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "graphic_surface:surface",
+    "egl:libEGL",
+    "opengles:libGLES",
+    "graphic_2d:librender_service_base",
   ]
 
   part_name = "graphics_effect"
