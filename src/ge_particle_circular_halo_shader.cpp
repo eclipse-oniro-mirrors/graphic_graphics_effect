@@ -133,7 +133,7 @@ namespace {
                     globalRadius * 0.35, 1.0, 0.25, 0.05);
                 solidColor = BlendScreen(solidColor, ambienceHaloBorder);
                 float glow = CentralAmbienceHaloGlow(polarCoords, 1.0, radius * 0.83, 0.2 * radius,
-                    0.4);
+                    0.4) * 1.2;
                 glowColor = BlendScreen(glowColor, glow);  // Add a glow circle
             }
 
@@ -348,7 +348,7 @@ namespace {
         const half3 STOP_COLOR1 = half3(86.0, 146.0, 255.0) / 255.0;   // 5692FF
         const half3 STOP_COLOR2 = half3(137.0, 240.0, 255.0) / 255.0;  // 89F0FF
         const half3 STOP_COLOR3 = half3(255.0, 200.0, 161.0) / 255.0;  // FFC8A1
-        const half3 STOP_COLOR4 = half3(253.0, 228.0, 142.0) / 255.0;  // FFE48E
+        const half3 STOP_COLOR4 = half3(253.0, 237.0, 181.0) / 255.0;  // FFEDB5
 
         const half2 RAND2_A = half2(127.1, 1.7);
         const half2 RAND2_B = half2(269.5, 183.3);
@@ -464,10 +464,10 @@ std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::Crea
 
 void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    Drawing::ImageInfo particleImg(rect.GetWidth(), rect.GetHeight(),
-        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    Drawing::ImageInfo glowImg(rect.GetWidth(), rect.GetHeight(),
-        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::ImageInfo particleImg(rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::ImageInfo glowImg(rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE);
 
     glowHaloImg_ = MakeGlowHaloShader(canvas, glowImg);
     particleHaloImg_ = MakeParticleHaloShader(canvas, particleImg);
@@ -552,8 +552,7 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeGlowHaloShader
     }
     // LCOV_EXCL_STOP
     glowHaloBuilder_->SetUniform("iResolution", width, height);
-    auto glowHaloShader =
-        glowHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    auto glowHaloShader = glowHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     if (glowHaloShader == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader glowHaloShader is nullptr.");
         return nullptr;
