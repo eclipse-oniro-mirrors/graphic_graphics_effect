@@ -89,7 +89,6 @@ public:
         return supportHeadroom_;
     }
 
-    const std::shared_ptr<Drawing::GEShaderMask> GetShaderMaskInner() const;
     const std::shared_ptr<Drawing::GEShaderMask> GenerateShaderMask() const;
 
 private:

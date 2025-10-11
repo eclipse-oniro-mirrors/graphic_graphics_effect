@@ -137,49 +137,54 @@ const Drawing::CanvasInfo& GEVisualEffect::GetCanvasInfo() const
     return visualEffectImpl_->GetCanvasInfo();
 }
 
-const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GetShaderMaskInner() const
+const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask() const
 {
-    switch (impl->GetFilterType()) {	
-        case GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK: {	
-            auto radialParams = impl->GetRadialGradientMaskParams();	
+    auto impl = visualEffectImpl_;
+    if (impl == nullptr) {
+        return nullptr;
+    }
+
+    switch (impl->GetFilterType()) {
+        case GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK: {
+            auto radialParams = impl->GetRadialGradientMaskParams();
             if (radialParams == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GERadialGradientShaderMask>(*radialParams);
-        }	
-        case GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK: {	
-            auto doubleRippleParams = impl->GetDoubleRippleMaskParams();	
+        }
+        case GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK: {
+            auto doubleRippleParams = impl->GetDoubleRippleMaskParams();
             if (doubleRippleParams == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GEDoubleRippleShaderMask>(*doubleRippleParams);
-        }	
-        case GEVisualEffectImpl::FilterType::RIPPLE_MASK: {	
-            auto rippleParams = impl->GetRippleMaskParams();	
+        }
+        case GEVisualEffectImpl::FilterType::RIPPLE_MASK: {
+            auto rippleParams = impl->GetRippleMaskParams();
             if (rippleParams == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GERippleShaderMask>(*rippleParams);
-        }	
-        case GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK: {	
-            auto pixelMapParams = impl->GetPixelMapMaskParams();	
+        }
+        case GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK: {
+            auto pixelMapParams = impl->GetPixelMapMaskParams();
             if (pixelMapParams == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GEPixelMapShaderMask>(*pixelMapParams);
-        }	
-        case GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK: {	
-            auto waveParams = impl->GetWaveGradientMaskParams();	
+        }
+        case GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK: {
+            auto waveParams = impl->GetWaveGradientMaskParams();
             if (waveParams == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GEWaveGradientShaderMask>(*waveParams);
-        }	
-        case GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK: {	
-            auto frameParams = impl->GetFrameGradientMaskParams();	
-            if (frameParams == nullptr) {	
-                return nullptr;	
-            }	
+        }
+        case GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK: {
+            auto frameParams = impl->GetFrameGradientMaskParams();
+            if (frameParams == nullptr) {
+                return nullptr;
+            }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
         }
         case GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK: {
@@ -192,16 +197,6 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GetShaderMaskInner(
         default:
             return nullptr;
     }
-}
-
-const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask() const
-{
-    auto impl = visualEffectImpl_;
-    if (impl == nullptr) {
-        return nullptr;
-    }
-
-    return GetShaderMaskInner();
 }
 
 } // namespace Drawing
