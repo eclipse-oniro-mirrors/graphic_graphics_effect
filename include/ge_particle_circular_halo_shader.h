@@ -31,7 +31,10 @@ public:
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
     ~GEParticleCircularHaloShader() override = default;
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
-    const std::string GetDescription() const{return "GEParticleCircularHaloShader";}
+    const std::string GetDescription() const
+    {
+        return "GEParticleCircularHaloShader";
+    }
 
 private:
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
@@ -44,8 +47,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleHaloBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleCircularHaloBuilder();
 
-    std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas,
-        const Drawing::ImageInfo& imageInfo);
+    std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::Image> MakeSingleParticleHaloShader(Drawing::Canvas& canvas,
         const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::Image> MakeParticleHaloShader(Drawing::Canvas& canvas,
