@@ -24,33 +24,30 @@
 
 namespace OHOS {
 namespace Rosen {
-
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();
-
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
-
     ~GEParticleCircularHaloShader() override = default;
-
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
-
     const std::string GetDescription() const
     {
         return "GEParticleCircularHaloShader";
     }
 
 private:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
     static std::shared_ptr<GEParticleCircularHaloShader> CreateParticleCircularHaloShader(
         Drawing::GEParticleCircularHaloShaderParams& params);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetGlowHaloBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSingleParticleHaloBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleHaloBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetParticleCircularHaloBuilder();
 
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
-
-    std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::Image> MakeGlowHaloShader(Drawing::Canvas& canvas, const Drawing::ImageInfo& imageInfo);
+    std::shared_ptr<Drawing::Image> MakeSingleParticleHaloShader(Drawing::Canvas& canvas,
         const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::Image> MakeParticleHaloShader(Drawing::Canvas& canvas,
         const Drawing::ImageInfo& imageInfo);
@@ -63,12 +60,12 @@ private:
 
     Drawing::GEParticleCircularHaloShaderParams particleCircularHaloParams_;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> glowHaloBuilder_ = nullptr;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> singleParticleHaloBuilder_ = nullptr;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> particleHaloBuilder_ = nullptr;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
-    std::shared_ptr<Drawing::Image> particleHaloImg_ = nullptr;
 
-    float lastCenterX_ = 0.0f;
-    float lastCenterY_ = 0.0f;
+    std::shared_ptr<Drawing::Image> particleHaloImg_ = nullptr;
+    std::shared_ptr<Drawing::Image> glowHaloImg_ = nullptr;
 };
 
 }  // namespace Rosen
