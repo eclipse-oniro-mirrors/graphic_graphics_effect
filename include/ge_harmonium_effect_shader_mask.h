@@ -24,8 +24,6 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-REGISTER_GEFILTER_TYPEINFO(HARMONIUM_EFFECT_MASK, GEHarmoniumEffectShaderMask,
-                        GEHarmoniumEffectMaskParams, GE_MASK_HARMONIUM_EFFECT);
 class GE_EXPORT GEHarmoniumEffectShaderMask : public GEShaderMask {
 public:
     GEHarmoniumEffectShaderMask(const GEHarmoniumEffectMaskParams& param) : param_(param) {}

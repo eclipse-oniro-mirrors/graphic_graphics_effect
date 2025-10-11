@@ -24,6 +24,7 @@
 #include "ge_double_ripple_shader_mask.h"
 #include "ge_wave_gradient_shader_mask.h"
 #include "ge_frame_gradient_shader_mask.h"
+#include "ge_harmonium_effect_shader_mask.cpp"
 
 namespace OHOS {
 namespace Rosen {
