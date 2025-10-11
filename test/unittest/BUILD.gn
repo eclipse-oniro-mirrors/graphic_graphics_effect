@@ -93,6 +93,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_water_ripple_filter.cpp",
     "${graphics_effect_root}/src/ge_wave_gradient_shader_mask.cpp",
     "${graphics_effect_root}/src/ge_wavy_ripple_light_shader.cpp",
+    "${graphics_effect_root}/src/ge_harmonium_effect_shader_mask.cpp",
   ]
 
   external_deps = []
@@ -166,7 +167,8 @@ ohos_unittest("GraphicsEffectTest") {
     "gex_dot_matrix_shader_test.cpp",
     "gex_flow_light_sweep_shader_test.cpp",
     "gex_complex_shader_test.cpp",
-    "ge_hps_effect_filter_test.cpp"
+    "ge_hps_effect_filter_test.cpp",
+    "ge_harmonium_effect_shader_mask_test.cpp"
   ]
 
   if (!is_mingw && !is_win) {
