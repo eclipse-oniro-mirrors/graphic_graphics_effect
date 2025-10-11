@@ -80,6 +80,19 @@ void GEVisualEffectContainer::SetGeometry(const Drawing::Canvas& canvas, float g
     }
 }
 
+void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
+    std::shared_ptr<Drawing::Image> cachedImage)
+{
+    if (cachedImage == nullptr) {
+        return;
+    }
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == "HarmoniumEffect") {
+            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE, cachedImage);
+        }
+    }
+}
+
 void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
 {
     for (auto vef : GetFilters()) {
