@@ -212,5 +212,35 @@ HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
     EXPECT_EQ(filter->Type(), Drawing::GE_FILTER_MAGNIFIER);
 }
 
+/**
+ * @tc.name: SetMagnifierOffset_001
+ * @tc.desc: Verify function SetMagnifierOffsetTest
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, SetMagnifierOffset_001, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
+        0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    Drawing::Matrix matrix1;
+    matrix1.PostRotate(90); // 90 degree
+    filter->SetMagnifierOffset(matrix1);
+    EXPECT_EQ(filter->rotateDegree_, 270);
+
+    Drawing::Matrix matrix2;
+    matrix2.PostRotate(180); // 180 degree
+    filter->SetMagnifierOffset(matrix2);
+    EXPECT_EQ(filter->rotateDegree_, 180);
+
+    Drawing::Matrix matrix3;
+    matrix3.PostRotate(270); // 270 degree
+    filter->SetMagnifierOffset(matrix3);
+    EXPECT_EQ(filter->rotateDegree_, 90);
+
+    Drawing::Matrix matrix4; // 0 degree
+    filter->SetMagnifierOffset(matrix4);
+    EXPECT_EQ(filter->rotateDegree_, 0);
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
