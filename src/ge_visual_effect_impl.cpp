@@ -914,6 +914,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
                 harmoniumEffectParams_->mask = param;
             }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK) {
+                harmoniumEffectParams_->maskClock = param;
+            }
             break;
         }
         default:
