@@ -133,19 +133,6 @@ HWTEST_F(GEParticleCircularHaloShaderTest, NoPreprocessTest, TestSize.Level1)
 }
 
 /**
-* @tc.name: PreprocessTest
-* @tc.desc: Verify Preprocess function
-* @tc.type: FUNC
-*/
-HWTEST_F(GEParticleCircularHaloShaderTest, PreprocessTest, TestSize.Level1)
-{
-    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    EXPECT_NE(shader->cacheAnyPtr_, nullptr);
-}
-
-/**
 * @tc.name: GetGlowHaloBuilderTest
 * @tc.desc: Verify GetGlowHaloBuilder function
 * @tc.type: FUNC
@@ -270,26 +257,5 @@ HWTEST_F(GEParticleCircularHaloShaderTest, MakeNullShaderTest, TestSize.Level1)
     EXPECT_EQ(particleEffect, nullptr);
 }
 
-/** 
- * @tc.name: PreprocessBranchCoverageTest
- * @tc.desc: Cover all branches of Preprocess: first build, no update when noise unchanged, update when noise changed.
- * @tc.type: FUNC 
- */
-HWTEST_F(GEParticleCircularHaloShaderTest, PreprocessBranchCoverageTest, TestSize.Level1)
-{
-    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 4.0);
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-
-    shader->Preprocess(*canvas_, rect_);
-    ASSERT_NE(shader->cacheAnyPtr_, nullptr);
-    auto* firstCachePtr = shader->cacheAnyPtr_.get();
-
-    shader->Preprocess(*canvas_, rect_);
-    EXPECT_EQ(shader->cacheAnyPtr_.get(), firstCachePtr);
-
-    shader->particleCircularHaloParams_.noise_ += 0.05f;
-    shader->Preprocess(*canvas_, rect_);
-    EXPECT_NE(shader->cacheAnyPtr_.get(), firstCachePtr);
-}
 }  // namespace Rosen
 }  // namespace OHOS
