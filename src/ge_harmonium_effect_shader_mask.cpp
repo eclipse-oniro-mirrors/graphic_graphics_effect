@@ -89,7 +89,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEHarmoniumEffectShaderMask::GetH
     return harmoniumEffectShaderMaskBuilder;
 }
 
-std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShaderHasNormal(float width, float height) const
+std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShaderHasNormal(float width,
+    float height) const
 {
     return GenerateDrawingShader(width, height);
 }
