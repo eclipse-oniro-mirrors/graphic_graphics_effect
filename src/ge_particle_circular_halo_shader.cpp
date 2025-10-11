@@ -635,7 +635,7 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
         Drawing::ShaderEffect::CreateImageShader(*glowHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
                                                  Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     auto particleHaloShader =
-        Drawing::ShaderEffect::CreateImageShader(*particleHaloImg_,Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::ShaderEffect::CreateImageShader(*particleHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
                                                  Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 
     builder_ = GetParticleCircularHaloBuilder();
