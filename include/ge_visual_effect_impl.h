@@ -398,6 +398,16 @@ public:
         return borderLightParams_;
     }
 
+    void MakeHarmoniumEffectParams()
+    {
+        harmoniumEffectParams_ = std::make_shared<GEHarmoniumEffectShaderParams>();
+    }
+        
+    const std::shared_ptr<GEHarmoniumEffectShaderParams>& GetHarmoniumEffectParams() const
+    {
+        return harmoniumEffectParams_;
+    }
+
     void SetCanvasInfo(Drawing::CanvasInfo info)
     {
         canvasInfo_ = info;
@@ -485,6 +495,7 @@ private:
     void SetColorGradientEffectParams(const std::string& tag, float param);
     void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
     void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
+    void SetHarmoniumEffectParams(const std::string& tag, float param);
     void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
     void SetLightCaveParams(const std::string& tag, const Vector4f& param);
     void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
@@ -528,6 +539,7 @@ private:
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
     std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
+    std::shared_ptr<GEHarmoniumEffectShaderParams> harmoniumEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
     std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;

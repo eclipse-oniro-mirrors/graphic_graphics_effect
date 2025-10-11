@@ -273,6 +273,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeColorGradientEffectParams();
         }
     },
+    { GE_SHADER_HARMONIUM_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT);
+            impl->MakeHarmoniumEffectParams();
+        }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -529,6 +535,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetColorGradientEffectParams(tag, param);
             break;
         }
+        case FilterType::HARMONIUM_EFFECT: {
+            SetHarmoniumEffectParams(tag, param);
+            break;
+        }
         case FilterType::LIGHT_CAVE: {
             SetLightCaveParams(tag, param);
             break;
@@ -571,6 +581,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_MASK_PIXEL_MAP_PIXEL_MAP) {
                 pixelMapMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE) {
+                harmoniumEffectParams_->blurImage = param;
             }
             break;
         }
@@ -887,6 +906,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
+                harmoniumEffectParams_->mask = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -918,6 +947,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
+                harmoniumEffectParams_->ripplePosition = param;
+            }
             break;
         }
         default:
@@ -959,6 +997,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::COLOR_GRADIENT_EFFECT: {
             SetColorGradientEffectParams(tag, param);
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_TINTCOLOR) {
+                harmoniumEffectParams_->tintColor = param;
+            }
             break;
         }
         case FilterType::SOUND_WAVE: {
@@ -1733,6 +1780,35 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, co
         },
        
     };
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float param)
+{
+    if (harmoniumEffectParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_SHADER_HARMONIUM_EFFECT_RIPPLEPROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->rippleProgress = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_DISTORTPROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortProgress = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortFactor = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->reflectionFactor = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_REFRACTIONFACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->refractionFactor = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->materialFactor = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cornerRadius = p; } },
+    };
+
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);

@@ -41,6 +41,8 @@ public:
 
     void RemoveFilterWithType(int32_t typeToRemove);
 
+    void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage);
+
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 
