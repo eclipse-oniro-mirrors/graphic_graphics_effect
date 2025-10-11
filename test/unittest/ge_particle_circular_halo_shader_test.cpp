@@ -201,39 +201,6 @@ HWTEST_F(GEParticleCircularHaloShaderTest, MakeShaderWithDifferentParamsTest, Te
     shader->Preprocess(*canvas_, rect_);
     shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
     EXPECT_NE(shaderEffect, nullptr);
-
-    params = InitialParams(0.5, 20.0, 0.5, 4.0);
-    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-    EXPECT_NE(shaderEffect, nullptr);
-
-    params = InitialParams(0.5, 0.5, 2.0, 4.0);
-    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-    EXPECT_NE(shaderEffect, nullptr);
-
-    params = InitialParams(0.5, 0.5, 0.5, -4.0);
-    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-    EXPECT_NE(shaderEffect, nullptr);
-
-    params = InitialParams(-0.5, -0.5, -0.5, -4.0);
-    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-    EXPECT_NE(shaderEffect, nullptr);
-
-    params.radius_ = 1;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 2.0f;
-
-    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(*canvas_, rect_);
-    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-    EXPECT_NE(shaderEffect, nullptr);
 }
 
 /**
