@@ -41,7 +41,6 @@ bool GEHarmoniumEffectShaderMask::IsValid() const
 
 std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShader(float width, float height) const
 {
-    ROSEN_LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader test");
     if (!IsValid()) {
         ROSEN_LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;

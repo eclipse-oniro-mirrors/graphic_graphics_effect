@@ -430,15 +430,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             break;
         }
-        case FilterType::HARMONIUM_EFFECT_MASK: {
-            if (harmoniumEffectMaskParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP) {
-                harmoniumEffectMaskParams_->image = param;
-            }
-            break;
-        }
         default:
             break;
     }
@@ -580,6 +571,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_MASK_PIXEL_MAP_PIXEL_MAP) {
                 pixelMapMaskParams_->image = param;
+            }
+            break;
+        }
+        
+        case FilterType::HARMONIUM_EFFECT_MASK: {
+            if (harmoniumEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP) {
+                harmoniumEffectMaskParams_->image = param;
             }
             break;
         }

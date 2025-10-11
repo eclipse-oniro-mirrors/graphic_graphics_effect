@@ -34,6 +34,10 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    std::shared_ptr<Drawing::Image> GetImage() const override
+    {
+        return param_.image;
+    }
 
 private:
     bool IsValid() const;
