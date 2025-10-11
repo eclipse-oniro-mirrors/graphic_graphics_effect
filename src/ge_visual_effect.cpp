@@ -192,7 +192,7 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             if (harmoniumEffectParams == nullptr) {
                 return nullptr;
             }
-            return std::make_shared(*harmoniumEffectParams);
+            return std::make_shared<GEHarmoniumEffectShaderMask>(*harmoniumEffectParams);
         }
         default:
             return nullptr;
