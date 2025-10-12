@@ -30,7 +30,7 @@ public:
     GESDFUnionOpShaderMask(const GESDFUnionOpMaskParams& param) : params_(param) {}
     GESDFUnionOpShaderMask(const GESDFUnionOpShaderMask&) = delete;
     virtual ~GESDFUnionOpShaderMask() = default;
-    DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderMask);
+    // DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderMask);
 
     GESDFMaskType GetSDFMaskType() const override
     {

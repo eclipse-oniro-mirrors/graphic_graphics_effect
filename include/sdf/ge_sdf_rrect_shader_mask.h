@@ -30,7 +30,7 @@ public:
     GESDFRRectShaderMask(const GESDFRRectMaskParams& param) : params_(param) {}
     GESDFRRectShaderMask(const GESDFRRectShaderMask&) = delete;
     virtual ~GESDFRRectShaderMask() = default;
-    DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderMask);
+    // DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderMask);
 
     GESDFMaskType GetSDFMaskType() const override
     {
