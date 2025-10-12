@@ -32,7 +32,7 @@ namespace Drawing {
 bool GEHarmoniumEffectShaderMask::IsValid() const
 {
     if (param_.image == nullptr) {
-        ROSEN_LOGE("GEHarmoniumEffectShaderMask::IsValid image is nullptr");
+        LOGE("GEHarmoniumEffectShaderMask::IsValid image is nullptr");
         return false;
     }
 
@@ -42,7 +42,7 @@ bool GEHarmoniumEffectShaderMask::IsValid() const
 std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {
-        ROSEN_LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader param is invalid");
+        LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
@@ -81,7 +81,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEHarmoniumEffectShaderMask::GetH
 
     auto harmoniumEffectShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
     if (harmoniumEffectShaderMaskEffect == nullptr) {
-        LOGE("GEPixelMapShaderMask::GetPixelMapShaderMaskBuilder effect error");
+        LOGE("GEHarmoniumEffectShaderMask::GetHarmoniumEffectShaderMaskBuilder effect error");
         return nullptr;
     }
 
