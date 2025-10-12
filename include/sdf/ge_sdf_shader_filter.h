@@ -42,7 +42,7 @@ public:
                    const std::shared_ptr<Drawing::Image> image,
                    const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
-    const std::string &Type() const; // overload, not override
+    const std::string &GetSDFShaderFilterType() const; // overload, not override
 
     Drawing::GESDFTreeProcessor *GetSDFTreeProcessor();
     const Drawing::GESDFTreeProcessor *GetSDFTreeProcessor() const;

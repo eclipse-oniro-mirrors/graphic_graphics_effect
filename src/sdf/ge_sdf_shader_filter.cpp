@@ -25,7 +25,7 @@ namespace Rosen {
 
 const std::string GESDFShaderFilter::type_ = Drawing::GE_FILTER_SDF;
 
-const std::string& GESDFShaderFilter::Type() const
+const std::string& GESDFShaderFilter::GetSDFShaderFilterType() const
 {
     return type_;
 }
