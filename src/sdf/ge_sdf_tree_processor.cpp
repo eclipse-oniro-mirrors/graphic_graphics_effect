@@ -171,12 +171,12 @@ namespace OHOS::Rosen::Drawing {
     {
         auto rect = sdfMask.GetRRect();
 
-        auto left = rect.rect_.left_;
-        auto top = rect.rect_.top_;
-        auto width = rect.rect_.width_;
-        auto height = rect.rect_.height_;
+        auto left = rect.left_;
+        auto top = rect.top_;
+        auto width = rect.width_;
+        auto height = rect.height_;
         GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
-        auto radius = std::max(rect.radius_->x_, rect.radius_->y_);
+        auto radius = std::max(rect.radiusX_, rect.radiusY_);
         auto right = left + width;
         auto bottom = top - height;
 

@@ -128,7 +128,7 @@ void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
     visualEffectImpl_->SetParam(tag, param);
 }
 
-void GEVisualEffect::SetParam(const std::string& tag, const RRect& param)
+void GEVisualEffect::SetParam(const std::string& tag, const GERRect& param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }

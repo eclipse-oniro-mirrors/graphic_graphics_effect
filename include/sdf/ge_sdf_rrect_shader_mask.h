@@ -34,7 +34,7 @@ public:
         return GESDFMaskType::RRECT;
     }
 
-    const RRect& GetRRect() const
+    const GERRect& GetRRect() const
     {
         return params_.rrect;
     }

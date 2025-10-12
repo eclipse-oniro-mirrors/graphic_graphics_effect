@@ -22,11 +22,14 @@
 #include <optional>
 #include <variant>
 
-#include "common/rs_rect.h"
+// rs
 #include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
+// drawing
 #include "utils/matrix.h"
+// ge
+#include "utils/ge_rect.h"
 #include "ge_shader_mask.h"
 #include "sdf/ge_sdf_shader_mask.h"
 
@@ -558,7 +561,17 @@ enum class GESDFUnionOp : uint8_t {
     MAX = SMOOTH_UNION,
 };
 
-using GESDFShapeNode = std::variant<RRect, GESDFUnionOp>;
+class GERRect {
+public:
+    float left_ = 0.f;
+    float width_ = 0.f;
+    float top_ = 0.f;
+    float bottom_ = 0.f;
+    float radiusX_ = 0.f;
+    float radiusY_ = 0.f;
+};
+
+using GESDFShapeNode = std::variant<GERRect, GESDFUnionOp>;
 
 constexpr char GE_MASK_SDF_UNION_OP[] = "SDFUnionOpMask";
 constexpr char GE_MASK_SDF_UNION_OP_MASKX[] = "SDFUnionOpMask_MaskX";
@@ -579,7 +592,7 @@ struct GESDFUnionOpMaskParams {
 constexpr char GE_MASK_SDF_RRECT_MASK[] = "SDFRRectMask";
 constexpr char GE_MASK_SDF_RRECT_MASK_RRECT[] = "SDFRRectMask_RRect";
 struct GESDFRRectMaskParams {
-    RRect rrect;
+    GERRect rrect;
 };
 
 constexpr char GE_FILTER_SDF[] = "SDFFilter";

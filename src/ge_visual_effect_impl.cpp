@@ -1138,7 +1138,7 @@ void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Vec
     }
 }
 
-void GEVisualEffectImpl::SetParam(const std::string& tag, const RRect& param)
+void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 {
     switch (filterType_) {
         case FilterType::SDF_RRECT_MASK: {
