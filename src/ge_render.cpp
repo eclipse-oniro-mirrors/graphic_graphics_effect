@@ -39,6 +39,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
+#include "sdf/ge_sdf_shader_filter.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_system_properties.h"
 #include "ge_visual_effect_impl.h"
@@ -547,6 +548,16 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         }
         case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
             shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::SDF: {
+            const auto& params = ve->GetSDFFilterParams();
+            if (!sdfShaderFilter_) {
+                sdfShaderFilter_ = std::make_shared<GESDFShaderFilter>(*params);
+            } else {
+                sdfShaderFilter_->Update(*params);
+            }
+            shaderFilter = sdfShaderFilter_;
             break;
         }
         default:

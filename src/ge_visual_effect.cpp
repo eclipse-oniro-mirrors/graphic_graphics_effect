@@ -14,15 +14,17 @@
  */
 #include <vector>
 #include "ge_visual_effect.h"
+#include "ge_double_ripple_shader_mask.h"
+#include "ge_frame_gradient_shader_mask.h"
 
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
-#include "ge_double_ripple_shader_mask.h"
 #include "ge_wave_gradient_shader_mask.h"
-#include "ge_frame_gradient_shader_mask.h"
+#include "sdf/ge_sdf_rrect_shader_mask.h"
+#include "sdf/ge_sdf_union_op_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -126,6 +128,21 @@ void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const RRect& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const GESDFBorderParams& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const GESDFShadowParams& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 void GEVisualEffect::SetCanvasInfo(Drawing::CanvasInfo info)
 {
     visualEffectImpl_->SetCanvasInfo(info);
@@ -186,6 +203,21 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
         }
+        case GEVisualEffectImpl::FilterType::SDF_UNION_OP: {
+            auto params = impl->GetSDFUnionOpMaskParams();
+            if (params == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GESDFUnionOpShaderMask>(*params);
+        }
+        case GEVisualEffectImpl::FilterType::SDF_RRECT_MASK: {
+            auto params = impl->GetSDFRRectMaskParams();
+            if (params == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GESDFRRectShaderMask>(*params);
+        }
+
         default:
             return nullptr;
     }

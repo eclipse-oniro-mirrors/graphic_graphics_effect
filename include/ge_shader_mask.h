@@ -32,6 +32,7 @@ public:
     virtual ~GEShaderMask() = default;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
+    virtual bool IsSDFShaderMask() const { return false; }
 };
 } // namespace Drawing
 } // namespace Rosen

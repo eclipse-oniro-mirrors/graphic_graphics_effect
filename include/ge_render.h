@@ -23,6 +23,7 @@
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_container.h"
+#include "sdf/ge_sdf_shader_filter.h"
 
 #include "draw/brush.h"
 #include "draw/canvas.h"
@@ -98,6 +99,7 @@ private:
     std::shared_ptr<GEShaderFilter> GenerateShaderKawaseBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
 
     static bool isMesablurAllEnable_;
+    std::shared_ptr<GESDFShaderFilter> sdfShaderFilter_;
 };
 
 } // namespace GraphicsEffectEngine

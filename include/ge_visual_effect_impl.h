@@ -77,6 +77,9 @@ public:
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
     void SetParam(const std::string& tag, const RectF& param);
+    void SetParam(const std::string& tag, const RRect& param);
+    void SetParam(const std::string& tag, const GESDFBorderParams& param);
+    void SetParam(const std::string& tag, const GESDFShadowParams& param);
 
     void SetFilterType(FilterType type)
     {
@@ -358,6 +361,38 @@ public:
         return variableRadiusBlurParams_;
     }
 
+    const std::shared_ptr<GESDFFilterParams>& GetSDFFilterParams() const
+    {
+        return sdfFilterParams_;
+    }
+
+    void MakeSDFFilterParams()
+    {
+        sdfFilterParams_ = std::make_shared<GESDFFilterParams>();
+    }
+
+    const std::shared_ptr<GESDFUnionOpMaskParams>& GetSDFUnionOpMaskParams() const
+    {
+        return sdfUnionOpMaskParams_;
+    }
+
+    void MakeSDFUnionOpMaskParams(const GESDFUnionOp& op)
+    {
+        sdfUnionOpMaskParams_ = std::make_shared<GESDFUnionOpMaskParams>();
+        sdfUnionOpMaskParams_->op = op;
+    }
+
+    const std::shared_ptr<GESDFRRectMaskParams>& GetSDFRRectMaskParams() const
+    {
+        return sdfRRectMaskParams_;
+    }
+
+    void MakeSDFRRectMaskParams()
+    {
+        sdfRRectMaskParams_ = std::make_shared<GESDFRRectMaskParams>();
+    }
+
+
     void MakeColorGradientEffectParams()
     {
         colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
@@ -437,6 +472,10 @@ public:
     {
         return frameGradientMaskParams_;
     }
+
+    void SetBorder(const Color& borderColor, float borderWidth);
+    void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
+                  float radius, Drawing::Path path, bool isFilled);
 
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
@@ -523,6 +562,10 @@ private:
     std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
+
+    std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
+    std::shared_ptr<GESDFUnionOpMaskParams> sdfUnionOpMaskParams_ = nullptr;
+    std::shared_ptr<GESDFRRectMaskParams> sdfRRectMaskParams_ = nullptr;
 };
 
 } // namespace Drawing
