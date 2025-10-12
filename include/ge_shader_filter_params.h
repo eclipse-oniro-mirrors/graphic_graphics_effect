@@ -566,7 +566,7 @@ public:
     float left_ = 0.f;
     float width_ = 0.f;
     float top_ = 0.f;
-    float bottom_ = 0.f;
+    float height_ = 0.f;
     float radiusX_ = 0.f;
     float radiusY_ = 0.f;
 };
