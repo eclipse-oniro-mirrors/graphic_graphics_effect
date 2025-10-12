@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,11 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// REGISTER_GEFILTER_TYPEINFO(SDF_RRECT_MASK, GESDFRRectShaderMask,
-//      Drawing::GESDFRRectMaskParams, Drawing::GE_MASK_SDF_RRECT_MASK);
 class GE_EXPORT GESDFRRectShaderMask : public GESDFShaderMask {
 public:
     GESDFRRectShaderMask(const GESDFRRectMaskParams& param) : params_(param) {}
     GESDFRRectShaderMask(const GESDFRRectShaderMask&) = delete;
     virtual ~GESDFRRectShaderMask() = default;
-    // DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderMask);
 
     GESDFMaskType GetSDFMaskType() const override
     {

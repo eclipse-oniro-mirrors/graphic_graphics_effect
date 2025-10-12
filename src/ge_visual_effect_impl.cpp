@@ -946,12 +946,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
         }
         case FilterType::SDF: {
             bool isSdfMask = !param || param->IsSDFShaderMask();
-            if (sdfFiltParams_ == nullptr || !isSdfMask) {
+            if (sdfFilterParams_ == nullptr || !isSdfMask) {
                 return;
             }
             
             if (tag == GE_FILTER_SDF_MASK) {
-                sdfFiltParams_->mask = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+                sdfFilterParams_->mask = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
             }
             break;
         }

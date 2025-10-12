@@ -552,7 +552,6 @@ struct GEBorderLightShaderParams {
     float cornerRadius = 0.0f;
 };
 
-// sdf
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
     SMOOTH_UNION,

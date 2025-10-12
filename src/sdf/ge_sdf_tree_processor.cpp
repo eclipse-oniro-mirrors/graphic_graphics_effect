@@ -159,7 +159,6 @@ namespace OHOS::Rosen::Drawing {
                  ");\n";
     }
 
-
     void GESDFTreeProcessor::GenerateHeader(const GESDFRRectShaderMask& sdfMask)
     {
         auto nodeId = reinterpret_cast<size_t>(&sdfMask);
