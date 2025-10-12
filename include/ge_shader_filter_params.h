@@ -29,7 +29,6 @@
 // drawing
 #include "utils/matrix.h"
 // ge
-#include "utils/ge_rect.h"
 #include "ge_shader_mask.h"
 #include "sdf/ge_sdf_shader_mask.h"
 
