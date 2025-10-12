@@ -16,9 +16,9 @@
 #include "ge_visual_effect.h"
 
 #include "ge_log.h"
+#include "ge_harmonium_effect_shader_mask.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_pixel_map_shader_mask.h"
-#include "ge_harmonium_effect_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
 #include "ge_double_ripple_shader_mask.h"
@@ -166,6 +166,13 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             return std::make_shared<GERippleShaderMask>(*rippleParams);
         }
+        case GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK: {
+            auto harmoniumEffectParams = impl->GetHarmoniumEffectMaskParams();
+            if (harmoniumEffectParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GEHarmoniumEffectShaderMask>(*harmoniumEffectParams);
+        }
         case GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK: {
             auto pixelMapParams = impl->GetPixelMapMaskParams();
             if (pixelMapParams == nullptr) {
@@ -186,13 +193,6 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
                 return nullptr;
             }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
-        }
-        case GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK: {
-            auto harmoniumEffectParams = impl->GetHarmoniumEffectMaskParams();
-            if (harmoniumEffectParams == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GEHarmoniumEffectShaderMask>(*harmoniumEffectParams);
         }
         default:
             return nullptr;

@@ -268,6 +268,12 @@ struct GEHarmoniumEffectShaderParams {
     float cornerRadius = 0.f;
 };
 
+constexpr char GE_MASK_HARMONIUM_EFFECT[] = "HarmoniumEffectMask";
+constexpr char GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP[] = "HarmoniumEffectMask_Image";
+struct GEHarmoniumEffectMaskParams {
+    std::shared_ptr<Drawing::Image> image = nullptr;
+};
+
 constexpr char GE_FILTER_EDGE_LIGHT[] = "EdgeLight";
 constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "EdgeLight_Alpha";
 constexpr char GE_FILTER_EDGE_LIGHT_BLOOM[] = "EdgeLight_Bloom";
@@ -634,12 +640,6 @@ struct GEFrameGradientMaskParams {
     Vector4f gradientBezierControlPoints;
     float cornerRadius = 0.0f;
     float frameWidth = 0.0f;
-};
-
-constexpr char GE_MASK_HARMONIUM_EFFECT[] = "HarmoniumEffectMask";
-constexpr char GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP[] = "HarmoniumEffectMask_Image";
-struct GEHarmoniumEffectMaskParams {
-    std::shared_ptr<Drawing::Image> image = nullptr;
 };
 
 } // namespace Drawing

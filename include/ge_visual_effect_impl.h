@@ -508,6 +508,7 @@ private:
     Drawing::CanvasInfo canvasInfo_;
 
     // ShaderFilter Params
+    std::shared_ptr<GEHarmoniumEffectMaskParams> harmoniumEffectMaskParams_ = nullptr;
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
     std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
     std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;
@@ -520,7 +521,6 @@ private:
 
     std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
     std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
-    std::shared_ptr<GEHarmoniumEffectMaskParams> harmoniumEffectMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
     std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;
