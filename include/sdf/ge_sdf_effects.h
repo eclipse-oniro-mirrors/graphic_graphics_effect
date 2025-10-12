@@ -36,7 +36,7 @@ public:
     virtual void Process(std::string& headers, std::string& calls, std::string& functions) const = 0;
     virtual void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const = 0;
 
-    [[nodiscard]] 
+    [[nodiscard]]
     virtual SDFEffectOrder GetOrder() const = 0;
     
     static bool InOrderComparator(const GESDFEffect& effect1, const GESDFEffect& effect2);

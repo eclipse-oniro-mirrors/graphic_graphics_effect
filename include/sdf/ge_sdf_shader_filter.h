@@ -37,10 +37,10 @@ public:
     GESDFShaderFilter(const GESDFShaderFilter& params) = delete;
     ~GESDFShaderFilter() override = default;
 
-    std::shared_ptr<Drawing::Image> 
+    std::shared_ptr<Drawing::Image>
     OnProcessImage(Drawing::Canvas& canvas,
                    const std::shared_ptr<Drawing::Image> image,
-                   const Drawing::Rect& src,const Drawing::Rect& dst) override;
+                   const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     const std::string &Type() const override;
 

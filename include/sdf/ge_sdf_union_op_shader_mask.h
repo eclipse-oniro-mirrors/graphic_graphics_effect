@@ -24,13 +24,13 @@ namespace Rosen {
 namespace Drawing {
 
 // REGISTER_GE_FILTER_TYPEINFO(SDF_UNION_OP, GESDFUnionOpShaderMask,
-//      Drawing::GESDFUnionOpShaderMask, Drawing::GE_MASK_SDF_UNION_OP);
+//      Drawing::GESDFUnionOpMaskParams, Drawing::GE_MASK_SDF_UNION_OP);
 class GE_EXPORT GESDFUnionOpShaderMask : public GESDFShaderMask {
 public:
     GESDFUnionOpShaderMask(const GESDFUnionOpMaskParams& param) : params_(param) {}
     GESDFUnionOpShaderMask(const GESDFUnionOpShaderMask&) = delete;
     virtual ~GESDFUnionOpShaderMask() = default;
-    // DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderMask);
+    DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderMask);
 
     GESDFMaskType GetSDFMaskType() const override
     {

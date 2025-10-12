@@ -19,6 +19,7 @@
 #include "ge_visual_effect_impl.h"
 #include "draw/path.h"
 #include "draw/canvas.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -32,13 +33,15 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
-    std::shared_ptr<Drawing::Image> MakeImage(Drawing::Canvas& canvas);
-
-    static inline Drawing::Canvas canvas_;
-    std::shared_ptr<Drawing::Image> image_ { nullptr };
-
-    // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
-    Drawing::Rect rect_ { 1.0f, 1.0f, 2.0f, 2.0f };
+private:
+    Drawing::GEParticleCircularHaloShaderParams InitialParams(
+        float radius, float centerFirst, float centerSecond, float noise);
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
+    Drawing::Canvas canvasNoGpu_;
+    Drawing::Rect rect_ = {};
+    Drawing::ImageInfo imageInfo_ = {};
 };
 
 void GEParticleCircularHaloShaderTest::SetUpTestCase(void) {}
@@ -46,272 +49,180 @@ void GEParticleCircularHaloShaderTest::TearDownTestCase(void) {}
 
 void GEParticleCircularHaloShaderTest::SetUp()
 {
-    canvas_.Restore();
-
-    Drawing::Bitmap bmp;
-    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(50, 50, format); // 50, 50  bitmap size
-    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
-    image_ = bmp.MakeImage();
+    Drawing::Rect rect {0.0f, 0.0f, 10.0f, 10.0f};
+    rect_ = rect;
+    imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
+    surface_ = CreateSurface();
+    canvas_ = surface_->GetCanvas();
 }
 
 void GEParticleCircularHaloShaderTest::TearDown() {}
 
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest001, TestSize.Level1)
+std::shared_ptr<Drawing::Surface> GEParticleCircularHaloShaderTest::CreateSurface()
 {
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_001 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (0.5, 0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = std::make_shared<RenderContext>();
+    renderContext->InitializeEglContext();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest::CreateSurface create gpuContext failed.";
+        return nullptr;
     }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_001 end";
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
 }
 
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest002, TestSize.Level1)
+Drawing::GEParticleCircularHaloShaderParams GEParticleCircularHaloShaderTest::InitialParams(
+    float radius, float centerFirst, float centerSecond, float noise)
 {
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_002 start";
     Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = -0.1f;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = -0.5, center = (0.5, 0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_002 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_003 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 2.0f;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 2.0, center = (0.5, 0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_003 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest004, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_004 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(-0.5f, 0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (-0.5, 0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_004 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest005, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_005 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(0.5f, -0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (0.5, -0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_005 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest006, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_006 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(1.5f, 0.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (1.5, 0.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_006 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest007, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_007 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(0.5f, 1.5f);
-    params.noise_ = 4.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (0.5, 1.5), noise = 4.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_007 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest008, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_008 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 0.5f;
-    params.center_ = std::make_pair(1.5f, 0.5f);
-    params.noise_ = -2.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (1.5, 0.5), noise = -2.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_008 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest009, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_009 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = -0.5f;
-    params.center_ = std::make_pair(-0.5f, -0.5f);
-    params.noise_ = -2.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = -0.5, center = (-0.5, -0.5), noise = -2.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_009 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest010, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_010 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 2.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (0.5, 0.5), noise = 2.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_010 end";
-}
-
-HWTEST_F(GEParticleCircularHaloShaderTest, GEParticleCircularHaloShaderTest011, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_011 start";
-    Drawing::GEParticleCircularHaloShaderParams params;
-    params.radius_ = 1;
-    params.center_ = std::make_pair(0.5f, 0.5f);
-    params.noise_ = 2.0f;
-
-    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
-    shader->Preprocess(canvas_, rect_);
-    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
-
-    if (shaderEffect) {
-        GTEST_LOG_(INFO) << "Shader created successfully, radius = 0.5, center = (0.5, 0.5), noise = 2.0";
-    } else {
-        GTEST_LOG_(ERROR) << "Failed to create shader.";
-    }
-    EXPECT_EQ(shaderEffect, nullptr);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest MakeParticleCircularHaloShader_011 end";
+    params.radius_ = radius;
+    params.center_ = std::make_pair(centerFirst, centerSecond);
+    params.noise_ = noise;
+    return params;
 }
 
 /**
- * @tc.name: Type_001
- * @tc.desc: Verify the Type
- * @tc.type: FUNC
- */
-HWTEST_F(GEParticleCircularHaloShaderTest, Type_001, TestSize.Level1)
+* @tc.name: CreateSurfaceCanvasTest
+* @tc.desc: Verify if surface_ and canvas_ were successfully created
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, CreateSurfaceCanvasTest, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 start";
-
-    auto filter = std::make_unique<GEParticleCircularHaloShader>();
-    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::PARTICLE_CIRCULAR_HALO);
-    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
-
-    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 end";
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
 }
+
+/**
+* @tc.name: GetDescpritionTest
+* @tc.desc: Verify GetDescprition
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, GetDescpritionTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    EXPECT_EQ(shader->GetDescription(), "GEParticleCircularHaloShader");
+}
+
+/**
+* @tc.name: CreateParamsTest
+* @tc.desc: Verify CreateParticleCircularHaloShader
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, CreateParamsTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    EXPECT_EQ(shader->particleCircularHaloParams_.radius_, 0.5);
+    EXPECT_EQ(shader->particleCircularHaloParams_.center_, std::make_pair(0.5f, 0.5f));
+    EXPECT_EQ(shader->particleCircularHaloParams_.noise_, 1.0);
+}
+
+/**
+* @tc.name: NoPreprocessTest
+* @tc.desc: Verify initial cache Imgs
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, NoPreprocessTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    EXPECT_EQ(shader->cacheAnyPtr_, nullptr);
+}
+
+/**
+* @tc.name: GetGlowHaloBuilderTest
+* @tc.desc: Verify GetGlowHaloBuilder function
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, GetGlowHaloBuilderTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    auto shderEffect = shader->GetGlowHaloBuilder();
+    EXPECT_NE(shderEffect, nullptr);
+}
+
+/**
+* @tc.name: MakeDrawingShaderTest
+* @tc.desc: Verify full drawing pipeline with MakeDrawingShader
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, MakeDrawingShaderTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shader->MakeDrawingShader(rect_, 0.5f);
+    EXPECT_NE(shader->drShader_, nullptr);
+}
+
+/**
+* @tc.name: MakeShaderWithDifferentParamsTest
+* @tc.desc: Test full pipe line with different inputs
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, MakeShaderWithDifferentParamsTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 4.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+
+    params = InitialParams(-0.1, 0.5, 0.5, 4.0);
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+
+    params = InitialParams(2.0, 0.5, 0.5, 4.0);
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+
+    params = InitialParams(0.5, -0.5, 0.5, 4.0);
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+
+    params = InitialParams(0.5, 0.5, -0.5, 4.0);
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+
+    params = InitialParams(0.5, 20.0, 0.5, 4.0);
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(*canvas_, rect_);
+    shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_NE(shaderEffect, nullptr);
+}
+
+/**
+* @tc.name: MakeNullShaderTest
+* @tc.desc: Test shader with nullptr outputs
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, MakeNullShaderTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    shader->Preprocess(canvasNoGpu_, rect_);
+    auto shaderEffect = shader->MakeParticleCircularHaloShader(rect_);
+    EXPECT_EQ(shaderEffect, nullptr);
+
+    shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    auto glowEffect = shader->MakeGlowHaloShader(canvasNoGpu_, imageInfo_);
+    EXPECT_EQ(glowEffect, nullptr);
+    
+    auto particleEffect = shader->MakeParticleHaloShader(canvasNoGpu_, imageInfo_);
+    EXPECT_EQ(particleEffect, nullptr);
+}
+
 }  // namespace Rosen
 }  // namespace OHOS

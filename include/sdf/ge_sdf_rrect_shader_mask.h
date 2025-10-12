@@ -23,14 +23,14 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// REGISTER_GE_FILTER_TYPEINFO(SDF_RRECT_MASK, GESDF_RRectShaderMask,
+// REGISTER_GEFILTER_TYPEINFO(SDF_RRECT_MASK, GESDFRRectShaderMask,
 //      Drawing::GESDFRRectMaskParams, Drawing::GE_MASK_SDF_RRECT_MASK);
 class GE_EXPORT GESDFRRectShaderMask : public GESDFShaderMask {
 public:
     GESDFRRectShaderMask(const GESDFRRectMaskParams& param) : params_(param) {}
     GESDFRRectShaderMask(const GESDFRRectShaderMask&) = delete;
     virtual ~GESDFRRectShaderMask() = default;
-    // DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderMask);
+    DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderMask);
 
     GESDFMaskType GetSDFMaskType() const override
     {

@@ -27,7 +27,7 @@
 
 namespace OHOS {
 namespace Rosen {
-class GEShaderFilter {
+class GEShaderFilter : public Drawing::IGEFilterType {
 public:
     GEShaderFilter() = default;
     GEShaderFilter(const GEShaderFilter&) = delete;

@@ -29,7 +29,6 @@ struct ComparatorForEffects final {
 };
 
 class GESDFTreeProcessor final {
-
     void Process(const std::shared_ptr<GESDFShaderMask> sdfMask);
     void Process(const GESDFRRectShaderMask& sdfMask);
     void Process(const GESDFUnionOpShaderMask& sdfMask);

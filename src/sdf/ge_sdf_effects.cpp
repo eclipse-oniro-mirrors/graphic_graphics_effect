@@ -24,9 +24,8 @@ namespace OHOS::Rosen::Drawing {
         return effect1.GetOrder() < effect2.GetOrder();
     }
 
-    GESDFBorder::GESDFBorder(const Color& color, float width) : 
-        color_(color),
-        width_(width)
+    GESDFBorder::GESDFBorder(const Color& color, float width) :
+        color_(color), width_(width)
     { }
 
     void GESDFBorder::Process(std::string& headers, std::string& calls, std::string& functions) const

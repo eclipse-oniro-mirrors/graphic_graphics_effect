@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "sdf/ge_sdf_tree_processor.h"
 
 #include "ge_log.h"
@@ -68,7 +83,7 @@ namespace OHOS::Rosen::Drawing {
                     return min(d1, d2) - h*h*0.25 / k;
                 }
 
-                float SDFRRect( in vec2 coord, in vec2 p, in vec2 b, in float r)
+                float SDFRRect(in vec2 coord, in vec2 p, in vec2 b, in float r)
                 {
                     vec2 d = abs(coord - p) - (b - r);
                     return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
@@ -76,7 +91,6 @@ namespace OHOS::Rosen::Drawing {
 
                 float SDFMap(in vec2 uv)
                 {
-
             )" + body_ + returnCode + "\n}\n";
             
             shaderCode_ += effectsFunctions_;
@@ -162,7 +176,7 @@ namespace OHOS::Rosen::Drawing {
         auto top = rect.rect_.top_;
         auto width = rect.rect_.width_;
         auto height = rect.rect_.height_;
-        GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h %{public}f, %{public}f, %{public}f, %{public}f",left, top, width, height);
+        GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
         auto radius = std::max(rect.radius_->x_, rect.radius_->y_);
         auto right = left + width;
         auto bottom = top - height;
