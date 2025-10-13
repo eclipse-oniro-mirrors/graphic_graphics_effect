@@ -61,28 +61,29 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing:
         return image;
     }
 
-    Drawing::Matrix matrix = canvasInfo_.mat;
-    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEMagnifierShaderFilter::OnProcessImage Invert matrix failed");
-        return image;
-    }
+    SetMagnifierOffset(canvasInfo_.mat);
+
+    Drawing::Matrix matrix;
+    matrix.Rotate(rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
+        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    Drawing::Rect imageRect(0, 0, image->GetWidth(), image->GetHeight());
-    matrix.MapRect(imageRect, imageRect);
-    auto builder = MakeMagnifierShader(imageShader, imageRect.GetWidth(), imageRect.GetHeight());
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    float imageWidth = image->GetWidth();
+    float imageHeight = image->GetHeight();
+    auto builder = MakeMagnifierShader(imageShader, imageWidth, imageHeight);
     if (builder == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage builder is null");
         return image;
     }
 
+    Drawing::Matrix invMatrix;
+    invMatrix.Rotate(-rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
+        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
 #ifdef RS_ENABLE_GPU
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &invMatrix, image->GetImageInfo(), false);
 #else
-    auto resultImage = builder->MakeImage(nullptr, &(matrix), image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(nullptr, &invMatrix, image->GetImageInfo(), false);
 #endif
     if (resultImage == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage resultImage is null");
@@ -111,12 +112,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     builder->SetUniform("iResolution", imageWidth, imageHeight);
 
     builder->SetUniform("factor", magnifierPara_->factor_);
-    builder->SetUniform("size", magnifierPara_->width_, magnifierPara_->height_);
-    builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_);
-    builder->SetUniform("borderWidth", magnifierPara_->borderWidth_);
+    builder->SetUniform("size", magnifierPara_->width_ * scaleX_, magnifierPara_->height_ * scaleY_);
+    builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_ * scaleY_);
+    builder->SetUniform("borderWidth", magnifierPara_->borderWidth_ * scaleY_);
 
-    builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_, magnifierPara_->shadowOffsetY_);
-    builder->SetUniform("shadowSize", magnifierPara_->shadowSize_);
+    builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_ * scaleX_,
+        magnifierPara_->shadowOffsetY_ * scaleY_);
+    builder->SetUniform("shadowSize", magnifierPara_->shadowSize_ * scaleY_);
     builder->SetUniform("shadowStrength", magnifierPara_->shadowStrength_);
 
     float maskColor1[COLOR_CHANNEL] = { 0.0f };
@@ -257,5 +259,33 @@ const std::string GEMagnifierShaderFilter::GetDescription() const
     return "GEMagnifierShaderFilter";
 }
 
+void GEMagnifierShaderFilter::SetMagnifierOffset(Drawing::Matrix& mat)
+{
+    if (!magnifierPara_) {
+        LOGD("GEMagnifierShaderFilter::SetMagnifierOffset magnifierPara_ is nullptr!");
+        return;
+    }
+
+    // 1 and 3 represents index
+    if ((mat.Get(1) > 1e-6) && (mat.Get(3) < -1e-6)) {
+        rotateDegree_ = 90; // 90 represents rotate degree
+        scaleX_ = mat.Get(1);
+        scaleY_ = -mat.Get(3); // 3 represents index
+    // 0 and 4 represents index
+    } else if ((mat.Get(0) < -1e-6) && (mat.Get(4) < -1e-6)) {
+        rotateDegree_ = 180; // 180 represents rotate degree
+        scaleX_ = -mat.Get(0);
+        scaleY_ = -mat.Get(4); // 4 represents index
+    // 1 and 3 represents index
+    } else if ((mat.Get(1) < -1e-6) && (mat.Get(3) > 1e-6)) {
+        rotateDegree_ = 270; // 270 represents rotate degree
+        scaleX_ = -mat.Get(1);
+        scaleY_ = mat.Get(3); // 3 represents index
+    } else {
+        rotateDegree_ = 0;
+        scaleX_ = mat.Get(0);
+        scaleY_ = mat.Get(4); // 4 represents index
+    }
+}
 } // namespace Rosen
 } // namespace OHOS

@@ -72,6 +72,11 @@ private:
         std::shared_ptr<Drawing::ShaderEffect> imageShader, float imageWidth, float imageHeight);
     bool InitMagnifierEffect();
     void ConvertToRgba(uint32_t rgba, float* color, int tupleSize);
+    void SetMagnifierOffset(Drawing::Matrix& mat);
+
+    float scaleX_ = 1.f;
+    float scaleY_ = 1.f;
+    int32_t rotateDegree_ = 0;
 
     std::shared_ptr<GEMagnifierParams> magnifierPara_ = nullptr;
     static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffect;
