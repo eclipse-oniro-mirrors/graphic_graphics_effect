@@ -712,6 +712,38 @@ struct GEFrameGradientMaskParams {
     float frameWidth = 0.0f;
 };
 
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST[] = "GasifyScaleTwist";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS[] = "GasifyScaleTwist_Progress";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE[] = "GasifyScaleTwist_SourceImage";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SCALE[] = "GasifyScaleTwist_Scale";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_MASK[] = "GasifyScaleTwist_Mask";
+struct GEGasifyScaleTwistFilterParams {
+    std::pair<float, float> scale_ = {1.0f, 1.0f};
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+
+constexpr char GE_FILTER_GASIFY_BLUR[] = "GasifyBlur";
+constexpr char GE_FILTER_GASIFY_BLUR_PROGRESS[] = "GasifyBlur_Progress";
+constexpr char GE_FILTER_GASIFY_BLUR_SOURCEIMAGE[] = "GasifyBlur_SourceImage";
+constexpr char GE_FILTER_GASIFY_BLUR_MASK[] = "GasifyBlur_Mask";
+struct GEGasifyBlurFilterParams {
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+
+constexpr char GE_FILTER_GASIFY[] = "Gasify";
+constexpr char GE_FILTER_GASIFY_PROGRESS[] = "Gasify_Progress";
+constexpr char GE_FILTER_GASIFY_SOURCEIMAGE[] = "Gasify_SourceImage";
+constexpr char GE_FILTER_GASIFY_MASK[] = "Gasify_Mask";
+struct GEGasifyFilterParams {
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -443,6 +443,36 @@ public:
         return harmoniumEffectParams_;
     }
 
+    void MakeGasifyScaleTwistFilterParams()
+    {
+        gasifyScaleTwistFilterParams_ = std::make_shared<GEGasifyScaleTwistFilterParams>();
+    }
+
+    const std::shared_ptr<GEGasifyScaleTwistFilterParams> &GetGasifyScaleTwistFilterParams() const
+    {
+        return gasifyScaleTwistFilterParams_;
+    }
+
+    void MakeGasifyBlurFilterParams()
+    {
+        gasifyBlurFilterParams_ = std::make_shared<GEGasifyBlurFilterParams>();
+    }
+
+    const std::shared_ptr<GEGasifyBlurFilterParams> &GetGasifyBlurFilterParams() const
+    {
+        return gasifyBlurFilterParams_;
+    }
+
+     void MakeGasifyFilterParams()
+    {
+        gasifyFilterParams_ = std::make_shared<GEGasifyFilterParams>();
+    }
+
+    const std::shared_ptr<GEGasifyFilterParams> &GetGasifyFilterParams() const
+    {
+        return gasifyFilterParams_;
+    }
+
     void SetCanvasInfo(Drawing::CanvasInfo info)
     {
         canvasInfo_ = info;
@@ -542,6 +572,13 @@ private:
     void SetBorderLightParams(const std::string& tag, const Vector3f& param);
     void SetBorderLightParams(const std::string& tag, const Vector4f& param);
     void SetBorderLightParams(const std::string& tag, float param);
+    void SetGasifyScaleTwistParams(const std::string& tag, float param);
+    void SetGasifyScaleTwistParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetGasifyScaleTwistParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetGasifyBlurParams(const std::string& tag, float param);
+    void SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetGasifyParams(const std::string& tag, float param);
+    void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -564,6 +601,9 @@ private:
     std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
     std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
+    std::shared_ptr<GEGasifyScaleTwistFilterParams> gasifyScaleTwistFilterParams_ = nullptr;
+    std::shared_ptr<GEGasifyBlurFilterParams> gasifyBlurFilterParams_ = nullptr;
+    std::shared_ptr<GEGasifyFilterParams> gasifyFilterParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
