@@ -377,7 +377,7 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
         return false;
     }
 
-    if (hpsEffectFilter->HpsSupportEffectGE(veContainer)) {
+    if (hpsEffectFilter->HpsSupportEffectGE(veContainer, context.isMaterial)) {
         for (auto vef : veContainer.GetFilters()) {
             auto ve = vef->GetImpl();
             hpsEffectFilter->GenerateVisualEffectFromGE(ve, context.src, context.dst, context.saturationForHPS,

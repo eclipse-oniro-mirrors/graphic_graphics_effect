@@ -62,6 +62,7 @@ public:
         uint32_t maskColor {};
         float saturationForHPS {};
         float brightnessForHPS {};
+        bool isMaterial {};
     };
 
     bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,

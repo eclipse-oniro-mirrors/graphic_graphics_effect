@@ -46,9 +46,9 @@ public:
         uint32_t maskColor;
     };
 
-    bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer);
+    bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer, bool isMaterial);
     bool IsHpsEffectEnabled() const;
-    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef);
+    bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef, bool isMaterial);
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
         const std::shared_ptr<Drawing::Image>& image);
