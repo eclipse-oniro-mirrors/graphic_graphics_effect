@@ -499,6 +499,83 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_010, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GenerateShaderFilters_011
+ * @tc.desc: Verify the GenerateShaderFilters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilters_011, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_011 start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY_SCALE_TWIST);
+    std::pair<float, float> scale = {1.0f, 1.0f};
+    std::shared_ptr<Drawing::Image> sourceImage = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage = nullptr;
+    float progress = 0.f;
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS, progress);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE, sourceImage);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_SCALE_TWIST_MASK, maskImage);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_SCALE_TWIST_SCALE, scale);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_011 end";
+}
+
+/**
+ * @tc.name: GenerateShaderFilters_012
+ * @tc.desc: Verify the GenerateShaderFilters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilters_012, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_012 start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY_BLUR);
+    std::shared_ptr<Drawing::Image> sourceImage = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage = nullptr;
+    float progress = 0.f;
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_BLUR_PROGRESS, progress);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_BLUR_SOURCEIMAGE, sourceImage);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_BLUR_MASK, maskImage);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_012 end";
+}
+
+/**
+ * @tc.name: GenerateShaderFilters_013
+ * @tc.desc: Verify the GenerateShaderFilters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilters_013, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_013 start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY);
+    std::shared_ptr<Drawing::Image> sourceImage = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage = nullptr;
+    float progress = 0.f;
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_PROGRESS, progress);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_SOURCEIMAGE, sourceImage);
+    visualEffect->SetParam(Drawing::GE_FILTER_GASIFY_MASK, maskImage);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_013 end";
+}
+
+/**
  * @tc.name: GenerateShaderFiltersEdgelight_001
  * @tc.desc: Verify the GenerateShaderFilters
  * @tc.type: FUNC

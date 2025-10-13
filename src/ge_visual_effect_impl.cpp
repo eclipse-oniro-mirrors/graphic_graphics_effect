@@ -315,7 +315,24 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeFrameGradientMaskParams();
         }
     },
-
+    { GE_FILTER_GASIFY_SCALE_TWIST,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
+            impl->MakeGasifyScaleTwistFilterParams();
+        }
+    },
+    { GE_FILTER_GASIFY_BLUR,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_BLUR);
+            impl->MakeGasifyBlurFilterParams();
+        }
+    },
+    { GE_FILTER_GASIFY,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY);
+            impl->MakeGasifyFilterParams();
+        }
+    },
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
@@ -547,6 +564,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetBorderLightParams(tag, param);
             break;
         }
+        case FilterType::GASIFY_SCALE_TWIST: {
+            SetGasifyScaleTwistParams(tag, param);
+            break;
+        }
+        case FilterType::GASIFY_BLUR: {
+            SetGasifyBlurParams(tag, param);
+            break;
+        }
+        case FilterType::GASIFY: {
+            SetGasifyParams(tag, param);
+            break;
+        }
         case FilterType::FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
@@ -593,7 +622,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
-        
+        case FilterType::GASIFY_SCALE_TWIST: {
+            SetGasifyScaleTwistParams(tag, param);
+            break;
+        }
+        case FilterType::GASIFY_BLUR: {
+            SetGasifyBlurParams(tag, param);
+            break;
+        }
+        case FilterType::GASIFY: {
+            SetGasifyParams(tag, param);
+            break;
+        }
         case FilterType::HARMONIUM_EFFECT_MASK: {
             if (harmoniumEffectMaskParams_ == nullptr) {
                 return;
@@ -701,6 +741,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::LIGHT_CAVE: {
             SetLightCaveParams(tag, param);
+            break;
+        }
+        case FilterType::GASIFY_SCALE_TWIST: {
+            SetGasifyScaleTwistParams(tag, param);
             break;
         }
         case FilterType::AIBAR_GLOW: {
@@ -1916,6 +1960,85 @@ void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
 
     if (tag == GEX_SHADER_LIGHT_CAVE_PROGRESS) {
         lightCaveShaderParams_->progress = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, float param)
+{
+    if (gasifyScaleTwistFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS) {
+        gasifyScaleTwistFilterParams_->progress_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (gasifyScaleTwistFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_SCALE_TWIST_SCALE) {
+        gasifyScaleTwistFilterParams_->scale_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param)
+{
+    if (gasifyScaleTwistFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE) {
+        gasifyScaleTwistFilterParams_->sourceImage_ = param;
+    }
+    if (tag == GE_FILTER_GASIFY_SCALE_TWIST_MASK) {
+        gasifyScaleTwistFilterParams_->maskImage_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyBlurParams(const std::string& tag, float param)
+{
+    if (gasifyBlurFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_BLUR_PROGRESS) {
+        gasifyBlurFilterParams_->progress_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param)
+{
+    if (gasifyBlurFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_BLUR_SOURCEIMAGE) {
+        gasifyBlurFilterParams_->sourceImage_ = param;
+    }
+    if (tag == GE_FILTER_GASIFY_BLUR_MASK) {
+        gasifyBlurFilterParams_->maskImage_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyParams(const std::string& tag, float param)
+{
+    if (gasifyFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_PROGRESS) {
+        gasifyFilterParams_->progress_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param)
+{
+    if (gasifyFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_GASIFY_SOURCEIMAGE) {
+        gasifyFilterParams_->sourceImage_ = param;
+    }
+    if (tag == GE_FILTER_GASIFY_MASK) {
+        gasifyFilterParams_->maskImage_ = param;
     }
 }
 } // namespace Drawing
