@@ -180,7 +180,7 @@ namespace OHOS::Rosen::Drawing {
         auto width = rect.width_;
         auto height = rect.height_;
         GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h"
-                "%{public}f, %{public}f, %{public}f, %{public}f", 
+                "%{public}f, %{public}f, %{public}f, %{public}f",
                 left, top, width, height);
         auto radius = std::max(rect.radiusX_, rect.radiusY_);
         auto right = left + width;
