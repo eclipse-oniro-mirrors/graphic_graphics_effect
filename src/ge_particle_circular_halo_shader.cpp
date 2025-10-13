@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Rosen {
-// LCOV_EXCL_START
 namespace {
     static constexpr char GLOW_HALO_PROG[] = R"(
         uniform half2 iResolution;
@@ -440,9 +439,8 @@ namespace {
         }
     )";
 }
-// LCOV_EXCL_STOP
 
-GEParticleCircularHaloShader::GEParticleCircularHaloShader() {} // LCOV_EXCL_LINE
+GEParticleCircularHaloShader::GEParticleCircularHaloShader() {}
 
 GEParticleCircularHaloShader::GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params)
 {
@@ -460,7 +458,7 @@ std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::Crea
     std::shared_ptr<GEParticleCircularHaloShader> particleCircularHaloShader =
         std::make_shared<GEParticleCircularHaloShader>(params);
     return particleCircularHaloShader;
-} // LCOV_EXCL_BR_LINE
+}
 
 void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
@@ -480,12 +478,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     if (glowHaloEffect_ == nullptr) {
         glowHaloEffect_ = Drawing::RuntimeEffect::CreateForShader(GLOW_HALO_PROG);
     }
-    // LCOV_EXCL_START
     if (glowHaloEffect_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader glowHaloEffect_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return std::make_shared<Drawing::RuntimeShaderBuilder>(glowHaloEffect_);
 }
 
@@ -496,13 +492,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     if (singleParticleHaloEffect_ == nullptr) {
         singleParticleHaloEffect_ = Drawing::RuntimeEffect::CreateForShader(SINGLE_PARTICLE_HALO_PROG);
     }
-    // LCOV_EXCL_START
     if (singleParticleHaloEffect_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::GetParticleHaloBuilder singleParticleHaloEffect_ is "
                 "nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return std::make_shared<Drawing::RuntimeShaderBuilder>(singleParticleHaloEffect_);
 }
 
@@ -513,13 +507,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     if (particleHaloEffect_ == nullptr) {
         particleHaloEffect_ = Drawing::RuntimeEffect::CreateForShader(PARTICLE_HALO_PROG);
     }
-    // LCOV_EXCL_START
     if (particleHaloEffect_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::GetParticleHaloBuilder particleHaloEffect_ is "
                 "nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return std::make_shared<Drawing::RuntimeShaderBuilder>(particleHaloEffect_);
 }
 
@@ -530,12 +522,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     if (glowHaloEffect_ == nullptr) {
         glowHaloEffect_ = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
     }
-    // LCOV_EXCL_START
     if (glowHaloEffect_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader:: GetParticleCircularHaloBuilder ShaderEffect_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return std::make_shared<Drawing::RuntimeShaderBuilder>(glowHaloEffect_);
 }
 
@@ -545,12 +535,10 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeGlowHaloShader
     float width = imageInfo.GetWidth();
     float height = imageInfo.GetHeight();
     auto glowHaloBuilder_ = GetGlowHaloBuilder();
-    // LCOV_EXCL_START
     if (glowHaloBuilder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader MakeGlowHaloShader preCalculatedBuilder_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     glowHaloBuilder_->SetUniform("iResolution", width, height);
     auto glowHaloShader = glowHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     if (glowHaloShader == nullptr) {
@@ -567,22 +555,18 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeSingleParticle
     float height = imageInfo.GetHeight();
 
     singleParticleHaloBuilder_ = GetSingleParticleHaloBuilder();
-    // LCOV_EXCL_START
     if (singleParticleHaloBuilder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader MakeParticleHaloShader singleParticleHaloBuilder_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     singleParticleHaloBuilder_->SetUniform("iResolution", width, height);
     singleParticleHaloBuilder_->SetUniform("randomNoise", particleCircularHaloParams_.noise_);
     auto singleParticleHaloShader =
         singleParticleHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
-    // LCOV_EXCL_START
     if (singleParticleHaloShader == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader MakeSingleParticleHaloShader is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return singleParticleHaloShader;
 }
 
@@ -597,12 +581,10 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeParticleHaloSh
         return nullptr;
     }
     particleHaloBuilder_ = GetParticleHaloBuilder();
-    // LCOV_EXCL_START
     if (particleHaloBuilder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader MakeParticleHaloShader particleTextureBuilder_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     Drawing::Matrix matrix;
     auto singleParticleHaloShader = Drawing::ShaderEffect::CreateImageShader(
         *singleParticleHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
@@ -610,12 +592,10 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeParticleHaloSh
     particleHaloBuilder_->SetUniform("iResolution", width, height);
     particleHaloBuilder_->SetChild("singleParticleHalo", singleParticleHaloShader);
     auto particleHaloShader = particleHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
-    // LCOV_EXCL_START
     if (particleHaloShader == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader MakeParticleHaloShader is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return particleHaloShader;
 }
 
@@ -624,12 +604,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-    // LCOV_EXCL_START
     if (glowHaloImg_ == nullptr || particleHaloImg_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader img_s are nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     Drawing::Matrix matrix;
     auto glowHaloShader =
         Drawing::ShaderEffect::CreateImageShader(*glowHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
@@ -639,12 +617,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
                                                  Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 
     builder_ = GetParticleCircularHaloBuilder();
-    // LCOV_EXCL_START
     if (builder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader builder_ is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     builder_->SetUniform("iResolution", width, height);
     builder_->SetChild("glowHalo", glowHaloShader);
     builder_->SetChild("particleHalo", particleHaloShader);
@@ -652,12 +628,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
     builder_->SetUniform("rotationCenter", particleCircularHaloParams_.center_.first,
                          particleCircularHaloParams_.center_.second);
     auto particleCircularHaloShader = builder_->MakeShader(nullptr, false);
-    // LCOV_EXCL_START
     if (particleCircularHaloShader == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader particleCircularHaloShader is nullptr.");
         return nullptr;
     }
-    // LCOV_EXCL_STOP
     return particleCircularHaloShader;
 }
 
