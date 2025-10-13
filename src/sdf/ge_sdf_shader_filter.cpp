@@ -53,7 +53,7 @@ std::shared_ptr<Drawing::Image> GESDFShaderFilter::OnProcessImage(Drawing::Canva
     return shaderEffectBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 }
 
-void GESDFShaderFilter::Update(const Drawing::GESDFFilterParams& params);
+void GESDFShaderFilter::Update(const Drawing::GESDFFilterParams& params)
 {
     if (sdfTreeProcessor_) {
         sdfTreeProcessor_->UpdateParams(params);
