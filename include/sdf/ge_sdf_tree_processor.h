@@ -37,7 +37,6 @@ class GESDFTreeProcessor final {
     void GenerateHeader(const GESDFRRectShaderMask& sdfMask);
     void GenerateHeader(const GESDFUnionOpShaderMask& sdfMask);
 
-
     void GenerateBody(const GESDFRRectShaderMask& sdfMask);
     void GenerateBody(const GESDFUnionOpShaderMask& sdfMask);
 

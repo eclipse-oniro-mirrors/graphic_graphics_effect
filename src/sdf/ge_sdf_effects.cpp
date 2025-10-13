@@ -20,12 +20,13 @@
 static constexpr float SDF_EFFECT_MIN_THRESHOLD = 0.0001f;
 namespace OHOS::Rosen::Drawing {
     bool GESDFEffect::InOrderComparator(const GESDFEffect& effect1,
-                                        const GESDFEffect& effect2) {
+                                        const GESDFEffect& effect2)
+    {
         return effect1.GetOrder() < effect2.GetOrder();
     }
 
-    GESDFBorder::GESDFBorder(const Color& color, float width) :
-        color_(color), width_(width)
+    GESDFBorder::GESDFBorder(const Color& color, float width)
+        : color_(color), width_(width)
     { }
 
     void GESDFBorder::Process(std::string& headers, std::string& calls, std::string& functions) const
@@ -57,7 +58,9 @@ namespace OHOS::Rosen::Drawing {
 
     void GESDFBorder::UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const
     {
-        builder.SetUniform("u_borderColor", static_cast<float>(color_.GetRed()) / 255.0f, static_cast<float>(color_.GetGreen()) / 255.0f, static_cast<float>(color_.GetBlue()) / 255.0f);
+        builder.SetUniform("u_borderColor", static_cast<float>(color_.GetRed()) / 255.0f,
+                            static_cast<float>(color_.GetGreen()) / 255.0f,
+                            static_cast<float>(color_.GetBlue()) / 255.0f);
         builder.SetUniform("u_borderWidth", std::max(width_, SDF_EFFECT_MIN_THRESHOLD));
     }
 
@@ -67,13 +70,9 @@ namespace OHOS::Rosen::Drawing {
     }
 
     GESDFShadow::GESDFShadow(const Color& color, float offsetX, float offsetY,
-                            float radius, const Path& path, bool isFilled) : 
-        color_(color),
-        offsetX_(offsetX),
-        offsetY_(offsetY),
-        radius_(radius),
-        isFilled_(isFilled)
-    {}
+                                float radius, const Path& path, bool isFilled)
+        : color_(color), offsetX_(offsetX), offsetY_(offsetY), radius_(radius), isFilled_(isFilled)
+    { }
 
     void GESDFShadow::Process(std::string& headers, std::string& calls, std::string& functions) const
     {
@@ -91,7 +90,8 @@ namespace OHOS::Rosen::Drawing {
             // vec2 shadowOffset - offset of the shadow
             // float shadowRadius - radius of the shadow
             // bool isFilled - should SDFBody be filled with shadow
-            vec4 shadowEffect(vec2 coord, float d, vec4 color, vec3 shadowColor, vec2 shadowOffset, float shadowRadius, bool isFilled)
+            vec4 shadowEffect(vec2 coord, float d, vec4 color, vec3 shadowColor,
+                                vec2 shadowOffset, float shadowRadius, bool isFilled)
             {
                 if (!isFilled && d < 0.0)
                 {
@@ -116,13 +116,16 @@ namespace OHOS::Rosen::Drawing {
         )";
 
         calls += R"(
-            color = shadowEffect(coord, d, u_color, u_shadowColor, u_shadowOffset, u_shadowRadius, !(u_shadowIsFilled < 1.0));
+            color = shadowEffect(coord, d, u_color, u_shadowColor, u_shadowOffset,
+                    u_shadowRadius, !(u_shadowIsFilled < 1.0));
         )";
     }
 
     void GESDFShadow::UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const
     {
-        builder.SetUniform("u_shadowColor", static_cast<float>(color_.GetRed()) / 255.0f, static_cast<float>(color_.GetGreen()) / 255.0f, static_cast<float>(color_.GetBlue()) / 255.0f);
+        builder.SetUniform("u_shadowColor", static_cast<float>(color_.GetRed()) / 255.0f,
+                            static_cast<float>(color_.GetGreen()) / 255.0f,
+                            static_cast<float>(color_.GetBlue()) / 255.0f);
         builder.SetUniform("u_shadowOffset", offsetX_, offsetY_);
         builder.SetUniform("u_shadowRadius", std::max(radius_, SDF_EFFECT_MIN_THRESHOLD));
         builder.SetUniform("u_shadowIsFilled", static_cast<int>(isFilled_));

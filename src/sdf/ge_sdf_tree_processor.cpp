@@ -27,7 +27,9 @@ namespace OHOS::Rosen::Drawing {
 
         if (params.shadow) {
             const auto& shadow = params.shadow.value();
-            effectsContainer_.insert(std::make_unique<Drawing::GESDFShadow>(shadow.color, shadow.offsetX, shadow.offsetY, shadow.radius, shadow.path, shadow.isFilled));
+            effectsContainer_.insert(std::make_unique<Drawing::GESDFShadow>(shadow.color, shadow.offsetX,
+                                                                            shadow.offsetY, shadow.radius,
+                                                                            shadow.path, shadow.isFilled));
         }
     }
 
@@ -125,7 +127,8 @@ namespace OHOS::Rosen::Drawing {
         }
     }
 
-    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder, const std::shared_ptr<GESDFShaderMask> sdfMask)
+    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
+        const std::shared_ptr<GESDFShaderMask> sdfMask)
     {
         if (!sdfMask) {
             return;
@@ -167,7 +170,8 @@ namespace OHOS::Rosen::Drawing {
         headers_ += "uniform float u_radius_" + std::to_string(nodeId) + ";\n";
     }
 
-    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder, const GESDFRRectShaderMask& sdfMask)
+    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
+        const GESDFRRectShaderMask& sdfMask)
     {
         auto rect = sdfMask.GetRRect();
 
@@ -175,7 +179,9 @@ namespace OHOS::Rosen::Drawing {
         auto top = rect.top_;
         auto width = rect.width_;
         auto height = rect.height_;
-        GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h %{public}f, %{public}f, %{public}f, %{public}f", left, top, width, height);
+        GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: l, t, w, h"
+                "%{public}f, %{public}f, %{public}f, %{public}f", 
+                left, top, width, height);
         auto radius = std::max(rect.radiusX_, rect.radiusY_);
         auto right = left + width;
         auto bottom = top - height;
@@ -224,15 +230,19 @@ namespace OHOS::Rosen::Drawing {
         auto nodeId = reinterpret_cast<size_t>(&sdfMask);
 
         if (sdfMask.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
-            body_ += "float var_" + std::to_string(nodeId) + " = SDFSmoothUnion(" + "var_" + std::to_string(nodeIdLeft) +
-                ", var_" + std::to_string(nodeIdRight) + ", u_factor_" + std::to_string(nodeId) + ");\n";
+            body_ += "float var_" + std::to_string(nodeId) + " = SDFSmoothUnion(" +
+                        "var_" + std::to_string(nodeIdLeft) +
+                        ", var_" + std::to_string(nodeIdRight) +
+                        ", u_factor_" + std::to_string(nodeId) + ");\n";
         } else {
-            body_ += "float var_" + std::to_string(nodeId) + " = SDFUnion(" + "var_" + std::to_string(nodeIdLeft) + ", var_" +
-                std::to_string(nodeIdRight) + ");\n";
+            body_ += "float var_" + std::to_string(nodeId) + " = SDFUnion(" +
+                        "var_" + std::to_string(nodeIdLeft) +
+                        ", var_" + std::to_string(nodeIdRight) + ");\n";
         }
     }
 
-    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder, const GESDFUnionOpShaderMask& sdfMask)
+    void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
+        const GESDFUnionOpShaderMask& sdfMask)
     {
         auto nodeId = reinterpret_cast<size_t>(&sdfMask);
         if (sdfMask.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
@@ -263,7 +273,8 @@ namespace OHOS::Rosen::Drawing {
         }
     }
 
-    bool ComparatorForEffects::operator()(const std::unique_ptr<GESDFEffect>& effect1, const std::unique_ptr<GESDFEffect>& effect2) const
+    bool ComparatorForEffects::operator()(const std::unique_ptr<GESDFEffect>& effect1,
+        const std::unique_ptr<GESDFEffect>& effect2) const
     {
         return GESDFEffect::InOrderComparator(*effect1, *effect2);
     }
