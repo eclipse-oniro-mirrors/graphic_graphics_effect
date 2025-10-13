@@ -47,12 +47,7 @@ public:
     Drawing::GESDFTreeProcessor *GetSDFTreeProcessor();
     const Drawing::GESDFTreeProcessor *GetSDFTreeProcessor() const;
 
-    void Update(const Drawing::GESDFFilterParams& params)
-    {
-        if (sdfTreeProcessor_) {
-            sdfTreeProcessor_->UpdateParams(params);
-        }
-    }
+    void Update(const Drawing::GESDFFilterParams& params);
 private:
     static const std::string type_;
     std::optional<Drawing::GESDFTreeProcessor> sdfTreeProcessor_;

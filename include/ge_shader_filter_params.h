@@ -562,9 +562,11 @@ enum class GESDFUnionOp : uint8_t {
 
 class GERRect {
 public:
+    GERRect(float l = 0.f, float t = 0.f, float w = 0.f,
+            float h = 0.f, float rx = 0.f, float ry = 0.f) {}
     float left_ = 0.f;
-    float width_ = 0.f;
     float top_ = 0.f;
+    float width_ = 0.f;
     float height_ = 0.f;
     float radiusX_ = 0.f;
     float radiusY_ = 0.f;
