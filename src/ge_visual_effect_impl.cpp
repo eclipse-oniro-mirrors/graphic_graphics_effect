@@ -237,6 +237,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakePixelMapMaskParams();
         }
     },
+    { GE_MASK_HARMONIUM_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK);
+            impl->MakeHarmoniumEffectMaskParams();
+        }
+    },
     { GE_MASK_WAVE_GRADIENT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK);
@@ -621,6 +627,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        
+        case FilterType::HARMONIUM_EFFECT_MASK: {
+            if (harmoniumEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP) {
+                harmoniumEffectMaskParams_->image = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -941,6 +957,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
                 harmoniumEffectParams_->mask = param;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK) {
+                harmoniumEffectParams_->maskClock = param;
             }
             break;
         }

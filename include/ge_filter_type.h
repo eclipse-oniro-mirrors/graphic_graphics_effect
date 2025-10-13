@@ -44,6 +44,7 @@ enum class GEFilterType : int32_t {
     WAVE_GRADIENT_MASK,
     FRAME_GRADIENT_MASK,
     LINEAR_GRADIENT_MASK,
+    HARMONIUM_EFFECT_MASK,
     SDF_UNION_OP,
     SDF_RRECT_MASK,
     // Shader
