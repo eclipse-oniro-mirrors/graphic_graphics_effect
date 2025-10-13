@@ -13,16 +13,15 @@
  * limitations under the License.
  */
 #include <vector>
-#include "ge_visual_effect.h"
 #include "ge_double_ripple_shader_mask.h"
 #include "ge_frame_gradient_shader_mask.h"
-
-#include "ge_log.h"
 #include "ge_harmonium_effect_shader_mask.h"
-#include "ge_visual_effect_impl.h"
+#include "ge_log.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
+#include "ge_visual_effect.h"
+#include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
 #include "sdf/ge_sdf_rrect_shader_mask.h"
 #include "sdf/ge_sdf_union_op_shader_mask.h"
