@@ -444,7 +444,7 @@ struct CacheDataType {
     std::shared_ptr<Drawing::Image> particleHaloImg;
     std::shared_ptr<Drawing::Image> glowHaloImg;
     float lastNoise = std::numeric_limits<float>::quiet_NaN();
-}
+};
 
 GEParticleCircularHaloShader::GEParticleCircularHaloShader() {}
 
@@ -466,7 +466,7 @@ std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::Crea
     return particleCircularHaloShader;
 }
 
-bool GEParticleCircularHaloShader::FloatEqual(flaot a, float b)
+bool GEParticleCircularHaloShader::FloatEqual(float a, float b)
 {
     const float eps = 1e-4f;
     return std::fabs(a - b) <= eps * (1.0f + std::max(std::fabs(a), std::fabs(b)));
@@ -478,13 +478,13 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
     // Helper lambdas to (re)build images
     auto BuildParticleHalo = [&](std::shared_ptr<Drawing::Image>& out) {
         Drawing::ImageInfo imgInfo(rect.GetWidth(), rect.GetHeight(),
-                                   Drawing::ColorType::COLORTYPE_RGBA_888,
+                                   Drawing::ColorType::COLORTYPE_RGBA_8888,
                                    Drawing::AlphaType::ALPHATYPE_OPAQUE);
         out = MakeParticleHaloShader(canvas, imgInfo);
     };
     auto BuildGlowHalo = [&](std::shared_ptr<Drawing::Image>& out) {
         Drawing::ImageInfo imgInfo(rect.GetWidth(), rect.GetHeight(),
-                                   Drawing::ColorType::COLORTYPE_RGBA_888,
+                                   Drawing::ColorType::COLORTYPE_RGBA_8888,
                                    Drawing::AlphaType::ALPHATYPE_OPAQUE);
         out = MakeGlowHaloShader(canvas, imgInfo);
     };
@@ -503,20 +503,20 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
 
         cacheAnyPtr_ = std::make_shared<std::any>(std::move(newCache));
         cache = std::any_cast<CacheDataType>(cacheAnyPtr_.get());
-        GE_LOEI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ doesn't exist, cache imgs first make.");
+        GE_LOGI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ doesn't exist, cache imgs first make.");
     } else {
         // Cache exists but noise is changed: only rebuild particleHalo, glowHalo stays frozen
         if (!FloatEqual(cache->lastNoise, currentNoise)) {
             BuildParticleHalo(cache->particleHaloImg);
             cache->lastNoise = currentNoise;
-            GE_LOEI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ exists, but noise changes,"
+            GE_LOGI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ exists, but noise changes,"
                     "update particleHaloImg cache in cacheAnyPtr_");
         }
     }
     // Mirror chched values back to members for the draw passes
-    if (cavhe) {
+    if (cache) {
         particleHaloImg_ = cache->particleHaloImg;
-        glowHaloImg_ = cache->glowHaloImg_;
+        glowHaloImg_ = cache->glowHaloImg;
     }
 }
 
@@ -561,7 +561,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
                 "nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(particleHaloEffect_);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(particleHaloEffect);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::GetParticleCircularHaloBuilder()
@@ -636,7 +636,7 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeParticleHaloSh
     }
     Drawing::Matrix matrix;
     auto singleParticleHaloShader = Drawing::ShaderEffect::CreateImageShader(
-        *singleParticleHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        *singleParticleHaloImg, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     particleHaloBuilder_->SetUniform("iResolution", width, height);
     particleHaloBuilder_->SetChild("singleParticleHalo", singleParticleHaloShader);
