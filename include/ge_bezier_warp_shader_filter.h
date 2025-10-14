@@ -15,6 +15,7 @@
 #ifndef GRAPHICS_EFFECT_GE_BEZIER_WARP_FILTER_H
 #define GRAPHICS_EFFECT_GE_BEZIER_WARP_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -22,13 +23,11 @@ namespace OHOS {
 namespace Rosen {
 constexpr size_t BEZIER_WARP_POINT_NUM = 12; // 12 anchor points of a patch
 
-REGISTER_GEFILTER_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilter,
-                           Drawing::GEBezierWarpShaderFilterParams, Drawing::GE_FILTER_BEZIER_WARP);
 class GEBezierWarpShaderFilter : public GEShaderFilter {
 public:
     GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params);
     ~GEBezierWarpShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEBezierWarpShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEBezierWarpShaderFilter, Drawing::GEBezierWarpShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

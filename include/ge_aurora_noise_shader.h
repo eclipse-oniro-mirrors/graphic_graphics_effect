@@ -16,20 +16,20 @@
 #ifndef GRAPHICS_EFFECT_AURORA_NOISE_SHADER_H
 #define GRAPHICS_EFFECT_AURORA_NOISE_SHADER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(AURORA_NOISE, GEAuroraNoiseShader,
-                           Drawing::GEAuroraNoiseShaderParams, Drawing::GE_SHADER_AURORA_NOISE);
+
 class GE_EXPORT GEAuroraNoiseShader : public GEShader {
 public:
     GEAuroraNoiseShader();
     GEAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& auroraNoiseParams);
     ~GEAuroraNoiseShader() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEAuroraNoiseShader);
+    DECLARE_GEFILTER_TYPEFUNC(GEAuroraNoiseShader, Drawing::GEAuroraNoiseShaderParams);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const { return "GEAuroraNoiseShader"; }
     void SetAuroraNoiseParams(const Drawing::GEAuroraNoiseShaderParams& params)

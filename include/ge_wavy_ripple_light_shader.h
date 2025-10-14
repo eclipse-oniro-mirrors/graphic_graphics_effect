@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_WAVY_RIPPLE_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_WAVY_RIPPLE_LIGHT_SHADER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "common/rs_vector2.h"
@@ -24,15 +25,14 @@
 
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(WAVY_RIPPLE_LIGHT, GEWavyRippleLightShader,
-                           Drawing::GEWavyRippleLightShaderParams, Drawing::GE_SHADER_WAVY_RIPPLE_LIGHT);
+
 class GE_EXPORT GEWavyRippleLightShader : public GEShader {
 
 public:
     GEWavyRippleLightShader();
     GEWavyRippleLightShader(Drawing::GEWavyRippleLightShaderParams& wavyRippleLightParams);
     ~GEWavyRippleLightShader() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEWavyRippleLightShader);
+    DECLARE_GEFILTER_TYPEFUNC(GEWavyRippleLightShader, Drawing::GEWavyRippleLightShaderParams);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const { return "GEWavyRippleLightShader"; }
     void SetWavyRippleLightParams(const Drawing::GEWavyRippleLightShaderParams& params)

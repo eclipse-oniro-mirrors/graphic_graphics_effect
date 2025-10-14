@@ -17,6 +17,8 @@
 #define GRAPHICS_EFFECT_GE_PIXEL_MAP_MASK_H
 
 #include "common/rs_vector4.h"
+
+#include "ge_filter_type_info.h"
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
 #include "image/image.h"
@@ -24,15 +26,14 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-REGISTER_GEFILTER_TYPEINFO(PIXEL_MAP_MASK, GEPixelMapShaderMask,
-                           GEPixelMapMaskParams, GE_MASK_PIXEL_MAP);
+
 class GE_EXPORT GEPixelMapShaderMask : public GEShaderMask {
 public:
     GEPixelMapShaderMask(const GEPixelMapMaskParams& param);
     GEPixelMapShaderMask(const GEPixelMapShaderMask&) = delete;
     virtual ~GEPixelMapShaderMask() = default;
 
-    DECLARE_GEFILTER_TYPEFUNC(GEPixelMapShaderMask);
+    DECLARE_GEFILTER_TYPEFUNC(GEPixelMapShaderMask, GEPixelMapMaskParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

@@ -15,6 +15,7 @@
 #ifndef GRAPHICS_EFFECT_BORDER_LIGHT_SHADER_H
 #define GRAPHICS_EFFECT_BORDER_LIGHT_SHADER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
@@ -25,15 +26,13 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(BORDER_LIGHT, GEBorderLightShader,
-                           Drawing::GEBorderLightShaderParams, Drawing::GE_SHADER_BORDER_LIGHT);
 class GE_EXPORT GEBorderLightShader : public GEShader {
 public:
     GEBorderLightShader();
     GEBorderLightShader(Drawing::GEBorderLightShaderParams& borderLightParams);
 
     ~GEBorderLightShader() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEBorderLightShader);
+    DECLARE_GEFILTER_TYPEFUNC(GEBorderLightShader, Drawing::GEBorderLightShaderParams);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const { return "GEBorderLightShader"; }

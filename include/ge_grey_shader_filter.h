@@ -15,19 +15,18 @@
 #ifndef GRAPHICS_EFFECT_GE_GREY_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_GREY_SHADER_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(GREY, GEGreyShaderFilter,
-                           Drawing::GEGreyShaderFilterParams, Drawing::GE_FILTER_GREY);
 class GEGreyShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& params);
     ~GEGreyShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEGreyShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEGreyShaderFilter, Drawing::GEGreyShaderFilterParams);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

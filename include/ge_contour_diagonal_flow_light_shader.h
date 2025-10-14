@@ -18,6 +18,7 @@
 #include <queue>
 #include "common/rs_vector4.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "utils/matrix.h"
@@ -35,16 +36,13 @@ struct Grid {
 };
 
 class GEKawaseBlurShaderFilter;
-REGISTER_GEFILTER_TYPEINFO(CONTOUR_DIAGONAL_FLOW_LIGHT, GEContourDiagonalFlowLightShader,
-                           Drawing::GEContentDiagonalFlowLightShaderParams,
-                           Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
 class GE_EXPORT GEContourDiagonalFlowLightShader : public GEShader {
 
 public:
     GEContourDiagonalFlowLightShader();
     GEContourDiagonalFlowLightShader(Drawing::GEContentDiagonalFlowLightShaderParams& contourDiagonalFlowLightParams);
     ~GEContourDiagonalFlowLightShader() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEContourDiagonalFlowLightShader);
+    DECLARE_GEFILTER_TYPEFUNC(GEContourDiagonalFlowLightShader, Drawing::GEContentDiagonalFlowLightShaderParams);
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const { return "GEContourDiagonalFlowLightShader"; }

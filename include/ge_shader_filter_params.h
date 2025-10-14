@@ -21,6 +21,7 @@
 #include <utility>
 #include <optional>
 #include <variant>
+#include <type_traits>
 
 // rs
 #include "common/rs_vector2.h"
@@ -29,12 +30,28 @@
 // drawing
 #include "utils/matrix.h"
 // ge
+#include "ge_filter_type.h"
 #include "ge_shader_mask.h"
 #include "sdf/ge_sdf_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+
+template<typename T>
+struct GEFilterParamsTypeInfo {
+    static constexpr GEFilterType ID = GEFilterType::NONE;
+    static constexpr std::string_view FilterName = "";
+};
+
+// Register type info for GE Filter Param type without Filter type (Non-instructive)
+#define REGISTER_GEFILTERPARAM_TYPEINFO(ENUM_VALUE, PARAM_TYPE, FILTER_TYPE_NAME)            \
+    template<>                                                                               \
+    struct ::OHOS::Rosen::Drawing::GEFilterParamsTypeInfo<PARAM_TYPE> {                      \
+        using Self = PARAM_TYPE;                                                             \
+        static constexpr GEFilterType ID = ::OHOS::Rosen::Drawing::GEFilterType::ENUM_VALUE; \
+        static constexpr std::string_view FilterName = FILTER_TYPE_NAME;                     \
+    }
 
 struct CanvasInfo {
     float geoWidth = 0.0f;
@@ -57,6 +74,7 @@ struct GEAIBarShaderFilterParams {
     float aiBarOpacity;
     float aiBarSaturation;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(AIBAR, GEAIBarShaderFilterParams, GE_FILTER_AI_BAR);
 
 constexpr char GE_FILTER_WATER_RIPPLE[] = "WATER_RIPPLE";
 constexpr char GE_FILTER_WATER_RIPPLE_PROGRESS[] = "PROGRESS";
@@ -71,6 +89,7 @@ struct GEWaterRippleFilterParams {
     float rippleCenterY = 0.7f;
     uint32_t rippleMode = 1;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(WATER_RIPPLE, GEWaterRippleFilterParams, GE_FILTER_WATER_RIPPLE);
 
 constexpr char GE_FILTER_SOUND_WAVE[] = "SoundWave";
 constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "SoundWave_ColorA";
@@ -98,6 +117,7 @@ struct GESoundWaveFilterParams {
     float shockWaveProgressB = 0.0f;
     float shockWaveTotalAlpha = 1.0f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SOUND_WAVE, GESoundWaveFilterParams, GE_FILTER_SOUND_WAVE);
 
 constexpr char GE_FILTER_GREY[] = "GREY";
 constexpr char GE_FILTER_GREY_COEF_1[] = "GREY_COEF_1";
@@ -106,12 +126,14 @@ struct GEGreyShaderFilterParams {
     float greyCoef1;
     float greyCoef2;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(GREY, GEGreyShaderFilterParams, GE_FILTER_GREY);
 
 constexpr char GE_FILTER_KAWASE_BLUR[] = "KAWASE_BLUR";
 constexpr char GE_FILTER_KAWASE_BLUR_RADIUS[] = "KAWASE_BLUR_RADIUS";
 struct GEKawaseBlurShaderFilterParams {
     int radius;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(KAWASE_BLUR, GEKawaseBlurShaderFilterParams, GE_FILTER_KAWASE_BLUR);
 
 constexpr char GE_FILTER_MESA_BLUR[] = "MESA_BLUR";
 constexpr char GE_FILTER_MESA_BLUR_RADIUS[] = "MESA_BLUR_RADIUS";
@@ -136,6 +158,7 @@ struct GEMESABlurShaderFilterParams {
     float width;
     float height;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(MESA_BLUR, GEMESABlurShaderFilterParams, GE_FILTER_MESA_BLUR);
 
 constexpr char GE_FILTER_LINEAR_GRADIENT_BLUR[] = "LINEAR_GRADIENT_BLUR";
 constexpr char GE_FILTER_LINEAR_GRADIENT_BLUR_DIRECTION[] = "DIRECTION";
@@ -160,6 +183,8 @@ struct GELinearGradientBlurShaderFilterParams {
     bool isOffscreenCanvas;
     bool isRadiusGradient;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(LINEAR_GRADIENT_BLUR, GELinearGradientBlurShaderFilterParams,
+                                GE_FILTER_LINEAR_GRADIENT_BLUR);
 
 constexpr char GE_FILTER_MAGNIFIER[] = "MAGNIFIER";
 constexpr char GE_FILTER_MAGNIFIER_FACTOR[] = "FACTOR";
@@ -196,6 +221,7 @@ struct GEMagnifierShaderFilterParams {
 
     int32_t rotateDegree = 0;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(MAGNIFIER, GEMagnifierShaderFilterParams, GE_FILTER_MAGNIFIER);
 
 constexpr char GE_MASK_RIPPLE[] = "RippleMask";
 constexpr char GE_MASK_RIPPLE_CENTER[] = "RippleMask_Center";
@@ -208,6 +234,7 @@ struct GERippleShaderMaskParams {
     float width_ = 0.f;
     float widthCenterOffset_ = 0.0f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(RIPPLE_MASK, GERippleShaderMaskParams, GE_MASK_RIPPLE);
 
 constexpr char GE_MASK_DOUBLE_RIPPLE[] = "DoubleRippleMask";
 constexpr char GE_MASK_DOUBLE_RIPPLE_CENTER1[] = "DoubleRippleMask_Center1";
@@ -224,6 +251,7 @@ struct GEDoubleRippleShaderMaskParams {
     float turbulence_ = 0.0f;
     float haloThickness_ = 0.0f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(DOUBLE_RIPPLE_MASK, GEDoubleRippleShaderMaskParams, GE_MASK_DOUBLE_RIPPLE);
 
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT[] = "DispDistort";
 constexpr char GE_FILTER_DISPLACEMENT_DISTORT_FACTOR[] = "DispDistort_Factor";
@@ -232,6 +260,8 @@ struct GEDisplacementDistortFilterParams {
     std::pair<float, float> factor_ = {1.0f, 1.0f};
     std::shared_ptr<GEShaderMask> mask_;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(DISPLACEMENT_DISTORT_FILTER, GEDisplacementDistortFilterParams,
+                                GE_FILTER_DISPLACEMENT_DISTORT);
 
 constexpr char GE_FILTER_COLOR_GRADIENT[] = "ColorGradient";
 constexpr char GE_FILTER_COLOR_GRADIENT_COLOR[] = "ColorGradient_Colors";
@@ -244,6 +274,7 @@ struct GEColorGradientShaderFilterParams {
     std::vector<float> strengths;
     std::shared_ptr<GEShaderMask> mask = nullptr;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilterParams, GE_FILTER_COLOR_GRADIENT);
 
 constexpr char GE_SHADER_HARMONIUM_EFFECT[] = "HarmoniumEffect";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASK[] = "HarmoniumEffect_Mask";
@@ -293,6 +324,7 @@ struct GEEdgeLightShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     bool useRawColor = false;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(EDGE_LIGHT, GEEdgeLightShaderFilterParams, GE_FILTER_EDGE_LIGHT);
 
 constexpr char GE_FILTER_BEZIER_WARP[] = "BezierWarp";
 constexpr char GE_FILTER_BEZIER_WARP_DESTINATION_PATCH[] = "BEZIER_WARP_DESTINATION_PATCH";
@@ -312,6 +344,7 @@ constexpr char GE_FILTER_BEZIER_WARP_CONTROL_POINT11[] = "BezierWarp_ControlPoin
 struct GEBezierWarpShaderFilterParams {
     std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM> destinationPatch;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(BEZIER_WARP, GEBezierWarpShaderFilterParams, GE_FILTER_BEZIER_WARP);
 
 constexpr char GE_MASK_PIXEL_MAP[] = "PixelMapMask";
 constexpr char GE_MASK_PIXEL_MAP_PIXEL_MAP[] = "PixelMapMask_Image";
@@ -324,6 +357,7 @@ struct GEPixelMapMaskParams {
     RectF dst;
     Vector4f fillColor;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(PIXEL_MAP_MASK, GEPixelMapMaskParams, GE_MASK_PIXEL_MAP);
 
 constexpr char GE_FILTER_DISPERSION[] = "Dispersion";
 constexpr char GE_FILTER_DISPERSION_MASK[] = "Dispersion_Mask";
@@ -338,6 +372,7 @@ struct GEDispersionShaderFilterParams {
     std::pair<float, float> greenOffset;
     std::pair<float, float> blueOffset;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(DISPERSION, GEDispersionShaderFilterParams, GE_FILTER_DISPERSION);
 
 constexpr char GE_FILTER_DIRECTION_LIGHT[] = "DirectionLight";
 constexpr char GE_FILTER_DIRECTION_LIGHT_MASK[] = "DirectionLight_Mask";
@@ -352,6 +387,7 @@ struct GEDirectionLightShaderFilterParams {
     Vector4f lightColor = Vector4f(2.0f, 2.0f, 2.0f, 1.0f);
     float lightIntensity = 0.5f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(DIRECTION_LIGHT, GEDirectionLightShaderFilterParams, GE_FILTER_DIRECTION_LIGHT);
 
 constexpr char GE_MASK_RADIAL_GRADIENT[] = "RadialGradientMask";
 constexpr char GE_MASK_RADIAL_GRADIENT_CENTER[] = "RadialGradientMask_Center";
@@ -366,6 +402,7 @@ struct GERadialGradientShaderMaskParams {
     std::vector<float> colors_;
     std::vector<float> positions_;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(RADIAL_GRADIENT_MASK, GERadialGradientShaderMaskParams, GE_MASK_RADIAL_GRADIENT);
 
 constexpr char GE_MASK_WAVE_GRADIENT[] = "WaveGradientMask";
 constexpr char GE_MASK_WAVE_GRADIENT_CENTER[] = "WaveGradientMask_WaveCenter";
@@ -380,6 +417,7 @@ struct GEWaveGradientShaderMaskParams {
     float blurRadius_ = 0.f;
     float turbulenceStrength_ = 0.f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(WAVE_GRADIENT_MASK, GEWaveGradientShaderMaskParams, GE_MASK_WAVE_GRADIENT);
 
 constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
 constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLightPosition";
@@ -392,6 +430,7 @@ struct GEContentLightFilterParams {
     float intensity = 0.0f;
     Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(CONTENT_LIGHT, GEContentLightFilterParams, GE_FILTER_CONTENT_LIGHT);
 
 // Declare same with in rs_render_shader_base.h
 constexpr char GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT[] = "ContourDiagonalFlowLight";
@@ -419,6 +458,8 @@ struct GEContentDiagonalFlowLightShaderParams {
     float lightWeight_ = 1.f;
     float haloWeight_ = 2.f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(CONTOUR_DIAGONAL_FLOW_LIGHT, GEContentDiagonalFlowLightShaderParams,
+                                GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
 
 // Declare same with in rs_render_shader_base.h
 constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT[] = "WavyRippleLight";
@@ -430,6 +471,8 @@ struct GEWavyRippleLightShaderParams {
     float radius_ = 0.f;
     float thickness_ = 0.2f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(WAVY_RIPPLE_LIGHT, GEWavyRippleLightShaderParams,
+                                GE_SHADER_WAVY_RIPPLE_LIGHT);
 
 // Declare same with in rs_render_shader_base.h
 constexpr char GE_SHADER_AURORA_NOISE[] = "AuroraNoise";
@@ -437,6 +480,7 @@ constexpr char GE_SHADER_AURORA_NOISE_VALUE[] = "AuroraNoise_Noise";
 struct GEAuroraNoiseShaderParams {
     float noise_ = 0.f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(AURORA_NOISE, GEAuroraNoiseShaderParams, GE_SHADER_AURORA_NOISE);
 
 // Declare same with in rs_render_shader_base.h
 constexpr char GE_SHADER_PARTICLE_CIRCULAR_HALO[] = "ParticleCircularHalo";
@@ -448,6 +492,8 @@ struct GEParticleCircularHaloShaderParams {
     float radius_ = 0.f;
     float noise_ = 0.f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(PARTICLE_CIRCULAR_HALO, GEParticleCircularHaloShaderParams,
+                                GE_SHADER_PARTICLE_CIRCULAR_HALO);
 
 constexpr char GE_FILTER_MASK_TRANSITION[] = "MaskTransition";
 constexpr char GE_FILTER_MASK_TRANSITION_MASK[] = "MaskTransition_Mask";
@@ -458,6 +504,7 @@ struct GEMaskTransitionShaderFilterParams {
     float factor = 1.0f;
     bool inverse = false;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(MASK_TRANSITION, GEMaskTransitionShaderFilterParams, GE_FILTER_MASK_TRANSITION);
 
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR[] = "VariableRadiusBlur";
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS[] = "VariableRadiusBlur_Radius";
@@ -466,6 +513,8 @@ struct GEVariableRadiusBlurShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     float blurRadius;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilterParams,
+                                GE_FILTER_VARIABLE_RADIUS_BLUR);
 
 constexpr char GE_MASK_LINEAR_GRADIENT[] = "MaskLinearGradient";
 constexpr char GE_MASK_LINEAR_GRADIENT_START_POSITION[] = "MaskLinearGradient_StartPosition";
@@ -475,6 +524,7 @@ struct GELinearGradientShaderMaskParams {
     Drawing::Point startPosition;
     Drawing::Point endPosition;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(LINEAR_GRADIENT_MASK, GELinearGradientShaderMaskParams, GE_MASK_LINEAR_GRADIENT);
 
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT[] = "ColorGradientEffect";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR0[] = "ColorGradientEffect_Color0";
@@ -528,6 +578,7 @@ struct GEXColorGradientEffectParams {
     float blendk_ = 0.0f;
     std::shared_ptr<GEShaderMask> mask_;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
 constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
 constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
@@ -544,7 +595,7 @@ struct GEXLightCaveShaderParams {
     Vector2f radiusXY = Vector2f(0.0f, 0.0f);
     float progress = 0.0f;
 };
-
+REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams, GEX_SHADER_LIGHT_CAVE);
 
 constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
 constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
@@ -561,6 +612,7 @@ struct GEBorderLightShaderParams {
     Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
     float cornerRadius = 0.0f;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
 
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
@@ -744,6 +796,7 @@ struct GEGasifyFilterParams {
     float progress_ = 0.f;
 };
 
+#undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -19,18 +19,19 @@
 #include "effect/runtime_shader_builder.h"
 #include "utils/matrix.h"
 
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(PARTICLE_CIRCULAR_HALO, GEParticleCircularHaloShader,
-                           Drawing::GEParticleCircularHaloShaderParams, Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
+
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();
     GEParticleCircularHaloShader(Drawing::GEParticleCircularHaloShaderParams& params);
     ~GEParticleCircularHaloShader() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEParticleCircularHaloShader, Drawing::GEParticleCircularHaloShaderParams);
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
     const std::string GetDescription() const
     {

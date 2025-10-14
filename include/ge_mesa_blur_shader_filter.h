@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -30,17 +31,13 @@
 
 namespace OHOS {
 namespace Rosen {
-
-REGISTER_GEFILTER_TYPEINFO(MESA_BLUR, GEMESABlurShaderFilter,
-                           Drawing::GEMESABlurShaderFilterParams, Drawing::GE_FILTER_MESA_BLUR);
-
 class GEMESABlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFilterParams& params);
     ~GEMESABlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
 
-    DECLARE_GEFILTER_TYPEFUNC(GEMESABlurShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEMESABlurShaderFilter, Drawing::GEMESABlurShaderFilterParams);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

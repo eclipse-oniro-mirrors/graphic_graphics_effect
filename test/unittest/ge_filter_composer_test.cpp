@@ -20,6 +20,7 @@
 #include "ge_filter_composer.h"
 #include "ge_filter_composer_pass.h"
 #include "ge_filter_type.h"
+#include "ge_filter_type_info.h"
 #include "ge_hps_build_pass.h"
 #include "ge_hps_compatible_pass.h"
 #include "ge_mesa_fusion_pass.h"

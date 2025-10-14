@@ -16,7 +16,8 @@
 #define GRAPHICS_EFFECT_GE_WATER_RIPPLE_FILTER_H
  
 #include <memory>
- 
+
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
  
@@ -30,14 +31,12 @@
  
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(WATER_RIPPLE, GEWaterRippleFilter,
-                           Drawing::GEWaterRippleFilterParams, Drawing::GE_FILTER_WATER_RIPPLE);
 class GEWaterRippleFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEWaterRippleFilter(const Drawing::GEWaterRippleFilterParams& params);
     ~GEWaterRippleFilter() override = default;
 
-    DECLARE_GEFILTER_TYPEFUNC(GEWaterRippleFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEWaterRippleFilter, Drawing::GEWaterRippleFilterParams);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

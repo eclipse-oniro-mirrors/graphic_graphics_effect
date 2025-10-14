@@ -33,7 +33,7 @@ public:
 
 private:
     std::reference_wrapper<Drawing::Canvas> canvas_; // observer only, used for build HpsEffectFilter
-    HpsGEImageEffectContext context_;
+    std::reference_wrapper<const HpsGEImageEffectContext> context_;
 };
 } // namespace Rosen
 } // namespace OHOS

@@ -18,6 +18,7 @@
 #include <memory>
 #include <optional>
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 #include "draw/color.h"
@@ -26,13 +27,11 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(EDGE_LIGHT, GEEdgeLightShaderFilter,
-                           Drawing::GEEdgeLightShaderFilterParams, Drawing::GE_FILTER_EDGE_LIGHT);
 class GE_EXPORT GEEdgeLightShaderFilter : public GEShaderFilter {
 public:
     GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShaderFilterParams& params);
     ~GEEdgeLightShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEEdgeLightShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEEdgeLightShaderFilter, Drawing::GEEdgeLightShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

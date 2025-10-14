@@ -24,6 +24,7 @@ std::string_view GEHpsBuildPass::GetLogName() const
 GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& composables)
 {
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas_);
+    const auto& context = context_.get();
     if (!hpsEffectFilter->IsHpsEffectEnabled()) {
         return GEFilterComposerPassResult { false };
     }
@@ -32,7 +33,7 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
     bool composed = false;
     for (auto& composable : composables) {
         auto effect = composable.GetEffect();
-        if (effect == nullptr || !hpsEffectFilter->IsEffectSupported(effect, context_.isMaterial)) {
+        if (effect == nullptr || !hpsEffectFilter->IsEffectSupported(effect, context.isMaterial)) {
             if (composedHpsFilter != nullptr) { // save the composed hps filter and leave non-VisualEffects as is
                 resultComposables.push_back(composedHpsFilter);
                 composedHpsFilter = nullptr;
@@ -43,8 +44,8 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
         if (composedHpsFilter == nullptr) {
             composedHpsFilter = std::make_shared<HpsEffectFilter>(canvas_);
         }
-        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(), context_.src, context_.dst,
-            context_.saturationForHPS, context_.brightnessForHPS, context_.image);
+        composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(), context.src, context.dst,
+            context.saturationForHPS, context.brightnessForHPS, context.image);
         composed = true;
     }
     if (composedHpsFilter != nullptr) {

@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -30,13 +31,12 @@
 
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(CONTENT_LIGHT, GEContentLightFilter,
-                           Drawing::GEContentLightFilterParams, Drawing::GE_FILTER_CONTENT_LIGHT);
+
 class GEContentLightFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEContentLightFilter(const Drawing::GEContentLightFilterParams& params);
     ~GEContentLightFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEContentLightFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEContentLightFilter, Drawing::GEContentLightFilterParams);
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
