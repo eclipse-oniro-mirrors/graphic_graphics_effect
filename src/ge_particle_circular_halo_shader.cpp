@@ -466,7 +466,7 @@ std::shared_ptr<GEParticleCircularHaloShader> GEParticleCircularHaloShader::Crea
     return particleCircularHaloShader;
 }
 
-bool GEParticleCircularHaloShader::FloatEqual(float a, float b)
+bool GEParticleCircularHaloShader::IsFloatEqual(float a, float b)
 {
     const float eps = 1e-4f;
     return std::fabs(a - b) <= eps * (1.0f + std::max(std::fabs(a), std::fabs(b)));
@@ -506,7 +506,7 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
         GE_LOGI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ doesn't exist, cache imgs first make.");
     } else {
         // Cache exists but noise is changed: only rebuild particleHalo, glowHalo stays frozen
-        if (!FloatEqual(cache->lastNoise, currentNoise)) {
+        if (!IsFloatEqual(cache->lastNoise, currentNoise)) {
             BuildParticleHalo(cache->particleHaloImg);
             cache->lastNoise = currentNoise;
             GE_LOGI("GEParticleCircularHaloShader::Preprocess cacheAnyPtr_ exists, but noise changes,"
