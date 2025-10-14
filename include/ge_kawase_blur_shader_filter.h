@@ -17,6 +17,7 @@
 
 #include <memory>
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -37,14 +38,12 @@ namespace Rosen {
 
 struct OffsetInfo;
 
-REGISTER_GEFILTER_TYPEINFO(KAWASE_BLUR, GEKawaseBlurShaderFilter,
-                           Drawing::GEKawaseBlurShaderFilterParams, Drawing::GE_FILTER_KAWASE_BLUR);
 class GEKawaseBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEKawaseBlurShaderFilter(const Drawing::GEKawaseBlurShaderFilterParams& params);
     ~GEKawaseBlurShaderFilter() override = default;
     GE_EXPORT int GetRadius() const;
-    DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams);
 
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

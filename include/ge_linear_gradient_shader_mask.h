@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_MASK_H
 #define GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_MASK_H
 
+#include "ge_filter_type_info.h"
 #include "ge_log.h"
 #include "ge_shader_filter_params.h"
 #include "ge_shader_mask.h"
@@ -28,13 +29,13 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-REGISTER_GEFILTER_TYPEINFO(LINEAR_GRADIENT_MASK, GELinearGradientShaderMask,
-                           GELinearGradientShaderMaskParams, GE_MASK_LINEAR_GRADIENT);
+
 class GE_EXPORT GELinearGradientShaderMask : public GEShaderMask {
 public:
     GELinearGradientShaderMask(const GELinearGradientShaderMaskParams& param);
     GELinearGradientShaderMask(const GELinearGradientShaderMask&) = delete;
     ~GELinearGradientShaderMask() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GELinearGradientShaderMask, GELinearGradientShaderMaskParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

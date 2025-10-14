@@ -276,7 +276,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
         return nullptr;
     }
     auto resImage = image;
-    for (auto vef: veContainer.GetFilters()) {
+    for (auto& vef: veContainer.GetFilters()) {
         ShaderFilterEffectContext context {resImage, src, dst};
         ApplyShaderFilter(canvas, vef, resImage, context);
     }

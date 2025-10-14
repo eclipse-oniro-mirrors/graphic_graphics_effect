@@ -15,6 +15,7 @@
 #ifndef GRAPHICS_EFFECT_GE_VARIABLE_RADIUS_BLUR_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_VARIABLE_RADIUS_BLUR_SHADER_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -25,15 +26,14 @@
 
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilter,
-                           Drawing::GEVariableRadiusBlurShaderFilterParams, Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
+
 class GE_EXPORT GEVariableRadiusBlurShaderFilter : public GEShaderFilter {
 public:
     GEVariableRadiusBlurShaderFilter(const Drawing::GEVariableRadiusBlurShaderFilterParams& params);
     GEVariableRadiusBlurShaderFilter(const GEVariableRadiusBlurShaderFilter&) = delete;
     GEVariableRadiusBlurShaderFilter operator=(const GEVariableRadiusBlurShaderFilter&) = delete;
     ~GEVariableRadiusBlurShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEVariableRadiusBlurShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEVariableRadiusBlurShaderFilter, Drawing::GEVariableRadiusBlurShaderFilterParams);
     virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 

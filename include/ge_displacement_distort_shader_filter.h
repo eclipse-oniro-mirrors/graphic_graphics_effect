@@ -14,7 +14,8 @@
  */
 #ifndef GRAPHICS_EFFECT_GE_DISPLACEMENT_DISTORT_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_DISPLACEMENT_DISTORT_SHADER_FILTER_H
- 
+
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
  
@@ -24,15 +25,13 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(DISPLACEMENT_DISTORT_FILTER, GEDisplacementDistortFilter,
-                           Drawing::GEDisplacementDistortFilterParams, Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
 class GEDisplacementDistortFilter : public GEShaderFilter {
 public:
     GEDisplacementDistortFilter(const Drawing::GEDisplacementDistortFilterParams& params);
     GEDisplacementDistortFilter(const GEDisplacementDistortFilter&) = delete;
     GEDisplacementDistortFilter operator=(const GEDisplacementDistortFilter&) = delete;
     ~GEDisplacementDistortFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEDisplacementDistortFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEDisplacementDistortFilter, Drawing::GEDisplacementDistortFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

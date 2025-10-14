@@ -32,7 +32,7 @@ GEFilterComposerPassResult GEHpsCompatiblePass::Run(std::vector<GEFilterComposab
     blurFilterExists_ = false;
     for (auto& composable : composables) {
         if (auto effect = composable.GetEffect(); effect != nullptr) {
-            auto ve = effect->GetImpl();
+            const auto& ve = effect->GetImpl();
             if (ve == nullptr) {
                 continue;
             }

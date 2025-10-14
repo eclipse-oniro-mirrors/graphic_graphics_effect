@@ -17,6 +17,7 @@
  
 #include <memory>
  
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
  
@@ -30,14 +31,12 @@
  
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(SOUND_WAVE, GESoundWaveFilter,
-                           Drawing::GESoundWaveFilterParams, Drawing::GE_FILTER_SOUND_WAVE);
 class GESoundWaveFilter : public GEShaderFilter {
 public:
     GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& params);
     ~GESoundWaveFilter() override = default;
 
-    DECLARE_GEFILTER_TYPEFUNC(GESoundWaveFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GESoundWaveFilter, Drawing::GESoundWaveFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;

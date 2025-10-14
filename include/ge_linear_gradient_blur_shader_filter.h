@@ -15,6 +15,7 @@
 #ifndef GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_BLUR_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_LINEAR_GRADIENT_BLUR_SHADER_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_gradient_blur_para.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
@@ -29,15 +30,13 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(LINEAR_GRADIENT_BLUR, GELinearGradientBlurShaderFilter,
-                           Drawing::GELinearGradientBlurShaderFilterParams, Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
 class GELinearGradientBlurShaderFilter : public GEShaderFilter {
 public:
     GE_EXPORT GELinearGradientBlurShaderFilter(const Drawing::GELinearGradientBlurShaderFilterParams& params);
     GELinearGradientBlurShaderFilter(const GELinearGradientBlurShaderFilter&) = delete;
     GELinearGradientBlurShaderFilter operator=(const GELinearGradientBlurShaderFilter&) = delete;
     ~GELinearGradientBlurShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GELinearGradientBlurShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GELinearGradientBlurShaderFilter, Drawing::GELinearGradientBlurShaderFilterParams);
 
     virtual GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;

@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_DIRECTION_LIGHT_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_GE_DIRECTION_LIGHT_SHADER_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -25,13 +26,11 @@
 namespace OHOS {
 namespace Rosen {
 
-REGISTER_GEFILTER_TYPEINFO(DIRECTION_LIGHT, GEDirectionLightShaderFilter,
-                           Drawing::GEDirectionLightShaderFilterParams, Drawing::GE_FILTER_DIRECTION_LIGHT);
 class GE_EXPORT GEDirectionLightShaderFilter : public GEShaderFilter {
 public:
     GEDirectionLightShaderFilter(const Drawing::GEDirectionLightShaderFilterParams& params);
     ~GEDirectionLightShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEDirectionLightShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEDirectionLightShaderFilter, Drawing::GEDirectionLightShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;

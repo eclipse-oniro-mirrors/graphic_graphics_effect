@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_GE_FRAME_GRADIENT_MASK_H
 
 #include "draw/canvas.h"
+#include "ge_filter_type_info.h"
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
 #include "ge_log.h"
@@ -24,8 +25,6 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-REGISTER_GEFILTER_TYPEINFO(FRAME_GRADIENT_MASK, GEFrameGradientShaderMask,
-                           GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT);
 class GE_EXPORT GEFrameGradientShaderMask : public GEShaderMask {
 public:
     explicit GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param);
@@ -34,7 +33,7 @@ public:
     GEFrameGradientShaderMask(GEFrameGradientShaderMask&&) = delete;
     GEFrameGradientShaderMask& operator=(GEFrameGradientShaderMask&&) = delete;
     ~GEFrameGradientShaderMask() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEFrameGradientShaderMask);
+    DECLARE_GEFILTER_TYPEFUNC(GEFrameGradientShaderMask, GEFrameGradientMaskParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

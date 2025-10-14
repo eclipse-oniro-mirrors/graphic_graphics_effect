@@ -18,6 +18,7 @@
 
 #include <vector>
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -28,13 +29,11 @@
 
 namespace OHOS {
 namespace Rosen {
-REGISTER_GEFILTER_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilter,
-                           Drawing::GEColorGradientShaderFilterParams, Drawing::GE_FILTER_COLOR_GRADIENT);
 class GEColorGradientShaderFilter : public GEShaderFilter {
 public:
     GEColorGradientShaderFilter(const Drawing::GEColorGradientShaderFilterParams& params);
     ~GEColorGradientShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEColorGradientShaderFilter);
+    DECLARE_GEFILTER_TYPEFUNC(GEColorGradientShaderFilter, Drawing::GEColorGradientShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;

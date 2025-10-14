@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_GE_DOUBLE_RIPPLE_MASK_H
 
 #include "draw/canvas.h"
+#include "ge_filter_type_info.h"
 #include "ge_shader_mask.h"
 #include "image/image.h"
 #include "ge_shader_filter_params.h"
@@ -26,15 +27,13 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-REGISTER_GEFILTER_TYPEINFO(DOUBLE_RIPPLE_MASK, GEDoubleRippleShaderMask,
-                           GEDoubleRippleShaderMaskParams, GE_MASK_DOUBLE_RIPPLE);
 class GE_EXPORT GEDoubleRippleShaderMask : public GEShaderMask {
 public:
     GEDoubleRippleShaderMask(GEDoubleRippleShaderMaskParams param);
     GEDoubleRippleShaderMask(const GEDoubleRippleShaderMask&) = delete;
     GEDoubleRippleShaderMask& operator=(const GEDoubleRippleShaderMask&) = delete;
     virtual ~GEDoubleRippleShaderMask() = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEDoubleRippleShaderMask);
+    DECLARE_GEFILTER_TYPEFUNC(GEDoubleRippleShaderMask, GEDoubleRippleShaderMaskParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
