@@ -224,5 +224,38 @@ HWTEST_F(GEParticleCircularHaloShaderTest, MakeNullShaderTest, TestSize.Level1)
     EXPECT_EQ(particleEffect, nullptr);
 }
 
+/**
+* @tc.name: PreprocessBranchCoverageTest
+* @tc.desc: Verify Preprocess() cache behavior:
+            1. First frame builds both particle/glow and cache.
+            2. Noise unchanged reuses cache.
+            3. Noise changed rebuilds particle only
+* @tc.type: FUNC
+*/
+HWTEST_F(GEParticleCircularHaloShaderTest, PreprocessBranchCoverageTest, TestSize.Level1)
+{
+    Drawing::GEParticleCircularHaloShaderParams params = InitialParams(0.5, 0.5, 0.5, 1.0);
+    auto shader = GEParticleCircularHaloShader::CreateParticleCircularHaloShader(params);
+    
+    shader->Preprocess(*canvas_, rect_);
+    EXPECT_NE(shader->cacheAnyPtr_, nullptr);
+    auto particle1 = shader->particleHaloImg_.get();
+    auto glow1 = shader->glowHaloImg_.get();
+    EXPECT_NE(particle1, nullptr);
+    EXPECT_NE(glow1, nullptr);
+
+    shader->Preprocess(*canvas_, rect_);
+    auto particle2 = shader->particleHaloImg_.get();
+    auto glow2 = shader->glowHaloImg_.get();
+    EXPECT_EQ(particle1, particle2);
+    EXPECT_EQ(glow1, glow2);
+
+    shader->particleCircularHaloParams_.noise_ += 0.1f;
+    shader->Preprocess(*canvas_, rect_);
+    auto particle3 = shader->particleHaloImg_.get();
+    auto glow3 = shader->glowHaloImg_.get();
+    EXPECT_NE(particle2, particle3);
+    EXPECT_EQ(glow2, glow3);
+}
 }  // namespace Rosen
 }  // namespace OHOS
