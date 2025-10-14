@@ -38,7 +38,7 @@ public:
     }
 
 private:
-    bool FloatEqual(float a, float b);
+    bool IsFloatEqual(float a, float b);
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     static std::shared_ptr<GEParticleCircularHaloShader> CreateParticleCircularHaloShader(
