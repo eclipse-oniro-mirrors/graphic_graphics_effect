@@ -42,7 +42,6 @@ public:
     std::shared_ptr<Drawing::Image> MakeAuroraNoiseVerticalBlurShader(Drawing::Canvas& canvas,
         const Drawing::ImageInfo& imageInfo);
     std::shared_ptr<Drawing::ShaderEffect> MakeAuroraNoiseShader(const Drawing::Rect& rect);
-    static std::shared_ptr<GEAuroraNoiseShader> CreateAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseVerticalBlurBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetAuroraNoiseUpSamplingBuilder();

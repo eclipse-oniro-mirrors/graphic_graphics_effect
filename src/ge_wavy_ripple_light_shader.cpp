@@ -72,13 +72,6 @@ GEWavyRippleLightShader::GEWavyRippleLightShader(Drawing::GEWavyRippleLightShade
     wavyRippleLightParams_ = param;
 }
 
-std::shared_ptr<GEWavyRippleLightShader> GEWavyRippleLightShader::CreateWavyRippleLightShader(
-    Drawing::GEWavyRippleLightShaderParams& param)
-{
-    std::shared_ptr<GEWavyRippleLightShader> wavyRippleLightShader = std::make_shared<GEWavyRippleLightShader>(param);
-    return wavyRippleLightShader;
-}
-
 void GEWavyRippleLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeWavyRippleLightShader(rect);

@@ -88,7 +88,7 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
                 return out;
             }
             const auto& params = ve->GetAuroraNoiseParams();
-            out = GEAuroraNoiseShader::CreateAuroraNoiseShader(*params);
+            out = std::make_shared<GEAuroraNoiseShader>(*params);
             return out;
         }
     },

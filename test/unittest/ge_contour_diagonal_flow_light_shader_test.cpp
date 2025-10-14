@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -40,6 +40,53 @@ using CacheDataType = struct TestCacheData {
     float blurRadius = 0.0f;
 };
 
+namespace {
+std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int width, int height)
+{
+    // canvas rect must width > 1 and height >1
+    if (height < 1 || width < 1 || uvPoints.empty()) {
+        return {};
+    }
+    std::vector<Vector2f> ndcPoints;
+    ndcPoints.reserve(uvPoints.size());
+    float aspect = static_cast<float>(width) / static_cast<float>(height);
+
+    for (const auto& uv : uvPoints) {
+        float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
+        float ndcY = uv[1] * 2.0f - 1.0f;
+        ndcPoints.emplace_back(ndcX, ndcY);
+    }
+
+    return ndcPoints;
+}
+
+void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
+{
+    out.clear();
+
+    for (auto& p : in) {
+        out.push_back(p[0]);
+        out.push_back(p[1]);
+    }
+}
+
+GEContentDiagonalFlowLightShaderParams InitializeParams()
+    {
+        GEContentDiagonalFlowLightShaderParams params;
+        params.line1Start_ = 0.5f;
+        params.line1Length_ = 0.4f;
+        params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
+        params.line2Start_ = 0.2f;
+        params.line2Length_ = 0.5f;
+        params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
+        params.thickness_ = 0.2f;
+        params.haloRadius_ = 56.0f;
+        params.lightWeight_ = 1.5f;
+        params.haloWeight_ = 53.0f;
+        return params;
+    }
+} // anonymous namespace
+
 class GEContourDiagonalFlowLightShaderTest : public Test {
 public:
     static void SetUpTestCase()
@@ -54,31 +101,6 @@ public:
     std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
     Drawing::Rect rect_ = {};
     Drawing::ImageInfo imageInfo_ = {};
-
-    static std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int width, int height)
-    {
-        if (height < 1 || width < 1 || uvPoints.empty()) {
-            return {};
-        }
-        std::vector<Vector2f> ndcPoints;
-        ndcPoints.reserve(uvPoints.size());
-        float aspect = static_cast<float>(width) / static_cast<float>(height);
-        for (const auto& uv : uvPoints) {
-            float ndcX = (uv[0] * 2.0f - 1.0f) * aspect;
-            float ndcY = uv[1] * 2.0f - 1.0f;
-            ndcPoints.emplace_back(ndcX, ndcY);
-        }
-        return ndcPoints;
-    }
-
-    static void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
-    {
-        out.clear();
-        for (const auto& p : in) {
-            out.push_back(p[0]);
-            out.push_back(p[1]);
-        }
-    }
 };
 
 void GEContourDiagonalFlowLightShaderTest::SetUp()
@@ -88,7 +110,16 @@ void GEContourDiagonalFlowLightShaderTest::SetUp()
     imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
         Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
     surface_ = CreateSurface();
+    if (surface_ == nullptr) {
+        GE_LOGE("Failed to create surface.");
+        return;
+    }
+
     canvas_ = surface_->GetCanvas();
+    if (canvas_ == nullptr) {
+        GE_LOGE("Failed to get canvas from surface.");
+        return;
+    }
 }
 
 std::shared_ptr<Drawing::Surface> GEContourDiagonalFlowLightShaderTest::CreateSurface()
@@ -109,17 +140,6 @@ void GEContourDiagonalFlowLightShaderTest::TearDown()
 {
     surface_ = nullptr;
     canvas_ = nullptr;
-}
-
-/**
- * @tc.name: CreateSurfaceCanvasTest_001
- * @tc.desc: Verify function SetUp in GEContourDiagonalFlowLightShaderTest
- * @tc.type: FUNC
- */
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateSurfaceCanvasTest_001, TestSize.Level3)
-{
-    EXPECT_NE(surface_, nullptr);
-    EXPECT_NE(canvas_, nullptr);
 }
 
 /**
@@ -388,22 +408,58 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.L
     Drawing::Rect rect(0, 0, 0, 0);
     img = shader2.DrawRuntimeShader(*canvas_, rect);
     EXPECT_EQ(img, nullptr); // rect is invalid
+}
 
+/**
+ * @tc.name: DrawRuntimeShader_002
+ * @tc.desc: Verify function DrawRuntimeShader
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_002, TestSize.Level1)
+{
+    GEContentDiagonalFlowLightShaderParams params;
+    params.line1Start_ = 0.05f;
     params.line1Length_ = -0.6f;
+    params.line1Color_ = Vector4f(0.8f, 0.5f, 1.0f, 1.0f);
+    params.line2Start_ = 0.55f;
+    params.line2Length_ = 0.2f;
+    params.line2Color_ = Vector4f(0.2f, 0.6f, 1.0f, 0.8f);
+    params.thickness_ = 0.5f;
+    params.haloRadius_ = 20.0f;
+    params.lightWeight_ = 0.9f;
+    params.haloWeight_ = 15.0f;
+    params.contour_ = std::vector<Vector2f>(98, Vector2f(0.45f, 0.88f));
+    auto shader = GEContourDiagonalFlowLightShader(params);
+    shader.offscreenSurface_ = surface_;
+    shader.offscreenCanvas_ = canvas_;
+    shader.Preprocess(*canvas_, rect_);
+    auto img = shader.DrawRuntimeShader(*canvas_, rect_);
+    EXPECT_NE(img, nullptr); // line1Length is negative
+
+    params.line1Length_ = 0.0f;
+    auto shader2 = GEContourDiagonalFlowLightShader(params);
+    shader2.offscreenSurface_ = surface_;
+    shader2.offscreenCanvas_ = canvas_;
+    shader2.Preprocess(*canvas_, rect_);
+    img = shader2.DrawRuntimeShader(*canvas_, rect_);
+    EXPECT_NE(img, nullptr); // line1Length is zero
+
+    params.line1Length_ = 0.6f;
+    params.line2Length_ = -0.2f;
     auto shader3 = GEContourDiagonalFlowLightShader(params);
     shader3.offscreenSurface_ = surface_;
     shader3.offscreenCanvas_ = canvas_;
     shader3.Preprocess(*canvas_, rect_);
     img = shader3.DrawRuntimeShader(*canvas_, rect_);
-    EXPECT_NE(img, nullptr); //lineLength is negative
+    EXPECT_NE(img, nullptr); // line2Length is negative
 
-    params.line1Length_ = 0.0f;
+    params.line2Length_ = 0.0f;
     auto shader4 = GEContourDiagonalFlowLightShader(params);
     shader4.offscreenSurface_ = surface_;
     shader4.offscreenCanvas_ = canvas_;
     shader4.Preprocess(*canvas_, rect_);
     img = shader4.DrawRuntimeShader(*canvas_, rect_);
-    EXPECT_NE(img, nullptr); // lineLength is zero
+    EXPECT_NE(img, nullptr); // line2Length is zero
 }
 
 /**
@@ -519,17 +575,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, GetFlowLightPrecalBuilder_001, Te
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, FlowLightConvertBuilder_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     auto builder = shader.FlowLightConvertBuilder();
@@ -538,145 +584,46 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, FlowLightConvertBuilder_001, Test
 
 /**
  * @tc.name: ComputeCurveBoundingBox_001
- * @tc.desc: Verify function ComputeCurveBoundingBox with normal canvas size
+ * @tc.desc: Verify function ComputeCurveBoundingBox
  * @tc.type: FUNC
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeCurveBoundingBox_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(32, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
-
     auto ndcPoints = ConvertUVToNDC(shader.contourDiagonalFlowLightParams_.contour_, 100, 100);
     ConvertPointsTo(ndcPoints, shader.controlPoints_);
     size_t numCurves = 16;
     shader.controlPoints_.resize(numCurves * 2);
     float maxThickness = 0.05f;
     float approxLen = 0.0f;
-
     for (size_t i = 0; i < numCurves; ++i) {
         Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 100, 100, approxLen);
-        EXPECT_FLOAT_EQ(bbox[0], 24.0f);
-        EXPECT_FLOAT_EQ(bbox[1], 30.0f);
-        EXPECT_FLOAT_EQ(bbox[2], 62.0f);
-        EXPECT_FLOAT_EQ(bbox[3], 68.0f);
+        // NDC: x = -0.46, y = 0.30
+        // x_min = -0.46 - 0.05 = -0.51, x_max = -0.46 + 0.05 = -0.41
+        // y_min = 0.3 - 0.05 = 0.25, y_max = 0.3 + 0.05 = 0.35
+        EXPECT_FLOAT_EQ(bbox[0], 24.0f); // [(−0.51 + 1) / 2 * 100]= floor[24.5] = 24
+        EXPECT_FLOAT_EQ(bbox[1], 30.0f); // [(−0.41 + 1) / 2 * 100]= ceil[29.5] = 30
+        EXPECT_FLOAT_EQ(bbox[2], 62.0f); // [(0.25 + 1) / 2 * 100]= floor[62.5] = 62
+        EXPECT_FLOAT_EQ(bbox[3], 68.0f); // [(0.35 + 1) / 2 * 100]= ceil[67.5] = 68
     }
-}
-
-/**
- * @tc.name: ComputeCurveBoundingBox_002
- * @tc.desc: Verify ComputeCurveBoundingBox with canvas height=0
- * @tc.type: FUNC
- */
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeCurveBoundingBox_002, TestSize.Level1)
-{
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
-    params.contour_ = std::vector<Vector2f>(32, Vector2f(0.27f, 0.65f));
-    auto shader = GEContourDiagonalFlowLightShader(params);
-
-    auto ndcPoints = ConvertUVToNDC(shader.contourDiagonalFlowLightParams_.contour_, 100, 100);
-    ConvertPointsTo(ndcPoints, shader.controlPoints_);
-    size_t numCurves = 16;
-    shader.controlPoints_.resize(numCurves * 2);
-    float maxThickness = 0.05f;
-    float approxLen = 0.0f;
-
     for (size_t i = 0; i < numCurves; ++i) {
-        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 100, 0, approxLen);
+        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 100, 0, approxLen); // height is zero
         EXPECT_FLOAT_EQ(bbox[0], 24.0f);
         EXPECT_FLOAT_EQ(bbox[1], 30.0f);
         EXPECT_FLOAT_EQ(bbox[2], 0.0f);
         EXPECT_FLOAT_EQ(bbox[3], 0.0f);
     }
-}
-
-/**
- * @tc.name: ComputeCurveBoundingBox_003
- * @tc.desc: Verify ComputeCurveBoundingBox with canvas width=0
- * @tc.type: FUNC
- */
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeCurveBoundingBox_003, TestSize.Level1)
-{
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
-    params.contour_ = std::vector<Vector2f>(32, Vector2f(0.27f, 0.65f));
-    auto shader = GEContourDiagonalFlowLightShader(params);
-
-    auto ndcPoints = ConvertUVToNDC(shader.contourDiagonalFlowLightParams_.contour_, 100, 100);
-    ConvertPointsTo(ndcPoints, shader.controlPoints_);
-    size_t numCurves = 16;
-    shader.controlPoints_.resize(numCurves * 2);
-    float maxThickness = 0.05f;
-    float approxLen = 0.0f;
-
     for (size_t i = 0; i < numCurves; ++i) {
-        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 0, 100, approxLen);
+        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 0, 100, approxLen); // width is zero
         EXPECT_FLOAT_EQ(bbox[0], 0.0f);
         EXPECT_FLOAT_EQ(bbox[1], 0.0f);
         EXPECT_FLOAT_EQ(bbox[2], 62.0f);
         EXPECT_FLOAT_EQ(bbox[3], 68.0f);
     }
-}
-
-/**
- * @tc.name: ComputeCurveBoundingBox_004
- * @tc.desc: Verify ComputeCurveBoundingBox with canvas width=0 and height=0
- * @tc.type: FUNC
- */
-HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeCurveBoundingBox_004, TestSize.Level1)
-{
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
-    params.contour_ = std::vector<Vector2f>(32, Vector2f(0.27f, 0.65f));
-    auto shader = GEContourDiagonalFlowLightShader(params);
-
-    auto ndcPoints = ConvertUVToNDC(shader.contourDiagonalFlowLightParams_.contour_, 100, 100);
-    ConvertPointsTo(ndcPoints, shader.controlPoints_);
-    size_t numCurves = 16;
-    shader.controlPoints_.resize(numCurves * 2);
-    float maxThickness = 0.05f;
-    float approxLen = 0.0f;
-
     for (size_t i = 0; i < numCurves; ++i) {
-        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 0, 0, approxLen);
+        Box4f bbox = shader.ComputeCurveBoundingBox(i, maxThickness, 0, 0, approxLen); // height and width are zero
         EXPECT_FLOAT_EQ(bbox[0], 0.0f);
         EXPECT_FLOAT_EQ(bbox[1], 0.0f);
         EXPECT_FLOAT_EQ(bbox[2], 0.0f);
@@ -691,17 +638,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeCurveBoundingBox_004, Test
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateSurfaceAndCanvas_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -728,17 +665,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateSurfaceAndCanvas_001, TestS
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, PreCalculateRegion_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenCanvas_ = canvas_;
@@ -765,17 +692,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, PreCalculateRegion_001, TestSize.
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoPartitionCal_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -807,17 +724,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoPartitionCal_001, TestSize.Le
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -850,17 +757,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_001, TestSize.L
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_002, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     const size_t K = 24;
     std::vector<Vector2f> contour;
     contour.reserve(2 * K);
@@ -890,17 +787,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_002, TestSize.L
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeAllCurveBoundingBoxes_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     std::vector<Box4f> curveBBoxes;
@@ -920,18 +807,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeAllCurveBoundingBoxes_001,
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, InitializeWorkQueue_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_  = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_  = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_  = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_  = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_   = 0.2f;
-    params.haloRadius_  = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_  = 53.0f;
-
+    auto params = InitializeParams();
     const int w = 200, h = 200;
     const size_t K = 20;
     std::vector<Vector2f> contour; contour.reserve(2 * K);
@@ -971,17 +847,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, InitializeWorkQueue_001, TestSize
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, SplitGrid_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_  = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_  = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_  = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_  = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_   = 0.2f;
-    params.haloRadius_  = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_  = 53.0f;
+    auto params = InitializeParams();
     const int w = 100, h = 100;
     const size_t K = 12;
     std::vector<Vector2f> contour; contour.reserve(2 * K);
@@ -1022,17 +888,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, SplitGrid_001, TestSize.Level1)
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, SplitGrid_002, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_  = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_  = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_  = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_  = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_   = 0.2f;
-    params.haloRadius_  = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_  = 53.0f;
+    auto params = InitializeParams();
     const int w = 200, h = 200;
     const size_t K = 6;
     std::vector<Vector2f> contour; contour.reserve(2 * K);
@@ -1075,17 +931,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, SplitGrid_002, TestSize.Level1)
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, ProcessFinalGrid_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     std::vector<Box4f> curveBBoxes;
@@ -1100,23 +946,60 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ProcessFinalGrid_001, TestSize.Le
 }
 
 /**
+ * @tc.name: ProcessFinalGrid_002
+ * @tc.desc: Verify function ProcessFinalGrid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, ProcessFinalGrid_002, TestSize.Level1)
+{
+    auto params = InitializeParams();
+    const int w = 200, h = 200;
+    const size_t K_L = 6;
+    const size_t K_R = 6;
+    // create 2 sets of curves：left (x ≈ 0.10 ~ 0.12), right (x ≈ 0.85~0.87)，overlaps vertically
+    std::vector<Vector2f> contour;
+    contour.reserve(2 * (K_L + K_R));
+    for (size_t i = 0; i < K_L; ++i) {
+        float y  = 0.30f + 0.02f * static_cast<float>(i); // 0.30~0.40
+        float x0 = 0.10f, xc = 0.12f;
+        contour.emplace_back(x0, y); // P0 (UV)
+        contour.emplace_back(xc, y); // C (UV)
+    }
+    for (size_t i = 0; i < K_R; ++i) {
+        float y  = 0.30f + 0.02f * static_cast<float>(i);
+        float x0 = 0.85f, xc = 0.87f;
+        contour.emplace_back(x0, y); // P0 (UV)
+        contour.emplace_back(xc, y); // C (UV)
+    }
+    params.contour_ = std::move(contour);
+    auto shader = GEContourDiagonalFlowLightShader(params);
+    auto ndcPoints = ConvertUVToNDC(shader.contourDiagonalFlowLightParams_.contour_, w, h);
+    shader.pointCnt_  = ndcPoints.size();
+    shader.numCurves_ = shader.pointCnt_ / 2;
+    ConvertPointsTo(ndcPoints, shader.controlPoints_);
+    std::vector<Box4f> curveBBoxes;
+    Box4f canvasBBoxUnion;
+    shader.ComputeAllCurveBoundingBoxes(w, h, 0.05f, canvasBBoxUnion, curveBBoxes); // 0.05f: maxThickness
+    Box4f rightCanvas{0.80f * w, static_cast<float>(w), 0.0f, static_cast<float>(h)};
+    std::queue<Grid> workQueue;
+    shader.InitializeWorkQueue(rightCanvas, curveBBoxes, workQueue);
+    ASSERT_FALSE(workQueue.empty());
+    Grid current = workQueue.front();
+    EXPECT_EQ(current.curveIndices.size(), K_R + 1);
+    EXPECT_LT(current.curveIndices.size(), static_cast<size_t>(shader.numCurves_));
+    shader.ProcessFinalGrid(current, curveBBoxes, 100); // 100: height
+    ASSERT_FALSE(shader.curvesInGrid_.empty());
+    ASSERT_FALSE(shader.segmentIndex_.empty());
+}
+
+/**
  * @tc.name: CreateImg_001
  * @tc.desc: Verify function CreateImg
  * @tc.type: FUNC
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateImg_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -1141,17 +1024,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateImg_001, TestSize.Level1)
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateDrawImg_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -1177,17 +1050,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateDrawImg_001, TestSize.Level
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, ResizeCurvesData_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     const int gridIndex = 24;
@@ -1207,17 +1070,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ResizeCurvesData_001, TestSize.Le
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, LoopAllCurvesInBatches_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenCanvas_ = canvas_;
@@ -1249,17 +1102,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, LoopAllCurvesInBatches_001, TestS
  */
 HWTEST_F(GEContourDiagonalFlowLightShaderTest, ConvertImage_001, TestSize.Level1)
 {
-    GEContentDiagonalFlowLightShaderParams params;
-    params.line1Start_ = 0.5f;
-    params.line1Length_ = 0.4f;
-    params.line1Color_ = Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
-    params.line2Start_ = 0.2f;
-    params.line2Length_ = 0.5f;
-    params.line2Color_ = Vector4f(0.5f, 0.5f, 1.0f, 1.0f);
-    params.thickness_ = 0.2f;
-    params.haloRadius_ = 56.0f;
-    params.lightWeight_ = 1.5f;
-    params.haloWeight_ = 53.0f;
+    auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
     shader.offscreenSurface_ = surface_;
@@ -1290,6 +1133,5 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Type_001, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest Type_001 end";
 }
-
 } // namespace Rosen
 } // namespace OHOS

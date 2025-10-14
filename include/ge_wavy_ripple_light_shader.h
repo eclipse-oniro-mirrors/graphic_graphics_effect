@@ -40,8 +40,6 @@ public:
         wavyRippleLightParams_ = params;
     }
     std::shared_ptr<Drawing::ShaderEffect> MakeWavyRippleLightShader(const Drawing::Rect& rect);
-    static std::shared_ptr<GEWavyRippleLightShader> CreateWavyRippleLightShader(
-        Drawing::GEWavyRippleLightShaderParams& param);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetWavyRippleLightBuilder();
 
 private:
