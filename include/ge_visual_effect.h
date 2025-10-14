@@ -64,6 +64,9 @@ public:
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
+    void SetParam(const std::string& tag, const GERRect& param);
+    void SetParam(const std::string& tag, const GESDFBorderParams& param);
+    void SetParam(const std::string& tag, const GESDFShadowParams& param);
 
     const std::string& GetName() const
     {

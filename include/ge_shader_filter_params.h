@@ -19,12 +19,18 @@
 #include <vector>
 #include <array>
 #include <utility>
+#include <optional>
+#include <variant>
 
+// rs
 #include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
+// drawing
 #include "utils/matrix.h"
+// ge
 #include "ge_shader_mask.h"
+#include "sdf/ge_sdf_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -554,6 +560,70 @@ struct GEBorderLightShaderParams {
     float width = 0.0f;
     Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
     float cornerRadius = 0.0f;
+};
+
+enum class GESDFUnionOp : uint8_t {
+    UNION = 0,
+    SMOOTH_UNION,
+    MAX = SMOOTH_UNION,
+};
+
+class GERRect {
+public:
+    GERRect(float l = 0.f, float t = 0.f, float w = 0.f,
+            float h = 0.f, float rx = 0.f, float ry = 0.f) {}
+    float left_ = 0.f;
+    float top_ = 0.f;
+    float width_ = 0.f;
+    float height_ = 0.f;
+    float radiusX_ = 0.f;
+    float radiusY_ = 0.f;
+};
+
+using GESDFShapeNode = std::variant<GERRect, GESDFUnionOp>;
+
+constexpr char GE_MASK_SDF_UNION_OP[] = "SDFUnionOpMask";
+constexpr char GE_MASK_SDF_UNION_OP_MASKX[] = "SDFUnionOpMask_MaskX";
+constexpr char GE_MASK_SDF_UNION_OP_MASKY[] = "SDFUnionOpMask_MaskY";
+constexpr char GE_MASK_SDF_UNION_OP_TYPE[] = "SDFUnionOpMask_Type";
+// for smooth union op
+constexpr char GE_MASK_SDF_SMOOTH_UNION_OP[] = "SDFSmoothUnionOpMask";
+constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_SPACING[] = "SDFSmoothUnionOpMask_Spacing";
+constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKX[] = "SDFSmoothUnionOpMask_MaskX";
+constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKY[] = "SDFSmoothUnionOpMask_MaskY";
+struct GESDFUnionOpMaskParams {
+    float spacing = 0.f;
+    std::shared_ptr<GESDFShaderMask> left;
+    std::shared_ptr<GESDFShaderMask> right;
+    GESDFUnionOp op;
+};
+
+constexpr char GE_MASK_SDF_RRECT_MASK[] = "SDFRRectMask";
+constexpr char GE_MASK_SDF_RRECT_MASK_RRECT[] = "SDFRRectMask_RRect";
+struct GESDFRRectMaskParams {
+    GERRect rrect;
+};
+
+constexpr char GE_FILTER_SDF[] = "SDFFilter";
+constexpr char GE_FILTER_SDF_MASK[] = "SDFFilter_Mask";
+struct GESDFBorderParams final {
+    Color color;
+    float width = 0.0f;
+};
+
+struct GESDFShadowParams final {
+    Drawing::Color color;
+    float offsetX = 0.0f;
+    float offsetY = 0.0f;
+    float radius = 0.0;
+    Drawing::Path path;
+    bool isFilled = false;
+};
+
+struct GESDFFilterParams {
+    std::shared_ptr<GESDFShaderMask> mask;
+    std::optional<GESDFBorderParams> border;
+    std::optional<GESDFShadowParams> shadow;
 };
 
 constexpr int ARRAY_SIZE_FOUR = 4;

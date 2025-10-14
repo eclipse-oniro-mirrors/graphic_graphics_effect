@@ -35,6 +35,7 @@ enum class GEFilterType : int32_t {
     DISPLACEMENT_DISTORT_FILTER,
     COLOR_GRADIENT,
     MASK_TRANSITION,
+    SDF,
     // Mask
     RIPPLE_MASK,
     DOUBLE_RIPPLE_MASK,
@@ -44,6 +45,8 @@ enum class GEFilterType : int32_t {
     FRAME_GRADIENT_MASK,
     LINEAR_GRADIENT_MASK,
     HARMONIUM_EFFECT_MASK,
+    SDF_UNION_OP,
+    SDF_RRECT_MASK,
     // Shader
     DOT_MATRIX,
     FLOW_LIGHT_SWEEP,

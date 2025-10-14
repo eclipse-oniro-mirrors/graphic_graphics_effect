@@ -279,6 +279,31 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeHarmoniumEffectParams();
         }
     },
+    { GE_FILTER_SDF,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF);
+            impl->MakeSDFFilterParams();
+        }
+    },
+    { GE_MASK_SDF_UNION_OP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
+            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::UNION);
+        }
+    },
+    { GE_MASK_SDF_SMOOTH_UNION_OP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
+            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::SMOOTH_UNION);
+        }
+    },
+    { GE_MASK_SDF_RRECT_MASK,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_RRECT_MASK);
+            impl->MakeSDFRRectMaskParams();
+        }
+    },
+
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -592,6 +617,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
+        case FilterType::SDF_UNION_OP: {
+            if (sdfUnionOpMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_SDF_SMOOTH_UNION_OP_SPACING) {
+                sdfUnionOpMaskParams_->spacing = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -864,6 +898,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
             }
             break;
         }
+        case FilterType::SDF_UNION_OP: {
+            bool isParamValid = param < static_cast<uint32_t>(GESDFUnionOp::MAX);
+            if (sdfUnionOpMaskParams_ == nullptr || !isParamValid) {
+                return;
+            }
+            if (tag == GE_MASK_SDF_UNION_OP_TYPE) {
+                sdfUnionOpMaskParams_->op = static_cast<GESDFUnionOp>(param);
+            }
+            break;
+        }
         default:
             break;
     }
@@ -964,6 +1008,31 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF: {
+            bool isSdfMask = !param || param->IsSDFShaderMask();
+            if (sdfFilterParams_ == nullptr || !isSdfMask) {
+                return;
+            }
+            
+            if (tag == GE_FILTER_SDF_MASK) {
+                sdfFilterParams_->mask = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_UNION_OP: {
+            bool isSdfMask = !param || param->IsSDFShaderMask();
+            if (sdfUnionOpMaskParams_ == nullptr || !isSdfMask) {
+                return;
+            }
+
+            if (tag == GE_MASK_SDF_UNION_OP_MASKX || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKX) {
+                sdfUnionOpMaskParams_->left = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            } else if (tag == GE_MASK_SDF_UNION_OP_MASKY || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKY) {
+                sdfUnionOpMaskParams_->right = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            }
+            break;
+        }
+
         default:
             break;
     }
@@ -1130,6 +1199,36 @@ void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Vec
     }
     if (tag == GE_MASK_PIXEL_MAP_FILL_COLOR) {
         pixelMapMaskParams_->fillColor = param;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
+{
+    switch (filterType_) {
+        case FilterType::SDF_RRECT_MASK: {
+            if (sdfRRectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_SDF_RRECT_MASK_RRECT) {
+                sdfRRectMaskParams_->rrect = param;
+            }
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParams& border)
+{
+    if (tag == GE_FILTER_SDF_MASK) {
+        sdfFilterParams_->border = border;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFShadowParams& shadow)
+{
+    if (tag == GE_FILTER_SDF_MASK) {
+        sdfFilterParams_->shadow = shadow;
     }
 }
 
@@ -1960,6 +2059,30 @@ void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
 
     if (tag == GEX_SHADER_LIGHT_CAVE_PROGRESS) {
         lightCaveShaderParams_->progress = param;
+    }
+}
+
+void GEVisualEffectImpl::SetBorder(const Color& color, float width)
+{
+    if (sdfFilterParams_) {
+        sdfFilterParams_->border = std::make_optional<GESDFBorderParams>();
+        sdfFilterParams_->border->color = color;
+        sdfFilterParams_->border->width = width;
+    }
+}
+
+void GEVisualEffectImpl::SetShadow(const Drawing::Color& color, float offsetX,
+                                   float offsetY, float radius,
+                                   Drawing::Path path, bool isFilled)
+{
+    if (sdfFilterParams_) {
+        sdfFilterParams_->shadow = std::make_optional<GESDFShadowParams>();
+        sdfFilterParams_->shadow->color = color;
+        sdfFilterParams_->shadow->offsetX = offsetX;
+        sdfFilterParams_->shadow->offsetY = offsetY;
+        sdfFilterParams_->shadow->radius = radius;
+        sdfFilterParams_->shadow->path = path;
+        sdfFilterParams_->shadow->isFilled = isFilled;
     }
 }
 
