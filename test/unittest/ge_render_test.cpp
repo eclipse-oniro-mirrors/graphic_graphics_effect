@@ -34,6 +34,7 @@ public:
     void TearDown() override;
 
     std::shared_ptr<Drawing::Image> MakeImage(Drawing::Canvas& canvas);
+    std::shared_ptr<Drawing::Image> MakeImage();
 
     static inline Drawing::Canvas canvas_;
 
@@ -130,6 +131,15 @@ std::shared_ptr<Drawing::Image> GERenderTest::MakeImage(Drawing::Canvas& canvas)
     builder->SetUniform("coefficient1", greyX);
     builder->SetUniform("coefficient2", greyY);
     return builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+}
+
+std::shared_ptr<Drawing::Image> GERenderTest::MakeImage()
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format); // 50, 50  bitmap size
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    return bmp.MakeImage();
 }
 
 /**
@@ -679,16 +689,14 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush));
  
     /* no filter */
-    auto image2 = MakeImage(canvas_);
-    if (!image2) {
-        GTEST_LOG_(INFO) << "GERenderTest image2 is null";
-        return;
-    }
+    auto image2 = MakeImage();
+    ASSERT_NE(image2, nullptr);
 
     GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions() };
     EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush));
  
     /* normal case */
+    image2 = MakeImage();
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
@@ -696,6 +704,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush));
 
     /* compatibility fallback */
+    image2 = MakeImage();
     GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions() };
     outImage = nullptr;
     EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context4, outImage, brush));
@@ -712,6 +721,9 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     visualEffect2->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
     veContainer.AddToChainedFilter(visualEffect2);
 
+    image2 = MakeImage();
+    std::vector<const char*> emptyVec {};
+    HpsEffectFilter::UnitTestSetExtensionProperties(emptyVec);
     GERender::HpsGEImageEffectContext context5 { image2, src, dst, Drawing::SamplingOptions() };
     EXPECT_TRUE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context5, outImage, brush));
 
