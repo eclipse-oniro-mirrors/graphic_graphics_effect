@@ -63,24 +63,23 @@ HWTEST_F(GEExternalDynamicLoaderTest, DynamicLoader_Test_001, TestSize.Level1)
     if (!file) {
         EXPECT_EQ(testLoader_->libHandle_, nullptr);
         EXPECT_EQ(testLoader_->createObjectFunc_, nullptr);
-        GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoader_Test_001 end, so not exist";
-        return;
+        GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoader_Test_001 end, target lib file not exist";
+    } else {
+        EXPECT_NE(testLoader_->libHandle_, nullptr);
+        EXPECT_NE(testLoader_->createObjectFunc_, nullptr);
+
+        auto object = testLoader_->CreateGEXObjectByType(
+            (uint32_t)Drawing::GEVisualEffectImpl::FilterType::NONE, 0, (void*)nullptr);
+        EXPECT_EQ(object, nullptr);
+
+        auto mesaBlurParam = std::make_shared<Drawing::GEMESABlurShaderFilterParams>();
+        auto mesaBlurObject =
+            testLoader_->CreateGEXObjectByType((uint32_t)Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR,
+                sizeof(Drawing::GEMESABlurShaderFilterParams), (void*)mesaBlurParam.get());
+        EXPECT_NE(mesaBlurObject, nullptr);
+
+        GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoaderTest001 end";
     }
-
-    EXPECT_NE(testLoader_->libHandle_, nullptr);
-    EXPECT_NE(testLoader_->createObjectFunc_, nullptr);
-
-    auto object = testLoader_->CreateGEXObjectByType(
-        (uint32_t)Drawing::GEVisualEffectImpl::FilterType::NONE, 0, (void*)nullptr);
-    EXPECT_EQ(object, nullptr);
-
-    auto mesaBlurParam = std::make_shared<Drawing::GEMESABlurShaderFilterParams>();
-    auto mesaBlurObject = testLoader_->CreateGEXObjectByType(
-        (uint32_t)Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR, sizeof(Drawing::GEMESABlurShaderFilterParams),
-        (void*)mesaBlurParam.get());
-    EXPECT_NE(mesaBlurObject, nullptr);
-
-    GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoaderTest001 end";
 }
 
 } // namespace Rosen
