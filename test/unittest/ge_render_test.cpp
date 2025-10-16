@@ -162,10 +162,7 @@ HWTEST_F(GERenderTest, DrawImageEffect_001, TestSize.Level1)
     const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
-    if (!geRender) {
-        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
-        return;
-    }
+    ASSERT_NE(geRender, nullptr);
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_001 end";
@@ -187,18 +184,12 @@ HWTEST_F(GERenderTest, DrawImageEffect_002, TestSize.Level1)
     veContainer->AddToChainedFilter(visualEffect);
 
     auto image = std::make_shared<Drawing::Image>();
-    if (!image) {
-        GTEST_LOG_(INFO) << "GERenderTest image is null";
-        return;
-    }
+    ASSERT_NE(image, nullptr);
     const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
-    if (!geRender) {
-        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
-        return;
-    }
+    ASSERT_NE(geRender, nullptr);
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_002 end";
@@ -220,18 +211,12 @@ HWTEST_F(GERenderTest, DrawImageEffect_003, TestSize.Level1)
     veContainer->AddToChainedFilter(visualEffect);
 
     auto image = MakeImage(canvas_);
-    if (!image) {
-        GTEST_LOG_(INFO) << "GERenderTest image is null";
-        return;
-    }
+    ASSERT_NE(image, nullptr);
     const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
-    if (!geRender) {
-        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
-        return;
-    }
+    ASSERT_NE(geRender, nullptr);
     geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_003 end";
@@ -257,10 +242,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
     const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
-    if (!geRender) {
-        GTEST_LOG_(INFO) << "GERenderTest geRender is null";
-        return;
-    }
+    ASSERT_NE(geRender, nullptr);
     auto outImage = geRender->ApplyImageEffect(canvas_, *veContainer, image, src, dst, sampling);
     EXPECT_TRUE(outImage == image);
 
