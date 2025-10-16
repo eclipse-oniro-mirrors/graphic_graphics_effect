@@ -166,13 +166,6 @@ GEAuroraNoiseShader::GEAuroraNoiseShader(Drawing::GEAuroraNoiseShaderParams& par
     auroraNoiseParams_ = param;
 }
 
-std::shared_ptr<GEAuroraNoiseShader> GEAuroraNoiseShader::CreateAuroraNoiseShader(
-    Drawing::GEAuroraNoiseShaderParams& param)
-{
-    std::shared_ptr<GEAuroraNoiseShader> auroraNoiseShader = std::make_shared<GEAuroraNoiseShader>(param);
-    return auroraNoiseShader;
-}
-
 void GEAuroraNoiseShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeAuroraNoiseShader(rect);
@@ -298,6 +291,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEAuroraNoiseShader::MakeAuroraNoiseShade
 {
     if (verticalBlurImg_ == nullptr) {
         GE_LOGE("GEAuroraNoiseShader MakeAuroraNoiseShader verticalBlurImg_ is nullptr.");
+        return nullptr;
+    }
+    if (!rect.IsValid()) {
+        GE_LOGE("GEAuroraNoiseShader::MakeAuroraNoiseShader rect is invalid.");
         return nullptr;
     }
     auto width = rect.GetWidth();

@@ -38,76 +38,100 @@ public:
 };
 
 /**
- * @tc.name: GEWavyRippleLightShaderTest001
+ * @tc.name: GEWavyRippleLightShaderConstrunctor_001
+ * @tc.desc: Verify the constructor of GEWavyRippleLightShader
  * @tc.type: FUNC
  */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest001, TestSize.Level1)
+HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderConstrunctor_001, TestSize.Level1)
 {
     Drawing::GEWavyRippleLightShaderParams params{{0.0f, 0.2f}, 0.5f, 0.2f};
-    auto shader = GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    EXPECT_NE(shader, nullptr);
+    auto shader = GEWavyRippleLightShader(params);
+
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.center_.first, params.center_.first);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.center_.second, params.center_.second);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.radius_, params.radius_);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.thickness_, params.thickness_);
 }
 
 /**
- * @tc.name: GEWavyRippleLightShaderTest002
+ * @tc.name: MakeDrawingShader_001
+ * @tc.desc: Verify function MakeDrawingShader
  * @tc.type: FUNC
  */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest002, TestSize.Level1)
+HWTEST_F(GEWavyRippleLightShaderTest, MakeDrawingShader_001, TestSize.Level1)
 {
-    Drawing::GEWavyRippleLightShaderParams params{{0.5f, 0.3f}, 0.1f, 0.5f};
-    auto shader = GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    ASSERT_NE(shader, nullptr);
+    Drawing::GEWavyRippleLightShaderParams params{{1.0f, 2.0f}, 0.8f, 0.0f};
+    auto shader = GEWavyRippleLightShader(params);
 
-    auto builder1 = shader->GetWavyRippleLightBuilder();
-    EXPECT_NE(builder1, nullptr);
-    auto builder2 = shader->GetWavyRippleLightBuilder();
-    EXPECT_NE(builder2, nullptr);
+    Drawing::Rect rect{0, 0, 50, 50};
+    shader.MakeDrawingShader(rect, 0.5f);
+    ASSERT_NE(shader.GetDrawingShader(), nullptr);
 }
 
 /**
- * @tc.name: GEWavyRippleLightShaderTest003
+ * @tc.name: GetDescription_001
+ * @tc.desc: Verify function GetDescription
  * @tc.type: FUNC
  */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest003, TestSize.Level1)
+HWTEST_F(GEWavyRippleLightShaderTest, GetDescription_001, TestSize.Level1)
 {
-    Drawing::GEWavyRippleLightShaderParams params{{0.5f, 0.3f}, 0.1f, 0.1f};
-    auto shader = GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    ASSERT_NE(shader, nullptr);
+    Drawing::GEWavyRippleLightShaderParams params{{0.9f, 0.2f}, 0.33f, 0.25f};
+    auto shader = GEWavyRippleLightShader(params);
+
+    std::string expectStr = "GEWavyRippleLightShader";
+    EXPECT_EQ(shader.GetDescription(), expectStr);
+}
+
+/**
+ * @tc.name: SetWavyRippleLightParams_001
+ * @tc.desc: Verify function SetWavyRippleLightParams
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWavyRippleLightShaderTest, SetWavyRippleLightParams_001, TestSize.Level1)
+{
+    Drawing::GEWavyRippleLightShaderParams params{{0.8f, 0.3f}, 0.1f, 2.0f};
+    auto shader = GEWavyRippleLightShader(params);
 
     Drawing::Rect rect{0, 0, 100, 100};
-    auto effect = shader->MakeWavyRippleLightShader(rect);
+    shader.MakeDrawingShader(rect, 0.75f);
+
+    Drawing::GEWavyRippleLightShaderParams params1{{0.5f, 0.2f}, 0.6f, 0.5f};
+    shader.SetWavyRippleLightParams(params1);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.center_.first, params1.center_.first);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.center_.second, params1.center_.second);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.radius_, params1.radius_);
+    EXPECT_FLOAT_EQ(shader.wavyRippleLightParams_.thickness_, params1.thickness_);
+}
+
+/**
+ * @tc.name: MakeWavyRippleLightShader_001
+ * @tc.desc: Verify function MakeWavyRippleLightShader
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWavyRippleLightShaderTest, MakeWavyRippleLightShader_001, TestSize.Level1)
+{
+    Drawing::GEWavyRippleLightShaderParams params{{0.5f, 0.3f}, 0.1f, 0.1f};
+    auto shader = GEWavyRippleLightShader(params);
+
+    Drawing::Rect rect{0, 0, 100, 100};
+    auto effect = shader.MakeWavyRippleLightShader(rect);
     EXPECT_NE(effect, nullptr);
 }
 
 /**
- * @tc.name: GEWavyRippleLightShaderTest004
+ * @tc.name: GetWavyRippleLightBuilder_001
+ * @tc.desc: Verify function GetWavyRippleLightBuilder
  * @tc.type: FUNC
  */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest004, TestSize.Level1)
+HWTEST_F(GEWavyRippleLightShaderTest, GetWavyRippleLightBuilder_001, TestSize.Level1)
 {
-    Drawing::GEWavyRippleLightShaderParams params{{1.0f, 2.0f}, 0.8f, 0.0f};
-    auto shader = GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    ASSERT_NE(shader, nullptr);
+    Drawing::GEWavyRippleLightShaderParams params{{0.5f, 0.3f}, 0.1f, 0.5f};
+    auto shader = GEWavyRippleLightShader(params);
 
-    Drawing::Rect rect{0, 0, 50, 50};
-    shader->MakeDrawingShader(rect, 0.5f);
-    SUCCEED();
-}
-
-/**
- * @tc.name: GEWavyRippleLightShaderTest005
- * @tc.type: FUNC
- */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderTest005, TestSize.Level1)
-{
-    Drawing::GEWavyRippleLightShaderParams params{{0.8f, 0.3f}, 0.1f, 2.0f};
-    auto shader = GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    ASSERT_NE(shader, nullptr);
-
-    Drawing::Rect rect{0, 0, 100, 100};
-    shader->MakeDrawingShader(rect, 0.75f);
-    shader->GEWavyRippleLightShader::CreateWavyRippleLightShader(params);
-    ASSERT_NE(shader, nullptr);
+    auto builder1 = shader.GetWavyRippleLightBuilder();
+    EXPECT_NE(builder1, nullptr);
+    auto builder2 = shader.GetWavyRippleLightBuilder();
+    EXPECT_NE(builder2, nullptr);
 }
 
 /**
