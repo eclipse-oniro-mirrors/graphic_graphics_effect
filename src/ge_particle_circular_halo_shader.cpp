@@ -476,13 +476,13 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
 {
     const float currentNoise = particleCircularHaloParams_.noise_;
     // Helper lambdas to (re)build images
-    auto BuildParticleHalo = [&](std::shared_ptr<Drawing::Image>& out) {
+    auto BuildParticleHalo = [this, &canvas, &rect](std::shared_ptr<Drawing::Image>& out) {
         Drawing::ImageInfo imgInfo(rect.GetWidth(), rect.GetHeight(),
                                    Drawing::ColorType::COLORTYPE_RGBA_8888,
                                    Drawing::AlphaType::ALPHATYPE_OPAQUE);
         out = MakeParticleHaloShader(canvas, imgInfo);
     };
-    auto BuildGlowHalo = [&](std::shared_ptr<Drawing::Image>& out) {
+    auto BuildGlowHalo = [this, &canvas, &rect](std::shared_ptr<Drawing::Image>& out) {
         Drawing::ImageInfo imgInfo(rect.GetWidth(), rect.GetHeight(),
                                    Drawing::ColorType::COLORTYPE_RGBA_8888,
                                    Drawing::AlphaType::ALPHATYPE_OPAQUE);
@@ -490,7 +490,7 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
     };
     CacheDataType* cache = nullptr;
     // Cache exists & noise is unchanged: reuse cache
-    if (cacheAnyPtr_ && cacheAnyPtr_->has_value()) {
+    if (cacheAnyPtr_) {
         cache = std::any_cast<CacheDataType>(cacheAnyPtr_.get());
     }
 
