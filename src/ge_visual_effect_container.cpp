@@ -90,17 +90,17 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE, cachedImage);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
-+           vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
+            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
         }
     }
 }
 
-+void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
-+{
-+    for (auto vef : GetFilters()) {
-+        if (vef->GetName() == "HarmoniumEffect") {
-+            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS, cornerRadius);
-         }
+void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
+{
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == "HarmoniumEffect") {
+            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS, cornerRadius);
+        }
      }
  }
 

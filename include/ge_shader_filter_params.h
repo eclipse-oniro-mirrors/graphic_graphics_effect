@@ -304,7 +304,7 @@ struct GEHarmoniumEffectShaderParams {
     float refractionFactor = 0.f;
     std::shared_ptr<Drawing::Image> blurImage = nullptr;
     float blurLeft = 0.f;
-+   float blurTop = 0.f;
+    float blurTop = 0.f;
     float materialFactor = 0.f;
     float cornerRadius = 0.f;
 };
