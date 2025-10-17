@@ -1951,6 +1951,10 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->refractionFactor = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->materialFactor = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_BLURLEFT,
++            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurLeft = p; } },
++       { GE_SHADER_HARMONIUM_EFFECT_BLURTOP,
++            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurTop = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cornerRadius = p; } },
     };

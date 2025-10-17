@@ -81,7 +81,7 @@ void GEVisualEffectContainer::SetGeometry(const Drawing::Canvas& canvas, float g
 }
 
 void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
-    std::shared_ptr<Drawing::Image> cachedImage)
+    std::shared_ptr<Drawing::Image> cachedImage, float left, float top)
 {
     if (cachedImage == nullptr) {
         return;
@@ -89,9 +89,20 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
     for (auto vef : GetFilters()) {
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE, cachedImage);
+            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
++           vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
         }
     }
 }
+
++void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
++{
++    for (auto vef : GetFilters()) {
++        if (vef->GetName() == "HarmoniumEffect") {
++            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS, cornerRadius);
+         }
+     }
+ }
 
 void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
 {
