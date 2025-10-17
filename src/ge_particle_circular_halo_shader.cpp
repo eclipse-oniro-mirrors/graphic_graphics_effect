@@ -638,6 +638,10 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeParticleHaloSh
     auto singleParticleHaloShader = Drawing::ShaderEffect::CreateImageShader(
         *singleParticleHaloImg, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (singleParticleHaloShader == nullptr) {
+        GE_LOGE("GEParticleCircularHaloShader MakeParticleHaloShader singleParticleHaloShader is nullptr.");
+        return nullptr;
+    }
     particleHaloBuilder_->SetUniform("iResolution", width, height);
     particleHaloBuilder_->SetChild("singleParticleHalo", singleParticleHaloShader);
     auto particleHaloShader = particleHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
@@ -661,10 +665,17 @@ std::shared_ptr<Drawing::ShaderEffect> GEParticleCircularHaloShader::MakeParticl
     auto glowHaloShader =
         Drawing::ShaderEffect::CreateImageShader(*glowHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
                                                  Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (glowHaloShader == nullptr) {
+        GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader glowHaloShader is nullptr.");
+        return nullptr;
+    }
     auto particleHaloShader =
         Drawing::ShaderEffect::CreateImageShader(*particleHaloImg_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
                                                  Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-
+    if (particleHaloShader == nullptr) {
+        GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader particleHaloShader is nullptr.");
+        return nullptr;
+    }
     builder_ = GetParticleCircularHaloBuilder();
     if (builder_ == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::MakeParticleCircularHaloShader builder_ is nullptr.");
