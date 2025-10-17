@@ -490,7 +490,7 @@ void GEParticleCircularHaloShader::Preprocess(Drawing::Canvas& canvas, const Dra
     };
     CacheDataType* cache = nullptr;
     // Cache exists & noise is unchanged: reuse cache
-    if (cacheAnyPtr_) {
+    if (cacheAnyPtr_ && cacheAnyPtr_->has_value()) {
         cache = std::any_cast<CacheDataType>(cacheAnyPtr_.get());
     }
 
