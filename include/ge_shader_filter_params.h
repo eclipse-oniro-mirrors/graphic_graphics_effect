@@ -287,8 +287,8 @@ constexpr char GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR[] = "HarmoniumEffect_Dis
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR[] = "HarmoniumEffect_ReflectionFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFRACTIONFACTOR[] = "HarmoniumEffect_RefractionFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE[] = "HarmoniumEffect_BlurImage";
-+constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURLEFT[] = "HarmoniumEffect_BlurLeft";
-+constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURTOP[] = "HarmoniumEffect_BlurTop";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURLEFT[] = "HarmoniumEffect_BlurLeft";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURTOP[] = "HarmoniumEffect_BlurTop";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR[] = "HarmoniumEffect_MaterialFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS[] = "HarmoniumEffect_CornerRadius";
 
