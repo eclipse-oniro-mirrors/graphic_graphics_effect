@@ -41,7 +41,9 @@ public:
 
     void RemoveFilterWithType(int32_t typeToRemove);
 
-    void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage);
+    void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage, float left, float top);
+
+    void UpdateCornerRadius(float cornerRadius);
 
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
