@@ -60,6 +60,8 @@ private:
     std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> precalculationImg,
         std::shared_ptr<Drawing::Image> lightImg, std::shared_ptr<Drawing::Image> haloImg);
+    std::shared_ptr<Drawing::Image> BlurImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
+        std::shared_ptr<Drawing::Image> image, float blurRadius);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();

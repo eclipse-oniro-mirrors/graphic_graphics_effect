@@ -110,16 +110,9 @@ void GEContourDiagonalFlowLightShaderTest::SetUp()
     imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
         Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
     surface_ = CreateSurface();
-    if (surface_ == nullptr) {
-        GE_LOGE("Failed to create surface.");
-        return;
-    }
-
+    EXPECT_NE(surface_, nullptr);
     canvas_ = surface_->GetCanvas();
-    if (canvas_ == nullptr) {
-        GE_LOGE("Failed to get canvas from surface.");
-        return;
-    }
+    EXPECT_NE(canvas_, nullptr);
 }
 
 std::shared_ptr<Drawing::Surface> GEContourDiagonalFlowLightShaderTest::CreateSurface()
@@ -206,6 +199,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, MakeDrawingShader_001, TestSize.L
     params.haloWeight_ = 50.0f;
     params.contour_ = std::vector<Vector2f>(128, Vector2f(0.2f, 0.5f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.Preprocess(*canvas_, rect_);
     shader.MakeDrawingShader(rect_, progress);
     EXPECT_EQ(shader.GetDrawingShader(), nullptr); // No implementation of MakeDrawingShader
@@ -314,6 +308,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Preprocess_001, TestSize.Level1)
     params.haloWeight_ = 0.5f;
     params.contour_ = std::vector<Vector2f>(80, Vector2f(0.2f, 0.3f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -362,6 +358,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawShader_001, TestSize.Level1)
     params.haloWeight_ = 25.0f;
     params.contour_ = std::vector<Vector2f>(46, Vector2f(0.15f, 0.57f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.DrawShader(*canvas_, rect_);
@@ -395,9 +393,11 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_001, TestSize.L
     params.haloWeight_ = 15.0f;
     params.contour_ = std::vector<Vector2f>(98, Vector2f(0.45f, 0.88f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(canvas_, nullptr);
     auto img = shader.DrawRuntimeShader(*canvas_, rect_);
     EXPECT_EQ(img, nullptr); // cache is empty
 
+    EXPECT_NE(surface_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -430,6 +430,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawRuntimeShader_002, TestSize.L
     params.haloWeight_ = 15.0f;
     params.contour_ = std::vector<Vector2f>(98, Vector2f(0.45f, 0.88f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -489,9 +491,11 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, BlendImg_001, TestSize.Level1)
     std::shared_ptr<Drawing::Image> precalc = bmp.MakeImage();
     std::shared_ptr<Drawing::Image> light = bmp.MakeImage();
     std::shared_ptr<Drawing::Image> halo = bmp.MakeImage();
+    EXPECT_NE(canvas_, nullptr);
     auto image = shader.BlendImg(*canvas_, precalc, light, halo);
     EXPECT_EQ(image, nullptr); // cache is empty
 
+    EXPECT_NE(surface_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -641,6 +645,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateSurfaceAndCanvas_001, TestS
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.CreateSurfaceAndCanvas(*canvas_, rect_);
@@ -668,6 +674,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, PreCalculateRegion_001, TestSize.
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenCanvas_ = canvas_;
     size_t curvesInGrid = 4;
     std::vector<Drawing::Rect> rectArr;
@@ -679,6 +686,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, PreCalculateRegion_001, TestSize.
     for (size_t i = 0; i < curvesInGrid; i++) {
         shader.PreCalculateRegion(*canvas_, *(shader.offscreenCanvas_), i, rect_, rectArr[i]);
     }
+    EXPECT_NE(surface_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.Preprocess(*canvas_, rect_);
     auto img = shader.DrawRuntimeShader(*canvas_, rect_);
@@ -695,6 +703,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoPartitionCal_001, TestSize.Le
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.AutoPartitionCal(*canvas_, rect_);
@@ -727,6 +737,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_001, TestSize.L
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     float maxThickness = 0.05f;
@@ -770,6 +782,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, AutoGridPartition_002, TestSize.L
     }
     params.contour_ = std::move(contour);
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     float maxThickness = 0.05f;
@@ -793,6 +807,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ComputeAllCurveBoundingBoxes_001,
     std::vector<Box4f> curveBBoxes;
     Box4f canvasBBox;
     shader.ComputeAllCurveBoundingBoxes(100, 100, 0.05f, canvasBBox, curveBBoxes); // width, height, maxThickness
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -954,18 +970,18 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ProcessFinalGrid_002, TestSize.Le
 {
     auto params = InitializeParams();
     const int w = 200, h = 200;
-    const size_t K_L = 6;
-    const size_t K_R = 6;
+    const size_t kL = 6;
+    const size_t kR = 6;
     // create 2 sets of curves：left (x ≈ 0.10 ~ 0.12), right (x ≈ 0.85~0.87)，overlaps vertically
     std::vector<Vector2f> contour;
-    contour.reserve(2 * (K_L + K_R));
-    for (size_t i = 0; i < K_L; ++i) {
+    contour.reserve(2 * (kL + kR));
+    for (size_t i = 0; i < kL; ++i) {
         float y  = 0.30f + 0.02f * static_cast<float>(i); // 0.30~0.40
         float x0 = 0.10f, xc = 0.12f;
         contour.emplace_back(x0, y); // P0 (UV)
         contour.emplace_back(xc, y); // C (UV)
     }
-    for (size_t i = 0; i < K_R; ++i) {
+    for (size_t i = 0; i < kR; ++i) {
         float y  = 0.30f + 0.02f * static_cast<float>(i);
         float x0 = 0.85f, xc = 0.87f;
         contour.emplace_back(x0, y); // P0 (UV)
@@ -985,7 +1001,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ProcessFinalGrid_002, TestSize.Le
     shader.InitializeWorkQueue(rightCanvas, curveBBoxes, workQueue);
     ASSERT_FALSE(workQueue.empty());
     Grid current = workQueue.front();
-    EXPECT_EQ(current.curveIndices.size(), K_R + 1);
+    EXPECT_EQ(current.curveIndices.size(), kR + 1);
     EXPECT_LT(current.curveIndices.size(), static_cast<size_t>(shader.numCurves_));
     shader.ProcessFinalGrid(current, curveBBoxes, 100); // 100: height
     ASSERT_FALSE(shader.curvesInGrid_.empty());
@@ -1002,6 +1018,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateImg_001, TestSize.Level1)
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -1027,6 +1045,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, CreateDrawImg_001, TestSize.Level
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);
@@ -1073,6 +1093,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, LoopAllCurvesInBatches_001, TestS
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenCanvas_ = canvas_;
     size_t curvesInGrid = 4;
     std::vector<Drawing::Rect> rectArr;
@@ -1105,6 +1126,8 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, ConvertImage_001, TestSize.Level1
     auto params = InitializeParams();
     params.contour_ = std::vector<Vector2f>(166, Vector2f(0.27f, 0.65f));
     auto shader = GEContourDiagonalFlowLightShader(params);
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(canvas_, nullptr);
     shader.offscreenSurface_ = surface_;
     shader.offscreenCanvas_ = canvas_;
     shader.Preprocess(*canvas_, rect_);

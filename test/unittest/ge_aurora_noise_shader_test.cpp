@@ -53,7 +53,9 @@ void GEAuroraNoiseShaderTest::SetUp()
     imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
         Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
     surface_ = CreateSurface();
+    EXPECT_NE(surface_, nullptr);
     canvas_ = surface_->GetCanvas();
+    EXPECT_NE(canvas_, nullptr);
 }
 
 std::shared_ptr<Drawing::Surface> GEAuroraNoiseShaderTest::CreateSurface()
@@ -108,6 +110,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, MakeDrawingShader_001, TestSize.Level1)
 {
     Drawing::GEAuroraNoiseShaderParams params{0.5};
     auto shader = GEAuroraNoiseShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.Preprocess(*canvas_, rect_);
     EXPECT_NE(shader.verticalBlurImg_, nullptr);
     shader.MakeDrawingShader(rect_, 0.5f);
@@ -151,6 +154,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, Preprocess_001, TestSize.Level1)
 {
     GEAuroraNoiseShaderParams params{0.5};
     auto shader = GEAuroraNoiseShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.Preprocess(*canvas_, rect_);
     EXPECT_NE(shader.noiseImg_, nullptr);
     EXPECT_NE(shader.verticalBlurImg_, nullptr);
@@ -165,6 +169,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, MakeAuroraNoiseShader_001, TestSize.Level1)
 {
     Drawing::GEAuroraNoiseShaderParams params{0.2};
     auto shader = GEAuroraNoiseShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.Preprocess(*canvas_, rect_);
     EXPECT_NE(shader.verticalBlurImg_, nullptr);
     auto effect = shader.MakeAuroraNoiseShader(rect_);
@@ -181,6 +186,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, MakeAuroraNoiseShader_002, TestSize.Level1)
     Drawing::GEAuroraNoiseShaderParams params{0.7};
     auto shader = GEAuroraNoiseShader(params);
     Drawing::ImageInfo image1Info(100, 100, ColorType::COLORTYPE_RGBA_8888, AlphaType::ALPHATYPE_OPAQUE);
+    EXPECT_NE(canvas_, nullptr);
     auto image1 = shader.MakeAuroraNoiseGeneratorShader(*canvas_, image1Info);
     EXPECT_NE(image1, nullptr);
 
@@ -215,6 +221,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, MakeAuroraNoiseGeneratorShader_001, TestSize.L
     Drawing::GEAuroraNoiseShaderParams params{0.7};
     auto shader = GEAuroraNoiseShader(params);
     Drawing::ImageInfo imageInfo(50, 50, ColorType::COLORTYPE_RGBA_8888, AlphaType::ALPHATYPE_OPAQUE);
+    EXPECT_NE(canvas_, nullptr);
     auto image = shader.MakeAuroraNoiseGeneratorShader(*canvas_, imageInfo);
     EXPECT_NE(image, nullptr);
 }
@@ -228,6 +235,7 @@ HWTEST_F(GEAuroraNoiseShaderTest, MakeAuroraNoiseVerticalBlurShader_001, TestSiz
 {
     Drawing::GEAuroraNoiseShaderParams params{0.5};
     auto shader = GEAuroraNoiseShader(params);
+    EXPECT_NE(canvas_, nullptr);
     shader.Preprocess(*canvas_, rect_);
     EXPECT_NE(shader.noiseImg_, nullptr);
     Drawing::ImageInfo imageInfo(50, 50, ColorType::COLORTYPE_RGBA_8888, AlphaType::ALPHATYPE_PREMUL);
@@ -258,10 +266,10 @@ HWTEST_F(GEAuroraNoiseShaderTest, GetAuroraNoiseBuilder_001, TestSize.Level1)
 {
     Drawing::GEAuroraNoiseShaderParams params{1.0};
     auto shader = GEAuroraNoiseShader(params);
-    auto builder1 = shader.GetAuroraNoiseBuilder();
-    EXPECT_NE(builder1, nullptr);
-    auto builder2 = shader.GetAuroraNoiseBuilder();
-    EXPECT_NE(builder2, nullptr);
+    auto builder = shader.GetAuroraNoiseBuilder();
+    EXPECT_NE(builder, nullptr);
+    builder = shader.GetAuroraNoiseBuilder();
+    EXPECT_NE(builder, nullptr);
 }
 
 /**

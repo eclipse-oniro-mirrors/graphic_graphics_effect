@@ -38,11 +38,11 @@ public:
 };
 
 /**
- * @tc.name: GEWavyRippleLightShaderConstrunctor_001
+ * @tc.name: GEWavyRippleLightShaderConstructor_001
  * @tc.desc: Verify the constructor of GEWavyRippleLightShader
  * @tc.type: FUNC
  */
-HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderConstrunctor_001, TestSize.Level1)
+HWTEST_F(GEWavyRippleLightShaderTest, GEWavyRippleLightShaderConstructor_001, TestSize.Level1)
 {
     Drawing::GEWavyRippleLightShaderParams params{{0.0f, 0.2f}, 0.5f, 0.2f};
     auto shader = GEWavyRippleLightShader(params);
