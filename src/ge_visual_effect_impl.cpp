@@ -2095,7 +2095,7 @@ void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, float
         return;
     }
     if (tag == GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS) {
-        gasifyScaleTwistFilterParams_->progress_ = param;
+        gasifyScaleTwistFilterParams_->progress_ = std::clamp(param, 0.0f, 1.0f);
     }
 }
 
@@ -2105,7 +2105,8 @@ void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, const
         return;
     }
     if (tag == GE_FILTER_GASIFY_SCALE_TWIST_SCALE) {
-        gasifyScaleTwistFilterParams_->scale_ = param;
+        gasifyScaleTwistFilterParams_->scale_.first = std::max(param.first, 0.0f);
+        gasifyScaleTwistFilterParams_->scale_.second = std::max(param.second, 0.0f);
     }
 }
 
@@ -2128,7 +2129,7 @@ void GEVisualEffectImpl::SetGasifyBlurParams(const std::string& tag, float param
         return;
     }
     if (tag == GE_FILTER_GASIFY_BLUR_PROGRESS) {
-        gasifyBlurFilterParams_->progress_ = param;
+        gasifyBlurFilterParams_->progress_ = std::clamp(param, 0.0f, 1.0f);
     }
 }
 
@@ -2151,7 +2152,7 @@ void GEVisualEffectImpl::SetGasifyParams(const std::string& tag, float param)
         return;
     }
     if (tag == GE_FILTER_GASIFY_PROGRESS) {
-        gasifyFilterParams_->progress_ = param;
+        gasifyFilterParams_->progress_ = std::clamp(param, 0.0f, 1.0f);
     }
 }
 

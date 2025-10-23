@@ -75,6 +75,8 @@ public:
         Drawing::Brush& brush
     );
 
+    bool IsGasifyFilter();
+
     static void SetMesablurAllEnabledByCCM(bool flag);
 private:
     struct ShaderFilterEffectContext {
@@ -100,6 +102,7 @@ private:
     std::shared_ptr<GEShaderFilter> GenerateShaderKawaseBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
 
     static bool isMesablurAllEnable_;
+    bool isGasifyFilter_ = false;
     std::shared_ptr<GESDFShaderFilter> sdfShaderFilter_;
 };
 

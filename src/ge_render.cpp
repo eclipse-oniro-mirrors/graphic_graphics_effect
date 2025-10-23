@@ -302,6 +302,9 @@ void GERender::ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawin
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
     resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
     ve->SetCache(geShaderFilter->GetCache());
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
+        isGasifyFilter_ = true;
+    }
 }
 
 bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
@@ -680,6 +683,15 @@ std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<D
 void GERender::SetMesablurAllEnabledByCCM(bool flag)
 {
     isMesablurAllEnable_ = isMesablurAllEnable_ || flag;
+}
+
+bool GERender::IsGasifyFilter()
+{
+    if (isGasifyFilter_) {
+        isGasifyFilter_ = false;
+        return true;
+    }
+    return false;
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
