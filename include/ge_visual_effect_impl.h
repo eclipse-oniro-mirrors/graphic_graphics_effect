@@ -331,14 +331,24 @@ public:
         return pixelMapMaskParams_;
     }
 
-    void MakeHarmoniumEffectMaskParams()
+    void MakeImageMaskParams()
     {
-        harmoniumEffectMaskParams_ = std::make_shared<GEHarmoniumEffectMaskParams>();
+        imageMaskParams_ = std::make_shared<GEImageMaskParams>();
+    }
+ 
+    const std::shared_ptr<GEImageMaskParams>& GetImageMaskParams() const
+    {
+        return imageMaskParams_;
     }
 
-    const std::shared_ptr<GEHarmoniumEffectMaskParams>& GetHarmoniumEffectMaskParams() const
+    void MakeUseEffectMaskParams()
     {
-        return harmoniumEffectMaskParams_;
+        useEffectMaskParams_ = std::make_shared<GEUseEffectMaskParams>();
+    }
+ 
+    const std::shared_ptr<GEUseEffectMaskParams>& GetUseEffectMaskParams() const
+    {
+        return useEffectMaskParams_;
     }
 
     void MakeWaveGradientMaskParams()
@@ -584,7 +594,8 @@ private:
     Drawing::CanvasInfo canvasInfo_;
 
     // ShaderFilter Params
-    std::shared_ptr<GEHarmoniumEffectMaskParams> harmoniumEffectMaskParams_ = nullptr;
+    std::shared_ptr<GEImageMaskParams> imageMaskParams_ = nullptr;
+    std::shared_ptr<GEUseEffectMaskParams> useEffectMaskParams_ = nullptr;
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
     std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
     std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;

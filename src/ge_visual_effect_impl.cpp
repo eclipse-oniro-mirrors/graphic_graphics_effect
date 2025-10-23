@@ -236,10 +236,16 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakePixelMapMaskParams();
         }
     },
-    { GE_MASK_HARMONIUM_EFFECT,
+    { GE_MASK_IMAGE,
         [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK);
-            impl->MakeHarmoniumEffectMaskParams();
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::IMAGE_MASK);
+            impl->MakeImageMaskParams();
+        }
+    },
+    { GE_MASK_USE_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::USE_EFFECT_MASK);
+            impl->MakeUseEffectMaskParams();
         }
     },
     { GE_MASK_WAVE_GRADIENT,
@@ -477,6 +483,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             break;
         }
+        case FilterType::USE_EFFECT_MASK: {
+            if (useEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_USE_EFFECT_USE_EFFECT) {
+                useEffectMaskParams_->useEffect = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -667,12 +682,21 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             SetGasifyParams(tag, param);
             break;
         }
-        case FilterType::HARMONIUM_EFFECT_MASK: {
-            if (harmoniumEffectMaskParams_ == nullptr) {
+        case FilterType::IMAGE_MASK: {
+            if (imageMaskParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP) {
-                harmoniumEffectMaskParams_->image = param;
+            if (tag == GE_MASK_IMAGE_IMAGE) {
+                imageMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::USE_EFFECT_MASK: {
+            if (useEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_USE_EFFECT_PIXEL_MAP) {
+                useEffectMaskParams_->image = param;
             }
             break;
         }
@@ -997,13 +1021,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             if (harmoniumEffectParams_ == nullptr) {
                 return;
             }
-
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
                 harmoniumEffectParams_->mask = param;
             }
 
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK) {
                 harmoniumEffectParams_->maskClock = param;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK) {
+                harmoniumEffectParams_->useEffectMask = param;
             }
             break;
         }
@@ -1071,6 +1098,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             }
             if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
                 harmoniumEffectParams_->ripplePosition = param;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_POSRGB) {
+                harmoniumEffectParams_->posRGB = param;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_NEGRGB) {
+                harmoniumEffectParams_->negRGB = param;
             }
             break;
         }
@@ -1957,6 +1990,18 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurTop = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cornerRadius = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_RATE,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->rate = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_LIGHTUPDEGREE,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->lightUpDegree = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_CUBICCOEFF,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cubicCoeff = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_QUADCOEFF,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->quadCoeff = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_SATURATION,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->saturation = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_FRACTION,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->fraction = p; } },
     };
 
     auto it = actions.find(tag);

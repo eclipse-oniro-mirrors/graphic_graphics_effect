@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_use_effect_shader_mask.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -91,6 +92,18 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE, cachedImage);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
+            if (vef->GetImpl() == nullptr) {
+                continue;
+            }
+            std::shared_ptr<GEHarmoniumEffectShaderParams> params = vef->GetImpl()->GetHarmoniumEffectParams();
+            if (params->useEffectMask != nullptr) {
+                GEUseEffectMaskParams maskParam;
+                maskParam.useEffect = params->useEffectMask->GetUseEffect();
+                maskParam.image = cachedImage;
+                std::shared_ptr<GEUseEffectShaderMask> useeffectMask =
+                    std::make_shared<GEUseEffectShaderMask>(maskParam);
+                vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK, useeffectMask);
+            }
         }
     }
 }
