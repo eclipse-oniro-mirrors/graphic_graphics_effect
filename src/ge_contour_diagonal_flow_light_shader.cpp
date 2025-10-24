@@ -38,6 +38,7 @@ namespace Rosen {
 
 using CacheDataType = struct CacheData {
     std::shared_ptr<Drawing::Image> precalculationImg = nullptr;
+    std::shared_ptr<Drawing::Image> blurredSdfMaskImg = nullptr;
     uint32_t hash = 0;
     float blurRadius = 0.0f;
 };
@@ -709,6 +710,15 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     return std::make_shared<Drawing::RuntimeShaderBuilder>(convertShader);
 }
 
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlurImg(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect, std::shared_ptr<Drawing::Image> image, float blurRadius)
+{
+    Drawing::GEKawaseBlurShaderFilterParams blurImgParas{blurRadius};
+    std::shared_ptr<GEKawaseBlurShaderFilter> blurImgShader = std::make_shared<GEKawaseBlurShaderFilter>(blurImgParas);
+    blurImgShader->SetFactor(0.0f); // not need noise
+    return blurImgShader->ProcessImage(canvas, image, rect, rect);
+}
+
 void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     if (contourDiagonalFlowLightParams_.contour_.size() < MIN_NUM) {
@@ -752,6 +762,8 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
         auto cacheImg = offscreenSurface_->GetImageSnapshot();
         if (cacheImg) {
             cacheData.precalculationImg = cacheImg;
+            float sdfMaskBlurRadius = 10.0; // 10.0: blur radius for sdf mask in BlendImg
+            cacheData.blurredSdfMaskImg = BlurImg(canvas, rect, cacheImg, sdfMaskBlurRadius);
             cacheAnyPtr_ = std::make_shared<std::any>(std::make_any<CacheDataType>(cacheData));
         }
     }
@@ -1233,13 +1245,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
         GE_LOGE("GEContourDiagonalFlowLightShader BlendImg cache is nullptr.");
         return nullptr;
     }
-    auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).precalculationImg;
-    if (precalculationImage == nullptr) {
-        cacheAnyPtr_ = nullptr;
-        GE_LOGE("GEContourDiagonalFlowLightShader BlendImg cache img is nullptr.");
-        return nullptr;
-    }
-    auto precalculationImgShader = Drawing::ShaderEffect::CreateImageShader(*precalculationImage,
+    auto precalculationImgShader = Drawing::ShaderEffect::CreateImageShader(*precalculationImg,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     auto lightShader = Drawing::ShaderEffect::CreateImageShader(*lightImg, Drawing::TileMode::CLAMP,
@@ -1268,7 +1274,7 @@ void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader cache is nullptr.");
         return;
     }
-    auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).precalculationImg;
+    auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).blurredSdfMaskImg;
     if (precalculationImage == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader cache img is nullptr.");
         return;
@@ -1278,12 +1284,18 @@ void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader light img is nullptr.");
         return;
     }
+    float lightCoreBlurRadius = 3.0; // 3.0: blur radius for light core for anti-aliasing
+    auto blurredLightImg = BlurImg(canvas, rect, lightImg, lightCoreBlurRadius);
+    if (!blurredLightImg) {
+        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader blurredLightImg is nullptr.");
+        return;
+    }
     auto blurImg = blurShader_->ProcessImage(canvas, lightImg, rect, rect);
     if (!blurImg) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader halo img is nullptr.");
         return;
     }
-    auto resImg = BlendImg(canvas, precalculationImage, lightImg, blurImg);
+    auto resImg = BlendImg(canvas, precalculationImage, blurredLightImg, blurImg);
     if (!resImg) {
         GE_LOGE("GEContourDiagonalFlowLightShader DrawShader blendimg is nullptr.");
         return;
