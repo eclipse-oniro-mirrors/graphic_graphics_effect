@@ -140,7 +140,7 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_001, TestSize.Level0)
     visualEffect->SetParam(Drawing::GE_MASK_RIPPLE_CENTER, factor);
     veContainer.AddToChainedFilter(visualEffect);
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
-    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer, true), false);
+    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer), false);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_001 end";
 }

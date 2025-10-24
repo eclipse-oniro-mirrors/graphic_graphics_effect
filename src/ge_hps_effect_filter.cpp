@@ -113,7 +113,7 @@ bool IsGradientSupport(
     return linearGradientBlurParams->isRadiusGradient;
 }
 
-bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef, bool isMaterial)
+bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef)
 {
     auto ve = vef->GetImpl();
     auto veType = ve->GetFilterType();
@@ -129,21 +129,18 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
             const auto& linearGradientBlurParams = ve->GetLinearGradientBlurParams();
             return IsGradientSupport(linearGradientBlurParams);
         }
-        if (veType == Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR) {
-            return isMaterial;
-        }
         return true;
     }
     return false;
 }
 
-bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer, bool isMaterial)
+bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer)
 {
     if (!GetHpsEffectEnabled()) {
         return false;
     }
     for (const auto& vef : veContainer.GetFilters()) {
-        if (!IsEffectSupported(vef, isMaterial)) {
+        if (!IsEffectSupported(vef)) {
             return false;
         }
     }
@@ -163,7 +160,7 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
             const auto& mesaParams = visualEffectImpl->GetMESAParams();
             isBlur_ = true;
-            GenerateMesaBlurEffect(*mesaParams, src, dst);
+            GenerateMesaBlurEffect(*mesaParams, src, dst, image);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR: {
@@ -194,7 +191,7 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
 }
 
 void HpsEffectFilter::GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilterParams& params,
-    const Drawing::Rect& src, const Drawing::Rect& dst)
+    const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image)
 {
     float radius = params.radius;
     float greyCoefLow = params.greyCoef1;
@@ -210,6 +207,17 @@ void HpsEffectFilter::GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilt
     if (radius < 1e-6) {
         LOGE("HpsEffectFilter::GenerateVisualEffectFromGE MESA sigma is zero");
         return;
+    }
+
+    int imagewidth = image->GetWidth();
+    int imageHeight = image->GetHeight();
+    if (width > 0) {
+        offsetX = imagewidth * (offsetX / width);
+        offsetZ = imagewidth * (offsetZ / width);
+    }
+    if (height > 0) {
+        offsetY = imageHeight * (offsetY / height);
+        offsetW = imageHeight * (offsetW / height);
     }
 
     auto mesaParamPtr = std::make_shared<Drawing::HpsMesaParameter>(
@@ -331,6 +339,31 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
     return s_upscaleEffect;
 }
 
+std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetClampUpEffect() const
+{
+    static std::shared_ptr<Drawing::RuntimeEffect> s_clampUpEffect = [] {
+        static const std::string mixClampString(R"(
+        uniform shader blurredInput;
+        uniform float inColorFactor;
+
+        highp float random(float2 xy) {
+            float t = dot(xy, float2(78.233, 12.9898));
+            return fract(sin(t) * 43758.5453);
+        }
+        half4 main(float2 xy) {
+            highp float noiseGranularity = inColorFactor / 255.0;
+            half4 finalColor = blurredInput.eval(xy);
+            float noise = mix(-noiseGranularity, noiseGranularity, random(xy));
+            finalColor.rgb += noise;
+            finalColor.rgb = clamp(finalColor.rgb, vec3(0.0), vec3(1.0));
+            return finalColor;
+        }
+        )");
+        return Drawing::RuntimeEffect::CreateForShader(mixClampString);
+    }();
+    return s_clampUpEffect;
+}
+
 bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
     std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext)
 {
@@ -342,15 +375,15 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     const auto blurShader = Drawing::ShaderEffect::CreateImageShader(*imageCache, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, linear, upscale_matrix_);
     auto upscaleEffect = GetUpscaleEffect();
-    if (upscaleEffect == nullptr) {
+    auto clampUpEffect = GetClampUpEffect();
+    if (upscaleEffect == nullptr || clampUpEffect == nullptr) {
         return false;
     }
     Drawing::Brush brush;
     float factor = GetHpsEffectBlurNoiseFactor();
-    LOGD("HpsEffectFilter::DrawImageWithHps HpsNoise %{public}f", factor);
     static constexpr float epsilon = 0.1f;
     if (!ROSEN_LE(factor, epsilon)) {
-        Drawing::RuntimeShaderBuilder mixBuilder(upscaleEffect);
+        Drawing::RuntimeShaderBuilder mixBuilder(needClampFilter_ ? clampUpEffect : upscaleEffect);
         mixBuilder.SetChild("blurredInput", blurShader);
         mixBuilder.SetUniform("inColorFactor", factor);
         brush.SetShaderEffect(mixBuilder.MakeShader(nullptr, imageCache->IsOpaque()));
@@ -438,6 +471,7 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
         LOGE("HpsEffectFilter::ApplyHpsEffect image size is zero");
         return false;
     }
+    needClampFilter_ = ((imageInfo.GetColorType() == Drawing::ColorType::COLORTYPE_RGBA_F16) ? false : true);
     if (isBlur_) {
         isBlur_ = false;
         return ApplyHpsSmallCanvas(canvas, image, outImage, hpsContext);
