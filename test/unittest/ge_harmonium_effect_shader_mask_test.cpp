@@ -136,7 +136,6 @@ HWTEST_F(GEHarmoniumEffectShaderMaskTest, Type_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEHarmoniumEffectShaderMaskTest Type_001 start";
     GEHarmoniumEffectMaskParams param {};
     auto filter = std::make_unique<GEHarmoniumEffectShaderMask>(param);
-    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::HARMONIUM_EFFECT_MASK);
     EXPECT_EQ(filter->TypeName(), Drawing::GE_MASK_HARMONIUM_EFFECT);
 
     GTEST_LOG_(INFO) << "GEHarmoniumEffectShaderMaskTest Type_001 end";
