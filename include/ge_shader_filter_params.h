@@ -279,6 +279,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilterParam
 constexpr char GE_SHADER_HARMONIUM_EFFECT[] = "HarmoniumEffect";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASK[] = "HarmoniumEffect_Mask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK[] = "HarmoniumEffect_MaskClock";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK[] = "HarmoniumEffect_UseEffectMask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_TINTCOLOR[] = "HarmoniumEffect_TintColor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION[] = "HarmoniumEffect_RipplePosition";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_RIPPLEPROGRESS[] = "HarmoniumEffect_RippleProgress";
@@ -291,10 +292,19 @@ constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURLEFT[] = "HarmoniumEffect_BlurLeft
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURTOP[] = "HarmoniumEffect_BlurTop";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR[] = "HarmoniumEffect_MaterialFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS[] = "HarmoniumEffect_CornerRadius";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_RATE[] = "HarmoniumEffect_Rate";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_LIGHTUPDEGREE[] = "HarmoniumEffect_LightUpDegree";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_CUBICCOEFF[] = "HarmoniumEffect_CubicCoeff";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_QUADCOEFF[] = "HarmoniumEffect_QuadCoeff";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_SATURATION[] = "HarmoniumEffect_Saturation";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_POSRGB[] = "HarmoniumEffect_PosRGB";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_NEGRGB[] = "HarmoniumEffect_NegRGB";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_FRACTION[] = "HarmoniumEffect_Fraction";
 
 struct GEHarmoniumEffectShaderParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     std::shared_ptr<GEShaderMask> maskClock = nullptr;
+    std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
     Vector4f tintColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector3f ripplePosition = Vector3f(0.0f, 0.0f, 0.0f);
     float rippleProgress = 0.f;
@@ -307,13 +317,30 @@ struct GEHarmoniumEffectShaderParams {
     float blurTop = 0.f;
     float materialFactor = 0.f;
     float cornerRadius = 0.f;
+    float rate = 0.f;
+    float lightUpDegree = 0.f;
+    float cubicCoeff = 0.f;
+    float quadCoeff = 0.f;
+    float saturation = 0.f;
+    Vector3f posRGB = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f negRGB = Vector3f(0.0f, 0.0f, 0.0f);
+    float fraction = 1.f; // 1 means default value
 };
 
-constexpr char GE_MASK_HARMONIUM_EFFECT[] = "HarmoniumEffectMask";
-constexpr char GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP[] = "HarmoniumEffectMask_Image";
-struct GEHarmoniumEffectMaskParams {
+constexpr char GE_MASK_USE_EFFECT[] = "UseEffectMask";
+constexpr char GE_MASK_USE_EFFECT_PIXEL_MAP[] = "UseEffectMask_Image";
+constexpr char GE_MASK_USE_EFFECT_USE_EFFECT[] = "UseEffectMask_UseEffect";
+struct GEUseEffectMaskParams {
+    std::shared_ptr<Drawing::Image> image = nullptr;
+    bool useEffect = false;
+};
+
+constexpr char GE_MASK_IMAGE[] = "ImageMask";
+constexpr char GE_MASK_IMAGE_IMAGE[] = "ImageMask_Image";
+struct GEImageMaskParams {
     std::shared_ptr<Drawing::Image> image = nullptr;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(IMAGE_MASK, GEImageMaskParams, GE_MASK_IMAGE);
 
 constexpr char GE_FILTER_EDGE_LIGHT[] = "EdgeLight";
 constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "EdgeLight_Alpha";

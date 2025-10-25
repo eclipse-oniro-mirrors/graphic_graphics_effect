@@ -40,6 +40,11 @@ public:
         return nullptr;
     }
 
+    virtual bool GetUseEffect() const
+    {
+        return false;
+    }
+
 };
 } // namespace Drawing
 } // namespace Rosen

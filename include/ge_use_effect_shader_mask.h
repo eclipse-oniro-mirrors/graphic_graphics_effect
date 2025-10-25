@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef GRAPHICS_EFFECT_GE_HARMONIUM_EFFECT_SHADER_MASK_H
-#define GRAPHICS_EFFECT_GE_HARMONIUM_EFFECT_SHADER_MASK_H
-
+ 
+#ifndef GRAPHICS_EFFECT_GE_USE_EFFECT_SHADER_MASK_H
+#define GRAPHICS_EFFECT_GE_USE_EFFECT_SHADER_MASK_H
+ 
 #include "common/rs_vector4.h"
+#include "ge_log.h"
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
 #include "image/image.h"
@@ -24,26 +25,35 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-class GE_EXPORT GEHarmoniumEffectShaderMask : public GEShaderMask {
+class GE_EXPORT GEUseEffectShaderMask : public GEShaderMask {
 public:
-    GEHarmoniumEffectShaderMask(const GEHarmoniumEffectMaskParams& param) : param_(param) {}
-    GEHarmoniumEffectShaderMask(const GEHarmoniumEffectShaderMask&) = delete;
-    virtual ~GEHarmoniumEffectShaderMask() = default;
-
+    GEUseEffectShaderMask(const GEUseEffectMaskParams& param) : param_(param) {}
+    GEUseEffectShaderMask(const GEUseEffectShaderMask&) = delete;
+    virtual ~GEUseEffectShaderMask() = default;
+ 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     std::shared_ptr<Drawing::Image> GetImage() const override
     {
+        if (!param_.useEffect) {
+            LOGE("GEUseEffectShaderMask::GetImage failed.");
+            return nullptr;
+        }
         return param_.image;
+    }
+
+    bool GetUseEffect() const override
+    {
+        return param_.useEffect;
     }
 
 private:
     bool IsValid() const;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetHarmoniumEffectShaderMaskBuilder() const;
-    GEHarmoniumEffectMaskParams param_;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetUseEffectShaderMaskBuilder() const;
+    GEUseEffectMaskParams param_;
 };
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
-
+ 
 #endif
