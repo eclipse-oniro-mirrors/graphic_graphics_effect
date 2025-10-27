@@ -547,11 +547,6 @@ static constexpr char BLEND_IMG_PROG[] = R"(
     uniform float blurRadius;
     uniform float headRoom;
 
-    float DecodeFloat(vec2 rg)
-    {
-        return rg.x + rg.y / 255.0; // 255.0 = maximum value representable in 8-bit channel
-    }
-
     vec4 main(vec2 fragCoord)
     {
         vec4 c1 = image1.eval(fragCoord).rgba;
