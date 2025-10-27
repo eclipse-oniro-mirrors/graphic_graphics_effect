@@ -152,13 +152,13 @@ static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
     // ===== Constant =====
     const float INF = 1e10; // infinity, i.e., 1.0 / 0.0
     const float SQRT3 = 1.7320508;
-    
+
     // ===== Vector Math Utilities =====
     float Cross2(vec2 a, vec2 b) { return a.x * b.y - a.y * b.x; }
     float SaturateFloat(float a) { return clamp(a, 0.0, 1.0); }
     vec3 SaturateVec3(vec3 a) { return clamp(a, 0.0, 1.0); }
     float AbsMin(float a, float b) { return abs(a) < abs(b) ? a : b; }
-    
+
     vec2 GetElement(vec2 arr[capacity], int index)
     {
         for (int i = 0; i < capacity; ++i) {
@@ -166,18 +166,18 @@ static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
         }
         return vec2(0.0);
     }
-    
+
     vec2 Bezier(vec2 pointA, vec2 pointB, vec2 pointC, float t)
     {
         return pointA + t * (-2.0 * pointA + 2.0 * pointB) + t * t * (pointA - 2.0 * pointB + pointC);
     }
-    
+
     float SdfLine(vec2 p, vec2 a, vec2 b)
     {
         float h = SaturateFloat(dot(p - a, b - a) / dot(b - a, b - a));
         return length(p - a - h * (b - a));
     }
-    
+
     float SdfLinePartition(vec2 p, vec2 a, vec2 b, inout vec2 closestPoint, inout float bestTLocal)
     {
         vec2 ba = b - a;
@@ -189,7 +189,7 @@ static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
         vec2 n = vec2(ba.y, -ba.x);
         return (dot(k, n) >= 0.0) ? length(k) : -length(k);
     }
-    
+
     float SdfBezier(vec2 pos, vec2 pointA, vec2 pointB, vec2 pointC,
         inout vec2 closestPoint, inout float bestTLocal)
     {
@@ -250,13 +250,13 @@ static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
         bestTLocal = bestT;
         return (sgn > 0.0 ? 1.0 : -1.0) * sqrt(res);
     }
-    
+
     // ================= SDF Polygon =================
     float SdfControlSegment(vec2 p, vec2 pointA, vec2 pointB, vec2 pointC)
     {
         return AbsMin(SdfLine(p, pointA, pointB), SdfLine(p, pointB, pointC));
     }
-    
+
     float SdfControlPolygon(vec2 p, vec2 controlPoly[capacity], int size,
         inout vec2 closest[3], inout float closestSegmentIndex)
     {
@@ -554,19 +554,34 @@ static constexpr char BLEND_IMG_PROG[] = R"(
 
     vec4 main(vec2 fragCoord)
     {
-        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg) * 3.0; // 3.0: decode the sdf
         vec4 c1 = image1.eval(fragCoord).rgba;
         vec4 c2 = image2.eval(fragCoord).rgba;
         float totalWeight = (lightWeight + haloWeight < 1e-5) ? 1.0 : lightWeight + haloWeight;
-        float contourWeight = exp(-sdf * 20.0); // 20.0: the greater, the thinner core
+        float contourWeight = precalculationImage.eval(fragCoord).r;
         contourWeight *= blurRadius / 50.0; // 50.0: default blur radius
-        if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard the transparent pixels
-            contourWeight = 0.0;
-        }
         vec4 blendColor = c1 + c2 * haloWeight * haloWeight / (totalWeight * lightWeight) * contourWeight;
         vec4 lnValue = log(blendColor + vec4(1.0, 1.0, 1.0, 1.0));
         vec4 c_out = max(2.0, headRoom) * 2.0 * lnValue / (lnValue + 1);
         return vec4(c_out.rgb, clamp(c_out.a, 0.0, 1.0));
+    }
+)";
+
+static constexpr char SDF_MASK_PROG[] = R"(
+    uniform shader precalculationImage;
+
+    float DecodeFloat(vec2 rg)
+    {
+        return rg.x + rg.y / 255.0; // 255.0 = maximum value representable in 8-bit channel
+    }
+
+    vec4 main(vec2 fragCoord)
+    {
+        float sdf = DecodeFloat(precalculationImage.eval(fragCoord).rg) * 3.0; // 3.0: decode the sdf
+        float contourWeight = exp(-sdf * 20.0); // 20.0: the greater, the thinner core
+        if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard the transparent pixels
+            contourWeight = 0.0;
+        }
+        return vec4(contourWeight, 0.0, 0.0, 1.0);
     }
 )";
 
@@ -622,6 +637,7 @@ std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int 
     if (height < 1 || width < 1 || uvPoints.empty()) {
         return {};
     }
+
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(uvPoints.size());
     float aspect = static_cast<float>(width) / static_cast<float>(height);
@@ -638,6 +654,7 @@ std::vector<Vector2f> ConvertUVToNDC(const std::vector<Vector2f>& uvPoints, int 
 void ConvertPointsTo(const std::vector<Vector2f>& in, std::vector<float>& out)
 {
     out.clear();
+
     for (auto& p : in) {
         out.push_back(p[0]);
         out.push_back(p[1]);
@@ -710,6 +727,21 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     return std::make_shared<Drawing::RuntimeShaderBuilder>(convertShader);
 }
 
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader::SdfMaskBuilder()
+{
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfMaskShader = nullptr;
+
+    if (sdfMaskShader == nullptr) {
+        sdfMaskShader = Drawing::RuntimeEffect::CreateForShader(SDF_MASK_PROG);
+    }
+
+    if (sdfMaskShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader convertShader is nullptr.");
+        return nullptr;
+    }
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(sdfMaskShader);
+}
+
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlurImg(Drawing::Canvas& canvas,
     const Drawing::Rect& rect, std::shared_ptr<Drawing::Image> image, float blurRadius)
 {
@@ -762,8 +794,11 @@ void GEContourDiagonalFlowLightShader::Preprocess(Drawing::Canvas& canvas, const
         auto cacheImg = offscreenSurface_->GetImageSnapshot();
         if (cacheImg) {
             cacheData.precalculationImg = cacheImg;
-            float sdfMaskBlurRadius = 10.0; // 10.0: blur radius for sdf mask in BlendImg
-            cacheData.blurredSdfMaskImg = BlurImg(canvas, rect, cacheImg, sdfMaskBlurRadius);
+            auto sdfMaskImg = CreateSdfMaskImg(canvas, cacheImg);
+            if (sdfMaskImg) {
+                float sdfMaskBlurRadius = 10.0; // 10.0: blur radius for sdf mask in BlendImg
+                cacheData.blurredSdfMaskImg = BlurImg(canvas, rect, sdfMaskImg, sdfMaskBlurRadius);
+            }
             cacheAnyPtr_ = std::make_shared<std::any>(std::make_any<CacheDataType>(cacheData));
         }
     }
@@ -965,7 +1000,6 @@ void GEContourDiagonalFlowLightShader::ProcessFinalGrid(
     Grid& current, const std::vector<Box4f>& curveBBoxes, int height)
 {
     Grid processedGrid = current;
-
     std::vector<float> gridCurves;
     std::vector<float> inOrderSeg;
     constexpr int slidingWindowLen = 4; // curve 3 point(6 value), slidingWindowLen is 4
@@ -1221,6 +1255,32 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateDrawImg(
     offscreenCanvas->DrawRect(Drawing::Rect{0, 0, rect.GetWidth(), rect.GetHeight()});
     offscreenCanvas->DetachBrush();
     return offscreenSurface->GetImageSnapshot();
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateSdfMaskImg(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::Image> precalculationImg)
+{
+    if (precalculationImg == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSdfMaskImg:invalid precalculation result.");
+        return nullptr;
+    }
+    auto sdfMaskBuilder = SdfMaskBuilder();
+    if (sdfMaskBuilder == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSdfMaskImg sdfMaskBuilder is nullptr.");
+        return nullptr;
+    }
+    Drawing::Matrix matrix;
+    auto sdfImgShader = Drawing::ShaderEffect::CreateImageShader(*precalculationImg,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR),
+        matrix);
+    if (sdfImgShader == nullptr) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSdfMaskImg sdfImgShader is nullptr.");
+        return nullptr;
+    }
+    auto imageInfo = precalculationImg->GetImageInfo();
+    sdfMaskBuilder->SetChild("precalculationImage", sdfImgShader);
+    auto sdfMaskShader = sdfMaskBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    return sdfMaskShader;
 }
 
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawing::Canvas& canvas,
