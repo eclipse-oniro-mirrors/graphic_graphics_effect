@@ -846,6 +846,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             break;
         }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
+                harmoniumEffectParams_->ripplePosition = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -895,15 +904,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<floa
             }
             if (tag == GE_MASK_RADIAL_GRADIENT_POSITIONS) {
                 radialGradientMaskParams_->positions_ = param;
-            }
-            break;
-        }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
-                harmoniumEffectParams_->ripplePosition = param;
             }
             break;
         }
