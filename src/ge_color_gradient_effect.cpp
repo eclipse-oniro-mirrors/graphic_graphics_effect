@@ -18,6 +18,7 @@
 #include <cmath>
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -96,8 +97,6 @@ const std::string COLOR_GRADIENT_SHADER_COMMN(
 
     half4 interpolate(in half2 uv)
     {
-        half2 p = 1.0 / iResolution.xy;
-        float dist0 = distance(p, half2(0.0, 0.0));
         float weights[NUM_COLORS];
         float weightSum = 0.0;
 
@@ -200,8 +199,26 @@ void GEColorGradientEffect::MakeColorGradientEffectWithMask()
     }
 }
 
+float GEColorGradientEffect::CalculateCompressRatio()
+{
+    // Do tone mapping when enable edr effect
+    if (!GEToneMappingHelper::NeedToneMapping(supportHeadroom_)) {
+        return 1.0f;
+    }
+    float highColor = 1.0f;
+    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
+        float maxRgb = std::max(std::max(colors_[indexColors].redF_, colors_[indexColors].greenF_),
+            colors_[indexColors].blueF_);
+        if (ROSEN_GNE(maxRgb, highColor)) {
+            highColor = maxRgb;
+        }
+    }
+    return GEToneMappingHelper::GetBrightnessMapping(supportHeadroom_, highColor) / highColor;
+}
+
 void GEColorGradientEffect::CalculateBlenderCol()
 {
+    float ratio = CalculateCompressRatio();
     for (int i = 0; i < paramColorSize_; i++) {
         std::vector<float> weights(paramColorSize_, 0.0f);
         float weightSum = 0.0f;
@@ -215,9 +232,9 @@ void GEColorGradientEffect::CalculateBlenderCol()
         Drawing::Color4f mixedColor = {0.0, 0.0, 0.0, 0.0};
         for (int k = 0; k < paramColorSize_; k++) {
             weights[k] /= weightSum;
-            mixedColor.redF_ += colors_[k].redF_ * weights[k];
-            mixedColor.greenF_ += colors_[k].greenF_ * weights[k];
-            mixedColor.blueF_ += colors_[k].blueF_ * weights[k];
+            mixedColor.redF_ += ratio * colors_[k].redF_ * weights[k];
+            mixedColor.greenF_ += ratio * colors_[k].greenF_ * weights[k];
+            mixedColor.blueF_ += ratio * colors_[k].blueF_ * weights[k];
             mixedColor.alphaF_ += colors_[k].alphaF_ * weights[k];
         }
         blend_colors_[i] = mixedColor;
@@ -239,10 +256,10 @@ bool GEColorGradientEffect::IsValidParam(float width, float height)
     bool isCreated = false;
     if (mask_) {
         MakeColorGradientEffectWithMask();
-        isCreated = colorGradientShaderEffect_ != nullptr;
+        isCreated = colorGradientShaderEffectHasMask_ != nullptr;
     } else {
         MakeColorGradientEffect();
-        isCreated = colorGradientShaderEffectHasMask_ != nullptr;
+        isCreated = colorGradientShaderEffect_ != nullptr;
     }
     return isCreated;
 }
@@ -253,15 +270,15 @@ void GEColorGradientEffect::SetUniform(float width, float height)
         std::make_shared<Drawing::RuntimeShaderBuilder>(colorGradientShaderEffectHasMask_);
     builder_->SetUniform("iResolution", width, height);
     CalculateBlenderCol();
-    std::vector<float> blendeColorArray(GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL, 0.0f);
+    std::vector<float> blendColorArray(GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL, 0.0f);
     for (int i = 0; i < paramColorSize_; i++) {
-        blendeColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_R_CHANNEL] = blend_colors_[i].redF_;
-        blendeColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_G_CHANNEL] = blend_colors_[i].greenF_;
-        blendeColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_B_CHANNEL] = blend_colors_[i].blueF_;
-        blendeColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_A_CHANNEL] = blend_colors_[i].alphaF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_R_CHANNEL] = blend_colors_[i].redF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_G_CHANNEL] = blend_colors_[i].greenF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_B_CHANNEL] = blend_colors_[i].blueF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_A_CHANNEL] = blend_colors_[i].alphaF_;
     }
 
-    float* blendColorArrayPtr = blendeColorArray.data();
+    float* blendColorArrayPtr = blendColorArray.data();
     builder_->SetUniform("blend_c", blendColorArrayPtr, GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL);
 
     std::vector<float> positionArray(GRADIENT_ARRAY_NUM * GRADIENT_POSITION_CHANNEL);

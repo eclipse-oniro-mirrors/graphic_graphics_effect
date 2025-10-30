@@ -43,6 +43,7 @@ private:
     void CalculateBlenderCol();
     bool IsValidParam(float width, float height);
     void SetUniform(float width, float height);
+    float CalculateCompressRatio();
 
     std::vector<Drawing::Color4f> colors_;
     std::vector<Drawing::Color4f> blend_colors_;
