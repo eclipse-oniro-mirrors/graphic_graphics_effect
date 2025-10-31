@@ -846,6 +846,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             break;
         }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
+                harmoniumEffectParams_->ripplePosition = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1095,9 +1104,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         case FilterType::HARMONIUM_EFFECT: {
             if (harmoniumEffectParams_ == nullptr) {
                 return;
-            }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
-                harmoniumEffectParams_->ripplePosition = param;
             }
             if (tag == GE_SHADER_HARMONIUM_EFFECT_POSRGB) {
                 harmoniumEffectParams_->posRGB = param;

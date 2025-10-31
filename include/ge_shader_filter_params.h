@@ -306,7 +306,7 @@ struct GEHarmoniumEffectShaderParams {
     std::shared_ptr<GEShaderMask> maskClock = nullptr;
     std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
     Vector4f tintColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector3f ripplePosition = Vector3f(0.0f, 0.0f, 0.0f);
+    std::vector<Vector2f> ripplePosition = {};
     float rippleProgress = 0.f;
     float distortProgress = 0.f;
     float distortFactor = 0.f;
