@@ -45,9 +45,16 @@ std::shared_ptr<Drawing::Image> GEWaterRippleFilter::OnProcessImage(Drawing::Can
         return nullptr;
     }
  
-    Drawing::Matrix matrix;
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
+    Drawing::Matrix invertMatrix;
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEWaterRippleFilter::ProcessImage Invert matrix failed");
+        return image;
+    }
+
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     auto imageInfo = image->GetImageInfo();
     float height = imageInfo.GetHeight();
     float width = imageInfo.GetWidth();
@@ -61,14 +68,14 @@ std::shared_ptr<Drawing::Image> GEWaterRippleFilter::OnProcessImage(Drawing::Can
     }
     Drawing::RuntimeShaderBuilder builder(waterRipple);
     builder.SetChild("image", shader);
-    builder.SetUniform("iResolution", width, height);
+    builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     builder.SetUniform("progress", progress_);
     builder.SetUniform("waveCount", static_cast<float>(waveCount_));
     builder.SetUniform("rippleCenter", rippleCenterX_, rippleCenterY_);
 #ifdef RS_ENABLE_GPU
-    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
 #else
-    auto invertedImage = builder.MakeImage(nullptr, nullptr, imageInfo, false);
+    auto invertedImage = builder.MakeImage(nullptr, &(matrix), imageInfo, false);
 #endif
     if (invertedImage == nullptr) {
         LOGE("GEWaterRippleFilter::OnProcessImage make image failed");
