@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_union_op_shader_mask.h"
+#include "sdf/ge_sdf_union_op_shader_shape.h"
 #include "utils/ge_trace.h"
 #include "ge_log.h"
 
@@ -21,16 +21,16 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-void GESDFUnionOpShaderMask::CopyState(const GESDFUnionOpShaderMask& mask)
+void GESDFUnionOpShaderShape::CopyState(const GESDFUnionOpShaderShape& shape)
 {
-    params_.spacing = mask.params_.spacing;
-    params_.op = mask.params_.op;
+    params_.spacing = shape.params_.spacing;
+    params_.op = shape.params_.op;
     if (params_.left) {
-        params_.left->CopyState(*static_cast<const GESDFShaderMask*>(mask.params_.left.get()));
+        params_.left->CopyState(*static_cast<const GESDFShaderShape*>(shape.params_.left.get()));
     }
 
     if (params_.right) {
-        params_.right->CopyState(*static_cast<const GESDFShaderMask*>(mask.params_.right.get()));
+        params_.right->CopyState(*static_cast<const GESDFShaderShape*>(shape.params_.right.get()));
     }
 }
 

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_SHADER_MASK_H
-#define GRAPHICS_EFFECT_GE_SHADER_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_SHADER_SHAPE_H
+#define GRAPHICS_EFFECT_GE_SHADER_SHAPE_H
  
 #include "draw/canvas.h"
 #include "ge_common.h"
@@ -25,27 +25,16 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-class GE_EXPORT GEShaderMask : public Drawing::IGEFilterType {
+class GE_EXPORT GEShaderShape : public Drawing::IGEFilterType {
 public:
-    GEShaderMask() = default;
-    GEShaderMask(const GEShaderMask&) = delete;
-    virtual ~GEShaderMask() = default;
+    GEShaderShape() = default;
+    GEShaderShape(const GEShaderShape&) = delete;
+    virtual ~GEShaderShape() = default;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
-
-    virtual std::shared_ptr<Drawing::Image> GetImage() const
-    {
-        return nullptr;
-    }
-
-    virtual bool GetUseEffect() const
-    {
-        return false;
-    }
-
 };
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
  
-#endif // GRAPHICS_EFFECT_GE_SHADER_MASK_H
+#endif // GRAPHICS_EFFECT_GE_SHADER_SHAPE_H

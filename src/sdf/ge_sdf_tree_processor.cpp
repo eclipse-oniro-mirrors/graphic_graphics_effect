@@ -18,7 +18,7 @@
 #include "ge_log.h"
 
 namespace OHOS::Rosen::Drawing {
-    GESDFTreeProcessor::GESDFTreeProcessor(const GESDFFilterParams& params) : sdfMask_(params.mask)
+    GESDFTreeProcessor::GESDFTreeProcessor(const GESDFFilterParams& params) : sdfShape_(params.shape)
     {
         if (params.border) {
             const auto& border = params.border.value();
@@ -35,13 +35,13 @@ namespace OHOS::Rosen::Drawing {
 
     std::string GESDFTreeProcessor::Process()
     {
-        if (!sdfMask_) {
-            GE_LOGE("GESDFTreeProcessor::Process mask is null.");
+        if (!sdfShape_) {
+            GE_LOGE("GESDFTreeProcessor::Process shape is null.");
             return "";
         }
         
         if (shaderCode_.empty()) {
-            Process(sdfMask_);
+            Process(sdfShape_);
 
             constexpr std::string_view mainFunctionCodeStart = R"(
 
@@ -71,7 +71,7 @@ namespace OHOS::Rosen::Drawing {
                 }
             )";
 
-            const auto returnNodeId = reinterpret_cast<size_t>(sdfMask_.get());
+            const auto returnNodeId = reinterpret_cast<size_t>(sdfShape_.get());
             const std::string returnCode = "return var_" + std::to_string(returnNodeId) + ";";
 
             shaderCode_ += headers_;
@@ -109,52 +109,52 @@ namespace OHOS::Rosen::Drawing {
         return shaderCode_;
     }
 
-    void GESDFTreeProcessor::Process(const std::shared_ptr<GESDFShaderMask> sdfMask)
+    void GESDFTreeProcessor::Process(const std::shared_ptr<GESDFShaderShape> sdfShape)
     {
-        if (!sdfMask) {
+        if (!sdfShape) {
             return;
         }
 
-        const auto type = sdfMask->GetSDFMaskType();
-        if (type == GESDFMaskType::RRECT) {
-            auto rrectMask = std::static_pointer_cast<GESDFRRectShaderMask>(sdfMask);
-            Process(*rrectMask);
-        } else if (type == GESDFMaskType::UNION_OP) {
-            auto unionMask = std::static_pointer_cast<GESDFUnionOpShaderMask>(sdfMask);
-            Process(*unionMask);
+        const auto type = sdfShape->GetSDFShapeType();
+        if (type == GESDFShapeType::RRECT) {
+            auto rrectShape = std::static_pointer_cast<GESDFRRectShaderShape>(sdfShape);
+            Process(*rrectShape);
+        } else if (type == GESDFShapeType::UNION_OP) {
+            auto unionShape = std::static_pointer_cast<GESDFUnionOpShaderShape>(sdfShape);
+            Process(*unionShape);
         } else {
-            GE_LOGE("GESDFTreeProcessor::Process undefined sdf mask type");
+            GE_LOGE("GESDFTreeProcessor::Process undefined sdf shape type");
         }
     }
 
     void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
-        const std::shared_ptr<GESDFShaderMask> sdfMask)
+        const std::shared_ptr<GESDFShaderShape> sdfShape)
     {
-        if (!sdfMask) {
+        if (!sdfShape) {
             return;
         }
 
-        const auto type = sdfMask->GetSDFMaskType();
-        if (type == GESDFMaskType::RRECT) {
-            auto rrectMask = std::static_pointer_cast<GESDFRRectShaderMask>(sdfMask);
-            UpdateUniformDatas(builder, *rrectMask);
-        } else if (type == GESDFMaskType::UNION_OP) {
-            auto unionMask = std::static_pointer_cast<GESDFUnionOpShaderMask>(sdfMask);
-            UpdateUniformDatas(builder, *unionMask);
+        const auto type = sdfShape->GetSDFShapeType();
+        if (type == GESDFShapeType::RRECT) {
+            auto rrectShape = std::static_pointer_cast<GESDFRRectShaderShape>(sdfShape);
+            UpdateUniformDatas(builder, *rrectShape);
+        } else if (type == GESDFShapeType::UNION_OP) {
+            auto unionShape = std::static_pointer_cast<GESDFUnionOpShaderShape>(sdfShape);
+            UpdateUniformDatas(builder, *unionShape);
         } else {
-            GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas undefined sdf mask type");
+            GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas undefined sdf shape type");
         }
     }
 
-    void GESDFTreeProcessor::Process(const GESDFRRectShaderMask& sdfMask)
+    void GESDFTreeProcessor::Process(const GESDFRRectShaderShape& sdfShape)
     {
-        GenerateHeader(sdfMask);
-        GenerateBody(sdfMask);
+        GenerateHeader(sdfShape);
+        GenerateBody(sdfShape);
     }
 
-    void GESDFTreeProcessor::GenerateBody(const GESDFRRectShaderMask& sdfMask)
+    void GESDFTreeProcessor::GenerateBody(const GESDFRRectShaderShape& sdfShape)
     {
-        auto nodeId = reinterpret_cast<size_t>(&sdfMask);
+        auto nodeId = reinterpret_cast<size_t>(&sdfShape);
         body_ += "float var_" + std::to_string(nodeId) +
                  " = SDFRRect(uv, u_pos_" + std::to_string(nodeId) +
                  ", u_size_" + std::to_string(nodeId) +
@@ -162,18 +162,18 @@ namespace OHOS::Rosen::Drawing {
                  ");\n";
     }
 
-    void GESDFTreeProcessor::GenerateHeader(const GESDFRRectShaderMask& sdfMask)
+    void GESDFTreeProcessor::GenerateHeader(const GESDFRRectShaderShape& sdfShape)
     {
-        auto nodeId = reinterpret_cast<size_t>(&sdfMask);
+        auto nodeId = reinterpret_cast<size_t>(&sdfShape);
         headers_ += "uniform vec2 u_pos_" + std::to_string(nodeId) + ";\n";
         headers_ += "uniform vec2 u_size_" + std::to_string(nodeId) + ";\n";
         headers_ += "uniform float u_radius_" + std::to_string(nodeId) + ";\n";
     }
 
     void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
-        const GESDFRRectShaderMask& sdfMask)
+        const GESDFRRectShaderShape& sdfShape)
     {
-        auto rect = sdfMask.GetRRect();
+        auto rect = sdfShape.GetRRect();
 
         auto left = rect.left_;
         auto top = rect.top_;
@@ -192,44 +192,44 @@ namespace OHOS::Rosen::Drawing {
         float sizeX = (std::max(right, left) - std::min(right, left)) / 2.0;
         float sizeY = (std::max(top, bottom) - std::min(top, bottom)) / 2.0;
 
-        auto nodeId = reinterpret_cast<size_t>(&sdfMask);
+        auto nodeId = reinterpret_cast<size_t>(&sdfShape);
 
         builder.SetUniform("u_pos_" + std::to_string(nodeId), posX, posY);
         builder.SetUniform("u_size_" + std::to_string(nodeId), sizeX, sizeY);
         builder.SetUniform("u_radius_" + std::to_string(nodeId), radius);
     }
 
-    void GESDFTreeProcessor::Process(const GESDFUnionOpShaderMask& sdfMask)
+    void GESDFTreeProcessor::Process(const GESDFUnionOpShaderShape& sdfShape)
     {
-        const auto leftNode = sdfMask.GetLeftSDFMask();
-        const auto rightNode = sdfMask.GetRightSDFMask();
+        const auto leftNode = sdfShape.GetLeftSDFShape();
+        const auto rightNode = sdfShape.GetRightSDFShape();
         if (!leftNode || !rightNode) {
             GE_LOGE("GESDFTreeProcessor::Process: one of the child nodes in the "
-                    "sdf union mask is null.");
+                    "sdf union shape is null.");
         }
 
-        GenerateHeader(sdfMask);
+        GenerateHeader(sdfShape);
         Process(leftNode);
         Process(rightNode);
 
-        GenerateBody(sdfMask);
+        GenerateBody(sdfShape);
     }
 
-    void GESDFTreeProcessor::GenerateHeader(const GESDFUnionOpShaderMask& sdfMask)
+    void GESDFTreeProcessor::GenerateHeader(const GESDFUnionOpShaderShape& sdfShape)
     {
-        if (sdfMask.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
-            auto nodeId = reinterpret_cast<size_t>(&sdfMask);
+        if (sdfShape.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
+            auto nodeId = reinterpret_cast<size_t>(&sdfShape);
             headers_ += "uniform float u_factor_" + std::to_string(nodeId) + ";\n";
         }
     }
 
-    void GESDFTreeProcessor::GenerateBody(const GESDFUnionOpShaderMask& sdfMask)
+    void GESDFTreeProcessor::GenerateBody(const GESDFUnionOpShaderShape& sdfShape)
     {
-        auto nodeIdLeft = reinterpret_cast<size_t>(sdfMask.GetLeftSDFMask().get());
-        auto nodeIdRight = reinterpret_cast<size_t>(sdfMask.GetRightSDFMask().get());
-        auto nodeId = reinterpret_cast<size_t>(&sdfMask);
+        auto nodeIdLeft = reinterpret_cast<size_t>(sdfShape.GetLeftSDFShape().get());
+        auto nodeIdRight = reinterpret_cast<size_t>(sdfShape.GetRightSDFShape().get());
+        auto nodeId = reinterpret_cast<size_t>(&sdfShape);
 
-        if (sdfMask.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
+        if (sdfShape.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
             body_ += "float var_" + std::to_string(nodeId) + " = SDFSmoothUnion(" +
                         "var_" + std::to_string(nodeIdLeft) +
                         ", var_" + std::to_string(nodeIdRight) +
@@ -242,34 +242,34 @@ namespace OHOS::Rosen::Drawing {
     }
 
     void GESDFTreeProcessor::UpdateUniformDatas(RuntimeShaderBuilder& builder,
-        const GESDFUnionOpShaderMask& sdfMask)
+        const GESDFUnionOpShaderShape& sdfShape)
     {
-        auto nodeId = reinterpret_cast<size_t>(&sdfMask);
-        if (sdfMask.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
-            float spacing = sdfMask.GetSpacing();
+        auto nodeId = reinterpret_cast<size_t>(&sdfShape);
+        if (sdfShape.GetSDFUnionOp() == GESDFUnionOp::SMOOTH_UNION) {
+            float spacing = sdfShape.GetSpacing();
             spacing = std::max(spacing, 0.0001f);
             builder.SetUniform("u_factor_" + std::to_string(nodeId), spacing);
         }
-        UpdateUniformDatas(builder, sdfMask.GetLeftSDFMask());
-        UpdateUniformDatas(builder, sdfMask.GetRightSDFMask());
+        UpdateUniformDatas(builder, sdfShape.GetLeftSDFShape());
+        UpdateUniformDatas(builder, sdfShape.GetRightSDFShape());
     }
 
     void GESDFTreeProcessor::UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder)
     {
         GE_LOGE("GESDFTreeProcessor::UpdateUniformDatas: UpdateUniformfromData.");
-        if (sdfMask_) {
+        if (sdfShape_) {
             for (const auto& effect: effectsContainer_) {
                 effect->UpdateUniformDatas(builder);
             }
 
-            UpdateUniformDatas(builder, sdfMask_);
+            UpdateUniformDatas(builder, sdfShape_);
         }
     }
 
     void GESDFTreeProcessor::UpdateParams(const GESDFFilterParams& params)
     {
-        if (params.mask) {
-            sdfMask_->CopyState(*params.mask);
+        if (params.shape) {
+            sdfShape_->CopyState(*params.shape);
         }
     }
 

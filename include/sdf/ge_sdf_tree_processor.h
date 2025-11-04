@@ -19,8 +19,8 @@
 #include <string>
 #include <set>
 #include "ge_sdf_effects.h"
-#include "ge_sdf_rrect_shader_mask.h"
-#include "ge_sdf_union_op_shader_mask.h"
+#include "ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_union_op_shader_shape.h"
 
 namespace OHOS::Rosen::Drawing {
 struct ComparatorForEffects final {
@@ -29,21 +29,21 @@ struct ComparatorForEffects final {
 };
 
 class GESDFTreeProcessor final {
-    void Process(const std::shared_ptr<GESDFShaderMask> sdfMask);
-    void Process(const GESDFRRectShaderMask& sdfMask);
-    void Process(const GESDFUnionOpShaderMask& sdfMask);
+    void Process(const std::shared_ptr<GESDFShaderShape> sdfShape);
+    void Process(const GESDFRRectShaderShape& sdfShape);
+    void Process(const GESDFUnionOpShaderShape& sdfShape);
 
     // Generate shader code
-    void GenerateHeader(const GESDFRRectShaderMask& sdfMask);
-    void GenerateHeader(const GESDFUnionOpShaderMask& sdfMask);
+    void GenerateHeader(const GESDFRRectShaderShape& sdfShape);
+    void GenerateHeader(const GESDFUnionOpShaderShape& sdfShape);
 
-    void GenerateBody(const GESDFRRectShaderMask& sdfMask);
-    void GenerateBody(const GESDFUnionOpShaderMask& sdfMask);
+    void GenerateBody(const GESDFRRectShaderShape& sdfShape);
+    void GenerateBody(const GESDFUnionOpShaderShape& sdfShape);
 
     // Update uniform values
-    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const std::shared_ptr<GESDFShaderMask> sdfMask);
-    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const GESDFRRectShaderMask& sdfMask);
-    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const GESDFUnionOpShaderMask& sdfMask);
+    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const std::shared_ptr<GESDFShaderShape> sdfShape);
+    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const GESDFRRectShaderShape& sdfShape);
+    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder, const GESDFUnionOpShaderShape& sdfShape);
 
 public:
 
@@ -60,7 +60,7 @@ public:
 
     void UpdateParams(const GESDFFilterParams& params);
 private:
-    std::shared_ptr<GESDFShaderMask> sdfMask_;
+    std::shared_ptr<GESDFShaderShape> sdfShape_;
     
     std::string shaderCode_;
     std::string headers_;

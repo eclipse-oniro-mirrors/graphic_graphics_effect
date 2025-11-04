@@ -290,22 +290,22 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFFilterParams();
         }
     },
-    { GE_MASK_SDF_UNION_OP,
+    { GE_SHAPE_SDF_UNION_OP,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
-            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::UNION);
+            impl->MakeSDFUnionOpShapeParams(GESDFUnionOp::UNION);
         }
     },
-    { GE_MASK_SDF_SMOOTH_UNION_OP,
+    { GE_SHAPE_SDF_SMOOTH_UNION_OP,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
-            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::SMOOTH_UNION);
+            impl->MakeSDFUnionOpShapeParams(GESDFUnionOp::SMOOTH_UNION);
         }
     },
-    { GE_MASK_SDF_RRECT_MASK,
+    { GE_SHAPE_SDF_RRECT_SHAPE,
         [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_RRECT_MASK);
-            impl->MakeSDFRRectMaskParams();
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE);
+            impl->MakeSDFRRectShapeParams();
         }
     },
 
@@ -632,11 +632,11 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::SDF_UNION_OP: {
-            if (sdfUnionOpMaskParams_ == nullptr) {
+            if (sdfUnionOpShapeParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_SDF_SMOOTH_UNION_OP_SPACING) {
-                sdfUnionOpMaskParams_->spacing = param;
+            if (tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING) {
+                sdfUnionOpShapeParams_->spacing = param;
             }
             break;
         }
@@ -932,11 +932,11 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
         }
         case FilterType::SDF_UNION_OP: {
             bool isParamValid = param < static_cast<uint32_t>(GESDFUnionOp::MAX);
-            if (sdfUnionOpMaskParams_ == nullptr || !isParamValid) {
+            if (sdfUnionOpShapeParams_ == nullptr || !isParamValid) {
                 return;
             }
-            if (tag == GE_MASK_SDF_UNION_OP_TYPE) {
-                sdfUnionOpMaskParams_->op = static_cast<GESDFUnionOp>(param);
+            if (tag == GE_SHAPE_SDF_UNION_OP_TYPE) {
+                sdfUnionOpShapeParams_->op = static_cast<GESDFUnionOp>(param);
             }
             break;
         }
@@ -1043,27 +1043,34 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    switch (filterType_) {
         case FilterType::SDF: {
-            bool isSdfMask = !param || param->IsSDFShaderMask();
-            if (sdfFilterParams_ == nullptr || !isSdfMask) {
+            if (sdfFilterParams_ == nullptr || !param) {
                 return;
             }
             
-            if (tag == GE_FILTER_SDF_MASK) {
-                sdfFilterParams_->mask = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            if (tag == GE_FILTER_SDF_SHAPE) {
+                sdfFilterParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
             }
             break;
         }
         case FilterType::SDF_UNION_OP: {
-            bool isSdfMask = !param || param->IsSDFShaderMask();
-            if (sdfUnionOpMaskParams_ == nullptr || !isSdfMask) {
+            if (sdfUnionOpShapeParams_ == nullptr || !param) {
                 return;
             }
 
-            if (tag == GE_MASK_SDF_UNION_OP_MASKX || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKX) {
-                sdfUnionOpMaskParams_->left = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
-            } else if (tag == GE_MASK_SDF_UNION_OP_MASKY || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKY) {
-                sdfUnionOpMaskParams_->right = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            if (tag == GE_SHAPE_SDF_UNION_OP_SHAPEX || tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEX) {
+                sdfUnionOpShapeParams_->left = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            } else if (tag == GE_SHAPE_SDF_UNION_OP_SHAPEY || tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY) {
+                sdfUnionOpShapeParams_->right = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
             }
             break;
         }
@@ -1243,12 +1250,12 @@ void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Vec
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 {
     switch (filterType_) {
-        case FilterType::SDF_RRECT_MASK: {
-            if (sdfRRectMaskParams_ == nullptr) {
+        case FilterType::SDF_RRECT_SHAPE: {
+            if (sdfRRectShapeParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_SDF_RRECT_MASK_RRECT) {
-                sdfRRectMaskParams_->rrect = param;
+            if (tag == GE_SHAPE_SDF_RRECT_SHAPE_RRECT) {
+                sdfRRectShapeParams_->rrect = param;
             }
         }
         default:
@@ -1258,14 +1265,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParams& border)
 {
-    if (tag == GE_FILTER_SDF_MASK) {
+    if (tag == GE_FILTER_SDF_SHAPE) {
         sdfFilterParams_->border = border;
     }
 }
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFShadowParams& shadow)
 {
-    if (tag == GE_FILTER_SDF_MASK) {
+    if (tag == GE_FILTER_SDF_SHAPE) {
         sdfFilterParams_->shadow = shadow;
     }
 }

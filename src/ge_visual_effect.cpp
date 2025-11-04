@@ -24,8 +24,8 @@
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
-#include "sdf/ge_sdf_rrect_shader_mask.h"
-#include "sdf/ge_sdf_union_op_shader_mask.h"
+#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "sdf/ge_sdf_union_op_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -110,6 +110,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const std::vector<float>& 
 }
 
 void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }
@@ -218,19 +223,33 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
         }
+
+        default:
+            return nullptr;
+    }
+}
+
+const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShape() const
+{
+    auto impl = visualEffectImpl_;
+    if (impl == nullptr) {
+        return nullptr;
+    }
+
+    switch (impl->GetFilterType()) {
         case GEVisualEffectImpl::FilterType::SDF_UNION_OP: {
-            auto params = impl->GetSDFUnionOpMaskParams();
+            auto params = impl->GetSDFUnionOpShapeParams();
             if (params == nullptr) {
                 return nullptr;
             }
-            return std::make_shared<GESDFUnionOpShaderMask>(*params);
+            return std::make_shared<GESDFUnionOpShaderShape>(*params);
         }
-        case GEVisualEffectImpl::FilterType::SDF_RRECT_MASK: {
-            auto params = impl->GetSDFRRectMaskParams();
+        case GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE: {
+            auto params = impl->GetSDFRRectShapeParams();
             if (params == nullptr) {
                 return nullptr;
             }
-            return std::make_shared<GESDFRRectShaderMask>(*params);
+            return std::make_shared<GESDFRRectShaderShape>(*params);
         }
 
         default:
