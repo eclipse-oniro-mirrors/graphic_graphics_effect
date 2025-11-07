@@ -317,6 +317,29 @@ void HpsEffectFilter::GenerateGradientBlurEffect(const Drawing::GELinearGradient
 
 std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() const
 {
+    if (needClampFilter_) {
+        static std::shared_ptr<Drawing::RuntimeEffect> s_clampUpEffect = [] {
+            static const std::string mixClampString(R"(
+            uniform shader blurredInput;
+            uniform float inColorFactor;
+
+            highp float random(float2 xy) {
+                float t = dot(xy, float2(78.233, 12.9898));
+                return fract(sin(t) * 43758.5453);
+            }
+            half4 main(float2 xy) {
+                highp float noiseGranularity = inColorFactor / 255.0;
+                half4 finalColor = blurredInput.eval(xy);
+                float noise = mix(-noiseGranularity, noiseGranularity, random(xy));
+                finalColor.rgb += noise;
+                finalColor.rgb = clamp(finalColor.rgb, vec3(0.0), vec3(1.0));
+                return finalColor;
+            }
+            )");
+            return Drawing::RuntimeEffect::CreateForShader(mixClampString);
+        }();
+        return s_clampUpEffect;
+    }
     static std::shared_ptr<Drawing::RuntimeEffect> s_upscaleEffect = [] {
         static const std::string mixString(R"(
         uniform shader blurredInput;
@@ -339,31 +362,6 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
     return s_upscaleEffect;
 }
 
-std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetClampUpEffect() const
-{
-    static std::shared_ptr<Drawing::RuntimeEffect> s_clampUpEffect = [] {
-        static const std::string mixClampString(R"(
-        uniform shader blurredInput;
-        uniform float inColorFactor;
-
-        highp float random(float2 xy) {
-            float t = dot(xy, float2(78.233, 12.9898));
-            return fract(sin(t) * 43758.5453);
-        }
-        half4 main(float2 xy) {
-            highp float noiseGranularity = inColorFactor / 255.0;
-            half4 finalColor = blurredInput.eval(xy);
-            float noise = mix(-noiseGranularity, noiseGranularity, random(xy));
-            finalColor.rgb += noise;
-            finalColor.rgb = clamp(finalColor.rgb, vec3(0.0), vec3(1.0));
-            return finalColor;
-        }
-        )");
-        return Drawing::RuntimeEffect::CreateForShader(mixClampString);
-    }();
-    return s_clampUpEffect;
-}
-
 bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
     std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext)
 {
@@ -375,15 +373,14 @@ bool HpsEffectFilter::DrawImageWithHps(Drawing::Canvas& canvas, const std::share
     const auto blurShader = Drawing::ShaderEffect::CreateImageShader(*imageCache, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, linear, upscale_matrix_);
     auto upscaleEffect = GetUpscaleEffect();
-    auto clampUpEffect = GetClampUpEffect();
-    if (upscaleEffect == nullptr || clampUpEffect == nullptr) {
+    if (upscaleEffect == nullptr) {
         return false;
     }
     Drawing::Brush brush;
     float factor = GetHpsEffectBlurNoiseFactor();
     static constexpr float epsilon = 0.1f;
     if (!ROSEN_LE(factor, epsilon)) {
-        Drawing::RuntimeShaderBuilder mixBuilder(needClampFilter_ ? clampUpEffect : upscaleEffect);
+        Drawing::RuntimeShaderBuilder mixBuilder(upscaleEffect);
         mixBuilder.SetChild("blurredInput", blurShader);
         mixBuilder.SetUniform("inColorFactor", factor);
         brush.SetShaderEffect(mixBuilder.MakeShader(nullptr, imageCache->IsOpaque()));

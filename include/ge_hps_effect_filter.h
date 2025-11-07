@@ -74,7 +74,6 @@ private:
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
-    std::shared_ptr<Drawing::RuntimeEffect> GetClampUpEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
     // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
