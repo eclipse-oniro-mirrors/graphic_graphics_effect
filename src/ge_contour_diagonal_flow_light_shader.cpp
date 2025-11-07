@@ -54,7 +54,8 @@ const int XMIN_I = 0;
 const int XMAX_I = 1;
 const int YMIN_I = 2;
 const int YMAX_I = 3;
-
+constexpr ColorType RGBA_F16 = ColorType::COLORTYPE_RGBA_F16;
+constexpr bool NOT_BUDGETED = false;
 // shader
 static constexpr char FLOW_LIGHT_PROG[] = R"(
     uniform shader precalculationImage;
@@ -510,6 +511,8 @@ static constexpr char BLEND_IMG_PROG[] = R"(
     uniform float weight1;
     uniform float weight2;
     uniform float blurRadius;
+    uniform float headRoom;
+
     float DecodeFloat(vec2 rg)
     {
         return rg.x + rg.y / 255.0; // 255.0 = maximum value representable in 8-bit channel
@@ -525,7 +528,10 @@ static constexpr char BLEND_IMG_PROG[] = R"(
         if (precalculationImage.eval(fragCoord).a < 0.5) { // 0.5: discard the transparent pixels
             contourWeight = 0.0;
         }
-        return c1 + c2 * weight2 * weight2 / (totalWeight * weight1) * contourWeight;
+        vec4 blendColor = c1 + c2 * weight2 * weight2 / (totalWeight * weight1) * contourWeight;
+        vec4 lnValue = log(blendColor + vec4(1.0, 1.0, 1.0, 1.0));
+        vec4 c_out = max(2.0, headRoom) * 2.0 * lnValue / (lnValue + 1);
+        return vec4(c_out.rgb, clamp(c_out.a, 0.0, 1.0));
     }
 )";
 
@@ -606,6 +612,7 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiag
     contourDiagonalFlowLightParams_ = param;
     Drawing::GEKawaseBlurShaderFilterParams blurParas{contourDiagonalFlowLightParams_.radius_};
     blurShader_ = std::make_shared<GEKawaseBlurShaderFilter>(blurParas);
+    blurShader_->SetFactor(0.0f); // Set zero noise
 }
 
 std::shared_ptr<GEContourDiagonalFlowLightShader> GEContourDiagonalFlowLightShader::CreateFlowLightShader(
@@ -942,8 +949,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeSha
         std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM1], 0.0f, 1.0f),
         std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM2], 0.0f, 1.0f));
     builder_->SetUniform("lineThickness", std::clamp(contourDiagonalFlowLightParams_.thickness_, 0.0f, 1.0f));
-    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(),
-        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
     auto img = builder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     return img;
 }
@@ -1072,13 +1078,12 @@ void GEContourDiagonalFlowLightShader::ConvertImg(Drawing::Canvas& canvas, const
 
 void GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    auto surface = canvas.GetSurface();
-    if (surface == nullptr) {
-        GE_LOGW("GEContourDiagonalFlowLightShader::ProcessImage surface is invalid");
+    if (!rect.IsValid()) {
+        GE_LOGE("GEContourDiagonalFlowLightShader::CreateSurfaceAndCanvas rect is invalid.");
         return;
     }
-    offscreenSurface_ = surface->MakeSurface(rect.GetWidth(),
-        rect.GetHeight());
+    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
     if (offscreenSurface_ == nullptr) {
         GE_LOGW("GEContourDiagonalFlowLightShader::ProcessImage offscreenSurface is invalid");
         return;
@@ -1096,12 +1101,8 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::CreateImg(Draw
         GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg rect is invalid");
         return nullptr;
     }
-    auto surface = canvas.GetSurface();
-    if (surface == nullptr) {
-        GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg surface is invalid");
-        return nullptr;
-    }
-    auto offscreenSurface = surface->MakeSurface(rect.GetWidth(), rect.GetHeight());
+    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    auto offscreenSurface  = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
     if (offscreenSurface == nullptr) {
         GE_LOGW("GEContourDiagonalFlowLightShader::CreateImg offscreenSurface is invalid");
         return nullptr;
@@ -1187,6 +1188,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     blendBuilder->SetUniform("weight1", contourDiagonalFlowLightParams_.weight1);
     blendBuilder->SetUniform("weight2", contourDiagonalFlowLightParams_.weight2);
     blendBuilder->SetUniform("blurRadius", contourDiagonalFlowLightParams_.radius_);
+    blendBuilder->SetUniform("headRoom", std::max(supportHeadroom_, 1.0f));
     auto imageInfo = img1->GetImageInfo();
     return blendBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 }

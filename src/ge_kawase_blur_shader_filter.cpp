@@ -501,9 +501,8 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::ScaleAndAddRandomColor
     float mixFactor = (abs(MAX_CROSS_FADE_RADIUS) <= 1e-6) ? 1.f : (blurRadius_ / MAX_CROSS_FADE_RADIUS);
     mixBuilder.SetUniform("mixFactor", std::min(1.0f, mixFactor));
 
-    static auto factor = 1.75; // 1.75 from experience
-    mixBuilder.SetUniform("inColorFactor", factor);
-    LOGD("GEKawaseBlurShaderFilter::kawase random color factor : %{public}f", factor);
+    mixBuilder.SetUniform("inColorFactor", factor_);
+    LOGD("GEKawaseBlurShaderFilter::kawase random color factor : %{public}f", factor_);
     auto scaledInfo = Drawing::ImageInfo(width, height, blurImage->GetImageInfo().GetColorType(),
         blurImage->GetImageInfo().GetAlphaType(), blurImage->GetImageInfo().GetColorSpace());
 
@@ -513,6 +512,11 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::ScaleAndAddRandomColor
     auto output = mixBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
 #endif
     return output;
+}
+
+void GEKawaseBlurShaderFilter::SetFactor(float factor)
+{
+    factor_ = std::max(0.0f, factor);
 }
 
 void GEKawaseBlurShaderFilter::ComputeRadiusAndScale(int radius)
