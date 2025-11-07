@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GRAPHICS_EFFECT_GE_SDF_UNION_OP_MASK_H
-#define GRAPHICS_EFFECT_GE_SDF_UNION_OP_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_SDF_UNION_OP_SHAPE_H
+#define GRAPHICS_EFFECT_GE_SDF_UNION_OP_SHAPE_H
 
-#include "ge_sdf_shader_mask.h"
+#include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
 
@@ -23,15 +23,15 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-class GE_EXPORT GESDFUnionOpShaderMask : public GESDFShaderMask {
+class GE_EXPORT GESDFUnionOpShaderShape : public GESDFShaderShape {
 public:
-    GESDFUnionOpShaderMask(const GESDFUnionOpMaskParams& param) : params_(param) {}
-    GESDFUnionOpShaderMask(const GESDFUnionOpShaderMask&) = delete;
-    virtual ~GESDFUnionOpShaderMask() = default;
+    GESDFUnionOpShaderShape(const GESDFUnionOpShapeParams& param) : params_(param) {}
+    GESDFUnionOpShaderShape(const GESDFUnionOpShaderShape&) = delete;
+    virtual ~GESDFUnionOpShaderShape() = default;
 
-    GESDFMaskType GetSDFMaskType() const override
+    GESDFShapeType GetSDFShapeType() const override
     {
-        return GESDFMaskType::UNION_OP;
+        return GESDFShapeType::UNION_OP;
     }
 
     inline float GetSpacing() const
@@ -39,12 +39,12 @@ public:
         return params_.spacing;
     }
 
-    inline const std::shared_ptr<GESDFShaderMask>& GetLeftSDFMask() const
+    inline const std::shared_ptr<GESDFShaderShape>& GetLeftSDFShape() const
     {
         return params_.left;
     }
 
-    inline const std::shared_ptr<GESDFShaderMask>& GetRightSDFMask() const
+    inline const std::shared_ptr<GESDFShaderShape>& GetRightSDFShape() const
     {
         return params_.right;
     }
@@ -54,13 +54,13 @@ public:
         return params_.op;
     }
 
-    void CopyState(const GESDFUnionOpShaderMask& mask);
+    void CopyState(const GESDFUnionOpShaderShape& shape);
 
 private:
-    GESDFUnionOpMaskParams params_ {};
+    GESDFUnionOpShapeParams params_ {};
 };
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_SDF_UNION_OP_MASK_H
+#endif // GRAPHICS_EFFECT_GE_SDF_UNION_OP_SHAPE_H

@@ -13,25 +13,25 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_SDF_RRECT_MASK_H
-#define GRAPHICS_EFFECT_GE_SDF_RRECT_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_SDF_RRECT_SHAPE_H
+#define GRAPHICS_EFFECT_GE_SDF_RRECT_SHAPE_H
 
-#include "ge_sdf_shader_mask.h"
+#include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-class GE_EXPORT GESDFRRectShaderMask : public GESDFShaderMask {
+class GE_EXPORT GESDFRRectShaderShape : public GESDFShaderShape {
 public:
-    GESDFRRectShaderMask(const GESDFRRectMaskParams& param) : params_(param) {}
-    GESDFRRectShaderMask(const GESDFRRectShaderMask&) = delete;
-    virtual ~GESDFRRectShaderMask() = default;
+    GESDFRRectShaderShape(const GESDFRRectShapeParams& param) : params_(param) {}
+    GESDFRRectShaderShape(const GESDFRRectShaderShape&) = delete;
+    virtual ~GESDFRRectShaderShape() = default;
 
-    GESDFMaskType GetSDFMaskType() const override
+    GESDFShapeType GetSDFShapeType() const override
     {
-        return GESDFMaskType::RRECT;
+        return GESDFShapeType::RRECT;
     }
 
     const GERRect& GetRRect() const
@@ -39,16 +39,16 @@ public:
         return params_.rrect;
     }
 
-    void CopyState(const GESDFRRectShaderMask& mask)
+    void CopyState(const GESDFRRectShaderShape& shape)
     {
-        params_ = mask.params_;
+        params_ = shape.params_;
     }
 
 private:
-    GESDFRRectMaskParams params_ {};
+    GESDFRRectShapeParams params_ {};
 };
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_SDF_RRECT_MASK_H
+#endif // GRAPHICS_EFFECT_GE_SDF_RRECT_SHAPE_H

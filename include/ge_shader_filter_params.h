@@ -32,7 +32,7 @@
 // ge
 #include "ge_filter_type.h"
 #include "ge_shader_mask.h"
-#include "sdf/ge_sdf_shader_mask.h"
+#include "sdf/ge_sdf_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -665,30 +665,30 @@ public:
 
 using GESDFShapeNode = std::variant<GERRect, GESDFUnionOp>;
 
-constexpr char GE_MASK_SDF_UNION_OP[] = "SDFUnionOpMask";
-constexpr char GE_MASK_SDF_UNION_OP_MASKX[] = "SDFUnionOpMask_MaskX";
-constexpr char GE_MASK_SDF_UNION_OP_MASKY[] = "SDFUnionOpMask_MaskY";
-constexpr char GE_MASK_SDF_UNION_OP_TYPE[] = "SDFUnionOpMask_Type";
+constexpr char GE_SHAPE_SDF_UNION_OP[] = "SDFUnionOpShape";
+constexpr char GE_SHAPE_SDF_UNION_OP_SHAPEX[] = "SDFUnionOpShape_ShapeX";
+constexpr char GE_SHAPE_SDF_UNION_OP_SHAPEY[] = "SDFUnionOpShape_ShapeY";
+constexpr char GE_SHAPE_SDF_UNION_OP_TYPE[] = "SDFUnionOpShape_Type";
 // for smooth union op
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP[] = "SDFSmoothUnionOpMask";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_SPACING[] = "SDFSmoothUnionOpMask_Spacing";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKX[] = "SDFSmoothUnionOpMask_MaskX";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKY[] = "SDFSmoothUnionOpMask_MaskY";
-struct GESDFUnionOpMaskParams {
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP[] = "SDFSmoothUnionOpShape";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING[] = "SDFSmoothUnionOpShape_Spacing";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEX[] = "SDFSmoothUnionOpShape_ShapeX";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY[] = "SDFSmoothUnionOpShape_ShapeY";
+struct GESDFUnionOpShapeParams {
     float spacing = 0.f;
-    std::shared_ptr<GESDFShaderMask> left;
-    std::shared_ptr<GESDFShaderMask> right;
+    std::shared_ptr<GESDFShaderShape> left;
+    std::shared_ptr<GESDFShaderShape> right;
     GESDFUnionOp op;
 };
 
-constexpr char GE_MASK_SDF_RRECT_MASK[] = "SDFRRectMask";
-constexpr char GE_MASK_SDF_RRECT_MASK_RRECT[] = "SDFRRectMask_RRect";
-struct GESDFRRectMaskParams {
+constexpr char GE_SHAPE_SDF_RRECT_SHAPE[] = "SDFRRectShape";
+constexpr char GE_SHAPE_SDF_RRECT_SHAPE_RRECT[] = "SDFRRectShape_RRect";
+struct GESDFRRectShapeParams {
     GERRect rrect;
 };
 
 constexpr char GE_FILTER_SDF[] = "SDFFilter";
-constexpr char GE_FILTER_SDF_MASK[] = "SDFFilter_Mask";
+constexpr char GE_FILTER_SDF_SHAPE[] = "SDFFilter_Shape";
 struct GESDFBorderParams final {
     Color color;
     float width = 0.0f;
@@ -704,7 +704,7 @@ struct GESDFShadowParams final {
 };
 
 struct GESDFFilterParams {
-    std::shared_ptr<GESDFShaderMask> mask;
+    std::shared_ptr<GESDFShaderShape> shape;
     std::optional<GESDFBorderParams> border;
     std::optional<GESDFShadowParams> shadow;
 };

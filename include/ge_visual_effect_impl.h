@@ -73,6 +73,7 @@ public:
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
@@ -391,25 +392,25 @@ public:
         sdfFilterParams_ = std::make_shared<GESDFFilterParams>();
     }
 
-    const std::shared_ptr<GESDFUnionOpMaskParams>& GetSDFUnionOpMaskParams() const
+    const std::shared_ptr<GESDFUnionOpShapeParams>& GetSDFUnionOpShapeParams() const
     {
-        return sdfUnionOpMaskParams_;
+        return sdfUnionOpShapeParams_;
     }
 
-    void MakeSDFUnionOpMaskParams(const GESDFUnionOp& op)
+    void MakeSDFUnionOpShapeParams(const GESDFUnionOp& op)
     {
-        sdfUnionOpMaskParams_ = std::make_shared<GESDFUnionOpMaskParams>();
-        sdfUnionOpMaskParams_->op = op;
+        sdfUnionOpShapeParams_ = std::make_shared<GESDFUnionOpShapeParams>();
+        sdfUnionOpShapeParams_->op = op;
     }
 
-    const std::shared_ptr<GESDFRRectMaskParams>& GetSDFRRectMaskParams() const
+    const std::shared_ptr<GESDFRRectShapeParams>& GetSDFRRectShapeParams() const
     {
-        return sdfRRectMaskParams_;
+        return sdfRRectShapeParams_;
     }
 
-    void MakeSDFRRectMaskParams()
+    void MakeSDFRRectShapeParams()
     {
-        sdfRRectMaskParams_ = std::make_shared<GESDFRRectMaskParams>();
+        sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
     }
 
 
@@ -638,8 +639,8 @@ private:
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
-    std::shared_ptr<GESDFUnionOpMaskParams> sdfUnionOpMaskParams_ = nullptr;
-    std::shared_ptr<GESDFRRectMaskParams> sdfRRectMaskParams_ = nullptr;
+    std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
+    std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
 };
 
 } // namespace Drawing
