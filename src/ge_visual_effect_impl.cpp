@@ -2274,36 +2274,20 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
         frostedGlassParams_->borderWidth = param;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_DIRECTION) {
-        frostedGlassParams_->direction = param;
-    }
-
     if (tag == GE_FILTER_FROSTED_GLASS_OFFSET) {
         frostedGlassParams_->offset = param;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_EMBOSSBLURRADIUS) {
-        frostedGlassParams_->embossBlurRadius = param;
-    }
-
-    if (tag == GE_FILTER_FROSTED_GLASS_EMBOSSSAMPLENUM) {
-        frostedGlassParams_->embossSampleNum = param;
-    }
-
-    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
-        frostedGlassParams_->refractOutPx = param;
-    }
-    
-    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTINPX) {
-        frostedGlassParams_->refractInPx = param;
-    }
-    
-    if (tag == GE_FILTER_FROSTED_GLASS_ANTIALIASING) {
-        frostedGlassParams_->antiAliasing = param;
+    if (tag == GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR) {
+        frostedGlassParams_->downSampleFactor = param;
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BG_FACTOR) {
         frostedGlassParams_->BG_FACTOR = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
+        frostedGlassParams_->refractOutPx = param;
     }
 }
 
@@ -2313,24 +2297,24 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         return;
     }
     
-    if (tag == GE_FILTER_FROSTED_GLASS_ENV_PARAMS) {
-        frostedGlassParams_->envParams = param;
+    if (tag == GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS) {
+        frostedGlassParams_->innerShadowParams = param;
     }
-
+    
     if (tag == GE_FILTER_FROSTED_GLASS_SD_PARAMS) {
         frostedGlassParams_->sdParams = param;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_HL_PARAMS) {
-        frostedGlassParams_->hlParams = param;
-    }
-
-    if (tag == GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS) {
-        frostedGlassParams_->innerShadowParams = param;
+    if (tag == GE_FILTER_FROSTED_GLASS_ENV_PARAMS) {
+        frostedGlassParams_->envParams = param;
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_HIGH_LIGHT_PARAMS) {
         frostedGlassParams_->highLightParams = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_HL_PARAMS) {
+        frostedGlassParams_->hlParams = param;
     }
 }
 } // namespace Drawing
