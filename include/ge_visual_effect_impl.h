@@ -534,6 +534,16 @@ public:
         return frameGradientMaskParams_;
     }
 
+    void MakeFrostedGlassParams()
+    {
+        frostedGlassParams_ = std::make_shared<GEFrostedGlassShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEFrostedGlassShaderFilterParams>& GetFrostedGlassParams() const
+    {
+        return frostedGlassParams_;
+    }
+
     void SetBorder(const Color& borderColor, float borderWidth);
     void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
                   float radius, Drawing::Path path, bool isFilled);
@@ -590,6 +600,9 @@ private:
     void SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetGasifyParams(const std::string& tag, float param);
     void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetFrostedGlassParams(const std::string& tag, const float& param);
+    void SetFrostedGlassParams(const std::string& tag, const std::vector<float>& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -623,6 +636,7 @@ private:
     std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
     std::shared_ptr<GEDirectionLightShaderFilterParams> directionLightParams_ = nullptr;
     std::shared_ptr<GEMaskTransitionShaderFilterParams> maskTransitionParams_ = nullptr;
+    std::shared_ptr<GEFrostedGlassShaderFilterParams> frostedGlassParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
