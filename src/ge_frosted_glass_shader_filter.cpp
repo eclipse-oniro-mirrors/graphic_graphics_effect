@@ -21,89 +21,58 @@ namespace OHOS {
 namespace Rosen {
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
+constexpr size_t NUM_2 = 2;
+constexpr size_t NUM_3 = 3;
+constexpr size_t NUM_4 = 4;
+constexpr size_t NUM_5 = 5;
+constexpr size_t NUM_6 = 6;
 static constexpr char MAIN_SHADER_PROG[] = R"(
-    uniform shader imageShader;
+    // -----------------------------------------------------------------------------
+    // Rounded-rect frosted glass style shader with toggleable effects.
+    // Groups are ordered as: COMMON → BACKGROUND → INNER SHADOW → ENV LIGHT → HIGHLIGHT → main
+    // Each effect block puts "parameters first, then functions", so you can splice blocks easily.
+    // -----------------------------------------------------------------------------
+
+    // ============================================================================
+    // 0) COMMON PARAMS & FUNCTIONS (shared by multiple effects)
+    // ============================================================================
+    uniform shader image;
     uniform shader blurredImage;
     uniform vec2 iResolution;
+    // ----- Shape Core -----
+    uniform vec2 halfsize;                          // rounded-rect half extents (px)
+    uniform float cornerRadius;                     // rounded-rect corner radius (px)
+    uniform float borderWidth;                      // SDF band width for emboss math
+    uniform float offset;                           // inner band offset for embossing
 
-    uniform vec2 halfsize;
-    uniform float cornerRadius;
-    uniform float borderWidth;
-    uniform vec2 direction;  // 对角高光
-    uniform float offset;
-    uniform float embossBlurRadius;
-    uniform float embossSampleNum;
-    uniform float refractOutPx; // 向外（凸）取样位移（全分辨率像素）
-    uniform float refractInPx; // 向内（凹）取样位移（全分辨率像素）
-    uniform loat antiAliasing;
+    // ----- AA / Numeric -----
+    const float antiAliasing  = 0.5;                // global AA softness scaling
+    const float PI            = 3.14159265358979323846;
+    const float EPSILON       = 1e-4;
+    const float N_EPS         = 1e-6;
 
-    // --------- Darken and vibrate blurred image parameters ---------
-    uniform float BG_FACTOR; // Darken
-    uniform float envK; // 环境光（边缘提亮）
-    uniform float envB;
-    uniform float envS;
-    uniform float sdK; // 内阴影（边缘压暗后再做色彩重映射）
-    uniform float sdB;
-    uniform float sdS;
-    uniform float hlK; // 对角高光（描边色）
-    uniform float hlB;
-    uniform float hlS;
+    // ----- Buffers / Scale -----
+    uniform float downSampleFactor;             // full-res : blur buffer res ratio (1 = same)
 
-    // --------- Inner edge shadow parameters -----------------------
-    uniform float shadowRefractRate;
-    uniform float innerShadowExp;  //4.62
-    uniform float shadowWidth;
-    uniform float shadowStrength;
-
-    // ---------- Edge diagonal highlight parameters ----------------
-    uniform float highLightAngleDeg;    // 扇形角宽（度）。越大覆盖越宽
-    uniform float highLightFeatherDeg;  // 扇形边缘羽化宽度（度）
-    uniform float highLightWidthPx;      // 对角高光带宽（像素，沿法线向内）
-    uniform float highLightFeatherPx;    // 对角高光内外两侧的羽化（像素）
-    uniform float highLightShiftPx;  // 对角高光相对外边界向内偏移（像素），>0 往内移，<0 可往外移
-
-    // Common constants
-    uniform float aaWidth;
-    const float PI = 3.14159265358979323846;
-    const float EPSILON = 0.0001;
-    const float N_EPS = 1e-6;
-    const float downSampleFactor = 2.0;
-
-    // ================= Subfunctions =====================
-    float DiagonalFanMask(vec2 posFromCenter, vec2 dir, float angleDeg, float featherDeg)
-    {
-        vec2 p = normalize(posFromCenter);
-        vec2 d = normalize(dir);
-
-        float angle = angleDeg * (PI / 180.0);
-        float feather = max(1e-4, featherDeg * (PI / 180.0));
-
-        float c1 = clamp(dot(d, p), -1.0, 1.0);
-        float c2 = clamp(dot(-d, p), -1.0, 1.0);
-
-        float theta1 = acos(c1);
-        float theta2 = acos(c2);
-
-        float lobe1 = 1.0 - smoothstep(angle * 0.5, angle * 0.5 + feather, theta1);
-        float lobe2 = 1.0 - smoothstep(angle * 0.5, angle * 0.5 + feather, theta2);
-
-        return clamp(lobe1 + lobe2, 0.0, 1.0);
-    }
-
+    // ----- Common SDF & Geometry helpers -----
     float SdfRRect(vec2 p, vec2 b, float r)
     {
         vec2 q = abs(p) - b + r;
         return length(max(q, 0.0)) - r;
     }
 
-    // ========= grad for Rounded-Rect ==============
+    vec2 safeNormalize(vec2 v)
+    {
+        return v / max(length(v), N_EPS);
+    }
+
     vec2 GradRRect(vec2 p, vec2 b, float r)
     {
         float rr = min(r, min(b.x, b.y));
-        vec2 w = abs(p) - b - vec2(rr);
-        float g = max(w.x, w.y);
-        vec2 q = max(w, 0.0);
-        float l = length(q);
+        vec2  w  = abs(p) - b - vec2(rr);
+        float g  = max(w.x, w.y);
+        vec2  q  = max(w, 0.0);
+        float l  = length(q);
 
         vec2 grad;
         if (g > 0.0) {
@@ -112,48 +81,73 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             grad = (w.x > w.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
         }
         grad *= sign(p);
-        return grad;
+        return grad; // outward (unnormalized)
     }
 
-    vec4 SampleUV(vec2 uv, vec2 res)
+    vec2 ToDownsamplePx(vec2 deltaFullPx, float downFactor)
     {
-        return iImage1.eval(uv + 0.5 * res);
+        return deltaFullPx / max(downFactor, N_EPS);
     }
 
-    int IntMin(int a, int b)
-    {
-        return (a <= b) ? a : b;
-    }
-
+    // ----- Image sampling helpers -----
     vec4 BaseBlur(vec2 coord)
     {
-        return blurredImage.eval(coord);
+        return blurredImage.eval(coord); // pre-blurred background
     }
 
+    // Optional original-image pixel sampling (not used in main but kept for reuse)
+    vec4 SampleUV(vec2 uv, vec2 res)
+    {
+        return image.eval(uv + 0.5 * res);
+    }
+
+    // ----- Common Color Utilities (Sat / KBS / CompareBlend) -----
     vec3 Sat(vec3 src255, float n, float p1r, float p2r, float p1g, float p2g, float p1b, float p2b)
     {
-        float r = src255.r;
-        float g = src255.g;
-        float b = src255.b;
+        // `src255` in [0,255]; `n` is base saturation factor
+        float r = src255.r, g = src255.g, b = src255.b;
         float rn = r * (0.2412016 * (1. - n) + n) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n));
         float gn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n) + n) + b * (0.0665688 * (1. - n));
         float bn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n) + n);
 
-        float dr = rn - r;
-        float grt = step(0., dr);
+        float dr = rn - r; float grt = step(0., dr);
         float rr = (r + dr * p1r) * grt + (r + dr * p2r) * (1. - grt);
 
-        float dg = gn - g;
-        grt = step(0., dg);
+        float dg = gn - g; grt = step(0., dg);
         float gg = (g + dg * p1g) * grt + (g + dg * p2g) * (1. - grt);
 
-        float db = bn - b;
-        grt = step(0., db);
+        float db = bn - b; grt = step(0., db);
         float bb = (b + db * p1b) * grt + (b + db * p2b) * (1. - grt);
 
         return vec3(rr, gg, bb);
     }
 
+    vec3 ApplyKBS(vec3 c01, float K, float B, float S,
+                float p1r, float p2r, float p1g, float p2g, float p1b, float p2b)
+    {
+        vec3 x = c01 * 255.0;
+        x = x * K + vec3(B);
+        x = Sat(x, S, p1r, p2r, p1g, p2g, p1b, p2b);
+        return clamp(x / 255.0, 0.0, 1.0);
+    }
+
+    vec3 CompareBlend(vec3 src, vec3 dst)
+    {
+        const vec3 grayBase = vec3(0.2412016, 0.6922296, 0.0665688);
+        float lb = dot(src, grayBase);
+        float le = dot(dst, grayBase);
+        return mix(src, dst, le / max((lb + le), EPSILON));
+    }
+
+    // ============================================================================
+    // 1) BACKGROUND (DARKEN + VIBRANCY)
+    //    Parameters first, then functions that specifically shape the background.
+    // ============================================================================
+
+    // ----- Params -----
+    uniform float BG_FACTOR;  // global attenuation for blurred background
+
+    // ----- Functions specific to background shaping -----
     vec3 BlurVibrancy(vec3 c01)
     {
         vec3 x = c01 * 255.0;
@@ -162,45 +156,83 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         return clamp(x / 255.0, 0.0, 1.0);
     }
 
-    vec3 ApplyKBS(vec3 c01, float K, float B, float S, float p1r, float p2r, float p1g, float p2g,
-                  float p1b, float p2b)
-    {
-        vec3 x = c01 * 255.0;
-        x = x * K + vec3(B);
-        x = Sat(x, S, p1r, p2r, p1g, p2g, p1b, p2b);
-        return clamp(x / 255.0, 0.0, 1.0);
-    }
+    // ============================================================================
+    // 2) INNER EDGE SHADOW
+    //    Parameters first, then functions used only by inner shadow.
+    //    (Shared geometry helpers already live in COMMON.)
+    // ============================================================================
 
-    vec3 EdgeLightVibrancy(vec3 c01)
-    {
-        return ApplyKBS(c01, envK, envB, envS, 1.0, 1.7, 1.5, 3.0, 2.0, 1.0);
-    }
+    // ----- Params -----
+    uniform float innerShadowRefractPx; // inward offset along outward normal (px, full-res)
+    uniform float innerShadowWidth;
+    uniform float innerShadowExp;
+    uniform float sdK; // K/B/S for inner shadow color
+    uniform float sdB;
+    uniform float sdS;
 
+    // ----- Functions (wrappers specific to inner shadow coloring) -----
     vec3 InnerShadowVibrancy(vec3 c01)
     {
         return ApplyKBS(c01, sdK, sdB, sdS, 1.0, 1.7, 1.5, 3.0, 2.0, 1.0);
     }
 
-    vec3 EdgeHighlightVibrancy(vec3 c01)
-    {
-        return ApplyKBS(c01, hlK, hlB, hlS, 1.0, 1.7, 1.5, 3.0, 2.0, 1.0);
-    }
-
-    vec3 CompareBlend(vec3 src, vec3 dst)
-    {
-        const vec3 grayBase = vec3(0.2412016, 0.6922296, 0.0665688);
-        float lb = dot(src, grayBase);  // src.r * 0.2412016 + src.g * 0.6922296 + src.b * 0.0665688;
-        float le = dot(dst, grayBase);  // dst.r * 0.2412016 + dst.g * 0.6922296 + dst.b * 0.0665688;
-        return mix(src, dst, le / max((lb + le), EPSILON));
-    }
-
+    // Optional extra inner-shadow exponential fade (not used in your main now)
     float EdgeExpInAA(vec2 p, vec2 b, float r, float decayLenPx, float aaPx)
     {
         float sd = SdfRRect(p, b, r);
-        float x = max(0.0, -sd);                        // 内部深度
-        float core = exp(-x / max(decayLenPx, N_EPS));  // 指数衰减核
-        float cover = smoothstep(aaPx, -aaPx, sd);      // 边界 AA 覆盖度（外0→内1）
+        float x  = max(0.0, -sd);
+        float core  = exp(-x / max(decayLenPx, N_EPS));
+        float cover = smoothstep(aaPx, -aaPx, sd);
         return core * cover;
+    }
+
+    // ============================================================================
+    // 3) ENVIRONMENTAL EDGE LIGHT (outward refraction brightening)
+    //    Parameters first, then functions used only by env light.
+    // ============================================================================
+
+    // ----- Params -----
+    uniform float refractOutPx; // outward offset along outward normal (px, full-res)
+    uniform float envK; // K/B/S for env light color
+    uniform float envB;
+    uniform float envS;
+
+    // ----- Functions (wrapper specific to env light coloring) -----
+    vec3 EdgeLightVibrancy(vec3 c01)
+    {
+        return ApplyKBS(c01, envK, envB, envS, 1.0, 1.7, 1.5, 3.0, 2.0, 1.0);
+    }
+
+    // ============================================================================
+    // 4) DIAGONAL EDGE HIGHLIGHT (band ∩ fan mask)
+    //    Parameters first, then functions used only by highlight.
+    // ============================================================================
+
+    // ----- Params -----
+    uniform float highLightAngleDeg;
+    uniform float highLightFeatherDeg;
+    uniform float highLightWidthPx;
+    uniform float highLightFeatherPx;
+    uniform float highLightShiftPx;
+    uniform vec2  highLightDirection;
+    uniform float hlK; // K/B/S for highlight color
+    uniform float hlB;
+    uniform float hlS;
+
+    // ----- Functions (highlight-specific) -----
+    float DiagonalFanMask(vec2 posFromCenter, vec2 dir, float angleDeg, float featherDeg)
+    {
+        vec2 p = normalize(posFromCenter);
+        vec2 d = normalize(dir);
+        float angle = angleDeg   * (PI / 180.0);
+        float feather = max(1e-4, featherDeg * (PI / 180.0));
+        float c1 = clamp(dot(d, p), -1.0, 1.0);
+        float c2 = clamp(dot(-d, p), -1.0, 1.0);
+        float theta1 = acos(c1);
+        float theta2 = acos(c2);
+        float lobe1 = 1.0 - smoothstep(angle * 0.5, angle * 0.5 + feather, theta1);
+        float lobe2 = 1.0 - smoothstep(angle * 0.5, angle * 0.5 + feather, theta2);
+        return clamp(lobe1 + lobe2, 0.0, 1.0);
     }
 
     float EdgeBandAA(float sd, float widthPx, float featherPx, float shiftPx)
@@ -211,90 +243,87 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         return clamp(coverOuter - coverInner, 0.0, 1.0);
     }
 
-    // UX Functions
-    // Compute refractive offset from SDF using screen-space gradients
-    float dF(vec3 sdf)
+    vec3 EdgeHighlightVibrancy(vec3 c01)
     {
-        return ((sdf.y - sdf.x) / sdf.z);
+        return ApplyKBS(c01, hlK, hlB, hlS, 1.0, 1.7, 1.5, 3.0, 2.0, 1.0);
     }
 
-    vec2 ComputeRefractOffset(vec3 sdfx, vec3 sdfy, float rate)
-    {
-        vec2 grad = normalize(vec2(dF(sdfx), dF(sdfy)));
-        return grad * rate;
-    }
-
-    vec4 AlphaBlend(in vec4 c1, in vec4 c2)
-    {
-        return vec4(c1.rgb * (1. - c2.a) + c2.rgb * c2.a, 1.);
-    }
-
+    // ============================================================================
+    // 5) MAIN (you already split logic per-effect; kept intact, only depends on above)
+    // ============================================================================
     vec4 main(vec2 fragCoord)
     {
-        vec4 baseTex = iImage1.eval(fragCoord) * BG_FACTOR;  // layer0: background image
-
+        // Centered local space for SDF
         vec2 uv = (fragCoord + fragCoord - iResolution.xy) * 0.5;
-        vec2 centerPos = iMouse.xy - iResolution.xy * 0.5;  // vec2(0.0);
-
+        vec2 centerPos = vec2(0.0);
+        // Primary & inner-offset SDFs
         float sd = SdfRRect(uv - centerPos, halfsize, cornerRadius);
-        vec2 sdGrad = GradRRect(uv - centerPos, halfsize, cornerRadius);
         float sdBlack = SdfRRect(uv - centerPos, halfsize - offset, cornerRadius - offset);
-
+        // Two-sided "border" masks → signed emboss pair (pos/neg) bands
         float border =
             smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sd * antiAliasing) -
-            smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing, (-sd - borderWidth) *
-            antiAliasing);
+            smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
+                    (-sd - borderWidth) * antiAliasing);
         float borderBlack =
-            smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sdBlack * 
-                        antiAliasing) -
+            smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sdBlack * antiAliasing) -
             smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
                     (-sdBlack - borderWidth) * antiAliasing);
-        float embossPos = (border - borderBlack + 1.0) * 0.5 * clamp(border + borderBlack, 0.0, 1.0);
-        float embossNeg = (-border + borderBlack + 1.0) * 0.5 * clamp(border + borderBlack, 0.0, 1.0);
         vec2 offsetUV = uv - centerPos;
 
-        // emboss with refraction
-        vec4 refractionPos = vec4(0.0);
-        vec4 refractionNeg = vec4(0.0);
-        vec4 blurredBgColor;
+        // ------------------------------- BACKGROUND -------------------------------
+        vec4 blurredBgColor = BaseBlur(fragCoord) * BG_FACTOR;
+        blurredBgColor.rgb = BlurVibrancy(blurredBgColor.rgb);
 
-        // sample blurred image
-        vec4 blurSample = BaseBlur(fragCoord) * BG_FACTOR;
+        // ------------------------------- INNER SHADOW -----------------------------
+        float embossNeg = exp(innerShadowExp * (sdBlack - 1.0 + innerShadowWidth));
+        if (embossNeg > 0.0) {
+            // Map to blur-buffer pixel grid
+            vec2 tileSize = iResolution.xy / downSampleFactor;
+            vec2 uvInTile = fragCoord / iResolution.xy;
+            vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
+            // Inward refraction sample
+            vec2 nOut = safeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
+            vec2 deltaInDS = ToDownsamplePx(nOut * innerShadowRefractPx, downSampleFactor);
+            vec2 negCoord = pixelDS + deltaInDS;
+            vec4 refractionNeg = blurredImage.eval(negCoord) * BG_FACTOR;
+            refractionNeg.rgb = BlurVibrancy(refractionNeg.rgb);
+            refractionNeg.rgb = CompareBlend(blurredBgColor.rgb, refractionNeg.rgb);
+            refractionNeg.rgb = InnerShadowVibrancy(refractionNeg.rgb);
+            blurredBgColor = mix(blurredBgColor, refractionNeg, clamp(embossNeg, 0.0, 1.0));
+        }
 
-        // Light up
-        blurredBgColor.rgb = BlurVibrancy(blurSample.rgb);
+        // ------------------------------- ENV LIGHT --------------------------------
+        float embossPos = (border - borderBlack + 1.0) * 0.5 * clamp(border + borderBlack, 0.0, 1.0);
+        if (embossPos > 0.0) {
+            // Map to blur-buffer pixel grid
+            vec2 tileSize = iResolution.xy / downSampleFactor;
+            vec2 uvInTile = fragCoord / iResolution.xy;
+            vec2 pixelDS  = uvInTile * (tileSize - 1.0) + 0.5;
+            // Outward refraction sample
+            vec2 nOut = safeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
+            vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
+            vec2 posCoord = pixelDS + deltaOutDS;
+            vec4 refractionPos = blurredImage.eval(posCoord) * BG_FACTOR;
+            refractionPos.rgb = CompareBlend(blurredBgColor.rgb, refractionPos.rgb);
+            refractionPos.rgb = EdgeLightVibrancy(refractionPos.rgb);
+            blurredBgColor = mix(blurredBgColor, refractionPos, clamp(embossPos, 0.0, 1.0));
+        }
 
-        // Edge inner shadow
-        vec2 biasUV0 = fragCoord + normalize(sdGrad) * shadowRefractRate;
-        refractionNeg.rgb = blurredImage.eval(biasUV0).rgb * BG_FACTOR;
-        refractionNeg.rgb = BlurVibrancy(refractionNeg.rgb);
-        refractionNeg.rgb = CompareBlend(blurSample.rgb, refractionNeg.rgb);
-        vec3 shadowEdge = InnerShadowVibrancy(refractionNeg.rgb).rgb;
-        float edge0 = clamp(exp(innerShadowExp * (sd - 1.0 + shadowWidth)), 0.0, 1.0);
-        blurredBgColor.rgb = mix(blurredBgColor.rgb, shadowEdge, edge0 * shadowStrength);
-
-        // Edge Ambient Light Effect
-        refractionPos.rgb = CompareBlend(blurredBgColor.rgb, refractionPos.rgb);
-        refractionPos.rgb = EdgeLightVibrancy(refractionPos.rgb);
-        blurredBgColor = mix(blurredBgColor, refractionPos, clamp(embossPos, 0.0, 1.0));
-
-        // Edge highlight, diagonal
+        // ------------------------------- HIGHLIGHT --------------------------------
         float widthClamped = min(highLightWidthPx, max(borderWidth, 0.0));
         float edgeBand = EdgeBandAA(sd, widthClamped, highLightFeatherPx, highLightShiftPx);
-        float diagMask = DiagonalFanMask(offsetUV, normalize(direction), highLightAngleDeg,
-                                            highLightFeatherDeg);
+        float diagMask = DiagonalFanMask(offsetUV, normalize(highLightDirection), highLightAngleDeg,
+            highLightFeatherDeg);
         float edge = edgeBand * diagMask;
         vec3 hlBase = EdgeHighlightVibrancy(blurredBgColor.rgb);
         blurredBgColor = mix(blurredBgColor, vec4(hlBase, 1.0), edge);
 
-        float boxMask = 1.0 - clamp(sd, 0.0, 1.0);
-        vec4 l1 = vec4(blurredBgColor.rgb, boxMask);
-        return AlphaBlend(baseTex, l1);
+        // ------------------------------- BACKGROUND MIX ---------------------------
+        blurredBgColor = mix(image.eval(fragCoord), blurredBgColor, clamp(-min(sd, sdBlack), 0.0, 1.0));
+        return blurredBgColor.rgb1; // vec4(rgb, 1.0)
     }
 )";
 
-// for init shader effect only once.
-// thread_local for thread safety and freeing variables.
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
 
 GEFrostedGlassShaderFilter::GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params)
@@ -342,8 +371,6 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         return nullptr;
     }
 
-    // init shader and set uniform
-    // TODO: get edge blur image
     auto builder = MakeFrostedGlassShader(shader, baseBlurShader, canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (builder == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
@@ -392,47 +419,40 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_frostedGlassShaderEffect);
-
-    builder->SetChild("imageShader", imageShader);
-    builder->SetChild("baseBlurImage", baseBlurShader);
+    // Common inputs
+    builder->SetChild("image", imageShader);
+    builder->SetChild("blurredImage", baseBlurShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetUniform("halfsize", frostedGlassParams_.borderSize[NUM_0], frostedGlassParams_.borderSize[NUM_1]);
     builder->SetUniform("cornerRadius", frostedGlassParams_.cornerRadius);
     builder->SetUniform("borderWidth", frostedGlassParams_.borderWidth);
-    builder->SetUniform("direction", frostedGlassParams_.direction);  // 对角高光
     builder->SetUniform("offset", frostedGlassParams_.offset);
-    builder->SetUniform("embossBlurRadius", frostedGlassParams_.embossBlurRadius);
-    builder->SetUniform("embossSampleNum", frostedGlassParams_.embossSampleNum);
-    builder->SetUniform("refractOutPx", frostedGlassParams_.refractOutPx); // 向外（凸）取样位移（全分辨率像素）
-    builder->SetUniform("refractInPx", frostedGlassParams_.refractInPx); // 向内（凹）取样位移（全分辨率像素）
-    builder->SetUniform("antiAliasing", frostedGlassParams_.antiAliasing);
-
-    // --------- Darken and vibrate blurred image parameters ---------
-    builder->SetUniform("BG_FACTOR", frostedGlassParams_.BG_FACTOR); // Darken
-    builder->SetUniform("envK", frostedGlassParams_.envParams[0]); // 环境光（边缘提亮）
-    builder->SetUniform("envB", frostedGlassParams_.envParams[1]);
-    builder->SetUniform("envS", frostedGlassParams_.envParams[2]);
-    builder->SetUniform("sdK", frostedGlassParams_.sdParams[0]); // 内阴影（边缘压暗后再做色彩重映射）
-    builder->SetUniform("sdB", frostedGlassParams_.sdParams[1]);
-    builder->SetUniform("sdS", frostedGlassParams_.sdParams[2]);
-    builder->SetUniform("hlK", frostedGlassParams_.hlParams[0]); // 对角高光（描边色）
-    builder->SetUniform("hlB", frostedGlassParams_.hlParams[1]);
-    builder->SetUniform("hlS", frostedGlassParams_.hlParams[2]);
-
-    // --------- Inner edge shadow parameters -----------------------
-    builder->SetUniform("shadowRefractRate", frostedGlassParams_.innerShadowParams[0]);
-    builder->SetUniform("innerShadowExp", frostedGlassParams_.innerShadowParams[1]);  //4.62
-    builder->SetUniform("shadowWidth", frostedGlassParams_.innerShadowParams[2]);
-    builder->SetUniform("shadowStrength", frostedGlassParams_.innerShadowParams[3]);
-
-    // ---------- Edge diagonal highlight parameters ----------------
-    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.highLightParams[0]);    // 扇形角宽（度）。越大覆盖越宽
-    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.highLightParams[1]);  // 扇形边缘羽化宽度（度）
-    builder->SetUniform("highLightWidthPx", frostedGlassParams_.highLightParams[2]);      // 对角高光带宽（像素，沿法线向内）
-    builder->SetUniform("highLightFeatherPx",  frostedGlassParams_.highLightParams[3]);    // 对角高光内外两侧的羽化（像素）
-    builder->SetUniform("highLightShiftPx", frostedGlassParams_.highLightParams[4]);  // 对角高光相对外边界向内偏移（像素），>0 往内移，<0 可往外移
-
-    // Common constants
+    builder->SetUniform("downSampleFactor", frostedGlassParams_.downSampleFactor);
+    // Background darken parameter
+    builder->SetUniform("BG_FACTOR", frostedGlassParams_.BG_FACTOR);
+    // Inner shadow parameters
+    builder->SetUniform("innerShadowRefractPx", frostedGlassParams_.innerShadowParams[NUM_0]);
+    builder->SetUniform("innerShadowWidth", frostedGlassParams_.innerShadowParams[NUM_1]);
+    builder->SetUniform("innerShadowExp", frostedGlassParams_.innerShadowParams[NUM_2]);
+    builder->SetUniform("sdK", frostedGlassParams_.sdParams[NUM_0]);
+    builder->SetUniform("sdB", frostedGlassParams_.sdParams[NUM_1]);
+    builder->SetUniform("sdS", frostedGlassParams_.sdParams[NUM_2]);
+    // Env refraction parameters
+    builder->SetUniform("refractOutPx", frostedGlassParams_.refractOutPx);
+    builder->SetUniform("envK", frostedGlassParams_.envParams[NUM_0]);
+    builder->SetUniform("envB", frostedGlassParams_.envParams[NUM_1]);
+    builder->SetUniform("envS", frostedGlassParams_.envParams[NUM_2]);
+    // Edge highlights parameters
+    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.highLightParams[NUM_0]);
+    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.highLightParams[NUM_1]);
+    builder->SetUniform("highLightWidthPx", frostedGlassParams_.highLightParams[NUM_2]);
+    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.highLightParams[NUM_3]);
+    builder->SetUniform("highLightShiftPx", frostedGlassParams_.highLightParams[NUM_4]);
+    builder->SetUniform("highLightDirection", frostedGlassParams_.highLightParams[NUM_5],
+                        frostedGlassParams_.highLightParams[NUM_6]);
+    builder->SetUniform("hlK", frostedGlassParams_.hlParams[NUM_0]);
+    builder->SetUniform("hlB", frostedGlassParams_.hlParams[NUM_1]);
+    builder->SetUniform("hlS", frostedGlassParams_.hlParams[NUM_2]);
     return builder;
 }
 } // namespace Rosen
