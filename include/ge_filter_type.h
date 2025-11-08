@@ -71,6 +71,7 @@ enum class GEFilterType : int32_t {
     AIBAR_GLOW,
     ROUNDED_RECT_FLOWLIGHT,
     GRADIENT_FLOW_COLORS,
+    FROSTED_GLASS,
     MAX
 };
 
