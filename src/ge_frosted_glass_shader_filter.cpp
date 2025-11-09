@@ -106,17 +106,18 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     {
         // `src255` in [0,255]; `n` is base saturation factor
         float r = src255.r, g = src255.g, b = src255.b;
-        float rn = r * (0.2412016 * (1. - n) + n) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n));
-        float gn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n) + n) + b * (0.0665688 * (1. - n));
-        float bn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n) + n);
+        float rnn = r * (0.2412016 * (1. - n) + n) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n));
+        float gnn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n) + n) + b * (0.0665688 * (1. - n));
+        float bnn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n) + n);
 
-        float dr = rn - r; float grt = step(0., dr);
+        float dr = rnn - r;
+        float grt = step(0., dr);
         float rr = (r + dr * p1r) * grt + (r + dr * p2r) * (1. - grt);
 
-        float dg = gn - g; grt = step(0., dg);
+        float dg = gnn - g; grt = step(0., dg);
         float gg = (g + dg * p1g) * grt + (g + dg * p2g) * (1. - grt);
 
-        float db = bn - b; grt = step(0., db);
+        float db = bnn - b; grt = step(0., db);
         float bb = (b + db * p1b) * grt + (b + db * p2b) * (1. - grt);
 
         return vec3(rr, gg, bb);
