@@ -40,19 +40,19 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform shader blurredImage;
     uniform vec2 iResolution;
     // ----- Shape Core -----
-    uniform vec2 halfsize;                          // rounded-rect half extents (px)
-    uniform float cornerRadius;                     // rounded-rect corner radius (px)
-    uniform float borderWidth;                      // SDF band width for emboss math
-    uniform float offset;                           // inner band offset for embossing
+    uniform vec2 halfsize;       // rounded-rect half extents (px)
+    uniform float cornerRadius;  // rounded-rect corner radius (px)
+    uniform float borderWidth;   // SDF band width for emboss math
+    uniform float offset;        // inner band offset for embossing
 
     // ----- AA / Numeric -----
-    const float antiAliasing  = 0.5;                // global AA softness scaling
-    const float PI            = 3.14159265358979323846;
-    const float EPSILON       = 1e-4;
-    const float N_EPS         = 1e-6;
+    const float antiAliasing = 0.5;  // global AA softness scaling
+    const float PI = 3.14159265358979323846;
+    const float EPSILON = 1e-4;
+    const float N_EPS = 1e-6;
 
     // ----- Buffers / Scale -----
-    uniform float downSampleFactor;             // full-res : blur buffer res ratio (1 = same)
+    uniform float downSampleFactor;  // full-res : blur buffer res ratio (1 = same)
 
     // ----- Common SDF & Geometry helpers -----
     float SdfRRect(vec2 p, vec2 b, float r)
@@ -69,10 +69,10 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     vec2 GradRRect(vec2 p, vec2 b, float r)
     {
         float rr = min(r, min(b.x, b.y));
-        vec2  w  = abs(p) - b - vec2(rr);
-        float g  = max(w.x, w.y);
-        vec2  q  = max(w, 0.0);
-        float l  = length(q);
+        vec2 w = abs(p) - b - vec2(rr);
+        float g = max(w.x, w.y);
+        vec2 q = max(w, 0.0);
+        float l = length(q);
 
         vec2 grad;
         if (g > 0.0) {
@@ -81,7 +81,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             grad = (w.x > w.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
         }
         grad *= sign(p);
-        return grad; // outward (unnormalized)
+        return grad;  // outward (unnormalized)
     }
 
     vec2 ToDownsamplePx(vec2 deltaFullPx, float downFactor)
@@ -92,7 +92,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ----- Image sampling helpers -----
     vec4 BaseBlur(vec2 coord)
     {
-        return blurredImage.eval(coord); // pre-blurred background
+        return blurredImage.eval(coord);  // pre-blurred background
     }
 
     // Optional original-image pixel sampling (not used in main but kept for reuse)
@@ -105,7 +105,9 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     vec3 Sat(vec3 src255, float n, float p1r, float p2r, float p1g, float p2g, float p1b, float p2b)
     {
         // `src255` in [0,255]; `n` is base saturation factor
-        float r = src255.r, g = src255.g, b = src255.b;
+        float r = src255.r;
+        float g = src255.g;
+        float b = src255.b;
         float rnn = r * (0.2412016 * (1. - n) + n) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n));
         float gnn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n) + n) + b * (0.0665688 * (1. - n));
         float bnn = r * (0.2412016 * (1. - n)) + g * (0.6922296 * (1. - n)) + b * (0.0665688 * (1. - n) + n);
@@ -114,17 +116,19 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         float grt = step(0., dr);
         float rr = (r + dr * p1r) * grt + (r + dr * p2r) * (1. - grt);
 
-        float dg = gnn - g; grt = step(0., dg);
+        float dg = gnn - g;
+        grt = step(0., dg);
         float gg = (g + dg * p1g) * grt + (g + dg * p2g) * (1. - grt);
 
-        float db = bnn - b; grt = step(0., db);
+        float db = bnn - b;
+        grt = step(0., db);
         float bb = (b + db * p1b) * grt + (b + db * p2b) * (1. - grt);
 
         return vec3(rr, gg, bb);
     }
 
-    vec3 ApplyKBS(vec3 c01, float K, float B, float S,
-                float p1r, float p2r, float p1g, float p2g, float p1b, float p2b)
+    vec3 ApplyKBS(vec3 c01, float K, float B, float S, float p1r, float p2r, float p1g, float p2g,
+        float p1b, float p2b)
     {
         vec3 x = c01 * 255.0;
         x = x * K + vec3(B);
@@ -164,10 +168,10 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ============================================================================
 
     // ----- Params -----
-    uniform float innerShadowRefractPx; // inward offset along outward normal (px, full-res)
+    uniform float innerShadowRefractPx;  // inward offset along outward normal (px, full-res)
     uniform float innerShadowWidth;
     uniform float innerShadowExp;
-    uniform float sdK; // K/B/S for inner shadow color
+    uniform float sdK;                   // K/B/S for inner shadow color
     uniform float sdB;
     uniform float sdS;
 
@@ -181,8 +185,8 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     float EdgeExpInAA(vec2 p, vec2 b, float r, float decayLenPx, float aaPx)
     {
         float sd = SdfRRect(p, b, r);
-        float x  = max(0.0, -sd);
-        float core  = exp(-x / max(decayLenPx, N_EPS));
+        float x = max(0.0, -sd);
+        float core = exp(-x / max(decayLenPx, N_EPS));
         float cover = smoothstep(aaPx, -aaPx, sd);
         return core * cover;
     }
@@ -193,8 +197,8 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ============================================================================
 
     // ----- Params -----
-    uniform float refractOutPx; // outward offset along outward normal (px, full-res)
-    uniform float envK; // K/B/S for env light color
+    uniform float refractOutPx;  // outward offset along outward normal (px, full-res)
+    uniform float envK;          // K/B/S for env light color
     uniform float envB;
     uniform float envS;
 
@@ -215,8 +219,8 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform float highLightWidthPx;
     uniform float highLightFeatherPx;
     uniform float highLightShiftPx;
-    uniform vec2  highLightDirection;
-    uniform float hlK; // K/B/S for highlight color
+    uniform vec2 highLightDirection;
+    uniform float hlK;  // K/B/S for highlight color
     uniform float hlB;
     uniform float hlS;
 
@@ -225,7 +229,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     {
         vec2 p = normalize(posFromCenter);
         vec2 d = normalize(dir);
-        float angle = angleDeg   * (PI / 180.0);
+        float angle = angleDeg * (PI / 180.0);
         float feather = max(1e-4, featherDeg * (PI / 180.0));
         float c1 = clamp(dot(d, p), -1.0, 1.0);
         float c2 = clamp(dot(-d, p), -1.0, 1.0);
@@ -264,11 +268,11 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         float border =
             smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sd * antiAliasing) -
             smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
-                    (-sd - borderWidth) * antiAliasing);
+                       (-sd - borderWidth) * antiAliasing);
         float borderBlack =
             smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sdBlack * antiAliasing) -
             smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
-                    (-sdBlack - borderWidth) * antiAliasing);
+                       (-sdBlack - borderWidth) * antiAliasing);
         vec2 offsetUV = uv - centerPos;
 
         // ------------------------------- BACKGROUND -------------------------------
@@ -299,7 +303,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             // Map to blur-buffer pixel grid
             vec2 tileSize = iResolution.xy / downSampleFactor;
             vec2 uvInTile = fragCoord / iResolution.xy;
-            vec2 pixelDS  = uvInTile * (tileSize - 1.0) + 0.5;
+            vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Outward refraction sample
             vec2 nOut = safeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
@@ -321,7 +325,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
 
         // ------------------------------- BACKGROUND MIX ---------------------------
         blurredBgColor = mix(image.eval(fragCoord), blurredBgColor, clamp(-min(sd, sdBlack), 0.0, 1.0));
-        return blurredBgColor.rgb1; // vec4(rgb, 1.0)
+        return blurredBgColor.rgb1;  // vec4(rgb, 1.0)
     }
 )";
 
