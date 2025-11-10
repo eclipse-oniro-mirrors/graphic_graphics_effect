@@ -345,6 +345,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeFrameGradientMaskParams();
         }
     },
+    { GE_FILTER_FROSTED_GLASS,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS);
+            impl->MakeFrostedGlassParams();
+        }
+    },
     { GE_FILTER_GASIFY_SCALE_TWIST,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
@@ -361,12 +367,6 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY);
             impl->MakeGasifyFilterParams();
-        }
-    },
-    { GE_FILTER_FROSTED_GLASS,
-        [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS);
-            impl->MakeFrostedGlassParams();
         }
     },
 };
@@ -2283,7 +2283,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BG_FACTOR) {
-        frostedGlassParams_->BG_FACTOR = param;
+        frostedGlassParams_->bgFactor = param;
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
