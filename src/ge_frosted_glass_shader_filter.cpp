@@ -61,7 +61,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         return length(max(q, 0.0)) - r;
     }
 
-    vec2 safeNormalize(vec2 v)
+    vec2 SafeNormalize(vec2 v)
     {
         return v / max(length(v), N_EPS);
     }
@@ -150,7 +150,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ============================================================================
 
     // ----- Params -----
-    uniform float BG_FACTOR;  // global attenuation for blurred background
+    uniform float bgFactor;  // global attenuation for blurred background
 
     // ----- Functions specific to background shaping -----
     vec3 BlurVibrancy(vec3 c01)
@@ -276,7 +276,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         vec2 offsetUV = uv - centerPos;
 
         // ------------------------------- BACKGROUND -------------------------------
-        vec4 blurredBgColor = BaseBlur(fragCoord) * BG_FACTOR;
+        vec4 blurredBgColor = BaseBlur(fragCoord) * bgFactor;
         blurredBgColor.rgb = BlurVibrancy(blurredBgColor.rgb);
 
         // ------------------------------- INNER SHADOW -----------------------------
@@ -287,10 +287,10 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 uvInTile = fragCoord / iResolution.xy;
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Inward refraction sample
-            vec2 nOut = safeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
+            vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaInDS = ToDownsamplePx(nOut * innerShadowRefractPx, downSampleFactor);
             vec2 negCoord = pixelDS + deltaInDS;
-            vec4 refractionNeg = blurredImage.eval(negCoord) * BG_FACTOR;
+            vec4 refractionNeg = blurredImage.eval(negCoord) * bgFactor;
             refractionNeg.rgb = BlurVibrancy(refractionNeg.rgb);
             refractionNeg.rgb = CompareBlend(blurredBgColor.rgb, refractionNeg.rgb);
             refractionNeg.rgb = InnerShadowVibrancy(refractionNeg.rgb);
@@ -305,10 +305,10 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 uvInTile = fragCoord / iResolution.xy;
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Outward refraction sample
-            vec2 nOut = safeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
+            vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
             vec2 posCoord = pixelDS + deltaOutDS;
-            vec4 refractionPos = blurredImage.eval(posCoord) * BG_FACTOR;
+            vec4 refractionPos = blurredImage.eval(posCoord) * bgFactor;
             refractionPos.rgb = CompareBlend(blurredBgColor.rgb, refractionPos.rgb);
             refractionPos.rgb = EdgeLightVibrancy(refractionPos.rgb);
             blurredBgColor = mix(blurredBgColor, refractionPos, clamp(embossPos, 0.0, 1.0));
@@ -434,7 +434,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetUniform("offset", frostedGlassParams_.offset);
     builder->SetUniform("downSampleFactor", frostedGlassParams_.downSampleFactor);
     // Background darken parameter
-    builder->SetUniform("BG_FACTOR", frostedGlassParams_.BG_FACTOR);
+    builder->SetUniform("bgFactor", frostedGlassParams_.bgFactor);
     // Inner shadow parameters
     builder->SetUniform("innerShadowRefractPx", frostedGlassParams_.innerShadowParams[NUM_0]);
     builder->SetUniform("innerShadowWidth", frostedGlassParams_.innerShadowParams[NUM_1]);
