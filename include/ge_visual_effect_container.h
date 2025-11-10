@@ -45,6 +45,8 @@ public:
 
     void UpdateCornerRadius(float cornerRadius);
 
+    void UpdateTotalMatrix(Drawing::Matrix totalMatrix);
+
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 

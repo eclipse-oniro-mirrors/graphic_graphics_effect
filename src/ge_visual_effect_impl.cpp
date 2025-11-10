@@ -720,6 +720,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Matrix 
             }
             break;
         }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX) {
+                harmoniumEffectParams_->totalMatrix = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1989,6 +1999,8 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->rippleProgress = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_DISTORTPROGRESS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortProgress = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_MASKPROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->maskProgress = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortFactor = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR,
