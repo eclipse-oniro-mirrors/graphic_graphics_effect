@@ -34,11 +34,13 @@ public:
 
     bool InitFrostedGlassEffect();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
-        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> baseBlurShader,
-        float imageWidth, float imageHeight);
+        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRadiusBlurShader,
+        std::shared_ptr<Drawing::ShaderEffect> smallRadiusBlurShader, float imageWidth, float imageHeight);
 
 private:
-    std::shared_ptr<Drawing::Image> MakeBaseBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
+    std::shared_ptr<Drawing::Image> MakeSmallRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
+        const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
+    std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
     std::shared_ptr<GEMESABlurShaderFilter> blurShader_ = nullptr;
