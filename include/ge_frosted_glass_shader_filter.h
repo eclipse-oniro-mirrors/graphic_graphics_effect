@@ -34,8 +34,8 @@ public:
 
     bool InitFrostedGlassEffect();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
-        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRadiusBlurShader,
-        std::shared_ptr<Drawing::ShaderEffect> smallRadiusBlurShader, float imageWidth, float imageHeight);
+        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
+        std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, float imageWidth, float imageHeight);
 
 private:
     std::shared_ptr<Drawing::Image> MakeSmallRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
