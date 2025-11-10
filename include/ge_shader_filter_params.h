@@ -628,47 +628,6 @@ struct GEXLightCaveShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams, GEX_SHADER_LIGHT_CAVE);
 
-constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
-// Common parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
-constexpr char GE_FILTER_FROSTED_GLASS_BLURRADIUS[] = "FrostedGlass_BlurRadius";
-constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
-constexpr char GE_FILTER_FROSTED_GLASS_BORDERWIDTH[] = "FrostedGlass_BorderWidth";
-constexpr char GE_FILTER_FROSTED_GLASS_OFFSET[] = "FrostedGlass_Offset";
-constexpr char GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR[] = "FrostedGlass_DownSampleFactor";
-// BG darken parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BG_FACTOR[] = "FrostedGlass_BgFactor";
-// Inner shadow parameters
-constexpr char GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS[] = "FrostedGlass_InnerShadowParams";
-constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
-// Env refraction parameters
-constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
-constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
-// Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_HIGH_LIGHT_PARAMS[] = "FrostedGlass_HighLightParams";
-constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
-
-struct GEFrostedGlassShaderFilterParams {
-    Vector2f borderSize = Vector2f(200.0f, 100.0f);
-    float blurRadius = 20.0f;
-    float cornerRadius = 100.0f;
-    float borderWidth = 2.9f;
-    float offset = 1.88f;
-    float downSampleFactor = 1.0f;
-    // Background darken parameters
-    float bgFactor = 0.9f;
-    // Inner shadow parameters
-    std::vector<float> innerShadowParams = {-0.02f, 2.0f, 4.62f};
-    std::vector<float> sdParams = {0.9f, 0.0f, 1.0f};
-    // Env refraction parameters
-    float refractOutPx = 20.0f;
-    std::vector<float> envParams = {0.8f, 70.0f, 2.0f};
-    // Edge highlights parameters
-    std::vector<float> highLightParams = {30.0f, 30.0f, 3.0f, 2.0f, -1.0f, 1.0f, 1.0f};
-    std::vector<float> hlParams = {0.6027f, 160.0f, 2.0f};
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
-
 constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
 constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
 constexpr char GE_SHADER_BORDER_LIGHT_COLOR[] = "BorderLightColor";
@@ -867,6 +826,47 @@ struct GEGasifyFilterParams {
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
     float progress_ = 0.f;
 };
+
+constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
+// Common parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_PARAMS[] = "FrostedGlass_BlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
+constexpr char GE_FILTER_FROSTED_GLASS_BORDERWIDTH[] = "FrostedGlass_BorderWidth";
+constexpr char GE_FILTER_FROSTED_GLASS_OFFSET[] = "FrostedGlass_Offset";
+constexpr char GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR[] = "FrostedGlass_DownSampleFactor";
+// BG darken parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BG_FACTOR[] = "FrostedGlass_BgFactor";
+// Inner shadow parameters
+constexpr char GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS[] = "FrostedGlass_InnerShadowParams";
+constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
+// Env refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
+constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
+// Edge highlights parameters
+constexpr char GE_FILTER_FROSTED_GLASS_HIGH_LIGHT_PARAMS[] = "FrostedGlass_HighLightParams";
+constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
+
+struct GEFrostedGlassShaderFilterParams {
+    Vector2f borderSize = Vector2f(200.0f, 100.0f);
+    std::vector<float> blurParams = {48.0f, 4.0f};
+    float cornerRadius = 100.0f;
+    float borderWidth = 2.9f;
+    float offset = 1.88f;
+    float downSampleFactor = 1.0f;
+    // Background darken parameters
+    float bgFactor = 0.9f;
+    // Inner shadow parameters
+    std::vector<float> innerShadowParams = {-0.02f, 2.0f, 4.62f};
+    std::vector<float> sdParams = {0.9f, 0.0f, 1.0f};
+    // Env refraction parameters
+    float refractOutPx = 20.0f;
+    std::vector<float> envParams = {0.8f, 70.0f, 2.0f};
+    // Edge highlights parameters
+    std::vector<float> highLightParams = {30.0f, 30.0f, 3.0f, 2.0f, -1.0f, -1.0f, 1.0f};
+    std::vector<float> hlParams = {0.6027f, 160.0f, 2.0f};
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing
