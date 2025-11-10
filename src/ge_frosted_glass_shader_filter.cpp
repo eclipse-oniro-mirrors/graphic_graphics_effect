@@ -37,7 +37,8 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // 0) COMMON PARAMS & FUNCTIONS (shared by multiple effects)
     // ============================================================================
     uniform shader image;
-    uniform shader blurredImage;
+    uniform shader edgeBlurredImage;
+    uniform shader bgBlurredImage;
     uniform vec2 iResolution;
     // ----- Shape Core -----
     uniform vec2 halfsize;       // rounded-rect half extents (px)
@@ -92,7 +93,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ----- Image sampling helpers -----
     vec4 BaseBlur(vec2 coord)
     {
-        return blurredImage.eval(coord);  // pre-blurred background
+        return bgBlurredImage.eval(coord);  // pre-blurred background
     }
 
     // Optional original-image pixel sampling (not used in main but kept for reuse)
@@ -290,7 +291,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaInDS = ToDownsamplePx(nOut * innerShadowRefractPx, downSampleFactor);
             vec2 negCoord = pixelDS + deltaInDS;
-            vec4 refractionNeg = blurredImage.eval(negCoord) * bgFactor;
+            vec4 refractionNeg = edgeBlurredImage.eval(negCoord) * bgFactor;
             refractionNeg.rgb = BlurVibrancy(refractionNeg.rgb);
             refractionNeg.rgb = CompareBlend(blurredBgColor.rgb, refractionNeg.rgb);
             refractionNeg.rgb = InnerShadowVibrancy(refractionNeg.rgb);
@@ -308,7 +309,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
             vec2 posCoord = pixelDS + deltaOutDS;
-            vec4 refractionPos = blurredImage.eval(posCoord) * bgFactor;
+            vec4 refractionPos = edgeBlurredImage.eval(posCoord) * bgFactor;
             refractionPos.rgb = CompareBlend(blurredBgColor.rgb, refractionPos.rgb);
             refractionPos.rgb = EdgeLightVibrancy(refractionPos.rgb);
             blurredBgColor = mix(blurredBgColor, refractionPos, clamp(embossPos, 0.0, 1.0));
@@ -367,16 +368,26 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         return nullptr;
     }
 
-    // base blur image to shader
-    auto baseBlurImg = MakeBaseBlurImg(canvas, src, dst, image);
-    auto baseBlurShader = Drawing::ShaderEffect::CreateImageShader(*baseBlurImg, Drawing::TileMode::CLAMP,
+    // large radius blur image to shader
+    auto largeRBlurImg = MakeLargeRadiusBlurImg(canvas, src, dst, image);
+    auto largeRBlurShader = Drawing::ShaderEffect::CreateImageShader(*largeRBlurImg, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    if (baseBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create baseBlurShader failed.");
+    if (largeRBlurShader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader failed.");
         return nullptr;
     }
 
-    auto builder = MakeFrostedGlassShader(shader, baseBlurShader, canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    // small radius blur image to shader
+    auto smallRBlurImg = MakeSmallRadiusBlurImg(canvas, src, dst, image);
+    auto smallRBlurShader = Drawing::ShaderEffect::CreateImageShader(*smallRBlurImg, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    if (smallRBlurShader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::create smallRBlurShader failed.");
+        return nullptr;
+    }
+
+    auto builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
+                                          canvasInfo_.geoHeight);
     if (builder == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
         return image;
@@ -390,11 +401,20 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
     return resultImage;
 }
 
-std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeBaseBlurImg(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeLargeRadiusBlurImg(Drawing::Canvas& canvas,
     const Drawing::Rect& src, const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image)
 {
     Drawing::GEMESABlurShaderFilterParams blurImgParas{};
-    blurImgParas.radius = frostedGlassParams_.blurRadius;
+    blurImgParas.radius = frostedGlassParams_.blurParams[0]; // Radius
+    blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
+    return blurShader_->OnProcessImage(canvas, image, src, dst);
+}
+
+std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurImg(Drawing::Canvas& canvas,
+    const Drawing::Rect& src, const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image)
+{
+    Drawing::GEMESABlurShaderFilterParams blurImgParas{};
+    blurImgParas.radius = frostedGlassParams_.blurParams[0]/frostedGlassParams_.blurParams[1]; // Radius / k
     blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
@@ -412,8 +432,8 @@ bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeFrostedGlassShader(
-    std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> baseBlurShader,
-    float imageWidth, float imageHeight)
+    std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
+    std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, float imageWidth, float imageHeight)
 {
     if (g_frostedGlassShaderEffect == nullptr) {
         if (!InitFrostedGlassEffect()) {
@@ -426,7 +446,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_frostedGlassShaderEffect);
     // Common inputs
     builder->SetChild("image", imageShader);
-    builder->SetChild("blurredImage", baseBlurShader);
+    builder->SetChild("edgeBlurredImg", largeRBlurShader);
+    builder->SetChild("bgBlurredImg", smallRBlurShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetUniform("halfsize", frostedGlassParams_.borderSize[NUM_0], frostedGlassParams_.borderSize[NUM_1]);
     builder->SetUniform("cornerRadius", frostedGlassParams_.cornerRadius);
