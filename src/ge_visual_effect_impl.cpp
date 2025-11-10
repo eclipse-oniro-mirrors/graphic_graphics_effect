@@ -2262,10 +2262,6 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
         return;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_BLURRADIUS) {
-        frostedGlassParams_->blurRadius = param;
-    }
-
     if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
         frostedGlassParams_->cornerRadius = param;
     }
@@ -2297,6 +2293,10 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         return;
     }
     
+    if (tag == GE_FILTER_FROSTED_GLASS_BLUR_PARAMS) {
+        frostedGlassParams_->blurParams = param;
+    }
+
     if (tag == GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS) {
         frostedGlassParams_->innerShadowParams = param;
     }
