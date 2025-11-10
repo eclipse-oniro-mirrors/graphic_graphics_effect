@@ -37,8 +37,8 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // 0) COMMON PARAMS & FUNCTIONS (shared by multiple effects)
     // ============================================================================
     uniform shader image;
-    uniform shader edgeBlurredImage;
-    uniform shader bgBlurredImage;
+    uniform shader edgeBlurredImg;
+    uniform shader bgBlurredImg;
     uniform vec2 iResolution;
     // ----- Shape Core -----
     uniform vec2 halfsize;       // rounded-rect half extents (px)
@@ -93,7 +93,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ----- Image sampling helpers -----
     vec4 BaseBlur(vec2 coord)
     {
-        return bgBlurredImage.eval(coord);  // pre-blurred background
+        return bgBlurredImg.eval(coord);  // pre-blurred background
     }
 
     // Optional original-image pixel sampling (not used in main but kept for reuse)
@@ -291,7 +291,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaInDS = ToDownsamplePx(nOut * innerShadowRefractPx, downSampleFactor);
             vec2 negCoord = pixelDS + deltaInDS;
-            vec4 refractionNeg = edgeBlurredImage.eval(negCoord) * bgFactor;
+            vec4 refractionNeg = edgeBlurredImg.eval(negCoord) * bgFactor;
             refractionNeg.rgb = BlurVibrancy(refractionNeg.rgb);
             refractionNeg.rgb = CompareBlend(blurredBgColor.rgb, refractionNeg.rgb);
             refractionNeg.rgb = InnerShadowVibrancy(refractionNeg.rgb);
@@ -309,7 +309,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
             vec2 posCoord = pixelDS + deltaOutDS;
-            vec4 refractionPos = edgeBlurredImage.eval(posCoord) * bgFactor;
+            vec4 refractionPos = edgeBlurredImg.eval(posCoord) * bgFactor;
             refractionPos.rgb = CompareBlend(blurredBgColor.rgb, refractionPos.rgb);
             refractionPos.rgb = EdgeLightVibrancy(refractionPos.rgb);
             blurredBgColor = mix(blurredBgColor, refractionPos, clamp(embossPos, 0.0, 1.0));
