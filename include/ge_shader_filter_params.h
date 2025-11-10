@@ -279,6 +279,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilterParam
 constexpr char GE_SHADER_HARMONIUM_EFFECT[] = "HarmoniumEffect";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASK[] = "HarmoniumEffect_Mask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK[] = "HarmoniumEffect_MaskClock";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_MASKPROGRESS[] = "HarmoniumEffect_MaskProgress";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK[] = "HarmoniumEffect_UseEffectMask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_TINTCOLOR[] = "HarmoniumEffect_TintColor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION[] = "HarmoniumEffect_RipplePosition";
@@ -300,10 +301,12 @@ constexpr char GE_SHADER_HARMONIUM_EFFECT_SATURATION[] = "HarmoniumEffect_Satura
 constexpr char GE_SHADER_HARMONIUM_EFFECT_POSRGB[] = "HarmoniumEffect_PosRGB";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_NEGRGB[] = "HarmoniumEffect_NegRGB";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_FRACTION[] = "HarmoniumEffect_Fraction";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX[] = "HarmoniumEffect_TotalMatrix";
 
 struct GEHarmoniumEffectShaderParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     std::shared_ptr<GEShaderMask> maskClock = nullptr;
+    float maskProgress = 1.f;
     std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
     Vector4f tintColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     std::vector<Vector2f> ripplePosition = {};
@@ -325,6 +328,7 @@ struct GEHarmoniumEffectShaderParams {
     Vector3f posRGB = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f negRGB = Vector3f(0.0f, 0.0f, 0.0f);
     float fraction = 1.f; // 1 means default value
+    Drawing::Matrix totalMatrix;
 };
 
 constexpr char GE_MASK_USE_EFFECT[] = "UseEffectMask";
