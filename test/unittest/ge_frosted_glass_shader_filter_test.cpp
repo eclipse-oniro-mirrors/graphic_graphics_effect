@@ -17,7 +17,14 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
-
+constexpr size_t NUM_0 = 0;
+constexpr size_t NUM_1 = 1;
+constexpr size_t NUM_2 = 2;
+constexpr size_t NUM_3 = 3;
+constexpr size_t NUM_4 = 4;
+constexpr size_t NUM_5 = 5;
+constexpr size_t NUM_6 = 6;
+constexpr size_t NUM_50 = 50;
 class GEFrostedGlassShaderFilterTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -46,7 +53,7 @@ void GEFrostedGlassShaderFilterTest::SetUp()
     // Build a 50x50 RGBA8888 bitmap and fill with BLUE, then convert to Image
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(50, 50, fmt);
+    bmp.Build(NUM_50, NUM_50, fmt);
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
 }
@@ -72,34 +79,34 @@ Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakePa
     p.bgFactor = 0.85f;
 
     // INNER SHADOW
-    p.innerShadowParams[0] = 3.5f;  // innerShadowRefractPx
-    p.innerShadowParams[1] = 1.25f; // innerShadowWidth
-    p.innerShadowParams[2] = 1.75f; // innerShadowExp
-    p.sdParams[0] = 1.0f;
-    p.sdParams[1] = 2.0f;
-    p.sdParams[2] = 1.2f;
+    p.innerShadowParams[NUM_0] = 3.5f;  // innerShadowRefractPx
+    p.innerShadowParams[NUM_1] = 1.25f; // innerShadowWidth
+    p.innerShadowParams[NUM_2] = 1.75f; // innerShadowExp
+    p.sdParams[NUM_0] = 1.0f;
+    p.sdParams[NUM_1] = 2.0f;
+    p.sdParams[NUM_2] = 1.2f;
 
     // ENV LIGHT
     p.refractOutPx = 4.0f;
-    p.envParams[0] = 1.1f;
-    p.envParams[1] = 0.0f;
-    p.envParams[2] = 1.1f;
+    p.envParams[NUM_0] = 1.1f;
+    p.envParams[NUM_1] = 0.0f;
+    p.envParams[NUM_2] = 1.1f;
 
     // HIGHLIGHT
-    p.highLightParams[0] = 55.0f; // angleDeg
-    p.highLightParams[1] = 25.0f; // featherDeg
-    p.highLightParams[2] = 3.0f;  // widthPx
-    p.highLightParams[3] = 2.0f;  // featherPx
-    p.highLightParams[4] = 0.5f;  // shiftPx
-    p.highLightParams[5] = 1.0f;  // dir.x
-    p.highLightParams[6] = 0.0f;  // dir.y
-    p.hlParams[0] = 1.0f;
-    p.hlParams[1] = 0.0f;
-    p.hlParams[2] = 1.0f;
+    p.highLightParams[NUM_0] = 55.0f; // angleDeg
+    p.highLightParams[NUM_1] = 25.0f; // featherDeg
+    p.highLightParams[NUM_2] = 3.0f;  // widthPx
+    p.highLightParams[NUM_3] = 2.0f;  // featherPx
+    p.highLightParams[NUM_4] = 0.5f;  // shiftPx
+    p.highLightParams[NUM_5] = 1.0f;  // dir.x
+    p.highLightParams[NUM_6] = 0.0f;  // dir.y
+    p.hlParams[NUM_0] = 1.0f;
+    p.hlParams[NUM_1] = 0.0f;
+    p.hlParams[NUM_2] = 1.0f;
 
     // BLUR (largeRadius = blurParams[0], smallRadius = blurParams[0]/blurParams[1])
-    p.blurParams[0] = 16.0f; // Radius
-    p.blurParams[1] = 4.0f;  // k (avoid 0 to prevent division by zero)
+    p.blurParams[NUM_0] = 16.0f; // Radius
+    p.blurParams[NUM_1] = 4.0f;  // k (avoid 0 to prevent division by zero)
 
     return p;
 }
@@ -122,19 +129,19 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_InvalidInputs, TestSize.
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
 
     // Case 2: width > 0, height == 0
-    bmp.Build(1, 0, fmt);
+    bmp.Build(NUM_1, NUM_0, fmt);
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto imgH0 = bmp.MakeImage();
     EXPECT_EQ(filter->OnProcessImage(canvas_, imgH0, src_, dst_), nullptr);
 
     // Case 3: width == 0, height > 0
-    bmp.Build(0, 1, fmt);
+    bmp.Build(NUM_0, NUM_1, fmt);
     bmp.ClearWithColor(Drawing::Color::COLOR_BLACK);
     auto imgW0 = bmp.MakeImage();
     EXPECT_EQ(filter->OnProcessImage(canvas_, imgW0, src_, dst_), nullptr);
 
     // Case 4: width == 0, height == 0
-    bmp.Build(0, 0, fmt);
+    bmp.Build(NUM_0, NUM_0, fmt);
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto img00 = bmp.MakeImage();
     EXPECT_EQ(filter->OnProcessImage(canvas_, img00, src_, dst_), nullptr);
@@ -185,13 +192,13 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
 
     Drawing::Bitmap bmpImg;
-    bmpImg.Build(2, 2, fmt);
+    bmpImg.Build(NUM_2, NUM_2, fmt);
     bmpImg.ClearWithColor(Drawing::Color::COLOR_WHITE);
     Drawing::Bitmap bmpBig;
-    bmpBig.Build(2, 2, fmt);
+    bmpBig.Build(NUM_2, NUM_2, fmt);
     bmpBig.ClearWithColor(Drawing::Color::COLOR_GREEN);
     Drawing::Bitmap bmpSml;
-    bmpSml.Build(2, 2, fmt);
+    bmpSml.Build(NUM_2, NUM_2, fmt);
     bmpSml.ClearWithColor(Drawing::Color::COLOR_RED);
 
     auto imgShaderImg = bmpImg.MakeImage();
