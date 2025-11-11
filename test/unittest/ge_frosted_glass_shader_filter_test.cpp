@@ -17,14 +17,12 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
+
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
-constexpr size_t NUM_3 = 3;
-constexpr size_t NUM_4 = 4;
-constexpr size_t NUM_5 = 5;
-constexpr size_t NUM_6 = 6;
 constexpr size_t NUM_50 = 50;
+
 class GEFrostedGlassShaderFilterTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -66,48 +64,24 @@ void GEFrostedGlassShaderFilterTest::TearDown()
 Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakeParams()
 {
     Drawing::GEFrostedGlassShaderFilterParams p;
-
     // COMMON
-    p.borderSize[0] = 80.0f;  // halfsize.x
-    p.borderSize[1] = 50.0f;  // halfsize.y
+    p.borderSize = {80.0, 50.f};
     p.cornerRadius = 20.0f;
     p.borderWidth = 6.0f;
     p.offset = 2.0f;
     p.downSampleFactor = 2.0f;
-
     // BACKGROUND
     p.bgFactor = 0.85f;
-
     // INNER SHADOW
-    p.innerShadowParams[NUM_0] = 3.5f;  // innerShadowRefractPx
-    p.innerShadowParams[NUM_1] = 1.25f; // innerShadowWidth
-    p.innerShadowParams[NUM_2] = 1.75f; // innerShadowExp
-    p.sdParams[NUM_0] = 1.0f;
-    p.sdParams[NUM_1] = 2.0f;
-    p.sdParams[NUM_2] = 1.2f;
-
+    p.innerShadowParams= {3.5f, 1.25f, 1.75f};
+    p.sdParams = {1.0f, 2.0f, 1.2f};
     // ENV LIGHT
     p.refractOutPx = 4.0f;
-    p.envParams[NUM_0] = 1.1f;
-    p.envParams[NUM_1] = 0.0f;
-    p.envParams[NUM_2] = 1.1f;
-
+    p.envParams = {1.1f, 0.0, 1.1f};
     // HIGHLIGHT
-    p.highLightParams[NUM_0] = 55.0f; // angleDeg
-    p.highLightParams[NUM_1] = 25.0f; // featherDeg
-    p.highLightParams[NUM_2] = 3.0f;  // widthPx
-    p.highLightParams[NUM_3] = 2.0f;  // featherPx
-    p.highLightParams[NUM_4] = 0.5f;  // shiftPx
-    p.highLightParams[NUM_5] = 1.0f;  // dir.x
-    p.highLightParams[NUM_6] = 0.0f;  // dir.y
-    p.hlParams[NUM_0] = 1.0f;
-    p.hlParams[NUM_1] = 0.0f;
-    p.hlParams[NUM_2] = 1.0f;
-
-    // BLUR (largeRadius = blurParams[0], smallRadius = blurParams[0]/blurParams[1])
-    p.blurParams[NUM_0] = 16.0f; // Radius
-    p.blurParams[NUM_1] = 4.0f;  // k (avoid 0 to prevent division by zero)
-
+    p.highLightParams= {30.0f, 30.0f, 3.0f, 2.0f, -1.0f, -1.0f, 1.0f};
+    // BLUR
+    p.blurParams = {48.0f, 4.0f};
     return p;
 }
 
