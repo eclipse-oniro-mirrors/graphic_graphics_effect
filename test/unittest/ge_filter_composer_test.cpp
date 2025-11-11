@@ -279,19 +279,15 @@ HWTEST_F(GEFilterComposerTest, HpsBuildPassRunWithMixedEffect, TestSize.Level1)
     GEHpsBuildPass pass(canvas_, context);
 
     std::vector<GEFilterComposable> composables {
-        CreateGreyEffect(), CreateGreyEffect(),              // composables[0]
-        CreateVisualEffect(Drawing::GE_FILTER_WATER_RIPPLE), // composables[1]
-        CreateGreyEffect()                                   // composables[2]
+        CreateGreyEffect(), CreateGreyEffect(),
+        CreateVisualEffect(Drawing::GE_FILTER_WATER_RIPPLE),
+        CreateGreyEffect()
     };
 
     auto result = pass.Run(composables);
-    // Should compose the effect into 2 HpsEffectFilters
-    EXPECT_TRUE(result.changed);
-    ASSERT_EQ(composables.size(), 3); // 3: composed 2 effects and leave 1 effects unchanged
-    EXPECT_NE(composables[0].GetHpsEffect(), nullptr);
-    ASSERT_NE(composables[1].GetEffect(), nullptr);
-    EXPECT_EQ(composables[1].GetEffect()->GetImpl()->GetFilterType(), GEFilterType::WATER_RIPPLE);
-    EXPECT_NE(composables[2].GetHpsEffect(), nullptr);
+    // Should not compose at all. HPS currently requires all filters to be applied.
+    EXPECT_FALSE(result.changed);
+    EXPECT_EQ(composables.size(), 4); // 4: original size
 
     GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithMixedEffect end";
 }
