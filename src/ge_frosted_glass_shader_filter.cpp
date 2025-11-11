@@ -284,7 +284,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         float embossNeg = exp(innerShadowExp * (sdBlack - 1.0 + innerShadowWidth));
         if (embossNeg > 0.0) {
             // Map to blur-buffer pixel grid
-            vec2 tileSize = iResolution.xy / downSampleFactor;
+            vec2 tileSize = iResolution.xy / max(downSampleFactor, 1e-6);
             vec2 uvInTile = fragCoord / iResolution.xy;
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Inward refraction sample
@@ -302,7 +302,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         float embossPos = (border - borderBlack + 1.0) * 0.5 * clamp(border + borderBlack, 0.0, 1.0);
         if (embossPos > 0.0) {
             // Map to blur-buffer pixel grid
-            vec2 tileSize = iResolution.xy / downSampleFactor;
+            vec2 tileSize = iResolution.xy / max(downSampleFactor, 1e-6);
             vec2 uvInTile = fragCoord / iResolution.xy;
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Outward refraction sample
