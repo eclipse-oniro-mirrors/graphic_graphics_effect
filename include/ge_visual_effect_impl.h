@@ -534,6 +534,16 @@ public:
         return frameGradientMaskParams_;
     }
 
+    const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
+    {
+        return sdfShadowShaderParams_;
+    }
+
+    void MakeSDFShadowParams()
+    {
+        sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
+    }
+
     void SetBorder(const Color& borderColor, float borderWidth);
     void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
                   float radius, Drawing::Path path, bool isFilled);
@@ -590,6 +600,7 @@ private:
     void SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetGasifyParams(const std::string& tag, float param);
     void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetSdfShadowParams(const std::string& tag, std::shared_ptr<Drawing::GEShaderShape> param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -641,6 +652,7 @@ private:
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
 };
 
 } // namespace Drawing

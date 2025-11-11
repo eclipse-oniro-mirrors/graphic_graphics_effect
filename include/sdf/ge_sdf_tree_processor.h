@@ -48,6 +48,7 @@ class GESDFTreeProcessor final {
 public:
 
     explicit GESDFTreeProcessor(const GESDFFilterParams& params);
+    explicit GESDFTreeProcessor(const std::shared_ptr<GESDFShaderShape>& shape) : sdfShape_(shape) {};
 
     GESDFTreeProcessor(GESDFTreeProcessor&& processor) = default;
     GESDFTreeProcessor(const GESDFTreeProcessor& processor) = delete;
@@ -56,6 +57,7 @@ public:
     GESDFTreeProcessor& operator = (const GESDFTreeProcessor& processor) = delete;
 
     [[nodiscard]] std::string Process();
+    void ProcessSDFShape(std::string& headers, std::string& functions);
     void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder);
 
     void UpdateParams(const GESDFFilterParams& params);
