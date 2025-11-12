@@ -1090,7 +1090,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             break;
         }
         case FilterType::SDF_SHADOW: {
-            SetSdfShadowParams(tag, param);
+            if (sdfShadowShaderParams_ && param) {
+                sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
             break;
         }
         default:
@@ -2169,16 +2171,6 @@ void GEVisualEffectImpl::SetShadow(const Drawing::Color& color, float offsetX,
         sdfFilterParams_->shadow->path = path;
         sdfFilterParams_->shadow->isFilled = isFilled;
     }
-}
-
-void GEVisualEffectImpl::SetSdfShadowParams(const std::string& tag, std::shared_ptr<Drawing::GEShaderShape> param)
-{
-    if (sdfShadowShaderParams_ == nullptr || !param) {
-        return;
-    }
-
-    sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
-
 }
 
 void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, float param)

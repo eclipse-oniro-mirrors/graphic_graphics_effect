@@ -242,7 +242,8 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
-    {GEVisualEffectImpl::FilterType::SDF_SHADOW, [] (std::shared_ptr<GEVisualEffectImpl> ve){
+    {GEVisualEffectImpl::FilterType::SDF_SHADOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
             std::shared_ptr<GEShader> out = nullptr;
             if (ve == nullptr) {
                 return out;

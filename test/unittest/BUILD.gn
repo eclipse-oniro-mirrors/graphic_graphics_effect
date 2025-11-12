@@ -55,6 +55,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/sdf/ge_sdf_shader_filter.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_effects.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_shader_shape.cpp",
+    "${graphics_effect_root}/src/sdf/ge_sdf_shadow_shader.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_tree_processor.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_union_op_shader_shape.cpp",
 
@@ -161,6 +162,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_image_shader_mask_test.cpp",
     "ge_render_test.cpp",
     "ge_ripple_shader_mask_test.cpp",
+    "ge_sdf_shadow_shader_test.cpp",
     "ge_shader_filter_test.cpp",
     "ge_shader_test.cpp",
     "ge_sound_wave_filter_test.cpp",

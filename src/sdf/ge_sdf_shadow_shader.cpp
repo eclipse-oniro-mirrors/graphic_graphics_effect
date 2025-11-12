@@ -22,8 +22,8 @@ namespace OHOS {
 namespace Rosen {
 static constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
 
- GESDFShadowShader:: GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params)
-    :params_(params), sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params.shape))
+GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params)
+    : params_(params), sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params.shape))
 {}
 
 void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
@@ -33,10 +33,6 @@ void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progr
 
 std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(const Drawing::Rect& rect)
 {
-    if (!rect.IsValid()) {
-        GE_LOGE("GESDFShadowShader::MakeSDFShadowShader rect is invalid.");
-        return nullptr;
-    }
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     if (height < 1e-6 || width < 1e-6) {

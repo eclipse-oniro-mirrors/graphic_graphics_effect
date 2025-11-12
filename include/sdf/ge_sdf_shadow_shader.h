@@ -110,4 +110,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
  
-#endif // GRAPHICS_EFFECT_GE_SDF_SHADOW_SHADER_FILTER_H
+#endif // GRAPHICS_EFFECT_GE_SDF_SHADOW_SHADER_H
