@@ -330,11 +330,49 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     }
 )";
 
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
-
 GEFrostedGlassShaderFilter::GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params)
 {
     frostedGlassParams_ = params;
+}
+
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader(
+    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
+    const Drawing::Rect& dst, const Drawing::Matrix& invertMatrix)
+{
+    auto largeRBlurImg = MakeLargeRadiusBlurImg(canvas, src, dst, image);
+    if (largeRBlurImg == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader largeRBlurImg is null");
+        return nullptr;
+    }
+
+    auto largeRBlurShader = Drawing::ShaderEffect::CreateImageShader(*largeRBlurImg, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    if (largeRBlurShader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader create shader failed");
+        return nullptr;
+    }
+
+    return largeRBlurShader;
+}
+
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader(
+    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
+    const Drawing::Rect& dst, const Drawing::Matrix& invertMatrix)
+{
+    auto smallRBlurImg = MakeSmallRadiusBlurImg(canvas, src, dst, image);
+    if (smallRBlurImg == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader smallRBlurImg is null");
+        return nullptr;
+    }
+
+    auto smallRBlurShader = Drawing::ShaderEffect::CreateImageShader(*smallRBlurImg, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    if (smallRBlurShader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader create shader failed");
+        return nullptr;
+    }
+
+    return smallRBlurShader;
 }
 
 std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
@@ -361,12 +399,8 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         LOGE("GEFrostedGlassShaderFilter::create shader failed.");
         return nullptr;
     }
-    auto largeRBlurImg = MakeLargeRadiusBlurImg(canvas, src, dst, image);
-    auto largeRBlurShader = Drawing::ShaderEffect::CreateImageShader(*largeRBlurImg, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    auto smallRBlurImg = MakeSmallRadiusBlurImg(canvas, src, dst, image);
-    auto smallRBlurShader = Drawing::ShaderEffect::CreateImageShader(*smallRBlurImg, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    auto largeRBlurShader = CreateLargeRadiusBlurShader(canvas, image, src, dst, invertMatrix);
+    auto smallRBlurShader = CreateSmallRadiusBlurShader(canvas, image, src, dst, invertMatrix);
     if (smallRBlurShader == nullptr || largeRBlurShader == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
         return nullptr;
@@ -390,7 +424,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeLargeRadiusBlurI
 {
     Drawing::GEMESABlurShaderFilterParams blurImgParas{};
     blurImgParas.radius = frostedGlassParams_.blurParams[0]; // Radius
-    blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
+    auto blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
 
@@ -399,9 +433,11 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurI
 {
     Drawing::GEMESABlurShaderFilterParams blurImgParas{};
     blurImgParas.radius = frostedGlassParams_.blurParams[0]/frostedGlassParams_.blurParams[1]; // Radius / k
-    blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
+    auto blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
+
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
 
 bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
 {
