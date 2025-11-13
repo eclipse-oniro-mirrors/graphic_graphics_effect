@@ -844,8 +844,8 @@ constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
 constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
 constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
 // Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLES[] = "FrostedGlass_EdgeLightAngles";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_FEATHER[] = "FrostedGlass_EdgeLightFeather";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngle";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlur";
 constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDir";
 constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
 
@@ -860,13 +860,13 @@ struct GEFrostedGlassShaderFilterParams {
     float bgFactor = 0.9f;
     // Inner shadow parameters
     Vector3f innerShadowParams = Vector3f(-0.02f, 2.0f, 4.62f};
-    Vector3f sdParams = Vector3f(0.9f, 0.0f, 1.0f};
+    Vector3f sdParams = Vector3f(0.9f, 0.0f, 1.0f);
     // Env refraction parameters
     float refractOutPx = 20.0f;
-    Vector3f envParams = Vector3f(0.8f, 70.0f, 2.0f};
+    Vector3f envParams = Vector3f(0.8f, 70.0f, 2.0f);
     // Edge highlights parameters
-    Vector3f edgeLightAngles = Vector3f(30.0f, 30.0f, 3.0f);
-    Vector2f edgeLightFeather = Vecotr2f(2.0f, -1.0f);
+    Vector3f edgeLightAngle = Vector3f(30.0f, 30.0f, 3.0f);
+    Vector2f edgeLightBlur = Vecotr2f(2.0f, -1.0f);
     Vector2f edgeLightDir = Vector2f(-1.0f, 1.0f);
     Vector3f hlParams = Vector3f(0.6027f, 160.0f, 2.0f);
 };
