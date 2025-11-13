@@ -89,8 +89,8 @@ Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakePa
     p.refractOutPx = 4.0f;
     p.envParams = {1.1f, 0.0, 1.1f};
     // EDGELIGHT
-    p.edgeLightAngles= {30.0f, 30.0f, 3.0f};
-    p.edgeLightFeather = {2.0f, -1.0f};
+    p.edgeLightAngle= {30.0f, 30.0f, 3.0f};
+    p.edgeLightBlur = {2.0f, -1.0f};
     p.edgeLightDir = {-1.0f, 1.0f};
     // BLUR
     p.blurParams = {48.0f, 4.0f};
