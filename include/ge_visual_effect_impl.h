@@ -602,7 +602,7 @@ private:
     void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassParams(const std::string& tag, const float& param);
-    void SetFrostedGlassParams(const std::string& tag, const std::vector<float>& param);
+    void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
