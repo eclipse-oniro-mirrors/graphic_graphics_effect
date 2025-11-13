@@ -38,6 +38,12 @@ public:
         std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, float imageWidth, float imageHeight);
 
 private:
+    std::shared_ptr<Drawing::ShaderEffect> CreateLargeRadiusBlurShader(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const Drawing::Matrix& invertMatrix);
+    std::shared_ptr<Drawing::ShaderEffect> CreateSmallRadiusBlurShader(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const Drawing::Matrix& invertMatrix);
     std::shared_ptr<Drawing::Image> MakeSmallRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
