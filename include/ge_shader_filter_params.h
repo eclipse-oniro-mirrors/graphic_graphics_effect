@@ -859,14 +859,14 @@ struct GEFrostedGlassShaderFilterParams {
     // Background darken parameters
     float bgFactor = 0.9f;
     // Inner shadow parameters
-    Vector3f innerShadowParams = Vector3f(-0.02f, 2.0f, 4.62f};
+    Vector3f innerShadowParams = Vector3f(-0.02f, 2.0f, 4.62f);
     Vector3f sdParams = Vector3f(0.9f, 0.0f, 1.0f);
     // Env refraction parameters
     float refractOutPx = 20.0f;
     Vector3f envParams = Vector3f(0.8f, 70.0f, 2.0f);
     // Edge highlights parameters
     Vector3f edgeLightAngle = Vector3f(30.0f, 30.0f, 3.0f);
-    Vector2f edgeLightBlur = Vecotr2f(2.0f, -1.0f);
+    Vector2f edgeLightBlur = Vector2f(2.0f, -1.0f);
     Vector2f edgeLightDir = Vector2f(-1.0f, 1.0f);
     Vector3f hlParams = Vector3f(0.6027f, 160.0f, 2.0f);
 };
