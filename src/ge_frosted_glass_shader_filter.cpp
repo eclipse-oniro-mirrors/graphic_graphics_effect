@@ -23,9 +23,6 @@ constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
-constexpr size_t NUM_4 = 4;
-constexpr size_t NUM_5 = 5;
-constexpr size_t NUM_6 = 6;
 static constexpr char MAIN_SHADER_PROG[] = R"(
     // -----------------------------------------------------------------------------
     // Rounded-rect frosted glass style shader with toggleable effects.
@@ -489,13 +486,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetUniform("envB", frostedGlassParams_.envParams[NUM_1]);
     builder->SetUniform("envS", frostedGlassParams_.envParams[NUM_2]);
     // Edge highlights parameters
-    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.highLightParams[NUM_0]);
-    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.highLightParams[NUM_1]);
-    builder->SetUniform("highLightWidthPx", frostedGlassParams_.highLightParams[NUM_2]);
-    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.highLightParams[NUM_3]);
-    builder->SetUniform("highLightShiftPx", frostedGlassParams_.highLightParams[NUM_4]);
-    builder->SetUniform("highLightDirection", frostedGlassParams_.highLightParams[NUM_5],
-                        frostedGlassParams_.highLightParams[NUM_6]);
+    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edgeLightParams1[NUM_0]);
+    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edgeLightParams1[NUM_1]);
+    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edgeLightParams1[NUM_2]);
+    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edgeLightParams2[NUM_0]);
+    builder->SetUniform("highLightShiftPx", frostedGlassParams_.edgeLightParams2[NUM_1]);
+    builder->SetUniform("highLightDirection", frostedGlassParams_.edgeLightDir[NUM_0],
+                        frostedGlassParams_.edgeLightDir[NUM_1]);
     builder->SetUniform("hlK", frostedGlassParams_.hlParams[NUM_0]);
     builder->SetUniform("hlB", frostedGlassParams_.hlParams[NUM_1]);
     builder->SetUniform("hlS", frostedGlassParams_.hlParams[NUM_2]);
