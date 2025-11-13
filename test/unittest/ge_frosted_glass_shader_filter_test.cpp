@@ -73,7 +73,7 @@ void GEFrostedGlassShaderFilterTest::TearDown()
 
 Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakeParams()
 {
-    Drawing::GEFrostedGlassShaderFilterParams p;
+    Drawing::GEFrostedGlassShaderFilterParams p; // Default parameters
     // COMMON
     p.borderSize = {80.0, 50.f};
     p.cornerRadius = 20.0f;
