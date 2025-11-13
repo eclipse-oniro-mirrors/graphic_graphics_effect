@@ -43,7 +43,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform float offset;        // inner band offset for embossing
 
     // ----- AA / Numeric -----
-    const float antiAliasing = 0.5;  // global AA softness scaling
+    const float ANTI_ALIASING = 0.5;  // global AA softness scaling
     const float PI = 3.14159265358979323846;
     const float EPSILON = 1e-4;
     const float N_EPS = 1e-6;
@@ -263,13 +263,13 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         float sdBlack = SdfRRect(uv - centerPos, halfsize - offset, cornerRadius - offset);
         // Two-sided "border" masks → signed emboss pair (pos/neg) bands
         float border =
-            smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sd * antiAliasing) -
-            smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
-                       (-sd - borderWidth) * antiAliasing);
+            smoothstep(-1.0 + ANTI_ALIASING, max(1.0, borderWidth * ANTI_ALIASING * 0.5), -sd * ANTI_ALIASING) -
+            smoothstep(min(-borderWidth * ANTI_ALIASING * 0.5, -1.), 1.0 - ANTI_ALIASING,
+                       (-sd - borderWidth) * ANTI_ALIASING);
         float borderBlack =
-            smoothstep(-1.0 + antiAliasing, max(1.0, borderWidth * antiAliasing * 0.5), -sdBlack * antiAliasing) -
-            smoothstep(min(-borderWidth * antiAliasing * 0.5, -1.), 1.0 - antiAliasing,
-                       (-sdBlack - borderWidth) * antiAliasing);
+            smoothstep(-1.0 + ANTI_ALIASING, max(1.0, borderWidth * ANTI_ALIASING * 0.5), -sdBlack * ANTI_ALIASING) -
+            smoothstep(min(-borderWidth * ANTI_ALIASING * 0.5, -1.), 1.0 - ANTI_ALIASING,
+                       (-sdBlack - borderWidth) * ANTI_ALIASING);
         vec2 offsetUV = uv - centerPos;
 
         // ------------------------------- BACKGROUND -------------------------------
