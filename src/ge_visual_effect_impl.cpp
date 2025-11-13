@@ -2266,7 +2266,6 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR) {
         frostedGlassParams_->edgeLightDir = Vector2f(param.first, param.second);
     }
-
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const float& param)
