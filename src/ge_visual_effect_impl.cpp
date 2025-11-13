@@ -2259,8 +2259,8 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         frostedGlassParams_->blurParams = Vector2f(param.first, param.second);
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_PARAMS3) {
-        frostedGlassParams_->highLightParams = param;
+    if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_PARAMS2) {
+        frostedGlassParams_->edgeLightParams2 = Vector2f(param.first, param.second);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR) {
@@ -2319,7 +2319,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vec
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_PARAMS1) {
-        frostedGlassParams_->highLightParams = param;
+        frostedGlassParams_->edgeLightParams1 = param;
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_HL_PARAMS) {
