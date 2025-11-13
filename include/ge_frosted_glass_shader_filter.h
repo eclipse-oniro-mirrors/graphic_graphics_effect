@@ -43,7 +43,6 @@ private:
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
-    std::shared_ptr<GEMESABlurShaderFilter> blurShader_ = nullptr;
 };
 
 } // namespace Rosen
