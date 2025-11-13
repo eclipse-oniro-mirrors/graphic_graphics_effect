@@ -485,11 +485,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetUniform("envB", frostedGlassParams_.envParams[NUM_1]);
     builder->SetUniform("envS", frostedGlassParams_.envParams[NUM_2]);
     // Edge highlights parameters
-    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edgeLightParams1[NUM_0]);
-    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edgeLightParams1[NUM_1]);
-    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edgeLightParams1[NUM_2]);
-    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edgeLightParams2[NUM_0]);
-    builder->SetUniform("highLightShiftPx", frostedGlassParams_.edgeLightParams2[NUM_1]);
+    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edgeLightAngle[NUM_0]);
+    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edgeLightAngle[NUM_1]);
+    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edgeLightAngle[NUM_2]);
+    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edgeLightBlur[NUM_0]);
+    builder->SetUniform("highLightShiftPx", frostedGlassParams_.edgeLightBlur[NUM_1]);
     builder->SetUniform("highLightDirection", frostedGlassParams_.edgeLightDir[NUM_0],
                         frostedGlassParams_.edgeLightDir[NUM_1]);
     builder->SetUniform("hlK", frostedGlassParams_.hlParams[NUM_0]);
