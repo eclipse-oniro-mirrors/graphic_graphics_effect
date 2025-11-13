@@ -33,7 +33,6 @@ enum class GEFilterType : int32_t {
     COLOR_GRADIENT,
     MASK_TRANSITION,
     SDF,
-    FROSTED_GLASS,
     // Mask
     RIPPLE_MASK,
     DOUBLE_RIPPLE_MASK,
@@ -72,7 +71,8 @@ enum class GEFilterType : int32_t {
     AIBAR_GLOW,
     ROUNDED_RECT_FLOWLIGHT,
     GRADIENT_FLOW_COLORS,
-    MAX
+    MAX,
+    FROSTED_GLASS,
 };
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
