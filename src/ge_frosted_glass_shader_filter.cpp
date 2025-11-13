@@ -322,7 +322,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
 
         // ------------------------------- BACKGROUND MIX ---------------------------
         blurredBgColor = mix(image.eval(fragCoord), blurredBgColor, clamp(-min(sd, sdBlack), 0.0, 1.0));
-        return blurredBgColor.rgb1;  // vec4(rgb, 1.0)
+        return blurredBgColor.rgb1;
     }
 )";
 
