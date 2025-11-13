@@ -22,7 +22,6 @@ namespace Rosen {
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
-constexpr size_t NUM_3 = 3;
 static constexpr char MAIN_SHADER_PROG[] = R"(
     // -----------------------------------------------------------------------------
     // Rounded-rect frosted glass style shader with toggleable effects.
