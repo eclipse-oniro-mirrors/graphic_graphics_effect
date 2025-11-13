@@ -345,6 +345,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeFrameGradientMaskParams();
         }
     },
+    { GE_FILTER_FROSTED_GLASS,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS);
+            impl->MakeFrostedGlassParams();
+        }
+    },
     { GE_FILTER_GASIFY_SCALE_TWIST,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
@@ -640,6 +646,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             }
             break;
         }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -820,6 +830,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
             ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
             break;
         }
         default:
@@ -1128,6 +1142,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             if (tag == GE_SHADER_HARMONIUM_EFFECT_NEGRGB) {
                 harmoniumEffectParams_->negRGB = param;
             }
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
             break;
         }
         default:
@@ -2236,6 +2254,87 @@ void GEVisualEffectImpl::SetGasifyParams(const std::string& tag, const std::shar
     }
     if (tag == GE_FILTER_GASIFY_MASK) {
         gasifyFilterParams_->maskImage_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BORDERSIZE) {
+        frostedGlassParams_->borderSize = Vector2f(param.first, param.second);
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BLUR_PARAMS) {
+        frostedGlassParams_->blurParams = Vector2f(param.first, param.second);
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR) {
+        frostedGlassParams_->edgeLightBlur = Vector2f(param.first, param.second);
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR) {
+        frostedGlassParams_->edgeLightDir = Vector2f(param.first, param.second);
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const float& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
+        frostedGlassParams_->cornerRadius = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BORDERWIDTH) {
+        frostedGlassParams_->borderWidth = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_OFFSET) {
+        frostedGlassParams_->offset = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR) {
+        frostedGlassParams_->downSampleFactor = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BG_FACTOR) {
+        frostedGlassParams_->bgFactor = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
+        frostedGlassParams_->refractOutPx = param;
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vector3f& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS) {
+        frostedGlassParams_->innerShadowParams = param;
+    }
+    
+    if (tag == GE_FILTER_FROSTED_GLASS_SD_PARAMS) {
+        frostedGlassParams_->sdParams = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_ENV_PARAMS) {
+        frostedGlassParams_->envParams = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE) {
+        frostedGlassParams_->edgeLightAngle = param;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_HL_PARAMS) {
+        frostedGlassParams_->hlParams = param;
     }
 }
 } // namespace Drawing
