@@ -844,12 +844,14 @@ constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
 constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
 constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
 // Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_HIGH_LIGHT_PARAMS[] = "FrostedGlass_HighLightParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_PARAMS1[] = "FrostedGlass_EdgeLightParams1";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_PARAMS2[] = "FrostedGlass_EdgeLightParams2";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDir";
 constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
 
 struct GEFrostedGlassShaderFilterParams {
     Vector2f borderSize = Vector2f(200.0f, 100.0f);
-    std::vector<float> blurParams = {48.0f, 4.0f};
+    Vector2f blurParams = Vector2f(48.0f, 4.0f);
     float cornerRadius = 100.0f;
     float borderWidth = 2.9f;
     float offset = 1.88f;
@@ -857,14 +859,16 @@ struct GEFrostedGlassShaderFilterParams {
     // Background darken parameters
     float bgFactor = 0.9f;
     // Inner shadow parameters
-    std::vector<float> innerShadowParams = {-0.02f, 2.0f, 4.62f};
-    std::vector<float> sdParams = {0.9f, 0.0f, 1.0f};
+    Vector3f innerShadowParams = Vector3f(-0.02f, 2.0f, 4.62f};
+    Vector3f sdParams = Vector3f(0.9f, 0.0f, 1.0f};
     // Env refraction parameters
     float refractOutPx = 20.0f;
-    std::vector<float> envParams = {0.8f, 70.0f, 2.0f};
+    Vector3f envParams = Vector3f(0.8f, 70.0f, 2.0f};
     // Edge highlights parameters
-    std::vector<float> highLightParams = {30.0f, 30.0f, 3.0f, 2.0f, -1.0f, -1.0f, 1.0f};
-    std::vector<float> hlParams = {0.6027f, 160.0f, 2.0f};
+    Vector3f edgeLightParams1 = Vector3f(30.0f, 30.0f, 3.0f);
+    Vector2f edgeLightParams2 = Vecotr2f(2.0f, -1.0f);
+    Vector2f edgeLightDir = Vector2f(-1.0f, 1.0f);
+    Vector3f hlParams = Vector3f(0.6027f, 160.0f, 2.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
