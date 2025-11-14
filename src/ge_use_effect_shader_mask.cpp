@@ -30,7 +30,7 @@ namespace Drawing {
 
 bool GEUseEffectShaderMask::IsValid() const
 {
-    if (param_.image == nullptr) {
+    if (param_.image.lock() == nullptr) {
         LOGE("GEUseEffectShaderMask::IsValid image is nullptr");
         return false;
     }
@@ -50,7 +50,12 @@ std::shared_ptr<ShaderEffect> GEUseEffectShaderMask::GenerateDrawingShader(float
         return nullptr;
     }
     static const Drawing::SamplingOptions option(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
-    builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(*param_.image,
+    auto image = param_.image.lock();
+    if (image == nullptr) {
+        LOGE("GEUseEffectShaderMask::GenerateDrawingShader image is nullptr");
+        return nullptr;
+    }
+    builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(*image,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, option, Drawing::Matrix()));
 
     auto useEffectMaskEffectShader = builder->MakeShader(nullptr, false);

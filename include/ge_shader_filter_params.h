@@ -288,7 +288,6 @@ constexpr char GE_SHADER_HARMONIUM_EFFECT_DISTORTPROGRESS[] = "HarmoniumEffect_D
 constexpr char GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR[] = "HarmoniumEffect_DistortFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR[] = "HarmoniumEffect_ReflectionFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFRACTIONFACTOR[] = "HarmoniumEffect_RefractionFactor";
-constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE[] = "HarmoniumEffect_BlurImage";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURLEFT[] = "HarmoniumEffect_BlurLeft";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURTOP[] = "HarmoniumEffect_BlurTop";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR[] = "HarmoniumEffect_MaterialFactor";
@@ -315,7 +314,6 @@ struct GEHarmoniumEffectShaderParams {
     float distortFactor = 0.f;
     float reflectionFactor = 0.f;
     float refractionFactor = 0.f;
-    std::shared_ptr<Drawing::Image> blurImage = nullptr;
     float blurLeft = 0.f;
     float blurTop = 0.f;
     float materialFactor = 0.f;
@@ -335,7 +333,7 @@ constexpr char GE_MASK_USE_EFFECT[] = "UseEffectMask";
 constexpr char GE_MASK_USE_EFFECT_PIXEL_MAP[] = "UseEffectMask_Image";
 constexpr char GE_MASK_USE_EFFECT_USE_EFFECT[] = "UseEffectMask_UseEffect";
 struct GEUseEffectMaskParams {
-    std::shared_ptr<Drawing::Image> image = nullptr;
+    std::weak_ptr<Drawing::Image> image;
     bool useEffect = false;
 };
 

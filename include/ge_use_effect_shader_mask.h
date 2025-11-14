@@ -33,11 +33,11 @@ public:
  
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-    std::shared_ptr<Drawing::Image> GetImage() const override
+    std::weak_ptr<Drawing::Image> GetImage() const override
     {
         if (!param_.useEffect) {
             LOGE("GEUseEffectShaderMask::GetImage failed.");
-            return nullptr;
+            return {};
         }
         return param_.image;
     }
