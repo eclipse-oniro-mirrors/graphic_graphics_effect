@@ -138,7 +138,7 @@ HWTEST_F(GEImageShaderMaskTest, GetImage_001, TestSize.Level1)
     };
     ASSERT_NE(param.image, nullptr);
     auto geImageShaderMask = std::make_shared<GEImageShaderMask>(param);
-    EXPECT_NE(geImageShaderMask->GetImage(), nullptr);
+    EXPECT_NE(geImageShaderMask->GetImage().lock(), nullptr);
 
     GTEST_LOG_(INFO) << "GEImageShaderMaskTest GetImage_001 end";
 }

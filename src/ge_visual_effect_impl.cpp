@@ -671,15 +671,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE) {
-                harmoniumEffectParams_->blurImage = param;
-            }
-            break;
-        }
         case FilterType::GASIFY_SCALE_TWIST: {
             SetGasifyScaleTwistParams(tag, param);
             break;

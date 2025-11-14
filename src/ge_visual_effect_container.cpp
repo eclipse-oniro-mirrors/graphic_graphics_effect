@@ -86,7 +86,6 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
 {
     for (auto vef : GetFilters()) {
         if (vef->GetName() == "HarmoniumEffect") {
-            vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE, cachedImage);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
             if (vef->GetImpl() == nullptr) {
