@@ -27,8 +27,10 @@ namespace Rosen {
 
 class GESDFShadowShaderTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    void SetUp() override {}
+    void TearDown() override {}
     static inline Drawing::Canvas canvas_;
 };
 
@@ -51,7 +53,8 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     Drawing::Rect rect1 { 1.0f, 1.0f, 2.0f, 2.0f };
     shader = shadowShader.MakeSDFShadowShader(rect0);
     EXPECT_EQ(shader, nullptr);
-    
+
+    Drawing::GESDFRRectShapeParams rectShadpeParams;
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShadpeParams);
     shadowParams.shape = sdfShape;
     shadowShader.sdfTreeProcessor_ = std::make_optional<Drawing::GESDFTreeProcessor>(sdfShape);
@@ -64,6 +67,5 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     shader = shadowShader.MakeSDFShadowShader(rect0);
     EXPECT_NE(shader, nullptr);
 }
-
 } // namespace Rosen
 } // namespace OHOS
