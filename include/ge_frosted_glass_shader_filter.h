@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Rosen {
 
 class GEMESABlurShaderFilter;
-class GEFrostedGlassShaderFilter : public GEShaderFilter {
+class GE_EXPORT GEFrostedGlassShaderFilter : public GEShaderFilter {
 public:
     GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params);
     ~GEFrostedGlassShaderFilter() override = default;
