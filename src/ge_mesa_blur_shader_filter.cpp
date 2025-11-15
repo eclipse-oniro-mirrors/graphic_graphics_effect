@@ -563,10 +563,10 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     auto tmpBlur = OnProcessImageWithoutUpSampling(canvas, image, src, dst);
-     if (!tmpBlur) {
-         LOGE("GEMESABlurShaderFilter::OnProcessImage make image error in PingPongBlur");
-         return image;
-     }
+    if (!tmpBlur) {
+        LOGE("GEMESABlurShaderFilter::OnProcessImage make image error in PingPongBlur");
+        return image;
+    }
 
     auto input = image;
     auto width = std::max(static_cast<int>(std::ceil(dst.GetWidth())), input->GetWidth());
