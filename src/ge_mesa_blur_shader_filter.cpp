@@ -572,7 +572,6 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::
     auto width = std::max(static_cast<int>(std::ceil(dst.GetWidth())), input->GetWidth());
     auto height = std::max(static_cast<int>(std::ceil(dst.GetHeight())), input->GetHeight());
     auto output = ScaleAndAddRandomColor(canvas, input, tmpBlur, src, dst, width, height);
-
     return output;
 }
 
