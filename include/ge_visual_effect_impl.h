@@ -413,7 +413,15 @@ public:
         sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
     }
 
+    void MakeSDFPixelmapShapeParams()
+    {
+        sdfPixelmapShapeParams_ = std::make_shared<GESDFPixelmapShapeParams>();
+    }
 
+    const std::shared_ptr<GESDFPixelmapShapeParams>& GetSDFPixelmapShapeParams() const
+    {
+        return sdfPixelmapShapeParams_;
+    }
     void MakeColorGradientEffectParams()
     {
         colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
@@ -655,6 +663,7 @@ private:
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFPixelmapShapeParams> sdfPixelmapShapeParams_ = nullptr;
 };
 
 } // namespace Drawing

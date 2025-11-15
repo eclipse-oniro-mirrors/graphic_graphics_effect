@@ -24,6 +24,7 @@ namespace Drawing {
 
 enum class GESDFShapeType : uint8_t {
     UNION_OP = 0,
+    PIXELMAP,
     RRECT,
     MAX = RRECT,
 };
@@ -34,8 +35,8 @@ public:
     GESDFShaderShape(const GESDFShaderShape&) = delete;
     virtual ~GESDFShaderShape() = default;
 
-    std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
-    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
     virtual GESDFShapeType GetSDFShapeType() const = 0;
 

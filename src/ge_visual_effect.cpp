@@ -251,7 +251,13 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
             }
             return std::make_shared<GESDFRRectShaderShape>(*params);
         }
-
+        case GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE: {
+            auto params = impl->GetSDFPixelmapShapeParams();
+            if (params == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GESDFPixelmapShaderShape>(*params);
+        }
         default:
             return nullptr;
     }
