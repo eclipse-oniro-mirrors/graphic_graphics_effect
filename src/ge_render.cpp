@@ -504,7 +504,7 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
                 sizeof(Drawing::GEFrostedGlassShaderFilterParams),
                 static_cast<void *>(params.get()));
             if (!object) {
-                return nullptr;
+                return std::make_shared<GEFrostedGlassShaderFilter>(*params);
             }
             std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
             return dmShader;
