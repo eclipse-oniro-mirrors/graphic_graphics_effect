@@ -20,11 +20,6 @@
 namespace OHOS::Rosen::Drawing {
     GESDFTreeProcessor::GESDFTreeProcessor(const GESDFFilterParams& params) : sdfShape_(params.shape)
     {
-        if (params.border) {
-            const auto& border = params.border.value();
-            effectsContainer_.insert(std::make_unique<Drawing::GESDFBorder>(border.color, border.width));
-        }
-
         if (params.shadow) {
             const auto& shadow = params.shadow.value();
             effectsContainer_.insert(std::make_unique<Drawing::GESDFShadow>(shadow.color, shadow.offsetX,

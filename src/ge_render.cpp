@@ -48,6 +48,7 @@
 #include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
+#include "sdf/ge_sdf_border_shader.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -241,6 +242,16 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_BORDER, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSDFBorderShaderParams();
+            out = std::make_shared<GESDFBorderShader>(*params);
+            return out;
         }
     },
     {GEVisualEffectImpl::FilterType::SDF_SHADOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
