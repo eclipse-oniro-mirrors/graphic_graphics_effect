@@ -41,6 +41,7 @@
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "sdf/ge_sdf_shader_filter.h"
+#include "sdf/ge_sdf_shadow_shader.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_system_properties.h"
 #include "ge_visual_effect_impl.h"
@@ -240,6 +241,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_SHADOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSDFShadowShaderParams();
+            out = std::make_shared<GESDFShadowShader>(*params);
+            return out;
         }
     },
 };
