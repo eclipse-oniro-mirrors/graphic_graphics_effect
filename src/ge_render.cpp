@@ -27,6 +27,7 @@
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
+#include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
@@ -508,6 +509,19 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
                 static_cast<GEVariableRadiusBlurShaderFilter*>(object));
             return dmShader;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
+            const auto &params = ve->GetFrostedGlassParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS),
+                sizeof(Drawing::GEFrostedGlassShaderFilterParams),
+                static_cast<void *>(params.get()));
+            if (!object) {
+                return std::make_shared<GEFrostedGlassShaderFilter>(*params);
+            }
+            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+            return dmShader;
+            break;
+        }
         default:
             break;
     }
@@ -640,6 +654,10 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
             shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
