@@ -725,6 +725,14 @@ struct GESDFFilterParams {
     std::optional<GESDFShadowParams> shadow;
 };
 
+constexpr char GE_SHADER_SDF_SHADOW[] = "SDFShadow";
+constexpr char GE_SHADER_SDF_SHADOW_SHAPE[] = "SDFShadow_Shape";
+constexpr char GE_SHADER_SDF_SHADOW_SHADOW[] = "SDFShadow_Shadow";
+struct GESDFShadowShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+    GESDFShadowParams shadow;
+};
+
 constexpr int ARRAY_SIZE_FOUR = 4;
 
 constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";

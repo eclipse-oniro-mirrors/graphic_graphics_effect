@@ -33,6 +33,43 @@ namespace OHOS::Rosen::Drawing {
         }
     }
 
+    void GESDFTreeProcessor::ProcessSDFShape(std::string& headers, std::string& functions)
+    {
+        if (!sdfShape_) {
+            GE_LOGE("GESDFTreeProcessor::Process shape is null.");
+            return;
+        }
+
+        Process(sdfShape_);
+
+        const auto returnNodeId = reinterpret_cast<size_t>(sdfShape_.get());
+        const std::string returnCode = "return var_" + std::to_string(returnNodeId) + ";";
+    
+        headers += headers_;
+
+        functions += R"(
+
+                float SDFSmoothUnion(float d1, float d2, float k)
+                {
+                    k*= 4.0;
+                    float h = max(k - abs(d1 - d2), 0.0);
+                    return min(d1, d2) - h*h*0.25 / k;
+                }
+
+                float SDFRRect(in vec2 coord, in vec2 p, in vec2 b, in float r)
+                {
+                    vec2 d = abs(coord - p) - (b - r);
+                    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
+                }
+
+                float SDFMap(in vec2 uv)
+                {
+            )" + body_ + returnCode + "\n}\n";
+
+        headers_.clear();
+        body_.clear();
+    }
+
     std::string GESDFTreeProcessor::Process()
     {
         if (!sdfShape_) {
@@ -41,7 +78,9 @@ namespace OHOS::Rosen::Drawing {
         }
         
         if (shaderCode_.empty()) {
-            Process(sdfShape_);
+            std::string headers;
+            std::string sdfShapeFunctions;
+            ProcessSDFShape(headers, sdfShapeFunctions);
 
             constexpr std::string_view mainFunctionCodeStart = R"(
 
@@ -62,7 +101,7 @@ namespace OHOS::Rosen::Drawing {
             )";
 
             for (const auto& effect: effectsContainer_) {
-                effect->Process(headers_, effects_, effectsFunctions_);
+                effect->Process(headers, effects_, effectsFunctions_);
             }
 
             constexpr std::string_view mainFunctionCodeEnd = R"(
@@ -71,37 +110,13 @@ namespace OHOS::Rosen::Drawing {
                 }
             )";
 
-            const auto returnNodeId = reinterpret_cast<size_t>(sdfShape_.get());
-            const std::string returnCode = "return var_" + std::to_string(returnNodeId) + ";";
-
-            shaderCode_ += headers_;
-
-            shaderCode_ += R"(
-
-                float SDFSmoothUnion(float d1, float d2, float k)
-                {
-                    k*= 4.0;
-                    float h = max(k - abs(d1 - d2), 0.0);
-                    return min(d1, d2) - h*h*0.25 / k;
-                }
-
-                float SDFRRect(in vec2 coord, in vec2 p, in vec2 b, in float r)
-                {
-                    vec2 d = abs(coord - p) - (b - r);
-                    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - r;
-                }
-
-                float SDFMap(in vec2 uv)
-                {
-            )" + body_ + returnCode + "\n}\n";
-            
+            shaderCode_ += headers;
+            shaderCode_ += sdfShapeFunctions;
             shaderCode_ += effectsFunctions_;
             shaderCode_ += mainFunctionCodeStart;
             shaderCode_ += effects_;
             shaderCode_ += mainFunctionCodeEnd;
 
-            headers_.clear();
-            body_.clear();
             effects_.clear();
             effectsFunctions_.clear();
         }

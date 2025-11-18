@@ -433,6 +433,15 @@ public:
         sdfTransformShapeParams_ = std::make_shared<GESDFTransformShapeParams>();
     }
 
+    const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
+    {
+        return sdfShadowShaderParams_;
+    }
+
+    void MakeSDFShadowParams()
+    {
+        sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
+    }
 
     void MakeColorGradientEffectParams()
     {
@@ -677,6 +686,7 @@ private:
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFPixelmapShapeParams> sdfPixelmapShapeParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
+    std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
 };
 
 } // namespace Drawing

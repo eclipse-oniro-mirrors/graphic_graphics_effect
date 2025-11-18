@@ -494,8 +494,8 @@ Drawing::ImageInfo GEMESABlurShaderFilter::ComputeImageInfo(const Drawing::Image
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
 }
 
-std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
+std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling(Drawing::Canvas &canvas,
+    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
     if (!IsInputValid(canvas, image, src, dst)) {
         return image;
@@ -512,7 +512,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::
     NewBlurParams blur;
     // Step1. Set blur params according to our algorithm.
     if (!SetBlurParams(blur)) {
-        LOGE("GEMESABlurShaderFilter:: The blur params are not correctly set.");
+        LOGE("GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling The blur params are not correctly set.");
         return image;
     }
     auto originImageInfo = input->GetImageInfo();
@@ -525,19 +525,52 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::
     // Step2. Apply downsampling and fuzed effect such as grey adjustment and pixel stretch
     auto tmpBlur = DownSamplingFuzedBlur(canvas, blurBuilder, input, src, scaledInfo, width, height, linear, blur);
     if (!tmpBlur) {
-        LOGE("GEMESABlurShaderFilter::OnProcessImage make image error when downsampling");
+        LOGE("GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling make image error when downsampling");
         return image;
     }
 
     // Step3. Blur iteration.
     Drawing::RuntimeShaderBuilder simpleBlurBuilder(g_simpleFilter);
     tmpBlur = PingPongBlur(canvas, blurBuilder, simpleBlurBuilder, tmpBlur, input, scaledInfo, linear, blur);
+    return tmpBlur;
+}
+
+std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::DownSamplingForEdge(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image>& input, const Drawing::Rect& src, const Drawing::SamplingOptions& linear,
+    float factor) const
+{
+    auto width = input->GetWidth();
+    auto height = input->GetHeight();
+    auto originImageInfo = input->GetImageInfo();
+    auto scaledInfo = Drawing::ImageInfo(std::ceil(width * factor), std::ceil(height * factor),
+        originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
+    const auto& blurMatrix = BuildMatrix(src, scaledInfo, input);
+
+    Drawing::RuntimeShaderBuilder simpleBlurBuilder(g_simpleFilter);
+    simpleBlurBuilder.SetChild("imageInput", Drawing::ShaderEffect::CreateImageShader(*input,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, linear, blurMatrix));
+
+    std::shared_ptr<Drawing::Image> tmpBlur = nullptr;
+#ifdef RS_ENABLE_GPU
+    tmpBlur = simpleBlurBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, scaledInfo, false);
+#else
+    tmpBlur = simpleBlurBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
+#endif
+    return tmpBlur;
+}
+
+std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    auto tmpBlur = OnProcessImageWithoutUpSampling(canvas, image, src, dst);
     if (!tmpBlur) {
         LOGE("GEMESABlurShaderFilter::OnProcessImage make image error in PingPongBlur");
         return image;
     }
 
-    // Step4. Upsampling and adding random noise.
+    auto input = image;
+    auto width = std::max(static_cast<int>(std::ceil(dst.GetWidth())), input->GetWidth());
+    auto height = std::max(static_cast<int>(std::ceil(dst.GetHeight())), input->GetHeight());
     auto output = ScaleAndAddRandomColor(canvas, input, tmpBlur, src, dst, width, height);
     return output;
 }

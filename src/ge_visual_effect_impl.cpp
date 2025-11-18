@@ -383,6 +383,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGasifyFilterParams();
         }
     },
+    { GE_SHADER_SDF_SHADOW,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
+            impl->MakeSDFShadowParams();
+        }
+    },
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
@@ -1090,7 +1096,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
-
         default:
             break;
     }
@@ -1121,7 +1126,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
-
+        case FilterType::SDF_SHADOW: {
+            if (sdfShadowShaderParams_ && param) {
+                sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1325,6 +1335,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFShadowParam
 {
     if (tag == GE_FILTER_SDF_SHAPE) {
         sdfFilterParams_->shadow = shadow;
+    }
+
+    if (tag == GE_SHADER_SDF_SHADOW_SHADOW && sdfShadowShaderParams_) {
+        sdfShadowShaderParams_->shadow = shadow;
     }
 }
 
