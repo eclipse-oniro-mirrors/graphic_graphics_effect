@@ -49,13 +49,6 @@ public:
 
     ~GEVisualEffectImpl();
 
-    template <typename T>
-    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
-
-    template <typename T>
-    void ApplyTagParams(const std::string& tag, const std::any& value,
-        std::shared_ptr<T>& params, const TagMap<T>& tagMap);
-
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
     void SetParam(const std::string& tag, float param);
@@ -675,7 +668,7 @@ private:
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
-    
+
     std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
 };
 
