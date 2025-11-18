@@ -61,6 +61,8 @@ struct CanvasInfo {
     Drawing::Matrix mat;
 };
 
+constexpr int ARRAY_SIZE_FOUR = 4;
+
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
 constexpr char GE_FILTER_AI_BAR_LOW[] = "AIBAR_LOW";
 constexpr char GE_FILTER_AI_BAR_HIGH[] = "AIBAR_HIGH";
@@ -647,6 +649,31 @@ struct GEBorderLightShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
 
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT[] = "CircleFlowlight";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0[] = "CircleFlowlight_Color0";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1[] = "CircleFlowlight_Color1";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR2[] = "CircleFlowlight_Color2";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3[] = "CircleFlowlight_Color3";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY[] = "CircleFlowlight_RotationFrequency";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE[] = "CircleFlowlight_RotationAmplitude";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED[] = "CircleFlowlight_RotationSeed";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX[] = "CircleFlowlight_GradientX";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY[] = "CircleFlowlight_GradientY";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS[] = "CircleFlowlight_Progress";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK[] = "CircleFlowlight_Mask";
+struct GECircleFlowlightEffectParams {
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    Vector4f rotationFrequency;
+    Vector4f rotationAmplitude;
+    Vector4f rotationSeed;
+    Vector4f gradientX;
+    Vector4f gradientY;
+    float progress = 0.0f;
+    std::shared_ptr<GEShaderMask> mask;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(CIRCLE_FLOWLIGHT, GECircleFlowlightEffectParams,
+                                GE_SHADER_CIRCLE_FLOWLIGHT);
+
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
     SMOOTH_UNION,
@@ -718,8 +745,6 @@ struct GESDFShadowShaderParams final {
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     GESDFShadowParams shadow;
 };
-
-constexpr int ARRAY_SIZE_FOUR = 4;
 
 constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
 constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
