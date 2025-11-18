@@ -1259,10 +1259,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
-        case FilterType::CIRCLE_FLOWLIGHT: {
-            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
-            break;
-        }
         default:
             break;
     }
