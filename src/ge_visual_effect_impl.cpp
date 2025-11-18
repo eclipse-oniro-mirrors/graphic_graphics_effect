@@ -100,6 +100,27 @@ GEVisualEffectImpl::TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
 };
 
+TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT0, gridPoints[0], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT1, gridPoints[1], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT2, gridPoints[2], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT3, gridPoints[3], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT4, gridPoints[4], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT5, gridPoints[5], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT6, gridPoints[6], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT7, gridPoints[7], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT8, gridPoints[8], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE0, rotationAngles[0], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE1, rotationAngles[1], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE2, rotationAngles[2], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE3, rotationAngles[3], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE4, rotationAngles[4], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE5, rotationAngles[5], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE6, rotationAngles[6], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE7, rotationAngles[7], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATIOM_ANGLE8, rotationAngles[8], PairFloat),
+};
+
 #undef ADD_TAG_HANDLER
 }
 
@@ -373,6 +394,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
             impl->MakeSDFShadowParams();
+        }
+    },
+    { GE_FILTER_GRID_WARP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GRID_WARP);
+            impl->MakeGridWarpFilterParams();
         }
     },
 };
@@ -833,6 +860,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             SetFrostedGlassParams(tag, param);
             break;
         }
+        case FilterType::GRID_WARP: {
+            ApplyTagParams(tag, param, gridWarpFilterParams_, gridWarpShaderFilterTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1226,6 +1257,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::GRADIENT_FLOW_COLORS: {
             ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
+            break;
+        }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
             break;
         }
         default:

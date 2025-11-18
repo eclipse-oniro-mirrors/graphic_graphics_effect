@@ -61,6 +61,8 @@ struct CanvasInfo {
     Drawing::Matrix mat;
 };
 
+constexpr int ARRAY_SIZE_NINE = 9;
+
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
 constexpr char GE_FILTER_AI_BAR_LOW[] = "AIBAR_LOW";
 constexpr char GE_FILTER_AI_BAR_HIGH[] = "AIBAR_HIGH";
@@ -646,6 +648,31 @@ struct GEBorderLightShaderParams {
     float cornerRadius = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
+
+constexpr char GE_FILTER_GRID_WARP[] = "GridWarp";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT0[] = "GridWarp_GridPoint0";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT1[] = "GridWarp_GridPoint1";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT2[] = "GridWarp_GridPoint2";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT3[] = "GridWarp_GridPoint3";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT4[] = "GridWarp_GridPoint4";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT5[] = "GridWarp_GridPoint5";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT6[] = "GridWarp_GridPoint6";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT7[] = "GridWarp_GridPoint7";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT8[] = "GridWarp_GridPoint8";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE0[] = "GridWarp_RotationAngle0";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE1[] = "GridWarp_RotationAngle1";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE2[] = "GridWarp_RotationAngle2";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE3[] = "GridWarp_RotationAngle3";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE4[] = "GridWarp_RotationAngle4";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE5[] = "GridWarp_RotationAngle5";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE6[] = "GridWarp_RotationAngle6";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE7[] = "GridWarp_RotationAngle7";
+constexpr char GE_FILTER_GRID_WARP_ROTATIOM_ANGLE8[] = "GridWarp_RotationAngle8";
+struct GEGridWarpShaderFilterParams {
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GRID_WARP, GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP);
 
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,

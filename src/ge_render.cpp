@@ -29,6 +29,7 @@
 #include "ge_filter_composer.h"
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
+#include "ge_grid_warp_shader_filter.h"
 #include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_hps_build_pass.h"
@@ -659,6 +660,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
             shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::GRID_WARP: {
+            const auto &params = ve->GetGridWarpFilterParams();
+            shaderFilter = std::make_shared<GEGridWarpShaderFilter>(*params);
             break;
         }
         default:

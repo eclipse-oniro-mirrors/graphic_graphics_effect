@@ -553,6 +553,16 @@ public:
         return frostedGlassParams_;
     }
 
+    void MakeGridWarpFilterParams()
+    {
+        gridWarpFilterParams_ = std::make_shared<GEGridWarpShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEGridWarpShaderFilterParams>& GetGridWarpFilterParams() const
+    {
+        return gridWarpFilterParams_;
+    }
+
     void SetBorder(const Color& borderColor, float borderWidth);
     void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
                   float radius, Drawing::Path path, bool isFilled);
@@ -665,6 +675,8 @@ private:
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
+    
+    std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
 };
 
 } // namespace Drawing
