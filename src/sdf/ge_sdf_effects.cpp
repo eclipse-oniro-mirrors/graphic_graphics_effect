@@ -25,50 +25,6 @@ namespace OHOS::Rosen::Drawing {
         return effect1.GetOrder() < effect2.GetOrder();
     }
 
-    GESDFBorder::GESDFBorder(const Color& color, float width)
-        : color_(color), width_(width)
-    { }
-
-    void GESDFBorder::Process(std::string& headers, std::string& calls, std::string& functions) const
-    {
-        headers += "uniform vec3 u_borderColor;\n";
-        headers += "uniform float u_borderWidth;\n";
-
-        functions += R"(
-            // Input data:
-            // float d - current SDF shape distance
-            // vec4 color - color of the background
-            // vec3 borderColor - color of the border
-            // float borderWidth - width of the border
-            vec4 borderEffect(float d, vec4 color, vec3 borderColor, float borderWidth)
-            {
-                if (d < 0.0 && d >= -borderWidth)
-                {
-                    color = vec4(borderColor, 1.0);
-                }
-                
-                return color;
-            }
-        )";
-
-        calls += R"(
-            color = borderEffect(d, color, u_borderColor, u_borderWidth);
-        )";
-    }
-
-    void GESDFBorder::UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const
-    {
-        builder.SetUniform("u_borderColor", static_cast<float>(color_.GetRed()) / 255.0f,
-            static_cast<float>(color_.GetGreen()) / 255.0f,
-            static_cast<float>(color_.GetBlue()) / 255.0f);
-        builder.SetUniform("u_borderWidth", std::max(width_, SDF_EFFECT_MIN_THRESHOLD));
-    }
-
-    SDFEffectOrder GESDFBorder::GetOrder() const
-    {
-        return SDFEffectOrder::BORDER;
-    }
-
     GESDFShadow::GESDFShadow(const Color& color, float offsetX, float offsetY,
         float radius, const Path& path, bool isFilled)
         : color_(color), offsetX_(offsetX), offsetY_(offsetY), radius_(radius), isFilled_(isFilled)
