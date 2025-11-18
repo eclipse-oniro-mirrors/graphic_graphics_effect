@@ -49,13 +49,6 @@ public:
 
     ~GEVisualEffectImpl();
 
-    template <typename T>
-    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
-
-    template <typename T>
-    void ApplyTagParams(const std::string& tag, const std::any& value,
-        std::shared_ptr<T>& params, const TagMap<T>& tagMap);
-
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
     void SetParam(const std::string& tag, float param);
@@ -553,6 +546,16 @@ public:
         return frostedGlassParams_;
     }
 
+    void MakeCircleFlowlightEffectParams()
+    {
+        circleFlowlightEffectParams_ = std::make_shared<GECircleFlowlightEffectParams>();
+    }
+
+    const std::shared_ptr<GECircleFlowlightEffectParams>& GetCircleFlowlightEffectParams() const
+    {
+        return circleFlowlightEffectParams_;
+    }
+
     void SetBorder(const Color& borderColor, float borderWidth);
     void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
                   float radius, Drawing::Path path, bool isFilled);
@@ -665,6 +668,7 @@ private:
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
+    std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
 };
 
 } // namespace Drawing

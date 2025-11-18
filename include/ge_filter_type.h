@@ -74,6 +74,7 @@ enum class GEFilterType : int32_t {
     SDF_SHADOW,
     MAX,
     FROSTED_GLASS,
+    CIRCLE_FLOWLIGHT,
 };
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
