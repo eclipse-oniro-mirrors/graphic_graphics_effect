@@ -53,7 +53,7 @@ GEGridWarpShaderFilter::GEGridWarpShaderFilter(const Drawing::GEGridWarpShaderFi
     }
 }
 
-Drawing::Point GEGridWarpShaderFilter::CalcPointCoord(const int index, const float pointsDistance,
+Drawing::Point GEGridWarpShaderFilter::CalcPointCoord(int index, const float pointsDistance,
     LocationType location)
 {
     const auto& coord = gridPointsCoords_[index];
