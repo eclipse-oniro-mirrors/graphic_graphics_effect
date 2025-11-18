@@ -30,11 +30,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float
         LOGE("GESDFRRectShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
     }
-    auto sdfRRectShapeShader = GenerateShaderEffect(width, height, builder);
-    if (auto matrixTransformShapeShader = GenerateMatrixTransformShader(width, height, sdfRRectShapeShader)) {
-        return matrixTransformShapeShader;
-    }
-    return sdfRRectShapeShader;
+    return GenerateShaderEffect(width, height, builder);
 }
 
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
@@ -46,11 +42,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShaderHasNor
         LOGE("GESDFRRectShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
     }
-    auto sdfRRectShapeShader = GenerateShaderEffect(width, height, builder);
-    if (auto matrixTransformShapeShader = GenerateMatrixTransformShader(width, height, sdfRRectShapeShader)) {
-        return matrixTransformShapeShader;
-    }
-    return sdfRRectShapeShader;
+    return GenerateShaderEffect(width, height, builder);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRectShaderShapeBuilder() const
@@ -61,8 +53,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
     }
 
     static constexpr char prog[] = R"(
-        uniform float2 iResolution;
-        uniform vec2 centerPos;
         uniform vec2 halfSize;
         uniform float radius;
 
@@ -74,8 +64,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
         half4 main(vec2 fragCoord)
         {
-            vec2 center = fragCoord - iResolution.xy * 0.5;
-            float sdf = sdfRRect(center, centerPos, halfSize, radius);
+            float sdf = sdfRRect(fragCoord, halfSize, halfSize, radius);
             return half4(sdf, 0, 0, 1);
         }
     )";
@@ -99,7 +88,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
     static constexpr char prog[] = R"(
         uniform float2 iResolution;
-        uniform vec2 centerPos;
         uniform vec2 halfSize;
         uniform float radius;
 
@@ -134,8 +122,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
         half4 main(float2 fragCoord)
         {
-            vec2 uv = fragCoord - 0.5 * iResolution.xy;
-            vec3 sdg = sdgRRect(uv - centerPos, halfSize, radius);
+            vec3 sdg = sdgRRect(fragCoord - halfSize, halfSize, radius);
             return half4(sdg.x, sdg.yz, 1.0);
         }
     )";
@@ -158,10 +145,10 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(float 
         return nullptr;
     }
 
-    // todo check boundary
-    builder->SetUniform("iResolution", width, height);
-    builder->SetUniform("centerPos", params_.rrect.left_ + HALF * params_.rrect.width_,
-        params_.rrect.top_ - HALF * params_.rrect.height_);
+    if (param_.rrect.width_ < 0.0001f || param_.rrect.height_ < 0.0001f) {
+        return nullptr;
+    }
+
     builder->SetUniform("halfSize", params_.rrect.width_ * HALF, params_.rrect.height_ * HALF);
     builder->SetUniform("radius", params_.rrect.radiusX_);
 
@@ -171,78 +158,6 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(float 
     }
     return sdfRRectShapeShader;
 }
-
-std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateMatrixTransformShader(float width, float height,
-    std::shared_ptr<ShaderEffect> shapeShader) const
-{
-    GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateMatrixTransformShader, Width: %g, Height: %g", width, height);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetMatrixTransformBuilder();
-    if (!builder) {
-        LOGE("GESDFRRectShaderShape::GenerateMatrixTransformShader has builder error");
-        return nullptr;
-    }
-    auto matrixTransformShapeShader = GenerateMatrixTransformShaderEffect(width, height, shapeShader, builder);
-    return matrixTransformShapeShader;
-}
-
-// todo turn to utils class. Should know anchor of transform
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetMatrixTransformBuilder() const
-{
-    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> matrixTransformBuilder = nullptr;
-    if (matrixTransformBuilder) {
-        return matrixTransformBuilder;
-    }
-
-    static constexpr char prog[] = R"(
-        uniform shader shapeShader;
-        uniform float2 iResolution;
-        uniform vec2 centerPos;
-        uniform float3x3 transformMatrix
-
-        half4 main(vec2 fragCoord) {
-            vec2 centered = fragCoord - 0.5 * iResolution.xy - centerPos;
-            vec3 transformedCoord = transformMatrix * vec3(centered, 1.0);
-            transformedCoord.xy += 0.5 * iResolution.xy + centerPos;
-            return shapeShader.eval(transformedCoord.xy);
-        }
-    )";
-
-    auto matrixTransformBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
-    if (!matrixTransformBuilderEffect) {
-        LOGE("GESDFRRectShaderShape::GetMatrixTransformBuilder effect error");
-        return nullptr;
-    }
-
-    matrixTransformBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(matrixTransformBuilderEffect);
-    return matrixTransformBuilder;
-}
-
-std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateMatrixTransformShaderEffect(float width, float height,
-    std::shared_ptr<ShaderEffect> shapeShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
-{
-    if (!builder) {
-        LOGE("GESDFRRectShaderShape::GenerateMatrixTransformShaderEffect builder error");
-        return nullptr;
-    }
-
-    if (params_.matrix == Drawing::Matrix()) {
-        return nullptr;
-    }
-
-    // todo check boundary
-    builder->SetChild("shapeShader", shapeShader);
-    builder->SetUniform("iResolution", width, height);
-    builder->SetUniform("centerPos", params_.rrect.left_ + HALF * params_.rrect.width_,
-        params_.rrect.top_ - HALF * params_.rrect.height_);
-    builder->SetUniform("transformMatrix", params_.matrix);
-    auto matrixTransformShapeShader = builder->MakeShader(nullptr, false);
-    if (!matrixTransformShapeShader) {
-        LOGE("GESDFRRectShaderShape::GenerateMatrixTransformShaderEffect shaderEffect error");
-    }
-    return matrixTransformShapeShader;
-}
-
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS

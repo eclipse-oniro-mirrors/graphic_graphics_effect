@@ -28,8 +28,9 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(fl
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has empty image");
         return nullptr;
     }
+    Drawing::Matrix matrix;
     auto sdfPixelmapShapeShader = Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), params_.matrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     return sdfPixelmapShapeShader;
 }
 
