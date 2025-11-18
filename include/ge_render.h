@@ -82,9 +82,14 @@ private:
         std::shared_ptr<Drawing::Image> image {};
         Drawing::Rect src {};
         Drawing::Rect dst {};
+        std::optional<std::reference_wrapper<Drawing::Brush>> brush {};
     };
 
-    void ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
+    // Apply a single shader filter
+    // Returns: 
+    // - true: The filter is directly drawn on canvas
+    // - false: The filter is drawn on outImage (maybe failed - check outImage is nullptr or not)
+    bool ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
         std::shared_ptr<Drawing::Image>& outImage, const ShaderFilterEffectContext& context);
 
     void DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,

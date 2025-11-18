@@ -35,10 +35,19 @@ public:
 
     virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) = 0;
+    
+    virtual bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
+    {
+        return false; // Placeholder default implementation (Does not support directly draw on canvas)
+    }
 
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst);
-
+    
+    GE_EXPORT bool DrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
+    
     uint32_t Hash() const
     {
         return hash_;
