@@ -98,6 +98,7 @@ ohos_source_set("graphics_effect_src") {
     "src/sdf/ge_sdf_rrect_shader_shape.cpp",
     "src/sdf/ge_sdf_transform_shader_shape.cpp",
     "src/sdf/ge_sdf_shader_shape.cpp",
+    "src/sdf/ge_sdf_border_shader.cpp",
     "src/sdf/ge_sdf_shadow_shader.cpp",
     "src/sdf/ge_sdf_tree_processor.cpp",
     "src/sdf/ge_sdf_union_op_shader_shape.cpp",

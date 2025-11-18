@@ -383,6 +383,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGasifyFilterParams();
         }
     },
+    {  GE_SHADER_SDF_BORDER,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_BORDER);
+            impl->MakeSDFBorderParams();
+        }
+    },
     { GE_SHADER_SDF_SHADOW,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
@@ -1126,6 +1132,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_BORDER: {
+            if (sdfBorderShaderParams_ && param) {
+                sdfBorderShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         case FilterType::SDF_SHADOW: {
             if (sdfShadowShaderParams_ && param) {
                 sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
@@ -1337,6 +1349,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParam
 {
     if (tag == GE_FILTER_SDF_SHAPE) {
         sdfFilterParams_->border = border;
+    }
+    if (tag == GE_SHADER_SDF_BORDER_BORDER && sdfBorderShaderParams_) {
+        sdfBorderShaderParams_->border = border;
     }
 }
 

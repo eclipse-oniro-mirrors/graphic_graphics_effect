@@ -42,19 +42,6 @@ public:
     static bool InOrderComparator(const GESDFEffect& effect1, const GESDFEffect& effect2);
 };
 
-class GESDFBorder final : public GESDFEffect {
-    void Process(std::string& headers, std::string& calls, std::string& functions) const override;
-    void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const override;
-
-    SDFEffectOrder GetOrder() const override;
-public:
-    explicit GESDFBorder(const Color& color, float width);
-
-private:
-    Color color_;
-    float width_ = 0.0f;
-};
-
 class GESDFShadow final : public GESDFEffect {
     void Process(std::string& headers, std::string& calls, std::string& functions) const override;
     void UpdateUniformDatas(Drawing::RuntimeShaderBuilder& builder) const override;
