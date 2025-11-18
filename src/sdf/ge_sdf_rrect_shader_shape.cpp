@@ -65,7 +65,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         half4 main(vec2 fragCoord)
         {
             float sdf = sdfRRect(fragCoord, halfSize, halfSize, radius);
-            return half4(sdf, 0, 0, 1);
+            return half4(0, 0, 0, sdf);
         }
     )";
 
@@ -123,7 +123,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         half4 main(float2 fragCoord)
         {
             vec3 sdg = sdgRRect(fragCoord - halfSize, halfSize, radius);
-            return half4(sdg.x, sdg.yz, 1.0);
+            return half4(sdg.yz, 0.0, sdg.x);
         }
     )";
 
@@ -145,7 +145,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(float 
         return nullptr;
     }
 
-    if (param_.rrect.width_ < 0.0001f || param_.rrect.height_ < 0.0001f) {
+    if (params_.rrect.width_ < 0.0001f || params_.rrect.height_ < 0.0001f) {
         return nullptr;
     }
 

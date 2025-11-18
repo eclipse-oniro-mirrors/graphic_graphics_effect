@@ -20,30 +20,45 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-constexpr float HALF = 0.5;
-std::shared_ptr<ShaderEffect> GESDFTranformShaderShape::GenerateDrawingShader(float width, float height) const
+std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShader(float width, float height) const
 {
-    GE_TRACE_NAME_FMT("GESDFTranformShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFTranformShaderShapeBuilder();
-    if (!builder) {
-        LOGE("GESDFTranformShaderShape::GenerateDrawingShader has builder error");
+    GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
+    if (!params_.shape) {
         return nullptr;
     }
-    auto sdfTranformShapeShader = GenerateShaderEffect(width, height, builder);
-    return sdfTranformShapeShader;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
+    builder = GetSDFTransformShaderShapeBuilder();
+    if (!builder) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShader has builder error");
+        return nullptr;
+    }
+    auto shapeShader = params_.shape->GenerateDrawingShader(width, height);
+    auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
+    return sdfTransformShapeShader;
 }
 
-std::shared_ptr<ShaderEffect> GESDFTranformShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
+std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    return GenerateDrawingShader(width, height);
+    GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
+    if (!params_.shape) {
+        return nullptr;
+    }
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
+    builder = GetSDFTransformShaderShapeBuilder();
+    if (!builder) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has builder error");
+        return nullptr;
+    }
+    auto shapeShader = params_.shape->GenerateDrawingShaderHasNormal(width, height);
+    auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
+    return sdfTransformShapeShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTranformShaderShape::GetSDFTranformShaderShapeBuilder() const
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder() const
 {
-    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfTranformShaderShapeBuilder = nullptr;
-    if (sdfTranformShaderShapeBuilder) {
-        return sdfTranformShaderShapeBuilder;
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfTransformShaderShapeBuilder = nullptr;
+    if (sdfTransformShaderShapeBuilder) {
+        return sdfTransformShaderShapeBuilder;
     }
 
     static constexpr char prog[] = R"(
@@ -56,21 +71,21 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTranformShaderShape::GetSDFT
         }
     )";
 
-    auto sdfTranformShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
-    if (!sdfTranformShaderBuilderEffect) {
-        LOGE("GESDFTranformShaderShape::GetSDFTranformShaderShapeBuilder effect error");
+    auto sdfTransformShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    if (!sdfTransformShaderBuilderEffect) {
+        LOGE("GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder effect error");
         return nullptr;
     }
 
-    sdfTranformShaderShapeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfTranformShaderBuilderEffect);
-    return sdfTranformShaderShapeBuilder;
+    sdfTransformShaderShapeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfTransformShaderBuilderEffect);
+    return sdfTransformShaderShapeBuilder;
 }
 
-std::shared_ptr<ShaderEffect> GESDFTranformShaderShape::GenerateShaderEffect(float width, float height,
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
+std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(float width, float height,
+    std::shared_ptr<ShaderEffect> shapeShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {
-        LOGE("GESDFTranformShaderShape::GenerateShaderEffect builder error");
+        LOGE("GESDFTransformShaderShape::GenerateShaderEffect builder error");
         return nullptr;
     }
 

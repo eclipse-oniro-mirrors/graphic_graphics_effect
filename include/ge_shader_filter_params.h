@@ -698,8 +698,8 @@ struct GESDFPixelmapShapeParams {
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX[] = "SDFTransformShape_Matrix";
-struct GETransformShapeParams {
-    std::shared_ptr<GEShaderShape> shape;
+struct GESDFTransformShapeParams {
+    std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix;
 };
 

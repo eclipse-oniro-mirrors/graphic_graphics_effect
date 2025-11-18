@@ -32,8 +32,7 @@ namespace Rosen {
 class GE_EXPORT GESDFShaderFilter : public GEShaderFilter {
 public:
     GESDFShaderFilter(const Drawing::GESDFFilterParams& params)
-        : sdfTreeProcessor_(
-            std::make_optional<Drawing::GESDFTreeProcessor>(params)) {}
+        : sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params)), params_(params) {}
     GESDFShaderFilter(const GESDFShaderFilter& params) = delete;
     ~GESDFShaderFilter() override = default;
 
@@ -52,6 +51,7 @@ private:
     static const std::string type_;
     std::optional<Drawing::GESDFTreeProcessor> sdfTreeProcessor_;
     std::optional<Drawing::RuntimeShaderBuilder> shaderEffectBuilder_;
+    Drawing::GESDFFilterParams params_ {};
 };
 } // namespace Rosen
 } // namespace OHOS

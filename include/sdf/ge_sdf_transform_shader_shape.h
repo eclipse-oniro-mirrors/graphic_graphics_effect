@@ -33,7 +33,7 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     GESDFShapeType GetSDFShapeType() const override
     {
-        return GESDFShapeType::Transform;
+        return GESDFShapeType::TRANSFORM;
     }
 
     const Drawing::Matrix& GetMatrix() const
@@ -49,7 +49,7 @@ public:
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFTransformShaderShapeBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateShaderEffect(float width, float height,
-        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+        std::shared_ptr<ShaderEffect> shapeShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFTransformShapeParams params_ {};
 };
 } // Drawing

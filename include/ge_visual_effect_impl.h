@@ -423,7 +423,7 @@ public:
         sdfPixelmapShapeParams_ = std::make_shared<GESDFPixelmapShapeParams>();
     }
 
-    const std::shared_ptr<GETransformShapeParams>& GetSDFTransformShapeParams() const
+    const std::shared_ptr<GESDFTransformShapeParams>& GetSDFTransformShapeParams() const
     {
         return sdfTransformShapeParams_;
     }

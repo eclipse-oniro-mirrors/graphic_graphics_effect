@@ -39,18 +39,48 @@ std::shared_ptr<Drawing::Image> GESDFShaderFilter::OnProcessImage(Drawing::Canva
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image) {
-        GE_LOGE("OnProcessImage:: image is null.");
+        GE_LOGE("GESDFShaderFilter::OnProcessImage, image is null.");
         return nullptr;
     }
-    std::shared_ptr<Drawing::Image> resImage = image; // Generate new image
+
+    // new sdf - for test
+    if (!params_.shape) {
+        GE_LOGE("GESDFShaderFilter::OnProcessImage, shape is null.");
+        return nullptr;
+    }
 
     if (!shaderEffectBuilder_) {
-        const auto shaderEffect = Drawing::RuntimeEffect::CreateForShader(sdfTreeProcessor_->Process());
-        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(shaderEffect);
-    }
-    sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
+        const auto shaderEffect = params_.shape->GenerateDrawingShader(canvas.GetWidth(), canvas.GetHeight());
+        static std::shared_ptr<Drawing::RuntimeEffect> sdfShaderEffect_;
+        static constexpr char prog[] = R"(
+            uniform shader imageShader;
+            half4 main(float2 coord) {
+                return imageShader.eval(coord);
+            }
+        )";
 
+        if (sdfShaderEffect_ == nullptr) {
+            sdfShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+            if (sdfShaderEffect_ == nullptr) {
+                LOGE("GESDFShaderFilter::OnProcessImage, effect error\n");
+                return nullptr;
+            }
+        }
+        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(sdfShaderEffect_);
+        shaderEffectBuilder_->SetChild("imageShader", shaderEffect);
+    }
+
+    std::shared_ptr<Drawing::Image> resImage = image; // Generate new image
     return shaderEffectBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+
+    // old sdf
+    // if (!shaderEffectBuilder_) {
+    //     const auto shaderEffect = Drawing::RuntimeEffect::CreateForShader(sdfTreeProcessor_->Process());
+    //     shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(shaderEffect);
+    // }
+    // sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
+
+    // return shaderEffectBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 }
 
 void GESDFShaderFilter::Update(const Drawing::GESDFFilterParams& params)

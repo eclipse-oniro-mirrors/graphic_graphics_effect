@@ -24,7 +24,9 @@
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
+#include "sdf/ge_sdf_pixelmap_shader_shape.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "sdf/ge_sdf_transform_shader_shape.h"
 #include "sdf/ge_sdf_union_op_shader_shape.h"
 
 namespace OHOS {

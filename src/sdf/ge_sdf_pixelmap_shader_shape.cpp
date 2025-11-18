@@ -36,7 +36,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(fl
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    GenerateDrawingShader(float width, float height);
+    return GenerateDrawingShader(width, height);
 }
 } // Drawing
 } // namespace Rosen

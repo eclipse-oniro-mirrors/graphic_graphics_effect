@@ -1132,6 +1132,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE) {
+                sdfTransformShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }
