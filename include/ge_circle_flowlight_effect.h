@@ -24,9 +24,6 @@
 #include "effect/runtime_shader_builder.h"
 namespace OHOS {
 namespace Rosen {
-namespace {
-    constexpr size_t COLOR_SIZE = 16;
-}
 class GE_EXPORT GECircleFlowlightEffect : public GEShader {
 public:
     GECircleFlowlightEffect(Drawing::GECircleFlowlightEffectParams& CircleFlowlightEffectParams);
