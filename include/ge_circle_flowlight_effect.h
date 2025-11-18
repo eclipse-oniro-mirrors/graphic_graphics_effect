@@ -42,8 +42,8 @@ public:
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 private:
-    constexpr uint8_t COLOR_CHANNEL = 4;
-    constexpr uint8_t ARRAY_NUM = 4;
+    constexpr static uint8_t COLOR_CHANNEL = 4;
+    constexpr static uint8_t ARRAY_NUM = 4;
 
     static void MakeCircleFlowlightEffect();
     static void MakeCircleFlowlightEffectWithMask();
