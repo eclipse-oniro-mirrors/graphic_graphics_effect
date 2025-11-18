@@ -13,14 +13,16 @@
  * limitations under the License.
  */
 
-#include "ge_log.h"
-#include "draw/surface.h"
 #include "ge_grid_warp_shader_filter.h"
+
+#include "draw/surface.h"
+#include "ge_log.h"
+
 
 namespace OHOS {
 namespace Rosen {
 
-static constexpr float DEGREE_180 = 180.0f;
+constexpr float DEGREE_180 = 180.0f;
 
 GEGridWarpShaderFilter::GEGridWarpShaderFilter(const Drawing::GEGridWarpShaderFilterParams& params)
 {
@@ -107,7 +109,7 @@ GEGridWarpShaderFilter::BezierPatchArray GEGridWarpShaderFilter::CalculateBezier
 // +----+----+
 GEGridWarpShaderFilter::GridTextureCoords GEGridWarpShaderFilter::CalcTexCoords(int imageWidth, int imageHeight)
 {
-    std::array<std::array<Drawing::Point, GRID_TEXTURE_COORDS_NUM>, GRID_NUM> texCoords;
+    GridTextureCoords texCoords;
     for (size_t i = 0; i < GRID_NUM; i++) {
         float offsetX = 0.5f * (i % 2); // 0.5 & 2:corresponding to 2*2 grid
         float offsetY = 0.5f * (i / 2); // 0.5 & 2:corresponding to 2*2 grid
@@ -135,8 +137,7 @@ std::shared_ptr<Drawing::Image> GEGridWarpShaderFilter::OnProcessImage(Drawing::
     }
     auto brush = GetBrush(image);
 
-    std::array<std::array<Drawing::Point, GRID_TEXTURE_COORDS_NUM>, GRID_NUM> texCoords =
-        CalcTexCoords(imageWidth, imageHeight);
+    auto texCoords = CalcTexCoords(imageWidth, imageHeight);
 
     std::array<std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>, GRID_NUM> realBezierPatch;
     for (size_t i = 0; i < GRID_NUM; i++) {

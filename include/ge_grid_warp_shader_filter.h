@@ -54,7 +54,7 @@ private:
     std::array<std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>, GRID_TEXTURE_COORDS_NUM> bezierPatch_;
 
     Drawing::Brush GetBrush(const std::shared_ptr<Drawing::Image>& image) const;
-    Drawing::Point CalcPointCoord(const int index, const float pointsDistance, LocationType location);
+    Drawing::Point CalcPointCoord(int index, const float pointsDistance, LocationType location);
     using BezierPatchArray = std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>;
     BezierPatchArray CalculateBezierPatch(int row, int col, int n, float pointsDistance);
     using GridTextureCoords = std::array<std::array<Drawing::Point, GRID_TEXTURE_COORDS_NUM>, GRID_NUM>;
