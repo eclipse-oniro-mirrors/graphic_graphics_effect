@@ -536,6 +536,16 @@ public:
         return frameGradientMaskParams_;
     }
 
+    const std::shared_ptr<GESDFBorderShaderParams>& GetSDFBorderShaderParams() const
+    {
+        return sdfBorderShaderParams_;
+    }
+
+    void MakeSDFBorderParams()
+    {
+        sdfBorderShaderParams_ = std::make_shared<GESDFBorderShaderParams>();
+    }
+
     void MakeFrostedGlassParams()
     {
         frostedGlassParams_ = std::make_shared<GEFrostedGlassShaderFilterParams>();
@@ -667,6 +677,7 @@ private:
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
     std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
 };

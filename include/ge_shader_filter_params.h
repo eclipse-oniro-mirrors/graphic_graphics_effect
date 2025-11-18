@@ -723,6 +723,14 @@ struct GESDFBorderParams final {
     float width = 0.0f;
 };
 
+constexpr char GE_SHADER_SDF_BORDER[] = "SDFBorder";
+constexpr char GE_SHADER_SDF_BORDER_SHAPE[] = "SDFBorder_Shape";
+constexpr char GE_SHADER_SDF_BORDER_BORDER[] = "SDFBorder_Border";
+struct GESDFBorderShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+    GESDFBorderParams border;
+};
+
 struct GESDFShadowParams final {
     Drawing::Color color;
     float offsetX = 0.0f;
