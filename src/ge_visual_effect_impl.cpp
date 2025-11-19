@@ -25,6 +25,10 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 namespace {
+constexpr size_t NUM_0 = 0;
+constexpr size_t NUM_1 = 1;
+constexpr size_t NUM_2 = 2;
+
 template <typename T>
 using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
 
@@ -2321,19 +2325,38 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BORDERSIZE) {
-        frostedGlassParams_->borderSize = Vector2f(param.first, param.second);
+        constexpr float MIN_V = 0.0f;
+
+        frostedGlassParams_->borderSize = Vector2f(std::max(param.first,  MIN_V), std::max(param.second, MIN_V));
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BLUR_PARAMS) {
-        frostedGlassParams_->blurParams = Vector2f(param.first, param.second);
+        constexpr float MIN_V = 1e-6f;
+        constexpr float MAX_V = 200.0f;
+        constexpr float MIN_K = 1.0f;
+        constexpr float MAX_K = 20.0f;
+
+        frostedGlassParams_->blurParams = Vector2f(std::clamp(param.first,  MIN_V, MAX_V),
+            std::clamp(param.second, MIN_K, MAX_K));
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR) {
-        frostedGlassParams_->edgeLightBlur = Vector2f(param.first, param.second);
+        constexpr float MIN_F = 0.0f;
+        frostedGlassParams_->edgeLightBlur = Vector2f(std::max(param.first,  MIN_F), param.second);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR) {
-        frostedGlassParams_->edgeLightDir = Vector2f(param.first, param.second);
+        constexpr float MIN_V = -1.0f;
+        constexpr float MAX_V = 1.0f;
+        constexpr float EPS = 1e-6f;
+
+        float dx = std::clamp(param.first,  MIN_V, MAX_V);
+        float dy = std::clamp(param.second, MIN_V, MAX_V);
+        if (std::abs(dx) < EPS && std::abs(dy) < EPS) {
+            dx = 1.0f;
+            dy = 0.0f;
+        }
+        frostedGlassParams_->edgeLightDir = Vector2f(dx, dy);
     }
 }
 
@@ -2344,54 +2367,95 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
-        frostedGlassParams_->cornerRadius = param;
+        constexpr float MIN_V = 0.0f;
+        frostedGlassParams_->cornerRadius = std::max(param, MIN_V);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BORDERWIDTH) {
-        frostedGlassParams_->borderWidth = param;
+        constexpr float MIN_V = 0.0f;
+        constexpr float MAX_V = 100.0f;
+        frostedGlassParams_->borderWidth = std::clamp(param, MIN_V, MAX_V);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_OFFSET) {
-        frostedGlassParams_->offset = param;
+        constexpr float MIN_V = -200.0f;
+        constexpr float MAX_V = 200.0f;
+        frostedGlassParams_->offset = std::clamp(param, MIN_V, MAX_V);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR) {
-        frostedGlassParams_->downSampleFactor = param;
+        constexpr float MIN_V = 0.25f;
+        constexpr float MAX_V = 16.0f;
+        frostedGlassParams_->downSampleFactor = std::clamp(param, MIN_V, MAX_V);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BG_FACTOR) {
-        frostedGlassParams_->bgFactor = param;
+        constexpr float MIN_V = 0.0f;
+        constexpr float MAX_V = 1.5f;
+        frostedGlassParams_->bgFactor = std::clamp(param, MIN_V, MAX_V);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
-        frostedGlassParams_->refractOutPx = param;
+        constexpr float MIN_V = -200.0f;
+        constexpr float MAX_V = 200.0f;
+        frostedGlassParams_->refractOutPx = std::clamp(param, MIN_V, MAX_V);
     }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vector3f& param)
 {
+    constexpr float K_MIN = 0.0f;
+    constexpr float K_MAX = 3.0f;
+    constexpr float B_MIN = -100.0f;
+    constexpr float B_MAX = 100.0f;
+    constexpr float S_MIN = 0.0f;
+    constexpr float S_MAX = 3.0f;
+
     if (frostedGlassParams_ == nullptr) {
         return;
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS) {
-        frostedGlassParams_->innerShadowParams = param;
+        constexpr float R_MIN = -100.0f;
+        constexpr float R_MAX = 100.0f;
+        constexpr float W_MIN = 0.0f;
+        constexpr float W_MAX = 100.0f;
+        constexpr float E_MIN = -10.0f;
+        constexpr float E_MAX = 10.0f;
+
+        frostedGlassParams_->innerShadowParams = Vector3f(std::clamp(param[NUM_0], R_MIN, R_MAX),
+            std::clamp(param[NUM_1], W_MIN, W_MAX), std::clamp(param[NUM_2], E_MIN, E_MAX));
     }
-    
+
     if (tag == GE_FILTER_FROSTED_GLASS_SD_PARAMS) {
-        frostedGlassParams_->sdParams = param;
+        // (sdK, sdB, sdS)
+        frostedGlassParams_->sdParams = Vector3f(std::clamp(param[NUM_0], K_MIN, K_MAX),
+            std::clamp(param[NUM_1], B_MIN, B_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_ENV_PARAMS) {
-        frostedGlassParams_->envParams = param;
+        // (envK, envB, envS)
+        frostedGlassParams_->envParams = Vector3f(std::clamp(param[NUM_0], K_MIN, K_MAX),
+            std::clamp(param[NUM_1], B_MIN, B_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE) {
-        frostedGlassParams_->edgeLightAngle = param;
+        // (angleDeg, featherDeg, width)
+        constexpr float A_MIN = -180.0f;
+        constexpr float A_MAX = 180.0f;
+        constexpr float F_MIN = 0.0f;
+        constexpr float F_MAX = 180.0f;
+        constexpr float S_MIN = 0.0f;
+        constexpr float S_MAX = 200.0f;
+
+        frostedGlassParams_->edgeLightAngle = Vector3f(std::clamp(param[NUM_0], A_MIN, A_MAX),
+            std::clamp(param[NUM_1], F_MIN, F_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_HL_PARAMS) {
-        frostedGlassParams_->hlParams = param;
+        // (hlK, hlB, hlS)
+        frostedGlassParams_->hlParams = Vector3f(std::clamp(param[NUM_0], K_MIN, K_MAX),
+            std::clamp(param[NUM_1], B_MIN, B_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 }
 } // namespace Drawing
