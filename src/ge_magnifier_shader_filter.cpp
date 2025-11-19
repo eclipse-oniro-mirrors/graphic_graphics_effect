@@ -36,6 +36,8 @@ GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShade
     magnifierPara_->height_ = params.height;
     magnifierPara_->cornerRadius_ = params.cornerRadius;
     magnifierPara_->borderWidth_ = params.borderWidth;
+    magnifierPara_->zoomOffsetX_ = params.zoomOffsetX;
+    magnifierPara_->zoomOffsetY_ = params.zoomOffsetY;
     magnifierPara_->shadowOffsetX_ = params.shadowOffsetX;
     magnifierPara_->shadowOffsetY_ = params.shadowOffsetY;
     magnifierPara_->shadowSize_ = params.shadowSize;
@@ -96,10 +98,18 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
             return nullptr;
         }
     }
-
-    if (magnifierPara_ == nullptr) {
+    if (GE_LE(imageHeight, 0.0f) || GE_LE(imageWidth, 0.0f)) {
+        LOGE("GEMagnifierShaderFilter::MakeMagnifierShader imageinfo is invalid");
         return nullptr;
     }
+    if (magnifierPara_ == nullptr || GE_LE(magnifierPara_->factor_, 0.0f)) {
+        LOGE("GEMagnifierShaderFilter::MakeMagnifierShader magnifierPara is invalid");
+        return nullptr;
+    }
+
+    float maxZoomOffsetX = (imageWidth - magnifierPara_->width_ * scaleX_ / magnifierPara_->factor_) / 2.0f;
+    float maxZoomOffsetY = (imageHeight - magnifierPara_->height_ * scaleY_ / magnifierPara_->factor_) / 2.0f;
+
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_magnifierShaderEffect);
     builder->SetChild("imageShader", imageShader);
@@ -109,6 +119,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     builder->SetUniform("size", magnifierPara_->width_ * scaleX_, magnifierPara_->height_ * scaleY_);
     builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_ * scaleY_);
     builder->SetUniform("borderWidth", magnifierPara_->borderWidth_ * scaleY_);
+    builder->SetUniform("zoomOffset",
+        std::clamp(magnifierPara_->zoomOffsetX_, -maxZoomOffsetX, maxZoomOffsetX) / imageWidth,
+        std::clamp(magnifierPara_->zoomOffsetY_, -maxZoomOffsetY, maxZoomOffsetY) / imageHeight);
 
     builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_ * scaleX_,
         magnifierPara_->shadowOffsetY_ * scaleY_);
@@ -142,6 +155,7 @@ bool GEMagnifierShaderFilter::InitMagnifierEffect()
             uniform float borderWidth;
             uniform float cornerRadius;
             uniform float2 size;
+            uniform float2 zoomOffset;
 
             uniform float2 shadowOffset;
             uniform float shadowSize;
@@ -196,7 +210,7 @@ bool GEMagnifierShaderFilter::InitMagnifierEffect()
                 float green = magnifyingGlass.y;
                 float offsetX = refractionStrength * sign(red) * red * red;
                 float offsetY = -refractionStrength * sign(green) * green * green;
-                vec2 sampleUV = (uv - boxPosition) / factor + boxPosition;
+                vec2 sampleUV = (uv - boxPosition + zoomOffset) / factor + boxPosition;
                 vec4 refraction = imageShader.eval((sampleUV + vec2(offsetX, offsetY)) * iResolution.x);
 
                 // add gradient mask
