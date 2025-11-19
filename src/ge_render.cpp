@@ -18,6 +18,7 @@
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_border_light_shader.h"
+#include "ge_circle_flowlight_effect.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -262,6 +263,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             const auto& params = ve->GetSDFShadowShaderParams();
             out = std::make_shared<GESDFShadowShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetCircleFlowlightEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetCircleFlowlightEffectParams();
+            out = std::make_shared<GECircleFlowlightEffect>(*params);
             return out;
         }
     },
