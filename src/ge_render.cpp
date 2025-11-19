@@ -18,6 +18,7 @@
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_border_light_shader.h"
+#include "ge_circle_flowlight_effect.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -49,6 +50,7 @@
 #include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
+#include "sdf/ge_sdf_border_shader.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -244,6 +246,16 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
+    {GEVisualEffectImpl::FilterType::SDF_BORDER, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSDFBorderShaderParams();
+            out = std::make_shared<GESDFBorderShader>(*params);
+            return out;
+        }
+    },
     {GEVisualEffectImpl::FilterType::SDF_SHADOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
@@ -252,6 +264,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             const auto& params = ve->GetSDFShadowShaderParams();
             out = std::make_shared<GESDFShadowShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetCircleFlowlightEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetCircleFlowlightEffectParams();
+            out = std::make_shared<GECircleFlowlightEffect>(*params);
             return out;
         }
     },

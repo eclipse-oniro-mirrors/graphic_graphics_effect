@@ -119,6 +119,7 @@ TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
 };
 
+
 TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT0, gridPoints[0], PairFloat),
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT1, gridPoints[1], PairFloat),
@@ -138,7 +139,24 @@ TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE6, rotationAngles[6], PairFloat),
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE7, rotationAngles[7], PairFloat),
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE8, rotationAngles[8], PairFloat),
-};
+    };
+
+TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0, colors[0], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1, colors[1], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR2, colors[2], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3, colors[3], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY, rotationFrequency,
+        Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE, rotationAmplitude,
+        Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED, rotationSeed, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX, gradientX, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY, gradientY, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK, mask,
+        std::shared_ptr<Drawing::GEShaderMask>),
+    };
 
 #undef ADD_TAG_HANDLER
 }
@@ -409,6 +427,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGasifyFilterParams();
         }
     },
+    {  GE_SHADER_SDF_BORDER,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_BORDER);
+            impl->MakeSDFBorderParams();
+        }
+    },
     { GE_SHADER_SDF_SHADOW,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
@@ -419,6 +443,11 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GRID_WARP);
             impl->MakeGridWarpFilterParams();
+    },        
+    { GE_SHADER_CIRCLE_FLOWLIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT);
+            impl->MakeCircleFlowlightEffectParams();
         }
     },
 };
@@ -683,6 +712,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::FROSTED_GLASS: {
             SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
             break;
         }
         default:
@@ -1097,6 +1130,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1124,6 +1161,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
                 sdfUnionOpShapeParams_->left = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
             } else if (tag == GE_SHAPE_SDF_UNION_OP_SHAPEY || tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY) {
                 sdfUnionOpShapeParams_->right = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_BORDER: {
+            if (sdfBorderShaderParams_ && param) {
+                sdfBorderShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
             }
             break;
         }
@@ -1261,6 +1304,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1329,6 +1376,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParam
 {
     if (tag == GE_FILTER_SDF_SHAPE) {
         sdfFilterParams_->border = border;
+    }
+    if (tag == GE_SHADER_SDF_BORDER_BORDER && sdfBorderShaderParams_) {
+        sdfBorderShaderParams_->border = border;
     }
 }
 
