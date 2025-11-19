@@ -118,8 +118,8 @@ void GEContourDiagonalFlowLightShaderTest::SetUp()
 std::shared_ptr<Drawing::Surface> GEContourDiagonalFlowLightShaderTest::CreateSurface()
 {
     std::shared_ptr<Drawing::GPUContext> context = nullptr;
-    auto renderContext = std::make_shared<RenderContext>();
-    renderContext->InitializeEglContext();
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
     renderContext->SetUpGpuContext();
     context = renderContext->GetSharedDrGPUContext();
     if (context == nullptr) {
