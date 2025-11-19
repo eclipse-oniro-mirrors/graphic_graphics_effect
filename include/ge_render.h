@@ -85,15 +85,19 @@ private:
         std::optional<std::reference_wrapper<Drawing::Brush>> brush {};
     };
 
+    enum class ApplyShaderFilterResult {
+        Error,
+        DrawOnImage,
+        DrawOnCanvas
+    };
+
     /**
      * @brief Apply a GEVisualEffect through GEShaderFilter.
      * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
      * Used as a common internal helper to apply GEShaderFilter.
-     * @return 
-     *         If true, outImage may be unchanged, depending on the corresponding GEShaderFilter::OnDrawImage
-     *         If false, outImage is definitely the output image.
+     * @return ApplyShaderFilterResult (Error / DrawOnImage / DrawOnCanvas)
      */
-    bool ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
+    ApplyShaderFilterResult ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
         std::shared_ptr<Drawing::Image>& outImage, const ShaderFilterEffectContext& context);
 
     void DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
