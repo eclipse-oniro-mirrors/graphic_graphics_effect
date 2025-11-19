@@ -101,7 +101,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFUn
         return sdfUnionShaderShapeBuilder;
     }
 
-    //todo 为了通用性，可以让sdf + normal都用，用的三通道union，在只有sdf的时候是浪费的
     static constexpr char prog[] = R"(
         uniform shader left;
         uniform shader right;
@@ -130,7 +129,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFSm
         return sdfSmoothUnionShaderShapeBuilder;
     }
 
-    //todo 为了通用性，可以让sdf + normal都用，用的三通道union，在只有sdf的时候是浪费的
     static constexpr char prog[] = R"(
         uniform float spacing;
         uniform shader left;

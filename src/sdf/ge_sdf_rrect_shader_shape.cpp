@@ -53,6 +53,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
     }
 
     static constexpr char prog[] = R"(
+        uniform vec2 centerPos;
         uniform vec2 halfSize;
         uniform float radius;
 
@@ -64,7 +65,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
         half4 main(vec2 fragCoord)
         {
-            float sdf = sdfRRect(fragCoord, halfSize, halfSize, radius);
+            float sdf = sdfRRect(fragCoord, centerPos, halfSize, radius);
             return half4(0, 0, 0, sdf);
         }
     )";
@@ -87,7 +88,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
     }
 
     static constexpr char prog[] = R"(
-        uniform float2 iResolution;
+        uniform vec2 centerPos;
         uniform vec2 halfSize;
         uniform float radius;
 
@@ -122,7 +123,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
         half4 main(float2 fragCoord)
         {
-            vec3 sdg = sdgRRect(fragCoord - halfSize, halfSize, radius);
+            vec3 sdg = sdgRRect(fragCoord - centerPos, halfSize, radius);
             return half4(sdg.yz, 0.0, sdg.x);
         }
     )";
@@ -149,6 +150,8 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(float 
         return nullptr;
     }
 
+    builder->SetUniform("centerPos", params_.rrect.left_ + params_.rrect.width_ * HALF,
+        params_.rrect.top_ + params_.rrect.height_ * HALF);
     builder->SetUniform("halfSize", params_.rrect.width_ * HALF, params_.rrect.height_ * HALF);
     builder->SetUniform("radius", params_.rrect.radiusX_);
 
