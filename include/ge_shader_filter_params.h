@@ -887,9 +887,9 @@ constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
 constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
 constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
 // Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngle";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlur";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDir";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngleParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDirParams";
 constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
 
 struct GEFrostedGlassShaderFilterParams {
