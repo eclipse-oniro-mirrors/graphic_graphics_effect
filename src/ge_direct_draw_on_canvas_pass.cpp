@@ -2,7 +2,7 @@
 
 namespace OHOS {
 namespace Rosen {
-    
+
 std::string_view GEDirectDrawOnCanvasPass::GetLogName() const
 {
     return "GEDirectDrawOnCanvasPass";

@@ -15,8 +15,8 @@
 #ifndef GRAPHICS_EFFECT_GE_DIRECT_DRAW_ON_CANVAS_PASS_H
 #define GRAPHICS_EFFECT_GE_DIRECT_DRAW_ON_CANVAS_PASS_H
 #include "ge_filter_composer_pass.h"
-#include "ge_visual_effect.h"
 #include "ge_render.h"
+#include "ge_visual_effect.h"
 
 namespace OHOS {
 namespace Rosen {

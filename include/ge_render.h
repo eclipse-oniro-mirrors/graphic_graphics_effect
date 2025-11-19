@@ -85,10 +85,14 @@ private:
         std::optional<std::reference_wrapper<Drawing::Brush>> brush {};
     };
 
-    // Apply a single shader filter
-    // Returns: 
-    // - true: The filter is directly drawn on canvas
-    // - false: The filter is drawn on outImage (maybe failed - check outImage is nullptr or not)
+    /**
+     * @brief Apply a GEVisualEffect through GEShaderFilter.
+     * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
+     * Used as a common internal helper to apply GEShaderFilter.
+     * @return Whether the image is drawn onto the canvas or not. 
+     *         If true, outImage may be unchanged, depending on the corresponding GEShaderFilter::OnDrawImage
+     *         If false, outImage is definitely the output image.
+     */
     bool ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
         std::shared_ptr<Drawing::Image>& outImage, const ShaderFilterEffectContext& context);
 
