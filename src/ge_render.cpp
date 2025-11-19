@@ -352,9 +352,9 @@ GERender::ApplyShaderFilterResult GERender::ApplyShaderFilter(Drawing::Canvas& c
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
-    bool isDrawOnCanvasOk = !visualEffect->GetAllowDirectDrawOnCanvas() // not allow directly draw on canvas 
-        || !context.brush.has_value() // brush is not given
-        || !geShaderFilter->DrawImage(canvas, resImage, context.src, context.dst, *context.brush); // unsupported / fail
+    bool isDrawOnCanvasOk = visualEffect->GetAllowDirectDrawOnCanvas() // allow directly draw on canvas 
+        && context.brush.has_value() // brush is given
+        && geShaderFilter->DrawImage(canvas, resImage, context.src, context.dst, *context.brush); // success
     if (!isDrawOnCanvasOk) {
         resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
     }
