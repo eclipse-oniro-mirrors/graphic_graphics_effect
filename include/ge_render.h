@@ -89,7 +89,7 @@ private:
      * @brief Apply a GEVisualEffect through GEShaderFilter.
      * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
      * Used as a common internal helper to apply GEShaderFilter.
-     * @return Whether the image is drawn onto the canvas or not. 
+     * @return 
      *         If true, outImage may be unchanged, depending on the corresponding GEShaderFilter::OnDrawImage
      *         If false, outImage is definitely the output image.
      */

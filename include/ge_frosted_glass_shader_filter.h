@@ -32,6 +32,9 @@ public:
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
+    bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, 
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush) override;
+
     bool InitFrostedGlassEffect();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
         std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
@@ -49,6 +52,10 @@ private:
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
+    bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, 
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder
+    );
 };
 
 } // namespace Rosen
