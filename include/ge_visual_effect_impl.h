@@ -556,6 +556,16 @@ public:
         return frostedGlassParams_;
     }
 
+    void MakeGridWarpFilterParams()
+    {
+        gridWarpFilterParams_ = std::make_shared<GEGridWarpShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEGridWarpShaderFilterParams>& GetGridWarpFilterParams() const
+    {
+        return gridWarpFilterParams_;
+    }
+
     void MakeCircleFlowlightEffectParams()
     {
         circleFlowlightEffectParams_ = std::make_shared<GECircleFlowlightEffectParams>();
@@ -679,6 +689,8 @@ private:
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
+
+    std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
     std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
 };
 

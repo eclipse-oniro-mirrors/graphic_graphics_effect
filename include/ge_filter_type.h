@@ -33,6 +33,7 @@ enum class GEFilterType : int32_t {
     COLOR_GRADIENT,
     MASK_TRANSITION,
     SDF,
+    GRID_WARP,
     // Mask
     RIPPLE_MASK,
     DOUBLE_RIPPLE_MASK,
