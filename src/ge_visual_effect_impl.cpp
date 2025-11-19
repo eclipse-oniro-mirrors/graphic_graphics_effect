@@ -443,7 +443,8 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GRID_WARP);
             impl->MakeGridWarpFilterParams();
-    },        
+        }
+    },
     { GE_SHADER_CIRCLE_FLOWLIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT);
