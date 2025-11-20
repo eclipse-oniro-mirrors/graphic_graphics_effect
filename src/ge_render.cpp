@@ -356,7 +356,12 @@ GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& c
         && context.brush.has_value() // brush is given
         && geShaderFilter->DrawImage(canvas, resImage, context.src, context.dst, *context.brush); // success
     if (!isDrawOnCanvasOk) {
-        resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
+        // dst assigned with src is a legacy issue when RSDrawingFilter calls geRender->ApplyImageEffect
+        // When RSDrawingFilter calls GERender::ApplyHpsGEImageEffect, ApplyHpsGEImageEffect enabled the compatibility
+        // flag to ignore dst in order to ensure the result is the same
+        // When the issue is resolved, please remove this flag and pass context.dst
+        resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src,
+            context.ignoreDstCompatibilityFlag ? context.src : context.dst);
     }
     ve->SetCache(geShaderFilter->GetCache());
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
@@ -392,8 +397,7 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            // dst assigned with src is a legacy issue, see the calls of geRender->ApplyImageEffect in RSDrawingFilter
-            ShaderFilterEffectContext geContext {resImage, context.src, context.src, brush};
+            ShaderFilterEffectContext geContext {resImage, context.src, context.dst, brush, true};
             applyTarget = ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {

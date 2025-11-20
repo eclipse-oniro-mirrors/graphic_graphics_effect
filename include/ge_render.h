@@ -89,6 +89,7 @@ private:
         Drawing::Rect src {};
         Drawing::Rect dst {};
         std::optional<std::reference_wrapper<Drawing::Brush>> brush {};
+        bool ignoreDstCompatibilityFlag = false; // See GERender::ApplyShaderFilter
     };
 
     enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
