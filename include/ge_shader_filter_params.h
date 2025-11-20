@@ -780,6 +780,12 @@ struct GESDFShadowShaderParams final {
     GESDFShadowParams shadow;
 };
 
+constexpr char GE_SHADER_SDF_CLIP[] = "SDFClip";
+constexpr char GE_SHADER_SDF_CLIP_SHAPE[] = "SDFClip_Shape";
+struct GESDFClipShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+};
+
 constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
 constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
 constexpr char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";

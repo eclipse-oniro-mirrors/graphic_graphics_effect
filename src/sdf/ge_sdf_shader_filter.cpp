@@ -48,6 +48,11 @@ std::shared_ptr<Drawing::Image> GESDFShaderFilter::OnProcessImage(Drawing::Canva
         const auto shaderEffect = Drawing::RuntimeEffect::CreateForShader(sdfTreeProcessor_->Process());
         shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(shaderEffect);
     }
+    Drawing::Matrix matrix;
+    auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+
+    shaderEffectBuilder_->SetChild("image", imageShader);
     sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
 
     return shaderEffectBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
