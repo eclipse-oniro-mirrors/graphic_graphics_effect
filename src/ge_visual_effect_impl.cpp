@@ -437,6 +437,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFBorderParams();
         }
     },
+    { GE_SHADER_SDF_CLIP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_CLIP);
+            impl->MakeSDFClipParams();
+        }
+    },
     { GE_SHADER_SDF_SHADOW,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
@@ -1176,13 +1182,29 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             break;
         }
         case FilterType::SDF_SHADOW: {
-            if (sdfShadowShaderParams_ && param) {
-                sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
-            }
+            SetSDFShadowParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_CLIP: {
+            SetSDFClipParams(tag, param);
             break;
         }
         default:
             break;
+    }
+}
+
+void GEVisualEffectImpl::SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    if (sdfClipShaderParams_ && param) {
+        sdfClipShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+    }
+}
+
+void GEVisualEffectImpl::SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    if (sdfShadowShaderParams_ && param) {
+        sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
     }
 }
 

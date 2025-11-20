@@ -64,25 +64,35 @@ private:
     inline static const std::string mainFunctionCode_ = R"(
         half4 main(float2 fragCoord)
         {
-            vec2 coord = fragCoord - shadowOffset;
+            vec2 coord = fragCoord;
             float d = SDFMap(coord);
-            vec4 color = shadowEffect(d, shadowColor, shadowRadius, isFilled > 0.5);
+            vec4 color = shadowEffect(coord, shadowOffset, d, shadowColor, shadowRadius, isFilled > 0.5);
             return half4(color);
         }
     )";
 
     inline static const std::string shadowEffectsFunctions_ = R"(
         // Input data:
+        // vec2 coord - coordinates used to calculate SDFMap
+        // vec2 shadowOffset - offset of the shadow
         // float d - current SDF shape distance
         // vec3 shadowColor - color of the shadow
         // float shadowRadius - radius of the shadow
         // bool isFilled - should SDFBody be filled with shadow
-        vec4 shadowEffect(float d, vec3 shadowColor, float shadowRadius, bool isFilled)
+        vec4 shadowEffect(vec2 coord, vec2 shadowOffset,
+            float d, vec3 shadowColor, float shadowRadius, bool isFilled)
         {
             vec4 color = vec4(0.0);
+            float alphaFilled = 1.0;
             if (!isFilled && d < 0.0)
             {
-                return color;
+                alphaFilled = smoothstep(-1.0, 0.0, d);
+            }
+
+            // Recalculate the distance if there is offset
+            if (any(notEqual(shadowOffset, vec2(0.0))))
+            {
+                d = SDFMap(coord - shadowOffset);
             }
 
             if (d <= shadowRadius)
@@ -90,7 +100,7 @@ private:
                 d += shadowRadius * 0.5;
                 float alpha = clamp(d / shadowRadius, 0.0, 1.0);
                 alpha = 1.0 - alpha;
-                color = vec4(shadowColor, 1.0) * alpha;
+                color = vec4(shadowColor, 1.0) * alpha * alphaFilled;
             }
 
             return color;

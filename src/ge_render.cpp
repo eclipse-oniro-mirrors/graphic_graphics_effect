@@ -42,6 +42,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
+#include "sdf/ge_sdf_clip_shader.h"
 #include "sdf/ge_sdf_shader_filter.h"
 #include "sdf/ge_sdf_shadow_shader.h"
 #include "ge_sound_wave_filter.h"
@@ -265,6 +266,18 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             const auto& params = ve->GetSDFShadowShaderParams();
             out = std::make_shared<GESDFShadowShader>(*params);
             return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_CLIP, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                LOGE("GERender::GenerateShaderEffect GEVisualEffectImpl is null");
+                return out;
+            }
+            const auto& params = ve->GetSDFClipShaderParams();
+            out = std::make_shared<GESDFClipShader>(*params);
+        return out;
         }
     },
     {GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)

@@ -59,7 +59,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
 
     auto outShader = shaderEffectBuilder_->MakeShader(nullptr, false);
     if (outShader == nullptr) {
-        GE_LOGE("GEAuroraNoiseShader::MakeSDFShadowShader sdfShadowShader is nullptr.");
+        GE_LOGE("GESDFShadowShader::MakeSDFShadowShader sdfShadowShader is nullptr.");
         return nullptr;
     }
     return outShader;

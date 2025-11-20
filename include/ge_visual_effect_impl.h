@@ -416,6 +416,16 @@ public:
         sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
     }
 
+    const std::shared_ptr<GESDFClipShaderParams>& GetSDFClipShaderParams() const
+    {
+        return sdfClipShaderParams_;
+    }
+
+    void MakeSDFClipParams()
+    {
+        sdfClipShaderParams_ = std::make_shared<GESDFClipShaderParams>();
+    }
+
     void MakeColorGradientEffectParams()
     {
         colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
@@ -635,6 +645,8 @@ private:
     void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassParams(const std::string& tag, const float& param);
     void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
+    void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
+    void SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -684,6 +696,7 @@ private:
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
+    std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
