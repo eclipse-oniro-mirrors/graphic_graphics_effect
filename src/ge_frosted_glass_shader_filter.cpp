@@ -464,13 +464,17 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
         }
     }
 
-    // 需迁移到rs
-    auto sdfRRectShapeParams = std::make_shared<Drawing::GESDFRRectShapeParams>();
-    sdfRRectShapeParams->rrect = Drawing::GERRect{0, 0,
-        frostedGlassParams_.borderSize[NUM_0] * NUM_2, frostedGlassParams_.borderSize[NUM_1] * NUM_2,
-        frostedGlassParams_.cornerRadius, frostedGlassParams_.cornerRadius};
-    auto rrectShape = std::make_shared<Drawing::GESDFRRectShaderShape>(*sdfRRectShapeParams);
-    auto sdfNormalShader = rrectShape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+    std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader;
+    if (auto shape = frostedGlassParams_.sdfShape) {
+        sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+    } else {
+        auto sdfRRectShapeParams = std::make_shared<Drawing::GESDFRRectShapeParams>();
+        sdfRRectShapeParams->rrect = Drawing::GERRect{0, 0,
+            frostedGlassParams_.borderSize[NUM_0] * NUM_2, frostedGlassParams_.borderSize[NUM_1] * NUM_2,
+            frostedGlassParams_.cornerRadius, frostedGlassParams_.cornerRadius};
+        auto rrectShape = std::make_shared<Drawing::GESDFRRectShaderShape>(*sdfRRectShapeParams);
+        sdfNormalShader = rrectShape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+    }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_frostedGlassShaderEffect);

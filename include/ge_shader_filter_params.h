@@ -680,7 +680,7 @@ struct GESDFUnionOpShapeParams {
     float spacing = 0.f;
     std::shared_ptr<GESDFShaderShape> left;
     std::shared_ptr<GESDFShaderShape> right;
-    GESDFUnionOp op;
+    GESDFUnionOp op = GESDFUnionOp::SMOOTH_UNION;
 };
 
 constexpr char GE_SHAPE_SDF_RRECT_SHAPE[] = "SDFRRectShape";
@@ -867,6 +867,7 @@ constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadi
 constexpr char GE_FILTER_FROSTED_GLASS_BORDERWIDTH[] = "FrostedGlass_BorderWidth";
 constexpr char GE_FILTER_FROSTED_GLASS_OFFSET[] = "FrostedGlass_Offset";
 constexpr char GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR[] = "FrostedGlass_DownSampleFactor";
+constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
 // BG darken parameters
 constexpr char GE_FILTER_FROSTED_GLASS_BG_FACTOR[] = "FrostedGlass_BgFactor";
 // Inner shadow parameters
@@ -888,6 +889,7 @@ struct GEFrostedGlassShaderFilterParams {
     float borderWidth = 2.9f;
     float offset = 1.88f;
     float downSampleFactor = 1.0f;
+    std::shared_ptr<GESDFShaderShape> sdfShape;
     // Background darken parameters
     float bgFactor = 0.9f;
     // Inner shadow parameters

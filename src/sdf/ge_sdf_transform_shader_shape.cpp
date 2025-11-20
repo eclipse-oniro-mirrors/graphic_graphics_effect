@@ -90,7 +90,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
     }
 
     if (params_.matrix == Drawing::Matrix()) {
-        return nullptr;
+        return shapeShader;
     }
 
     builder->SetChild("shapeShader", shapeShader);
