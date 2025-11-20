@@ -67,8 +67,14 @@ public:
 
     bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage);
-
-    bool ApplyHpsGEImageEffect(
+    
+    struct ApplyHpsGEResult {
+        bool hasDrawnOnCanvas;
+        bool isHpsBlurApplied;
+        static ApplyHpsGEResult CanvasNotDrawnAndHpsNotApplied() { return {false, false}; }
+    };
+    
+    ApplyHpsGEResult ApplyHpsGEImageEffect(
         Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage,
         Drawing::Brush& brush
@@ -85,15 +91,15 @@ private:
         std::optional<std::reference_wrapper<Drawing::Brush>> brush {};
     };
 
-    enum class ApplyShaderFilterResult { Error, DrawOnImage, DrawOnCanvas };
+    enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
 
     /**
      * @brief Apply a GEVisualEffect through GEShaderFilter.
      * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
      * Used as a common internal helper to apply GEShaderFilter.
-     * @return ApplyShaderFilterResult (Error / DrawOnImage / DrawOnCanvas)
+     * @return ApplyShaderFilterTarget (Error / DrawOnImage / DrawOnCanvas)
      */
-    ApplyShaderFilterResult ApplyShaderFilter(Drawing::Canvas& canvas,
+    ApplyShaderFilterTarget ApplyShaderFilter(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& outImage,
         const ShaderFilterEffectContext& context);
 

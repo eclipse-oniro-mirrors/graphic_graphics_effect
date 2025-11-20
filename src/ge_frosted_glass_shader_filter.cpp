@@ -397,7 +397,7 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
         return false;
     }
     builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
-                                          canvasInfo_.geoHeight);
+                                     canvasInfo_.geoHeight);
     return true;
 }
 
@@ -425,7 +425,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
     return resultImage;
 }
 
-bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, 
+bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
     const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
 {
     if (image == nullptr) {

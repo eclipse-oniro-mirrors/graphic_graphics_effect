@@ -335,19 +335,19 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     return resImage;
 }
 
-GERender::ApplyShaderFilterResult GERender::ApplyShaderFilter(Drawing::Canvas& canvas, 
+GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& canvas, 
     std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage, 
     const ShaderFilterEffectContext& context)
 {
     if (visualEffect == nullptr) {
         LOGD("GERender::ApplyShaderFilter visualEffect is null");
-        return ApplyShaderFilterResult::Error;
+        return ApplyShaderFilterTarget::Error;
     }
     auto ve = visualEffect->GetImpl();
     std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
     if (geShaderFilter == nullptr) {
         LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
-        return ApplyShaderFilterResult::Error;
+        return ApplyShaderFilterTarget::Error;
     }
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
@@ -362,19 +362,20 @@ GERender::ApplyShaderFilterResult GERender::ApplyShaderFilter(Drawing::Canvas& c
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
         isGasifyFilter_ = true;
     }
-    return isDrawOnCanvasOk ? ApplyShaderFilterResult::DrawOnCanvas : ApplyShaderFilterResult::DrawOnImage;
+    return isDrawOnCanvasOk ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
 }
 
-bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-    const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas,
+    Drawing::GEVisualEffectContainer& veContainer, const HpsGEImageEffectContext& context,
+    std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
 {
     if (!context.image) {
         LOGE("GERender::ApplyHpsGEImageEffect image is null");
-        return false;
+        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     const auto& visualEffects = veContainer.GetFilters();
     if (visualEffects.empty()) {
-        return false;
+        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     GEFilterComposer composer;
     composer.Add<GEHpsBuildPass>(canvas, context);
@@ -382,30 +383,30 @@ bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualE
     composer.Add<GEDirectDrawOnCanvasPass>();
     auto composables = GEFilterComposer::BuildComposables(visualEffects);
     auto composerResult = composer.Run(composables);
-    if (!composerResult.anyPassChanged) {
-        return false; // No pass has changed the effect sequence, fallback to original route to ensure compatibility
+    if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables
+        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     auto resImage = context.image;
     bool appliedHpsBlur = false;
-    ApplyShaderFilterResult applyTarget = ApplyShaderFilterResult::Error; // Last applied target
+    ApplyShaderFilterTarget applyTarget = ApplyShaderFilterTarget::Error; // Last applied target
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            // dst assigned with src because GE doesn't apply downsample like HPS
+            // dst assigned with src is a legacy issue, see the calls of geRender->ApplyImageEffect in RSDrawingFilter
             ShaderFilterEffectContext geContext {resImage, context.src, context.src, brush};
             applyTarget = ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
             appliedHpsBlur = hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
-            applyTarget = appliedHpsBlur ? ApplyShaderFilterResult::DrawOnCanvas : ApplyShaderFilterResult::DrawOnImage;
+            applyTarget = appliedHpsBlur ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
         } else {
             LOGE("GERender::ApplyHpsGEImageEffect unhandled composable type");
         }
     }
 
     outImage = resImage;
-    return applyTarget == ApplyShaderFilterResult::DrawOnCanvas; // drawn or not
+    return {applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur}; // canvas drawn & applied hps blur
 }
 
 void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
