@@ -442,6 +442,7 @@ bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std:
         return false;
     }
 
+    matrix.PostConcat(CreateDestinationTranslateMatrix(dst));
     auto shader = builder->MakeShader(&matrix, image->IsOpaque());
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);

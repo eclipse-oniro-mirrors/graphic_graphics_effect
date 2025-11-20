@@ -85,6 +85,15 @@ public:
     }
 
 protected:
+    /**
+     * @brief Create a matrix that translates to the top-left corner of destination area.
+     *        Used in OnDrawImage.
+     * @param dst destination area
+     * @return Translation matrix. Call the PostConcat method on your matrix with it before calling MakeShader
+     */
+    static Drawing::Matrix CreateDestinationTranslateMatrix(const Drawing::Rect& dst);
+
+protected:
     Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;
     uint32_t hash_ = 0;

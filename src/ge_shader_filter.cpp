@@ -34,5 +34,12 @@ bool GEShaderFilter::DrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Dr
     return OnDrawImage(canvas, image, src, dst, brush);
 }
 
+Drawing::Matrix GEShaderFilter::CreateDestinationTranslateMatrix(const Drawing::Rect& dst)
+{
+    Drawing::Matrix translateMatrix;
+    translateMatrix.Translate(dst.GetLeft(), dst.GetTop());
+    return translateMatrix;
+}
+
 } // namespace Rosen
 } // namespace OHOS
