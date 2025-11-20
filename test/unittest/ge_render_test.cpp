@@ -668,14 +668,14 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
 
     /* image is nullptr */
     GERender::HpsGEImageEffectContext context1 { image, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush));
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush).hasDrawnOnCanvas);
  
     /* no filter */
     auto image2 = MakeImage();
     ASSERT_NE(image2, nullptr);
 
     GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush));
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush).hasDrawnOnCanvas);
  
     /* normal case */
     image2 = MakeImage();
@@ -683,13 +683,13 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
     GERender::HpsGEImageEffectContext context3 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush));
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush).hasDrawnOnCanvas);
 
     /* compatibility fallback */
     image2 = MakeImage();
     GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions() };
     outImage = nullptr;
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context4, outImage, brush));
+    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context4, outImage, brush).hasDrawnOnCanvas);
     EXPECT_EQ(outImage, nullptr);
 
     /* normal case with composable greyblur */
@@ -707,7 +707,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
     std::vector<const char*> emptyVec {};
     HpsEffectFilter::UnitTestSetExtensionProperties(emptyVec);
     GERender::HpsGEImageEffectContext context5 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_TRUE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context5, outImage, brush));
+    EXPECT_TRUE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context5, outImage, brush).hasDrawnOnCanvas);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
 }
