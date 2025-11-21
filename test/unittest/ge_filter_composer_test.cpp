@@ -22,7 +22,6 @@
 #include "ge_filter_type.h"
 #include "ge_filter_type_info.h"
 #include "ge_hps_build_pass.h"
-#include "ge_hps_compatible_pass.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_render.h"
 #include "ge_visual_effect_impl.h"
@@ -412,75 +411,6 @@ HWTEST_F(GEFilterComposerTest, MesaFusionPassRunOddSize, TestSize.Level1)
 }
 
 /**
- * @tc.name: HpsCompatiblePassGetLogName
- * @tc.desc: Test GEHpsCompatiblePass GetLogName function
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassGetLogName, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassGetLogName start";
-
-    GEHpsCompatiblePass pass;
-
-    auto name = pass.GetLogName();
-    EXPECT_EQ(name, "GEHpsCompatiblePass");
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassGetLogName end";
-}
-
-/**
- * @tc.name: HpsCompatiblePassRunWithBlur
- * @tc.desc: Test GEHpsCompatiblePass Run function with blur filters
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassRunWithBlur, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithBlur start";
-
-    GEHpsCompatiblePass pass;
-
-    std::vector<GEFilterComposable> composables;
-    // Add a kawase blur effect
-    auto kawaseEffect = CreateKawaseBlurEffect();
-    composables.push_back(kawaseEffect);
-
-    auto result = pass.Run(composables);
-    EXPECT_FALSE(result.changed); // This pass doesn't modify composables
-
-    // Check that blur filter detection works correctly
-    bool exists = pass.IsBlurFilterExists();
-    EXPECT_TRUE(exists);
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithBlur end";
-}
-
-/**
- * @tc.name: HpsCompatiblePassRunWithoutBlur
- * @tc.desc: Test GEHpsCompatiblePass Run function without blur filters
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassRunWithoutBlur, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithoutBlur start";
-
-    GEHpsCompatiblePass pass;
-
-    std::vector<GEFilterComposable> composables;
-    // Add an AI bar effect (not a blur filter)
-    auto greyEffect = CreateGreyEffect();
-    composables.push_back(greyEffect);
-
-    auto result = pass.Run(composables);
-    EXPECT_FALSE(result.changed); // This pass doesn't modify composables
-
-    // Check that blur filter detection works correctly
-    bool exists = pass.IsBlurFilterExists();
-    EXPECT_FALSE(exists);
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithoutBlur end";
-}
-
-/**
  * @tc.name: GEFilterComposerRunNoPasses
  * @tc.desc: Test GEFilterComposer Run function with no passes
  * @tc.type: FUNC
@@ -574,7 +504,6 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges start";
 
     GEFilterComposer composer;
-    composer.Add<GEHpsCompatiblePass>();
     composer.Add<GEMesaFusionPass>();
 
     std::vector<GEFilterComposable> composables;

@@ -104,9 +104,6 @@ private:
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& outImage,
         const ShaderFilterEffectContext& context);
 
-    void DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
-        std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
-
     std::shared_ptr<GEShader> GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve);
 
     std::shared_ptr<GEShaderFilter> GenerateShaderFilter(const std::shared_ptr<Drawing::GEVisualEffect>& ve);

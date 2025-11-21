@@ -32,7 +32,6 @@
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
-#include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_hps_build_pass.h"
 #include "ge_kawase_blur_shader_filter.h"
@@ -411,16 +410,6 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
 
     outImage = resImage;
     return {applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur}; // canvas drawn & applied hps blur
-}
-
-void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
-                            std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
-{
-    if (outImage != nullptr) {
-        canvas.AttachBrush(brush);
-        canvas.DrawImageRect(*outImage, context.src, context.dst, context.sampling);
-        canvas.DetachBrush();
-    }
 }
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
