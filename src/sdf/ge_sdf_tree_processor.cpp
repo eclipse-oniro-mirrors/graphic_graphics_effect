@@ -73,7 +73,7 @@ namespace OHOS::Rosen::Drawing {
         }
         
         if (shaderCode_.empty()) {
-            std::string headers;
+            std::string headers = "uniform shader image;\n";
             std::string sdfShapeFunctions;
             ProcessSDFShape(headers, sdfShapeFunctions);
 
@@ -81,19 +81,10 @@ namespace OHOS::Rosen::Drawing {
 
                 vec4 main(vec2 fragCoord)
                 {
-                    vec4 color = vec4(0.0);
+                    vec4 color = image.eval(fragCoord).rgba;
                     vec2 coord = fragCoord;
                     float d = SDFMap(coord);
                 )";
-
-            effects_ = R"(
-
-                if (d < 0.0)
-                {
-                    color = vec4(0.5, 0.5, 0.5, 1.0);
-                }
-            
-            )";
 
             for (const auto& effect: effectsContainer_) {
                 effect->Process(headers, effects_, effectsFunctions_);

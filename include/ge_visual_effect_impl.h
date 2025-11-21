@@ -49,13 +49,6 @@ public:
 
     ~GEVisualEffectImpl();
 
-    template <typename T>
-    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
-
-    template <typename T>
-    void ApplyTagParams(const std::string& tag, const std::any& value,
-        std::shared_ptr<T>& params, const TagMap<T>& tagMap);
-
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
     void SetParam(const std::string& tag, float param);
@@ -443,6 +436,16 @@ public:
         sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
     }
 
+    const std::shared_ptr<GESDFClipShaderParams>& GetSDFClipShaderParams() const
+    {
+        return sdfClipShaderParams_;
+    }
+
+    void MakeSDFClipParams()
+    {
+        sdfClipShaderParams_ = std::make_shared<GESDFClipShaderParams>();
+    }
+
     void MakeColorGradientEffectParams()
     {
         colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
@@ -583,6 +586,26 @@ public:
         return frostedGlassParams_;
     }
 
+    void MakeGridWarpFilterParams()
+    {
+        gridWarpFilterParams_ = std::make_shared<GEGridWarpShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEGridWarpShaderFilterParams>& GetGridWarpFilterParams() const
+    {
+        return gridWarpFilterParams_;
+    }
+
+    void MakeCircleFlowlightEffectParams()
+    {
+        circleFlowlightEffectParams_ = std::make_shared<GECircleFlowlightEffectParams>();
+    }
+
+    const std::shared_ptr<GECircleFlowlightEffectParams>& GetCircleFlowlightEffectParams() const
+    {
+        return circleFlowlightEffectParams_;
+    }
+
     void SetBorder(const Color& borderColor, float borderWidth);
     void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
                   float radius, Drawing::Path path, bool isFilled);
@@ -642,6 +665,8 @@ private:
     void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassParams(const std::string& tag, const float& param);
     void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
+    void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
+    void SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -691,6 +716,7 @@ private:
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
+    std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
@@ -698,6 +724,9 @@ private:
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
     std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
+
+    std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
+    std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
 };
 
 } // namespace Drawing

@@ -18,6 +18,7 @@
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_border_light_shader.h"
+#include "ge_circle_flowlight_effect.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -29,6 +30,7 @@
 #include "ge_filter_composer.h"
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
+#include "ge_grid_warp_shader_filter.h"
 #include "ge_hps_compatible_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_hps_build_pass.h"
@@ -40,6 +42,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
+#include "sdf/ge_sdf_clip_shader.h"
 #include "sdf/ge_sdf_shader_filter.h"
 #include "sdf/ge_sdf_shadow_shader.h"
 #include "ge_sound_wave_filter.h"
@@ -262,6 +265,29 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             const auto& params = ve->GetSDFShadowShaderParams();
             out = std::make_shared<GESDFShadowShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_CLIP, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                LOGE("GERender::GenerateShaderEffect GEVisualEffectImpl is null");
+                return out;
+            }
+            const auto& params = ve->GetSDFClipShaderParams();
+            out = std::make_shared<GESDFClipShader>(*params);
+        return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetCircleFlowlightEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetCircleFlowlightEffectParams();
+            out = std::make_shared<GECircleFlowlightEffect>(*params);
             return out;
         }
     },
@@ -670,6 +696,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
             shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::GRID_WARP: {
+            const auto &params = ve->GetGridWarpFilterParams();
+            shaderFilter = std::make_shared<GEGridWarpShaderFilter>(*params);
             break;
         }
         default:

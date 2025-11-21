@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "sdf/ge_sdf_shadow_shader.h"
+#include "sdf/ge_sdf_clip_shader.h"
 
 #include "draw/color.h"
 
@@ -25,7 +25,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Rosen {
 
-class GESDFShadowShaderTest : public testing::Test {
+class GESDFClipShaderTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
@@ -35,36 +35,27 @@ public:
 };
 
 /**
- * @tc.name: MakeSDFShadowShaderTest
- * @tc.desc: test MakeSDFShadowShader by sdfShape
+ * @tc.name: MakeSDFClipShaderTest
+ * @tc.desc: test MakeSDFClipShader by sdfShape
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
+HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
 {
-    Drawing::GESDFShadowShaderParams shadowParams;
-    GESDFShadowShader shadowShader(shadowParams);
-    shadowShader.sdfTreeProcessor_ = std::nullopt;
-
-    Drawing::Rect rect0;
-    auto shader = shadowShader.MakeSDFShadowShader(rect0);
-    EXPECT_EQ(shader, nullptr);
+    Drawing::GESDFClipShaderParams params;
+    GESDFClipShader clipShader(params);
+    clipShader.sdfTreeProcessor_ = std::nullopt;
 
     // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
-    Drawing::Rect rect1 { 1.0f, 1.0f, 2.0f, 2.0f };
-    shader = shadowShader.MakeSDFShadowShader(rect1);
+    Drawing::Rect rect { 1.0f, 1.0f, 2.0f, 2.0f };
+    auto shader = clipShader.MakeSDFClipShader(rect);
     EXPECT_EQ(shader, nullptr);
 
     Drawing::GESDFRRectShapeParams rectShadpeParams;
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShadpeParams);
-    shadowParams.shape = sdfShape;
-    shadowShader.sdfTreeProcessor_ = std::make_optional<Drawing::GESDFTreeProcessor>(sdfShape);
-    shadowShader.SetSDFShadowParams(shadowParams);
-    shader = shadowShader.MakeSDFShadowShader(rect1);
-    EXPECT_NE(shader, nullptr);
-
-    shadowParams.shadow.color = Drawing::Color::COLOR_GRAY;
-    shadowShader.SetSDFShadowParams(shadowParams);
-    shader = shadowShader.MakeSDFShadowShader(rect1);
+    params.shape = sdfShape;
+    clipShader.sdfTreeProcessor_ = std::make_optional<Drawing::GESDFTreeProcessor>(sdfShape);
+    clipShader.SetSDFClipParams(params);
+    shader = clipShader.MakeSDFClipShader(rect);
     EXPECT_NE(shader, nullptr);
 }
 } // namespace Rosen

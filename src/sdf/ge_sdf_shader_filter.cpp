@@ -58,7 +58,6 @@ std::shared_ptr<Drawing::Image> GESDFShaderFilter::OnProcessImage(Drawing::Canva
                 return vec4(sdfNormal.z, sdfNormal.xy, 1.0);
             }
         )";
-
         if (sdfShaderEffect_ == nullptr) {
             sdfShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
             if (sdfShaderEffect_ == nullptr) {

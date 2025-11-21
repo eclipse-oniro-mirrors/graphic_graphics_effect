@@ -61,6 +61,9 @@ struct CanvasInfo {
     Drawing::Matrix mat;
 };
 
+constexpr int ARRAY_SIZE_NINE = 9;
+constexpr int ARRAY_SIZE_FOUR = 4;
+
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
 constexpr char GE_FILTER_AI_BAR_LOW[] = "AIBAR_LOW";
 constexpr char GE_FILTER_AI_BAR_HIGH[] = "AIBAR_HIGH";
@@ -647,6 +650,56 @@ struct GEBorderLightShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
 
+constexpr char GE_FILTER_GRID_WARP[] = "GridWarp";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT0[] = "GridWarp_GridPoint0";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT1[] = "GridWarp_GridPoint1";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT2[] = "GridWarp_GridPoint2";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT3[] = "GridWarp_GridPoint3";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT4[] = "GridWarp_GridPoint4";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT5[] = "GridWarp_GridPoint5";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT6[] = "GridWarp_GridPoint6";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT7[] = "GridWarp_GridPoint7";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT8[] = "GridWarp_GridPoint8";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE0[] = "GridWarp_RotationAngle0";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE1[] = "GridWarp_RotationAngle1";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE2[] = "GridWarp_RotationAngle2";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE3[] = "GridWarp_RotationAngle3";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE4[] = "GridWarp_RotationAngle4";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE5[] = "GridWarp_RotationAngle5";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE6[] = "GridWarp_RotationAngle6";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE7[] = "GridWarp_RotationAngle7";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE8[] = "GridWarp_RotationAngle8";
+struct GEGridWarpShaderFilterParams {
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GRID_WARP, GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP);
+
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT[] = "CircleFlowlight";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0[] = "CircleFlowlight_Color0";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1[] = "CircleFlowlight_Color1";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR2[] = "CircleFlowlight_Color2";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3[] = "CircleFlowlight_Color3";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY[] = "CircleFlowlight_RotationFrequency";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE[] = "CircleFlowlight_RotationAmplitude";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED[] = "CircleFlowlight_RotationSeed";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX[] = "CircleFlowlight_GradientX";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY[] = "CircleFlowlight_GradientY";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS[] = "CircleFlowlight_Progress";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK[] = "CircleFlowlight_Mask";
+struct GECircleFlowlightEffectParams {
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    Vector4f rotationFrequency;
+    Vector4f rotationAmplitude;
+    Vector4f rotationSeed;
+    Vector4f gradientX;
+    Vector4f gradientY;
+    float progress = 0.0f;
+    std::shared_ptr<GEShaderMask> mask;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(CIRCLE_FLOWLIGHT, GECircleFlowlightEffectParams,
+                                GE_SHADER_CIRCLE_FLOWLIGHT);
+
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
     SMOOTH_UNION,
@@ -741,7 +794,11 @@ struct GESDFShadowShaderParams final {
     GESDFShadowParams shadow;
 };
 
-constexpr int ARRAY_SIZE_FOUR = 4;
+constexpr char GE_SHADER_SDF_CLIP[] = "SDFClip";
+constexpr char GE_SHADER_SDF_CLIP_SHAPE[] = "SDFClip_Shape";
+struct GESDFClipShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+};
 
 constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
 constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
@@ -877,9 +934,9 @@ constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
 constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
 constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
 // Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngle";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlur";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDir";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngleParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDirParams";
 constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
 
 struct GEFrostedGlassShaderFilterParams {

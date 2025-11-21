@@ -98,6 +98,64 @@ Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakePa
 }
 
 /**
+ * @tc.name: MakeLargeRadiusBlurImg_InvalidInputs
+ * @tc.desc: Verify MakeLargeRadiusBlurImg return nullptr when input image is invalid (nullptr).
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, MakeLargeRadiusBlurImg_InvalidInputs, TestSize.Level0)
+{
+    auto params = MakeParams();
+    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
+
+    // Case: image == nullptr
+    EXPECT_EQ(filter->MakeLargeRadiusBlurImg(canvas_, src_, dst_, nullptr), nullptr);
+}
+
+/**
+ * @tc.name: MakeSmallRadiusBlurImg_InvalidInputs
+ * @tc.desc: Verify MakeSmallRadiusBlurImg return nullptr when input image is invalid (nullptr).
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSmallRadiusBlurImg_InvalidInputs, TestSize.Level0)
+{
+    auto params = MakeParams();
+    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
+
+    // Case: image == nullptr
+    EXPECT_EQ(filter->MakeSmallRadiusBlurImg(canvas_, src_, dst_, nullptr), nullptr);
+}
+
+/**
+ * @tc.name: CreateLargeRadiusBlurShader_InvalidInputs
+ * @tc.desc: Verify CreateLargeRadiusBlurShader return nullptr when input image is invalid (nullptr).
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, CreateLargeRadiusBlurShader_InvalidInputs, TestSize.Level0)
+{
+    auto params = MakeParams();
+    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
+    Drawing::Matrix invertMatrix;
+
+    // Case 1: image == nullptr caused largeRBlurImg == nullptr
+    EXPECT_EQ(filter->CreateLargeRadiusBlurShader(canvas_, nullptr, src_, dst_, invertMatrix), nullptr);
+}
+
+/**
+ * @tc.name: CreateSmallRadiusBlurShader_InvalidInputs
+ * @tc.desc: Verify CreateSmallRadiusBlurShader return nullptr when input image is invalid (nullptr).
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, CreateSmallRadiusBlurShader_InvalidInputs, TestSize.Level0)
+{
+    auto params = MakeParams();
+    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
+    Drawing::Matrix invertMatrix;
+
+    // Case 1: image == nullptr caused largeRBlurImg == nullptr
+    EXPECT_EQ(filter->CreateSmallRadiusBlurShader(canvas_, nullptr, src_, dst_, invertMatrix), nullptr);
+}
+
+/**
  * @tc.name: OnProcessImage_InvalidInputs
  * @tc.desc: Verify OnProcessImage returns nullptr when input image is invalid (nullptr or zero dimension).
  * @tc.type: FUNC
