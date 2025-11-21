@@ -370,7 +370,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFRRectShapeParams();
         }
     },
-
+    { GE_SHAPE_SDF_TRANSFORM_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE);
+            impl->MakeSDFTransformShapeParams();
+        }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -810,6 +815,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Matrix 
             }
             break;
         }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX) {
+                sdfTransformShapeParams_->matrix = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1187,6 +1201,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
         }
         case FilterType::SDF_CLIP: {
             SetSDFClipParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE) {
+                sdfTransformShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
             break;
         }
         default:

@@ -15,6 +15,7 @@
 
 #include "sdf/ge_sdf_shader_shape.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "sdf/ge_sdf_transform_shader_shape.h"
 #include "sdf/ge_sdf_union_op_shader_shape.h"
 
 #include "ge_log.h"
@@ -45,6 +46,10 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         const auto* unionShape = static_cast<const GESDFUnionOpShaderShape*>(&shape);
         auto* thisUnion = static_cast<GESDFUnionOpShaderShape*>(this);
         thisUnion->CopyState(*unionShape);
+    } else if (GetSDFShapeType() == GESDFShapeType::TRANSFORM) {
+        const auto* transformShape = static_cast<const GESDFTransformShaderShape*>(&shape);
+        auto* thisTransform = static_cast<GESDFTransformShaderShape*>(this);
+        thisTransform->CopyState(*transformShape);
     }
 }
 

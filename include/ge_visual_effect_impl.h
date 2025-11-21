@@ -406,6 +406,16 @@ public:
         sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
     }
 
+    const std::shared_ptr<GESDFTransformShapeParams>& GetSDFTransformShapeParams() const
+    {
+        return sdfTransformShapeParams_;
+    }
+
+    void MakeSDFTransformShapeParams()
+    {
+        sdfTransformShapeParams_ = std::make_shared<GESDFTransformShapeParams>();
+    }
+
     const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
     {
         return sdfShadowShaderParams_;
@@ -700,6 +710,7 @@ private:
     std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
     std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
 
