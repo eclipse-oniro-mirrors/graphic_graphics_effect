@@ -742,20 +742,6 @@ struct GESDFRRectShapeParams {
     GERRect rrect;
 };
 
-constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
-constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
-struct GESDFPixelmapShapeParams {
-    std::shared_ptr<Drawing::Image> image;
-};
-
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX[] = "SDFTransformShape_Matrix";
-struct GESDFTransformShapeParams {
-    std::shared_ptr<GESDFShaderShape> shape;
-    Drawing::Matrix matrix;
-};
-
 constexpr char GE_FILTER_SDF[] = "SDFFilter";
 constexpr char GE_FILTER_SDF_SHAPE[] = "SDFFilter_Shape";
 struct GESDFBorderParams final {

@@ -49,8 +49,7 @@ public:
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectShaderShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectNormalShapeBuilder() const;
-    std::shared_ptr<ShaderEffect> GenerateShaderEffect(float width, float height,
-        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+    std::shared_ptr<ShaderEffect> GenerateShaderEffect(std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFRRectShapeParams params_ {};
 };
 } // Drawing

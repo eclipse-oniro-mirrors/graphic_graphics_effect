@@ -30,7 +30,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float
         LOGE("GESDFRRectShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
     }
-    return GenerateShaderEffect(width, height, builder);
+    return GenerateShaderEffect(builder);
 }
 
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
@@ -42,7 +42,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShaderHasNor
         LOGE("GESDFRRectShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
     }
-    return GenerateShaderEffect(width, height, builder);
+    return GenerateShaderEffect(builder);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRectShaderShapeBuilder() const
@@ -134,11 +134,12 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return nullptr;
     }
 
-    sdfRRectNormalShaderShapeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfRRectNormalShaderBuilderEffect);
+    sdfRRectNormalShaderShapeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(
+        sdfRRectNormalShaderBuilderEffect);
     return sdfRRectNormalShaderShapeBuilder;
 }
 
-std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(float width, float height,
+std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {

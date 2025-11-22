@@ -39,8 +39,6 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform shader sdfNormalImg;
     uniform vec2 iResolution;
     // ----- Shape Core -----
-    // uniform vec2 halfsize;       // rounded-rect half extents (px)
-    // uniform float cornerRadius;  // rounded-rect corner radius (px)
     uniform float borderWidth;   // SDF band width for emboss math
     uniform float offset;        // inner band offset for embossing
 
@@ -257,13 +255,9 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ============================================================================
     vec4 main(vec2 fragCoord)
     {
-        // Centered local space for SDF
-        vec2 uv = fragCoord;
-        vec2 centerPos = vec2(0.0);
         // Primary & inner-offset SDFs
-        vec4 sdfNormal = sdfNormalImg.eval(uv);
+        vec4 sdfNormal = sdfNormalImg.eval(fragCoord);
         float sd = sdfNormal.a;
-        // float sdBlack = SdfRRect(uv - centerPos, halfsize - offset, cornerRadius - offset);
         float sdBlack = sd + offset;
         // Two-sided "border" masks → signed emboss pair (pos/neg) bands
         float border =
@@ -274,8 +268,6 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             smoothstep(-1.0 + ANTI_ALIASING, max(1.0, borderWidth * ANTI_ALIASING * 0.5), -sdBlack * ANTI_ALIASING) -
             smoothstep(min(-borderWidth * ANTI_ALIASING * 0.5, -1.), 1.0 - ANTI_ALIASING,
                        (-sdBlack - borderWidth) * ANTI_ALIASING);
-        vec2 offsetUV = uv - centerPos;
-
         // ------------------------------- BACKGROUND -------------------------------
         vec4 blurredBgColor = BaseBlur(fragCoord) * bgFactor;
         blurredBgColor.rgb = BlurVibrancy(blurredBgColor.rgb);
@@ -289,7 +281,6 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Inward refraction sample
             vec2 nOut = sdfNormal.xy;
-            // vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaInDS = ToDownsamplePx(nOut * innerShadowRefractPx, downSampleFactor);
             vec2 negCoord = pixelDS + deltaInDS;
             vec4 refractionNeg = edgeBlurredImg.eval(negCoord) * bgFactor;
@@ -308,7 +299,6 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
             vec2 pixelDS = uvInTile * (tileSize - 1.0) + 0.5;
             // Outward refraction sample
             vec2 nOut = sdfNormal.xy;
-            // vec2 nOut = SafeNormalize(GradRRect(offsetUV, halfsize, cornerRadius));
             vec2 deltaOutDS = ToDownsamplePx(nOut * refractOutPx, downSampleFactor);
             vec2 posCoord = pixelDS + deltaOutDS;
             vec4 refractionPos = edgeBlurredImg.eval(posCoord) * bgFactor;
@@ -320,7 +310,7 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         // ------------------------------- HIGHLIGHT --------------------------------
         float widthClamped = min(highLightWidthPx, max(borderWidth, 0.0));
         float edgeBand = EdgeBandAA(sd, widthClamped, highLightFeatherPx, highLightShiftPx);
-        float diagMask = DiagonalFanMask(offsetUV, normalize(highLightDirection), highLightAngleDeg,
+        float diagMask = DiagonalFanMask(fragCoord, normalize(highLightDirection), highLightAngleDeg,
             highLightFeatherDeg);
         float edge = edgeBand * diagMask;
         vec3 hlBase = EdgeHighlightVibrancy(blurredBgColor.rgb);
@@ -468,12 +458,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     if (auto shape = frostedGlassParams_.sdfShape) {
         sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
     } else {
-        auto sdfRRectShapeParams = std::make_shared<Drawing::GESDFRRectShapeParams>();
-        sdfRRectShapeParams->rrect = Drawing::GERRect{0, 0,
-            frostedGlassParams_.borderSize[NUM_0] * NUM_2, frostedGlassParams_.borderSize[NUM_1] * NUM_2,
-            frostedGlassParams_.cornerRadius, frostedGlassParams_.cornerRadius};
-        auto rrectShape = std::make_shared<Drawing::GESDFRRectShaderShape>(*sdfRRectShapeParams);
-        sdfNormalShader = rrectShape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+        LOGE("GEFrostedGlassShaderFilter::MakeFrostedGlassShader sdfShapeShader is null");
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
@@ -484,8 +469,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetChild("bgBlurredImg", smallRBlurShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetChild("sdfNormalImg", sdfNormalShader);
-    // builder->SetUniform("halfsize", frostedGlassParams_.borderSize[NUM_0], frostedGlassParams_.borderSize[NUM_1]);
-    // builder->SetUniform("cornerRadius", frostedGlassParams_.cornerRadius);
     builder->SetUniform("borderWidth", frostedGlassParams_.borderWidth);
     builder->SetUniform("offset", frostedGlassParams_.offset);
     builder->SetUniform("downSampleFactor", frostedGlassParams_.downSampleFactor);
