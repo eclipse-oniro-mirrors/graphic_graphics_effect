@@ -39,7 +39,7 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(flo
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShader, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
 
-    if (params_.left == nullptr && params_.right == nullptr) {
+    if (!params_.left && !params_.right) {
         return nullptr;
     }
 
@@ -53,7 +53,18 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(flo
 
     auto leftShader = params_.left->GenerateDrawingShader(width, height);
     auto rightShader = params_.right->GenerateDrawingShader(width, height);
-    
+
+    if (!leftShader && !rightShader) {
+        return nullptr;
+    }
+
+    if (!leftShader) {
+        return rightShader;
+    }
+
+    if (!rightShader) {
+        return leftShader;
+    }
     return GenerateUnionOpDrawingShader(false, leftShader, rightShader);
 }
 
@@ -61,7 +72,7 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
 
-    if (params_.left == nullptr && params_.right == nullptr) {
+    if (!params_.left && !params_.right) {
         return nullptr;
     }
 
@@ -75,7 +86,19 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 
     auto leftShader = params_.left->GenerateDrawingShaderHasNormal(width, height);
     auto rightShader = params_.right->GenerateDrawingShaderHasNormal(width, height);
-    
+
+    if (!leftShader && !rightShader) {
+        return nullptr;
+    }
+
+    if (!leftShader) {
+        return rightShader;
+    }
+
+    if (!rightShader) {
+        return leftShader;
+    }
+
     return GenerateUnionOpDrawingShader(true, leftShader, rightShader);
 }
 
@@ -146,7 +169,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFSm
         {
             vec4 leftShape = left.eval(fragCoord);
             vec4 rightShape = right.eval(fragCoord);
-            return sdfSmoothUnion(leftShape.x, rightShape.x, spacing);
+            return sdfSmoothUnion(leftShape, rightShape, spacing);
         }
     )";
 
@@ -176,8 +199,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNo
         vec4 sdgSmoothUnion(vec4 d1, vec4 d2, float k)
         {
             k *= 4.0;
-            float h = max(k-abs(d1.x-d2.x), 0.0) / (2.0 * k);
-            return vec4(mix(d1.xy, d2.xy, (d1.a < d2.a) ? h : 1.0-h), 0.0, min(d1.a, d2b.a) - h * h * k);
+            float h = max(k - abs(d1.a - d2.a), 0.0) / (2.0 * k);
+            return vec4(mix(d1.xy, d2.xy, (d1.a < d2.a) ? h : 1.0 - h), 0.0, min(d1.a, d2.a) - h * h * k);
         }
 
         half4 main(vec2 fragCoord)

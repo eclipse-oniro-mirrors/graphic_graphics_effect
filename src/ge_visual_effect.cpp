@@ -251,6 +251,7 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
             }
             return std::make_shared<GESDFRRectShaderShape>(*params);
         }
+
         default:
             return nullptr;
     }

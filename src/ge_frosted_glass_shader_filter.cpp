@@ -308,9 +308,11 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
         }
 
         // ------------------------------- HIGHLIGHT --------------------------------
+        // Centered space for highlight
+        vec2 uv = (fragCoord + fragCoord - iResolution.xy) * 0.5;
         float widthClamped = min(highLightWidthPx, max(borderWidth, 0.0));
         float edgeBand = EdgeBandAA(sd, widthClamped, highLightFeatherPx, highLightShiftPx);
-        float diagMask = DiagonalFanMask(fragCoord, normalize(highLightDirection), highLightAngleDeg,
+        float diagMask = DiagonalFanMask(uv, normalize(highLightDirection), highLightAngleDeg,
             highLightFeatherDeg);
         float edge = edgeBand * diagMask;
         vec3 hlBase = EdgeHighlightVibrancy(blurredBgColor.rgb);

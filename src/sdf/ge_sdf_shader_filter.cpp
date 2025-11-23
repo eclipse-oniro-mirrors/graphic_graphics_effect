@@ -39,37 +39,22 @@ std::shared_ptr<Drawing::Image> GESDFShaderFilter::OnProcessImage(Drawing::Canva
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image) {
-        GE_LOGE("GESDFShaderFilter::OnProcessImage, image is null.");
+        GE_LOGE("OnProcessImage:: image is null.");
         return nullptr;
     }
-
-    if (!params_.shape) {
-        GE_LOGE("GESDFShaderFilter::OnProcessImage, shape is null.");
-        return nullptr;
-    }
+    std::shared_ptr<Drawing::Image> resImage = image; // Generate new image
 
     if (!shaderEffectBuilder_) {
-        const auto shaderEffect = params_.shape->GenerateDrawingShaderHasNormal(canvas.GetWidth(), canvas.GetHeight());
-        static std::shared_ptr<Drawing::RuntimeEffect> sdfShaderEffect_;
-        static constexpr char prog[] = R"(
-            uniform shader imageShader;
-            half4 main(float2 coord) {
-                vec4 sdfNormal = imageShader.eval(coord);
-                return vec4(sdfNormal.z, sdfNormal.xy, 1.0);
-            }
-        )";
-        if (sdfShaderEffect_ == nullptr) {
-            sdfShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
-            if (sdfShaderEffect_ == nullptr) {
-                LOGE("GESDFShaderFilter::OnProcessImage, effect error\n");
-                return nullptr;
-            }
-        }
-        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(sdfShaderEffect_);
-        shaderEffectBuilder_->SetChild("imageShader", shaderEffect);
+        const auto shaderEffect = Drawing::RuntimeEffect::CreateForShader(sdfTreeProcessor_->Process());
+        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(shaderEffect);
     }
+    Drawing::Matrix matrix;
+    auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 
-    std::shared_ptr<Drawing::Image> resImage = image; // Generate new image
+    shaderEffectBuilder_->SetChild("image", imageShader);
+    sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
+
     return shaderEffectBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 }
 
