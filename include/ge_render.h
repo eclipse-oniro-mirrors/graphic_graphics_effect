@@ -101,11 +101,9 @@ public:
      *       ApplyHpsGEImageEffect instead.
      * @see ApplyHpsGEImageEffect for the recommended external API.
      * @see HpsEffectFilter for HPS-specific effect processing.
-     * 
      *
      * @return true if HPS blur was successfully applied, false otherwise.
      *         Please notice that returning false *DOES NOT* imply image application failure (outImage == nullptr)
-     *
      */
     bool ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage);
