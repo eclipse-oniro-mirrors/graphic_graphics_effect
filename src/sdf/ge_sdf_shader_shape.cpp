@@ -14,6 +14,7 @@
  */
 
 #include "sdf/ge_sdf_shader_shape.h"
+#include "sdf/ge_sdf_pixelmap_shader_shape.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "sdf/ge_sdf_union_op_shader_shape.h"
 
@@ -45,6 +46,10 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         const auto* unionShape = static_cast<const GESDFUnionOpShaderShape*>(&shape);
         auto* thisUnion = static_cast<GESDFUnionOpShaderShape*>(this);
         thisUnion->CopyState(*unionShape);
+    } else if (GetSDFShapeType() == GESDFShapeType::PIXELMAP) {
+        const auto* pixelmapShape = static_cast<const GESDFPixelmapShaderShape*>(&shape);
+        auto* thisPixelmap = static_cast<GESDFPixelmapShaderShape*>(this);
+        thisPixelmap->CopyState(*pixelmapShape);
     }
 }
 
