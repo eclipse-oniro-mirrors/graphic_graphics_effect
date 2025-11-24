@@ -53,7 +53,6 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(flo
 
     auto leftShader = params_.left->GenerateDrawingShader(width, height);
     auto rightShader = params_.right->GenerateDrawingShader(width, height);
-
     if (!leftShader && !rightShader) {
         return nullptr;
     }
@@ -86,7 +85,6 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 
     auto leftShader = params_.left->GenerateDrawingShaderHasNormal(width, height);
     auto rightShader = params_.right->GenerateDrawingShaderHasNormal(width, height);
-
     if (!leftShader && !rightShader) {
         return nullptr;
     }
@@ -102,7 +100,7 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
     return GenerateUnionOpDrawingShader(true, leftShader, rightShader);
 }
 
-std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader( bool hasNormal,
+std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(bool hasNormal,
     std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader) const
 {
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;

@@ -94,8 +94,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
 
         const float N_EPS = 1e-6;
 
-        vec2 safeNorm(vec2 v) 
-        { 
+        vec2 safeNorm(vec2 v)
+        {
             return v / max(length(v), N_EPS);
         }
 

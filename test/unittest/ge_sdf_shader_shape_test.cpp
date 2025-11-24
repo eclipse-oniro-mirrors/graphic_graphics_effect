@@ -26,13 +26,12 @@ namespace Drawing {
 // TestMock
 class TestSDFShaderShape : public GESDFShaderShape {
 public:
-    TestSDFShaderShape(GESDFShapeType type) : type_(type) {}
+    explicit TestSDFShaderShape(GESDFShapeType type) : type_(type) {}
 
     GESDFShapeType GetSDFShapeType() const override
     {
         return type_;
     }
-
 private:
     GESDFShapeType type_;
 };

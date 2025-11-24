@@ -171,10 +171,10 @@ HWTEST_F(GESDFRRectShaderShapeTest, CopyState_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CopyState_001 start";
     GESDFRRectShapeParams param1;
-    param1.rrect = {10.0f, 20.0f, 100.0f, 200.0f, 15.0f, 15.0f,};
+    param1.rrect = {10.0f, 20.0f, 100.0f, 200.0f, 15.0f, 15.0f};
 
     GESDFRRectShapeParams param2;
-    param2.rrect = {5.0f, 10.0f, 50.0f, 100.0f, 8.0f, 8.0f,};
+    param2.rrect = {5.0f, 10.0f, 50.0f, 100.0f, 8.0f, 8.0f};
 
     GESDFRRectShaderShape shape1(param1);
     GESDFRRectShaderShape shape2(param2);
@@ -246,7 +246,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, GenerateShaderEffect_001, TestSize.Level1)
 
     GESDFRRectShaderShape shape(param);
     auto builder = shape.GetSDFRRectShaderShapeBuilder();
-    auto shader = shape.GenerateShaderEffect(100.0f, 100.0f, builder);
+    auto shader = shape.GenerateShaderEffect(builder);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GenerateShaderEffect_001 end";
 }
@@ -263,7 +263,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, GenerateShaderEffect_002, TestSize.Level1)
     param.rrect = {10.0f, 20.0f, 100.0f, 200.0f, 15.0f};
 
     GESDFRRectShaderShape shape(param);
-    auto shader = shape.GenerateShaderEffect(100.0f, 100.0f, nullptr);
+    auto shader = shape.GenerateShaderEffect(nullptr);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GenerateShaderEffect_002 end";
 }
