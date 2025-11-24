@@ -96,7 +96,7 @@ public:
      *
      * This function is a legacy internal helper used primarily for unit testing (e.g., ApplyHpsImageEffect001).
      * In the future, the unit tests may be refactored and this function may be removed.
-     * 
+     *
      * @note This function is NOT intended for external use. All external clients should use
      *       ApplyHpsGEImageEffect instead.
      * @see ApplyHpsGEImageEffect for the recommended external API.

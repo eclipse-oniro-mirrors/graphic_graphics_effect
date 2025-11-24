@@ -22,8 +22,8 @@
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
-#include "ge_direction_light_shader_filter.h"
 #include "ge_direct_draw_on_canvas_pass.h"
+#include "ge_direction_light_shader_filter.h"
 #include "ge_dispersion_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
 #include "ge_edge_light_shader_filter.h"
@@ -32,8 +32,8 @@
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
-#include "ge_hps_effect_filter.h"
 #include "ge_hps_build_pass.h"
+#include "ge_hps_effect_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
@@ -42,16 +42,16 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
-#include "sdf/ge_sdf_clip_shader.h"
-#include "sdf/ge_sdf_shader_filter.h"
-#include "sdf/ge_sdf_shadow_shader.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_system_properties.h"
-#include "ge_visual_effect_impl.h"
 #include "ge_variable_radius_blur_shader_filter.h"
+#include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
 #include "sdf/ge_sdf_border_shader.h"
+#include "sdf/ge_sdf_clip_shader.h"
+#include "sdf/ge_sdf_shader_filter.h"
+#include "sdf/ge_sdf_shadow_shader.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -334,8 +334,8 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     return resImage;
 }
 
-GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& canvas, 
-    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage, 
+GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage,
     const ShaderFilterEffectContext& context)
 {
     if (visualEffect == nullptr) {
@@ -351,16 +351,17 @@ GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& c
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
-    bool isDrawOnCanvasOk = visualEffect->GetAllowDirectDrawOnCanvas() // allow directly draw on canvas 
-        && context.brush.has_value() // brush is given
+    bool isDrawOnCanvasOk =
+        visualEffect->GetAllowDirectDrawOnCanvas() // allow directly draw on canvas
+        && context.brush.has_value()               // brush is given
         && geShaderFilter->DrawImage(canvas, resImage, context.src, context.dst, *context.brush); // success
     if (!isDrawOnCanvasOk) {
         // dst assigned with src is a legacy issue when RSDrawingFilter calls geRender->ApplyImageEffect
         // When RSDrawingFilter calls GERender::ApplyHpsGEImageEffect, ApplyHpsGEImageEffect enabled the compatibility
         // flag to ignore dst in order to ensure the result is the same
         // When the issue is resolved, please remove this flag and pass context.dst
-        resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src,
-            context.ignoreDstCompatibilityFlag ? context.src : context.dst);
+        resImage = geShaderFilter->ProcessImage(
+            canvas, resImage, context.src, context.ignoreDstCompatibilityFlag ? context.src : context.dst);
     }
     ve->SetCache(geShaderFilter->GetCache());
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
@@ -396,7 +397,7 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            ShaderFilterEffectContext geContext {resImage, context.src, context.dst, brush, true};
+            ShaderFilterEffectContext geContext { resImage, context.src, context.dst, brush, true };
             applyTarget = ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
@@ -409,7 +410,7 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     }
 
     outImage = resImage;
-    return {applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur}; // canvas drawn & applied hps blur
+    return { applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur }; // canvas drawn & applied hps blur
 }
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
