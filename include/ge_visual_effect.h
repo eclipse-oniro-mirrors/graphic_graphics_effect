@@ -98,7 +98,7 @@ public:
         allowDirectDrawOnCanvas_ = allowDirectDrawOnCanvas;
     }
 
-    bool GetAllowDirectDrawOnCanvas()
+    bool GetAllowDirectDrawOnCanvas() const
     {
         return allowDirectDrawOnCanvas_;
     }
