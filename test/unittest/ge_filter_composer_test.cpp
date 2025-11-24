@@ -21,6 +21,7 @@
 #include "ge_filter_composer_pass.h"
 #include "ge_filter_type.h"
 #include "ge_filter_type_info.h"
+#include "ge_direct_draw_on_canvas_pass.h"
 #include "ge_hps_build_pass.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_render.h"
@@ -514,6 +515,75 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
     EXPECT_TRUE(result.anyPassChanged);
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRun
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with valid composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRun, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables;
+
+    // Other effects should not be affected
+    auto effect1 = CreateGreyEffect();
+    composables.push_back(effect1);
+    auto effect2 = CreateGreyEffect();
+    composables.push_back(effect2);
+
+    // Add the final visual effect
+    auto effect = CreateGreyEffect();
+    composables.push_back(effect);
+
+    auto result = pass.Run(composables);
+    EXPECT_TRUE(result.changed);
+    EXPECT_FALSE(effect1->GetAllowDirectDrawOnCanvas());
+    EXPECT_FALSE(effect2->GetAllowDirectDrawOnCanvas());
+    EXPECT_TRUE(effect->GetAllowDirectDrawOnCanvas());
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRunEmptyComposables
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with empty composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRunEmptyComposables, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunEmptyComposables start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables;
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunEmptyComposables end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRunNullEffect
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with null effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRunNullEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunNullEffect start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables;
+    auto nullEffect = std::shared_ptr<Drawing::GEVisualEffect>(nullptr);
+    composables.push_back(GEFilterComposable(nullEffect));
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunNullEffect end";
 }
 
 } // namespace Rosen
