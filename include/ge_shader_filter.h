@@ -91,7 +91,7 @@ protected:
      * @param dst destination area
      * @return Translation matrix. Call the PostConcat method on your matrix with it before calling MakeShader
      */
-    static Drawing::Matrix CreateDestinationTranslateMatrix(const Drawing::Rect& dst);
+    GE_EXPORT static Drawing::Matrix CreateDestinationTranslateMatrix(const Drawing::Rect& dst);
 
 protected:
     Drawing::CanvasInfo canvasInfo_;
