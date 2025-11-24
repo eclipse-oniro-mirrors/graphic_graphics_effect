@@ -376,6 +376,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFTransformShapeParams();
         }
     },
+    { GE_SHAPE_SDF_PIXELMAP_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE);
+            impl->MakeSDFPixelmapShapeParams();
+        }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -782,6 +788,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_MASK_USE_EFFECT_PIXEL_MAP) {
                 useEffectMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::SDF_PIXELMAP_SHAPE: {
+            if (sdfPixelmapShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE) {
+                sdfPixelmapShapeParams_->image = param;
             }
             break;
         }
