@@ -97,6 +97,7 @@ ohos_source_set("graphics_effect_src") {
     "src/sdf/ge_sdf_clip_shader.cpp",
     "src/sdf/ge_sdf_shader_filter.cpp",
     "src/sdf/ge_sdf_effects.cpp",
+    "src/sdf/ge_sdf_transform_shader_shape.cpp",
     "src/sdf/ge_sdf_pixelmap_shader_shape.cpp",
     "src/sdf/ge_sdf_shader_shape.cpp",
     "src/sdf/ge_sdf_border_shader.cpp",
