@@ -25,6 +25,7 @@ namespace Drawing {
 enum class GESDFShapeType : uint8_t {
     UNION_OP = 0,
     RRECT,
+    TRANSFORM,
     PIXELMAP,
     MAX = RRECT,
 };
