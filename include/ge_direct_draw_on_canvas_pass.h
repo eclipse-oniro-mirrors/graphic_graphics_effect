@@ -20,6 +20,14 @@
 
 namespace OHOS {
 namespace Rosen {
+
+struct DirectDrawOnCanvasFlag : GEFilterComposableFlags<DirectDrawOnCanvasFlag> {
+    bool isDirectDrawOnCanvasEnabled;
+
+    static bool IsDirectDrawOnCanvasEnabled(const GEFilterComposable& composable);
+};
+
+// Enable direct drawing on canvas for the last GEVisualEffect in composables
 class GEDirectDrawOnCanvasPass : public GEFilterComposerPass {
 public:
     std::string_view GetLogName() const override;

@@ -23,8 +23,47 @@
 #include "ge_hps_effect_filter.h"
 #include "ge_visual_effect.h"
 
+#include "utils/ge_downcast.h"
+
 namespace OHOS {
 namespace Rosen {
+/**
+ * @brief Base interface for settable flags used in filter composition passes.
+ * For convinent use, please derive from GEFilterComposableFlags<YourFlagType>
+ * 
+ * @see GEFilterComposableFlags
+ */
+class IGEFilterComposableFlags : public ExactDowncastUtils::ExactDowncastable {};
+
+/**
+ * @brief Template base class for settable flags used in filter composition passes.
+ *
+ * This template class provides a convenient base for defining specific flag types
+ * used by `GEFilterComposerPass` instances. It inherits from `IGEFilterComposableFlags`
+ * and implements `GetExactTypeID` using the `TypeID::Get<Derived>()` mechanism,
+ * enabling exact type identification.
+ *
+ * @tparam Derived The concrete derived class type (CRTP pattern).
+ *
+ * @see IGEFilterComposableFlags
+ * @see ExactDowncastUtils
+ */
+template<typename Derived>
+class GEFilterComposableFlags : public IGEFilterComposableFlags {
+public:
+    /**
+     * @brief Returns the unique type ID for the derived class.
+     *
+     * This method overrides `GetExactTypeID` from `ExactDowncastable` and returns
+     * the compile-time unique ID generated via the `TypeID::Get<Derived>()` mechanism.
+     *
+     * @return The unique type ID for the derived class.
+     */
+    ExactDowncastUtils::TypeID GetExactTypeID() const override
+    {
+        return ExactDowncastUtils::TypeID::Get<Derived>();
+    }
+};
 
 class GEFilterComposable {
     using GEViusalEffect = Drawing::GEVisualEffect;
@@ -53,8 +92,31 @@ public:
         return Get<HpsEffectFilter>();
     }
 
+    // Set the related flags by some GEFilterComposerPass
+    template<typename T, typename... Args>
+    void SetFlags(Args&&... args)
+    {
+        static_assert(std::is_base_of_v<IGEFilterComposableFlags, T>, "T must be subtype of IGEFilterComposableFlags");
+        SetFlags(std::make_shared<T>(std::forward<T>(args)...));
+    }
+
+    // Set the related flags by some GEFilterComposerPass
+    void SetFlags(const std::shared_ptr<IGEFilterComposableFlags>& flags)
+    {
+        flags_ = flags;
+    }
+
+    // Readonly getter returns a non-owning pointer
+    // Modify the return value is not allowed. Call SetFlags() if you want to.
+    template<typename T>
+    const T* GetFlags() const
+    {
+        return flags_ != nullptr ? flags_->As<T>() : nullptr;
+    }
+
 private:
     std::variant<std::shared_ptr<Drawing::GEVisualEffect>, std::shared_ptr<HpsEffectFilter>> effect_;
+    std::shared_ptr<IGEFilterComposableFlags> flags_ = nullptr;
 };
 
 struct GEFilterComposerPassResult {

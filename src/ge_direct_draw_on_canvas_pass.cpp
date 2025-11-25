@@ -18,6 +18,27 @@
 namespace OHOS {
 namespace Rosen {
 
+static bool IsDirectDrawOnCanvasSupported(Drawing::GEFilterType type)
+{
+    // NOTICE: DO NOT use std::map/std::unordered_set to replace switch/case, it's worse in performance, not better.
+    switch (type) {
+        // Currently only GEFrostedGlassShaderFilter is supported.
+        // If you want to add new support, add a case line below to support it
+        // When static reflection infrastructure refactor is done, use that to query info.
+        case Drawing::GEFilterType::FROSTED_GLASS:
+            return true;
+        default:
+            return false;
+    }
+    return false; // should be unreachable
+}
+
+bool DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(const GEFilterComposable& composable)
+{
+    auto flag = composable.GetFlags<DirectDrawOnCanvasFlag>();
+    return flag != nullptr && flag->isDirectDrawOnCanvasEnabled;
+}
+
 std::string_view GEDirectDrawOnCanvasPass::GetLogName() const
 {
     return "GEDirectDrawOnCanvasPass";
@@ -29,11 +50,21 @@ GEFilterComposerPassResult GEDirectDrawOnCanvasPass::Run(std::vector<GEFilterCom
         return GEFilterComposerPassResult { false };
     }
     // now it won't be empty, it's safe to access .back()
-    auto effect = composables.back().GetEffect();
+    auto& lastOne = composables.back();
+    auto effect = lastOne.GetEffect();
     if (effect == nullptr) {
         return GEFilterComposerPassResult { false };
     }
-    effect->SetAllowDirectDrawOnCanvas(true);
+    const auto& impl = effect->GetImpl();
+    if (impl == nullptr) {
+        return GEFilterComposerPassResult { false };
+    }
+
+    if (IsDirectDrawOnCanvasSupported(impl->GetFilterType())) {
+        LOGD("GEDirectDrawOnCanvasPass: direct draw on canvas is enabled for %d", impl->GetFilterType());
+        lastOne.SetFlags<DirectDrawOnCanvasFlag>(true);
+    }
+
     return GEFilterComposerPassResult { true };
 }
 

@@ -328,13 +328,41 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     auto resImage = image;
     for (auto& vef: veContainer.GetFilters()) {
         ShaderFilterEffectContext context {resImage, src, dst};
-        ApplyShaderFilter(canvas, vef, resImage, context);
+        ProcessShaderFilter(canvas, vef, resImage, context);
     }
 
     return resImage;
 }
 
-GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& canvas,
+GERender::ApplyShaderFilterTarget GERender::DrawShaderFilter(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
+    const ShaderFilterEffectContext& context)
+{
+    if (visualEffect == nullptr) {
+        LOGD("GERender::ApplyShaderFilter visualEffect is null");
+        return ApplyShaderFilterTarget::Error;
+    }
+    auto ve = visualEffect->GetImpl();
+    std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
+    if (geShaderFilter == nullptr) {
+        LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
+        return ApplyShaderFilterTarget::Error;
+    }
+    geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
+    geShaderFilter->SetCache(ve->GetCache());
+    geShaderFilter->Preprocess(canvas, context.src, context.dst);
+    bool status = geShaderFilter->DrawImage(canvas, context.image, context.src, context.dst, brush);
+    if (!status) {
+        return ApplyShaderFilterTarget::Error;
+    }
+    ve->SetCache(geShaderFilter->GetCache());
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
+        isGasifyFilter_ = true;
+    }
+    return ApplyShaderFilterTarget::DrawOnCanvas;
+}
+
+GERender::ApplyShaderFilterTarget GERender::ProcessShaderFilter(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage,
     const ShaderFilterEffectContext& context)
 {
@@ -351,23 +379,12 @@ GERender::ApplyShaderFilterTarget GERender::ApplyShaderFilter(Drawing::Canvas& c
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
-    bool isDrawOnCanvasOk =
-        visualEffect->GetAllowDirectDrawOnCanvas() // allow directly draw on canvas
-        && context.brush.has_value()               // brush is given
-        && geShaderFilter->DrawImage(canvas, resImage, context.src, context.dst, *context.brush); // success
-    if (!isDrawOnCanvasOk) {
-        // dst assigned with src is a legacy issue when RSDrawingFilter calls geRender->ApplyImageEffect
-        // When RSDrawingFilter calls GERender::ApplyHpsGEImageEffect, ApplyHpsGEImageEffect enabled the compatibility
-        // flag to ignore dst in order to ensure the result is the same
-        // When the issue is resolved, please remove this flag and pass context.dst
-        resImage = geShaderFilter->ProcessImage(
-            canvas, resImage, context.src, context.ignoreDstCompatibilityFlag ? context.src : context.dst);
-    }
+    resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
     ve->SetCache(geShaderFilter->GetCache());
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
         isGasifyFilter_ = true;
     }
-    return isDrawOnCanvasOk ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
+    return ApplyShaderFilterTarget::DrawOnImage;
 }
 
 GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas,
@@ -398,7 +415,13 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
             ShaderFilterEffectContext geContext { resImage, context.src, context.dst, brush, true };
-            applyTarget = ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
+            if (DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composable)) {
+                applyTarget = DrawShaderFilter(canvas, visualEffect, brush, geContext);
+                if (applyTarget == ApplyShaderFilterTarget::DrawOnCanvas) {
+                    continue;
+                }
+            }
+            applyTarget = ProcessShaderFilter(canvas, visualEffect, resImage, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};

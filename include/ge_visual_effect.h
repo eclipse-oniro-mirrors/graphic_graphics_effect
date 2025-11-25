@@ -93,16 +93,6 @@ public:
         return supportHeadroom_;
     }
 
-    void SetAllowDirectDrawOnCanvas(bool allowDirectDrawOnCanvas)
-    {
-        allowDirectDrawOnCanvas_ = allowDirectDrawOnCanvas;
-    }
-
-    bool GetAllowDirectDrawOnCanvas() const
-    {
-        return allowDirectDrawOnCanvas_;
-    }
-
     const std::shared_ptr<Drawing::GEShaderMask> GenerateShaderMask() const;
     const std::shared_ptr<Drawing::GEShaderShape> GenerateShaderShape() const;
 
@@ -111,7 +101,6 @@ private:
     DrawingPaintType type_;
     std::shared_ptr<GEVisualEffectImpl> visualEffectImpl_;
     float supportHeadroom_ = 0.0f;
-    bool allowDirectDrawOnCanvas_ = false;
 };
 
 } // namespace Drawing

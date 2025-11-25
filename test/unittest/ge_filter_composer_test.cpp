@@ -527,23 +527,14 @@ HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRun, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun start";
 
     GEDirectDrawOnCanvasPass pass;
-    std::vector<GEFilterComposable> composables;
-
-    // Other effects should not be affected
-    auto effect1 = CreateGreyEffect();
-    composables.push_back(effect1);
-    auto effect2 = CreateGreyEffect();
-    composables.push_back(effect2);
-
-    // Add the final visual effect
-    auto effect = CreateGreyEffect();
-    composables.push_back(effect);
+    std::vector<GEFilterComposable> composables { CreateGreyEffect(), CreateGreyEffect(), CreateGreyEffect() };
 
     auto result = pass.Run(composables);
     EXPECT_TRUE(result.changed);
-    EXPECT_FALSE(effect1->GetAllowDirectDrawOnCanvas());
-    EXPECT_FALSE(effect2->GetAllowDirectDrawOnCanvas());
-    EXPECT_TRUE(effect->GetAllowDirectDrawOnCanvas());
+    ASSERT_EQ(composables.size(), 3); // 3: original size
+    EXPECT_FALSE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[0]));
+    EXPECT_FALSE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[1]));
+    EXPECT_TRUE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[2])); // enabled on the last one
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun end";
 }

@@ -177,8 +177,12 @@ private:
      * @retval `ApplyShaderFilterTarget::DrawOnCanvas`: The output is drawn on `canvas`. Used when direct drawing
      *          is applied for the last effect in a GEVisualEffect sequence (generally GEVisualEffectContainer).
      */
-    ApplyShaderFilterTarget ApplyShaderFilter(Drawing::Canvas& canvas,
+    ApplyShaderFilterTarget ProcessShaderFilter(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& outImage,
+        const ShaderFilterEffectContext& context);
+    
+    ApplyShaderFilterTarget DrawShaderFilter(Drawing::Canvas& canvas,
+        std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
         const ShaderFilterEffectContext& context);
 
     std::shared_ptr<GEShader> GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve);
