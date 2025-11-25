@@ -169,6 +169,26 @@ std::string GEVisualEffectFuzzTest014()
     return res;
 }
 
+bool GEVisualEffectFuzzTest015()
+{
+    DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
+    auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
+    std::string tag = GETest::GetStringFromData(STR_LEN);
+    std::shared_ptr<Drawing::GEShaderShape> param;
+    geVisualEffect->SetParam(tag, param);
+    return true;
+}
+
+bool GEVisualEffectFuzzTest016()
+{
+    DrawingPaintType type = GETest::GetPlainData<DrawingPaintType>();
+    auto geVisualEffect = std::make_shared<GEVisualEffect>("test", type);
+    std::string tag = GETest::GetStringFromData(STR_LEN);
+    GERRect param = GETest::GetPlainData<GERRect>();
+    geVisualEffect->SetParam(tag, param);
+    return true;
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
@@ -198,5 +218,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     OHOS::Rosen::Drawing::GEVisualEffectFuzzTest012();
     OHOS::Rosen::Drawing::GEVisualEffectFuzzTest013();
     OHOS::Rosen::Drawing::GEVisualEffectFuzzTest014();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest015();
+    OHOS::Rosen::Drawing::GEVisualEffectFuzzTest016();
     return 0;
 }

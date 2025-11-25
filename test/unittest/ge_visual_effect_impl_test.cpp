@@ -20,6 +20,7 @@
 #include "ge_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
+#include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "utils/rect.h"
 
 using namespace testing;
@@ -1115,6 +1116,108 @@ HWTEST_F(GEVisualEffectImplTest, SetLightCaveParamsTest, TestSize.Level1)
 
     geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_PROGRESS, progress);
     EXPECT_EQ(geVisualEffectImpl.lightCaveShaderParams_->progress, progress);
+}
+
+/**
+ * @tc.name: SetSDFRRectShapeParamsTest
+ * @tc.desc: Verify function Set SDFRRectShape Param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetSDFRRectShapeParamsTest, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE);
+    EXPECT_EQ(geVisualEffectImpl.GetSDFRRectShapeParams(), nullptr);
+
+    // init param data
+    float left = 10.0f;
+    float top = 20.0f;
+    float width = 100.0f;
+    float height = 200.0f;
+    float radiusX = 15.0f;
+    float radiusY = 15.0f;
+
+    Drawing::GERRect rrect{left, top, width, height, radiusX, radiusY};
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_RRECT_SHAPE_RRECT, rrect);
+    EXPECT_EQ(geVisualEffectImpl.GetSDFRRectShapeParams(), nullptr);
+
+    geVisualEffectImpl.MakeSDFRRectShapeParams();
+    ASSERT_NE(geVisualEffectImpl.GetSDFRRectShapeParams(), nullptr);
+
+    // test invalid parameter names
+    geVisualEffectImpl.SetParam("", rrect);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.left_, left);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_RRECT_SHAPE_RRECT, rrect);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.left_, left);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.top_, top);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.width_, width);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.height_, height);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusX_, radiusX);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusY_, radiusY);
+}
+
+/**
+ * @tc.name: SetUnionOpShapeParamsTest
+ * @tc.desc: Verify function Set UnionOp Shape Param
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetUnionOpShapeParamsTest, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::SDF_UNION_OP);
+    EXPECT_EQ(geVisualEffectImpl.GetSDFUnionOpShapeParams(), nullptr);
+
+    // init param data
+    float spacing = 5.0f;
+    auto opType = Drawing::GESDFUnionOp::UNION;
+    auto opTypeInt = static_cast<uint32_t>(opType);
+
+    // Create test sub-shapes
+    Drawing::GESDFRRectShapeParams leftRectParams;
+    leftRectParams.rrect = {10.0f, 10.0f, 50.0f, 50.0f, 5.0f, 5.0f};
+    auto leftShape = std::make_shared<Drawing::GESDFRRectShaderShape>(leftRectParams);
+
+    Drawing::GESDFRRectShapeParams rightRectParams;
+    rightRectParams.rrect = {60.0f, 60.0f, 50.0f, 50.0f, 5.0f, 5.0f};
+    auto rightShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rightRectParams);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING, spacing);
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_TYPE, opTypeInt);
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEX, leftShape);
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEY, rightShape);
+    EXPECT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_, nullptr);
+
+    geVisualEffectImpl.MakeSDFUnionOpShapeParams(Drawing::GESDFUnionOp::UNION);
+    ASSERT_NE(geVisualEffectImpl.GetSDFUnionOpShapeParams(), nullptr);
+
+    // test invalid parameter names
+    geVisualEffectImpl.SetParam("", spacing);
+    EXPECT_NE(geVisualEffectImpl.sdfUnionOpShapeParams_->spacing, spacing);
+
+    geVisualEffectImpl.SetParam("", opTypeInt);
+    EXPECT_NE(geVisualEffectImpl.sdfUnionOpShapeParams_->op, opType);
+
+    geVisualEffectImpl.SetParam("", leftShape);
+    EXPECT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_->left, nullptr);
+
+    geVisualEffectImpl.SetParam("", rightShape);
+    EXPECT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_->right, nullptr);
+
+    // test normal case
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING, spacing);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_->spacing, spacing);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_TYPE, opTypeInt);
+    EXPECT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_->op, opType);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEX, leftShape);
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEX, leftShape);
+    EXPECT_NE(geVisualEffectImpl.sdfUnionOpShapeParams_->left, nullptr);
+
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEY, rightShape);
+    geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY, leftShape);
+    EXPECT_NE(geVisualEffectImpl.sdfUnionOpShapeParams_->right, nullptr);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

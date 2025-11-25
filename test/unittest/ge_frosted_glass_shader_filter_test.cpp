@@ -21,6 +21,7 @@
 #include "draw/canvas.h"
 #include "image/bitmap.h"
 #include "image/image.h"
+#include "sdf/ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -273,6 +274,38 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
         childImage, childBig, childSml,
         static_cast<float>(imgShaderImg->GetWidth()),
         static_cast<float>(imgShaderImg->GetHeight()));
+    EXPECT_NE(builder, nullptr);
+}
+
+/**
+ * @tc.name: MakeFrostedGlassShader_WO_SDFShape
+ * @tc.desc: Build a RuntimeShaderBuilder without sdfShape.
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_WO_SDFShape, TestSize.Level0)
+{
+    auto params = MakeParams();
+    GEFrostedGlassShaderFilter filter(params);
+    ASSERT_TRUE(filter.InitFrostedGlassEffect());
+
+    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, 100.0f, 100.0f);
+    EXPECT_NE(builder, nullptr);
+}
+
+/**
+ * @tc.name: MakeFrostedGlassShader_W_SDFShape
+ * @tc.desc: Build a RuntimeShaderBuilder with sdfShape.
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_W_SDFShape, TestSize.Level0)
+{
+    auto params = MakeParams();
+    Drawing::GESDFRRectShapeParams sdfParam;
+    params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
+    GEFrostedGlassShaderFilter filter(params);
+    ASSERT_TRUE(filter.InitFrostedGlassEffect());
+
+    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, 100.0f, 100.0f);
     EXPECT_NE(builder, nullptr);
 }
 

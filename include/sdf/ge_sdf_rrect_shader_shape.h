@@ -29,6 +29,8 @@ public:
     GESDFRRectShaderShape(const GESDFRRectShaderShape&) = delete;
     virtual ~GESDFRRectShaderShape() = default;
 
+    std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     GESDFShapeType GetSDFShapeType() const override
     {
         return GESDFShapeType::RRECT;
@@ -45,6 +47,9 @@ public:
     }
 
 private:
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectShaderShapeBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectNormalShapeBuilder() const;
+    std::shared_ptr<ShaderEffect> GenerateShaderEffect(std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFRRectShapeParams params_ {};
 };
 } // Drawing

@@ -29,6 +29,9 @@ public:
     GESDFUnionOpShaderShape(const GESDFUnionOpShaderShape&) = delete;
     virtual ~GESDFUnionOpShaderShape() = default;
 
+    std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+
     GESDFShapeType GetSDFShapeType() const override
     {
         return GESDFShapeType::UNION_OP;
@@ -57,6 +60,17 @@ public:
     void CopyState(const GESDFUnionOpShaderShape& shape);
 
 private:
+    std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(bool hasNormal,
+        std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader) const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFUnionBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFSmoothUnionBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFNormalSmoothUnionBuilder() const;
+    std::shared_ptr<ShaderEffect> GenerateUnionShaderEffect(
+        std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+    std::shared_ptr<ShaderEffect> GenerateSmoothUnionShaderEffect(
+        std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFUnionOpShapeParams params_ {};
 };
 } // Drawing
