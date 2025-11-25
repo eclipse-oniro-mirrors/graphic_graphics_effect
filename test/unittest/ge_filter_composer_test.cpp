@@ -468,8 +468,8 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerAddNullPass, TestSize.Level1)
     GEFilterComposer composer;
 
     // This should not crash and should just ignore the null pass
-    std::shared_ptr<GEFilterComposerPass> nullPass = nullptr;
-    composer.Add(nullPass);
+    std::unique_ptr<GEFilterComposerPass> nullPass = nullptr;
+    composer.Add(std::move(nullPass));
     EXPECT_TRUE(composer.passes_.empty());
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerAddNullPass end";

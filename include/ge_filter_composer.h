@@ -33,19 +33,12 @@ public:
     template <typename Pass, typename... Args> void Add(Args&&... args)
     {
         static_assert(std::is_base_of_v<GEFilterComposerPass, Pass>, "Pass should be subtype of GEFilterComposerPass");
-        Add(std::make_shared<Pass>(std::forward<Args>(args)...));
+        Add(std::make_unique<Pass>(std::forward<Args>(args)...));
     }
 
     // Add a GEFilterComposerPass
-    template <typename Pass> void Add(std::shared_ptr<Pass> pass)
-    {
-        static_assert(std::is_base_of_v<GEFilterComposerPass, Pass>, "Pass should be subtype of GEFilterComposerPass");
-        Add(std::static_pointer_cast<GEFilterComposerPass>(pass));
-    }
+    void Add(std::unique_ptr<GEFilterComposerPass> pass);
 
-    // Add a GEFilterComposerPass
-    void Add(std::shared_ptr<GEFilterComposerPass> pass);
-    
     struct ComposerRunResult {
         bool anyPassChanged;
     };
@@ -58,7 +51,7 @@ public:
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>&);
 
 private:
-    std::vector<std::shared_ptr<GEFilterComposerPass>> passes_;
+    std::vector<std::unique_ptr<GEFilterComposerPass>> passes_;
 };
 } // namespace Rosen
 } // namespace OHOS
