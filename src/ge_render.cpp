@@ -479,6 +479,9 @@ GERender::ApplyShaderFilterTarget GERender::DispatchGEShaderFilter(Drawing::Canv
             return applyTarget;
         }
     }
+    // Compatibility issue: dst assigned with src is a legacy issue when RSDrawingFilter calls
+    // geRender->ApplyImageEffect(). When the issue is resolved, please remove this line.
+    geContext.dst = geContext.src;
     // Direct drawing on canvas is disabled / not supported / failed, fallback to ProcessShaderFilter
     applyTarget = ProcessShaderFilter(canvas, visualEffect, geContext.image, geContext);
     return applyTarget;
