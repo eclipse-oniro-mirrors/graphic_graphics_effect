@@ -24,6 +24,7 @@
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_filter_composer_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
@@ -160,8 +161,6 @@ private:
         std::shared_ptr<Drawing::Image> image {};
         Drawing::Rect src {};
         Drawing::Rect dst {};
-        std::optional<std::reference_wrapper<Drawing::Brush>> brush {}; // (Optional) Brush for direct drawing on canvas
-        bool ignoreDstCompatibilityFlag = false; // (Optional) Legacy issue, GERender::ApplyShaderFilter for details
     };
 
     // Return type of ApplyShaderFilter() indicates the applied target for visualEffect.
@@ -188,6 +187,12 @@ private:
      */
     bool AfterExecuteShaderFilter(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
         const ShaderFilterEffectContext& context, const std::shared_ptr<GEShaderFilter>& geShaderFilter);
+    
+    // Internal helper for dispatching between ProcessShaderFilter and DrawShaderFilter.
+    // Used in ApplyHpsGEImageEffect only.
+    ApplyShaderFilterTarget DispatchGEShaderFilter(Drawing::Canvas& canvas, Drawing::Brush& brush,
+        GEFilterComposable& composable, std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
+        ShaderFilterEffectContext& geContext);
 
     /**
      * @brief Apply a GEVisualEffect through GEShaderFilter with dst compatiblity handling.

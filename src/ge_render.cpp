@@ -410,6 +410,28 @@ GERender::ApplyShaderFilterTarget GERender::ProcessShaderFilter(Drawing::Canvas&
     return ApplyShaderFilterTarget::DrawOnImage;
 }
 
+// Internal helper for composing / transforming effects with GEFilterComposer.
+// Add passes in this function if needed.
+// Used in ApplyHpsGEImageEffect only.
+static bool ComposeEffects(Drawing::Canvas& canvas,
+    const std::vector<std::shared_ptr<GEVisualEffect>>& visualEffects,
+    const GERender::HpsGEImageEffectContext& context, std::vector<GEFilterComposable>& composables)
+{
+    if (visualEffects.empty()) {
+        return false;
+    }
+    GEFilterComposer composer;
+    composer.Add<GEHpsBuildPass>(canvas, context);
+    composer.Add<GEMesaFusionPass>();
+    composer.Add<GEDirectDrawOnCanvasPass>();
+    composables = GEFilterComposer::BuildComposables(visualEffects);
+    auto composerResult = composer.Run(composables);
+    if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables
+        return false;
+    }
+    return true;
+}
+
 GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas,
     Drawing::GEVisualEffectContainer& veContainer, const HpsGEImageEffectContext& context,
     std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
@@ -419,16 +441,8 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
         return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     const auto& visualEffects = veContainer.GetFilters();
-    if (visualEffects.empty()) {
-        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
-    }
-    GEFilterComposer composer;
-    composer.Add<GEHpsBuildPass>(canvas, context);
-    composer.Add<GEMesaFusionPass>();
-    composer.Add<GEDirectDrawOnCanvasPass>();
-    auto composables = GEFilterComposer::BuildComposables(visualEffects);
-    auto composerResult = composer.Run(composables);
-    if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables
+    std::vector<GEFilterComposable> composables;
+    if (!ComposeEffects(canvas, visualEffects, context, composables)) {
         return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     auto resImage = context.image;
@@ -437,14 +451,8 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            ShaderFilterEffectContext geContext { resImage, context.src, context.dst, brush, true };
-            if (DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composable)) {
-                applyTarget = DrawShaderFilter(canvas, visualEffect, brush, geContext);
-                if (applyTarget == ApplyShaderFilterTarget::DrawOnCanvas) {
-                    continue;
-                }
-            }
-            applyTarget = ProcessShaderFilter(canvas, visualEffect, resImage, geContext);
+            ShaderFilterEffectContext geContext { resImage, context.src, context.dst };
+            applyTarget = DispatchGEShaderFilter(canvas, brush, composable, visualEffect, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
@@ -457,6 +465,23 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
 
     outImage = resImage;
     return { applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur }; // canvas drawn & applied hps blur
+}
+
+GERender::ApplyShaderFilterTarget GERender::DispatchGEShaderFilter(Drawing::Canvas& canvas, Drawing::Brush& brush,
+    GEFilterComposable& composable, std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
+    ShaderFilterEffectContext& geContext)
+{
+    ApplyShaderFilterTarget applyTarget;
+    // Enabled direct drawing on canvas
+    if (DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composable)) {
+        applyTarget = DrawShaderFilter(canvas, visualEffect, brush, geContext);
+        if (applyTarget == ApplyShaderFilterTarget::DrawOnCanvas) {
+            return applyTarget;
+        }
+    }
+    // Direct drawing on canvas is disabled / not supported / failed, fallback to ProcessShaderFilter
+    applyTarget = ProcessShaderFilter(canvas, visualEffect, geContext.image, geContext);
+    return applyTarget;
 }
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
