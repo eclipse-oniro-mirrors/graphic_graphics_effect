@@ -334,30 +334,63 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     return resImage;
 }
 
-GERender::ApplyShaderFilterTarget GERender::DrawShaderFilter(Drawing::Canvas& canvas,
-    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
-    const ShaderFilterEffectContext& context)
+bool GERender::BeforeExecuteShaderFilter(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
+    std::shared_ptr<GEShaderFilter>& geShaderFilter)
 {
     if (visualEffect == nullptr) {
-        LOGD("GERender::ApplyShaderFilter visualEffect is null");
-        return ApplyShaderFilterTarget::Error;
+        LOGD("GERender::BeforeExecuteShaderFilter visualEffect is null");
+        return false;
     }
     auto ve = visualEffect->GetImpl();
-    std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
+    geShaderFilter = GenerateShaderFilter(visualEffect);
     if (geShaderFilter == nullptr) {
-        LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
-        return ApplyShaderFilterTarget::Error;
+        LOGD("GERender::BeforeExecuteShaderFilter geShaderFilter is null");
+        return false;
     }
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
+    return true;
+}
+
+bool GERender::AfterExecuteShaderFilter(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
+    const std::shared_ptr<GEShaderFilter>& geShaderFilter)
+{
+    if (visualEffect == nullptr) {
+        LOGD("GERender::AfterExecuteShaderFilter visualEffect is null");
+        return false;
+    }
+    if (geShaderFilter == nullptr) {
+        LOGD("GERender::AfterExecuteShaderFilter geShaderFilter is null");
+        return false;
+    }
+    // Update information after executing the shader filter
+    auto ve = visualEffect->GetImpl();
+    ve->SetCache(geShaderFilter->GetCache());
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
+        isGasifyFilter_ = true;
+    }
+    return true;
+}
+
+GERender::ApplyShaderFilterTarget GERender::DrawShaderFilter(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
+    const ShaderFilterEffectContext& context)
+{
+    std::shared_ptr<GEShaderFilter> geShaderFilter;
+    if (!BeforeExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        LOGD("GERender::DrawShaderFilter failed before executing shader filter");
+        return ApplyShaderFilterTarget::Error;
+    }
+    // When BeforeExecuteShaderFilter returning true, geShaderFilter is not nullptr
     bool status = geShaderFilter->DrawImage(canvas, context.image, context.src, context.dst, brush);
     if (!status) {
         return ApplyShaderFilterTarget::Error;
     }
-    ve->SetCache(geShaderFilter->GetCache());
-    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
-        isGasifyFilter_ = true;
+    if (!AfterExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        return ApplyShaderFilterTarget::Error;
     }
     return ApplyShaderFilterTarget::DrawOnCanvas;
 }
@@ -366,23 +399,13 @@ GERender::ApplyShaderFilterTarget GERender::ProcessShaderFilter(Drawing::Canvas&
     std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage,
     const ShaderFilterEffectContext& context)
 {
-    if (visualEffect == nullptr) {
-        LOGD("GERender::ApplyShaderFilter visualEffect is null");
+    std::shared_ptr<GEShaderFilter> geShaderFilter;
+    if (!BeforeExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
         return ApplyShaderFilterTarget::Error;
     }
-    auto ve = visualEffect->GetImpl();
-    std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
-    if (geShaderFilter == nullptr) {
-        LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
-        return ApplyShaderFilterTarget::Error;
-    }
-    geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
-    geShaderFilter->SetCache(ve->GetCache());
-    geShaderFilter->Preprocess(canvas, context.src, context.dst);
     resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
-    ve->SetCache(geShaderFilter->GetCache());
-    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
-        isGasifyFilter_ = true;
+    if (!AfterExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        return ApplyShaderFilterTarget::Error;
     }
     return ApplyShaderFilterTarget::DrawOnImage;
 }

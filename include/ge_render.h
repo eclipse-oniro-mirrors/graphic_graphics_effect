@@ -168,6 +168,28 @@ private:
     enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
 
     /**
+     * @brief Shader filter creation, set flags and prepare works before execute the shader filter.
+     * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
+     * Used as an internal helper of GEShaderFilter pipeline.
+     * @see ProcessShaderFilter for drawing on the image.
+     * @see DrawShaderFilter for drawing on the canvas.
+     * @return True if the process is successful
+     */
+    bool BeforeExecuteShaderFilter(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
+        std::shared_ptr<GEShaderFilter>& outShaderFilter);
+
+    /**
+     * @brief Update information after executing the shader filter, including writing cache back.
+     * Used as an internal helper of GEShaderFilter pipeline.
+     * @see ProcessShaderFilter for drawing on the image.
+     * @see DrawShaderFilter for drawing on the canvas.
+     * @return True if the process is successful
+     */
+    bool AfterExecuteShaderFilter(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
+        const ShaderFilterEffectContext& context, const std::shared_ptr<GEShaderFilter>& geShaderFilter);
+
+    /**
      * @brief Apply a GEVisualEffect through GEShaderFilter with dst compatiblity handling.
      * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
      * Used as a common internal helper to apply GEShaderFilter.
