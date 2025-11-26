@@ -527,7 +527,8 @@ HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRun, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun start";
 
     GEDirectDrawOnCanvasPass pass;
-    std::vector<GEFilterComposable> composables { CreateGreyEffect(), CreateGreyEffect(), CreateGreyEffect() };
+    std::vector<GEFilterComposable> composables { CreateGreyEffect(),
+        CreateVisualEffect(Drawing::GE_FILTER_FROSTED_GLASS), CreateVisualEffect(Drawing::GE_FILTER_FROSTED_GLASS) };
 
     auto result = pass.Run(composables);
     EXPECT_TRUE(result.changed);

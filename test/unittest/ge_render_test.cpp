@@ -17,6 +17,7 @@
 
 #include "ge_render.h"
 #include "ge_visual_effect_impl.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -36,19 +37,44 @@ public:
     std::shared_ptr<Drawing::Image> MakeImage(Drawing::Canvas& canvas);
     std::shared_ptr<Drawing::Image> MakeImage();
 
-    static inline Drawing::Canvas canvas_;
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
+    Drawing::Rect rect_ = {};
+    Drawing::ImageInfo imageInfo_ = {};
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> MakeGreyAdjustmentEffect();
-
+    std::shared_ptr<Drawing::Surface> CreateSurface();
     std::shared_ptr<Drawing::RuntimeEffect> greyAdjustEffect_;
 };
+
+std::shared_ptr<Drawing::Surface> GERenderTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GERenderTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
+}
 
 void GERenderTest::SetUpTestCase(void) {}
 
 void GERenderTest::TearDownTestCase(void) {}
 
-void GERenderTest::SetUp() {}
+void GERenderTest::SetUp()
+{
+    Drawing::Rect rect { 0.0f, 0.0f, 10.0f, 10.0f };
+    rect_ = rect;
+    imageInfo_ = Drawing::ImageInfo { rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE };
+    surface_ = CreateSurface();
+    canvas_ = surface_->GetCanvas();
+}
 
 void GERenderTest::TearDown() {}
 
@@ -163,7 +189,7 @@ HWTEST_F(GERenderTest, DrawImageEffect_001, TestSize.Level1)
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     ASSERT_NE(geRender, nullptr);
-    geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_001 end";
 }
@@ -190,7 +216,7 @@ HWTEST_F(GERenderTest, DrawImageEffect_002, TestSize.Level1)
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     ASSERT_NE(geRender, nullptr);
-    geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_002 end";
 }
@@ -210,14 +236,14 @@ HWTEST_F(GERenderTest, DrawImageEffect_003, TestSize.Level1)
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     veContainer->AddToChainedFilter(visualEffect);
 
-    auto image = MakeImage(canvas_);
+    auto image = MakeImage();
     ASSERT_NE(image, nullptr);
     const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     ASSERT_NE(geRender, nullptr);
-    geRender->DrawImageEffect(canvas_, *veContainer, image, src, dst, sampling);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
 
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_003 end";
 }
@@ -243,7 +269,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     ASSERT_NE(geRender, nullptr);
-    auto outImage = geRender->ApplyImageEffect(canvas_, *veContainer, image, src, dst, sampling);
+    auto outImage = geRender->ApplyImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
     EXPECT_TRUE(outImage == image);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_001 end";
@@ -632,86 +658,173 @@ HWTEST_F(GERenderTest, ApplyHpsImageEffect_001, TestSize.Level1)
     auto geRender = std::make_shared<GERender>();
 
     /* image is nullptr*/
-    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage);
+    geRender->ApplyHpsImageEffect(*canvas_, veContainer, context, outImage);
 
     /* no filter*/
-    auto image2 = MakeImage(canvas_);
+    auto image2 = MakeImage();
     context.image = image2;
-    geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage);
+    geRender->ApplyHpsImageEffect(*canvas_, veContainer, context, outImage);
 
     /* normal case */
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
     visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
     veContainer.AddToChainedFilter(visualEffect);
-    EXPECT_EQ(geRender->ApplyHpsImageEffect(canvas_, veContainer, context, outImage), false);
+    EXPECT_EQ(geRender->ApplyHpsImageEffect(*canvas_, veContainer, context, outImage), false);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsImageEffect_001 end";
 }
 
 /**
- * @tc.name: ApplyHpsGEImageEffect_001
- * @tc.desc: Verify the ApplyHpsGEImageEffect
+ * @tc.name: ApplyHpsGEImageEffect_NullImage
+ * @tc.desc: Verify ApplyHpsGEImageEffect handles null image input
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_001, TestSize.Level1)
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NullImage, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 start";
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NullImage start";
 
     Drawing::GEVisualEffectContainer veContainer;
-    const std::shared_ptr<Drawing::Image> image = nullptr;
+    auto context = GERender::HpsGEImageEffectContext { nullptr, // image is null
+        Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::SamplingOptions() };
     std::shared_ptr<Drawing::Image> outImage = nullptr;
-    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
-    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
     Drawing::Brush brush;
 
     auto geRender = std::make_shared<GERender>();
+    auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
 
-    /* image is nullptr */
-    GERender::HpsGEImageEffectContext context1 { image, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context1, outImage, brush).hasDrawnOnCanvas);
- 
-    /* no filter */
-    auto image2 = MakeImage();
-    ASSERT_NE(image2, nullptr);
-
-    GERender::HpsGEImageEffectContext context2 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context2, outImage, brush).hasDrawnOnCanvas);
- 
-    /* normal case */
-    image2 = MakeImage();
-    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
-    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0);
-    veContainer.AddToChainedFilter(visualEffect);
-    GERender::HpsGEImageEffectContext context3 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context3, outImage, brush).hasDrawnOnCanvas);
-
-    /* compatibility fallback */
-    image2 = MakeImage();
-    GERender::HpsGEImageEffectContext context4 { image2, src, dst, Drawing::SamplingOptions() };
-    outImage = nullptr;
-    EXPECT_FALSE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context4, outImage, brush).hasDrawnOnCanvas);
+    EXPECT_FALSE(result.isHpsBlurApplied);
+    EXPECT_FALSE(result.hasDrawnOnCanvas);
     EXPECT_EQ(outImage, nullptr);
 
-    /* normal case with composable greyblur */
-    veContainer = {};
-    auto visualEffect1 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
-    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 1.0f); // 1.0 grey blur coff
-    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 1.0f); // 1.0 grey blur coff
-    veContainer.AddToChainedFilter(visualEffect1);
-
-    auto visualEffect2 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
-    visualEffect2->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
-    veContainer.AddToChainedFilter(visualEffect2);
-
-    image2 = MakeImage();
-    std::vector<const char*> emptyVec {};
-    HpsEffectFilter::UnitTestSetExtensionProperties(emptyVec);
-    GERender::HpsGEImageEffectContext context5 { image2, src, dst, Drawing::SamplingOptions() };
-    EXPECT_TRUE(geRender->ApplyHpsGEImageEffect(canvas_, veContainer, context5, outImage, brush).hasDrawnOnCanvas);
-
-    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_001 end";
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NullImage end";
 }
 
+/**
+ * @tc.name: ApplyHpsGEImageEffect_NoFilters
+ * @tc.desc: Verify ApplyHpsGEImageEffect handles empty filter container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NoFilters, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NoFilters start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    auto context = GERender::HpsGEImageEffectContext { image, Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f),
+        Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::SamplingOptions() };
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+    auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
+
+    EXPECT_FALSE(result.isHpsBlurApplied);
+    EXPECT_FALSE(result.hasDrawnOnCanvas);
+    EXPECT_EQ(outImage, nullptr); // No Filters will return when no effect can be composed
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NoFilters end";
+}
+
+/**
+ * @tc.name: ApplyHpsGEImageEffect_NormalCase
+ * @tc.desc: Verify ApplyHpsGEImageEffect with valid edge light filter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NormalCase, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NormalCase start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
+    visualEffect->SetParam(Drawing::GE_FILTER_EDGE_LIGHT_ALPHA, 1.0f);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+
+    auto context = GERender::HpsGEImageEffectContext { image, Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f),
+        Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::SamplingOptions() };
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+    auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
+
+    EXPECT_FALSE(result.isHpsBlurApplied);
+    EXPECT_FALSE(result.hasDrawnOnCanvas);
+    EXPECT_NE(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NormalCase end";
+}
+
+/**
+ * @tc.name: ApplyHpsGEImageEffect_DisabledHpsGrey
+ * @tc.desc: Verify ApplyHpsGEImageEffect with disabled hps and grey effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_DisabledHpsGrey, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DisabledHpsGrey start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
+    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 0.1f);
+    visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 0.1f);
+    HpsEffectFilter::UnitTestSetExtensionProperties({ "" }); // disable hps features to test fallback
+
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+
+    auto context = GERender::HpsGEImageEffectContext { image, Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f),
+        Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::SamplingOptions() };
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+    auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
+
+    EXPECT_FALSE(result.isHpsBlurApplied);
+    EXPECT_FALSE(result.hasDrawnOnCanvas);
+    EXPECT_NE(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DisabledHpsGrey end";
+}
+
+/**
+ * @tc.name: ApplyHpsGEImageEffect_DirectDrawOnCanvas
+ * @tc.desc: Verify ApplyHpsGEImageEffect with direct draw
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_DirectDrawOnCanvas, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DirectDrawOnCanvas start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_FROSTED_GLASS);
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+
+    auto context = GERender::HpsGEImageEffectContext { image, Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f),
+        Drawing::Rect(0.0f, 0.0f, 1.0f, 1.0f), Drawing::SamplingOptions() };
+    std::shared_ptr<Drawing::Image> outImage = nullptr;
+    Drawing::Brush brush;
+
+    auto geRender = std::make_shared<GERender>();
+    auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
+
+    EXPECT_FALSE(result.isHpsBlurApplied);
+    EXPECT_TRUE(result.hasDrawnOnCanvas);
+    EXPECT_NE(outImage, nullptr); // As long as the apply loop is entered, outImage will be assigned at least once
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DirectDrawOnCanvas end";
+}
 
 /**
  * @tc.name: GenerateShaderEffectTest_LightCave
