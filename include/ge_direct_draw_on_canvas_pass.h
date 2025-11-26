@@ -24,6 +24,7 @@ namespace Rosen {
 struct DirectDrawOnCanvasFlag : GEFilterComposableFlags<DirectDrawOnCanvasFlag> {
     bool isDirectDrawOnCanvasEnabled;
 
+    DirectDrawOnCanvasFlag(bool enabled) : isDirectDrawOnCanvasEnabled(enabled) {}
     static bool IsDirectDrawOnCanvasEnabled(const GEFilterComposable& composable);
 };
 
