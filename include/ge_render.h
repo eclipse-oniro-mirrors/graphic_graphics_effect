@@ -195,19 +195,22 @@ private:
         ShaderFilterEffectContext& geContext);
 
     /**
-     * @brief Apply a GEVisualEffect through GEShaderFilter with dst compatiblity handling.
-     * This function generates a GEShaderFilter from visualEffect and handle the cache/process/draw pipeline.
-     * Used as a common internal helper to apply GEShaderFilter.
+     * @brief Apply a GEVisualEffect on outImage through GEShaderFilter::ProcessImage
      * @return The applied target for visualEffect.
      * @retval `ApplyShaderFilterTarget::Error`: Failed to apply visualEffect due to invalid visualEffect.
      * @retval `ApplyShaderFilterTarget::DrawOnImage`: The output is drawn on `outImage`.
-     * @retval `ApplyShaderFilterTarget::DrawOnCanvas`: The output is drawn on `canvas`. Used when direct drawing
-     *          is applied for the last effect in a GEVisualEffect sequence (generally GEVisualEffectContainer).
      */
     ApplyShaderFilterTarget ProcessShaderFilter(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& outImage,
         const ShaderFilterEffectContext& context);
     
+    /**
+     * @brief Apply a GEVisualEffect on canvas through GEShaderFilter::DrawImage
+     * @return The applied target for visualEffect.
+     * @retval `ApplyShaderFilterTarget::Error`: Failed to apply visualEffect due to invalid visualEffect.
+     * @retval `ApplyShaderFilterTarget::DrawOnCanvas`: The output is drawn on `canvas`. Used when direct drawing
+     *          is applied for the last effect in a GEVisualEffect sequence (generally GEVisualEffectContainer).
+     */
     ApplyShaderFilterTarget DrawShaderFilter(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
         const ShaderFilterEffectContext& context);

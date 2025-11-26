@@ -24,6 +24,25 @@
 #include "ge_visual_effect.h"
 namespace OHOS {
 namespace Rosen {
+/**
+ * @class GEFilterComposer
+ * @brief Orchestrates a sequence of filter composition passes over graphical effects.
+ *
+ * This class manages a pipeline of @ref GEFilterComposerPass objects, applying them
+ * sequentially to a list of @ref GEFilterComposable objects. It is designed to separate
+ * specific optimization logics from GERender and reduce cross-pass dependencies or side effects.
+ *
+ * Usage typically involves:
+ * 1. Creating a composer instance.
+ * 2. Adding one or more passes (e.g., `Add<GEHpsBuildPass>(canvas, context)`).
+ * 3. Converting visual effects into composables via @ref BuildComposables.
+ * 4. Running the pipeline with @ref Run.
+ *
+ * @see GEFilterComposerPass
+ * @see GEFilterComposable
+ * @see GEFilterComposerPassResult
+ * @see GEFilterComposer::ComposerRunResult
+ */
 class GEFilterComposer {
 public:
     GEFilterComposer() = default;
@@ -40,13 +59,14 @@ public:
     void Add(std::unique_ptr<GEFilterComposerPass> pass);
 
     struct ComposerRunResult {
-        bool anyPassChanged;
+        bool anyPassChanged; // True if at least one pass made changes; false otherwise.
     };
 
-    // Transform composables with GEFilterComposerPass
+    // Executes all registered passes in sequence on the given composables.
+    // Applies each pass in the order they were added.
     ComposerRunResult Run(std::vector<GEFilterComposable>& composables) const;
     
-    // Convert GEVisualEffects into GEFilterComposables
+    // Converts a list of GEVisualEffect objects into GEFilterComposable wrappers.
     static std::vector<GEFilterComposable> BuildComposables(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>&);
 

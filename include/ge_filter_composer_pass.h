@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace Rosen {
 /**
+ * @interface IGEFilterComposableFlags
  * @brief Base interface for settable flags used in filter composition passes.
  * For convinent use, please derive from GEFilterComposableFlags<YourFlagType>
  * 
@@ -36,6 +37,7 @@ namespace Rosen {
 class IGEFilterComposableFlags : public ExactDowncastUtils::ExactDowncastable {};
 
 /**
+ * @class GEFilterComposableFlags
  * @brief Template base class for settable flags used in filter composition passes.
  *
  * This template class provides a convenient base for defining specific flag types
@@ -65,6 +67,25 @@ public:
     }
 };
 
+/**
+ * @class GEFilterComposable
+ * @brief Represents a composable graphical effect with optional flags.
+ *
+ * This class wraps either a `GEVisualEffect` or `HpsEffectFilter` and provides
+ * type-safe access to both through the `Get<T>()` method. It also supports attaching
+ * a set of composition flags via `SetFlags()` and retrieving them via `GetFlags<T>()`.
+ *
+ * The class uses `std::variant` to hold one of the two effect types, ensuring
+ * memory safety and avoiding raw pointers. The `flags_` member allows pass-specific
+ * metadata to be associated with the effect during composition.
+ *
+ * @note The `GetEffect()` and `GetHpsEffect()` methods return shared_ptr to the
+ *       underlying effect type, or `nullptr` if the variant does not contain that type.
+ *
+ * @see GEFilterComposerPass
+ * @see GEFilterComposer
+ * @see IGEFilterComposableFlags
+ */
 class GEFilterComposable {
     using GEViusalEffect = Drawing::GEVisualEffect;
 
@@ -82,17 +103,34 @@ public:
         return nullptr;
     }
 
+    /**
+     * @brief Returns the underlying GEVisualEffect, if present.
+     * @return Shared pointer to GEVisualEffect, or nullptr if not present.
+     */
     std::shared_ptr<Drawing::GEVisualEffect> GetEffect()
     {
         return Get<Drawing::GEVisualEffect>();
     }
 
+    /**
+     * @brief Returns the underlying HpsEffectFilter, if present.
+     * @return Shared pointer to HpsEffectFilter, or nullptr if not present.
+     */
     std::shared_ptr<HpsEffectFilter> GetHpsEffect()
     {
         return Get<HpsEffectFilter>();
     }
 
-    // Set the related flags by some GEFilterComposerPass
+    /**
+     * @brief Sets flags of type T using provided arguments.
+     *
+     * This method creates a new instance of `T` using the provided arguments and
+     * sets it as the flags for this composable.
+     * @tparam T The flag type to set.
+     * @tparam Args Variadic template parameters for constructing T.
+     * @param args Arguments to pass to the constructor of T.
+     * @note T must be derived from `IGEFilterComposableFlags`.
+     */
     template<typename T, typename... Args>
     void SetFlags(Args&&... args)
     {
@@ -106,8 +144,13 @@ public:
         flags_ = flags;
     }
 
-    // Readonly getter returns a non-owning pointer
-    // Modify the return value is not allowed. Call SetFlags() if you want to.
+
+    /**
+     * @brief Retrieves the flags as type T, if present.
+     * @tparam T The desired flag type.
+     * @return Pointer to T if the flags are of that type; otherwise, nullptr.
+     * @note The returned pointer is non-owning. Do not modify or delete it.
+     */
     template<typename T>
     const T* GetFlags() const
     {
@@ -123,12 +166,37 @@ struct GEFilterComposerPassResult {
     bool changed;
 };
 
+/**
+ * @class GEFilterComposerPass
+ * @brief Base class for filter composition passes in the graphics effect pipeline.
+ *
+ * This abstract base class defines the interface for individual passes in the filter
+ * composition pipeline. Each pass is responsible for transforming a collection of
+ * @ref GEFilterComposable objects, potentially modifying them or combining them
+ * into more efficient representations.
+ * @see GEFilterComposer
+ * @see GEFilterComposable
+ * @see GEFilterComposerPassResult
+ */
 class GEFilterComposerPass {
 public:
     virtual ~GEFilterComposerPass() = default;
     // Log only, DO NOT use it for serialization
     virtual std::string_view GetLogName() const = 0;
-    // Execute the transform pass for effects
+
+    /**
+     * @brief Executes the composition pass on the given list of composables.
+     *
+     * This method performs the actual transformation logic of the pass. It may
+     * modify the composables in place, merge them, or replace them with new
+     * representations (e.g., converting multiple visual effects into a single HPS filter).
+     * @param[in,out] composables A reference to a vector of @ref GEFilterComposable
+     *                            objects to be processed.
+     * @return A @ref GEFilterComposerPassResult indicating whether any changes were
+     *         made to the composables.
+     * @note The pass is allowed to modify the vector in-place (e.g., by erasing,
+     *       replacing, or reordering elements).
+     */
     virtual GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) = 0;
 };
 
