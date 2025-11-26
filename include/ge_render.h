@@ -187,7 +187,7 @@ private:
      */
     bool AfterExecuteShaderFilter(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
         const ShaderFilterEffectContext& context, const std::shared_ptr<GEShaderFilter>& geShaderFilter);
-    
+
     // Internal helper for dispatching between ProcessShaderFilter and DrawShaderFilter.
     // Used in ApplyHpsGEImageEffect only.
     ApplyShaderFilterTarget DispatchGEShaderFilter(Drawing::Canvas& canvas, Drawing::Brush& brush,
@@ -203,7 +203,7 @@ private:
     ApplyShaderFilterTarget ProcessShaderFilter(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& outImage,
         const ShaderFilterEffectContext& context);
-    
+
     /**
      * @brief Apply a GEVisualEffect on canvas through GEShaderFilter::DrawImage
      * @return The applied target for visualEffect.

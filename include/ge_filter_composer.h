@@ -49,7 +49,8 @@ public:
     ~GEFilterComposer() = default;
 
     // Add a GEFilterComposerPass with its constructor
-    template <typename Pass, typename... Args> void Add(Args&&... args)
+    template<typename Pass, typename... Args>
+    void Add(Args&&... args)
     {
         static_assert(std::is_base_of_v<GEFilterComposerPass, Pass>, "Pass should be subtype of GEFilterComposerPass");
         Add(std::make_unique<Pass>(std::forward<Args>(args)...));
@@ -65,7 +66,7 @@ public:
     // Executes all registered passes in sequence on the given composables.
     // Applies each pass in the order they were added.
     ComposerRunResult Run(std::vector<GEFilterComposable>& composables) const;
-    
+
     // Converts a list of GEVisualEffect objects into GEFilterComposable wrappers.
     static std::vector<GEFilterComposable> BuildComposables(
         const std::vector<std::shared_ptr<Drawing::GEVisualEffect>>&);

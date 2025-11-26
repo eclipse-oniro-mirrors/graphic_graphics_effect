@@ -31,7 +31,7 @@ namespace Rosen {
  * @interface IGEFilterComposableFlags
  * @brief Base interface for settable flags used in filter composition passes.
  * For convinent use, please derive from GEFilterComposableFlags<YourFlagType>
- * 
+ *
  * @see GEFilterComposableFlags
  */
 class IGEFilterComposableFlags : public ExactDowncastUtils::ExactDowncastable {};
@@ -143,7 +143,6 @@ public:
     {
         flags_ = flags;
     }
-
 
     /**
      * @brief Retrieves the flags as type T, if present.
