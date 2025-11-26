@@ -60,7 +60,7 @@ public:
      * @note The function assumes the input image is valid and non-null. If any effect fails
      *       to generate a valid shader or filter, the process continues but may result in
      *       unexpected output.
-     * @see ApplyShaderFilter for the underlying effect application mechanism.
+     * @see ProcessShaderFilter for the underlying effect application mechanism.
      * @see GEVisualEffectContainer for the container of visual effects.
      * @see GEShaderFilter for the filtering pipeline.
      *
@@ -136,7 +136,7 @@ public:
      *
      * @see GEFilterComposer for the underlying pipeline composition mechanism.
      * @see GEHpsBuildPass for the HPS composition mechanism
-     * @see ApplyShaderFilter for the GE effect application mechanism.
+     * @see ProcessShaderFilter for the GE effect application mechanism.
      *
      * @param canvas Reference to the Drawing::Canvas where rendering occurs.
      * @param veContainer Reference to the GEVisualEffectContainer containing the sequence of visual effects to apply.
@@ -163,7 +163,7 @@ private:
         Drawing::Rect dst {};
     };
 
-    // Return type of ApplyShaderFilter() indicates the applied target for visualEffect.
+    // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
     enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
 
     /**
