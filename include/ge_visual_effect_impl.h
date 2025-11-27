@@ -663,8 +663,12 @@ private:
     void SetGasifyParams(const std::string& tag, float param);
     void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassWeights(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassRates(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassParams(const std::string& tag, const float& param);
     void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassKBS(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
     void SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
 
