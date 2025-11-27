@@ -509,34 +509,34 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetChild("bgBlurredImg", smallRBlurShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetChild("sdfNormalImg", sdfNormalShader);
-    builder->SetUniform("borderWidth", frostedGlassParams_.borderWidth);
-    builder->SetUniform("offset", frostedGlassParams_.offset);
-    builder->SetUniform("downSampleFactor", frostedGlassParams_.downSampleFactor);
+    builder->SetUniform("borderWidth", frostedGlassParams_.envLightParams[NUM_1]);
+    builder->SetUniform("offset", 0.0f);
+    builder->SetUniform("downSampleFactor", 1.0f);
     // Background darken parameter
-    builder->SetUniform("bgFactor", frostedGlassParams_.bgFactor);
+    builder->SetUniform("bgFactor", 1.0f);
     // Inner shadow parameters
-    builder->SetUniform("innerShadowRefractPx", frostedGlassParams_.innerShadowParams[NUM_0]);
-    builder->SetUniform("innerShadowWidth", frostedGlassParams_.innerShadowParams[NUM_1]);
-    builder->SetUniform("innerShadowExp", frostedGlassParams_.innerShadowParams[NUM_2]);
-    builder->SetUniform("sdK", frostedGlassParams_.sdParams[NUM_0]);
-    builder->SetUniform("sdB", frostedGlassParams_.sdParams[NUM_1]);
-    builder->SetUniform("sdS", frostedGlassParams_.sdParams[NUM_2]);
+    builder->SetUniform("innerShadowRefractPx", frostedGlassParams_.sdParams[NUM_0]);
+    builder->SetUniform("innerShadowWidth", frostedGlassParams_.sdParams[NUM_1]);
+    builder->SetUniform("innerShadowExp", 4.62f);
+    builder->SetUniform("sdK", frostedGlassParams_.sdKBS[NUM_0]);
+    builder->SetUniform("sdB", frostedGlassParams_.sdKBS[NUM_1]);
+    builder->SetUniform("sdS", frostedGlassParams_.sdKBS[NUM_2]);
     // Env refraction parameters
-    builder->SetUniform("refractOutPx", frostedGlassParams_.refractOutPx);
-    builder->SetUniform("envK", frostedGlassParams_.envParams[NUM_0]);
-    builder->SetUniform("envB", frostedGlassParams_.envParams[NUM_1]);
-    builder->SetUniform("envS", frostedGlassParams_.envParams[NUM_2]);
+    builder->SetUniform("refractOutPx", frostedGlassParams_.envLightParams[NUM_0]);
+    builder->SetUniform("envK", frostedGlassParams_.envLightKBS[NUM_0]);
+    builder->SetUniform("envB", frostedGlassParams_.envLightKBS[NUM_1]);
+    builder->SetUniform("envS", frostedGlassParams_.envLightKBS[NUM_2]);
     // Edge highlights parameters
-    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edgeLightAngle[NUM_0]);
-    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edgeLightAngle[NUM_1]);
-    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edgeLightAngle[NUM_2]);
-    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edgeLightBlur[NUM_0]);
-    builder->SetUniform("highLightShiftPx", frostedGlassParams_.edgeLightBlur[NUM_1]);
-    builder->SetUniform("highLightDirection", frostedGlassParams_.edgeLightDir[NUM_0],
-                        frostedGlassParams_.edgeLightDir[NUM_1]);
-    builder->SetUniform("hlK", frostedGlassParams_.hlParams[NUM_0]);
-    builder->SetUniform("hlB", frostedGlassParams_.hlParams[NUM_1]);
-    builder->SetUniform("hlS", frostedGlassParams_.hlParams[NUM_2]);
+    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edLightAngles[NUM_0]);
+    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edLightAngles[NUM_1]);
+    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edLightParams[NUM_0]);
+    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edLightParams[NUM_1]);
+    builder->SetUniform("highLightShiftPx", 0.0f);
+    builder->SetUniform("highLightDirection", frostedGlassParams_.edLightDir[NUM_0],
+                        frostedGlassParams_.edLightDir[NUM_1]);
+    builder->SetUniform("hlK", frostedGlassParams_.edLightKBS[NUM_0]);
+    builder->SetUniform("hlB", frostedGlassParams_.edLightKBS[NUM_1]);
+    builder->SetUniform("hlS", frostedGlassParams_.edLightKBS[NUM_2]);
     return builder;
 }
 } // namespace Rosen
