@@ -447,6 +447,7 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     }
     auto resImage = context.image;
     bool appliedHpsBlur = false;
+    bool lastAppliedHpsBlur = false;
     ApplyShaderFilterTarget applyTarget = ApplyShaderFilterTarget::Error; // Last applied target
     for (auto& composable: composables) {
         auto currentImage = resImage;
@@ -456,8 +457,10 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
-            appliedHpsBlur = hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
-            applyTarget = appliedHpsBlur ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
+            lastAppliedHpsBlur = hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
+            appliedHpsBlur |= lastAppliedHpsBlur;
+            applyTarget =
+                lastAppliedHpsBlur ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
         } else {
             LOGE("GERender::ApplyHpsGEImageEffect unhandled composable type");
         }
