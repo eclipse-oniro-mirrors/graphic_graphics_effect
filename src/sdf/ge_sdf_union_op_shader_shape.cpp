@@ -20,39 +20,12 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-
-void GESDFUnionOpShaderShape::CopyState(const GESDFUnionOpShaderShape& shape)
-{
-    params_.spacing = shape.params_.spacing;
-    params_.op = shape.params_.op;
-    if (params_.left) {
-        params_.left->CopyState(*static_cast<const GESDFShaderShape*>(shape.params_.left.get()));
-    }
-
-    if (params_.right) {
-        params_.right->CopyState(*static_cast<const GESDFShaderShape*>(shape.params_.right.get()));
-    }
-}
-
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShader, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
-
-    if (!params_.left && !params_.right) {
-        return nullptr;
-    }
-
-    if (!params_.left) {
-        return params_.right->GenerateDrawingShader(width, height);
-    }
-
-    if (!params_.right) {
-        return params_.left->GenerateDrawingShader(width, height);
-    }
-
-    auto leftShader = params_.left->GenerateDrawingShader(width, height);
-    auto rightShader = params_.right->GenerateDrawingShader(width, height);
+    auto leftShader = params_.left ? params_.left->GenerateDrawingShader(width, height) : nullptr;
+    auto rightShader = params_.right ? params_.right->GenerateDrawingShader(width, height) : nullptr;
     if (!leftShader && !rightShader) {
         return nullptr;
     }
@@ -64,27 +37,15 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(flo
     if (!rightShader) {
         return leftShader;
     }
-    return GenerateUnionOpDrawingShader(false, leftShader, rightShader);
+    return GenerateUnionOpDrawingShader(leftShader, rightShader, false);
 }
 
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
-
-    if (!params_.left && !params_.right) {
-        return nullptr;
-    }
-
-    if (!params_.left) {
-        return params_.right->GenerateDrawingShaderHasNormal(width, height);
-    }
-
-    if (!params_.right) {
-        return params_.left->GenerateDrawingShaderHasNormal(width, height);
-    }
-
-    auto leftShader = params_.left->GenerateDrawingShaderHasNormal(width, height);
-    auto rightShader = params_.right->GenerateDrawingShaderHasNormal(width, height);
+    GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Type: %s , Width: %g, Height: %g",
+        params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
+    auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height);
+    auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height);
     if (!leftShader && !rightShader) {
         return nullptr;
     }
@@ -97,11 +58,11 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
         return leftShader;
     }
 
-    return GenerateUnionOpDrawingShader(true, leftShader, rightShader);
+    return GenerateUnionOpDrawingShader(leftShader, rightShader, true);
 }
 
-std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(bool hasNormal,
-    std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader) const
+std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(
+    std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const
 {
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
 
@@ -114,7 +75,6 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingSha
     return params_.op == GESDFUnionOp::UNION ? GenerateUnionShaderEffect(leftShader, rightShader, builder)
                                              : GenerateSmoothUnionShaderEffect(leftShader, rightShader, builder);
 }
-
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFUnionBuilder() const
 {

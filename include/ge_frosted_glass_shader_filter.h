@@ -35,7 +35,8 @@ public:
     bool InitFrostedGlassEffect();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
         std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
-        std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, float imageWidth, float imageHeight);
+        std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader,
+        std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader, float imageWidth, float imageHeight);
 
 private:
     std::shared_ptr<Drawing::ShaderEffect> CreateLargeRadiusBlurShader(Drawing::Canvas& canvas,
@@ -48,6 +49,8 @@ private:
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(float width, float height) const;
+
     Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
 };
 

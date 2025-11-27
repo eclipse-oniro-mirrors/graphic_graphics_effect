@@ -47,6 +47,11 @@ public:
     }
 
 private:
+    std::shared_ptr<ShaderEffect> GeneratePixelmapShader() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFPixelmapShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFPixelmapNormalShaderShapeBuilder();
+    std::shared_ptr<ShaderEffect> GenerateShaderEffect(std::shared_ptr<ShaderEffect> pixelmapShader,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder)  const
     GESDFPixelmapShapeParams params_ {};
 };
 } // Drawing

@@ -380,6 +380,10 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage imageinfo is invalid");
         return nullptr;
     }
+
+    Drawing::AutoCanvasRestore acr(*canvas, true);
+    canvas->ResetMatrix();
+
     Drawing::Matrix matrix = canvasInfo_.mat;
     matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
@@ -399,8 +403,13 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
         return nullptr;
     }
-    auto builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
-                                          canvasInfo_.geoHeight);
+    auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    if (!sdfNormalShader) {
+        LOGE("GEFrostedGlassShaderFilter::OnProcessImage sdfShapeShader is null");
+        return image;
+    }
+    auto builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, sdfNormalShader,
+                                          canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (builder == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
         return image;
@@ -431,6 +440,14 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurI
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
 
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::MakeSDFNormalShader(float width, float height) const
+{
+    if (auto shape = frostedGlassParams_.sdfShape) {
+        return shape->GenerateDrawingShaderHasNormal(width, height);
+    }
+    return nullptr;
+}
+
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
 
 bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
@@ -447,20 +464,14 @@ bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeFrostedGlassShader(
     std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
-    std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, float imageWidth, float imageHeight)
+    std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader,
+    float imageWidth, float imageHeight)
 {
     if (g_frostedGlassShaderEffect == nullptr) {
         if (!InitFrostedGlassEffect()) {
             LOGE("GEFrostedGlassShaderFilter::failed when initializing MagnifierEffect.");
             return nullptr;
         }
-    }
-
-    std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader;
-    if (auto shape = frostedGlassParams_.sdfShape) {
-        sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
-    } else {
-        LOGE("GEFrostedGlassShaderFilter::MakeFrostedGlassShader sdfShapeShader is null");
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
