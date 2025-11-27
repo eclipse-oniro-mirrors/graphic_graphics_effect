@@ -25,5 +25,21 @@ std::shared_ptr<Drawing::Image> GEShaderFilter::ProcessImage(Drawing::Canvas& ca
         TypeName().data(), dst.GetWidth(), dst.GetHeight());
     return OnProcessImage(canvas, image, src, dst);
 }
+
+bool GEShaderFilter::DrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
+{
+    GE_TRACE_NAME_FMT("GEShaderFilter::DrawImage, Type: %s, dst Rect Width: %g, Height: %g",
+        TypeName().data(), dst.GetWidth(), dst.GetHeight());
+    return OnDrawImage(canvas, image, src, dst, brush);
+}
+
+Drawing::Matrix GEShaderFilter::CreateDestinationTranslateMatrix(const Drawing::Rect& dst)
+{
+    Drawing::Matrix translateMatrix;
+    translateMatrix.Translate(dst.GetLeft(), dst.GetTop());
+    return translateMatrix;
+}
+
 } // namespace Rosen
 } // namespace OHOS

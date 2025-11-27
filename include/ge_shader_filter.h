@@ -36,8 +36,26 @@ public:
     virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) = 0;
 
+    /**
+     * @brief Directly draw on canvas
+     * @return Whether the image is successfully drawn onto the canvas.
+     *         The default implementation returns false, indicating that this function is unimplemented.
+     * @note Any GEShaderFilter supporting directly drawing on canvas should override this function and provides a
+     *       correct implementation. It will be executed when any GEShaderFilter is generated from the last
+     *       GEVisualEffect in GEVisualEffectContainer. When returning false, the canvas should be unchanged
+     *       and GERender will automatically fall-back to OnProcessImage.
+     */
+    virtual bool OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
+    {
+        return false; // Placeholder default implementation (Does not support directly draw on canvas)
+    }
+
     GE_EXPORT std::shared_ptr<Drawing::Image> ProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst);
+
+    GE_EXPORT bool DrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+        const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush);
 
     uint32_t Hash() const
     {
@@ -65,6 +83,15 @@ public:
     {
         return cacheAnyPtr_;
     }
+
+protected:
+    /**
+     * @brief Create a matrix that translates to the top-left corner of destination area.
+     *        Used in OnDrawImage.
+     * @param dst destination area
+     * @return Translation matrix. Call the PostConcat method on your matrix with it before calling MakeShader
+     */
+    GE_EXPORT static Drawing::Matrix CreateDestinationTranslateMatrix(const Drawing::Rect& dst);
 
 protected:
     Drawing::CanvasInfo canvasInfo_;

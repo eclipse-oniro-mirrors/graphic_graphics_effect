@@ -21,10 +21,10 @@
 namespace OHOS {
 namespace Rosen {
 
-void GEFilterComposer::Add(std::shared_ptr<GEFilterComposerPass> pass)
+void GEFilterComposer::Add(std::unique_ptr<GEFilterComposerPass> pass)
 {
     if (pass != nullptr) {
-        passes_.push_back(pass);
+        passes_.push_back(std::move(pass));
     } else {
         LOGE("GEFilterComposer::Add nullptr pass found");
     }

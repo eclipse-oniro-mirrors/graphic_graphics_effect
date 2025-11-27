@@ -369,6 +369,38 @@ std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateSmallRa
     return smallRBlurShader;
 }
 
+bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst,
+    Drawing::Matrix& matrix, std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder)
+{
+    if (image->GetHeight() < 1e-6 || image->GetWidth() < 1e-6) {
+        LOGE("GEFrostedGlassShaderFilter::PrepareDrawing imageinfo is invalid");
+        return false;
+    }
+    matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
+    Drawing::Matrix invertMatrix;
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEFrostedGlassShaderFilter::PrepareDrawing Invert matrix failed");
+        return false;
+    }
+    auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    if (shader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::create shader failed.");
+        return false;
+    }
+    auto largeRBlurShader = CreateLargeRadiusBlurShader(canvas, image, src, dst, invertMatrix);
+    auto smallRBlurShader = CreateSmallRadiusBlurShader(canvas, image, src, dst, invertMatrix);
+    if (smallRBlurShader == nullptr || largeRBlurShader == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
+        return false;
+    }
+    builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
+                                     canvasInfo_.geoHeight);
+    return true;
+}
+
 std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
@@ -376,31 +408,11 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage input is invalid");
         return nullptr;
     }
-    if (image->GetHeight() < 1e-6 || image->GetWidth() < 1e-6) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage imageinfo is invalid");
-        return nullptr;
-    }
-    Drawing::Matrix matrix = canvasInfo_.mat;
-    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage Invert matrix failed");
+    Drawing::Matrix matrix;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
+    if (!PrepareDrawing(canvas, image, src, dst, matrix, builder)) {
         return image;
     }
-    auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    if (shader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create shader failed.");
-        return nullptr;
-    }
-    auto largeRBlurShader = CreateLargeRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    auto smallRBlurShader = CreateSmallRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    if (smallRBlurShader == nullptr || largeRBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
-        return nullptr;
-    }
-    auto builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
-                                          canvasInfo_.geoHeight);
     if (builder == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
         return image;
@@ -411,6 +423,32 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         return image;
     }
     return resultImage;
+}
+
+bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
+    const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
+{
+    if (image == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::OnDrawImage input is invalid");
+        return false;
+    }
+    Drawing::Matrix matrix;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
+    if (!PrepareDrawing(canvas, image, src, dst, matrix, builder)) {
+        return false;
+    }
+    if (builder == nullptr) {
+        LOGE("GEFrostedGlassShaderFilter::OnDrawImage builder is null");
+        return false;
+    }
+
+    matrix.PostConcat(CreateDestinationTranslateMatrix(dst));
+    auto shader = builder->MakeShader(&matrix, image->IsOpaque());
+    brush.SetShaderEffect(shader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(dst);
+    canvas.DetachBrush();
+    return true;
 }
 
 std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeLargeRadiusBlurImg(Drawing::Canvas& canvas,
