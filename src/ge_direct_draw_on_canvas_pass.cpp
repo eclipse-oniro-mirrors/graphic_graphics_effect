@@ -63,9 +63,10 @@ GEFilterComposerPassResult GEDirectDrawOnCanvasPass::Run(std::vector<GEFilterCom
     if (IsDirectDrawOnCanvasSupported(impl->GetFilterType())) {
         LOGD("GEDirectDrawOnCanvasPass: direct draw on canvas is enabled for %d", impl->GetFilterType());
         lastOne.SetFlags<DirectDrawOnCanvasFlag>(true);
+        return GEFilterComposerPassResult { true };
     }
 
-    return GEFilterComposerPassResult { true };
+    return GEFilterComposerPassResult { false };
 }
 
 } // namespace Rosen
