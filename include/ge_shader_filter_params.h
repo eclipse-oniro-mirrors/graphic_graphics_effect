@@ -918,48 +918,72 @@ struct GEGasifyFilterParams {
 
 constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
 // Common parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
-constexpr char GE_FILTER_FROSTED_GLASS_BLUR_PARAMS[] = "FrostedGlass_BlurParams";
-constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
-constexpr char GE_FILTER_FROSTED_GLASS_BORDERWIDTH[] = "FrostedGlass_BorderWidth";
-constexpr char GE_FILTER_FROSTED_GLASS_OFFSET[] = "FrostedGlass_Offset";
-constexpr char GE_FILTER_FROSTED_GLASS_DOWN_SAMPLE_FACTOR[] = "FrostedGlass_DownSampleFactor";
-constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
+constexpr char GE_FILTER_FROSTED_GLASS_BLURPARAMS[] = "FrostedGlass_BlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS[] = "FrostedGlass_WeightsEmboss"; // envLight, sd
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEDL[] = "FrostedGlass_WeightsEdl";
 // BG darken parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BG_FACTOR[] = "FrostedGlass_BgFactor";
+constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
+constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_BGPOS[] = "FrostedGlass_BgPos";
+constexpr char GE_FILTER_FROSTED_GLASS_BGNEG[] = "FrostedGlass_BgNeg";
+// Refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTPARAMS[] = "FrostedGlass_RefractParams";
 // Inner shadow parameters
-constexpr char GE_FILTER_FROSTED_GLASS_INNER_SHADOW_PARAMS[] = "FrostedGlass_InnerShadowParams";
-constexpr char GE_FILTER_FROSTED_GLASS_SD_PARAMS[] = "FrostedGlass_SdParams";
+constexpr char GE_FILTER_FROSTED_GLASS_SDPARAMS[] = "FrostedGlass_SdParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_SDRATES[] = "FrostedGlass_SdRates";
+constexpr char GE_FILTER_FROSTED_GLASS_SDKBS[] = "FrostedGlass_SdKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_SDPOS[] = "FrostedGlass_SdPos";
+constexpr char GE_FILTER_FROSTED_GLASS_SDNEG[] = "FrostedGlass_SdNeg";
 // Env refraction parameters
-constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlass_RefractOutPx";
-constexpr char GE_FILTER_FROSTED_GLASS_ENV_PARAMS[] = "FrostedGlass_EnvParams";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS[] = "FrostedGlass_EnvLightParams"; // width. featherPx, OutPx
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates"; // 3, 2
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS[] = "FrostedGlass_EnvLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS[] = "FrostedGlass_EnvLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG[] = "FrostedGlass_EnvLightNeg";
 // Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_ANGLE[] = "FrostedGlass_EdgeLightAngleParams";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_BLUR[] = "FrostedGlass_EdgeLightBlurParams";
-constexpr char GE_FILTER_FROSTED_GLASS_EDGE_LIGHT_DIR[] = "FrostedGlass_EdgeLightDirParams";
-constexpr char GE_FILTER_FROSTED_GLASS_HL_PARAMS[] = "FrostedGlass_HlParams";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPARAMS[] = "FrostedGlass_EdLightParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_EDLANGLES[] = "FrostedGlass_EdLightAngles"; // AngleDeg, featherDeg
+constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir"; // x, y
+constexpr char GE_FILTER_FROSTED_GLASS_EDLRATES[] = "FrostedGlass_EdLightRates";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLKBS[] = "FrostedGlass_EdLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPOS[] = "FrostedGlass_EdLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
+constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
+constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
 
 struct GEFrostedGlassShaderFilterParams {
-    Vector2f borderSize = Vector2f(200.0f, 100.0f);
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
-    float cornerRadius = 100.0f;
-    float borderWidth = 2.9f;
-    float offset = 1.88f;
-    float downSampleFactor = 1.0f;
-    std::shared_ptr<GESDFShaderShape> sdfShape;
+    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     // Background darken parameters
-    float bgFactor = 0.9f;
+    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    // Refraction params
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
     // Inner shadow parameters
-    Vector3f innerShadowParams = Vector3f(-0.02f, 2.0f, 4.62f);
-    Vector3f sdParams = Vector3f(0.9f, 0.0f, 1.0f);
+    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
+    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
     // Env refraction parameters
-    float refractOutPx = 20.0f;
-    Vector3f envParams = Vector3f(0.8f, 70.0f, 2.0f);
+    Vector3f envLightParams = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     // Edge highlights parameters
-    Vector3f edgeLightAngle = Vector3f(30.0f, 30.0f, 3.0f);
-    Vector2f edgeLightBlur = Vector2f(2.0f, -1.0f);
-    Vector2f edgeLightDir = Vector2f(-1.0f, 1.0f);
-    Vector3f hlParams = Vector3f(0.6027f, 160.0f, 2.0f);
+    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
+    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
+    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    Vector2f borderSize = Vector2f(200.0f, 100.0f);
+    float cornerRadius = 100.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
