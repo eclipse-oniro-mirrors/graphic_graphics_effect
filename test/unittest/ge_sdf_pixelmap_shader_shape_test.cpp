@@ -48,7 +48,7 @@ HWTEST_F(GESDFPixelmapShaderShapeTest, GenerateDrawingShader_001, TestSize.Level
 {
     GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateDrawingShader_001 start";
     GESDFPixelmapShapeParams param;
-    param.image = std::make_shared<Drawing::Image>(); 
+    param.image = std::make_shared<Drawing::Image>();
 
     GESDFPixelmapShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
