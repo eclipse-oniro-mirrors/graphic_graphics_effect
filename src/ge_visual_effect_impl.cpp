@@ -123,7 +123,6 @@ TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
 };
 
-
 TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT0, gridPoints[0], PairFloat),
     ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT1, gridPoints[1], PairFloat),
@@ -2481,7 +2480,6 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
     if (tag == GE_FILTER_FROSTED_GLASS_BORDERSIZE) {
         constexpr float MIN_V = 0.0f;
         frostedGlassParams_->borderSize = Vector2f(std::max(param.first, MIN_V), std::max(param.second, MIN_V));
- 
     }
  
     if (tag == GE_FILTER_FROSTED_GLASS_BLURPARAMS) {
@@ -2491,7 +2489,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         constexpr float MAX_K = 20.0f;
         frostedGlassParams_->blurParams = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
  
-            std::clamp(param.second, MIN_K, MAX_K));
+        std::clamp(param.second, MIN_K, MAX_K));
     }
     
     HandleSetFrostedGlassWeights(tag, param);
@@ -2573,19 +2571,16 @@ void GEVisualEffectImpl::HandleSetFrostedGlassPosNegCoefs(const std::string& tag
     if (tag == GE_FILTER_FROSTED_GLASS_SDPOS) {
         frostedGlassParams_->sdPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
- 
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_SDNEG) {
         frostedGlassParams_->sdNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
- 
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS) {
         frostedGlassParams_->envLightPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
- 
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG) {
