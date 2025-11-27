@@ -1,4 +1,7 @@
 /*
+ * Copyright (c) Huawei Technologies Co., Ltd. 2025-2025. All rights reserved.
+ */
+/*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2190,7 +2193,7 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->materialFactor = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_BLURLEFT,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurLeft = p; } },
-       { GE_SHADER_HARMONIUM_EFFECT_BLURTOP,
+        { GE_SHADER_HARMONIUM_EFFECT_BLURTOP,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurTop = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cornerRadius = p; } },
