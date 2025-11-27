@@ -2591,7 +2591,6 @@ void GEVisualEffectImpl::HandleSetFrostedGlassPosNegCoefs(const std::string& tag
     if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG) {
         frostedGlassParams_->envLightNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
- 
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLPOS) {
@@ -2623,7 +2622,6 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vec
     if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS) {
         frostedGlassParams_->envLightParams = Vector3f(std::clamp(param[NUM_0], MIN_S, MAX_S),
             std::clamp(param[NUM_1], MIN_V, MAX_V), std::clamp(param[NUM_2], MIN_V, MAX_V));
- 
     }
 
     HandleSetFrostedGlassKBS(tag, param);
