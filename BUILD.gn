@@ -75,6 +75,8 @@ ohos_source_set("graphics_effect_src") {
     "src/ge_external_dynamic_loader.cpp",
     "src/ge_filter_composer.cpp",
     "src/ge_frame_gradient_shader_mask.cpp",
+    "src/ge_frosted_glass_blur_shader_filter.cpp",
+    "src/ge_frosted_glass_effect.cpp",
     "src/ge_frosted_glass_shader_filter.cpp",
     "src/ge_grey_shader_filter.cpp",
     "src/ge_grid_warp_shader_filter.cpp",

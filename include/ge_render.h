@@ -227,6 +227,8 @@ private:
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlass(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
 
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlassBlur(
+        const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve);
     static bool isMesablurAllEnable_;
     bool isGasifyFilter_ = false;
     std::shared_ptr<GESDFShaderFilter> sdfShaderFilter_;

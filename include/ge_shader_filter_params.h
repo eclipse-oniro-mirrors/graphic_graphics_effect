@@ -616,6 +616,95 @@ struct GEXColorGradientEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
+
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT[] = "FrostedGlassEffect";
+// Common parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM[] = "FrostedGlassEffect_BlurParam";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS[] = "FrostedGlassEffect_WeightsEmboss"; // envLight, sd
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL[] = "FrostedGlassEffect_WeightsEdl";
+// BG darken parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGRATES[] = "FrostedGlassEffect_BgRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGKBS[] = "FrostedGlassEffect_BgKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGPOS[] = "FrostedGlassEffect_BgPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG[] = "FrostedGlassEffect_BgNeg";
+// Refraction parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTPARAMS[] = "FrostedGlassEffect_RefractParams";
+// Inner shadow parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPARAMS[] = "FrostedGlassEffect_SdParams"; // width. featherPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDRATES[] = "FrostedGlassEffect_SdRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDKBS[] = "FrostedGlassEffect_SdKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPOS[] = "FrostedGlassEffect_SdPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDNEG[] = "FrostedGlassEffect_SdNeg";
+// Env refraction parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS[] = "FrostedGlassEffect_EnvLightParams"; // width. featherPx, OutPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES[] = "FrostedGlassEffect_EnvLightRates"; // 3, 2
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTKBS[] = "FrostedGlassEffect_EnvLightKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS[] = "FrostedGlassEffect_EnvLightPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTNEG[] = "FrostedGlassEffect_EnvLightNeg";
+// Edge highlights parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPARAMS[] = "FrostedGlassEffect_EdLightParams"; // width. featherPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES[] = "FrostedGlassEffect_EdLightAngles"; // AngleDeg, featherDeg
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR[] = "FrostedGlassEffect_EdLightDir"; // x, y
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLRATES[] = "FrostedGlassEffect_EdLightRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS[] = "FrostedGlassEffect_EdLightKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS[] = "FrostedGlassEffect_EdLightPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLNEG[] = "FrostedGlassEffect_EdLightNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE[] = "FrostedGlassEffect_Shape";
+// Adapt effect component
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK[] = "FrostedGlassEffect_UseEffectMask";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP[] = "FrostedGlassEffect_MaskLeftTop";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX[] = "FrostedGlassEffect_MaskMatrix";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffect_RefractOutPx";
+
+struct GEFrostedGlassEffectParams {
+    float blurParam = 4.0f;
+    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    // Background darken parameters
+    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    // Refraction params
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
+    // Inner shadow parameters
+    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
+    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Env refraction parameters
+    Vector2f envLightParams = Vector2f(0.2745f, 2.0f);
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Edge highlights parameters
+    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
+    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
+    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    std::shared_ptr<GESDFShaderShape> sdfShape;
+    // Adapt effect component
+    std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
+    Vector2f maskLeftTop = Vector2f(0.0f, 0.0f);
+    Drawing::Matrix maskMatrix;
+    float refractOutPx = 0.8f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
+
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
+struct GEFrostedGlassBlurShaderFilterParams {
+    float radius = 0.0f;
+    float refractOutPx = 0.8f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_BLUR, GEFrostedGlassBlurShaderFilterParams, GE_FILTER_FROSTED_GLASS_BLUR);
+
 constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
 constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
 constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";

@@ -29,6 +29,8 @@
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
+#include "ge_frosted_glass_blur_shader_filter.h"
+#include "ge_frosted_glass_effect.h"
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
@@ -289,6 +291,24 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             const auto& params = ve->GetCircleFlowlightEffectParams();
             out = std::make_shared<GECircleFlowlightEffect>(*params);
             return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetFrostedGlassEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetFrostedGlassEffectParams();
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEFrostedGlassEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                out = std::make_shared<GEFrostedGlassEffect>(*params);
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
         }
     },
 };
@@ -632,10 +652,38 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             return dmShader;
             break;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
+            const auto &params = ve->GetFrostedGlassBlurParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
+                sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+                static_cast<void *>(params.get()));
+            if (!object) {
+                return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+            }
+            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+            return dmShader;
+            break;
+        }
         default:
             break;
     }
     return nullptr;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFrostedGlassBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &params = ve->GetFrostedGlassBlurParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
+        sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+        static_cast<void *>(params.get()));
+    if (!object) {
+        return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateShaderKawaseBlur(
@@ -774,6 +822,10 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::GRID_WARP: {
             const auto &params = ve->GetGridWarpFilterParams();
             shaderFilter = std::make_shared<GEGridWarpShaderFilter>(*params);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
+            shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
         default:
