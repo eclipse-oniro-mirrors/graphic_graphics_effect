@@ -616,7 +616,6 @@ struct GEXColorGradientEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
-
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT[] = "FrostedGlassEffect";
 // Common parameters
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM[] = "FrostedGlassEffect_BlurParam";
