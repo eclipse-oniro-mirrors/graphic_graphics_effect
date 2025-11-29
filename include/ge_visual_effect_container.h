@@ -47,7 +47,7 @@ public:
 
     void UpdateTotalMatrix(Drawing::Matrix totalMatrix);
 
-    void UpdateRefractOutValue(float value)
+    void UpdateRefractOutValue(float value);
 
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
