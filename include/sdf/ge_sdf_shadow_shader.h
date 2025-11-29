@@ -45,33 +45,20 @@ public:
     }
 
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFShadowShader(const Drawing::Rect& rect);
+    void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFShadowEffect();
     Drawing::GESDFShadowShaderParams params_;
-    std::string shaderCode_;
-    std::optional<Drawing::GESDFTreeProcessor> sdfTreeProcessor_;
-    std::optional<Drawing::RuntimeShaderBuilder> shaderEffectBuilder_;
 
-    inline static const std::string shadowHeaders_ = R"(
+    inline static const std::string shaderCode_ = R"(
+        uniform shader sdfShape;
         uniform vec2 iResolution;
         uniform vec3 shadowColor;
         uniform vec2 shadowOffset;
         uniform float shadowRadius;
         uniform float isFilled;
-    )";
 
-    inline static const std::string mainFunctionCode_ = R"(
-        half4 main(float2 fragCoord)
-        {
-            vec2 coord = fragCoord;
-            float d = SDFMap(coord);
-            vec4 color = shadowEffect(coord, shadowOffset, d, shadowColor, shadowRadius, isFilled > 0.5);
-            return half4(color);
-        }
-    )";
-
-    inline static const std::string shadowEffectsFunctions_ = R"(
         // Input data:
         // vec2 coord - coordinates used to calculate SDFMap
         // vec2 shadowOffset - offset of the shadow
@@ -92,7 +79,7 @@ private:
             // Recalculate the distance if there is offset
             if (any(notEqual(shadowOffset, vec2(0.0))))
             {
-                d = SDFMap(coord - shadowOffset);
+                d = sdfShape.eval(coord - shadowOffset).a;
             }
 
             if (d <= shadowRadius)
@@ -104,6 +91,14 @@ private:
             }
 
             return color;
+        }
+
+        half4 main(float2 fragCoord)
+        {
+            vec2 coord = fragCoord;
+            float d = sdfShape.eval(coord).a;
+            vec4 color = shadowEffect(coord, shadowOffset, d, shadowColor, shadowRadius, isFilled > 0.5);
+            return half4(color);
         }
     )";
 };
