@@ -119,6 +119,15 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
     }
 }
 
+void GEVisualEffectContainer::UpdateRefractOutValue(float value)
+{
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == "FrostedGlassEffect") {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
+        }
+    }
+}
+
 void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
 {
     for (auto vef : GetFilters()) {
@@ -126,7 +135,7 @@ void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS, cornerRadius);
         }
      }
- }
+}
 
 void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
 {

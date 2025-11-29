@@ -697,7 +697,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams
 
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
-constexpr char GE_FILTER_FROSTED_GLASS_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
 struct GEFrostedGlassBlurShaderFilterParams {
     float radius = 0.0f;
     float refractOutPx = 0.8f;

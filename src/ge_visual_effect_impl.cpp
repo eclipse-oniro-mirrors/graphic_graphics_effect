@@ -2836,7 +2836,7 @@ void GEVisualEffectImpl::SetFrostedGlassBlurParams(const std::string& tag, const
     if (tag == GE_FILTER_FROSTED_GLASS_BLUR_RADIUS) {
         frostedGlassBlurParams_->radius = param;
     }
-    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTOUTPX) {
+    if (tag == GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX) {
         frostedGlassBlurParams_->refractOutPx = param;
     }
 }
