@@ -2707,7 +2707,8 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectRates(const std::string& tag
     }
 }
 
-void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(const std::string& tag, const std::pair<float, float>& param)
+void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
+    const std::string& tag, const std::pair<float, float>& param)
 {
     constexpr float MIN_W = 0.0f;
     constexpr float MAX_W = 1.0f;
