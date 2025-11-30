@@ -450,7 +450,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     builder->SetUniform("hlS", frostedGlassEffectParams_.edLightKBS[NUM_2]);
     // Adapt effect component
     builder->SetUniform("ecOffset", rect.GetLeft() - frostedGlassEffectParams_.maskLeftTop[NUM_0],
-                                    rect.GetTop() - frostedGlassEffectParams_.maskLeftTop[NUM_1]);
+        rect.GetTop() - frostedGlassEffectParams_.maskLeftTop[NUM_1]);
     return builder;
 }
 } // namespace Rosen

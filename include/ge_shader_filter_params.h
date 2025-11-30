@@ -635,7 +635,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDKBS[] = "FrostedGlassEffect_SdKB
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPOS[] = "FrostedGlassEffect_SdPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDNEG[] = "FrostedGlassEffect_SdNeg";
 // Env refraction parameters
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS[] = "FrostedGlassEffect_EnvLightParams"; // width. featherPx, OutPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS[] =
+    "FrostedGlassEffect_EnvLightParams"; // width. featherPx, OutPx
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES[] = "FrostedGlassEffect_EnvLightRates"; // 3, 2
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTKBS[] = "FrostedGlassEffect_EnvLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS[] = "FrostedGlassEffect_EnvLightPos";
