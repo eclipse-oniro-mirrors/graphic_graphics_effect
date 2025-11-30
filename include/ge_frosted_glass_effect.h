@@ -16,12 +16,12 @@
 #ifndef GRAPHICS_EFFECT_GE_FROSTED_GLASS_SHADER_EFFECT_H
 #define GRAPHICS_EFFECT_GE_FROSTED_GLASS_SHADER_EFFECT_H
 
-#include "ge_visual_effect.h"
-#include "ge_shader.h"
-#include "ge_common.h"
-
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+
+#include "ge_common.h"
+#include "ge_shader.h"
+#include "ge_visual_effect.h"
 
 namespace OHOS {
 namespace Rosen {

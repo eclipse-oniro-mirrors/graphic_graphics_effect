@@ -32,8 +32,8 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(D
     params.radius = blurParams_.radius;
 
     GEMESABlurShaderFilter blurFilter(params);
-    auto blurImage1 = blurFilter.OnProcessImageWithoutUpSampling(canvas, image, src, dst);
-    return blurImage1;
+    auto blurImage = blurFilter.OnProcessImageWithoutUpSampling(canvas, image, src, dst);
+    return blurImage;
 }
 } // namespace Rosen
 } // namespace OHOS

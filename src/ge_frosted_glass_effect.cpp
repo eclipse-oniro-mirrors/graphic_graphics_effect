@@ -336,7 +336,7 @@ GEFrostedGlassEffect::GEFrostedGlassEffect(const Drawing::GEFrostedGlassEffectPa
 bool GEFrostedGlassEffect::IsValidParam(float width, float height)
 {
     if (width < 1e-6 || height < 1e-6) {
-        LOGE("GEFrostedGlassEffect::MakeDrawingShader width or height less than 1e-6");
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader width or height less than 1e-6");
         return false;
     }
     return true;
@@ -362,19 +362,19 @@ void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float pr
     auto shader = Drawing::ShaderEffect::CreateImageShader(*cachedBlurImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix());
     if (shader == nullptr) {
-        LOGE("GEFrostedGlassEffect::create shader failed.");
+        GE_LOGE("GEFrostedGlassEffect::create shader failed.");
         return;
     }
 
     auto builder = MakeFrostedGlassShader(shader, rect);
     if (builder == nullptr) {
-        LOGE("GEFrostedGlassEffect::OnProcessImage builder is null");
+        GE_LOGE("GEFrostedGlassEffect::OnProcessImage builder is null");
         return;
     }
 
     auto frostedGlassShader = builder->MakeShader(nullptr, false);
-    if (!frostedGlassShader) {
-        LOGE("GEFrostedGlassEffect::MakeDrawingShader frostedGlassShader is nullptr");
+    if (frostedGlassShader == nullptr) {
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader frostedGlassShader is nullptr");
         return;
     }
     drShader_ = frostedGlassShader;
@@ -385,7 +385,7 @@ bool GEFrostedGlassEffect::InitFrostedGlassEffect()
     if (g_frostedGlassShaderEffect == nullptr) {
         g_frostedGlassShaderEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
         if (g_frostedGlassShaderEffect == nullptr) {
-            LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
+            GE_LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
             return false;
         }
     }
@@ -400,7 +400,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
 
     if (g_frostedGlassShaderEffect == nullptr) {
         if (!InitFrostedGlassEffect()) {
-            LOGE("GEFrostedGlassEffect::failed when initializing MagnifierEffect.");
+            GE_LOGE("GEFrostedGlassEffect::failed when initializing MagnifierEffect.");
             return nullptr;
         }
     }
@@ -409,7 +409,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     if (auto shape = frostedGlassEffectParams_.sdfShape) {
         sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
     } else {
-        LOGE("GEFrostedGlassEffect::MakeFrostedGlassShader sdfShapeShader is null");
+        GE_LOGE("GEFrostedGlassEffect::MakeFrostedGlassShader sdfShapeShader is null");
+        return nullptr;
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =

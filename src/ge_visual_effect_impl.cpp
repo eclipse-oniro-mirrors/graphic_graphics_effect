@@ -2676,6 +2676,9 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
 
 void GEVisualEffectImpl::HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param)
 {
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
     constexpr float V_MIN = -20.0f;
     constexpr float V_MAX = 20.0f;
 
@@ -2710,6 +2713,9 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectRates(const std::string& tag
 void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
     const std::string& tag, const std::pair<float, float>& param)
 {
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
     constexpr float MIN_W = 0.0f;
     constexpr float MAX_W = 1.0f;
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS) {
@@ -2725,6 +2731,9 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
 
 void GEVisualEffectImpl::HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param)
 {
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
     constexpr float KB_MIN = -20.0f;
     constexpr float KB_MAX = 20.0f;
     constexpr float S_MIN = 0.0f;
@@ -2753,6 +2762,9 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectKBS(const std::string& tag, 
 
 void GEVisualEffectImpl::HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param)
 {
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
     constexpr float V_MIN = -20.0f;
     constexpr float V_MAX = 20.0f;
 
