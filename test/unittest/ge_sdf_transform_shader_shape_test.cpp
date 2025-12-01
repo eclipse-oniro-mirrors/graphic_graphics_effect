@@ -24,7 +24,6 @@ using namespace testing::ext;
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-
 class GESDFTransformShaderShapeTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -340,6 +339,69 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateShaderEffect_003, TestSize.Level
     auto shader = shape.GenerateShaderEffect(100.0f, 100.0f, shapeShader, builder);
     EXPECT_EQ(shader, shapeShader);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateShaderEffect_003 end";
+}
+
+/**
+ * @tc.name: MatrixBoundaryTest_001
+ * @tc.desc: Verify maximum of matrix value
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_001 start";
+    float infinity = std::numeric_limits<float>::infinity();
+    GESDFTransformShapeParams param;
+    param.shape = CreateTestShape();
+    // Create a translation matrix
+    Drawing::Matrix matrix;
+    matrix.Translate(infinity, -infinity);
+    param.matrix = matrix;
+    GESDFTransformShaderShape shape(param);
+    auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
+    EXPECT_NE(shader, nullptr);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_001 end";
+}
+
+/**
+ * @tc.name: MatrixBoundaryTest_002
+ * @tc.desc: Verify maximum of matrix value
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_002 start";
+    float infinity = std::numeric_limits<float>::infinity();
+    GESDFTransformShapeParams param;
+    param.shape = CreateTestShape();
+    // Create a translation matrix
+    Drawing::Matrix matrix;
+    matrix.Rotate(infinity, 0, 0); // degree, px, py
+    param.matrix = matrix;
+    GESDFTransformShaderShape shape(param);
+    auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
+    EXPECT_NE(shader, nullptr);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_002 end";
+}
+
+/**
+ * @tc.name: MatrixBoundaryTest_003
+ * @tc.desc: Verify maximum of matrix value
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_003, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_003 start";
+    float infinity = std::numeric_limits<float>::infinity();
+    GESDFTransformShapeParams param;
+    param.shape = CreateTestShape();
+    // Create a translation matrix
+    Drawing::Matrix matrix;
+    matrix.Scale(infinity, -infinity, 0, 0); // sx, sy, px, py
+    param.matrix = matrix;
+    GESDFTransformShaderShape shape(param);
+    auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
+    EXPECT_NE(shader, nullptr);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_003 end";
 }
 } // namespace Drawing
 } // namespace Rosen

@@ -22,18 +22,20 @@
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
+#include "ge_direct_draw_on_canvas_pass.h"
 #include "ge_direction_light_shader_filter.h"
 #include "ge_dispersion_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
+#include "ge_frosted_glass_blur_shader_filter.h"
+#include "ge_frosted_glass_effect.h"
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
-#include "ge_hps_compatible_pass.h"
-#include "ge_hps_effect_filter.h"
 #include "ge_hps_build_pass.h"
+#include "ge_hps_effect_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
@@ -42,16 +44,16 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
-#include "sdf/ge_sdf_clip_shader.h"
-#include "sdf/ge_sdf_shader_filter.h"
-#include "sdf/ge_sdf_shadow_shader.h"
 #include "ge_sound_wave_filter.h"
 #include "ge_system_properties.h"
-#include "ge_visual_effect_impl.h"
 #include "ge_variable_radius_blur_shader_filter.h"
+#include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
 #include "sdf/ge_sdf_border_shader.h"
+#include "sdf/ge_sdf_clip_shader.h"
+#include "sdf/ge_sdf_shader_filter.h"
+#include "sdf/ge_sdf_shadow_shader.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -291,6 +293,24 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return out;
         }
     },
+    {GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetFrostedGlassEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetFrostedGlassEffectParams();
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEFrostedGlassEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                out = std::make_shared<GEFrostedGlassEffect>(*params);
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
 };
 
 GERender::GERender() {}
@@ -328,93 +348,166 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     auto resImage = image;
     for (auto& vef: veContainer.GetFilters()) {
         ShaderFilterEffectContext context {resImage, src, dst};
-        ApplyShaderFilter(canvas, vef, resImage, context);
+        ProcessShaderFilter(canvas, vef, resImage, context);
     }
 
     return resImage;
 }
 
-void GERender::ApplyShaderFilter(Drawing::Canvas& canvas, std::shared_ptr<Drawing::GEVisualEffect> visualEffect,
-                                 std::shared_ptr<Drawing::Image>& resImage, const ShaderFilterEffectContext& context)
+bool GERender::BeforeExecuteShaderFilter(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
+    std::shared_ptr<GEShaderFilter>& geShaderFilter)
 {
     if (visualEffect == nullptr) {
-        LOGD("GERender::ApplyShaderFilter visualEffect is null");
-        return;
+        LOGD("GERender::BeforeExecuteShaderFilter visualEffect is null");
+        return false;
     }
     auto ve = visualEffect->GetImpl();
-    std::shared_ptr<GEShaderFilter> geShaderFilter = GenerateShaderFilter(visualEffect);
+    geShaderFilter = GenerateShaderFilter(visualEffect);
     if (geShaderFilter == nullptr) {
-        LOGD("GERender::ApplyShaderFilter geShaderFilter is null");
-        return;
+        LOGD("GERender::BeforeExecuteShaderFilter geShaderFilter is null");
+        return false;
     }
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
-    resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
+    return true;
+}
+
+bool GERender::AfterExecuteShaderFilter(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
+    const std::shared_ptr<GEShaderFilter>& geShaderFilter)
+{
+    if (visualEffect == nullptr) {
+        LOGD("GERender::AfterExecuteShaderFilter visualEffect is null");
+        return false;
+    }
+    if (geShaderFilter == nullptr) {
+        LOGD("GERender::AfterExecuteShaderFilter geShaderFilter is null");
+        return false;
+    }
+    // Update information after executing the shader filter
+    auto ve = visualEffect->GetImpl();
     ve->SetCache(geShaderFilter->GetCache());
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
         isGasifyFilter_ = true;
     }
+    return true;
 }
 
-bool GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
-    const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+GERender::ApplyShaderFilterTarget GERender::DrawShaderFilter(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, Drawing::Brush& brush,
+    const ShaderFilterEffectContext& context)
 {
-    if (!context.image) {
-        LOGE("GERender::ApplyHpsGEImageEffect image is null");
-        return false;
+    std::shared_ptr<GEShaderFilter> geShaderFilter;
+    if (!BeforeExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        LOGD("GERender::DrawShaderFilter failed before executing shader filter");
+        return ApplyShaderFilterTarget::Error;
     }
-    const auto& visualEffects = veContainer.GetFilters();
+    // When BeforeExecuteShaderFilter returning true, geShaderFilter is not nullptr
+    bool status = geShaderFilter->DrawImage(canvas, context.image, context.src, context.dst, brush);
+    if (!status) {
+        return ApplyShaderFilterTarget::Error;
+    }
+    if (!AfterExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        return ApplyShaderFilterTarget::Error;
+    }
+    return ApplyShaderFilterTarget::DrawOnCanvas;
+}
+
+GERender::ApplyShaderFilterTarget GERender::ProcessShaderFilter(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::GEVisualEffect> visualEffect, std::shared_ptr<Drawing::Image>& resImage,
+    const ShaderFilterEffectContext& context)
+{
+    std::shared_ptr<GEShaderFilter> geShaderFilter;
+    if (!BeforeExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        return ApplyShaderFilterTarget::Error;
+    }
+    resImage = geShaderFilter->ProcessImage(canvas, resImage, context.src, context.dst);
+    if (!AfterExecuteShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
+        return ApplyShaderFilterTarget::Error;
+    }
+    return ApplyShaderFilterTarget::DrawOnImage;
+}
+
+// Internal helper for composing / transforming effects with GEFilterComposer.
+// Add passes in this function if needed.
+// Used in ApplyHpsGEImageEffect only.
+static bool ComposeEffects(Drawing::Canvas& canvas,
+    const std::vector<std::shared_ptr<GEVisualEffect>>& visualEffects,
+    const GERender::HpsGEImageEffectContext& context, std::vector<GEFilterComposable>& composables)
+{
     if (visualEffects.empty()) {
         return false;
     }
     GEFilterComposer composer;
-    auto hpsCompatiblePass = std::make_shared<GEHpsCompatiblePass>();
-    composer.Add(hpsCompatiblePass);
     composer.Add<GEHpsBuildPass>(canvas, context);
     composer.Add<GEMesaFusionPass>();
-    auto composables = GEFilterComposer::BuildComposables(visualEffects);
+    composer.Add<GEDirectDrawOnCanvasPass>();
+    composables = GEFilterComposer::BuildComposables(visualEffects);
     auto composerResult = composer.Run(composables);
-    if (!composerResult.anyPassChanged) {
-        return false; // No pass has changed the effect sequence, fallback to original route to ensure compatibility
+    if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables
+        return false;
+    }
+    return true;
+}
+
+GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canvas,
+    Drawing::GEVisualEffectContainer& veContainer, const HpsGEImageEffectContext& context,
+    std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+{
+    if (!context.image) {
+        LOGE("GERender::ApplyHpsGEImageEffect image is null");
+        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
+    }
+    const auto& visualEffects = veContainer.GetFilters();
+    std::vector<GEFilterComposable> composables;
+    if (!ComposeEffects(canvas, visualEffects, context, composables)) {
+        return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
     auto resImage = context.image;
     bool appliedHpsBlur = false;
-    bool lastAppliedGE = true;
+    bool lastAppliedHpsBlur = false;
+    ApplyShaderFilterTarget applyTarget = ApplyShaderFilterTarget::Error; // Last applied target
     for (auto& composable: composables) {
         auto currentImage = resImage;
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            // dst assigned with src because GE doesn't apply downsample like HPS
-            ShaderFilterEffectContext geContext {resImage, context.src, context.src};
-            ApplyShaderFilter(canvas, visualEffect, resImage, geContext);
-            lastAppliedGE = true;
+            ShaderFilterEffectContext geContext { resImage, context.src, context.dst };
+            applyTarget = DispatchGEShaderFilter(canvas, brush, composable, visualEffect, geContext);
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
-            appliedHpsBlur |= hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
-            lastAppliedGE = false;
+            lastAppliedHpsBlur = hpsEffect->ApplyHpsEffect(canvas, currentImage, resImage, hpsEffectContext);
+            appliedHpsBlur |= lastAppliedHpsBlur;
+            applyTarget =
+                lastAppliedHpsBlur ? ApplyShaderFilterTarget::DrawOnCanvas : ApplyShaderFilterTarget::DrawOnImage;
         } else {
             LOGE("GERender::ApplyHpsGEImageEffect unhandled composable type");
         }
     }
 
     outImage = resImage;
-    if (lastAppliedGE) { // ApplyShaderFilter does not draw to canvas by default
-        DrawToCanvas(canvas, context, outImage, brush);
-        return hpsCompatiblePass->IsBlurFilterExists();
-    } else { // ApplyHpsEffect have done canvas sync
-        return appliedHpsBlur; // If false, fallback to HPS 1.0 late-applied kawase blur
-    }
+    return { applyTarget == ApplyShaderFilterTarget::DrawOnCanvas, appliedHpsBlur }; // canvas drawn & applied hps blur
 }
 
-void GERender::DrawToCanvas(Drawing::Canvas& canvas, const HpsGEImageEffectContext& context,
-                            std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush)
+GERender::ApplyShaderFilterTarget GERender::DispatchGEShaderFilter(Drawing::Canvas& canvas, Drawing::Brush& brush,
+    GEFilterComposable& composable, std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
+    ShaderFilterEffectContext& geContext)
 {
-    if (outImage != nullptr) {
-        canvas.AttachBrush(brush);
-        canvas.DrawImageRect(*outImage, context.src, context.dst, context.sampling);
-        canvas.DetachBrush();
+    ApplyShaderFilterTarget applyTarget;
+    // Enabled direct drawing on canvas
+    if (DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composable)) {
+        applyTarget = DrawShaderFilter(canvas, visualEffect, brush, geContext);
+        if (applyTarget == ApplyShaderFilterTarget::DrawOnCanvas) {
+            return applyTarget;
+        }
     }
+    // Compatibility issue: dst assigned with src is a legacy issue when RSDrawingFilter calls
+    // geRender->ApplyImageEffect(). When the issue is resolved, please remove this line.
+    geContext.dst = geContext.src;
+    // Direct drawing on canvas is disabled / not supported / failed, fallback to ProcessShaderFilter
+    applyTarget = ProcessShaderFilter(canvas, visualEffect, geContext.image, geContext);
+    return applyTarget;
 }
 
 // true represent Draw Kawase or Mesa succ, false represent Draw Kawase or Mesa false or no Kawase and Mesa
@@ -559,10 +652,38 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
             return dmShader;
             break;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
+            const auto &params = ve->GetFrostedGlassBlurParams();
+            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
+                sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+                static_cast<void *>(params.get()));
+            if (!object) {
+                return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+            }
+            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+            return dmShader;
+            break;
+        }
         default:
             break;
     }
     return nullptr;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFrostedGlassBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &params = ve->GetFrostedGlassBlurParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
+        sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+        static_cast<void *>(params.get()));
+    if (!object) {
+        return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateShaderKawaseBlur(
@@ -701,6 +822,10 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::GRID_WARP: {
             const auto &params = ve->GetGridWarpFilterParams();
             shaderFilter = std::make_shared<GEGridWarpShaderFilter>(*params);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
+            shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
         default:

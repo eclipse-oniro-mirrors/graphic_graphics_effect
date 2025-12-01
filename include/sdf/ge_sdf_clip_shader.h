@@ -50,16 +50,14 @@ public:
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFClipEffect();
     Drawing::GESDFClipShaderParams params_;
-    std::string shaderCode_;
-    std::optional<Drawing::GESDFTreeProcessor> sdfTreeProcessor_;
-    std::optional<Drawing::RuntimeShaderBuilder> shaderEffectBuilder_;
 
-    inline static const std::string mainFunctionCode_ = R"(
+    inline static const std::string shaderCode_ = R"(
+        uniform shader sdfShape;
+
         half4 main(float2 fragCoord)
         {
             vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
-            vec2 coord = fragCoord;
-            float d = SDFMap(coord);
+            float d = sdfShape.eval(fragCoord).a;
             color.a = 1.0 - smoothstep(-1.0, 0.0, d);
             return half4(color);
         }

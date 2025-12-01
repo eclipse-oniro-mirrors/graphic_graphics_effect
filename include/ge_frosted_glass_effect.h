@@ -1,0 +1,56 @@
+/*
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef GRAPHICS_EFFECT_GE_FROSTED_GLASS_SHADER_EFFECT_H
+#define GRAPHICS_EFFECT_GE_FROSTED_GLASS_SHADER_EFFECT_H
+
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+
+#include "ge_common.h"
+#include "ge_shader.h"
+#include "ge_visual_effect.h"
+
+namespace OHOS {
+namespace Rosen {
+class GEFrostedGlassEffect : public GEShader {
+public:
+    GEFrostedGlassEffect(const Drawing::GEFrostedGlassEffectParams& params);
+    ~GEFrostedGlassEffect() override = default;
+    GEFrostedGlassEffect(const GEFrostedGlassEffect&) = delete;
+    GEFrostedGlassEffect(const GEFrostedGlassEffect&&) = delete;
+    GEFrostedGlassEffect& operator=(const GEFrostedGlassEffect&) = delete;
+    GEFrostedGlassEffect& operator=(const GEFrostedGlassEffect&&) = delete;
+
+    const std::string GetDescription() const { return "GEFrostedGlassEffect"; }
+
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
+        std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect);
+private:
+    bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
+        const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder);
+    bool IsValidParam(float width, float height);
+    bool InitFrostedGlassEffect();
+
+    Drawing::GEFrostedGlassEffectParams frostedGlassEffectParams_;
+};
+
+} // namespace Rosen
+} // namespace OHOS
+
+#endif // GRAPHICS_EFFECT_GE_FROSTED_GLASS_SHADER_EFFECT_H

@@ -101,6 +101,30 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
                 vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK, useeffectMask);
             }
         }
+        if (vef->GetName() == "FrostedGlassEffect") {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP, std::make_pair(left, top));
+            if (vef->GetImpl() == nullptr) {
+                continue;
+            }
+            std::shared_ptr<GEFrostedGlassEffectParams> params = vef->GetImpl()->GetFrostedGlassEffectParams();
+            if (params->useEffectMask != nullptr) {
+                GEUseEffectMaskParams maskParam;
+                maskParam.useEffect = params->useEffectMask->GetUseEffect();
+                maskParam.image = cachedImage;
+                std::shared_ptr<GEUseEffectShaderMask> useEffectMask =
+                    std::make_shared<GEUseEffectShaderMask>(maskParam);
+                vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK, useEffectMask);
+            }
+        }
+    }
+}
+
+void GEVisualEffectContainer::UpdateRefractOutValue(float value)
+{
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == "FrostedGlassEffect") {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
+        }
     }
 }
 
@@ -111,13 +135,16 @@ void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS, cornerRadius);
         }
      }
- }
+}
 
 void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
 {
     for (auto vef : GetFilters()) {
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX, totalMatrix);
+        }
+        if (vef->GetName() == "FrostedGlassEffect") {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX, totalMatrix);
         }
     }
 }

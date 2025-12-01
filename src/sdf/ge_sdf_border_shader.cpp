@@ -23,8 +23,7 @@ namespace OHOS {
 namespace Rosen {
 static constexpr float SDF_BORDER_MIN_THRESHOLD = 0.0001f;
 
-GESDFBorderShader::GESDFBorderShader(const Drawing::GESDFBorderShaderParams& params)
-    :params_(params), sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params.shape))
+GESDFBorderShader::GESDFBorderShader(const Drawing::GESDFBorderShaderParams& params) : params_(params)
 {}
 
 void GESDFBorderShader::MakeDrawingShader(const Drawing::Rect &rect, float progress)
@@ -32,34 +31,51 @@ void GESDFBorderShader::MakeDrawingShader(const Drawing::Rect &rect, float progr
     drShader_ = MakeSDFBorderShader(rect);
 }
 
+void GESDFBorderShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    Preprocess(canvas, rect); // to calculate your cache data
+    MakeDrawingShader(rect, -1.f); // not use progress
+    auto shader = GetDrawingShader();
+    if (shader == nullptr) {
+        return;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(rect);
+    canvas.DetachBrush();
+}
+
 std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(const Drawing::Rect &rect)
 {
-    if (!rect.IsValid()) {
-        GE_LOGE("GESDFBorderShader::MakeSDFBorderShader rect is invalid.");
-        return nullptr;
-    }
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     if (height < 1e-6 || width < 1e-6) {
         return nullptr;
     }
 
-    if (!params_.shape || !sdfTreeProcessor_) {
+    if (!params_.shape) {
         GE_LOGE("GESDFBorderShader::MakeSDFBorderShader shape is invalid.");
         return nullptr;
     }
 
-    if (!shaderEffectBuilder_) {
-        auto sdfBorderEffect = GetSDFBorderEffect();
-        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(sdfBorderEffect);
+    auto sdfShader = params_.shape->GenerateDrawingShader(width, height);
+    if (sdfShader == nullptr) {
+        GE_LOGE("GESDFBorderShader: failed generate GESDFBorderShader.");
+        return nullptr;
     }
 
-    sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
-
-    shaderEffectBuilder_->SetUniform("u_borderColor", params_.border.color.GetRedF(), params_.border.color.GetGreenF(),
+    auto sdfEffect = GetSDFBorderEffect();
+    if (sdfEffect == nullptr) {
+        GE_LOGE("GESDFBorderShader: failed GetSDFBorderEffect.");
+        return nullptr;
+    }
+    auto shaderEffectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfEffect);
+    shaderEffectBuilder->SetChild("sdfShape", sdfShader);
+    shaderEffectBuilder->SetUniform("u_borderColor", params_.border.color.GetRedF(), params_.border.color.GetGreenF(),
         params_.border.color.GetBlueF());
-    shaderEffectBuilder_->SetUniform("u_borderWidth", std::max(params_.border.width, SDF_BORDER_MIN_THRESHOLD));
-    auto outShader = shaderEffectBuilder_->MakeShader(nullptr, false);
+    shaderEffectBuilder->SetUniform("u_borderWidth", std::max(params_.border.width, SDF_BORDER_MIN_THRESHOLD));
+    auto outShader = shaderEffectBuilder->MakeShader(nullptr, false);
     if (outShader == nullptr) {
         GE_LOGE("GESDFBorderShader::MakeSDFBorderShader sdfBorderShader is nullptr");
         return nullptr;
@@ -69,17 +85,11 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(co
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFBorderShader::GetSDFBorderEffect()
 {
-    if (shaderCode_.empty()) {
-        shaderCode_ += borderHeaders_;
-        std::string headers;
-        std::string sdfMaskFunctions;
-        sdfTreeProcessor_->ProcessSDFShape(headers, sdfMaskFunctions);
-        shaderCode_ += headers;
-        shaderCode_ += sdfMaskFunctions;
-        shaderCode_ += borderEffectsFunctions_;
-        shaderCode_ += mainFunctionCode_;
+    static std::shared_ptr<Drawing::RuntimeEffect> sdfBorderShader = nullptr;
+    if (sdfBorderShader == nullptr) {
+        sdfBorderShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }
-    return Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+    return sdfBorderShader;
 }
 }
 }
