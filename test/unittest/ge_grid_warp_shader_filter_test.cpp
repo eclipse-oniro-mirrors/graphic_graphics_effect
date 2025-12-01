@@ -129,6 +129,114 @@ HWTEST_F(GEGridWarpShaderFilterTest, Constructor_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: Constructor_002
+ * @tc.desc: Verify the constructor with specific ControlPoints values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEGridWarpShaderFilterTest, Constructor_002, TestSize.Level1)
+{
+    size_t pointsNum = GEGridWarpShaderFilter::GRID_WARP_MAIN_POINT_NUM;
+    Drawing::GEGridWarpShaderFilterParams params;
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.gridPoints[i].first = (i % 3) * 0.5f;
+        params.gridPoints[i].second = (i / 3) * 0.5f;
+    }
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.rotationAngles[i].first = 0.0f;
+        params.rotationAngles[i].second = 0.0f;
+    }
+
+    GEGridWarpShaderFilter filter(params);
+    const float pointsDistance = 1.0f / 6.0f;
+
+    std::array<Drawing::Point, GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM> bezierPatch1 = {
+        Drawing::Point{0.5f, 0.0f}, Drawing::Point{0.5f + pointsDistance, 0.0f},
+        Drawing::Point{1.0f - pointsDistance, 0.0f}, Drawing::Point{1.0f, 0.0f},
+        Drawing::Point{1.0f, pointsDistance}, Drawing::Point{1.0f, 0.5f - pointsDistance},
+        Drawing::Point{1.0f, 0.5f}, Drawing::Point{1.0f - pointsDistance, 0.5f},
+        Drawing::Point{0.5f + pointsDistance, 0.5f}, Drawing::Point{0.5f, 0.5f},
+        Drawing::Point{0.5f, 0.5f - pointsDistance}, Drawing::Point{0.5f, pointsDistance}
+    };
+
+    for (size_t i = 0; i < GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM; i++) {
+        EXPECT_NEAR(filter.bezierPatch_[1][i].GetX(), bezierPatch1[i].GetX(), 1e-6);
+        EXPECT_NEAR(filter.bezierPatch_[1][i].GetY(), bezierPatch1[i].GetY(), 1e-6);
+    }
+}
+
+/**
+ * @tc.name: Constructor_003
+ * @tc.desc: Verify the constructor with specific ControlPoints values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEGridWarpShaderFilterTest, Constructor_003, TestSize.Level1)
+{
+    size_t pointsNum = GEGridWarpShaderFilter::GRID_WARP_MAIN_POINT_NUM;
+    Drawing::GEGridWarpShaderFilterParams params;
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.gridPoints[i].first = (i % 3) * 0.5f;
+        params.gridPoints[i].second = (i / 3) * 0.5f;
+    }
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.rotationAngles[i].first = 0.0f;
+        params.rotationAngles[i].second = 0.0f;
+    }
+
+    GEGridWarpShaderFilter filter(params);
+    const float pointsDistance = 1.0f / 6.0f;
+
+    std::array<Drawing::Point, GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM> bezierPatch2 = {
+        Drawing::Point{0.0f, 0.5f}, Drawing::Point{pointsDistance, 0.5f},
+        Drawing::Point{0.5f - pointsDistance, 0.5f}, Drawing::Point{0.5f, 0.5f},
+        Drawing::Point{0.5f, 0.5f + pointsDistance}, Drawing::Point{0.5f, 1.0f - pointsDistance},
+        Drawing::Point{0.5f, 1.0f}, Drawing::Point{0.5f - pointsDistance, 1.0f},
+        Drawing::Point{pointsDistance, 1.0f}, Drawing::Point{0.0f, 1.0f},
+        Drawing::Point{0.0f, 1.0f - pointsDistance}, Drawing::Point{0.0f, 0.5f + pointsDistance}
+    };
+
+    for (size_t i = 0; i < GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM; i++) {
+        EXPECT_NEAR(filter.bezierPatch_[2][i].GetX(), bezierPatch2[i].GetX(), 1e-6);
+        EXPECT_NEAR(filter.bezierPatch_[2][i].GetY(), bezierPatch2[i].GetY(), 1e-6);
+    }
+}
+
+/**
+ * @tc.name: Constructor_004
+ * @tc.desc: Verify the constructor with specific ControlPoints values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEGridWarpShaderFilterTest, Constructor_004, TestSize.Level1)
+{
+    size_t pointsNum = GEGridWarpShaderFilter::GRID_WARP_MAIN_POINT_NUM;
+    Drawing::GEGridWarpShaderFilterParams params;
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.gridPoints[i].first = (i % 3) * 0.5f;
+        params.gridPoints[i].second = (i / 3) * 0.5f;
+    }
+    for (size_t i = 0; i < pointsNum; ++i) {
+        params.rotationAngles[i].first = 0.0f;
+        params.rotationAngles[i].second = 0.0f;
+    }
+
+    GEGridWarpShaderFilter filter(params);
+    const float pointsDistance = 1.0f / 6.0f;
+
+    std::array<Drawing::Point, GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM> bezierPatch3 = {
+        Drawing::Point{0.5f, 0.5f}, Drawing::Point{0.5f + pointsDistance, 0.5f},
+        Drawing::Point{1.0f - pointsDistance, 0.5f}, Drawing::Point{1.0f, 0.5f},
+        Drawing::Point{1.0f, 0.5f + pointsDistance}, Drawing::Point{1.0f, 1.0f - pointsDistance},
+        Drawing::Point{1.0f, 1.0f}, Drawing::Point{1.0f - pointsDistance, 1.0f},
+        Drawing::Point{0.5f + pointsDistance, 1.0f}, Drawing::Point{0.5f, 1.0f},
+        Drawing::Point{0.5f, 1.0f - pointsDistance}, Drawing::Point{0.5f, 0.5f + pointsDistance}
+    };
+
+    for (size_t i = 0; i < GEGridWarpShaderFilter::BEZIER_WARP_POINT_NUM; i++) {
+        EXPECT_NEAR(filter.bezierPatch_[3][i].GetX(), bezierPatch3[i].GetX(), 1e-6);
+        EXPECT_NEAR(filter.bezierPatch_[3][i].GetY(), bezierPatch3[i].GetY(), 1e-6);
+    }
+}
+
+/**
  * @tc.name: CalcTexCoords_001
  * @tc.desc: Verify the CalcTexCoords function with given image dimensions
  * @tc.type: FUNC
