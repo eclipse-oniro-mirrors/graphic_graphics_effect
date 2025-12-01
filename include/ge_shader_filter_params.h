@@ -59,6 +59,7 @@ struct CanvasInfo {
     float tranX = 0.0f;
     float tranY = 0.0f;
     Drawing::Matrix mat;
+    RectF materialDst;
 };
 
 constexpr int ARRAY_SIZE_NINE = 9;

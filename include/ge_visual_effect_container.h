@@ -35,7 +35,8 @@ public:
 
     void UpdateCacheDataFrom(const std::shared_ptr<GEVisualEffectContainer>& ge);
 
-    void SetGeometry(const Drawing::Matrix& matrix, const Drawing::RectF& bound, float geoWidth, float geoHeight);
+    void SetGeometry(const Drawing::Matrix& matrix, const Drawing::RectF& bound, const Drawing::RectF& materialDst,
+        float geoWidth, float geoHeight);
 
     void SetDisplayHeadroom(float headroom);
 
