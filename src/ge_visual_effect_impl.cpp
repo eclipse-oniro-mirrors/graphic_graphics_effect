@@ -2791,7 +2791,7 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
         return;
     }
     constexpr float MIN_W = 0.0f;
-    constexpr float MAX_W = 1.0f;
+    constexpr float MAX_W = 5.0f;
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS) {
         frostedGlassEffectParams_->weightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
