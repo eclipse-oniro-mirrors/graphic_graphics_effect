@@ -845,8 +845,6 @@ struct GESDFPixelmapShapeParams {
     std::shared_ptr<Drawing::Image> image;
 };
 
-constexpr char GE_FILTER_SDF[] = "SDFFilter";
-constexpr char GE_FILTER_SDF_SHAPE[] = "SDFFilter_Shape";
 struct GESDFBorderParams final {
     Color color;
     float width = 0.0f;
@@ -867,12 +865,6 @@ struct GESDFShadowParams final {
     float radius = 0.0;
     Drawing::Path path;
     bool isFilled = false;
-};
-
-struct GESDFFilterParams {
-    std::shared_ptr<GESDFShaderShape> shape;
-    std::optional<GESDFBorderParams> border;
-    std::optional<GESDFShadowParams> shadow;
 };
 
 constexpr char GE_SHADER_SDF_SHADOW[] = "SDFShadow";

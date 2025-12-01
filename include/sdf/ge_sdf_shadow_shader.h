@@ -18,7 +18,6 @@
 
 #include "effect/runtime_shader_builder.h"
 #include "ge_filter_type_info.h"
-#include "ge_sdf_tree_processor.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"

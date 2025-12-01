@@ -345,12 +345,6 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeHarmoniumEffectParams();
         }
     },
-    { GE_FILTER_SDF,
-        [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF);
-            impl->MakeSDFFilterParams();
-        }
-    },
     { GE_SHAPE_SDF_UNION_OP,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
@@ -1223,16 +1217,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
 void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
 {
     switch (filterType_) {
-        case FilterType::SDF: {
-            if (sdfFilterParams_ == nullptr || !param) {
-                return;
-            }
-
-            if (tag == GE_FILTER_SDF_SHAPE) {
-                sdfFilterParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
-            }
-            break;
-        }
         case FilterType::SDF_UNION_OP: {
             if (sdfUnionOpShapeParams_ == nullptr || !param) {
                 return;
@@ -1502,9 +1486,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParams& border)
 {
-    if (tag == GE_FILTER_SDF_SHAPE) {
-        sdfFilterParams_->border = border;
-    }
     if (tag == GE_SHADER_SDF_BORDER_BORDER && sdfBorderShaderParams_) {
         sdfBorderShaderParams_->border = border;
     }
@@ -1512,10 +1493,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParam
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFShadowParams& shadow)
 {
-    if (tag == GE_FILTER_SDF_SHAPE) {
-        sdfFilterParams_->shadow = shadow;
-    }
-
     if (tag == GE_SHADER_SDF_SHADOW_SHADOW && sdfShadowShaderParams_) {
         sdfShadowShaderParams_->shadow = shadow;
     }
@@ -2366,30 +2343,6 @@ void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
 
     if (tag == GEX_SHADER_LIGHT_CAVE_PROGRESS) {
         lightCaveShaderParams_->progress = param;
-    }
-}
-
-void GEVisualEffectImpl::SetBorder(const Color& color, float width)
-{
-    if (sdfFilterParams_) {
-        sdfFilterParams_->border = std::make_optional<GESDFBorderParams>();
-        sdfFilterParams_->border->color = color;
-        sdfFilterParams_->border->width = width;
-    }
-}
-
-void GEVisualEffectImpl::SetShadow(const Drawing::Color& color, float offsetX,
-                                   float offsetY, float radius,
-                                   Drawing::Path path, bool isFilled)
-{
-    if (sdfFilterParams_) {
-        sdfFilterParams_->shadow = std::make_optional<GESDFShadowParams>();
-        sdfFilterParams_->shadow->color = color;
-        sdfFilterParams_->shadow->offsetX = offsetX;
-        sdfFilterParams_->shadow->offsetY = offsetY;
-        sdfFilterParams_->shadow->radius = radius;
-        sdfFilterParams_->shadow->path = path;
-        sdfFilterParams_->shadow->isFilled = isFilled;
     }
 }
 

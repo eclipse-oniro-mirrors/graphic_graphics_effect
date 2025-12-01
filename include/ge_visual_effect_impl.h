@@ -375,16 +375,6 @@ public:
         return variableRadiusBlurParams_;
     }
 
-    const std::shared_ptr<GESDFFilterParams>& GetSDFFilterParams() const
-    {
-        return sdfFilterParams_;
-    }
-
-    void MakeSDFFilterParams()
-    {
-        sdfFilterParams_ = std::make_shared<GESDFFilterParams>();
-    }
-
     const std::shared_ptr<GESDFUnionOpShapeParams>& GetSDFUnionOpShapeParams() const
     {
         return sdfUnionOpShapeParams_;
@@ -626,10 +616,6 @@ public:
         return frostedGlassBlurParams_;
     }
 
-    void SetBorder(const Color& borderColor, float borderWidth);
-    void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
-                  float radius, Drawing::Path path, bool isFilled);
-
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -751,7 +737,6 @@ private:
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
     std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
-    std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;

@@ -52,7 +52,6 @@
 #include "ge_wavy_ripple_light_shader.h"
 #include "sdf/ge_sdf_border_shader.h"
 #include "sdf/ge_sdf_clip_shader.h"
-#include "sdf/ge_sdf_shader_filter.h"
 #include "sdf/ge_sdf_shadow_shader.h"
 
 namespace OHOS {
@@ -793,15 +792,6 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
             shaderFilter = GenerateExtShaderFilter(ve);
             break;
-        }
-        case Drawing::GEVisualEffectImpl::FilterType::SDF: {
-            const auto& params = ve->GetSDFFilterParams();
-            if (!sdfShaderFilter_) {
-                sdfShaderFilter_ = std::make_shared<GESDFShaderFilter>(*params);
-            } else {
-                sdfShaderFilter_->Update(*params);
-            }
-            shaderFilter = sdfShaderFilter_;
         }
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST: {
             shaderFilter = GenerateExtShaderFilter(ve);
