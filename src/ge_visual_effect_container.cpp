@@ -68,12 +68,11 @@ std::shared_ptr<GEVisualEffect> GEVisualEffectContainer::GetGEVisualEffect(const
     return nullptr;
 }
 
-
 void GEVisualEffectContainer::SetGeometry(const Drawing::Matrix& matrix, const Drawing::RectF& bound,
-    float geoWidth, float geoHeight)
+    const Drawing::RectF& materialDst, float geoWidth, float geoHeight)
 {
     Drawing::CanvasInfo info { std::ceil(geoWidth), std::ceil(geoHeight),
-        bound.GetLeft(), bound.GetTop(), matrix };
+        bound.GetLeft(), bound.GetTop(), matrix, materialDst};
     for (auto vef : GetFilters()) {
         if (vef) {
             vef->SetCanvasInfo(info);
