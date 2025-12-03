@@ -35,6 +35,7 @@
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
 #include "ge_hps_build_pass.h"
+#include "ge_hps_upscale_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
@@ -444,6 +445,7 @@ static bool ComposeEffects(Drawing::Canvas& canvas,
     composer.Add<GEHpsBuildPass>(canvas, context);
     composer.Add<GEMesaFusionPass>();
     composer.Add<GEDirectDrawOnCanvasPass>();
+    composer.Add<GEHpsUpscalePass>();
     composables = GEFilterComposer::BuildComposables(visualEffects);
     auto composerResult = composer.Run(composables);
     if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables

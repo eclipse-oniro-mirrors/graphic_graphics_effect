@@ -31,6 +31,11 @@ constexpr static float RADIUS_SCALE = 2.0f;
 
 GERadialGradientShaderMask::GERadialGradientShaderMask(GERadialGradientShaderMaskParams param) : param_(param) {}
 
+GERadialGradientShaderMaskParams GERadialGradientShaderMask::GetGERadialGradientShaderMaskParams()
+{
+    return param_;
+}
+
 std::shared_ptr<ShaderEffect> GERadialGradientShaderMask::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GERadialGradientShaderMask::GenerateDrawingShader, Type: %s, Width: %g, Height: %g",
