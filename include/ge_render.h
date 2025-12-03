@@ -31,7 +31,6 @@
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_container.h"
 #include "image/image.h"
-#include "sdf/ge_sdf_shader_filter.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -231,7 +230,6 @@ private:
         const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve);
     static bool isMesablurAllEnable_;
     bool isGasifyFilter_ = false;
-    std::shared_ptr<GESDFShaderFilter> sdfShaderFilter_;
 };
 
 } // namespace GraphicsEffectEngine
