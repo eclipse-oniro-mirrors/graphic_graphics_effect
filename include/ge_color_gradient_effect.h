@@ -16,9 +16,9 @@
 #ifndef GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_EFFECT_H
 #define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_EFFECT_H
 
-#include "ge_visual_effect.h"
-#include "ge_shader.h"
 #include "ge_common.h"
+#include "ge_shader.h"
+#include "ge_visual_effect.h"
 
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
@@ -37,11 +37,10 @@ public:
     const std::string GetDescription() const { return "GEColorGradientEffect"; }
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+
 private:
-    static void MakeColorGradientEffect();
-    static void MakeColorGradientEffectWithMask();
     void CalculateBlenderCol();
-    bool IsValidParam(float width, float height);
+    bool CreateShaderEffect(float width, float height);
     void SetUniform(float width, float height);
     float CalculateCompressRatio();
 
@@ -50,7 +49,7 @@ private:
     std::vector<Drawing::Point> positions_;
     std::vector<float> strengths_;
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
-    int paramColorSize_ = 0;
+    size_t paramColorSize_ = 0;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
     float gradientBlend_ = 6.0f;
     float gradientBlendK_ = 20.0f;

@@ -73,39 +73,38 @@ HWTEST_F(GEColorGradientEffectTest, MakeDrawingShader_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: IsValidParam_001
- * @tc.desc: test IsValidParam function
+ * @tc.name: CreateShaderEffect_001
+ * @tc.desc: test CreateShaderEffect function
  * @tc.type: FUNC
  */
-HWTEST_F(GEColorGradientEffectTest, IsValidParam_001, TestSize.Level1)
+HWTEST_F(GEColorGradientEffectTest, CreateShaderEffect_001, TestSize.Level1)
 {
     Drawing::GEXColorGradientEffectParams param{};
     auto shaderNoMask = std::make_shared<GEColorGradientEffect>(param);
-    EXPECT_FALSE(shaderNoMask->IsValidParam(0.0f, 1.0f));
-    EXPECT_FALSE(shaderNoMask->IsValidParam(1.0f, 0.0f));
+    EXPECT_FALSE(shaderNoMask->CreateShaderEffect(0.0f, 1.0f));
+    EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 0.0f));
     shaderNoMask->positions_.clear();
     shaderNoMask->strengths_.clear();
     shaderNoMask->colors_.clear();
-    EXPECT_FALSE(shaderNoMask->IsValidParam(1.0f, 1.0f));
+    EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
     const size_t size_colors = 12;
     auto colors = std::vector<Drawing::Color4f>(size_colors, Drawing::Color4f{0.f, 0.0f, 0.0f, 0.0f});
     shaderNoMask->colors_ = colors;
-    EXPECT_FALSE(shaderNoMask->IsValidParam(1.0f, 1.0f));
+    EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
     auto positions = std::vector<Drawing::Point>(size_colors, Drawing::Point{0.5f, 0.3f});
     shaderNoMask->positions_ = positions;
-    EXPECT_FALSE(shaderNoMask->IsValidParam(1.0f, 1.0f));
+    EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
     auto strengths = std::vector<float>(size_colors, 2.0f);
     shaderNoMask->strengths_ = strengths;
-    EXPECT_TRUE(shaderNoMask->IsValidParam(1.0f, 1.0f));
-    EXPECT_TRUE(shaderNoMask->IsValidParam(1.0f, 1.0f));
-
+    EXPECT_TRUE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
+    EXPECT_TRUE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
     param.mask_ = std::make_shared<Drawing::GERadialGradientShaderMask>(maskParam_);
     auto shaderWithMask = std::make_shared<GEColorGradientEffect>(param);
     shaderWithMask->colors_ = colors;
     shaderWithMask->positions_ = positions;
     shaderWithMask->strengths_ = strengths;
-    EXPECT_TRUE(shaderWithMask->IsValidParam(1.0f, 1.0f));
-    EXPECT_TRUE(shaderWithMask->IsValidParam(1.0f, 1.0f));
+    EXPECT_TRUE(shaderWithMask->CreateShaderEffect(1.0f, 1.0f));
+    EXPECT_TRUE(shaderWithMask->CreateShaderEffect(1.0f, 1.0f));
 }
 } // namespace Rosen
 } // namespace OHOS

@@ -24,8 +24,8 @@ namespace OHOS {
 namespace Rosen {
 
 namespace {
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> colorGradientShaderEffect_ = nullptr;
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> colorGradientShaderEffectHasMask_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffectHasMask_ = nullptr;
 constexpr static uint8_t GRADIENT_POSITION_CHANNEL = 2;
 constexpr static uint8_t GRADIENT_COLOR_CHANNEL = 4;
 constexpr static uint8_t GRADIENT_ARRAY_NUM = 12;
@@ -159,44 +159,44 @@ const std::string COLOR_GRADIENT_SHADER_STRING = COLOR_GRADIENT_SHADER_HEAD +
     COLOR_GRADIENT_SHADER_COMMN + COLOR_GRADIENT_SHADER_END;
 const std::string COLOR_GRADIENT_SHADER_STRING_WITH_MASK = COLOR_GRADIENT_SHADER_WITH_MASK_HEAD +
     COLOR_GRADIENT_SHADER_COMMN + COLOR_GRADIENT_SHADER_WITH_MASK_END;
-} // namespace
 
-GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffectParams& param)
+void MakeColorGradientEffect()
 {
-    paramColorSize_ = int(param.colorNum_);
-    blend_colors_ = std::vector<Drawing::Color4f>(GRADIENT_ARRAY_NUM, {0.0f, 0.0f, 0.0f, 0.0f});
-    for (int i = 0; i < GRADIENT_ARRAY_NUM; i++) {
-        colors_.push_back(param.colors_[i]);
-        positions_.push_back(param.positions_[i]);
-        strengths_.push_back(param.strengths_[i]);
-    }
-    if (param.mask_) {
-        mask_ = param.mask_;
-    }
-    gradientBlend_ = param.blend_;
-    gradientBlendK_ = param.blendk_;
-}
-
-void GEColorGradientEffect::MakeColorGradientEffect()
-{
-    if (colorGradientShaderEffect_ != nullptr) {
+    if (g_colorGradientShaderEffect_ != nullptr) {
         return;
     }
-    colorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING);
-    if (colorGradientShaderEffect_ == nullptr) {
+    g_colorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING);
+    if (g_colorGradientShaderEffect_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeColorGradientEffect colorGradientShaderEffect create failed");
     }
 }
 
-void GEColorGradientEffect::MakeColorGradientEffectWithMask()
+void MakeColorGradientEffectWithMask()
 {
-    if (colorGradientShaderEffectHasMask_ != nullptr) {
+    if (g_colorGradientShaderEffectHasMask_ != nullptr) {
         return;
     }
-    colorGradientShaderEffectHasMask_ = Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING_WITH_MASK);
-    if (colorGradientShaderEffectHasMask_ == nullptr) {
+    g_colorGradientShaderEffectHasMask_ =
+        Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING_WITH_MASK);
+    if (g_colorGradientShaderEffectHasMask_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeColorGradientEffectWithMask colorGradientShaderEffect create failed");
     }
+}
+} // namespace
+
+GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffectParams& param)
+{
+    paramColorSize_ = static_cast<size_t>(std::max(param.colorNum_, 0.0f));
+    blend_colors_ = std::vector<Drawing::Color4f>(GRADIENT_ARRAY_NUM, {0.0f, 0.0f, 0.0f, 0.0f});
+    auto size = blend_colors_.size();
+    for (size_t i = 0; i < size; i++) {
+        colors_.push_back(param.colors_[i]);
+        positions_.push_back(param.positions_[i]);
+        strengths_.push_back(param.strengths_[i]);
+    }
+    mask_ = param.mask_;
+    gradientBlend_ = param.blend_;
+    gradientBlendK_ = param.blendk_;
 }
 
 float GEColorGradientEffect::CalculateCompressRatio()
@@ -206,10 +206,11 @@ float GEColorGradientEffect::CalculateCompressRatio()
         return 1.0f;
     }
     float highColor = 1.0f;
-    for (size_t indexColors = 0; indexColors < colors_.size(); indexColors++) {
-        float maxRgb = std::max(std::max(colors_[indexColors].redF_, colors_[indexColors].greenF_),
-            colors_[indexColors].blueF_);
-        if (ROSEN_GNE(maxRgb, highColor)) {
+    auto size = colors_.size();
+    for (size_t index = 0; index < size; index++) {
+        float maxRgb = std::max(std::max(colors_[index].redF_, colors_[index].greenF_),
+            colors_[index].blueF_);
+        if (highColor < maxRgb) {
             highColor = maxRgb;
         }
     }
@@ -218,19 +219,19 @@ float GEColorGradientEffect::CalculateCompressRatio()
 
 void GEColorGradientEffect::CalculateBlenderCol()
 {
-    float ratio = CalculateCompressRatio();
-    for (int i = 0; i < paramColorSize_; i++) {
+    const float ratio = CalculateCompressRatio();
+    for (size_t i = 0; i < paramColorSize_; i++) {
         std::vector<float> weights(paramColorSize_, 0.0f);
         float weightSum = 0.0f;
-        for (int j = 0; j < paramColorSize_; j++) {
+        for (size_t j = 0; j < paramColorSize_; j++) {
             float x2 = std::pow(positions_[i].GetX() - positions_[j].GetX(), 2);
             float y2 = std::pow(positions_[i].GetY() - positions_[j].GetY(), 2);
             float dist = std::sqrt(x2 + y2);
             weights[j] = 1.0 / (1.0 + exp(gradientBlendK_ * dist - gradientBlend_));
             weightSum += weights[j];
         }
-        Drawing::Color4f mixedColor = {0.0, 0.0, 0.0, 0.0};
-        for (int k = 0; k < paramColorSize_; k++) {
+        Drawing::Color4f mixedColor = {0.0f, 0.0f, 0.0f, 0.0f};
+        for (size_t k = 0; k < paramColorSize_; k++) {
             weights[k] /= weightSum;
             mixedColor.redF_ += ratio * colors_[k].redF_ * weights[k];
             mixedColor.greenF_ += ratio * colors_[k].greenF_ * weights[k];
@@ -241,33 +242,32 @@ void GEColorGradientEffect::CalculateBlenderCol()
     }
 }
 
-bool GEColorGradientEffect::IsValidParam(float width, float height)
+bool GEColorGradientEffect::CreateShaderEffect(float width, float height)
 {
     if (width < 1e-6 || height < 1e-6) {
-        LOGE("GEColorGradientEffect::IsValidParam width or height less than 1e-6");
+        LOGE("GEColorGradientEffect::CreateShaderEffect width or height less than 1e-6");
         return false;
     }
-    if (colors_.size() < GRADIENT_ARRAY_NUM || positions_.size() < GRADIENT_ARRAY_NUM ||
-        strengths_.size() < GRADIENT_ARRAY_NUM) {
-        LOGE("GEColorGradientEffect::IsValidParam width or height less than %{public}d",
-            static_cast<int>(GRADIENT_ARRAY_NUM));
+    if (colors_.size() != positions_.size() || colors_.size() != strengths_.size() ||
+        strengths_.size() != GRADIENT_ARRAY_NUM) {
+        LOGE("GEColorGradientEffect::CreateShaderEffect colors, positions, or strengths size mismatch");
         return false;
     }
     bool isCreated = false;
     if (mask_) {
         MakeColorGradientEffectWithMask();
-        isCreated = colorGradientShaderEffectHasMask_ != nullptr;
+        isCreated = g_colorGradientShaderEffectHasMask_ != nullptr;
     } else {
         MakeColorGradientEffect();
-        isCreated = colorGradientShaderEffect_ != nullptr;
+        isCreated = g_colorGradientShaderEffect_ != nullptr;
     }
     return isCreated;
 }
 
 void GEColorGradientEffect::SetUniform(float width, float height)
 {
-    builder_ = mask_ == nullptr ? std::make_shared<Drawing::RuntimeShaderBuilder>(colorGradientShaderEffect_) :
-        std::make_shared<Drawing::RuntimeShaderBuilder>(colorGradientShaderEffectHasMask_);
+    builder_ = mask_ == nullptr ? std::make_shared<Drawing::RuntimeShaderBuilder>(g_colorGradientShaderEffect_) :
+        std::make_shared<Drawing::RuntimeShaderBuilder>(g_colorGradientShaderEffectHasMask_);
     builder_->SetUniform("iResolution", width, height);
     CalculateBlenderCol();
     std::vector<float> blendColorArray(GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL, 0.0f);
@@ -304,7 +304,7 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-    if (!IsValidParam(width, height)) {
+    if (!CreateShaderEffect(width, height)) {
         drShader_ = nullptr;
         return;
     }
