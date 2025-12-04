@@ -589,6 +589,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             break;
         }
+        case FilterType::FROSTED_GLASS: {
+            if (frostedGlassParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
+                frostedGlassParams_->innerShadowEnabled = param;
+            }
+            break;
+        }
         default:
             break;
     }
