@@ -173,9 +173,8 @@ private:
      * @see DrawShaderFilter for drawing on the canvas.
      * @return True if the process is successful
      */
-    bool BeforeExecuteShaderFilter(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect, const ShaderFilterEffectContext& context,
-        std::shared_ptr<GEShaderFilter>& outShaderFilter);
+    bool BeforeApplyShaderFilter(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
+        const ShaderFilterEffectContext& context, std::shared_ptr<GEShaderFilter>& outShaderFilter);
 
     /**
      * @brief Update information after executing the shader filter, including writing cache back.
@@ -184,8 +183,8 @@ private:
      * @see DrawShaderFilter for drawing on the canvas.
      * @return True if the process is successful
      */
-    bool AfterExecuteShaderFilter(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::GEVisualEffect>& visualEffect,
-        const ShaderFilterEffectContext& context, const std::shared_ptr<GEShaderFilter>& geShaderFilter);
+    bool AfterApplyShaderFilter(Drawing::Canvas& canvas, const Drawing::GEVisualEffect& visualEffect,
+        const ShaderFilterEffectContext& context, const GEShaderFilter& geShaderFilter);
 
     // Internal helper for dispatching between ProcessShaderFilter and DrawShaderFilter.
     // Used in ApplyHpsGEImageEffect only.
