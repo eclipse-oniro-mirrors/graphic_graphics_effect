@@ -35,8 +35,9 @@ public:
 
     DECLARE_GEFILTER_TYPEFUNC(GERadialGradientShaderMask, GERadialGradientShaderMaskParams);
 
-    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
-    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    GERadialGradientShaderMaskParams GetGERadialGradientShaderMaskParams();
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRadialGradientShaderMaskBuilder() const;
