@@ -58,6 +58,8 @@ private:
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader& operator=(const GEContourDiagonalFlowLightShader&&) = delete;
     std::shared_ptr<Drawing::Image> DrawRuntimeShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    std::shared_ptr<Drawing::Image> CreateSdfMaskImg(Drawing::Canvas& canvas,
+        std::shared_ptr<Drawing::Image> precalculationImg);
     std::shared_ptr<Drawing::Image> BlendImg(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> precalculationImg,
         std::shared_ptr<Drawing::Image> lightImg, std::shared_ptr<Drawing::Image> haloImg);
     std::shared_ptr<Drawing::Image> BlurImg(Drawing::Canvas& canvas, const Drawing::Rect& rect,
@@ -65,6 +67,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetContourDiagonalFlowLightBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetFlowLightPrecalBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> FlowLightConvertBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> SdfMaskBuilder();
     Box4f ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, int width, int height, float& approxLenPixels);
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
     void PreCalculateRegion(Drawing::Canvas& mainCanvas, Drawing::Canvas& canvas, int gridIndex,

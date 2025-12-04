@@ -12,22 +12,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GRAPHICS_EFFECT_GE_HPS_COMPATIBLE_PASS_H
-#define GRAPHICS_EFFECT_GE_HPS_COMPATIBLE_PASS_H
+#ifndef GRAPHICS_EFFECT_GE_DIRECT_DRAW_ON_CANVAS_PASS_H
+#define GRAPHICS_EFFECT_GE_DIRECT_DRAW_ON_CANVAS_PASS_H
 #include "ge_filter_composer_pass.h"
+#include "ge_render.h"
+#include "ge_visual_effect.h"
 
 namespace OHOS {
 namespace Rosen {
-class GEHpsCompatiblePass : public GEFilterComposerPass {
+
+struct DirectDrawOnCanvasFlag : GEFilterComposableFlags<DirectDrawOnCanvasFlag> {
+    bool isDirectDrawOnCanvasEnabled;
+
+    DirectDrawOnCanvasFlag(bool enabled) : isDirectDrawOnCanvasEnabled(enabled) {}
+    static bool IsDirectDrawOnCanvasEnabled(const GEFilterComposable& composable);
+};
+
+// Enable direct drawing on canvas for the last GEVisualEffect in composables
+class GEDirectDrawOnCanvasPass : public GEFilterComposerPass {
 public:
     std::string_view GetLogName() const override;
     GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
-    bool IsBlurFilterExists() const;
-
-private:
-    bool blurFilterExists_ = false;
 };
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GE_HPS_COMPATIBLE_PASS_H
+#endif // GRAPHICS_EFFECT_GE_DIRECT_DRAW_ON_CANVAS_PASS_H

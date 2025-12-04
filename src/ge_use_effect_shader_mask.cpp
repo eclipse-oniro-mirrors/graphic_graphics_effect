@@ -16,8 +16,7 @@
 #include "common/rs_common_def.h"
 #include "common/rs_vector4.h"
 #include "effect/shader_effect.h"
-#include "ge_log.h"
-#include "ge_harmonium_effect_shader_mask.h"
+#include "ge_use_effect_shader_mask.h"
 #include "ge_shader_filter_params.h"
 #include "platform/common/rs_log.h"
 #include "utils/matrix.h"
@@ -29,45 +28,49 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-bool GEHarmoniumEffectShaderMask::IsValid() const
+bool GEUseEffectShaderMask::IsValid() const
 {
-    if (param_.image == nullptr) {
-        LOGE("GEHarmoniumEffectShaderMask::IsValid image is nullptr");
+    if (param_.image.lock() == nullptr) {
+        LOGE("GEUseEffectShaderMask::IsValid image is nullptr");
         return false;
     }
-
     return true;
 }
 
-std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShader(float width, float height) const
+std::shared_ptr<ShaderEffect> GEUseEffectShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {
-        LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader param is invalid");
+        LOGE("GEUseEffectShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetHarmoniumEffectShaderMaskBuilder();
+    builder = GetUseEffectShaderMaskBuilder();
     if (builder == nullptr) {
-        LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShaderHas get builder error");
+        LOGE("GEUseEffectShaderMask::GenerateDrawingShaderHas get builder error");
         return nullptr;
     }
     static const Drawing::SamplingOptions option(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
-    builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(*param_.image,
-        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, option, Drawing::Matrix()));
-
-    auto harmoniumEffectMaskEffectShader = builder->MakeShader(nullptr, false);
-    if (harmoniumEffectMaskEffectShader == nullptr) {
-        LOGE("GEHarmoniumEffectShaderMask::GenerateDrawingShader make shader failed");
+    auto image = param_.image.lock();
+    if (image == nullptr) {
+        LOGE("GEUseEffectShaderMask::GenerateDrawingShader image is nullptr");
         return nullptr;
     }
-    return harmoniumEffectMaskEffectShader;
+    builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(*image,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, option, Drawing::Matrix()));
+
+    auto useEffectMaskEffectShader = builder->MakeShader(nullptr, false);
+    if (useEffectMaskEffectShader == nullptr) {
+        LOGE("GEUseEffectShaderMask::GenerateDrawingShader make shader failed");
+        return nullptr;
+    }
+    return useEffectMaskEffectShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEHarmoniumEffectShaderMask::GetHarmoniumEffectShaderMaskBuilder() const
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEUseEffectShaderMask::GetUseEffectShaderMaskBuilder() const
 {
-    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> harmoniumEffectShaderMaskBuilder = nullptr;
-    if (harmoniumEffectShaderMaskBuilder != nullptr) {
-        return harmoniumEffectShaderMaskBuilder;
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> useEffectShaderMaskBuilder = nullptr;
+    if (useEffectShaderMaskBuilder != nullptr) {
+        return useEffectShaderMaskBuilder;
     }
 
     static constexpr char prog[] = R"(
@@ -79,17 +82,17 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEHarmoniumEffectShaderMask::GetH
         }
     )";
 
-    auto harmoniumEffectShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
-    if (harmoniumEffectShaderMaskEffect == nullptr) {
-        LOGE("GEHarmoniumEffectShaderMask::GetHarmoniumEffectShaderMaskBuilder effect error");
+    auto useEffectShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    if (useEffectShaderMaskEffect == nullptr) {
+        LOGE("GEUseEffectShaderMask::GetUseEffectShaderMaskBuilder effect error");
         return nullptr;
     }
 
-    harmoniumEffectShaderMaskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(harmoniumEffectShaderMaskEffect);
-    return harmoniumEffectShaderMaskBuilder;
+    useEffectShaderMaskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(useEffectShaderMaskEffect);
+    return useEffectShaderMaskBuilder;
 }
 
-std::shared_ptr<ShaderEffect> GEHarmoniumEffectShaderMask::GenerateDrawingShaderHasNormal(float width,
+std::shared_ptr<ShaderEffect> GEUseEffectShaderMask::GenerateDrawingShaderHasNormal(float width,
     float height) const
 {
     return GenerateDrawingShader(width, height);

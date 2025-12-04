@@ -60,6 +60,11 @@ bool GEPixelMapShaderMask::IsValid() const
     return true;
 }
 
+GEPixelMapMaskParams GEPixelMapShaderMask::GetGEPixelMapMaskParams()
+{
+    return param_;
+}
+
 std::shared_ptr<ShaderEffect> GEPixelMapShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {

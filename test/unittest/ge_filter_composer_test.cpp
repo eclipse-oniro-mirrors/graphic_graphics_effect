@@ -21,8 +21,8 @@
 #include "ge_filter_composer_pass.h"
 #include "ge_filter_type.h"
 #include "ge_filter_type_info.h"
+#include "ge_direct_draw_on_canvas_pass.h"
 #include "ge_hps_build_pass.h"
-#include "ge_hps_compatible_pass.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_render.h"
 #include "ge_visual_effect_impl.h"
@@ -279,19 +279,15 @@ HWTEST_F(GEFilterComposerTest, HpsBuildPassRunWithMixedEffect, TestSize.Level1)
     GEHpsBuildPass pass(canvas_, context);
 
     std::vector<GEFilterComposable> composables {
-        CreateGreyEffect(), CreateGreyEffect(),              // composables[0]
-        CreateVisualEffect(Drawing::GE_FILTER_WATER_RIPPLE), // composables[1]
-        CreateGreyEffect()                                   // composables[2]
+        CreateGreyEffect(), CreateGreyEffect(),
+        CreateVisualEffect(Drawing::GE_FILTER_WATER_RIPPLE),
+        CreateGreyEffect()
     };
 
     auto result = pass.Run(composables);
-    // Should compose the effect into 2 HpsEffectFilters
-    EXPECT_TRUE(result.changed);
-    ASSERT_EQ(composables.size(), 3); // 3: composed 2 effects and leave 1 effects unchanged
-    EXPECT_NE(composables[0].GetHpsEffect(), nullptr);
-    ASSERT_NE(composables[1].GetEffect(), nullptr);
-    EXPECT_EQ(composables[1].GetEffect()->GetImpl()->GetFilterType(), GEFilterType::WATER_RIPPLE);
-    EXPECT_NE(composables[2].GetHpsEffect(), nullptr);
+    // Should not compose at all. HPS currently requires all filters to be applied.
+    EXPECT_FALSE(result.changed);
+    EXPECT_EQ(composables.size(), 4); // 4: original size
 
     GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithMixedEffect end";
 }
@@ -416,75 +412,6 @@ HWTEST_F(GEFilterComposerTest, MesaFusionPassRunOddSize, TestSize.Level1)
 }
 
 /**
- * @tc.name: HpsCompatiblePassGetLogName
- * @tc.desc: Test GEHpsCompatiblePass GetLogName function
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassGetLogName, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassGetLogName start";
-
-    GEHpsCompatiblePass pass;
-
-    auto name = pass.GetLogName();
-    EXPECT_EQ(name, "GEHpsCompatiblePass");
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassGetLogName end";
-}
-
-/**
- * @tc.name: HpsCompatiblePassRunWithBlur
- * @tc.desc: Test GEHpsCompatiblePass Run function with blur filters
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassRunWithBlur, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithBlur start";
-
-    GEHpsCompatiblePass pass;
-
-    std::vector<GEFilterComposable> composables;
-    // Add a kawase blur effect
-    auto kawaseEffect = CreateKawaseBlurEffect();
-    composables.push_back(kawaseEffect);
-
-    auto result = pass.Run(composables);
-    EXPECT_FALSE(result.changed); // This pass doesn't modify composables
-
-    // Check that blur filter detection works correctly
-    bool exists = pass.IsBlurFilterExists();
-    EXPECT_TRUE(exists);
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithBlur end";
-}
-
-/**
- * @tc.name: HpsCompatiblePassRunWithoutBlur
- * @tc.desc: Test GEHpsCompatiblePass Run function without blur filters
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsCompatiblePassRunWithoutBlur, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithoutBlur start";
-
-    GEHpsCompatiblePass pass;
-
-    std::vector<GEFilterComposable> composables;
-    // Add an AI bar effect (not a blur filter)
-    auto greyEffect = CreateGreyEffect();
-    composables.push_back(greyEffect);
-
-    auto result = pass.Run(composables);
-    EXPECT_FALSE(result.changed); // This pass doesn't modify composables
-
-    // Check that blur filter detection works correctly
-    bool exists = pass.IsBlurFilterExists();
-    EXPECT_FALSE(exists);
-
-    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsCompatiblePassRunWithoutBlur end";
-}
-
-/**
  * @tc.name: GEFilterComposerRunNoPasses
  * @tc.desc: Test GEFilterComposer Run function with no passes
  * @tc.type: FUNC
@@ -541,8 +468,8 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerAddNullPass, TestSize.Level1)
     GEFilterComposer composer;
 
     // This should not crash and should just ignore the null pass
-    std::shared_ptr<GEFilterComposerPass> nullPass = nullptr;
-    composer.Add(nullPass);
+    std::unique_ptr<GEFilterComposerPass> nullPass = nullptr;
+    composer.Add(std::move(nullPass));
     EXPECT_TRUE(composer.passes_.empty());
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerAddNullPass end";
@@ -578,7 +505,6 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges start";
 
     GEFilterComposer composer;
-    composer.Add<GEHpsCompatiblePass>();
     composer.Add<GEMesaFusionPass>();
 
     std::vector<GEFilterComposable> composables;
@@ -589,6 +515,67 @@ HWTEST_F(GEFilterComposerTest, GEFilterComposerRunWithChanges, TestSize.Level1)
     EXPECT_TRUE(result.anyPassChanged);
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEFilterComposerRunWithChanges end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRun
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with valid composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRun, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables { CreateGreyEffect(),
+        CreateVisualEffect(Drawing::GE_FILTER_FROSTED_GLASS), CreateVisualEffect(Drawing::GE_FILTER_FROSTED_GLASS) };
+
+    auto result = pass.Run(composables);
+    EXPECT_TRUE(result.changed);
+    ASSERT_EQ(composables.size(), 3); // 3: original size
+    EXPECT_FALSE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[0]));
+    EXPECT_FALSE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[1]));
+    EXPECT_TRUE(DirectDrawOnCanvasFlag::IsDirectDrawOnCanvasEnabled(composables[2])); // enabled on the last one
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRun end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRunEmptyComposables
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with empty composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRunEmptyComposables, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunEmptyComposables start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables;
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunEmptyComposables end";
+}
+
+/**
+ * @tc.name: GEDirectDrawOnCanvasPassRunNullEffect
+ * @tc.desc: Test GEDirectDrawOnCanvasPass Run function with null effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRunNullEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunNullEffect start";
+
+    GEDirectDrawOnCanvasPass pass;
+    std::vector<GEFilterComposable> composables;
+    auto nullEffect = std::shared_ptr<Drawing::GEVisualEffect>(nullptr);
+    composables.push_back(GEFilterComposable(nullEffect));
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunNullEffect end";
 }
 
 } // namespace Rosen

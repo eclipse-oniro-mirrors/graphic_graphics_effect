@@ -32,7 +32,7 @@ enum class GEFilterType : int32_t {
     DISPLACEMENT_DISTORT_FILTER,
     COLOR_GRADIENT,
     MASK_TRANSITION,
-    SDF,
+    GRID_WARP,
     // Mask
     RIPPLE_MASK,
     DOUBLE_RIPPLE_MASK,
@@ -41,9 +41,13 @@ enum class GEFilterType : int32_t {
     WAVE_GRADIENT_MASK,
     FRAME_GRADIENT_MASK,
     LINEAR_GRADIENT_MASK,
-    HARMONIUM_EFFECT_MASK,
+    IMAGE_MASK,
+    USE_EFFECT_MASK,
+    // Shape
     SDF_UNION_OP,
-    SDF_RRECT_MASK,
+    SDF_RRECT_SHAPE,
+    SDF_TRANSFORM_SHAPE,
+    SDF_PIXELMAP_SHAPE,
     // Shader
     DOT_MATRIX,
     FLOW_LIGHT_SWEEP,
@@ -69,7 +73,14 @@ enum class GEFilterType : int32_t {
     AIBAR_GLOW,
     ROUNDED_RECT_FLOWLIGHT,
     GRADIENT_FLOW_COLORS,
-    MAX
+    SDF_SHADOW,
+    SDF_CLIP,
+    FROSTED_GLASS,
+    SDF_BORDER,
+    CIRCLE_FLOWLIGHT,
+    FROSTED_GLASS_BLUR,
+    FROSTED_GLASS_EFFECT,
+    MAX,
 };
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams

@@ -32,7 +32,7 @@
 // ge
 #include "ge_filter_type.h"
 #include "ge_shader_mask.h"
-#include "sdf/ge_sdf_shader_mask.h"
+#include "sdf/ge_sdf_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -59,7 +59,11 @@ struct CanvasInfo {
     float tranX = 0.0f;
     float tranY = 0.0f;
     Drawing::Matrix mat;
+    RectF materialDst;
 };
+
+constexpr int ARRAY_SIZE_NINE = 9;
+constexpr int ARRAY_SIZE_FOUR = 4;
 
 constexpr char GE_FILTER_AI_BAR[] = "AIBAR";
 constexpr char GE_FILTER_AI_BAR_LOW[] = "AIBAR_LOW";
@@ -279,6 +283,8 @@ REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT, GEColorGradientShaderFilterParam
 constexpr char GE_SHADER_HARMONIUM_EFFECT[] = "HarmoniumEffect";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASK[] = "HarmoniumEffect_Mask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK[] = "HarmoniumEffect_MaskClock";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_MASKPROGRESS[] = "HarmoniumEffect_MaskProgress";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK[] = "HarmoniumEffect_UseEffectMask";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_TINTCOLOR[] = "HarmoniumEffect_TintColor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION[] = "HarmoniumEffect_RipplePosition";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_RIPPLEPROGRESS[] = "HarmoniumEffect_RippleProgress";
@@ -286,34 +292,61 @@ constexpr char GE_SHADER_HARMONIUM_EFFECT_DISTORTPROGRESS[] = "HarmoniumEffect_D
 constexpr char GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR[] = "HarmoniumEffect_DistortFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR[] = "HarmoniumEffect_ReflectionFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_REFRACTIONFACTOR[] = "HarmoniumEffect_RefractionFactor";
-constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE[] = "HarmoniumEffect_BlurImage";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURLEFT[] = "HarmoniumEffect_BlurLeft";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_BLURTOP[] = "HarmoniumEffect_BlurTop";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_MATERIALFACTOR[] = "HarmoniumEffect_MaterialFactor";
 constexpr char GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS[] = "HarmoniumEffect_CornerRadius";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_RATE[] = "HarmoniumEffect_Rate";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_LIGHTUPDEGREE[] = "HarmoniumEffect_LightUpDegree";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_CUBICCOEFF[] = "HarmoniumEffect_CubicCoeff";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_QUADCOEFF[] = "HarmoniumEffect_QuadCoeff";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_SATURATION[] = "HarmoniumEffect_Saturation";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_POSRGB[] = "HarmoniumEffect_PosRGB";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_NEGRGB[] = "HarmoniumEffect_NegRGB";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_FRACTION[] = "HarmoniumEffect_Fraction";
+constexpr char GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX[] = "HarmoniumEffect_TotalMatrix";
 
 struct GEHarmoniumEffectShaderParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     std::shared_ptr<GEShaderMask> maskClock = nullptr;
+    float maskProgress = 1.f;
+    std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
     Vector4f tintColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector3f ripplePosition = Vector3f(0.0f, 0.0f, 0.0f);
+    std::vector<Vector2f> ripplePosition = {};
     float rippleProgress = 0.f;
     float distortProgress = 0.f;
     float distortFactor = 0.f;
     float reflectionFactor = 0.f;
     float refractionFactor = 0.f;
-    std::shared_ptr<Drawing::Image> blurImage = nullptr;
     float blurLeft = 0.f;
     float blurTop = 0.f;
     float materialFactor = 0.f;
     float cornerRadius = 0.f;
+    float rate = 0.f;
+    float lightUpDegree = 0.f;
+    float cubicCoeff = 0.f;
+    float quadCoeff = 0.f;
+    float saturation = 0.f;
+    Vector3f posRGB = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f negRGB = Vector3f(0.0f, 0.0f, 0.0f);
+    float fraction = 1.f; // 1 means default value
+    Drawing::Matrix totalMatrix;
 };
 
-constexpr char GE_MASK_HARMONIUM_EFFECT[] = "HarmoniumEffectMask";
-constexpr char GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP[] = "HarmoniumEffectMask_Image";
-struct GEHarmoniumEffectMaskParams {
+constexpr char GE_MASK_USE_EFFECT[] = "UseEffectMask";
+constexpr char GE_MASK_USE_EFFECT_PIXEL_MAP[] = "UseEffectMask_Image";
+constexpr char GE_MASK_USE_EFFECT_USE_EFFECT[] = "UseEffectMask_UseEffect";
+struct GEUseEffectMaskParams {
+    std::weak_ptr<Drawing::Image> image;
+    bool useEffect = false;
+};
+
+constexpr char GE_MASK_IMAGE[] = "ImageMask";
+constexpr char GE_MASK_IMAGE_IMAGE[] = "ImageMask_Image";
+struct GEImageMaskParams {
     std::shared_ptr<Drawing::Image> image = nullptr;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(IMAGE_MASK, GEImageMaskParams, GE_MASK_IMAGE);
 
 constexpr char GE_FILTER_EDGE_LIGHT[] = "EdgeLight";
 constexpr char GE_FILTER_EDGE_LIGHT_ALPHA[] = "EdgeLight_Alpha";
@@ -584,6 +617,95 @@ struct GEXColorGradientEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT[] = "FrostedGlassEffect";
+// Common parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM[] = "FrostedGlassEffect_BlurParam";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS[] = "FrostedGlassEffect_WeightsEmboss"; // envLight, sd
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL[] = "FrostedGlassEffect_WeightsEdl";
+// BG darken parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGRATES[] = "FrostedGlassEffect_BgRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGKBS[] = "FrostedGlassEffect_BgKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGPOS[] = "FrostedGlassEffect_BgPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG[] = "FrostedGlassEffect_BgNeg";
+// Refraction parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTPARAMS[] = "FrostedGlassEffect_RefractParams";
+// Inner shadow parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPARAMS[] = "FrostedGlassEffect_SdParams"; // width. featherPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDRATES[] = "FrostedGlassEffect_SdRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDKBS[] = "FrostedGlassEffect_SdKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPOS[] = "FrostedGlassEffect_SdPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDNEG[] = "FrostedGlassEffect_SdNeg";
+// Env refraction parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS[] =
+    "FrostedGlassEffect_EnvLightParams"; // width. featherPx, OutPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES[] = "FrostedGlassEffect_EnvLightRates"; // 3, 2
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTKBS[] = "FrostedGlassEffect_EnvLightKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS[] = "FrostedGlassEffect_EnvLightPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTNEG[] = "FrostedGlassEffect_EnvLightNeg";
+// Edge highlights parameters
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPARAMS[] = "FrostedGlassEffect_EdLightParams"; // width. featherPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES[] = "FrostedGlassEffect_EdLightAngles"; // AngleDeg, featherDeg
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR[] = "FrostedGlassEffect_EdLightDir"; // x, y
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLRATES[] = "FrostedGlassEffect_EdLightRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS[] = "FrostedGlassEffect_EdLightKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS[] = "FrostedGlassEffect_EdLightPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLNEG[] = "FrostedGlassEffect_EdLightNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE[] = "FrostedGlassEffect_Shape";
+// Adapt effect component
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK[] = "FrostedGlassEffect_UseEffectMask";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP[] = "FrostedGlassEffect_MaskLeftTop";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX[] = "FrostedGlassEffect_MaskMatrix";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffect_RefractOutPx";
+
+struct GEFrostedGlassEffectParams {
+    float blurParam = 4.0f;
+    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    // Background darken parameters
+    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    // Refraction params
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
+    // Inner shadow parameters
+    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
+    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Env refraction parameters
+    Vector2f envLightParams = Vector2f(0.2745f, 2.0f);
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Edge highlights parameters
+    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
+    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
+    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    std::shared_ptr<GESDFShaderShape> sdfShape;
+    // Adapt effect component
+    std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
+    Vector2f maskLeftTop = Vector2f(0.0f, 0.0f);
+    Drawing::Matrix maskMatrix;
+    float refractOutPx = 0.8f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
+
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
+struct GEFrostedGlassBlurShaderFilterParams {
+    float radius = 0.0f;
+    float refractOutPx = 0.8f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_BLUR, GEFrostedGlassBlurShaderFilterParams, GE_FILTER_FROSTED_GLASS_BLUR);
+
 constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
 constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
 constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";
@@ -618,6 +740,56 @@ struct GEBorderLightShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
 
+constexpr char GE_FILTER_GRID_WARP[] = "GridWarp";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT0[] = "GridWarp_GridPoint0";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT1[] = "GridWarp_GridPoint1";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT2[] = "GridWarp_GridPoint2";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT3[] = "GridWarp_GridPoint3";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT4[] = "GridWarp_GridPoint4";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT5[] = "GridWarp_GridPoint5";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT6[] = "GridWarp_GridPoint6";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT7[] = "GridWarp_GridPoint7";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT8[] = "GridWarp_GridPoint8";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE0[] = "GridWarp_RotationAngle0";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE1[] = "GridWarp_RotationAngle1";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE2[] = "GridWarp_RotationAngle2";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE3[] = "GridWarp_RotationAngle3";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE4[] = "GridWarp_RotationAngle4";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE5[] = "GridWarp_RotationAngle5";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE6[] = "GridWarp_RotationAngle6";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE7[] = "GridWarp_RotationAngle7";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE8[] = "GridWarp_RotationAngle8";
+struct GEGridWarpShaderFilterParams {
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GRID_WARP, GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP);
+
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT[] = "CircleFlowlight";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0[] = "CircleFlowlight_Color0";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1[] = "CircleFlowlight_Color1";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR2[] = "CircleFlowlight_Color2";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3[] = "CircleFlowlight_Color3";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY[] = "CircleFlowlight_RotationFrequency";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE[] = "CircleFlowlight_RotationAmplitude";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED[] = "CircleFlowlight_RotationSeed";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX[] = "CircleFlowlight_GradientX";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY[] = "CircleFlowlight_GradientY";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS[] = "CircleFlowlight_Progress";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK[] = "CircleFlowlight_Mask";
+struct GECircleFlowlightEffectParams {
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    Vector4f rotationFrequency;
+    Vector4f rotationAmplitude;
+    Vector4f rotationSeed;
+    Vector4f gradientX;
+    Vector4f gradientY;
+    float progress = 0.0f;
+    std::shared_ptr<GEShaderMask> mask;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(CIRCLE_FLOWLIGHT, GECircleFlowlightEffectParams,
+                                GE_SHADER_CIRCLE_FLOWLIGHT);
+
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
     SMOOTH_UNION,
@@ -638,33 +810,53 @@ public:
 
 using GESDFShapeNode = std::variant<GERRect, GESDFUnionOp>;
 
-constexpr char GE_MASK_SDF_UNION_OP[] = "SDFUnionOpMask";
-constexpr char GE_MASK_SDF_UNION_OP_MASKX[] = "SDFUnionOpMask_MaskX";
-constexpr char GE_MASK_SDF_UNION_OP_MASKY[] = "SDFUnionOpMask_MaskY";
-constexpr char GE_MASK_SDF_UNION_OP_TYPE[] = "SDFUnionOpMask_Type";
+constexpr char GE_SHAPE_SDF_UNION_OP[] = "SDFUnionOpShape";
+constexpr char GE_SHAPE_SDF_UNION_OP_SHAPEX[] = "SDFUnionOpShape_ShapeX";
+constexpr char GE_SHAPE_SDF_UNION_OP_SHAPEY[] = "SDFUnionOpShape_ShapeY";
+constexpr char GE_SHAPE_SDF_UNION_OP_TYPE[] = "SDFUnionOpShape_Type";
 // for smooth union op
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP[] = "SDFSmoothUnionOpMask";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_SPACING[] = "SDFSmoothUnionOpMask_Spacing";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKX[] = "SDFSmoothUnionOpMask_MaskX";
-constexpr char GE_MASK_SDF_SMOOTH_UNION_OP_MASKY[] = "SDFSmoothUnionOpMask_MaskY";
-struct GESDFUnionOpMaskParams {
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP[] = "SDFSmoothUnionOpShape";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING[] = "SDFSmoothUnionOpShape_Spacing";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEX[] = "SDFSmoothUnionOpShape_ShapeX";
+constexpr char GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY[] = "SDFSmoothUnionOpShape_ShapeY";
+struct GESDFUnionOpShapeParams {
     float spacing = 0.f;
-    std::shared_ptr<GESDFShaderMask> left;
-    std::shared_ptr<GESDFShaderMask> right;
-    GESDFUnionOp op;
+    std::shared_ptr<GESDFShaderShape> left;
+    std::shared_ptr<GESDFShaderShape> right;
+    GESDFUnionOp op = GESDFUnionOp::SMOOTH_UNION;
 };
 
-constexpr char GE_MASK_SDF_RRECT_MASK[] = "SDFRRectMask";
-constexpr char GE_MASK_SDF_RRECT_MASK_RRECT[] = "SDFRRectMask_RRect";
-struct GESDFRRectMaskParams {
+constexpr char GE_SHAPE_SDF_RRECT_SHAPE[] = "SDFRRectShape";
+constexpr char GE_SHAPE_SDF_RRECT_SHAPE_RRECT[] = "SDFRRectShape_RRect";
+struct GESDFRRectShapeParams {
     GERRect rrect;
 };
 
-constexpr char GE_FILTER_SDF[] = "SDFFilter";
-constexpr char GE_FILTER_SDF_MASK[] = "SDFFilter_Mask";
+constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
+constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
+constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX[] = "SDFTransformShape_Matrix";
+struct GESDFTransformShapeParams {
+    std::shared_ptr<GESDFShaderShape> shape;
+    Drawing::Matrix matrix = Drawing::Matrix();
+};
+
+constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
+constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
+struct GESDFPixelmapShapeParams {
+    std::shared_ptr<Drawing::Image> image;
+};
+
 struct GESDFBorderParams final {
     Color color;
     float width = 0.0f;
+};
+
+constexpr char GE_SHADER_SDF_BORDER[] = "SDFBorder";
+constexpr char GE_SHADER_SDF_BORDER_SHAPE[] = "SDFBorder_Shape";
+constexpr char GE_SHADER_SDF_BORDER_BORDER[] = "SDFBorder_Border";
+struct GESDFBorderShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+    GESDFBorderParams border;
 };
 
 struct GESDFShadowParams final {
@@ -676,13 +868,19 @@ struct GESDFShadowParams final {
     bool isFilled = false;
 };
 
-struct GESDFFilterParams {
-    std::shared_ptr<GESDFShaderMask> mask;
-    std::optional<GESDFBorderParams> border;
-    std::optional<GESDFShadowParams> shadow;
+constexpr char GE_SHADER_SDF_SHADOW[] = "SDFShadow";
+constexpr char GE_SHADER_SDF_SHADOW_SHAPE[] = "SDFShadow_Shape";
+constexpr char GE_SHADER_SDF_SHADOW_SHADOW[] = "SDFShadow_Shadow";
+struct GESDFShadowShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+    GESDFShadowParams shadow;
 };
 
-constexpr int ARRAY_SIZE_FOUR = 4;
+constexpr char GE_SHADER_SDF_CLIP[] = "SDFClip";
+constexpr char GE_SHADER_SDF_CLIP_SHAPE[] = "SDFClip_Shape";
+struct GESDFClipShaderParams final {
+    std::shared_ptr<GESDFShaderShape> shape = nullptr;
+};
 
 constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
 constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
@@ -799,6 +997,79 @@ struct GEGasifyFilterParams {
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
     float progress_ = 0.f;
 };
+
+constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
+// Common parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BLURPARAMS[] = "FrostedGlass_BlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS[] = "FrostedGlass_WeightsEmboss"; // envLight, sd
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEDL[] = "FrostedGlass_WeightsEdl";
+// BG darken parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
+constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_BGPOS[] = "FrostedGlass_BgPos";
+constexpr char GE_FILTER_FROSTED_GLASS_BGNEG[] = "FrostedGlass_BgNeg";
+// Refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTPARAMS[] = "FrostedGlass_RefractParams";
+// Inner shadow parameters
+constexpr char GE_FILTER_FROSTED_GLASS_SDPARAMS[] = "FrostedGlass_SdParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_SDRATES[] = "FrostedGlass_SdRates";
+constexpr char GE_FILTER_FROSTED_GLASS_SDKBS[] = "FrostedGlass_SdKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_SDPOS[] = "FrostedGlass_SdPos";
+constexpr char GE_FILTER_FROSTED_GLASS_SDNEG[] = "FrostedGlass_SdNeg";
+// Env refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS[] = "FrostedGlass_EnvLightParams"; // width. featherPx, OutPx
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates"; // 3, 2
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS[] = "FrostedGlass_EnvLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS[] = "FrostedGlass_EnvLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG[] = "FrostedGlass_EnvLightNeg";
+// Edge highlights parameters
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPARAMS[] = "FrostedGlass_EdLightParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_EDLANGLES[] = "FrostedGlass_EdLightAngles"; // AngleDeg, featherDeg
+constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir"; // x, y
+constexpr char GE_FILTER_FROSTED_GLASS_EDLRATES[] = "FrostedGlass_EdLightRates";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLKBS[] = "FrostedGlass_EdLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPOS[] = "FrostedGlass_EdLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
+constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
+constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
+constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
+
+struct GEFrostedGlassShaderFilterParams {
+    Vector2f blurParams = Vector2f(48.0f, 4.0f);
+    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    // Background darken parameters
+    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    // Refraction params
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
+    // Inner shadow parameters
+    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
+    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Env refraction parameters
+    Vector3f envLightParams = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Edge highlights parameters
+    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
+    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
+    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    Vector2f borderSize = Vector2f(200.0f, 100.0f);
+    float cornerRadius = 100.0f;
+    std::shared_ptr<GESDFShaderShape> sdfShape;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,37 +13,36 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_SDF_MASK_H
-#define GRAPHICS_EFFECT_GE_SDF_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_IMAGE_SHADER_MASK_H
+#define GRAPHICS_EFFECT_GE_IMAGE_SHADER_MASK_H
 
-#include "../ge_shader_mask.h"
+#include "common/rs_vector4.h"
+#include "ge_shader_mask.h"
+#include "ge_shader_filter_params.h"
+#include "image/image.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-
-enum class GESDFMaskType : uint8_t {
-    UNION_OP = 0,
-    RRECT,
-    MAX = RRECT,
-};
-
-class GE_EXPORT GESDFShaderMask : public GEShaderMask {
+class GE_EXPORT GEImageShaderMask : public GEShaderMask {
 public:
-    GESDFShaderMask() = default;
-    GESDFShaderMask(const GESDFShaderMask&) = delete;
-    virtual ~GESDFShaderMask() = default;
+    GEImageShaderMask(const GEImageMaskParams& param) : param_(param) {}
+    GEImageShaderMask(const GEImageShaderMask&) = delete;
+    virtual ~GEImageShaderMask() = default;
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-    bool IsSDFShaderMask() const override { return true; }
+    std::weak_ptr<Drawing::Image> GetImage() const override
+    {
+        return param_.image;
+    }
 
-    virtual GESDFMaskType GetSDFMaskType() const = 0;
-
-    void CopyState(const GESDFShaderMask& mask);
+private:
+    bool IsValid() const;
+    GEImageMaskParams param_;
 };
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_SDF_MASK_H
+#endif

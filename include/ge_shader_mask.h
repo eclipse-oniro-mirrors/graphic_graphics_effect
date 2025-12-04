@@ -33,11 +33,14 @@ public:
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
 
-    virtual bool IsSDFShaderMask() const { return false; }
-
-    virtual std::shared_ptr<Drawing::Image> GetImage() const
+    virtual std::weak_ptr<Drawing::Image> GetImage() const
     {
-        return nullptr;
+        return {};
+    }
+
+    virtual bool GetUseEffect() const
+    {
+        return false;
     }
 
 };

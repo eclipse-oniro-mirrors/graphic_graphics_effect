@@ -35,7 +35,8 @@ public:
 
     void UpdateCacheDataFrom(const std::shared_ptr<GEVisualEffectContainer>& ge);
 
-    void SetGeometry(const Drawing::Canvas& canvas, float geoWidth, float geoHeight);
+    void SetGeometry(const Drawing::Matrix& matrix, const Drawing::RectF& bound, const Drawing::RectF& materialDst,
+        float geoWidth, float geoHeight);
 
     void SetDisplayHeadroom(float headroom);
 
@@ -44,6 +45,10 @@ public:
     void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage, float left, float top);
 
     void UpdateCornerRadius(float cornerRadius);
+
+    void UpdateTotalMatrix(Drawing::Matrix totalMatrix);
+
+    void UpdateRefractOutValue(float value);
 
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);

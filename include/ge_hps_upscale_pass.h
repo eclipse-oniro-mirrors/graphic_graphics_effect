@@ -13,27 +13,18 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_union_op_shader_mask.h"
-#include "utils/ge_trace.h"
-#include "ge_log.h"
+#ifndef GRAPHICS_EFFECT_GE_HPS_UPSCALE_PASS_H
+#define GRAPHICS_EFFECT_GE_HPS_UPSCALE_PASS_H
+#include "ge_filter_composer_pass.h"
 
 namespace OHOS {
 namespace Rosen {
-namespace Drawing {
 
-void GESDFUnionOpShaderMask::CopyState(const GESDFUnionOpShaderMask& mask)
-{
-    params_.spacing = mask.params_.spacing;
-    params_.op = mask.params_.op;
-    if (params_.left) {
-        params_.left->CopyState(*static_cast<const GESDFShaderMask*>(mask.params_.left.get()));
-    }
-
-    if (params_.right) {
-        params_.right->CopyState(*static_cast<const GESDFShaderMask*>(mask.params_.right.get()));
-    }
-}
-
-} // Drawing
+class GEHpsUpscalePass : public GEFilterComposerPass {
+public:
+    std::string_view GetLogName() const override;
+    GEFilterComposerPassResult Run(std::vector<GEFilterComposable>& composables) override;
+};
 } // namespace Rosen
 } // namespace OHOS
+#endif // GRAPHICS_EFFECT_GE_HPS_UPSCALE_PASS_H

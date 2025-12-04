@@ -55,26 +55,42 @@ public:
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
 
+    bool IsNeedUpscale();
+    void SetNeedUpscale(bool needUpscale);
+
 private:
     std::vector<std::shared_ptr<Drawing::HpsEffectParameter>> hpsEffect_;
     bool isBlur_ {false};
     bool needClampFilter_ {true};
-    Drawing::Matrix upscale_matrix_;
-    void GenerateMesaBlurEffect(const Drawing::GEMESABlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image);
-    void GenerateKawaseBlurEffect(const Drawing::GEKawaseBlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS);
-    void GenerateGreyEffect(const Drawing::GEGreyShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst);
-    void GenerateAIBarEffect(const Drawing::GEAIBarShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst);
-    void GenerateGradientBlurEffect(const Drawing::GELinearGradientBlurShaderFilterParams& params,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
-        Drawing::CanvasInfo info);
+    bool needUpscale_ { false };
+
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateMesaBlurEffect(
+        const Drawing::GEMESABlurShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const std::shared_ptr<Drawing::Image>& image);
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateKawaseBlurEffect(
+        const Drawing::GEKawaseBlurShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst,
+        float saturationForHPS, float brightnessForHPS);
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateGreyEffect(
+        const Drawing::GEGreyShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst);
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateAIBarEffect(
+        const Drawing::GEAIBarShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst);
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateGradientBlurEffect(
+        const Drawing::GELinearGradientBlurShaderFilterParams& params, const Drawing::Rect& src,
+        const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image, Drawing::CanvasInfo info);
+    std::shared_ptr<Drawing::HpsEffectParameter> GenerateEdgeLightEffect(
+        const Drawing::GEEdgeLightShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const std::shared_ptr<Drawing::Image>& image, Drawing::CanvasInfo info);
+
+    std::shared_ptr<Drawing::HpsMaskParameter> GenerateMaskParameter(
+        const std::shared_ptr<Drawing::GEShaderMask>& mask);
+    std::shared_ptr<Drawing::HpsMaskParameter> GeneratePixelMapMaskParameter(
+        const Drawing::GEPixelMapMaskParams& params);
+    std::shared_ptr<Drawing::HpsMaskParameter> GenerateRadialGradientShaderMaskParameter(
+        const Drawing::GERadialGradientShaderMaskParams& params);
+
     bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
-    std::shared_ptr<Drawing::RuntimeEffect> GetClampUpEffect() const;
     bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
     // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases

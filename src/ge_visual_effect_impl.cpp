@@ -25,6 +25,29 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 namespace {
+constexpr size_t NUM_0 = 0;
+constexpr size_t NUM_1 = 1;
+constexpr size_t NUM_2 = 2;
+
+template <typename T>
+using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
+
+template <typename T>
+void ApplyTagParams(const std::string& tag, const std::any& value,
+    std::shared_ptr<T>& params, const TagMap<T>& tagMap)
+{
+    if (!params) {
+        GE_LOGE("GEVisualEffectImpl params for tag %{public}s not found", tag.c_str());
+        return;
+    }
+    auto it = tagMap.find(tag);
+    if (it != tagMap.end()) {
+        it->second(params, value);
+    } else {
+        GE_LOGE("GEVisualEffectImpl tag %{public}s not found", tag.c_str());
+    }
+}
+
 #define ADD_TAG_HANDLER(type, tag, member, valueType) \
     {tag, [](std::shared_ptr<type>&params, const std::any& value) { \
         params->member = std::any_cast<valueType>(value); \
@@ -32,7 +55,7 @@ namespace {
 
 using PairFloat = std::pair<float, float>;
 
-GEVisualEffectImpl::TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
+TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
     ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_LTWH, LTWH, Vector4f),
     ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR,
         stretchFactor, float),
@@ -50,7 +73,7 @@ GEVisualEffectImpl::TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
     ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRENGTH, strengths, Vector4f),
 };
 
-GEVisualEffectImpl::TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
+TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
     ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS,
         startEndPosition, PairFloat),
     ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH,
@@ -79,7 +102,7 @@ GEVisualEffectImpl::TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowl
         progress, float),
 };
 
-GEVisualEffectImpl::TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
+TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
     ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0, colors[0], Vector4f),
     ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1, colors[1], Vector4f),
     ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2, colors[2], Vector4f),
@@ -93,12 +116,50 @@ GEVisualEffectImpl::TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColors
     ADD_TAG_HANDLER(GEXGradientFlowColorsEffectParams, GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS, progress, float),
 };
 
-GEVisualEffectImpl::TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
+TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS,
         gradientBezierControlPoints, Vector4f),
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
 };
+
+TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT0, gridPoints[0], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT1, gridPoints[1], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT2, gridPoints[2], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT3, gridPoints[3], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT4, gridPoints[4], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT5, gridPoints[5], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT6, gridPoints[6], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT7, gridPoints[7], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_GRID_POINT8, gridPoints[8], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE0, rotationAngles[0], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE1, rotationAngles[1], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE2, rotationAngles[2], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE3, rotationAngles[3], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE4, rotationAngles[4], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE5, rotationAngles[5], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE6, rotationAngles[6], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE7, rotationAngles[7], PairFloat),
+    ADD_TAG_HANDLER(GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP_ROTATION_ANGLE8, rotationAngles[8], PairFloat),
+    };
+
+TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0, colors[0], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1, colors[1], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR2, colors[2], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3, colors[3], Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY, rotationFrequency,
+        Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE, rotationAmplitude,
+        Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED, rotationSeed, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX, gradientX, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY, gradientY, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK, mask,
+        std::shared_ptr<Drawing::GEShaderMask>),
+    };
 
 #undef ADD_TAG_HANDLER
 }
@@ -236,10 +297,16 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakePixelMapMaskParams();
         }
     },
-    { GE_MASK_HARMONIUM_EFFECT,
+    { GE_MASK_IMAGE,
         [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::HARMONIUM_EFFECT_MASK);
-            impl->MakeHarmoniumEffectMaskParams();
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::IMAGE_MASK);
+            impl->MakeImageMaskParams();
+        }
+    },
+    { GE_MASK_USE_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::USE_EFFECT_MASK);
+            impl->MakeUseEffectMaskParams();
         }
     },
     { GE_MASK_WAVE_GRADIENT,
@@ -278,31 +345,36 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeHarmoniumEffectParams();
         }
     },
-    { GE_FILTER_SDF,
-        [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF);
-            impl->MakeSDFFilterParams();
-        }
-    },
-    { GE_MASK_SDF_UNION_OP,
+    { GE_SHAPE_SDF_UNION_OP,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
-            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::UNION);
+            impl->MakeSDFUnionOpShapeParams(GESDFUnionOp::UNION);
         }
     },
-    { GE_MASK_SDF_SMOOTH_UNION_OP,
+    { GE_SHAPE_SDF_SMOOTH_UNION_OP,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP);
-            impl->MakeSDFUnionOpMaskParams(GESDFUnionOp::SMOOTH_UNION);
+            impl->MakeSDFUnionOpShapeParams(GESDFUnionOp::SMOOTH_UNION);
         }
     },
-    { GE_MASK_SDF_RRECT_MASK,
+    { GE_SHAPE_SDF_RRECT_SHAPE,
         [](GEVisualEffectImpl* impl) {
-            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_RRECT_MASK);
-            impl->MakeSDFRRectMaskParams();
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE);
+            impl->MakeSDFRRectShapeParams();
         }
     },
-
+    { GE_SHAPE_SDF_TRANSFORM_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE);
+            impl->MakeSDFTransformShapeParams();
+        }
+    },
+    { GE_SHAPE_SDF_PIXELMAP_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE);
+            impl->MakeSDFPixelmapShapeParams();
+        }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);
@@ -339,6 +411,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeFrameGradientMaskParams();
         }
     },
+    { GE_FILTER_FROSTED_GLASS,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS);
+            impl->MakeFrostedGlassParams();
+        }
+    },
     { GE_FILTER_GASIFY_SCALE_TWIST,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
@@ -357,6 +435,48 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGasifyFilterParams();
         }
     },
+    {  GE_SHADER_SDF_BORDER,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_BORDER);
+            impl->MakeSDFBorderParams();
+        }
+    },
+    { GE_SHADER_SDF_CLIP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_CLIP);
+            impl->MakeSDFClipParams();
+        }
+    },
+    { GE_SHADER_SDF_SHADOW,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
+            impl->MakeSDFShadowParams();
+        }
+    },
+    { GE_FILTER_GRID_WARP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::GRID_WARP);
+            impl->MakeGridWarpFilterParams();
+        }
+    },
+    { GE_SHADER_CIRCLE_FLOWLIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT);
+            impl->MakeCircleFlowlightEffectParams();
+        }
+    },
+    { GE_SHADER_FROSTED_GLASS_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT);
+            impl->MakeFrostedGlassEffectParams();
+        }
+    },
+    { GE_FILTER_FROSTED_GLASS_BLUR,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR);
+            impl->MakeFrostedGlassBlurParams();
+        }
+    }
 };
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
@@ -369,23 +489,6 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
 }
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}
-
-template <typename T>
-void GEVisualEffectImpl::ApplyTagParams(const std::string& tag, const std::any& value,
-    std::shared_ptr<T>& params, const TagMap<T>& tagMap)
-{
-    if (!params) {
-        GE_LOGE("GEVisualEffectImpl params for tag %{public}s not found", tag.c_str());
-        return;
-    }
-    auto it = tagMap.find(tag);
-    if (it != tagMap.end()) {
-        it->second(params, value);
-    } else {
-        GE_LOGE("GEVisualEffectImpl tag %{public}s not found", tag.c_str());
-    }
-}
-
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
 {
@@ -474,6 +577,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             if (tag == GE_FILTER_MASK_TRANSITION_INVERSE) {
                 maskTransitionParams_->inverse = param;
+            }
+            break;
+        }
+        case FilterType::USE_EFFECT_MASK: {
+            if (useEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_USE_EFFECT_USE_EFFECT) {
+                useEffectMaskParams_->useEffect = param;
             }
             break;
         }
@@ -617,12 +729,28 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::SDF_UNION_OP: {
-            if (sdfUnionOpMaskParams_ == nullptr) {
+            if (sdfUnionOpShapeParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_SDF_SMOOTH_UNION_OP_SPACING) {
-                sdfUnionOpMaskParams_->spacing = param;
+            if (tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING) {
+                sdfUnionOpShapeParams_->spacing = param;
             }
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_BLUR: {
+            SetFrostedGlassBlurParams(tag, param);
             break;
         }
         default:
@@ -646,15 +774,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
-        case FilterType::HARMONIUM_EFFECT: {
-            if (harmoniumEffectParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_BLURIMAGE) {
-                harmoniumEffectParams_->blurImage = param;
-            }
-            break;
-        }
         case FilterType::GASIFY_SCALE_TWIST: {
             SetGasifyScaleTwistParams(tag, param);
             break;
@@ -667,12 +786,30 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             SetGasifyParams(tag, param);
             break;
         }
-        case FilterType::HARMONIUM_EFFECT_MASK: {
-            if (harmoniumEffectMaskParams_ == nullptr) {
+        case FilterType::IMAGE_MASK: {
+            if (imageMaskParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_HARMONIUM_EFFECT_PIXEL_MAP) {
-                harmoniumEffectMaskParams_->image = param;
+            if (tag == GE_MASK_IMAGE_IMAGE) {
+                imageMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::USE_EFFECT_MASK: {
+            if (useEffectMaskParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_MASK_USE_EFFECT_PIXEL_MAP) {
+                useEffectMaskParams_->image = param;
+            }
+            break;
+        }
+        case FilterType::SDF_PIXELMAP_SHAPE: {
+            if (sdfPixelmapShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE) {
+                sdfPixelmapShapeParams_->image = param;
             }
             break;
         }
@@ -693,6 +830,34 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Drawing::Matrix 
 
             if (tag == GE_FILTER_LINEAR_GRADIENT_BLUR_CANVAS_MAT) {
                 linearGradientBlurParams_->mat = param;
+            }
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX) {
+                harmoniumEffectParams_->totalMatrix = param;
+            }
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX) {
+                sdfTransformShapeParams_->matrix = param;
+            }
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            if (frostedGlassEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX) {
+                frostedGlassEffectParams_->maskMatrix = param;
             }
             break;
         }
@@ -788,6 +953,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
         }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::GRID_WARP: {
+            ApplyTagParams(tag, param, gridWarpFilterParams_, gridWarpShaderFilterTagMap_);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -819,6 +996,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             if (tag == GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR) {
                 contentDiagonalParams_->contour_ = param;
+            }
+            break;
+        }
+        case FilterType::HARMONIUM_EFFECT: {
+            if (harmoniumEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
+                harmoniumEffectParams_->ripplePosition = param;
             }
             break;
         }
@@ -899,11 +1085,11 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const uint32_t param)
         }
         case FilterType::SDF_UNION_OP: {
             bool isParamValid = param < static_cast<uint32_t>(GESDFUnionOp::MAX);
-            if (sdfUnionOpMaskParams_ == nullptr || !isParamValid) {
+            if (sdfUnionOpShapeParams_ == nullptr || !isParamValid) {
                 return;
             }
-            if (tag == GE_MASK_SDF_UNION_OP_TYPE) {
-                sdfUnionOpMaskParams_->op = static_cast<GESDFUnionOp>(param);
+            if (tag == GE_SHAPE_SDF_UNION_OP_TYPE) {
+                sdfUnionOpShapeParams_->op = static_cast<GESDFUnionOp>(param);
             }
             break;
         }
@@ -997,7 +1183,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             if (harmoniumEffectParams_ == nullptr) {
                 return;
             }
-
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASK) {
                 harmoniumEffectParams_->mask = param;
             }
@@ -1005,35 +1190,102 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             if (tag == GE_SHADER_HARMONIUM_EFFECT_MASKCLOCK) {
                 harmoniumEffectParams_->maskClock = param;
             }
+
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK) {
+                harmoniumEffectParams_->useEffectMask = param;
+            }
             break;
         }
-        case FilterType::SDF: {
-            bool isSdfMask = !param || param->IsSDFShaderMask();
-            if (sdfFilterParams_ == nullptr || !isSdfMask) {
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            if (frostedGlassEffectParams_ == nullptr) {
                 return;
             }
-            
-            if (tag == GE_FILTER_SDF_MASK) {
-                sdfFilterParams_->mask = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
+            if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK) {
+                frostedGlassEffectParams_->useEffectMask = param;
             }
             break;
         }
-        case FilterType::SDF_UNION_OP: {
-            bool isSdfMask = !param || param->IsSDFShaderMask();
-            if (sdfUnionOpMaskParams_ == nullptr || !isSdfMask) {
-                return;
-            }
-
-            if (tag == GE_MASK_SDF_UNION_OP_MASKX || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKX) {
-                sdfUnionOpMaskParams_->left = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
-            } else if (tag == GE_MASK_SDF_UNION_OP_MASKY || tag == GE_MASK_SDF_SMOOTH_UNION_OP_MASKY) {
-                sdfUnionOpMaskParams_->right = std::static_pointer_cast<Drawing::GESDFShaderMask>(param);
-            }
-            break;
-        }
-
         default:
             break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    switch (filterType_) {
+        case FilterType::SDF_UNION_OP: {
+            if (sdfUnionOpShapeParams_ == nullptr || !param) {
+                return;
+            }
+
+            if (tag == GE_SHAPE_SDF_UNION_OP_SHAPEX || tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEX) {
+                sdfUnionOpShapeParams_->left = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            } else if (tag == GE_SHAPE_SDF_UNION_OP_SHAPEY || tag == GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY) {
+                sdfUnionOpShapeParams_->right = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_BORDER: {
+            if (sdfBorderShaderParams_ && param) {
+                sdfBorderShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_SHADOW: {
+            SetSDFShadowParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_CLIP: {
+            SetSDFClipParams(tag, param);
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            if (frostedGlassParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_FILTER_FROSTED_GLASS_SHAPE) {
+                frostedGlassParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE) {
+                sdfTransformShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            if (frostedGlassEffectParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE) {
+                frostedGlassEffectParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    if (sdfClipShaderParams_ && param) {
+        sdfClipShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+    }
+}
+
+void GEVisualEffectImpl::SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param)
+{
+    if (sdfShadowShaderParams_ && param) {
+        sdfShadowShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
     }
 }
 
@@ -1069,9 +1321,20 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             if (harmoniumEffectParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_SHADER_HARMONIUM_EFFECT_RIPPLEPOSITION) {
-                harmoniumEffectParams_->ripplePosition = param;
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_POSRGB) {
+                harmoniumEffectParams_->posRGB = param;
             }
+            if (tag == GE_SHADER_HARMONIUM_EFFECT_NEGRGB) {
+                harmoniumEffectParams_->negRGB = param;
+            }
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            SetFrostedGlassEffectParams(tag, param);
             break;
         }
         default:
@@ -1153,6 +1416,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
             ApplyTagParams(tag, param, gradientFlowColorsEffectParams_, gradientFlowColorsEffectTagMap_);
             break;
         }
+        case FilterType::CIRCLE_FLOWLIGHT: {
+            ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1204,12 +1471,12 @@ void GEVisualEffectImpl::SetPixelMapMaskParams(const std::string& tag, const Vec
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 {
     switch (filterType_) {
-        case FilterType::SDF_RRECT_MASK: {
-            if (sdfRRectMaskParams_ == nullptr) {
+        case FilterType::SDF_RRECT_SHAPE: {
+            if (sdfRRectShapeParams_ == nullptr) {
                 return;
             }
-            if (tag == GE_MASK_SDF_RRECT_MASK_RRECT) {
-                sdfRRectMaskParams_->rrect = param;
+            if (tag == GE_SHAPE_SDF_RRECT_SHAPE_RRECT) {
+                sdfRRectShapeParams_->rrect = param;
             }
         }
         default:
@@ -1219,15 +1486,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const GERRect& param)
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFBorderParams& border)
 {
-    if (tag == GE_FILTER_SDF_MASK) {
-        sdfFilterParams_->border = border;
+    if (tag == GE_SHADER_SDF_BORDER_BORDER && sdfBorderShaderParams_) {
+        sdfBorderShaderParams_->border = border;
     }
 }
 
 void GEVisualEffectImpl::SetParam(const std::string& tag, const GESDFShadowParams& shadow)
 {
-    if (tag == GE_FILTER_SDF_MASK) {
-        sdfFilterParams_->shadow = shadow;
+    if (tag == GE_SHADER_SDF_SHADOW_SHADOW && sdfShadowShaderParams_) {
+        sdfShadowShaderParams_->shadow = shadow;
     }
 }
 
@@ -1924,7 +2191,7 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, co
                 obj->colorGradientEffectParams_->colors_[11] = Drawing::Color4f{param[0], param[1], param[2], param[3]};
             }
         },
-       
+
     };
     auto it = actions.find(tag);
     if (it != actions.end()) {
@@ -1943,6 +2210,8 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->rippleProgress = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_DISTORTPROGRESS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortProgress = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_MASKPROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->maskProgress = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_DISTORTFACTOR,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->distortFactor = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_REFLECTIONFACTOR,
@@ -1953,10 +2222,22 @@ void GEVisualEffectImpl::SetHarmoniumEffectParams(const std::string& tag, float 
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->materialFactor = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_BLURLEFT,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurLeft = p; } },
-       { GE_SHADER_HARMONIUM_EFFECT_BLURTOP,
+        { GE_SHADER_HARMONIUM_EFFECT_BLURTOP,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->blurTop = p; } },
         { GE_SHADER_HARMONIUM_EFFECT_CORNERRADIUS,
             [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cornerRadius = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_RATE,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->rate = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_LIGHTUPDEGREE,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->lightUpDegree = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_CUBICCOEFF,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->cubicCoeff = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_QUADCOEFF,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->quadCoeff = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_SATURATION,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->saturation = p; } },
+        { GE_SHADER_HARMONIUM_EFFECT_FRACTION,
+            [](GEVisualEffectImpl* obj, float p) { obj->harmoniumEffectParams_->fraction = p; } },
     };
 
     auto it = actions.find(tag);
@@ -2065,30 +2346,6 @@ void GEVisualEffectImpl::SetLightCaveParams(const std::string& tag, float param)
     }
 }
 
-void GEVisualEffectImpl::SetBorder(const Color& color, float width)
-{
-    if (sdfFilterParams_) {
-        sdfFilterParams_->border = std::make_optional<GESDFBorderParams>();
-        sdfFilterParams_->border->color = color;
-        sdfFilterParams_->border->width = width;
-    }
-}
-
-void GEVisualEffectImpl::SetShadow(const Drawing::Color& color, float offsetX,
-                                   float offsetY, float radius,
-                                   Drawing::Path path, bool isFilled)
-{
-    if (sdfFilterParams_) {
-        sdfFilterParams_->shadow = std::make_optional<GESDFShadowParams>();
-        sdfFilterParams_->shadow->color = color;
-        sdfFilterParams_->shadow->offsetX = offsetX;
-        sdfFilterParams_->shadow->offsetY = offsetY;
-        sdfFilterParams_->shadow->radius = radius;
-        sdfFilterParams_->shadow->path = path;
-        sdfFilterParams_->shadow->isFilled = isFilled;
-    }
-}
-
 void GEVisualEffectImpl::SetGasifyScaleTwistParams(const std::string& tag, float param)
 {
     if (gasifyScaleTwistFilterParams_ == nullptr) {
@@ -2166,6 +2423,461 @@ void GEVisualEffectImpl::SetGasifyParams(const std::string& tag, const std::shar
     }
     if (tag == GE_FILTER_GASIFY_MASK) {
         gasifyFilterParams_->maskImage_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const float& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
+        constexpr float V_MIN = 0.0f;
+        frostedGlassParams_->cornerRadius = std::max(param, V_MIN);
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassRates(const std::string& tag, const std::pair<float, float>& param)
+{
+    constexpr float V_MIN = -20.0f;
+    constexpr float V_MAX = 20.0f;
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_BGRATES) {
+        frostedGlassParams_->bgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_SDRATES) {
+        frostedGlassParams_->sdRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES) {
+        frostedGlassParams_->envLightRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLRATES) {
+        frostedGlassParams_->edLightRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassWeights(const std::string& tag, const std::pair<float, float>& param)
+{
+    constexpr float MIN_W = 0.0f;
+    constexpr float MAX_W = 1.0f;
+    if (tag == GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS) {
+        frostedGlassParams_->weightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_WEIGHTSEDL) {
+        frostedGlassParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_BORDERSIZE) {
+        constexpr float MIN_V = 0.0f;
+        frostedGlassParams_->borderSize = Vector2f(std::max(param.first, MIN_V), std::max(param.second, MIN_V));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_BLURPARAMS) {
+        constexpr float MIN_V = 1e-6f;
+        constexpr float MAX_V = 200.0f;
+        constexpr float MIN_K = 1.0f;
+        constexpr float MAX_K = 20.0f;
+        frostedGlassParams_->blurParams = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
+ 
+        std::clamp(param.second, MIN_K, MAX_K));
+    }
+    
+    HandleSetFrostedGlassWeights(tag, param);
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLPARAMS) {
+        constexpr float MIN_P = 0.0f;
+        constexpr float MAX_P = 500.0f;
+        frostedGlassParams_->edLightParams = Vector2f(std::clamp(param.first, MIN_P, MAX_P),
+            std::clamp(param.second, MIN_P, MAX_P));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLANGLES) {
+        constexpr float MIN_V = 0.0f;
+        constexpr float MAX_V = 180.0f;
+        frostedGlassParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
+            std::clamp(param.second, MIN_V, MAX_V));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLDIR) {
+        constexpr float MIN_V = -1.0f;
+        constexpr float MAX_V = 1.0f;
+        constexpr float EPS = 1e-6f;
+ 
+        float dx = std::clamp(param.first, MIN_V, MAX_V);
+        float dy = std::clamp(param.second, MIN_V, MAX_V);
+        if (std::abs(dx) < EPS && std::abs(dy) < EPS) {
+            dx = 1.0f;
+            dy = 0.0f;
+        }
+        frostedGlassParams_->edLightDir = Vector2f(dx, dy);
+    }
+ 
+    HandleSetFrostedGlassRates(tag, param);
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassKBS(const std::string& tag, const Vector3f& param)
+{
+    constexpr float KB_MIN = -20.0f;
+    constexpr float KB_MAX = 20.0f;
+    constexpr float S_MIN = 0.0f;
+    constexpr float S_MAX = 20.0f;
+    
+    if (tag == GE_FILTER_FROSTED_GLASS_BGKBS) {
+        frostedGlassParams_->bgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_SDKBS) {
+        frostedGlassParams_->sdKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS) {
+        frostedGlassParams_->envLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+ 
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLKBS) {
+        frostedGlassParams_->edLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassPosNegCoefs(const std::string& tag, const Vector3f& param)
+{
+    constexpr float V_MIN = -20.0f;
+    constexpr float V_MAX = 20.0f;
+    
+    if (tag == GE_FILTER_FROSTED_GLASS_BGPOS) {
+        frostedGlassParams_->bgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BGNEG) {
+        frostedGlassParams_->bgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_SDPOS) {
+        frostedGlassParams_->sdPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_SDNEG) {
+        frostedGlassParams_->sdNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS) {
+        frostedGlassParams_->envLightPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG) {
+        frostedGlassParams_->envLightNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLPOS) {
+        frostedGlassParams_->edLightPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_EDLNEG) {
+        frostedGlassParams_->edLightNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vector3f& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+    constexpr float MIN_S = -500.0f;
+    constexpr float MAX_S = 500.0f;
+    constexpr float MIN_V = 0.0f;
+    constexpr float MAX_V = 250.0f;
+
+    if (tag == GE_FILTER_FROSTED_GLASS_SDPARAMS) {
+        frostedGlassParams_->sdParams = Vector3f(std::clamp(param[NUM_0], MIN_S, MAX_S),
+            std::clamp(param[NUM_1], MIN_V, MAX_V), std::clamp(param[NUM_2], MIN_V, MAX_V));
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS) {
+        frostedGlassParams_->envLightParams = Vector3f(std::clamp(param[NUM_0], MIN_S, MAX_S),
+            std::clamp(param[NUM_1], MIN_V, MAX_V), std::clamp(param[NUM_2], MIN_V, MAX_V));
+    }
+
+    HandleSetFrostedGlassKBS(tag, param);
+    HandleSetFrostedGlassPosNegCoefs(tag, param);
+
+    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTPARAMS) {
+        constexpr float MIN_R = -1.0f;
+        constexpr float MAX_R = 1.0f;
+        constexpr float MIN_C = 0.0f;
+        constexpr float MAX_C = 10.0f;
+        constexpr float MIN_D = 0.0f;
+        constexpr float MAX_D = 1.0f;
+        frostedGlassParams_->refractParams = Vector3f(std::clamp(param[NUM_0], MIN_R, MAX_R),
+            std::clamp(param[NUM_1], MIN_C, MAX_C), std::clamp(param[NUM_2], MIN_D, MAX_D));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, const float& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM) {
+        constexpr float MIN_V = 1e-6f;
+        constexpr float MAX_V = 200.0f;
+        frostedGlassEffectParams_->blurParam = std::clamp(param, MIN_V, MAX_V);
+    }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX) {
+        constexpr float MIN_S = -500.0f;
+        constexpr float MAX_S = 500.0f;
+        frostedGlassEffectParams_->refractOutPx = std::clamp(param, MIN_S, MAX_S);
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    HandleSetFrostedGlassEffectWeights(tag, param);
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLPARAMS) {
+        constexpr float MIN_P = 0.0f;
+        constexpr float MAX_P = 500.0f;
+        frostedGlassEffectParams_->edLightParams = Vector2f(std::clamp(param.first, MIN_P, MAX_P),
+            std::clamp(param.second, MIN_P, MAX_P));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES) {
+        constexpr float MIN_V = 0.0f;
+        constexpr float MAX_V = 180.0f;
+        frostedGlassEffectParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
+            std::clamp(param.second, MIN_V, MAX_V));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR) {
+        constexpr float MIN_V = -1.0f;
+        constexpr float MAX_V = 1.0f;
+        constexpr float EPS = 1e-6f;
+
+        float dx = std::clamp(param.first, MIN_V, MAX_V);
+        float dy = std::clamp(param.second, MIN_V, MAX_V);
+        if (std::abs(dx) < EPS && std::abs(dy) < EPS) {
+            dx = 1.0f;
+            dy = 0.0f;
+        }
+        frostedGlassEffectParams_->edLightDir = Vector2f(dx, dy);
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP) {
+        frostedGlassEffectParams_->maskLeftTop = Vector2f(param.first, param.second);
+    }
+
+    HandleSetFrostedGlassEffectRates(tag, param);
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    constexpr float V_MIN = -20.0f;
+    constexpr float V_MAX = 20.0f;
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGRATES) {
+        frostedGlassEffectParams_->bgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDRATES) {
+        frostedGlassEffectParams_->sdRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES) {
+        frostedGlassEffectParams_->envLightRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLRATES) {
+        frostedGlassEffectParams_->edLightRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+
+    constexpr float MIN_V = 0.0f;
+    constexpr float MAX_V = 250.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS) {
+        frostedGlassEffectParams_->envLightParams = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
+            std::clamp(param.second, MIN_V, MAX_V));
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
+    const std::string& tag, const std::pair<float, float>& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    constexpr float MIN_W = 0.0f;
+    constexpr float MAX_W = 5.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS) {
+        frostedGlassEffectParams_->weightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL) {
+        frostedGlassEffectParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    constexpr float KB_MIN = -20.0f;
+    constexpr float KB_MAX = 20.0f;
+    constexpr float S_MIN = 0.0f;
+    constexpr float S_MAX = 20.0f;
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGKBS) {
+        frostedGlassEffectParams_->bgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDKBS) {
+        frostedGlassEffectParams_->sdKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTKBS) {
+        frostedGlassEffectParams_->envLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS) {
+        frostedGlassEffectParams_->edLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+}
+
+void GEVisualEffectImpl::HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    constexpr float V_MIN = -20.0f;
+    constexpr float V_MAX = 20.0f;
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGPOS) {
+        frostedGlassEffectParams_->bgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG) {
+        frostedGlassEffectParams_->bgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDPOS) {
+        frostedGlassEffectParams_->sdPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDNEG) {
+        frostedGlassEffectParams_->sdNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS) {
+        frostedGlassEffectParams_->envLightPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTNEG) {
+        frostedGlassEffectParams_->envLightNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS) {
+        frostedGlassEffectParams_->edLightPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLNEG) {
+        frostedGlassEffectParams_->edLightNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, const Vector3f& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    constexpr float MIN_S = -500.0f;
+    constexpr float MAX_S = 500.0f;
+    constexpr float MIN_V = 0.0f;
+    constexpr float MAX_V = 250.0f;
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDPARAMS) {
+        frostedGlassEffectParams_->sdParams = Vector3f(std::clamp(param[NUM_0], MIN_S, MAX_S),
+            std::clamp(param[NUM_1], MIN_V, MAX_V), std::clamp(param[NUM_2], MIN_V, MAX_V));
+    }
+
+    HandleSetFrostedGlassEffectKBS(tag, param);
+    HandleSetFrostedGlassEffectPosNegCoefs(tag, param);
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTPARAMS) {
+        constexpr float MIN_R = -1.0f;
+        constexpr float MAX_R = 1.0f;
+        constexpr float MIN_C = 0.0f;
+        constexpr float MAX_C = 10.0f;
+        constexpr float MIN_D = 0.0f;
+        constexpr float MAX_D = 1.0f;
+        frostedGlassEffectParams_->refractParams = Vector3f(std::clamp(param[NUM_0], MIN_R, MAX_R),
+            std::clamp(param[NUM_1], MIN_C, MAX_C), std::clamp(param[NUM_2], MIN_D, MAX_D));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassBlurParams(const std::string& tag, const float& param)
+{
+    if (frostedGlassBlurParams_ == nullptr) {
+        GE_LOGE("GEVisualEffectImpl::SetFrostedGlassBlurParams frostedGlassBlurParams_ is nullptr");
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_BLUR_RADIUS) {
+        frostedGlassBlurParams_->radius = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX) {
+        frostedGlassBlurParams_->refractOutPx = param;
     }
 }
 } // namespace Drawing

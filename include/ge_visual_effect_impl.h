@@ -49,13 +49,6 @@ public:
 
     ~GEVisualEffectImpl();
 
-    template <typename T>
-    using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
-
-    template <typename T>
-    void ApplyTagParams(const std::string& tag, const std::any& value,
-        std::shared_ptr<T>& params, const TagMap<T>& tagMap);
-
     void SetParam(const std::string& tag, int32_t param);
     void SetParam(const std::string& tag, int64_t param);
     void SetParam(const std::string& tag, float param);
@@ -73,6 +66,7 @@ public:
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
@@ -331,14 +325,24 @@ public:
         return pixelMapMaskParams_;
     }
 
-    void MakeHarmoniumEffectMaskParams()
+    void MakeImageMaskParams()
     {
-        harmoniumEffectMaskParams_ = std::make_shared<GEHarmoniumEffectMaskParams>();
+        imageMaskParams_ = std::make_shared<GEImageMaskParams>();
     }
 
-    const std::shared_ptr<GEHarmoniumEffectMaskParams>& GetHarmoniumEffectMaskParams() const
+    const std::shared_ptr<GEImageMaskParams>& GetImageMaskParams() const
     {
-        return harmoniumEffectMaskParams_;
+        return imageMaskParams_;
+    }
+
+    void MakeUseEffectMaskParams()
+    {
+        useEffectMaskParams_ = std::make_shared<GEUseEffectMaskParams>();
+    }
+
+    const std::shared_ptr<GEUseEffectMaskParams>& GetUseEffectMaskParams() const
+    {
+        return useEffectMaskParams_;
     }
 
     void MakeWaveGradientMaskParams()
@@ -355,12 +359,12 @@ public:
     {
         maskTransitionParams_ = std::make_shared<GEMaskTransitionShaderFilterParams>();
     }
- 
+
     const std::shared_ptr<GEMaskTransitionShaderFilterParams>& GetMaskTransitionParams() const
     {
         return maskTransitionParams_;
     }
-    
+
     void MakeVariableRadiusBlurParams()
     {
         variableRadiusBlurParams_ = std::make_shared<GEVariableRadiusBlurShaderFilterParams>();
@@ -371,37 +375,66 @@ public:
         return variableRadiusBlurParams_;
     }
 
-    const std::shared_ptr<GESDFFilterParams>& GetSDFFilterParams() const
+    const std::shared_ptr<GESDFUnionOpShapeParams>& GetSDFUnionOpShapeParams() const
     {
-        return sdfFilterParams_;
+        return sdfUnionOpShapeParams_;
     }
 
-    void MakeSDFFilterParams()
+    void MakeSDFUnionOpShapeParams(const GESDFUnionOp& op)
     {
-        sdfFilterParams_ = std::make_shared<GESDFFilterParams>();
+        sdfUnionOpShapeParams_ = std::make_shared<GESDFUnionOpShapeParams>();
+        sdfUnionOpShapeParams_->op = op;
     }
 
-    const std::shared_ptr<GESDFUnionOpMaskParams>& GetSDFUnionOpMaskParams() const
+    const std::shared_ptr<GESDFRRectShapeParams>& GetSDFRRectShapeParams() const
     {
-        return sdfUnionOpMaskParams_;
+        return sdfRRectShapeParams_;
     }
 
-    void MakeSDFUnionOpMaskParams(const GESDFUnionOp& op)
+    void MakeSDFRRectShapeParams()
     {
-        sdfUnionOpMaskParams_ = std::make_shared<GESDFUnionOpMaskParams>();
-        sdfUnionOpMaskParams_->op = op;
+        sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
     }
 
-    const std::shared_ptr<GESDFRRectMaskParams>& GetSDFRRectMaskParams() const
+    const std::shared_ptr<GESDFTransformShapeParams>& GetSDFTransformShapeParams() const
     {
-        return sdfRRectMaskParams_;
+        return sdfTransformShapeParams_;
     }
 
-    void MakeSDFRRectMaskParams()
+    void MakeSDFTransformShapeParams()
     {
-        sdfRRectMaskParams_ = std::make_shared<GESDFRRectMaskParams>();
+        sdfTransformShapeParams_ = std::make_shared<GESDFTransformShapeParams>();
     }
 
+    const std::shared_ptr<GESDFPixelmapShapeParams>& GetSDFPixelmapShapeParams() const
+    {
+        return sdfPixelmapShapeParams_;
+    }
+
+    void MakeSDFPixelmapShapeParams()
+    {
+        sdfPixelmapShapeParams_ = std::make_shared<GESDFPixelmapShapeParams>();
+    }
+
+    const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
+    {
+        return sdfShadowShaderParams_;
+    }
+
+    void MakeSDFShadowParams()
+    {
+        sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
+    }
+
+    const std::shared_ptr<GESDFClipShaderParams>& GetSDFClipShaderParams() const
+    {
+        return sdfClipShaderParams_;
+    }
+
+    void MakeSDFClipParams()
+    {
+        sdfClipShaderParams_ = std::make_shared<GESDFClipShaderParams>();
+    }
 
     void MakeColorGradientEffectParams()
     {
@@ -422,7 +455,7 @@ public:
     {
         return lightCaveShaderParams_;
     }
-    
+
     void MakeBorderLightParams()
     {
         borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
@@ -437,7 +470,7 @@ public:
     {
         harmoniumEffectParams_ = std::make_shared<GEHarmoniumEffectShaderParams>();
     }
-        
+
     const std::shared_ptr<GEHarmoniumEffectShaderParams>& GetHarmoniumEffectParams() const
     {
         return harmoniumEffectParams_;
@@ -502,7 +535,7 @@ public:
     {
         return roundedRectFlowlightEffectParams_;
     }
-    
+
     void MakeGradientFlowColorsEffectParams()
     {
         gradientFlowColorsEffectParams_ = std::make_shared<GEXGradientFlowColorsEffectParams>();
@@ -523,9 +556,65 @@ public:
         return frameGradientMaskParams_;
     }
 
-    void SetBorder(const Color& borderColor, float borderWidth);
-    void SetShadow(const Drawing::Color& color, float offsetX, float offsetY,
-                  float radius, Drawing::Path path, bool isFilled);
+    const std::shared_ptr<GESDFBorderShaderParams>& GetSDFBorderShaderParams() const
+    {
+        return sdfBorderShaderParams_;
+    }
+
+    void MakeSDFBorderParams()
+    {
+        sdfBorderShaderParams_ = std::make_shared<GESDFBorderShaderParams>();
+    }
+
+    void MakeFrostedGlassParams()
+    {
+        frostedGlassParams_ = std::make_shared<GEFrostedGlassShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEFrostedGlassShaderFilterParams>& GetFrostedGlassParams() const
+    {
+        return frostedGlassParams_;
+    }
+
+    void MakeGridWarpFilterParams()
+    {
+        gridWarpFilterParams_ = std::make_shared<GEGridWarpShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEGridWarpShaderFilterParams>& GetGridWarpFilterParams() const
+    {
+        return gridWarpFilterParams_;
+    }
+
+    void MakeCircleFlowlightEffectParams()
+    {
+        circleFlowlightEffectParams_ = std::make_shared<GECircleFlowlightEffectParams>();
+    }
+
+    const std::shared_ptr<GECircleFlowlightEffectParams>& GetCircleFlowlightEffectParams() const
+    {
+        return circleFlowlightEffectParams_;
+    }
+
+    void MakeFrostedGlassEffectParams()
+    {
+        frostedGlassEffectParams_ = std::make_shared<GEFrostedGlassEffectParams>();
+    }
+
+    const std::shared_ptr<GEFrostedGlassEffectParams>& GetFrostedGlassEffectParams() const
+    {
+        return frostedGlassEffectParams_;
+    }
+
+    void MakeFrostedGlassBlurParams()
+    {
+        frostedGlassBlurParams_ = std::make_shared<GEFrostedGlassBlurShaderFilterParams>();
+    }
+
+    const std::shared_ptr<GEFrostedGlassBlurShaderFilterParams>& GetFrostedGlassBlurParams() const
+    {
+        return frostedGlassBlurParams_;
+    }
 
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
@@ -579,12 +668,30 @@ private:
     void SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetGasifyParams(const std::string& tag, float param);
     void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
+    void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassWeights(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassRates(const std::string& tag, const std::pair<float, float>& param);
+    void SetFrostedGlassParams(const std::string& tag, const float& param);
+    void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassKBS(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassPosNegCoefs(const std::string& tag, const Vector3f& param);
+    void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
+    void SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
+    void SetFrostedGlassEffectParams(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassEffectWeights(const std::string& tag, const std::pair<float, float>& param);
+    void HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param);
+    void SetFrostedGlassEffectParams(const std::string& tag, const float& param);
+    void SetFrostedGlassEffectParams(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
+    void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
+    void SetFrostedGlassBlurParams(const std::string& tag, const float& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
 
     // ShaderFilter Params
-    std::shared_ptr<GEHarmoniumEffectMaskParams> harmoniumEffectMaskParams_ = nullptr;
+    std::shared_ptr<GEImageMaskParams> imageMaskParams_ = nullptr;
+    std::shared_ptr<GEUseEffectMaskParams> useEffectMaskParams_ = nullptr;
     std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
     std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
     std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;
@@ -611,6 +718,9 @@ private:
     std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
     std::shared_ptr<GEDirectionLightShaderFilterParams> directionLightParams_ = nullptr;
     std::shared_ptr<GEMaskTransitionShaderFilterParams> maskTransitionParams_ = nullptr;
+    std::shared_ptr<GEFrostedGlassShaderFilterParams> frostedGlassParams_ = nullptr;
+    std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
+    std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
@@ -626,9 +736,16 @@ private:
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
-    std::shared_ptr<GESDFFilterParams> sdfFilterParams_ = nullptr;
-    std::shared_ptr<GESDFUnionOpMaskParams> sdfUnionOpMaskParams_ = nullptr;
-    std::shared_ptr<GESDFRRectMaskParams> sdfRRectMaskParams_ = nullptr;
+    std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
+    std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
+    std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
+    std::shared_ptr<GESDFPixelmapShapeParams> sdfPixelmapShapeParams_ = nullptr;
+    std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
+    std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
+
+    std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
+    std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
 };
 
 } // namespace Drawing

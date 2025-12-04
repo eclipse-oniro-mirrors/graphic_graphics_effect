@@ -16,6 +16,9 @@
 #include <gtest/gtest.h>
 
 #include "ge_hps_effect_filter.h"
+#include "ge_pixel_map_shader_mask.h"
+#include "ge_radial_gradient_shader_mask.h"
+#include "ge_ripple_shader_mask.h"
 #include "ge_shader_filter_params.h"
 #include "draw/color.h"
 #include "image/bitmap.h"
@@ -33,6 +36,10 @@ public:
     void SetUp() override;
     void TearDown() override;
     std::shared_ptr<Drawing::Image> MakeImage(Drawing::Canvas& canvas);
+
+    std::shared_ptr<Drawing::GEPixelMapShaderMask> CreatePixelMapShaderMask();
+    std::shared_ptr<Drawing::GERadialGradientShaderMask> CreateRadialGradientShaderMask();
+    std::shared_ptr<Drawing::GERippleShaderMask> CreateRippleShaderMask();
 
     static inline Drawing::Canvas canvas_;
     std::shared_ptr<Drawing::Image> image_ { nullptr };
@@ -57,6 +64,46 @@ void GEHpsEffectFilterTest::SetUp()
 }
 
 void GEHpsEffectFilterTest::TearDown() {}
+
+std::shared_ptr<Drawing::Image> MakeImage()
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    return bmp.MakeImage();
+}
+
+std::shared_ptr<Drawing::GEPixelMapShaderMask> GEHpsEffectFilterTest::CreatePixelMapShaderMask()
+{
+    Drawing::GEPixelMapMaskParams maskParams;
+    maskParams.image = ::OHOS::Rosen::MakeImage();
+    maskParams.src = { 0.5, 1.0, 0.1, 0.2 };
+    maskParams.dst = { 1.3, 1.2, 1.6, 2.0 };
+    maskParams.fillColor = Vector4f(0.2, 0.8, 0.1, 0.9);
+    return std::make_shared<Drawing::GEPixelMapShaderMask>(maskParams);
+}
+
+std::shared_ptr<Drawing::GERadialGradientShaderMask> GEHpsEffectFilterTest::CreateRadialGradientShaderMask()
+{
+    Drawing::GERadialGradientShaderMaskParams maskParams;
+    maskParams.center_ = {0.5f, 0.5f};
+    maskParams.radiusX_ = 1.0f;
+    maskParams.radiusY_ = 1.0f;
+    maskParams.colors_ = {0.0f, 1.0f};
+    maskParams.positions_ = {0.0f, 1.0f};
+    return std::make_shared<Drawing::GERadialGradientShaderMask>(maskParams);
+}
+
+std::shared_ptr<Drawing::GERippleShaderMask> GEHpsEffectFilterTest::CreateRippleShaderMask()
+{
+    Drawing::GERippleShaderMaskParams maskParams;
+    maskParams.center_ = {0.5f, 0.5f};
+    maskParams.radius_ = 0.5f;
+    maskParams.width_ = 0.5f;
+    maskParams.widthCenterOffset_ = 0.0f;
+    return std::make_shared<Drawing::GERippleShaderMask>(maskParams);
+}
 
 /**
  * @tc.name: GenerateVisualEffectFromGE_001
@@ -100,7 +147,43 @@ HWTEST_F(GEHpsEffectFilterTest, GenerateVisualEffectFromGE_001, TestSize.Level0)
     hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
         brightnessForHPS_, image_);
 
+    visualEffectImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+    visualEffectImpl->MakeEdgeLightParams();
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    auto edgeLightParams = visualEffectImpl->GetEdgeLightParams();
+    edgeLightParams->mask = CreatePixelMapShaderMask();
+    hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateVisualEffectFromGE_001 end";
+}
+
+/**
+ * @tc.name: GenerateMaskParameter_001
+ * @tc.desc: Verify the GenerateMaskParameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHpsEffectFilterTest, GenerateMaskParameter_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateMaskParameter_001 start";
+
+    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+
+    std::shared_ptr<Drawing::GEShaderMask> shaderMask = CreatePixelMapShaderMask();
+    auto maskParams = hpsEffectFilter->GenerateMaskParameter(shaderMask);
+    EXPECT_NE(maskParams, nullptr);
+
+    shaderMask = CreateRadialGradientShaderMask();
+    maskParams = hpsEffectFilter->GenerateMaskParameter(shaderMask);
+    EXPECT_NE(maskParams, nullptr);
+
+    shaderMask = CreateRippleShaderMask();
+    maskParams = hpsEffectFilter->GenerateMaskParameter(shaderMask);
+    EXPECT_EQ(maskParams, nullptr);
+
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateMaskParameter_001 end";
 }
 
 /**
