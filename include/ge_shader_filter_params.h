@@ -1075,7 +1075,7 @@ struct GEFrostedGlassShaderFilterParams {
     std::shared_ptr<GESDFShaderShape> sdfShape;
     bool innerShadowEnabled = true;
     bool baseVibrancyEnabled = true;
-    float baseMaterialType = 0.0;
+    float baseMaterialType = 0.0f;
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
