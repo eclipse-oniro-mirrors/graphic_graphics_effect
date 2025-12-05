@@ -28,6 +28,9 @@ GEFrostedGlassBlurShaderFilter::GEFrostedGlassBlurShaderFilter(
 std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
+    if (ROSEN_LE(blurParams_.radius, 0.0f)) {
+        return image;
+    }
     Drawing::GEMESABlurShaderFilterParams params;
     params.radius = blurParams_.radius;
 
