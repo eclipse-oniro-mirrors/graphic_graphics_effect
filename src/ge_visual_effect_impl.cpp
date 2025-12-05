@@ -2443,7 +2443,8 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
     if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
         constexpr float V_MIN = 0.0f;
         frostedGlassParams_->cornerRadius = std::max(param, V_MIN);
-    } else if (tag == GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE) {
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE) {
         frostedGlassParams_->baseMaterialType = param;
     }
 }
@@ -2454,9 +2455,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const boo
         return;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
-        frostedGlassParams_->innerShadowEnabled = param;
-    } else if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
+    if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
         frostedGlassParams_->baseVibrancyEnabled = param;
     }
 }
