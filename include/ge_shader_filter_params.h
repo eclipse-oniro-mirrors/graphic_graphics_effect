@@ -1040,12 +1040,6 @@ constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMa
 constexpr char GE_FILTER_FROSTED_GLASS_MATERIALCOLOR[] = "FrostedGlass_MaterialColor";
 
 struct GEFrostedGlassShaderFilterParams {
-    enum BaseMaterialType {
-        NO_BLUR = 0,
-        BLUR = 1,
-        NEW_MATERIAL = 2
-    };
-
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
@@ -1081,7 +1075,7 @@ struct GEFrostedGlassShaderFilterParams {
     std::shared_ptr<GESDFShaderShape> sdfShape;
     bool innerShadowEnabled = true;
     bool baseVibrancyEnabled = true;
-    float baseMaterialType = static_cast<float>(NEW_MATERIAL);
+    float baseMaterialType = 0.0;
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
