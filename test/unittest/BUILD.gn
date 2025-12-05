@@ -63,6 +63,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_bezier_warp_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_border_light_shader.cpp",
     "${graphics_effect_root}/src/ge_circle_flowlight_effect.cpp",
+    "${graphics_effect_root}/src/ge_color_gradient_effect.cpp",
     "${graphics_effect_root}/src/ge_color_gradient_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_content_light_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_direction_light_shader_filter.cpp",
