@@ -590,12 +590,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             break;
         }
         case FilterType::FROSTED_GLASS: {
-            if (frostedGlassParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
-                frostedGlassParams_->innerShadowEnabled = param;
-            }
+            SetFrostedGlassParams(tag, param);
             break;
         }
         default:
@@ -1427,6 +1422,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::CIRCLE_FLOWLIGHT: {
             ApplyTagParams(tag, param, circleFlowlightEffectParams_, circleFlowlightEffectTagMap_);
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            SetFrostedGlassParams(tag, param);
             break;
         }
         default:
@@ -2444,6 +2443,32 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
     if (tag == GE_FILTER_FROSTED_GLASS_CORNERRADIUS) {
         constexpr float V_MIN = 0.0f;
         frostedGlassParams_->cornerRadius = std::max(param, V_MIN);
+    } else if (tag == GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE) {
+        frostedGlassParams_->baseMaterialType = param;
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
+        frostedGlassParams_->innerShadowEnabled = param;
+    } else if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
+        frostedGlassParams_->baseVibrancyEnabled = param;
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vector4f& param)
+{
+    if (frostedGlassParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_FROSTED_GLASS_MATERIALCOLOR) {
+        frostedGlassParams_->materialColor = param;
     }
 }
 
