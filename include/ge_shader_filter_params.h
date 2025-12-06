@@ -1033,6 +1033,10 @@ constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
 constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
 constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
 constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
+// Switch params
+constexpr char GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED[] = "FrostedGlass_BaseVibrancyEnabled";
+constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMaterialType";
+constexpr char GE_FILTER_FROSTED_GLASS_MATERIALCOLOR[] = "FrostedGlass_MaterialColor";
 
 struct GEFrostedGlassShaderFilterParams {
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
@@ -1068,6 +1072,9 @@ struct GEFrostedGlassShaderFilterParams {
     Vector2f borderSize = Vector2f(200.0f, 100.0f);
     float cornerRadius = 100.0f;
     std::shared_ptr<GESDFShaderShape> sdfShape;
+    bool baseVibrancyEnabled = true;
+    float baseMaterialType = 0.0f;
+    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 

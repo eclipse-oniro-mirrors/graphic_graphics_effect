@@ -673,6 +673,8 @@ private:
     void HandleSetFrostedGlassRates(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassParams(const std::string& tag, const float& param);
     void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
+    void SetFrostedGlassParams(const std::string& tag, const bool& param);
+    void SetFrostedGlassParams(const std::string& tag, const Vector4f& param);
     void HandleSetFrostedGlassKBS(const std::string& tag, const Vector3f& param);
     void HandleSetFrostedGlassPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
