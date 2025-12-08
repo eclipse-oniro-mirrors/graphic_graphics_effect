@@ -198,7 +198,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNo
         {
             k *= 4.0;
             float h = max(k - abs(d1.a - d2.a), 0.0) / (2.0 * k);
-            return vec4(mix(d1.xy, d2.xy, (d1.a < d2.a) ? h : 1.0 - h), 0.0, min(d1.a, d2.a) - h * h * k);
+            return vec4(mix(d1.xyz, d2.xyz, (d1.a < d2.a) ? h : 1.0 - h), min(d1.a, d2.a) - h * h * k);
         }
 
         half4 main(vec2 fragCoord)
