@@ -2455,7 +2455,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const boo
         return;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
+    if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED ||
+        tag == GE_FILTER_FROSTED_GLASS_REFRACTENABLED ||
+        tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED ||
+        tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED ||
+        tag == GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED) {
         frostedGlassParams_->baseVibrancyEnabled = param;
     }
 }
