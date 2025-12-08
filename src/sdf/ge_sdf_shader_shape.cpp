@@ -27,18 +27,20 @@ namespace Drawing {
 
 std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShader(float width, float height) const
 {
-    // currently we only support sdf filter
     return nullptr;
 }
 
 std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    // currently we only support sdf filter
     return nullptr;
 }
 
 void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
 {
+    if (GetSDFShapeType() != shape.GetSDFShapeType()) {
+        LOGE("GESDFShaderShape::CopyState, forbid to copy state from different type shape!");
+        return;
+    }
     if (GetSDFShapeType() == GESDFShapeType::RRECT) {
         const auto* rectShape = static_cast<const GESDFRRectShaderShape*>(&shape);
         auto* thisRect = static_cast<GESDFRRectShaderShape*>(this);
