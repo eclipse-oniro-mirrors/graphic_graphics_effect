@@ -54,7 +54,9 @@ private:
     Vector4f gradientX_;
     Vector4f gradientY_;
     float progress_;
-
+    Vector4f strength_;
+    float distortStrength_;
+    float blendGradient_;
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
 };

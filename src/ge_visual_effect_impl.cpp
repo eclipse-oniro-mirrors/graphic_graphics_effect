@@ -154,10 +154,13 @@ TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
     ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE, rotationAmplitude,
         Vector4f),
     ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED, rotationSeed, Vector4f),
-    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX, gradientX, Vector4f),
-    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY, gradientY, Vector4f),
-    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS, progress, float),
-    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK, mask,
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_GRADIENTX, gradientX, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_GRADIENTY, gradientY, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_STRENGTH, strength, Vector4f),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_DISTORT_STRENGTH, distortStrength, float),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_BLEND_GRADIENT, blendGradient, float),
+    ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_MASK, mask,
         std::shared_ptr<Drawing::GEShaderMask>),
     };
 
