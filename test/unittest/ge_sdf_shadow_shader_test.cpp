@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "sdf/ge_sdf_shadow_shader.h"
+#include "sdf/ge_sdf_rrect_shader_shape.h"
 
 #include "draw/color.h"
 
@@ -43,7 +44,6 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
 {
     Drawing::GESDFShadowShaderParams shadowParams;
     GESDFShadowShader shadowShader(shadowParams);
-    shadowShader.sdfTreeProcessor_ = std::nullopt;
 
     Drawing::Rect rect0;
     auto shader = shadowShader.MakeSDFShadowShader(rect0);
@@ -54,10 +54,9 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     shader = shadowShader.MakeSDFShadowShader(rect1);
     EXPECT_EQ(shader, nullptr);
 
-    Drawing::GESDFRRectShapeParams rectShadpeParams;
-    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShadpeParams);
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f, 10.0f, 10.0f}};
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     shadowParams.shape = sdfShape;
-    shadowShader.sdfTreeProcessor_ = std::make_optional<Drawing::GESDFTreeProcessor>(sdfShape);
     shadowShader.SetSDFShadowParams(shadowParams);
     shader = shadowShader.MakeSDFShadowShader(rect1);
     EXPECT_NE(shader, nullptr);

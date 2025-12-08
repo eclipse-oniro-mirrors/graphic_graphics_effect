@@ -18,7 +18,6 @@
 
 #include "effect/runtime_shader_builder.h"
 #include "ge_filter_type_info.h"
-#include "ge_sdf_tree_processor.h"
 #include "ge_shader.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
@@ -42,31 +41,17 @@ public:
     }
 
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFBorderShader(const Drawing::Rect& rect);
+    void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFBorderEffect();
     Drawing::GESDFBorderShaderParams params_;
-    std::string shaderCode_;
-    std::optional<Drawing::GESDFTreeProcessor> sdfTreeProcessor_;
-    std::optional<Drawing::RuntimeShaderBuilder> shaderEffectBuilder_;
 
-    inline static const std::string borderHeaders_ = R"(
+    inline static const std::string shaderCode_ = R"(
+        uniform shader sdfShape;
         uniform vec3 u_borderColor;
         uniform float u_borderWidth;
-    )";
 
-    inline static const std::string mainFunctionCode_ = R"(
-        half4 main(float2 fragCoord)
-        {
-            vec4 color = vec4(0.0);
-            vec2 coord = fragCoord;
-            float d = SDFMap(coord);
-            color = borderEffect(d, color, u_borderColor, u_borderWidth);
-            return half4(color);
-        }
-    )";
-
-    inline static const std::string borderEffectsFunctions_ = R"(
         // Input data:
         // float d - current SDF shape distance
         // vec4 color - color of the background
@@ -74,12 +59,23 @@ private:
         // float borderWidth - width of the border
         vec4 borderEffect(float d, vec4 color, vec3 borderColor, float borderWidth)
         {
-            if (d < 0.0 && d >= -borderWidth)
-            {
-                color = vec4(borderColor, 1.0);
+            if (d < 0.0 && d >= -borderWidth) {
+                color = vec4(borderColor, 1.0) * (1.0 - smoothstep(-1.0, 0.0, d));
+            }
+
+            if (d < -borderWidth && d >= (-borderWidth - 1.0)) {
+                color = vec4(borderColor, 1.0) * smoothstep(-borderWidth - 1.0, -borderWidth, d);
             }
             
             return color;
+        }
+
+        half4 main(float2 fragCoord)
+        {
+            vec4 color = vec4(0.0);
+            float d = sdfShape.eval(fragCoord).a;
+            color = borderEffect(d, color, u_borderColor, u_borderWidth);
+            return half4(color);
         }
     )";
 };

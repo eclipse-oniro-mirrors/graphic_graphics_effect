@@ -75,26 +75,36 @@ void GEFrostedGlassShaderFilterTest::TearDown()
 Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakeParams()
 {
     Drawing::GEFrostedGlassShaderFilterParams p; // Default parameters
-    // COMMON
-    p.borderSize = {80.0, 50.f};
-    p.cornerRadius = 20.0f;
-    p.borderWidth = 6.0f;
-    p.offset = 2.0f;
-    p.downSampleFactor = 2.0f;
-    // BACKGROUND
-    p.bgFactor = 0.85f;
-    // INNER SHADOW
-    p.innerShadowParams= {3.5f, 1.25f, 1.75f};
-    p.sdParams = {1.0f, 2.0f, 1.2f};
-    // ENV LIGHT
-    p.refractOutPx = 4.0f;
-    p.envParams = {1.1f, 0.0, 1.1f};
-    // EDGELIGHT
-    p.edgeLightAngle= {30.0f, 30.0f, 3.0f};
-    p.edgeLightBlur = {2.0f, -1.0f};
-    p.edgeLightDir = {-1.0f, 1.0f};
-    // BLUR
-    p.blurParams = {48.0f, 4.0f};
+    p.weightsEmboss = {1.0f, 1.0f};
+    p.weightsEdl = {1.0f, 1.0f};
+    p.refractParams = {0.5f, 0.5f, 1.0f};
+    p.bgRates = {-0.00003f, 1.2f};
+    p.bgKBS = {0.010834f, 0.007349f, 1.2f};
+    p.bgPos = {0.3f, 0.5f, 1.0f};
+    p.bgNeg = {0.5f, 0.5f, 1.0f};
+ 
+    p.sdParams = {0.0f, 2.0f, 0.0f};
+    p.sdRates = {0.0f, 0.0f};
+    p.sdKBS = {-0.02f, 2.0f, 4.62f};
+    p.sdPos = {1.0f, 1.5f, 2.0f};
+    p.sdNeg = {1.7f, 3.0f, 1.0f};
+ 
+    p.envLightParams = {0.8f, 0.2745f, 2.0f};
+    p.envLightRates = {0.0f, 0.0f};
+    p.envLightKBS = {0.8f, 0.2745f, 2.0f};
+    p.envLightPos = {1.0f, 1.5f, 2.0f};
+    p.envLightNeg = {1.7f, 3.0f, 1.0f};
+ 
+    p.edLightParams = {2.0f, -1.0f};
+    p.edLightAngles = {30.0f, 30.0f};
+    p.edLightDir = {-1.0f, 1.0f};
+    p.edLightRates = {0.0f, 0.0f};
+    p.edLightKBS = {0.6027f, 0.64f, 2.0f};
+    p.edLightPos = {1.0f, 1.5f, 2.0f};
+    p.edLightNeg = {1.7f, 3.0f, 1.0f};
+ 
+    p.borderSize = {200.0f, 100.0f};
+    p.cornerRadius = 100.0f;
     return p;
 }
 

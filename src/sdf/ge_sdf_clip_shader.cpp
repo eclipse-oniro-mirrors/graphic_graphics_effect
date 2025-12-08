@@ -21,8 +21,7 @@
 namespace OHOS {
 namespace Rosen {
 
-GESDFClipShader::GESDFClipShader(const Drawing::GESDFClipShaderParams& params)
-    : params_(params), sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params.shape))
+GESDFClipShader::GESDFClipShader(const Drawing::GESDFClipShaderParams& params) : params_(params)
 {}
 
 void GESDFClipShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
@@ -31,6 +30,9 @@ void GESDFClipShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& r
     MakeDrawingShader(rect, -1.f);
     auto shader = GetDrawingShader();
     Drawing::Brush brush;
+    if (shader == nullptr) {
+        brush.SetColor(Drawing::Color::COLOR_TRANSPARENT);
+    }
     brush.SetBlendMode(Drawing::BlendMode::DST_IN);
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
@@ -49,17 +51,25 @@ void GESDFClipShader::MakeDrawingShader(const Drawing::Rect& rect, float progres
 
 std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const Drawing::Rect& rect)
 {
-    if (!params_.shape || !sdfTreeProcessor_) {
+    if (!params_.shape) {
         GE_LOGE("GESDFClipShader::MakeSDFClipShader mask is invalid.");
         return nullptr;
     }
 
-    if (!shaderEffectBuilder_) {
-        auto sdfEffect = GetSDFClipEffect();
-        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(sdfEffect);
+    auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
+    if (sdfShader == nullptr) {
+        GE_LOGE("GESDFClipShader: failed generate GESDFClipShader.");
+        return nullptr;
     }
-    sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
-    auto outShader = shaderEffectBuilder_->MakeShader(nullptr, false);
+
+    auto sdfEffect = GetSDFClipEffect();
+    if (sdfEffect == nullptr) {
+        GE_LOGE("GESDFClipShader: failed GetSDFClipEffect.");
+        return nullptr;
+    }
+    auto shaderEffectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfEffect);
+    shaderEffectBuilder->SetChild("sdfShape", sdfShader);
+    auto outShader = shaderEffectBuilder->MakeShader(nullptr, false);
     if (outShader == nullptr) {
         GE_LOGE("GESDFClipShader::MakeSDFClipShader sdfShadowShader is nullptr.");
         return nullptr;
@@ -69,15 +79,11 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const 
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFClipShader::GetSDFClipEffect()
 {
-    if (shaderCode_.empty()) {
-        std::string headers;
-        std::string sdfShapeFunctions;
-        sdfTreeProcessor_->ProcessSDFShape(headers, sdfShapeFunctions);
-        shaderCode_ += headers;
-        shaderCode_ += sdfShapeFunctions;
-        shaderCode_ += mainFunctionCode_;
+    static std::shared_ptr<Drawing::RuntimeEffect> sdfClipShader = nullptr;
+    if (sdfClipShader == nullptr) {
+        sdfClipShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }
-    return Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+    return sdfClipShader;
 }
 
 } // namespace Rosen
