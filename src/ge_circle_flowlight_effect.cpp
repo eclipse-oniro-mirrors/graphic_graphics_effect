@@ -287,7 +287,7 @@ void GECircleFlowlightEffect::SetUniform(float width, float height)
     builder_->SetUniform("gradientX", gradientX_.GetData(), ARRAY_NUM);
     builder_->SetUniform("gradientY", gradientY_.GetData(), ARRAY_NUM);
     builder_->SetUniform("progress", progress_);
-    builder_->SetUniform("strength", strength_.GetDate(), ARRAY_NUM);
+    builder_->SetUniform("strength", strength_.GetData(), ARRAY_NUM);
     builder_->SetUniform("distortStrength", distortStrength_);
     builder_->SetUniform("blendGradient", blendGradient_);
 }
