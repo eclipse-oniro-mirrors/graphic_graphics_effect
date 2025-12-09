@@ -2455,12 +2455,20 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const boo
         return;
     }
 
-    if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED ||
-        tag == GE_FILTER_FROSTED_GLASS_REFRACTENABLED ||
-        tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED ||
-        tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED ||
-        tag == GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED) {
+    if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
         frostedGlassParams_->baseVibrancyEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTENABLED) {
+        frostedGlassParams_->refractEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
+        frostedGlassParams_->innerShadowEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED) {
+        frostedGlassParams_->envLightEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED) {
+        frostedGlassParams_->highLightEnabled = param;
     }
 }
 
