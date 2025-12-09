@@ -392,6 +392,7 @@ bool GERender::BeforeApplyShaderFilter(Drawing::Canvas& canvas,
     }
     geShaderFilter->SetSupportHeadroom(visualEffect->GetSupportHeadroom());
     geShaderFilter->SetCache(ve->GetCache());
+    geShaderFilter->SetCacheProvider(context.geCacheProvider);
     geShaderFilter->Preprocess(canvas, context.src, context.dst);
     return true;
 }

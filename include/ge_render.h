@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "cache/ge_cache_provider.h"
 #include "draw/brush.h"
 #include "draw/canvas.h"
 #include "draw/pen.h"
@@ -88,6 +89,7 @@ public:
         uint32_t maskColor {};
         float saturationForHPS {};
         float brightnessForHPS {};
+        IGECacheProvider* geCacheProvider {};
     };
 
     /**
@@ -160,6 +162,7 @@ private:
         std::shared_ptr<Drawing::Image> image {};
         Drawing::Rect src {};
         Drawing::Rect dst {};
+        IGECacheProvider* geCacheProvider {};
     };
 
     // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
