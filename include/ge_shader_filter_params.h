@@ -657,7 +657,7 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP[] = "FrostedGlassEffec
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX[] = "FrostedGlassEffect_MaskMatrix";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffect_RefractOutPx";
 
-constexpr char GE_FILTER_FROSTED_GLASS_EFFECT_MATERIALCOLOR[] = "FrostedGlassEffect_MaterialColor";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MATERIALCOLOR[] = "FrostedGlassEffect_MaterialColor";
 
 struct GEFrostedGlassEffectParams {
     float blurParam = 4.0f;
