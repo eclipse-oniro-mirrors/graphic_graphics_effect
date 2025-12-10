@@ -33,7 +33,7 @@ public:
         return static_cast<const IGECache*>(&cache_);
     }
 
-    virtual bool Store(const IGECache& cache)
+    virtual bool Store(const IGECache& cache) override
     {
         auto imageCache = cache.As<GEImageCache>();
         if (imageCache != nullptr) {
