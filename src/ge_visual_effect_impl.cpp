@@ -28,6 +28,8 @@ namespace {
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
+constexpr size_t NUM_3 = 3;
+
 
 template <typename T>
 using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
@@ -1426,6 +1428,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::FROSTED_GLASS: {
             SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            SetFrostedGlassEffectParams(tag, param);
             break;
         }
         default:
@@ -2902,6 +2908,21 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
         constexpr float MAX_D = 1.0f;
         frostedGlassEffectParams_->refractParams = Vector3f(std::clamp(param[NUM_0], MIN_R, MAX_R),
             std::clamp(param[NUM_1], MIN_C, MAX_C), std::clamp(param[NUM_2], MIN_D, MAX_D));
+    }
+}
+
+void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, const Vector4f& param)
+{
+    if (frostedGlassEffectParams_ == nullptr) {
+        return;
+    }
+    
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MATERIALCOLOR) {
+        constexpr float MIN_C = 0.0f;
+        constexpr float MAX_C = 1.0f;
+        frostedGlassEffectParams_->materialColor = Vector4f(std::clamp(param[NUM_0], MIN_C, MAX_C),
+            std::clamp(param[NUM_1], MIN_C, MAX_C), std::clamp(param[NUM_2], MIN_C, MAX_C),
+            , std::clamp(param[NUM_3], MIN_C, MAX_C));
     }
 }
 
