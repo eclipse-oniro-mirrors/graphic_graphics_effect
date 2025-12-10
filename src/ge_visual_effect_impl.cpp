@@ -2922,7 +2922,7 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
         constexpr float MAX_C = 1.0f;
         frostedGlassEffectParams_->materialColor = Vector4f(std::clamp(param[NUM_0], MIN_C, MAX_C),
             std::clamp(param[NUM_1], MIN_C, MAX_C), std::clamp(param[NUM_2], MIN_C, MAX_C),
-            , std::clamp(param[NUM_3], MIN_C, MAX_C));
+            std::clamp(param[NUM_3], MIN_C, MAX_C));
     }
 }
 
