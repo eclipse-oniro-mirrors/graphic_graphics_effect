@@ -21,6 +21,7 @@
 namespace OHOS {
 namespace Rosen {
 static constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
+static constexpr float RADIUS_FACTOR = 1.5f;
 
 GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params) : params_(params)
 {}
@@ -75,7 +76,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
     shaderEffectBuilder->SetUniform("shadowColor", params_.shadow.color.GetRedF(),
         params_.shadow.color.GetGreenF(), params_.shadow.color.GetBlueF());
     shaderEffectBuilder->SetUniform("shadowOffset", params_.shadow.offsetX, params_.shadow.offsetY);
-    shaderEffectBuilder->SetUniform("shadowRadius", std::max(params_.shadow.radius, SDF_SHADOW_MIN_THRESHOLD));
+    shaderEffectBuilder->SetUniform("shadowRadius",
+        std::max(params_.shadow.radius * RADIUS_FACTOR, SDF_SHADOW_MIN_THRESHOLD));
     shaderEffectBuilder->SetUniform("isFilled", static_cast<float>(params_.shadow.isFilled));
 
     auto outShader = shaderEffectBuilder->MakeShader(nullptr, false);
@@ -88,7 +90,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetSDFShadowEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> sdfShadowShader = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfShadowShader = nullptr;
     if (sdfShadowShader == nullptr) {
         sdfShadowShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }

@@ -85,7 +85,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(co
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFBorderShader::GetSDFBorderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> sdfBorderShader = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfBorderShader = nullptr;
     if (sdfBorderShader == nullptr) {
         sdfBorderShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }
