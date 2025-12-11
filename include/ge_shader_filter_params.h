@@ -1037,6 +1037,10 @@ constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
 constexpr char GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED[] = "FrostedGlass_BaseVibrancyEnabled";
 constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMaterialType";
 constexpr char GE_FILTER_FROSTED_GLASS_MATERIALCOLOR[] = "FrostedGlass_MaterialColor";
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTENABLED[] = "FrostedGlass_RefractEnabled";
+constexpr char GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED[] = "FrostedGlass_InnerShadowEnabled";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED[] = "FrostedGlass_EnvLightEnabled";
+constexpr char GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED[] = "FrostedGlass_HighLightEnabled";
 
 struct GEFrostedGlassShaderFilterParams {
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
@@ -1074,6 +1078,10 @@ struct GEFrostedGlassShaderFilterParams {
     std::shared_ptr<GESDFShaderShape> sdfShape;
     bool baseVibrancyEnabled = true;
     float baseMaterialType = 0.0f;
+    bool refractEnabled = true;
+    bool innerShadowEnabled = true;
+    bool envLightEnabled = true;
+    bool highLightEnabled = true;
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);

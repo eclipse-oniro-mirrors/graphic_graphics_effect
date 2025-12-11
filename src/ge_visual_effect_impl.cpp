@@ -2458,6 +2458,18 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const boo
     if (tag == GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED) {
         frostedGlassParams_->baseVibrancyEnabled = param;
     }
+    if (tag == GE_FILTER_FROSTED_GLASS_REFRACTENABLED) {
+        frostedGlassParams_->refractEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED) {
+        frostedGlassParams_->innerShadowEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED) {
+        frostedGlassParams_->envLightEnabled = param;
+    }
+    if (tag == GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED) {
+        frostedGlassParams_->highLightEnabled = param;
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const Vector4f& param)
