@@ -657,6 +657,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP[] = "FrostedGlassEffec
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX[] = "FrostedGlassEffect_MaskMatrix";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffect_RefractOutPx";
 
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MATERIALCOLOR[] = "FrostedGlassEffect_MaterialColor";
+
 struct GEFrostedGlassEffectParams {
     float blurParam = 4.0f;
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
@@ -694,6 +696,7 @@ struct GEFrostedGlassEffectParams {
     Vector2f maskLeftTop = Vector2f(0.0f, 0.0f);
     Drawing::Matrix maskMatrix;
     float refractOutPx = 0.8f;
+    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
 

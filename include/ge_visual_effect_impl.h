@@ -684,6 +684,7 @@ private:
     void HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassEffectParams(const std::string& tag, const float& param);
     void SetFrostedGlassEffectParams(const std::string& tag, const Vector3f& param);
+    void SetFrostedGlassEffectParams(const std::string& tag, const Vector4f& param);
     void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
     void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetFrostedGlassBlurParams(const std::string& tag, const float& param);
