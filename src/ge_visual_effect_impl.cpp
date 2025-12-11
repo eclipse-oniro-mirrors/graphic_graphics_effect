@@ -2562,7 +2562,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
  
     if (tag == GE_FILTER_FROSTED_GLASS_EDLANGLES) {
         constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 180.0f;
+        constexpr float MAX_V = 360.0f;
         frostedGlassParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
             std::clamp(param.second, MIN_V, MAX_V));
     }
@@ -2728,7 +2728,7 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES) {
         constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 180.0f;
+        constexpr float MAX_V = 360.0f;
         frostedGlassEffectParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
             std::clamp(param.second, MIN_V, MAX_V));
     }
