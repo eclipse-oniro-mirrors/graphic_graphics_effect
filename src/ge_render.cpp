@@ -380,7 +380,7 @@ bool GERender::AfterApplyShaderFilter(Drawing::Canvas& canvas, const Drawing::GE
     // Update information after executing the shader filter
     auto ve = visualEffect.GetImpl();
     ve->SetCache(geShaderFilter.GetCache());
-    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY) {
         isGasifyFilter_ = true;
     }
     return true;
