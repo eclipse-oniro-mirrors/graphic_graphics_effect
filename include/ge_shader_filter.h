@@ -85,7 +85,7 @@ public:
         return cacheAnyPtr_;
     }
 
-    virtual void SetCacheProvider(const IGECacheProvider* cacheProvider) {}
+    virtual void SetCacheProvider(IGECacheProvider* cacheProvider) {}
 
 protected:
     /**
