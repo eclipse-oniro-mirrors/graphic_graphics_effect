@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "sdf/ge_sdf_clip_shader.h"
+#include "sdf/ge_sdf_rrect_shader_shape.h"
 
 #include "draw/color.h"
 
@@ -43,17 +44,15 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
 {
     Drawing::GESDFClipShaderParams params;
     GESDFClipShader clipShader(params);
-    clipShader.sdfTreeProcessor_ = std::nullopt;
 
     // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
     Drawing::Rect rect { 1.0f, 1.0f, 2.0f, 2.0f };
     auto shader = clipShader.MakeSDFClipShader(rect);
     EXPECT_EQ(shader, nullptr);
 
-    Drawing::GESDFRRectShapeParams rectShadpeParams;
-    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShadpeParams);
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f, 10.0f, 10.0f}};
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     params.shape = sdfShape;
-    clipShader.sdfTreeProcessor_ = std::make_optional<Drawing::GESDFTreeProcessor>(sdfShape);
     clipShader.SetSDFClipParams(params);
     shader = clipShader.MakeSDFClipShader(rect);
     EXPECT_NE(shader, nullptr);

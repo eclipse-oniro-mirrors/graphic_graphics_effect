@@ -12,14 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "ge_frosted_glass_shader_filter.h"
 
+#include "ge_frosted_glass_effect.h"
+
+#include <cmath>
 #include "ge_log.h"
-#include "ge_mesa_blur_shader_filter.h"
+#include "ge_visual_effect_impl.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
+
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
@@ -324,228 +328,130 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     }
 )";
 
-GEFrostedGlassShaderFilter::GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params)
+GEFrostedGlassEffect::GEFrostedGlassEffect(const Drawing::GEFrostedGlassEffectParams& params)
 {
-    frostedGlassParams_ = params;
+    frostedGlassEffectParams_ = params;
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader(
-    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
-    const Drawing::Rect& dst, const Drawing::Matrix& invertMatrix)
+bool GEFrostedGlassEffect::IsValidParam(float width, float height)
 {
-    auto largeRBlurImg = MakeLargeRadiusBlurImg(canvas, src, dst, image);
-    if (largeRBlurImg == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader largeRBlurImg is null");
-        return nullptr;
-    }
-
-    auto largeRBlurShader = Drawing::ShaderEffect::CreateImageShader(*largeRBlurImg, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    if (largeRBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::CreateLargeRadiusBlurShader create shader failed");
-        return nullptr;
-    }
-
-    return largeRBlurShader;
-}
-
-std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader(
-    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
-    const Drawing::Rect& dst, const Drawing::Matrix& invertMatrix)
-{
-    auto smallRBlurImg = MakeSmallRadiusBlurImg(canvas, src, dst, image);
-    if (smallRBlurImg == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader smallRBlurImg is null");
-        return nullptr;
-    }
-
-    auto smallRBlurShader = Drawing::ShaderEffect::CreateImageShader(*smallRBlurImg, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    if (smallRBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::CreateSmallRadiusBlurShader create shader failed");
-        return nullptr;
-    }
-
-    return smallRBlurShader;
-}
-
-bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst,
-    Drawing::Matrix& matrix, std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder)
-{
-    if (image->GetHeight() < 1e-6 || image->GetWidth() < 1e-6) {
-        LOGE("GEFrostedGlassShaderFilter::PrepareDrawing imageinfo is invalid");
+    if (width < 1e-6 || height < 1e-6) {
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader width or height less than 1e-6");
         return false;
     }
-    matrix = canvasInfo_.mat;
-    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEFrostedGlassShaderFilter::PrepareDrawing Invert matrix failed");
-        return false;
+    return true;
+}
+
+void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+{
+    drShader_ = nullptr;
+    if (!IsValidParam(rect.GetWidth(), rect.GetHeight())) {
+        return;
     }
-    auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+
+    if (frostedGlassEffectParams_.useEffectMask == nullptr) {
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader useEffectMask is nullptr");
+        return;
+    }
+    std::shared_ptr<Drawing::Image> cachedBlurImage = frostedGlassEffectParams_.useEffectMask->GetImage().lock();
+    if (cachedBlurImage == nullptr) {
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader cachedBlurImage is nullptr");
+        return;
+    }
+
+    auto shader = Drawing::ShaderEffect::CreateImageShader(*cachedBlurImage, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix());
     if (shader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create shader failed.");
-        return false;
-    }
-    auto largeRBlurShader = CreateLargeRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    auto smallRBlurShader = CreateSmallRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    if (smallRBlurShader == nullptr || largeRBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
-        return false;
+        GE_LOGE("GEFrostedGlassEffect::create shader failed.");
+        return;
     }
 
-    auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
-    if (!sdfNormalShader) {
-        LOGE("GEFrostedGlassShaderFilter::create sdfShapeShader failed.");
-        return false;
-    }
-
-    builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, sdfNormalShader,
-                                     canvasInfo_.geoWidth, canvasInfo_.geoHeight);
-    return true;
-}
-
-std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
-{
-    if (image == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage input is invalid");
-        return nullptr;
-    }
-    Drawing::Matrix matrix;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
-    if (!PrepareDrawing(canvas, image, src, dst, matrix, builder)) {
-        return image;
-    }
+    auto builder = MakeFrostedGlassShader(shader, rect);
     if (builder == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
-        return image;
+        GE_LOGE("GEFrostedGlassEffect::OnProcessImage builder is null");
+        return;
     }
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &matrix, image->GetImageInfo(), false);
-    if (resultImage == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage resultImage is null");
-        return image;
+
+    auto frostedGlassShader = builder->MakeShader(nullptr, false);
+    if (frostedGlassShader == nullptr) {
+        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader frostedGlassShader is nullptr");
+        return;
     }
-    return resultImage;
+    drShader_ = frostedGlassShader;
 }
 
-bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
-    const Drawing::Rect& src, const Drawing::Rect& dst, Drawing::Brush& brush)
-{
-    if (image == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::OnDrawImage input is invalid");
-        return false;
-    }
-    Drawing::Matrix matrix;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
-    if (!PrepareDrawing(canvas, image, src, dst, matrix, builder)) {
-        return false;
-    }
-    if (builder == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::OnDrawImage builder is null");
-        return false;
-    }
-
-    matrix.PostConcat(CreateDestinationTranslateMatrix(dst));
-    auto shader = builder->MakeShader(&matrix, image->IsOpaque());
-    brush.SetShaderEffect(shader);
-    canvas.AttachBrush(brush);
-    canvas.DrawRect(dst);
-    canvas.DetachBrush();
-    return true;
-}
-
-std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeLargeRadiusBlurImg(Drawing::Canvas& canvas,
-    const Drawing::Rect& src, const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image)
-{
-    Drawing::GEMESABlurShaderFilterParams blurImgParas{};
-    blurImgParas.radius = frostedGlassParams_.blurParams[0]; // Radius
-    auto blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
-    return blurShader_->OnProcessImage(canvas, image, src, dst);
-}
-
-std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurImg(Drawing::Canvas& canvas,
-    const Drawing::Rect& src, const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image)
-{
-    Drawing::GEMESABlurShaderFilterParams blurImgParas{};
-    blurImgParas.radius = frostedGlassParams_.blurParams[0]/frostedGlassParams_.blurParams[1]; // Radius / k
-    auto blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
-    return blurShader_->OnProcessImage(canvas, image, src, dst);
-}
-
-std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::MakeSDFNormalShader(float width, float height) const
-{
-    if (auto shape = frostedGlassParams_.sdfShape) {
-        return shape->GenerateDrawingShaderHasNormal(width, height);
-    }
-    return nullptr;
-}
-
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
-
-bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
+bool GEFrostedGlassEffect::InitFrostedGlassEffect()
 {
     if (g_frostedGlassShaderEffect == nullptr) {
         g_frostedGlassShaderEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
         if (g_frostedGlassShaderEffect == nullptr) {
-            LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
+            GE_LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
             return false;
         }
     }
     return true;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeFrostedGlassShader(
-    std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
-    std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader, std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader,
-    float imageWidth, float imageHeight)
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrostedGlassShader(
+    std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect)
 {
+    float imageWidth = rect.GetWidth();
+    float imageHeight = rect.GetHeight();
+
     if (g_frostedGlassShaderEffect == nullptr) {
         if (!InitFrostedGlassEffect()) {
-            LOGE("GEFrostedGlassShaderFilter::failed when initializing MagnifierEffect.");
+            GE_LOGE("GEFrostedGlassEffect::failed when initializing MagnifierEffect.");
             return nullptr;
         }
+    }
+
+    std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader;
+    if (auto shape = frostedGlassEffectParams_.sdfShape) {
+        sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+    } else {
+        GE_LOGE("GEFrostedGlassEffect::MakeFrostedGlassShader sdfShapeShader is null");
+        return nullptr;
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_frostedGlassShaderEffect);
     // Common inputs
     builder->SetChild("image", imageShader);
-    builder->SetChild("edgeBlurredImg", largeRBlurShader);
-    builder->SetChild("bgBlurredImg", smallRBlurShader);
+    builder->SetChild("edgeBlurredImg", imageShader);
+    builder->SetChild("bgBlurredImg", imageShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetChild("sdfNormalImg", sdfNormalShader);
-    builder->SetUniform("borderWidth", frostedGlassParams_.envLightParams[NUM_1]);
+    builder->SetUniform("borderWidth", frostedGlassEffectParams_.envLightParams[NUM_0]);
     builder->SetUniform("offset", 0.0f);
     builder->SetUniform("downSampleFactor", 1.0f);
     // Background darken parameter
     builder->SetUniform("bgFactor", 1.0f);
     // Inner shadow parameters
-    builder->SetUniform("innerShadowRefractPx", frostedGlassParams_.sdParams[NUM_0]);
-    builder->SetUniform("innerShadowWidth", frostedGlassParams_.sdParams[NUM_1]);
+    builder->SetUniform("innerShadowRefractPx", frostedGlassEffectParams_.sdParams[NUM_0]);
+    builder->SetUniform("innerShadowWidth", frostedGlassEffectParams_.sdParams[NUM_1]);
     builder->SetUniform("innerShadowExp", 4.62f);
-    builder->SetUniform("sdK", frostedGlassParams_.sdKBS[NUM_0]);
-    builder->SetUniform("sdB", frostedGlassParams_.sdKBS[NUM_1]);
-    builder->SetUniform("sdS", frostedGlassParams_.sdKBS[NUM_2]);
+    builder->SetUniform("sdK", frostedGlassEffectParams_.sdKBS[NUM_0]);
+    builder->SetUniform("sdB", frostedGlassEffectParams_.sdKBS[NUM_1]);
+    builder->SetUniform("sdS", frostedGlassEffectParams_.sdKBS[NUM_2]);
     // Env refraction parameters
-    builder->SetUniform("refractOutPx", frostedGlassParams_.envLightParams[NUM_0]);
-    builder->SetUniform("envK", frostedGlassParams_.envLightKBS[NUM_0]);
-    builder->SetUniform("envB", frostedGlassParams_.envLightKBS[NUM_1]);
-    builder->SetUniform("envS", frostedGlassParams_.envLightKBS[NUM_2]);
+    builder->SetUniform("refractOutPx", frostedGlassEffectParams_.refractOutPx);
+    builder->SetUniform("envK", frostedGlassEffectParams_.envLightKBS[NUM_0]);
+    builder->SetUniform("envB", frostedGlassEffectParams_.envLightKBS[NUM_1]);
+    builder->SetUniform("envS", frostedGlassEffectParams_.envLightKBS[NUM_2]);
     // Edge highlights parameters
-    builder->SetUniform("highLightAngleDeg", frostedGlassParams_.edLightAngles[NUM_0]);
-    builder->SetUniform("highLightFeatherDeg", frostedGlassParams_.edLightAngles[NUM_1]);
-    builder->SetUniform("highLightWidthPx", frostedGlassParams_.edLightParams[NUM_0]);
-    builder->SetUniform("highLightFeatherPx", frostedGlassParams_.edLightParams[NUM_1]);
+    builder->SetUniform("highLightAngleDeg", frostedGlassEffectParams_.edLightAngles[NUM_0]);
+    builder->SetUniform("highLightFeatherDeg", frostedGlassEffectParams_.edLightAngles[NUM_1]);
+    builder->SetUniform("highLightWidthPx", frostedGlassEffectParams_.edLightParams[NUM_0]);
+    builder->SetUniform("highLightFeatherPx", frostedGlassEffectParams_.edLightParams[NUM_1]);
     builder->SetUniform("highLightShiftPx", 0.0f);
-    builder->SetUniform("highLightDirection", frostedGlassParams_.edLightDir[NUM_0],
-                        frostedGlassParams_.edLightDir[NUM_1]);
-    builder->SetUniform("hlK", frostedGlassParams_.edLightKBS[NUM_0]);
-    builder->SetUniform("hlB", frostedGlassParams_.edLightKBS[NUM_1]);
-    builder->SetUniform("hlS", frostedGlassParams_.edLightKBS[NUM_2]);
+    builder->SetUniform("highLightDirection", frostedGlassEffectParams_.edLightDir[NUM_0],
+                        frostedGlassEffectParams_.edLightDir[NUM_1]);
+    builder->SetUniform("hlK", frostedGlassEffectParams_.edLightKBS[NUM_0]);
+    builder->SetUniform("hlB", frostedGlassEffectParams_.edLightKBS[NUM_1]);
+    builder->SetUniform("hlS", frostedGlassEffectParams_.edLightKBS[NUM_2]);
+    // Adapt effect component
+    builder->SetUniform("ecOffset", rect.GetLeft() - frostedGlassEffectParams_.maskLeftTop[NUM_0],
+        rect.GetTop() - frostedGlassEffectParams_.maskLeftTop[NUM_1]);
     return builder;
 }
 } // namespace Rosen

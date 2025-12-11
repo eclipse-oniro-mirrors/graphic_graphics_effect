@@ -22,13 +22,27 @@ namespace OHOS {
 namespace Rosen {
 static constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
 
-GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params)
-    : params_(params), sdfTreeProcessor_(std::make_optional<Drawing::GESDFTreeProcessor>(params.shape))
+GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params) : params_(params)
 {}
 
 void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeSDFShadowShader(rect);
+}
+
+void GESDFShadowShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    Preprocess(canvas, rect); // to calculate your cache data
+    MakeDrawingShader(rect, -1.f); // not use progress
+    auto shader = GetDrawingShader();
+    if (shader == nullptr) {
+        return;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(rect);
+    canvas.DetachBrush();
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(const Drawing::Rect& rect)
@@ -39,25 +53,32 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
         return nullptr;
     }
 
-    if (!params_.shape || !sdfTreeProcessor_) {
-        GE_LOGE("GESDFShadowShader::MakeSDFShadowShader mask is invalid.");
+    if (!params_.shape) {
+        GE_LOGE("GESDFShadowShader::MakeSDFShadowShader shape is invalid.");
         return nullptr;
     }
 
-    if (!shaderEffectBuilder_) {
-        auto sdfShadowEffect = GetSDFShadowEffect();
-        shaderEffectBuilder_ = std::make_optional<Drawing::RuntimeShaderBuilder>(sdfShadowEffect);
+    auto sdfShader = params_.shape->GenerateDrawingShader(width, height);
+    if (sdfShader == nullptr) {
+        GE_LOGE("GESDFShadowShader: failed generate GESDFShadowShader.");
+        return nullptr;
     }
-    sdfTreeProcessor_->UpdateUniformDatas(*shaderEffectBuilder_);
 
-    shaderEffectBuilder_->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
-    shaderEffectBuilder_->SetUniform("shadowColor", params_.shadow.color.GetRedF(),
+    auto sdfEffect = GetSDFShadowEffect();
+    if (sdfEffect == nullptr) {
+        GE_LOGE("GESDFShadowShader: failed GetSDFShadowEffect.");
+        return nullptr;
+    }
+    auto shaderEffectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfEffect);
+    shaderEffectBuilder->SetChild("sdfShape", sdfShader);
+    shaderEffectBuilder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
+    shaderEffectBuilder->SetUniform("shadowColor", params_.shadow.color.GetRedF(),
         params_.shadow.color.GetGreenF(), params_.shadow.color.GetBlueF());
-    shaderEffectBuilder_->SetUniform("shadowOffset", params_.shadow.offsetX, params_.shadow.offsetY);
-    shaderEffectBuilder_->SetUniform("shadowRadius", std::max(params_.shadow.radius, SDF_SHADOW_MIN_THRESHOLD));
-    shaderEffectBuilder_->SetUniform("isFilled", static_cast<float>(params_.shadow.isFilled));
+    shaderEffectBuilder->SetUniform("shadowOffset", params_.shadow.offsetX, params_.shadow.offsetY);
+    shaderEffectBuilder->SetUniform("shadowRadius", std::max(params_.shadow.radius, SDF_SHADOW_MIN_THRESHOLD));
+    shaderEffectBuilder->SetUniform("isFilled", static_cast<float>(params_.shadow.isFilled));
 
-    auto outShader = shaderEffectBuilder_->MakeShader(nullptr, false);
+    auto outShader = shaderEffectBuilder->MakeShader(nullptr, false);
     if (outShader == nullptr) {
         GE_LOGE("GESDFShadowShader::MakeSDFShadowShader sdfShadowShader is nullptr.");
         return nullptr;
@@ -67,17 +88,11 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetSDFShadowEffect()
 {
-    if (shaderCode_.empty()) {
-        shaderCode_ += shadowHeaders_;
-        std::string headers;
-        std::string sdfShapeFunctions;
-        sdfTreeProcessor_->ProcessSDFShape(headers, sdfShapeFunctions);
-        shaderCode_ += headers;
-        shaderCode_ += sdfShapeFunctions;
-        shaderCode_ += shadowEffectsFunctions_;
-        shaderCode_ += mainFunctionCode_;
+    static std::shared_ptr<Drawing::RuntimeEffect> sdfShadowShader = nullptr;
+    if (sdfShadowShader == nullptr) {
+        sdfShadowShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }
-    return Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+    return sdfShadowShader;
 }
 
 } // namespace Rosen
