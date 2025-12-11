@@ -92,12 +92,19 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
         return nullptr;
     }
 
-    if (params_.matrix == Drawing::Matrix()) {
+    if (params_.matrix.IsIdentity()) {
         return shapeShader;
     }
 
+    // turn transform  from shape to fragcoord
+    Drawing::Matrix invertMatrix;
+    if (params_.matrix.Invert(invertMatrix)) {
+        builder->SetUniform("transformMatrix", invertMatrix);
+    } else {
+        LOGE("GESDFTransformShaderShape::GenerateShaderEffect, invert matrix failed");
+        builder->SetUniform("transformMatrix", params_.matrix);
+    }
     builder->SetChild("shapeShader", shapeShader);
-    builder->SetUniform("transformMatrix", params_.matrix);
 
     auto sdfTransformShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfTransformShapeShader) {

@@ -23,11 +23,11 @@ namespace Rosen {
 namespace Drawing {
 
 enum class GESDFShapeType : uint8_t {
-    UNION_OP = 0,
+    PIXELMAP = 0,
     RRECT,
     TRANSFORM,
-    PIXELMAP,
-    MAX = RRECT,
+    UNION_OP,
+    MAX = UNION_OP,
 };
 
 class GE_EXPORT GESDFShaderShape : public GEShaderShape {

@@ -396,8 +396,15 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
         LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
         return false;
     }
-    builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, canvasInfo_.geoWidth,
-                                     canvasInfo_.geoHeight);
+
+    auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    if (!sdfNormalShader) {
+        LOGE("GEFrostedGlassShaderFilter::create sdfShapeShader failed.");
+        return false;
+    }
+
+    builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, sdfNormalShader,
+                                     canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     return true;
 }
 
@@ -408,40 +415,11 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::OnProcessImage(Drawi
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage input is invalid");
         return nullptr;
     }
-    if (image->GetHeight() < 1e-6 || image->GetWidth() < 1e-6) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage imageinfo is invalid");
-        return nullptr;
-    }
-
-    Drawing::AutoCanvasRestore acr(*canvas, true);
-    canvas->ResetMatrix();
-
-    Drawing::Matrix matrix = canvasInfo_.mat;
-    matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
-    Drawing::Matrix invertMatrix;
-    if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage Invert matrix failed");
+    Drawing::Matrix matrix;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
+    if (!PrepareDrawing(canvas, image, src, dst, matrix, builder)) {
         return image;
     }
-    auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    if (shader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create shader failed.");
-        return nullptr;
-    }
-    auto largeRBlurShader = CreateLargeRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    auto smallRBlurShader = CreateSmallRadiusBlurShader(canvas, image, src, dst, invertMatrix);
-    if (smallRBlurShader == nullptr || largeRBlurShader == nullptr) {
-        LOGE("GEFrostedGlassShaderFilter::create largeRBlurShader or smallRBlurShader failed.");
-        return nullptr;
-    }
-    auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
-    if (!sdfNormalShader) {
-        LOGE("GEFrostedGlassShaderFilter::OnProcessImage sdfShapeShader is null");
-        return image;
-    }
-    auto builder = MakeFrostedGlassShader(shader, largeRBlurShader, smallRBlurShader, sdfNormalShader,
-                                          canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (builder == nullptr) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage builder is null");
         return image;

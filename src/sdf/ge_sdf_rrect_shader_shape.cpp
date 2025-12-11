@@ -21,6 +21,57 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
+static constexpr char SDF_GRAD_PROG[] = R"(
+    uniform vec2 centerPos;
+    uniform vec2 halfSize;
+    uniform float radius;
+
+    const float N_EPS = 1e-6;
+    const float N_SCALE = 2048.0;
+
+    vec2 safeNorm(vec2 v)
+    {
+        return v / max(length(v), N_EPS);
+    }
+
+    vec3 sdgRRect(vec2 p, vec2 b, float r)
+    {
+        float rr = clamp(r, 0.0, min(b.x, b.y));
+
+        vec2 s = sign(p);
+        vec2 w = abs(p) - b + rr;
+
+        float g = max(w.x, w.y);
+        vec2  q = max(w, 0.0);
+        float l = length(q);
+
+        float outside = step(0.0, g);
+        float sd = mix(g, l, outside) - rr;
+
+        float pickX = step(w.y, w.x);
+        vec2  gradIn  = vec2(pickX, 1.0 - pickX);
+        vec2  gradOut = safeNorm(q);
+        vec2  grad    = s * mix(gradIn, gradOut, outside);
+
+        return vec3(sd, grad);
+    }
+
+    float EncodeDir(vec2 dir)
+    {
+        float xPos = floor(dir.x + N_SCALE);
+        float yPos = floor(dir.y + N_SCALE);
+        return xPos + (yPos / N_SCALE) / 2.0;
+    }
+
+    vec4 main(float2 fragCoord)
+    {
+        vec2 posFromCenter = fragCoord - centerPos;
+        vec3 sdg = sdgRRect(posFromCenter, halfSize, radius);
+        float packedDir = EncodeDir(posFromCenter);
+        return vec4(sdg.yz, packedDir, sdg.x);
+    }
+)";
+
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
@@ -87,48 +138,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectNormalShaderShapeBuilder;
     }
 
-    static constexpr char prog[] = R"(
-        uniform vec2 centerPos;
-        uniform vec2 halfSize;
-        uniform float radius;
-
-        const float N_EPS = 1e-6;
-
-        vec2 safeNorm(vec2 v)
-        {
-            return v / max(length(v), N_EPS);
-        }
-
-        vec3 sdgRRect(vec2 p, vec2 b, float r)
-        {
-            float rr = clamp(r, 0.0, min(b.x, b.y));
-
-            vec2 s = sign(p);
-            vec2 w = abs(p) - b + rr;
-
-            float g = max(w.x, w.y);
-            vec2  q = max(w, 0.0);
-            float l = length(q);
-
-            float outside = step(0.0, g);
-            float sd = mix(g, l, outside) - rr;
-
-            float pickX = step(w.y, w.x);
-            vec2  gradIn  = vec2(pickX, 1.0 - pickX);
-            vec2  gradOut = safeNorm(q);
-            vec2  grad    = s * mix(gradIn, gradOut, outside);
-
-            return vec3(sd, grad);
-        }
-
-        half4 main(float2 fragCoord)
-        {
-            vec3 sdg = sdgRRect(fragCoord - centerPos, halfSize, radius);
-            return half4(sdg.yz, 0.0, sdg.x);
-        }
-    )";
-
-    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
     if (!sdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GettSDFRRectNormalShapeBuilder effect error");
         return nullptr;
