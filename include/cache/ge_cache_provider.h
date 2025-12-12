@@ -27,9 +27,6 @@ struct IGECacheProvider : ExactDowncastUtils::ExactDowncastable {
     virtual ~IGECacheProvider() = default;
     virtual const IGECache* GetFirst() const = 0;
     virtual bool Store(const IGECache& cache) = 0;
-
-    // a possible idea for future extension
-    // virtual const IGECache* Get(const IGECacheKey& cache) = 0;
 };
 
 template<typename Derived>

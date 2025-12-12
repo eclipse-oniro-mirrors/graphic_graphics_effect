@@ -48,6 +48,12 @@ public:
     void DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::SamplingOptions& sampling);
+    struct ShaderFilterEffectContext {
+        std::shared_ptr<Drawing::Image> image {};
+        Drawing::Rect src {};
+        Drawing::Rect dst {};
+        IGECacheProvider* geCacheProvider {};
+    };
     /**
      * @brief Applies a sequence of visual effects to an image using the GE (Graphics Effect) pipeline.
      *
@@ -76,8 +82,8 @@ public:
      *         Returns nullptr if the input image is null or processing fails.
      */
     std::shared_ptr<Drawing::Image> ApplyImageEffect(Drawing::Canvas& canvas,
-        Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
+        Drawing::GEVisualEffectContainer& veContainer, const ShaderFilterEffectContext& context,
+        const Drawing::SamplingOptions& sampling);
 
     struct HpsGEImageEffectContext {
         std::shared_ptr<Drawing::Image> image {};
@@ -158,13 +164,6 @@ public:
     static void SetMesablurAllEnabledByCCM(bool flag);
 
 private:
-    struct ShaderFilterEffectContext {
-        std::shared_ptr<Drawing::Image> image {};
-        Drawing::Rect src {};
-        Drawing::Rect dst {};
-        IGECacheProvider* geCacheProvider {};
-    };
-
     // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
     enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
 
