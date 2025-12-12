@@ -776,10 +776,13 @@ constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR3[] = "CircleFlowlight_Color3";
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY[] = "CircleFlowlight_RotationFrequency";
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE[] = "CircleFlowlight_RotationAmplitude";
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_SEED[] = "CircleFlowlight_RotationSeed";
-constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTX[] = "CircleFlowlight_GradientX";
-constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_GRADIENTY[] = "CircleFlowlight_GradientY";
-constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_PROGRESS[] = "CircleFlowlight_Progress";
-constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_ROTATION_MASK[] = "CircleFlowlight_Mask";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_GRADIENTX[] = "CircleFlowlight_GradientX";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_GRADIENTY[] = "CircleFlowlight_GradientY";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_PROGRESS[] = "CircleFlowlight_Progress";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_STRENGTH[] = "CircleFlowlight_Strength";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_DISTORT_STRENGTH[] = "CircleFlowlight_DistortStrength";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_BLEND_GRADIENT[] = "CircleFlowlight_BlendGradient";
+constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_MASK[] = "CircleFlowlight_Mask";
 struct GECircleFlowlightEffectParams {
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
     Vector4f rotationFrequency;
@@ -788,6 +791,9 @@ struct GECircleFlowlightEffectParams {
     Vector4f gradientX;
     Vector4f gradientY;
     float progress = 0.0f;
+    Vector4f strength = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    float distortStrength = 4.0f;
+    float blendGradient = 1.0f;
     std::shared_ptr<GEShaderMask> mask;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(CIRCLE_FLOWLIGHT, GECircleFlowlightEffectParams,
