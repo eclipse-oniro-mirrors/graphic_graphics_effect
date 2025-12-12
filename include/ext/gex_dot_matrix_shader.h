@@ -31,11 +31,6 @@ public:
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override { }
 
     virtual const std::string GetDescription() const;
-    virtual void SetNormalParams(Drawing::Color dotColor, float dotRadius, float dotSpacing,
-        Drawing::Color bgColor = {}) { }
-    virtual void SetNoneEffect() { }
-    virtual void SetRotateEffect(const RotateEffectParams& rotateParams) { }
-    virtual void SetRippleEffect(const RippleEffectParams& rippleParams) { }
 };
 
 } // namespace Rosen

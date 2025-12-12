@@ -56,7 +56,7 @@ bool RotateEffectParams::Unmarshalling(Parcel& parcel)
         GE_LOGE("RotateEffectParams::Unmarshalling Read pathDirection failed!");
         return false;
     }
-    pathDirection_ = static_cast<DotMatrixDirection>(valueUint32);
+    pathDirection_ = static_cast<Drawing::DotMatrixDirection>(valueUint32);
     uint32_t size = 0;
     if (!parcel.ReadUint32(size)) {
         GE_LOGE("RotateEffectParams::Unmarshalling Read size failed!");
@@ -234,11 +234,11 @@ bool DotMatrixShaderParams::Marshalling(Parcel& parcel)
         return false;
     }
 
-    if (effectType_ == DotMatrixEffectType::ROTATE) {
+    if (effectType_ == Drawing::DotMatrixEffectType::ROTATE) {
         return rotateEffectParams_.Marshalling(parcel);
     }
 
-    if (effectType_ == DotMatrixEffectType::RIPPLE) {
+    if (effectType_ == Drawing::DotMatrixEffectType::RIPPLE) {
         return rippleEffectParams_.Marshalling(parcel);
     }
     return true;
@@ -250,12 +250,12 @@ bool DotMatrixShaderParams::Unmarshalling(Parcel& parcel)
         return false;
     }
 
-    effectType_ = (DotMatrixEffectType)parcel.ReadUint32();
-    if (effectType_ == DotMatrixEffectType::ROTATE) {
+    effectType_ = (Drawing::DotMatrixEffectType)parcel.ReadUint32();
+    if (effectType_ == Drawing::DotMatrixEffectType::ROTATE) {
         return rotateEffectParams_.Unmarshalling(parcel);
     }
 
-    if (effectType_ == DotMatrixEffectType::RIPPLE) {
+    if (effectType_ == Drawing::DotMatrixEffectType::RIPPLE) {
         return rippleEffectParams_.Unmarshalling(parcel);
     }
     return true;

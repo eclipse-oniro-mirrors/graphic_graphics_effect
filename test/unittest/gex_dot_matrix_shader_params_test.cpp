@@ -92,7 +92,7 @@ HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling_001, TestSiz
  */
 HWTEST_F(DotMatrixShaderParamsTest, RotateEffectParamsUnmarshalling_002, TestSize.Level1)
 {
-    RotateEffectParams params1{DotMatrixDirection::TOP, colorVector_};
+    RotateEffectParams params1{Drawing::DotMatrixDirection::TOP, colorVector_};
     Parcel parcel;
     EXPECT_TRUE(params1.Marshalling(parcel));
     RotateEffectParams params2;

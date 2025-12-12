@@ -19,32 +19,16 @@
 
 #include "draw/color.h"
 #include "ge_common.h"
+#include "ge_shader_filter_params.h"
 #include "parcel.h"
 #include "utils/point.h"
 #include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {
-enum class DotMatrixEffectType {
-    NONE,
-    ROTATE,
-    RIPPLE,
-};
-
-enum class DotMatrixDirection {
-    TOP,
-    TOP_RIGHT,
-    RIGHT,
-    BOTTOM_RIGHT,
-    BOTTOM,
-    BOTTOM_LEFT,
-    LEFT,
-    TOP_LEFT,
-    MAX = TOP_LEFT,
-};
 
 struct RotateEffectParams {
-    DotMatrixDirection pathDirection_ = DotMatrixDirection::TOP_LEFT;
+    Drawing::DRDotMatrixDirection pathDirection_ = Drawing::DotMatrixDirection::TOP_LEFT;
     std::vector<Drawing::Color> effectColors_;
 
     bool Marshalling(Parcel& parcel);
@@ -73,7 +57,7 @@ struct DotMatrixNormalParams {
 };
 
 struct GE_EXPORT DotMatrixShaderParams {
-    DotMatrixEffectType effectType_ = DotMatrixEffectType::NONE;
+    Drawing::DotMatrixEffectType effectType_ = Drawing::DotMatrixEffectType::NONE;
     DotMatrixNormalParams normalParams_;
     RotateEffectParams rotateEffectParams_;
     RippleEffectParams rippleEffectParams_;

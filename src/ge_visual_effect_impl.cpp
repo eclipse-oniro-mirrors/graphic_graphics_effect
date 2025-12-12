@@ -266,6 +266,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeContentDiagonalParams();
         }
     },
+    { GE_SHADER_DOT_MATRIX_SHADER,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DOT_MATRIX);
+            impl->MakeDotMatrixShaderParams();
+        }
+    },
     { GE_SHADER_WAVY_RIPPLE_LIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT);
@@ -541,6 +547,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             }
             break;
         }
+        case FilterType::DOT_MATRIX: {
+            SetDotMatrixShaderParamsInitData(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -596,6 +606,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
         }
         case FilterType::FROSTED_GLASS: {
             SetFrostedGlassParams(tag, param);
+            break;
+        }
+        case FilterType::DOT_MATRIX: {
+            if (dotMatrixShaderParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_DOT_MATRIX_SHADER_INVERSEEFFECT) {
+                dotMatrixShaderParams_->inverseEffect_ = param;
+            }
             break;
         }
         default:
@@ -671,6 +690,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
             SetContentDiagonalFlowParams(tag, param);
+            break;
+        }
+        case FilterType::DOT_MATRIX: {
+            SetDotMatrixShaderParams(tag, param);
             break;
         }
         case FilterType::WAVY_RIPPLE_LIGHT: {
@@ -917,6 +940,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             }
             break;
         }
+        case FilterType::DOT_MATRIX: {
+            if (dotMatrixShaderParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_DOT_MATRIX_SHADER_COLORFRACTIONS) {
+                dotMatrixShaderParams_->colorFractions_ = Vector2f(param.first, param.second);
+            }
+            break;
+        }
         case FilterType::WAVY_RIPPLE_LIGHT: {
             SetWavyRippleLightParams(tag, param);
             break;
@@ -1031,6 +1063,32 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::array<Drawi
             }
             if (tag == GE_FILTER_BEZIER_WARP_DESTINATION_PATCH) {
                 bezierWarpParams_->destinationPatch = param;
+            }
+            break;
+        }
+        case FilterType::DOT_MATRIX: {
+            if (dotMatrixShaderParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_DOT_MATRIX_SHADER_STARTPOINTS) {
+                dotMatrixShaderParams_->startPoints_ = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vector4f>& param)
+{
+    switch (filterType_) {
+        case FilterType::DOT_MATRIX: {
+            if (dotMatrixShaderParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_DOT_MATRIX_SHADER_EFFECTCOLORS) {
+                dotMatrixShaderParams_->effectColors_ = param;
             }
             break;
         }
@@ -1362,6 +1420,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT: {
             SetContentDiagonalFlowParams(tag, param);
+            break;
+        }
+        case FilterType::DOT_MATRIX: {
+            SetDotMatrixShaderParams(tag, param);
             break;
         }
         case FilterType::PIXEL_MAP_MASK: {
@@ -1995,6 +2057,102 @@ void GEVisualEffectImpl::SetContentDiagonalFlowParams(const std::string& tag, fl
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDotMatrixShaderParamsInitData(const std::string &tag, int32_t param)
+{
+    if (dotMatrixShaderParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_PATHDIRECTION) {
+        SetDotMatrixShaderParamsPathDirection(tag, param);
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_EFFECTTYPE) {
+        SetDotMatrixShaderParamsEffectType(tag, param);
+    }
+}
+
+void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string& tag, int32_t param)
+{
+    switch (param) {
+        case 0:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP;
+            break;
+        case 1:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_RIGHT;
+            break;
+        case 2:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::RIGHT;
+            break;
+        case 3:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_RIGHT;
+            break;
+        case 4:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM;
+            break;
+        case 5:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_LEFT;
+            break;
+        case 6:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::LEFT;
+            break;
+        case 7:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_LEFT;
+            break;
+        default:
+            dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_LEFT;
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetDotMatrixShaderParamsEffectType(const std::string& tag, int32_t param)
+{
+    switch (param) {
+        case 0:
+            dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::NONE;
+            break;
+        case 1:
+            dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::ROTATE;
+            break;
+        case 2:
+            dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::RIPPLE;
+            break;
+        default:
+            dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::NONE;
+            break;
+    }
+}
+void GEVisualEffectImpl::SetDotMatrixShaderParams(const std::string& tag, float param)
+{
+    if (dotMatrixShaderParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_PATHWIDTH) {
+        dotMatrixShaderParams_->pathWidth_ = param;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_DOTSPACING) {
+        dotMatrixShaderParams_->dotSpacing_ = param;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_DOTRADIUS) {
+        dotMatrixShaderParams_->dotRadius_ = param;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_PROGRESS) {
+        dotMatrixShaderParams_->progress_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetDotMatrixShaderParams(const std::string& tag, const Vector4f& param)
+{
+    if (dotMatrixShaderParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_DOTCOLOR) {
+        dotMatrixShaderParams_->dotColor_ = param;
+    }
+    if (tag == GE_SHADER_DOT_MATRIX_SHADER_BGCOLOR) {
+        dotMatrixShaderParams_->bgColor_ = param;
     }
 }
 
