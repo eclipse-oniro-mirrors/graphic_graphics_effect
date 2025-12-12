@@ -73,9 +73,7 @@ public:
      * @param canvas Reference to the Drawing::Canvas used for rendering context.
      * @param veContainer Reference to the GEVisualEffectContainer containing the sequence
      *                    of visual effects to apply.
-     * @param image Shared pointer to the input image to process.
-     * @param src Source rectangle defining the region of the input image to process.
-     * @param dst Destination rectangle defining where to draw the result.
+     * @param context Rendering context for the effect application.
      * @param sampling Sampling options for image scaling and filtering.
      *
      * @return Shared pointer to the resulting image after all effects have been applied.

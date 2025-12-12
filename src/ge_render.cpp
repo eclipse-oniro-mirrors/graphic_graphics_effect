@@ -348,7 +348,7 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
         return;
     }
 
-    auto resImage = ApplyImageEffect(canvas, veContainer, image, src, dst, sampling);
+    auto resImage = ApplyImageEffect(canvas, veContainer, {image, src, dst}, sampling);
     if (!resImage) {
         LOGE("GERender::DrawImageRect resImage is null");
         return;
@@ -360,17 +360,17 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
 }
 
 std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canvas,
-    Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
-    const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling)
+    Drawing::GEVisualEffectContainer& veContainer, const ShaderFilterEffectContext& context,
+    const Drawing::SamplingOptions& sampling)
 {
-    if (!image) {
+    if (!context.image) {
         LOGE("GERender::ApplyImageEffect image is null");
         return nullptr;
     }
-    auto resImage = image;
+    auto resImage = context.image;
     for (auto& vef: veContainer.GetFilters()) {
-        ShaderFilterEffectContext context {resImage, src, dst};
-        ProcessShaderFilter(canvas, vef, resImage, context);
+        ShaderFilterEffectContext innerContext {resImage, context.src, context.dst, context.geCacheProvider};
+        ProcessShaderFilter(canvas, vef, resImage, innerContext);
     }
 
     return resImage;
