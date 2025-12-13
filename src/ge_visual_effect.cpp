@@ -18,6 +18,7 @@
 #include "ge_image_shader_mask.h"
 #include "ge_use_effect_shader_mask.h"
 #include "ge_log.h"
+#include "ge_external_dynamic_loader.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
@@ -251,7 +252,7 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
             if (params == nullptr) {
                 return nullptr;
             }
-            return std::make_shared<GESDFRRectShaderShape>(*params);
+            return GenerateExtShaderRRect(params);
         }
         case GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE: {
             auto params = impl->GetSDFTransformShapeParams();
@@ -270,6 +271,20 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
         default:
             return nullptr;
     }
+}
+
+std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateExtShaderRRect(
+    const std::shared_ptr<GESDFRRectShapeParams>& params) const
+{
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE),
+        sizeof(Drawing::GESDFRRectShapeParams),
+        static_cast<void *>(params.get()));
+    if (!CanBeContinuous(params) || !object) {
+        return std::make_shared<GESDFRRectShaderShape>(*params);
+    }
+    std::shared_ptr<Drawing::GEShaderShape> rrectShape(static_cast<Drawing::GEShaderShape*>(object));
+    return rrectShape;
 }
 
 } // namespace Drawing
