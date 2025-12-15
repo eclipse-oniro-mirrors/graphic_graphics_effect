@@ -28,8 +28,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(fl
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has empty image");
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFPixelmapShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFPixelmapShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
@@ -47,8 +46,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHas
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal has empty image");
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFPixelmapNormalShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFPixelmapNormalShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
@@ -62,7 +60,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GeneratePixelmapShader()
 {
     Drawing::Matrix matrix;
     return Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);    
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFPixelmapShaderShapeBuilder() const
@@ -121,14 +119,14 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
 }
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateShaderEffect(std::shared_ptr<ShaderEffect> pixelmapShader,
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder)  const
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {
         LOGE("GESDFPixelmapShaderShape::GenerateShaderEffect builder error");
         return nullptr;
     }
 
-    builder->SetUniform("pixelmapShader", pixelmapShader);
+    builder->SetChild("pixelmapShader", pixelmapShader);
 
     auto sdfPixelmapShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfPixelmapShapeShader) {

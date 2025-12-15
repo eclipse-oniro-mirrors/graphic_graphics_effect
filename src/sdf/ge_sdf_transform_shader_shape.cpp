@@ -26,8 +26,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShader(f
     if (!params_.shape) {
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFTransformShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
@@ -45,8 +44,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
     if (!params_.shape) {
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFTransformShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;

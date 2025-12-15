@@ -44,8 +44,8 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
-    auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height);
-    auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height);
+    auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
+    auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
     if (!leftShader && !rightShader) {
         return nullptr;
     }
@@ -64,9 +64,7 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(
     std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const
 {
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-
-    builder = params_.op == GESDFUnionOp::UNION ? GetSDFUnionBuilder()
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = params_.op == GESDFUnionOp::UNION ? GetSDFUnionBuilder()
         : hasNormal ? GetSDFNormalSmoothUnionBuilder() : GetSDFSmoothUnionBuilder();
     if (!builder) {
         LOGE("GESDFUnionOpShaderShape::GenerateDrawingShader has builder error");

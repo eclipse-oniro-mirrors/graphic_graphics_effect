@@ -75,8 +75,7 @@ static constexpr char SDF_GRAD_PROG[] = R"(
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFRRectShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFRRectShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFRRectShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
@@ -87,8 +86,7 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFRRectNormalShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFRRectNormalShapeBuilder();
     if (!builder) {
         LOGE("GESDFRRectShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
