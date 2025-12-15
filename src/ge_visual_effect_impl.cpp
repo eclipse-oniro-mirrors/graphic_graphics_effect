@@ -30,7 +30,7 @@ constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 
-enum class DotMatrixParamCode : int32_t {
+enum class DotMatrixParamCode {
     TOP = 0,
     TOP_RIGHT,
     RIGHT,
@@ -1059,23 +1059,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             break;
         }
-        default:
-            break;
-    }
-}
-
-void GEVisualEffectImpl::SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param)
-{
-    switch (filterType_) {
-        case FilterType::BEZIER_WARP: {
-            if (bezierWarpParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_FILTER_BEZIER_WARP_DESTINATION_PATCH) {
-                bezierWarpParams_->destinationPatch = param;
-            }
-            break;
-        }
         case FilterType::DOT_MATRIX: {
             if (dotMatrixShaderParams_ == nullptr) {
                 return;
@@ -1099,6 +1082,23 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             if (tag == GE_SHADER_DOT_MATRIX_SHADER_EFFECTCOLORS) {
                 dotMatrixShaderParams_->effectColors_ = param;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void GEVisualEffectImpl::SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param)
+{
+    switch (filterType_) {
+        case FilterType::BEZIER_WARP: {
+            if (bezierWarpParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_BEZIER_WARP_DESTINATION_PATCH) {
+                bezierWarpParams_->destinationPatch = param;
             }
             break;
         }
@@ -2086,7 +2086,8 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsInitData(const std::string &tag
 
 void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string& tag, int32_t param)
 {
-    switch (param) {
+    DotMatrixParamCode param_ = static_cast<DotMatrixParamCode>(param);
+    switch (param_) {
         case DotMatrixParamCode::TOP:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP;
             break;
@@ -2119,12 +2120,13 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string
 
 void GEVisualEffectImpl::SetDotMatrixShaderParamsEffectType(const std::string& tag, int32_t param)
 {
-    enum class EffectTypeParam : int32_t {
+    enum class EffectTypeParam {
         NONE = 0,
         ROTATE,
         RIPPLE
     };
-    switch (param) {
+    EffectTypeParam param_ = static_cast<EffectTypeParam>(param);
+    switch (param_) {
         case EffectTypeParam::NONE:
             dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::NONE;
             break;
