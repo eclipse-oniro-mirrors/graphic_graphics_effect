@@ -28,7 +28,7 @@ namespace OHOS {
 namespace Rosen {
 
 struct RotateEffectParams {
-    Drawing::DRDotMatrixDirection pathDirection_ = Drawing::DotMatrixDirection::TOP_LEFT;
+    Drawing::DotMatrixDirection pathDirection_ = Drawing::DotMatrixDirection::TOP_LEFT;
     std::vector<Drawing::Color> effectColors_;
 
     bool Marshalling(Parcel& parcel);
