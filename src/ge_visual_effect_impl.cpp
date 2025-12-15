@@ -30,6 +30,16 @@ constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 
+enum class DotMatrixParamCode : int32_t {
+    TOP = 0,              
+    TOP_RIGHT,
+    RIGHT,
+    BOTTOM_RIGHT,
+    BOTTOM, 
+    BOTTOM_LEFT,
+    LEFT,
+    TOP_LEFT
+};
 
 template <typename T>
 using TagMap = std::map<std::string, std::function<void(std::shared_ptr<T>&, const std::any&)>>;
@@ -2077,28 +2087,28 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsInitData(const std::string &tag
 void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string& tag, int32_t param)
 {
     switch (param) {
-        case 0:
+        case DotMatrixParamCode::TOP:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP;
             break;
-        case 1:
+        case DotMatrixParamCode::TOP_RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_RIGHT;
             break;
-        case 2:
+        case DotMatrixParamCode::RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::RIGHT;
             break;
-        case 3:
+        case DotMatrixParamCode::BOTTOM_RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_RIGHT;
             break;
-        case 4:
+        case DotMatrixParamCode::BOTTOM:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM;
             break;
-        case 5:
+        case DotMatrixParamCode::BOTTOM_LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_LEFT;
             break;
-        case 6:
+        case DotMatrixParamCode::LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::LEFT;
             break;
-        case 7:
+        case DotMatrixParamCode::TOP_LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_LEFT;
             break;
         default:
