@@ -19,6 +19,7 @@
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_border_light_shader.h"
 #include "ge_circle_flowlight_effect.h"
+#include "ge_color_gradient_effect.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -126,7 +127,7 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
                 type, sizeof(GEXColorGradientEffectParams), static_cast<void*>(params.get()));
             if (!impl) {
-                GE_LOGE("GEXColorGradientEffect::CreateDynamicImpl create object failed.");
+                out = std::make_shared<GEColorGradientEffect>(*params);
                 return out;
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));

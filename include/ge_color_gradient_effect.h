@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_EFFECT_H
-#define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_EFFECT_H
+#ifndef GRAPHICS_EFFECT_GE_COLOR_GRADIENT_EFFECT_H
+#define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_EFFECT_H
 
 #include "ge_common.h"
 #include "ge_shader.h"
@@ -45,7 +45,7 @@ private:
     float CalculateCompressRatio();
 
     std::vector<Drawing::Color4f> colors_;
-    std::vector<Drawing::Color4f> blend_colors_;
+    std::vector<Drawing::Color4f> blendColors_;
     std::vector<Drawing::Point> positions_;
     std::vector<float> strengths_;
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
@@ -58,4 +58,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_COLOR_GRADIENT_SHADER_EFFECT_H
+#endif // GRAPHICS_EFFECT_GE_COLOR_GRADIENT_EFFECT_H

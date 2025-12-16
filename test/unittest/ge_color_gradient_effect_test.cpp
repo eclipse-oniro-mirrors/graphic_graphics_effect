@@ -87,14 +87,14 @@ HWTEST_F(GEColorGradientEffectTest, CreateShaderEffect_001, TestSize.Level1)
     shaderNoMask->strengths_.clear();
     shaderNoMask->colors_.clear();
     EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
-    const size_t size_colors = 12;
-    auto colors = std::vector<Drawing::Color4f>(size_colors, Drawing::Color4f{0.f, 0.0f, 0.0f, 0.0f});
+    const size_t sizeColors = 12;
+    auto colors = std::vector<Drawing::Color4f>(sizeColors, Drawing::Color4f{0.f, 0.0f, 0.0f, 0.0f});
     shaderNoMask->colors_ = colors;
     EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
-    auto positions = std::vector<Drawing::Point>(size_colors, Drawing::Point{0.5f, 0.3f});
+    auto positions = std::vector<Drawing::Point>(sizeColors, Drawing::Point{0.5f, 0.3f});
     shaderNoMask->positions_ = positions;
     EXPECT_FALSE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
-    auto strengths = std::vector<float>(size_colors, 2.0f);
+    auto strengths = std::vector<float>(sizeColors, 2.0f);
     shaderNoMask->strengths_ = strengths;
     EXPECT_TRUE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
     EXPECT_TRUE(shaderNoMask->CreateShaderEffect(1.0f, 1.0f));
