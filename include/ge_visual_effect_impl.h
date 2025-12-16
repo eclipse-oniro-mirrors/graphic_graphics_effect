@@ -455,7 +455,24 @@ public:
     {
         return lightCaveShaderParams_;
     }
+    void MakeDistortChromaParams()
+    {
+        distortChromaParams_ = std::make_shared<GEXDistortChromaEffectParams>();
+    }
 
+    const std::shared_ptr<GEXDistortChromaEffectParams>& GetDistortChromaParams() const
+    {
+        return distortChromaParams_;
+    }
+    void MakeDupoliNoiseMaskParams()
+    {
+        dupoliNoiseMaskParams_ = std::make_shared<GEXDupoliNoiseMaskParams>();
+    }
+
+    const std::shared_ptr<GEXDupoliNoiseMaskParams>& GetDupoliNoiseMaskParams() const
+    {
+        return dupoliNoiseMaskParams_;
+    }
     void MakeBorderLightParams()
     {
         borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
@@ -733,6 +750,8 @@ private:
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEHarmoniumEffectShaderParams> harmoniumEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
+    std::shared_ptr<GEXDistortChromaEffectParams> distortChromaParams_ = nullptr;
+    std::shared_ptr<GEXDupoliNoiseMaskParams> dupoliNoiseMaskParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
     std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
     std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;

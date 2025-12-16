@@ -43,6 +43,7 @@ enum class GEFilterType : int32_t {
     LINEAR_GRADIENT_MASK,
     IMAGE_MASK,
     USE_EFFECT_MASK,
+    DUPOLI_NOISE_MASK,
     // Shape
     SDF_UNION_OP,
     SDF_RRECT_SHAPE,
@@ -80,6 +81,7 @@ enum class GEFilterType : int32_t {
     CIRCLE_FLOWLIGHT,
     FROSTED_GLASS_BLUR,
     FROSTED_GLASS_EFFECT,
+    DISTORT_CHROMA,
     MAX,
 };
 

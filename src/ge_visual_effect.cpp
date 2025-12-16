@@ -28,6 +28,7 @@
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "sdf/ge_sdf_transform_shader_shape.h"
 #include "sdf/ge_sdf_union_op_shader_shape.h"
+#include "ge_external_dynamic_loader.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -224,6 +225,21 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
                 return nullptr;
             }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
+        }
+        case GEVisualEffectImpl::FilterType::DUPOLI_NOISE_MASK: {
+            auto dupoliNoiseParams = impl->GetDupoliNoiseMaskParams();
+            if (dupoliNoiseParams == nullptr) {
+                return nullptr;
+            }            
+            auto type = static_cast<uint32_t>(GEVisualEffectImpl::FilterType::DUPOLI_NOISE_MASK);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXDupoliNoiseMaskParams), static_cast<void*>(dupoliNoiseParams.get()));
+            if (!impl) {
+                GE_LOGE("GEXDupoliNoiseShaderMask::CreateDynamicImpl create object failed.");
+                return nullptr;
+            }
+            std::shared_ptr<Drawing::GEShaderMask> gexShaderMask(static_cast<Drawing::GEShaderMask*>(impl));
+            return gexShaderMask;
         }
 
         default:

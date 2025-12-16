@@ -175,6 +175,27 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
+    {GEVisualEffectImpl::FilterType::DISTORT_CHROMA, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetDistortChromaParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::DISTORT_CHROMA);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXDistortChromaEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXDistortChromaEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
     {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
