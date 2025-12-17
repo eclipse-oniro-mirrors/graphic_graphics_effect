@@ -230,7 +230,7 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             auto dupoliNoiseParams = impl->GetDupoliNoiseMaskParams();
             if (dupoliNoiseParams == nullptr) {
                 return nullptr;
-            }            
+            }
             auto type = static_cast<uint32_t>(GEVisualEffectImpl::FilterType::DUPOLI_NOISE_MASK);
             auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
                 type, sizeof(GEXDupoliNoiseMaskParams), static_cast<void*>(dupoliNoiseParams.get()));
