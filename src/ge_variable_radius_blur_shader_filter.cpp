@@ -47,8 +47,8 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::OnProcessImage
     }
     float radius = std::clamp(params_.blurRadius, 0.0f, 60.0f); // 60.0 represents largest blur radius
     radius = radius / 2; // 2 half blur radius
-    MakeHorizontalBoxBlurEffect();
-    MakeVerticalBoxBlurEffect();
+    MakeHorizontalBoxBlurEffect(params_.applyInsideMask);
+    MakeVerticalBoxBlurEffect(params_.applyInsideMask);
     MakeTextureShaderEffect();
     return DrawBoxLinearGradientBlur(image, canvas, radius, maskShader, dst);
 }
@@ -70,7 +70,7 @@ void GEVariableRadiusBlurShaderFilter::MakeTextureShaderEffect()
     }
 }
 
-void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect()
+void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect(bool applyInsideMask)
 {
     if (horizontalBoxBlurShaderEffect_ != nullptr) {
         return;
@@ -97,20 +97,57 @@ void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect()
         }
         half4 main(float2 coord)
         {
-            if (abs(gradientShader.eval(coord).a - 0) < 0.001) {
+            float radius = r * gradientShader.eval(coord).a;
+            if (radius < 1.0) {
                 return imageShader.eval(coord);
             }
-            float val = clamp(r * gradientShader.eval(coord).a, 1.0, r);
-            return boxFilter(coord, val);
+            radius = clamp(radius, 1.0, r);
+            return boxFilter(coord, radius);
         }
     )");
-    horizontalBoxBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(HorizontalBlurString);
+    static const std::string HorizontalBlurMaskedString(
+        R"(
+        uniform half r;
+        uniform shader imageShader;
+        uniform shader gradientShader;
+        half4 boxFilter(float2 coord, half radius)
+        {
+            half4 sum = vec4(0.0);
+            half div = 0;
+            for (half x = -30.0; x < 30.0; x += 1.0) {
+                if (x > radius) {
+                    break;
+                }
+                if (abs(x) < radius) {
+                    bool inside = gradientShader.eval(coord + float2(x, 0)).a > 0.0;
+                    if (inside)
+                    {
+                        div += 1;
+                        sum += imageShader.eval(coord + float2(x, 0));
+                    }
+                }
+            }
+            return half4(sum.xyz / div, 1.0);
+        }
+        half4 main(float2 coord)
+        {
+            float radius = r * gradientShader.eval(coord).a;
+            if (radius < 1.0) {
+                return imageShader.eval(coord);
+            }
+            radius = clamp(radius, 1.0, r);
+            return boxFilter(coord, radius);
+        }
+    )");
+    horizontalBoxBlurShaderEffect_ = applyInsideMask ?
+        Drawing::RuntimeEffect::CreateForShader(HorizontalBlurMaskedString) :
+        Drawing::RuntimeEffect::CreateForShader(HorizontalBlurString);
     if (horizontalBoxBlurShaderEffect_ == nullptr) {
         LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader horizontalBoxBlurShaderEffect create failed");
     }
 }
 
-void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect()
+void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect(bool applyInsideMask)
 {
     if (verticalBoxBlurShaderEffect_ != nullptr) {
         return;
@@ -137,14 +174,51 @@ void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect()
         }
         half4 main(float2 coord)
         {
-            if (abs(gradientShader.eval(coord).a - 0) < 0.001) {
+            float radius = r * gradientShader.eval(coord).a;
+            if (radius < 1.0) {
                 return imageShader.eval(coord);
             }
-            float val = clamp(r * gradientShader.eval(coord).a, 1.0, r);
-            return boxFilter(coord, val);
+            radius = clamp(radius, 1.0, r);
+            return boxFilter(coord, radius);
         }
     )");
-    verticalBoxBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(VerticalBlurString);
+    static const std::string VerticalBlurMaskedString(
+        R"(
+        uniform half r;
+        uniform shader imageShader;
+        uniform shader gradientShader;
+        half4 boxFilter(float2 coord, half radius)
+        {
+            half4 sum = vec4(0.0);
+            half div = 0;
+            for (half y = -30.0; y < 30.0; y += 1.0) {
+                if (y > radius) {
+                    break;
+                }
+                if (abs(y) < radius) {
+                    bool inside = gradientShader.eval(coord + float2(0, y)).a > 0.0;
+                    if (inside)
+                    {
+                        div += 1;
+                        sum += imageShader.eval(coord + float2(0, y));
+                    }
+                }
+            }
+            return half4(sum.xyz / div, 1.0);
+        }
+        half4 main(float2 coord)
+        {
+            float radius = r * gradientShader.eval(coord).a;
+            if (radius < 1.0) {
+                return imageShader.eval(coord);
+            }
+            radius = clamp(radius, 1.0, r);
+            return boxFilter(coord, radius);
+        }
+    )");    
+    verticalBoxBlurShaderEffect_ = applyInsideMask ?
+        Drawing::RuntimeEffect::CreateForShader(VerticalBlurMaskedString) :
+        Drawing::RuntimeEffect::CreateForShader(VerticalBlurString);
     if (verticalBoxBlurShaderEffect_ == nullptr) {
         LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader verticalBoxBlurShaderEffect create failed");
     }
