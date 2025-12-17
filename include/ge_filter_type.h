@@ -43,6 +43,7 @@ enum class GEFilterType : int32_t {
     LINEAR_GRADIENT_MASK,
     IMAGE_MASK,
     USE_EFFECT_MASK,
+    NOISY_FRAME_GRADIENT_MASK,
     // Shape
     SDF_UNION_OP,
     SDF_RRECT_SHAPE,

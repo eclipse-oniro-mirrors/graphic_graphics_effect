@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 #include <vector>
+#include "ge_log.h"
+#include "ge_external_dynamic_loader.h"
+
 #include "ge_double_ripple_shader_mask.h"
 #include "ge_frame_gradient_shader_mask.h"
 #include "ge_image_shader_mask.h"
 #include "ge_use_effect_shader_mask.h"
-#include "ge_log.h"
-#include "ge_external_dynamic_loader.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
@@ -226,7 +227,25 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             return std::make_shared<GEFrameGradientShaderMask>(*frameParams);
         }
-
+        case GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK: {
+            std::shared_ptr<GEShaderMask> out = nullptr;
+            if (impl == nullptr) {
+                return out;
+            }
+            auto noisyFrameParams = impl->GetNoisyFrameGradientMaskParams();
+            if (noisyFrameParams == nullptr) {
+                return out;
+            }
+            auto mask = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK),
+                sizeof(Drawing::GEXNoisyFrameGradientParams),
+                static_cast<void *>(noisyFrameParams.get()));;
+            if (!mask) {
+                return out;
+            }
+            std::shared_ptr<GEShaderMask> maskShader(static_cast<GEShaderMask*>(mask));
+            return maskShader;
+        }
         default:
             return nullptr;
     }
