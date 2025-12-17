@@ -83,9 +83,7 @@ private:
 
             if (d <= shadowRadius)
             {
-                d += shadowRadius * 0.5;
-                float alpha = clamp(d / shadowRadius, 0.0, 1.0);
-                alpha = 1.0 - alpha;
+                float alpha = 1.0 - smoothstep(-shadowRadius, shadowRadius, d);
                 color = vec4(shadowColor, 1.0) * alpha * alphaFilled;
             }
 
