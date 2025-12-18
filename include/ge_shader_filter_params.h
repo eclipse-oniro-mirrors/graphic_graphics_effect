@@ -549,6 +549,7 @@ constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask"
 struct GEVariableRadiusBlurShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     float blurRadius;
+    bool applyInsideMask = false;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilterParams,
                                 GE_FILTER_VARIABLE_RADIUS_BLUR);
