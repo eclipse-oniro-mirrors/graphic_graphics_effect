@@ -369,6 +369,30 @@ std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::CreateSmallRa
     return smallRBlurShader;
 }
 
+
+namespace {
+template<typename V>
+inline V Interpolate(const V& base, const V& dark, float t)
+{
+    return base * (1.0f - t) + dark * t;
+}
+} // namespace
+
+namespace FrostedGlass {
+void InterpolateAdaptiveParams(Drawing::GEFrostedGlassShaderFilterParams& params)
+{
+    const auto& t = params.darkScale;
+    // Only interpolate adaptive parameters defined in the header:
+    // Dark-mode set for FrostedGlass shader filter params.
+    params.blurParams = Interpolate(params.blurParams, params.darkModeBlurParam, t);
+    params.weightsEmboss = Interpolate(params.weightsEmboss, params.darkModeWeightsEmboss, t);
+    params.bgRates = Interpolate(params.bgRates, params.darkModeBgRates, t);
+    params.bgKBS = Interpolate(params.bgKBS, params.darkModeBgKBS, t);
+    params.bgPos = Interpolate(params.bgPos, params.darkModeBgPos, t);
+    params.bgNeg = Interpolate(params.bgNeg, params.darkModeBgNeg, t);
+}
+} // namespace FrostedGlass
+
 bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst,
     Drawing::Matrix& matrix, std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder)
@@ -377,6 +401,7 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
         LOGE("GEFrostedGlassShaderFilter::PrepareDrawing imageinfo is invalid");
         return false;
     }
+    FrostedGlass::InterpolateAdaptiveParams(frostedGlassParams_);
     matrix = canvasInfo_.mat;
     matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;

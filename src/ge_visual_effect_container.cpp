@@ -157,6 +157,15 @@ void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
     }
 }
 
+void GEVisualEffectContainer::UpdateDarkScale(float darkScale)
+{
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == GE_FILTER_FROSTED_GLASS) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_DARK_SCALE, darkScale);
+        }
+    }
+}
+
 void GEVisualEffectContainer::RemoveFilterWithType(int32_t typeToRemove)
 {
     filterVec_.erase(
