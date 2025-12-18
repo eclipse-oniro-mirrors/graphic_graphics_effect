@@ -28,7 +28,7 @@ enum class GESDFShapeType : uint8_t {
     TRANSFORM,
     PIXELMAP,
     EMPTY,
-    MAX = EMPTY,
+    MAX = RRECT,
 };
 
 class GE_EXPORT GESDFShaderShape : public GEShaderShape {
