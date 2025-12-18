@@ -59,8 +59,8 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHas
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GeneratePixelmapShader() const
 {
     Drawing::Matrix matrix;
-    return Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::DECAL,
-        Drawing::TileMode::DECAL, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    return Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFPixelmapShaderShapeBuilder() const
@@ -74,9 +74,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
         uniform shader pixelmapShader;
         half4 main(vec2 fragCoord)
         {
-            // SDF will be mapped from [0, 1] to [-63.5, 64]
+            // SDF will be mapped from [0, 255] to [-63, 64]
             vec4 pixelmapShape = pixelmapShader.eval(fragCoord);
-            return half4(pixelmapShape.xyz, pixelmapShape.a * 127.5 - 63.5);
+            return half4(pixelmapShape.xyz, (pixelmapShape.a - 127) / 2);
         }
     )";
 
@@ -101,10 +101,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
         uniform shader pixelmapShader;
         half4 main(vec2 fragCoord)
         {
-            // Gradient(rg channel) will be mapped from [0, 1] to [-1, 1]
-            // SDF(a channel) will be mapped from [0, 1] to [-63.5, 64]
+            // Gradient(rg channel) will be mapped from [0, 255] to [-1, 1]
+            // SDF(a channel) will be mapped from [0, 255] to [-63, 64]
             vec4 pixelmapShape = pixelmapShader.eval(fragCoord);
-            return half4(pixelmapShape.xy * 2 - 1, pixelmapShape.z, pixelmapShape.a * 127.5 - 63.5);
+            return half4(pixelmapShape.xy / 255 * 2 - 1, pixelmapShape.z, (pixelmapShape.a - 127) / 2);
         }
     )";
 

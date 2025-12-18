@@ -38,10 +38,6 @@ public:
 
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-    virtual bool GenerateCodeHasNormal(GESDFTreeManager& manager) const override
-    {
-        return false;
-    }
 
     virtual GESDFShapeType GetSDFShapeType() const = 0;
 
