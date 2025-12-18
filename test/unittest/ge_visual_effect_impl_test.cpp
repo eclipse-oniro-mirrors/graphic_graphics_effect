@@ -93,7 +93,7 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
     Drawing::GEVisualEffectImpl geVisualEffectImplGasify(Drawing::GE_FILTER_GASIFY);
     EXPECT_EQ(geVisualEffectImplGasify.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::GASIFY);
 
-    Drawing::GEVisualEffectImpl geVisualEffectImplEmpty(Drawing::GE_FILTER_GASIFY);
+    Drawing::GEVisualEffectImpl geVisualEffectImplEmpty(Drawing::GE_SHAPE_SDF_EMPTY_SHAPE);
     EXPECT_EQ(geVisualEffectImplEmpty.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE);
 }
 
