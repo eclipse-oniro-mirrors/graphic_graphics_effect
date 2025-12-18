@@ -2088,28 +2088,28 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string
 {
     DotDirection direction = static_cast<DotDirection>(param);
     switch (direction) {
-        case DotMatrixParamCode::TOP:
+        case DotDirection ::TOP:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP;
             break;
-        case DotMatrixParamCode::TOP_RIGHT:
+        case DotDirection ::TOP_RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_RIGHT;
             break;
-        case DotMatrixParamCode::RIGHT:
+        case DotDirection ::RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::RIGHT;
             break;
-        case DotMatrixParamCode::BOTTOM_RIGHT:
+        case DotDirection ::BOTTOM_RIGHT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_RIGHT;
             break;
-        case DotMatrixParamCode::BOTTOM:
+        case DotDirection ::BOTTOM:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM;
             break;
-        case DotMatrixParamCode::BOTTOM_LEFT:
+        case DotDirection ::BOTTOM_LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::BOTTOM_LEFT;
             break;
-        case DotMatrixParamCode::LEFT:
+        case DotDirection ::LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::LEFT;
             break;
-        case DotMatrixParamCode::TOP_LEFT:
+        case DotDirection ::TOP_LEFT:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP_LEFT;
             break;
         default:
