@@ -1096,7 +1096,8 @@ struct GEFrostedGlassShaderFilterParams {
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT[] = "NoisyFrameGradientMask";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS[] = "NoisyFrameGradientMask_GradientBezierControlPoints";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS[] =
+    "NoisyFrameGradientMask_GradientBezierControlPoints";
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS[] = "NoisyFrameGradientMask_CornerRadius";
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "NoisyFrameGradientMask_InnerFrameWidth";
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH[] = "NoisyFrameGradientMask_MiddleFrameWidth";
