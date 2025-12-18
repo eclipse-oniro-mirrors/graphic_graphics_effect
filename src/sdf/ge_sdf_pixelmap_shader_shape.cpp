@@ -34,6 +34,10 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(fl
         return nullptr;
     }
     auto pixelmapShader = GeneratePixelmapShader();
+    if (!pixelmapShader) {
+        LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has empty shader");
+        return nullptr;
+    }
     auto sdfPixelmapShapeShader = GenerateShaderEffect(pixelmapShader, builder);
     return sdfPixelmapShapeShader;
 }
@@ -48,10 +52,14 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHas
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFPixelmapNormalShaderShapeBuilder();
     if (!builder) {
-        LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has builder error");
+        LOGE("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
     }
     auto pixelmapShader = GeneratePixelmapShader();
+    if (!pixelmapShader) {
+        LOGE("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal has empty shader");
+        return nullptr;
+    }
     auto sdfPixelmapShapeShader = GenerateShaderEffect(pixelmapShader, builder);
     return sdfPixelmapShapeShader;
 }

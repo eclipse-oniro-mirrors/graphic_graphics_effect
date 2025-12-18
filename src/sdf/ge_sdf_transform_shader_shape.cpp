@@ -32,6 +32,10 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShader(f
         return nullptr;
     }
     auto shapeShader = params_.shape->GenerateDrawingShader(width, height);
+    if (!shapeShader) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShader has empty shader");
+        return nullptr;
+    }
     auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
     return sdfTransformShapeShader;
 }
@@ -50,6 +54,10 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
         return nullptr;
     }
     auto shapeShader = params_.shape->GenerateDrawingShaderHasNormal(width, height);
+    if (!shapeShader) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has empty shader");
+        return nullptr;
+    }
     auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
     return sdfTransformShapeShader;
 }
