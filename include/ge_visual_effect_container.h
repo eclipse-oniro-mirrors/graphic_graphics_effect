@@ -48,6 +48,8 @@ public:
 
     void UpdateTotalMatrix(Drawing::Matrix totalMatrix);
 
+    void UpdateDarkScale(float darkScale);
+
     void UpdateRefractOutValue(float value);
 
 private:

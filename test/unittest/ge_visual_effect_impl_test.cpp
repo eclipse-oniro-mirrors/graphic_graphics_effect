@@ -1137,6 +1137,96 @@ HWTEST_F(GEVisualEffectImplTest, SetLightCaveParamsTest, TestSize.Level1)
 }
 
 /**
+ * @tc.name: SetParam_FrostedGlass_DarkMode_001
+ * @tc.desc: Verify SetParam for FrostedGlass dark-mode properties updates params
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_FrostedGlass_DarkMode_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl ve(Drawing::GE_FILTER_FROSTED_GLASS);
+    ve.MakeFrostedGlassParams();
+    ASSERT_NE(ve.GetFrostedGlassParams(), nullptr);
+
+    // dark scale
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARK_SCALE, 0.7f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkScale, 0.7f);
+
+    // dark blur params (radius, k)
+    std::pair<float, float> darkBlur = {60.0f, 5.0f};
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM, darkBlur);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBlurParam[0], darkBlur.first);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBlurParam[1], darkBlur.second);
+
+    // dark weights emboss
+    std::pair<float, float> darkWeights = {0.2f, 0.8f};
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS, darkWeights);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[0], darkWeights.first);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[1], darkWeights.second);
+
+    // dark bg rates
+    std::pair<float, float> darkRates = {-0.00003f, 1.2f};
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES, darkRates);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgRates[0], darkRates.first);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgRates[1], darkRates.second);
+
+    // dark bg KBS
+    Vector3f darkBgKBS = Vector3f(-5.0f, 7.0f, 10.0f);
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS, darkBgKBS);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[0], darkBgKBS[0]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[1], darkBgKBS[1]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[2], darkBgKBS[2]);
+
+    // dark bg pos/neg
+    Vector3f darkBgPos = Vector3f(1.0f, 2.0f, 3.0f);
+    Vector3f darkBgNeg = Vector3f(4.0f, 5.0f, 6.0f);
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS, darkBgPos);
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG, darkBgNeg);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgPos[0], darkBgPos[0]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgPos[1], darkBgPos[1]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgPos[2], darkBgPos[2]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgNeg[0], darkBgNeg[0]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgNeg[1], darkBgNeg[1]);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgNeg[2], darkBgNeg[2]);
+}
+
+/**
+ * @tc.name: SetParam_FrostedGlass_DarkMode_Clamp
+ * @tc.desc: Verify clamping for FrostedGlass dark-mode setters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_FrostedGlass_DarkMode_Clamp, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl ve(Drawing::GE_FILTER_FROSTED_GLASS);
+    ve.MakeFrostedGlassParams();
+    ASSERT_NE(ve.GetFrostedGlassParams(), nullptr);
+
+    // darkScale clamps to [0,1]
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARK_SCALE, -0.5f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkScale, 0.0f);
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARK_SCALE, 1.5f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkScale, 1.0f);
+
+    // blurParam clamps: radius >= 1e-6, k in [1,200]
+    std::pair<float, float> badBlur = {0.0f, 500.0f};
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM, badBlur);
+    EXPECT_GE(ve.GetFrostedGlassParams()->darkModeBlurParam[0], 1e-6f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBlurParam[1], 200.0f);
+
+    // weightsEmboss clamps to [0,1]
+    std::pair<float, float> badWeights = {-1.0f, 2.0f};
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS, badWeights);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[0], 0.0f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[1], 1.0f);
+
+    // KBS clamps: KB in [-20,20], S in [0,20]
+    Vector3f badBgKBS = Vector3f(-50.0f, 50.0f, -5.0f);
+    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS, badBgKBS);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[0], -20.0f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[1], 20.0f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBgKBS[2], 0.0f);
+}
+
+/**
  * @tc.name: SetSDFRRectShapeParamsTest
  * @tc.desc: Verify function Set SDFRRectShape Param
  * @tc.type:FUNC
