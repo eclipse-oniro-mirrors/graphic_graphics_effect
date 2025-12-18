@@ -15,6 +15,8 @@
 
 #ifndef GRAPHICS_EFFECT_COMMON_H
 #define GRAPHICS_EFFECT_COMMON_H
+#include <cmath>
+#include <memory>
 
 namespace OHOS {
 namespace Rosen {
@@ -26,6 +28,58 @@ namespace Rosen {
 #define GE_EXPORT __attribute__((visibility("default")))
 #define GE_IMPORT __attribute__((visibility("default")))
 #endif
+
+template<typename T>
+inline constexpr bool GE_EQ(const T& x, const T& y)
+{
+    if constexpr (std::is_floating_point<T>::value) {
+        return (std::abs((x) - (y)) <= (std::numeric_limits<T>::epsilon()));
+    } else {
+        return x == y;
+    }
+}
+
+template<typename T>
+inline bool GE_EQ(T x, T y, T epsilon)
+{
+    return (std::abs((x) - (y)) <= (epsilon));
+}
+
+template<typename T>
+inline bool GE_EQ(const std::weak_ptr<T>& x, const std::weak_ptr<T>& y)
+{
+    return !(x.owner_before(y) || y.owner_before(x));
+}
+
+template<typename T>
+inline constexpr bool GE_NE(const T& x, const T& y)
+{
+    return !GE_EQ(x, y);
+}
+
+inline bool GE_LNE(float left, float right) // less not equal
+{
+    constexpr float epsilon = -0.001f;
+    return (left - right) < epsilon;
+}
+
+inline bool GE_GNE(float left, float right) // great not equal
+{
+    constexpr float epsilon = 0.001f;
+    return (left - right) > epsilon;
+}
+
+inline bool GE_GE(float left, float right) // great or equal
+{
+    constexpr float epsilon = -0.001f;
+    return (left - right) > epsilon;
+}
+
+inline bool GE_LE(float left, float right) // less or equal
+{
+    constexpr float epsilon = 0.001f;
+    return (left - right) < epsilon;
+}
 
 } // namespace Rosen
 } // namespace OHOS
