@@ -119,8 +119,8 @@ void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect(bool applyIns
                     break;
                 }
                 if (abs(x) < radius) {
-                    bool inside = gradientShader.eval(coord + float2(x, 0)).a > 0.0;
-                    if (inside)
+                    float res = gradientShader.eval(coord + float2(x, 0)).a;
+                    if (res > 0.0)
                     {
                         div += 1;
                         sum += imageShader.eval(coord + float2(x, 0));
@@ -196,8 +196,8 @@ void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect(bool applyInsid
                     break;
                 }
                 if (abs(y) < radius) {
-                    bool inside = gradientShader.eval(coord + float2(0, y)).a > 0.0;
-                    if (inside)
+                    float res = gradientShader.eval(coord + float2(0, y)).a;
+                    if (res > 0.0)
                     {
                         div += 1;
                         sum += imageShader.eval(coord + float2(0, y));
