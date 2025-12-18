@@ -532,14 +532,14 @@ struct GEDotMatrixShaderParams {
     std::vector<Vector4f> effectColors_{};
     Vector2f colorFractions_ = Vector2f(0.0f, 0.0f);
     std::vector<Vector2f> startPoints_{};
-    float pathWidth_ = 0.f;
+    float pathWidth_ = 0.0f;
     bool inverseEffect_ = false;
-    Vector4f dotColor_ = Vector4f(0.f, 0.f, 0.f, 0.f);
-    float dotSpacing_ = 0.f;
-    float dotRadius_ = 0.f;
-    Vector4f bgColor_ = Vector4f(0.f, 0.f, 0.f, 0.f);
+    Vector4f dotColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float dotSpacing_ = 0.0f;
+    float dotRadius_ = 0.0f;
+    Vector4f bgColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     DotMatrixEffectType effectType_ = DotMatrixEffectType::NONE;
-    float progress_ = 0.f;
+    float progress_ = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(DOT_MATRIX, GEDotMatrixShaderParams,
                                 GE_SHADER_DOT_MATRIX_SHADER);

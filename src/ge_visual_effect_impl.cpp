@@ -30,7 +30,7 @@ constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 
-enum class DotMatrixParamCode {
+enum class DotDirection {
     TOP = 0,
     TOP_RIGHT,
     RIGHT,
@@ -2086,8 +2086,8 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsInitData(const std::string &tag
 
 void GEVisualEffectImpl::SetDotMatrixShaderParamsPathDirection(const std::string& tag, int32_t param)
 {
-    DotMatrixParamCode param_ = static_cast<DotMatrixParamCode>(param);
-    switch (param_) {
+    DotDirection direction = static_cast<DotDirection>(param);
+    switch (direction) {
         case DotMatrixParamCode::TOP:
             dotMatrixShaderParams_->pathDirection_ = DotMatrixDirection::TOP;
             break;
@@ -2125,8 +2125,8 @@ void GEVisualEffectImpl::SetDotMatrixShaderParamsEffectType(const std::string& t
         ROTATE,
         RIPPLE
     };
-    EffectTypeParam param_ = static_cast<EffectTypeParam>(param);
-    switch (param_) {
+    EffectTypeParam effectTypeParam = static_cast<EffectTypeParam>(param);
+    switch (effectTypeParam) {
         case EffectTypeParam::NONE:
             dotMatrixShaderParams_->effectType_ = DotMatrixEffectType::NONE;
             break;
