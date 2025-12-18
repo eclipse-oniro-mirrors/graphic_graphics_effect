@@ -55,9 +55,6 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         const auto* pixelmapShape = static_cast<const GESDFPixelmapShaderShape*>(&shape);
         auto* thisPixelmap = static_cast<GESDFPixelmapShaderShape*>(this);
         thisPixelmap->CopyState(*pixelmapShape);
-    } else if (GetSDFShapeType() == GESDFShapeType::EMPTY) {
-        const auto* emptyShape = static_cast<const GESDFEmptyShaderShape*>(&shape);
-        auto* thisEmptyShape = static_cast<GESDFEmptyShaderShape*>(this);
     }
 }
 

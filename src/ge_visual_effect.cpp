@@ -25,6 +25,7 @@
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
+#include "sdf/ge_sdf_empty_shader_shape.h"
 #include "sdf/ge_sdf_pixelmap_shader_shape.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "sdf/ge_sdf_transform_shader_shape.h"
@@ -267,6 +268,9 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
                 return nullptr;
             }
             return std::make_shared<GESDFPixelmapShaderShape>(*params);
+        }
+        case GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE: {
+            return std::make_shared<GESDFEmptyShaderShape>();
         }
         default:
             return nullptr;
