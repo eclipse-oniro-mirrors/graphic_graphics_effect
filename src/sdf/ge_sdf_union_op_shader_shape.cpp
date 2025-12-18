@@ -40,25 +40,72 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(flo
     return GenerateUnionOpDrawingShader(leftShader, rightShader, false);
 }
 
+// std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
+// {
+//     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Type: %s , Width: %g, Height: %g",
+//         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
+//     auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
+//     auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
+//     if (!leftShader && !rightShader) {
+//         return nullptr;
+//     }
+
+//     if (!leftShader) {
+//         return rightShader;
+//     }
+
+//     if (!rightShader) {
+//         return leftShader;
+//     }
+
+//     return GenerateUnionOpDrawingShader(leftShader, rightShader, true);
+// }
+
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
-    auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
-    auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
+
+    SDFTreeManager manager;
+    bool leftShader = params_.left ? params_.left->GenerateCodeHasNormal(manager) : false;
+    bool rightShader = params_.right ? params_.right->GenerateCodeHasNormal(manager) : false;
     if (!leftShader && !rightShader) {
         return nullptr;
     }
 
     if (!leftShader) {
-        return rightShader;
+        return rightShader->GenerateDrawingShaderHasNormal(width, height);
     }
 
     if (!rightShader) {
-        return leftShader;
+        return leftShader->GenerateDrawingShaderHasNormal(width, height);
+    }
+    if (!GenerateCodeHasNormal(manager)) {
+        return nullptr;
+    }
+    auto name = std::to_string(reinterpret_cast<size_t>(this->Get()));
+    manager.CompleteProg("return union" + name + ";\n");
+
+    auto sdfUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(manager.GetProg());
+    if (!sdfUnionShaderBuilderEffect) {
+        LOGE("GESDFUnionOpShaderShape::GetSDFUnionBuilder effect error");
+        return nullptr;
     }
 
-    return GenerateUnionOpDrawingShader(leftShader, rightShader, true);
+    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfUnionShaderBuilderEffect);
+
+    manager.ApplyParam(builder);
+    auto sdfShapeShader = builder->MakeShader(nullptr, false);
+    if (!sdfShapeShader) {
+        LOGE("GESDFRRectShaderShape::GenerateSmoothUnionShaderEffect shaderEffect error");
+    }
+    return sdfShapeShader;
+}
+
+bool GESDFUnionOpShaderShape::GenerateCodeHasNormal(SDFTreeManager& manager)
+{
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = params_.op == GESDFUnionOp::UNION ? GetSDFUnionBuilder()
+        : hasNormal ? GenerateCodeHasNormal(prog, type) : GetSDFSmoothUnionBuilder();
 }
 
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(

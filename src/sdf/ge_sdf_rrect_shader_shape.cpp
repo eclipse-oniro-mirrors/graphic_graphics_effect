@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
-static constexpr char SDF_GRAD_PROG[] = R"(
+static constexpr char SDF_GRAD_FUNC_PROG[] = R"(
     uniform vec2 centerPos;
     uniform vec2 halfSize;
     uniform float radius;
@@ -63,12 +63,19 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         return xPos + (yPos / N_SCALE) / 2.0;
     }
 
-    vec4 main(float2 fragCoord)
+    vec4 sdfNormalRRect(float2 fragCoord, vec2 centerPos, vec2 halfSize, float radius)
     {
         vec2 posFromCenter = fragCoord - centerPos;
         vec3 sdg = sdgRRect(posFromCenter, halfSize, radius);
         float packedDir = EncodeDir(posFromCenter);
         return vec4(sdg.yz, packedDir, sdg.x);
+    }
+)";
+
+static constexpr char SDF_GRAD_MAIN_PROG[] = R"(
+    vec4 main(float2 fragCoord)
+    {
+        return sdfNormalRRect(fragCoord, centerPos, halfSize, radius);
     }
 )";
 
@@ -136,7 +143,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectNormalShaderShapeBuilder;
     }
 
-    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfRRectNormalShaderBuilderEffect =
+        Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_FUNC_PROG + SDF_GRAD_MAIN_PROG);
     if (!sdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GettSDFRRectNormalShapeBuilder effect error");
         return nullptr;
@@ -169,6 +177,25 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
         LOGE("GESDFRRectShaderShape::GenerateShaderEffect shaderEffect error");
     }
     return sdfRRectShapeShader;
+}
+
+bool GESDFRRectShaderShape::GenerateCodeHasNormal(SDFTreeManager& manager)
+{
+    if (params_.rrect.width_ < 0.0001f || params_.rrect.height_ < 0.0001f) {
+        return false;
+    }
+
+    if (manager.AddSDFType(GESDFShapeType::RRECT)) {
+        manager.PrependProg(SDF_GRAD_FUNC_PROG);
+    }
+
+    // TODO: use hash as name. If shape has same property, it can be reused.
+    auto name = std::to_string(reinterpret_cast<size_t>(this->Get()));
+    manager.AppendProg("vec4 sdf" + name + " = sdfNormalRRect(fragCoord, centerPos" + name +
+        ", halfSize" + name + ", radius" + name + ");\n");
+    auto& rrectMap = manager.GetMutableRRectMap();
+    rrectMap.insert({name, params_.rrect});
+    return true;
 }
 } // Drawing
 } // namespace Rosen

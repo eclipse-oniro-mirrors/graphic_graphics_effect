@@ -23,7 +23,8 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-class GE_EXPORT GESDFUnionOpShaderShape : public GESDFShaderShape {
+class GE_EXPORT GESDFUnionOpShaderShape : public GESDFShaderShape,
+    public std::enable_shared_from_this<GESDFUnionOpShaderShape> {
 public:
     GESDFUnionOpShaderShape(const GESDFUnionOpShapeParams& param) : params_(param) {}
     GESDFUnionOpShaderShape(const GESDFUnionOpShaderShape&) = delete;
@@ -31,7 +32,7 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-
+    bool GenerateCodeHasNormal(GESDFTreeManager& manager) const override;
     GESDFShapeType GetSDFShapeType() const override
     {
         return GESDFShapeType::UNION_OP;

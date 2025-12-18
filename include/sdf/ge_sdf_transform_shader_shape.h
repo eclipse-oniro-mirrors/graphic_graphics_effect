@@ -31,6 +31,11 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    bool GenerateCodeHasNormal(GESDFTreeManager& manager) const override
+    {
+        return false;
+    }
+
     GESDFShapeType GetSDFShapeType() const override
     {
         return GESDFShapeType::TRANSFORM;

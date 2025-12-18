@@ -19,6 +19,7 @@
 #include "draw/canvas.h"
 #include "ge_common.h"
 #include "ge_filter_type.h"
+#include "ge_sdf_tree_manager.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
  
@@ -32,6 +33,7 @@ public:
     virtual ~GEShaderShape() = default;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
+    virtual bool GenerateCodeHasNormal(GESDFTreeManager& manager) const = 0;
 };
 } // namespace Drawing
 } // namespace Rosen
