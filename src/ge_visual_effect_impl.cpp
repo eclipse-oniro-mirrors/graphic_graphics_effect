@@ -166,6 +166,30 @@ TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
         std::shared_ptr<Drawing::GEShaderMask>),
     };
 
+TagMap<GEXDupoliNoiseMaskParams> dupoliNoiseMaskTagMap_{
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_GRANULARITY, granularity, float),
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_VERTICALMOVEDISTANCE, verticalMoveDistance, float),
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_PROGRESS, progress, float),
+};
+
+TagMap<GEXDistortChromaEffectParams> distortChromaTagMap_{
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_TURBULENTMASK, turbulentMask,
+                    std::shared_ptr<Drawing::GEShaderMask>),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_MASK, mask,
+                    std::shared_ptr<Drawing::GEShaderMask>),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_GRANULARITY, granularity, Vector2f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_FREQUENCY, frequency, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_SHARPNESS, sharpness, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_BRIGHTNESS, brightness, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_DISTORTFACTOR, distortFactor, Vector2f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_DISPERSION, dispersion, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_SATURATION, saturation, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_COLORSTRENGTH, colorStrength, Vector3f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_VERTICALMOVEDISTANCE,
+                    verticalMoveDistance, float),
+};
+
 #undef ADD_TAG_HANDLER
 }
 
@@ -414,6 +438,18 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK);
             impl->MakeFrameGradientMaskParams();
+        }
+    },
+    { GEX_MASK_DUPOLI_NOISE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DUPOLI_NOISE_MASK);
+            impl->MakeDupoliNoiseMaskParams();
+        }
+    },
+    { GEX_SHADER_DISTORT_CHROMA,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISTORT_CHROMA);
+            impl->MakeDistortChromaParams();
         }
     },
     { GE_FILTER_FROSTED_GLASS,
@@ -762,6 +798,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetFrostedGlassBlurParams(tag, param);
             break;
         }
+        case FilterType::DUPOLI_NOISE_MASK: {
+            ApplyTagParams(tag, param, dupoliNoiseMaskParams_, dupoliNoiseMaskTagMap_);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -972,6 +1016,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::FROSTED_GLASS_EFFECT: {
             SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::DUPOLI_NOISE_MASK: {
+            ApplyTagParams(tag, Vector2f(param.first, param.second), dupoliNoiseMaskParams_, dupoliNoiseMaskTagMap_);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, Vector2f(param.first, param.second), distortChromaParams_, distortChromaTagMap_);
             break;
         }
         default:
@@ -1218,6 +1270,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1344,6 +1400,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         }
         case FilterType::FROSTED_GLASS_EFFECT: {
             SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
             break;
         }
         default:
