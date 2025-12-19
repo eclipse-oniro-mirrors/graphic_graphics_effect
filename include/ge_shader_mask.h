@@ -32,6 +32,18 @@ public:
     virtual ~GEShaderMask() = default;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
+    /**
+     * @brief Get the rectangle area can be subtracted.
+     * @details Specifies the inner rectangle (in normalized units) to be excluded from the rendering area.
+     *          This is typically used to construct a nine-patch layout where the center region is subtracted to
+     *          reduce the rendered area.
+     * Nine-patch regions: 1 2 3
+     *                     4 5 6
+     *                     7 8 9
+     * Where region 5 (the center) is subtracted, others preserved.
+     * @note If the returned value is empty or invalid, no subtraction should be applied.
+     */
+    virtual Drawing::Rect GetSubtractedRect() const { return Drawing::Rect(); }
 
     virtual std::weak_ptr<Drawing::Image> GetImage() const
     {

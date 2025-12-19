@@ -205,6 +205,22 @@ TagMap<GEXDistortChromaEffectParams> distortChromaTagMap_{
                     verticalMoveDistance, float),
 };
 
+TagMap<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskTagMap_{
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS,
+        gradientBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH,
+        innerFrameWidth, PairFloat),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH,
+        middleFrameWidth, PairFloat),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH,
+        outsideFrameWidth, PairFloat),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH, RRectWH, PairFloat),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS, RRectPos, PairFloat),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE, slope, float),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS, progress, float),
+};
+
 #undef ADD_TAG_HANDLER
 }
 
@@ -543,6 +559,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR);
             impl->MakeFrostedGlassBlurParams();
         }
+    },
+    { GEX_MASK_NOISY_FRAME_GRADIENT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK);
+            impl->MakeNoisyFrameGradientMaskParams();
+        }
     }
 };
 
@@ -836,6 +858,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
             break;
         }
+        case FilterType::NOISY_FRAME_GRADIENT_MASK: {
+            ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1050,6 +1076,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::FROSTED_GLASS_EFFECT: {
             SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::NOISY_FRAME_GRADIENT_MASK: {
+            ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
             break;
         }
         case FilterType::DUPOLI_NOISE_MASK: {
@@ -1533,6 +1563,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::FROSTED_GLASS_EFFECT: {
             SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::NOISY_FRAME_GRADIENT_MASK: {
+            ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
             break;
         }
         default:

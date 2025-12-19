@@ -1178,6 +1178,30 @@ struct GEFrostedGlassShaderFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT[] = "NoisyFrameGradientMask";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS[] =
+    "NoisyFrameGradientMask_GradientBezierControlPoints";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS[] = "NoisyFrameGradientMask_CornerRadius";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "NoisyFrameGradientMask_InnerFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH[] = "NoisyFrameGradientMask_MiddleFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH[] = "NoisyFrameGradientMask_OutsideFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH[] = "NoisyFrameGradientMask_RRectWH";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS[] = "NoisyFrameGradientMask_RRectPos";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE[] = "NoisyFrameGradientMask_Slope";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS[] = "NoisyFrameGradientMask_Progress";
+struct GEXNoisyFrameGradientMaskParams {
+    Vector4f gradientBezierControlPoints;
+    float cornerRadius = 0.0f;
+    std::pair<float, float> innerFrameWidth;
+    std::pair<float, float> middleFrameWidth;
+    std::pair<float, float> outsideFrameWidth;
+    std::pair<float, float> RRectWH;
+    std::pair<float, float> RRectPos;
+    float slope;
+    float progress;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
+                                GEX_MASK_NOISY_FRAME_GRADIENT);
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing
 } // namespace Rosen

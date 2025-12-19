@@ -19,11 +19,36 @@
 namespace OHOS {
 namespace Rosen {
 
+bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    auto subRect = GetSubtractedRect();
+    bool rectNotValid = subRect.IsEmpty() || !subRect.IsValid() || !rect.Contains(subRect);
+    if (rectNotValid) {
+        return false;
+    }
+
+    auto width = rect.GetWidth();
+    auto height = rect.GetHeight();
+    float maxWidth = std::max({ width * subRect.GetLeft(), width * (1.f - subRect.GetRight()),
+        height * subRect.GetTop(), height * (1.f - subRect.GetBottom())});
+    float penWidth = maxWidth * 2.f; // needs to be doubled since the border meets the middle of pen
+    Drawing::Pen pen;
+    pen.SetWidth(penWidth);
+    pen.SetShaderEffect(drShader_);
+    canvas.AttachPen(pen);
+    canvas.DrawRect(rect);
+    canvas.DetachPen();
+    return true;
+}
+
 void GEShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f); // not use progress
     auto shader = GetDrawingShader();
+    if (TryDrawShaderWithPen(canvas, rect)) {
+        return;
+    }
     Drawing::Brush brush;
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);

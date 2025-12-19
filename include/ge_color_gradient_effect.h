@@ -39,6 +39,7 @@ public:
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
 private:
+    Drawing::Rect GetSubtractedRect() const override;
     void CalculateBlenderCol();
     bool CreateShaderEffect(float width, float height);
     void SetUniform(float width, float height);

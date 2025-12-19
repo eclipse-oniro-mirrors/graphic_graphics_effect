@@ -643,6 +643,16 @@ public:
         return frostedGlassBlurParams_;
     }
 
+    void MakeNoisyFrameGradientMaskParams()
+    {
+        noisyFrameGradientMaskParams_ = std::make_shared<GEXNoisyFrameGradientMaskParams>();
+    }
+
+    const std::shared_ptr<GEXNoisyFrameGradientMaskParams>& GetNoisyFrameGradientMaskParams() const
+    {
+        return noisyFrameGradientMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -779,6 +789,7 @@ private:
 
     std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
     std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
+    std::shared_ptr<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskParams_ = nullptr;
 };
 
 } // namespace Drawing
