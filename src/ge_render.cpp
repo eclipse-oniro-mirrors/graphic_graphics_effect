@@ -229,6 +229,27 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
+    {GEVisualEffectImpl::FilterType::AIBAR_RECT_HALO, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (!ve) {
+                return out;
+            }
+            const auto& params = ve->GetAIBarRectHaloEffectParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::AIBAR_RECT_HALO);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXAIBarRectHaloEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXAIBarRectHaloShader::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
     {GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;

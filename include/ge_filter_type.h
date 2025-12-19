@@ -72,6 +72,7 @@ enum class GEFilterType : int32_t {
     GASIFY,
     LIGHT_CAVE,
     AIBAR_GLOW,
+    AIBAR_RECT_HALO,
     ROUNDED_RECT_FLOWLIGHT,
     GRADIENT_FLOW_COLORS,
     SDF_SHADOW,
