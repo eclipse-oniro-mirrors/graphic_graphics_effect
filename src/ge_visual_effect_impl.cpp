@@ -404,6 +404,11 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFPixelmapShapeParams();
         }
     },
+    { GE_SHAPE_SDF_EMPTY_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE);
+        }
+    },
     { GEX_SHADER_LIGHT_CAVE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::LIGHT_CAVE);

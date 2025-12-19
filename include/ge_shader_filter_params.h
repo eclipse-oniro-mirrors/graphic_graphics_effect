@@ -896,6 +896,8 @@ struct GESDFPixelmapShapeParams {
     std::shared_ptr<Drawing::Image> image;
 };
 
+constexpr char GE_SHAPE_SDF_EMPTY_SHAPE[] = "SDFEmptyShape";
+
 struct GESDFBorderParams final {
     Color color;
     float width = 0.0f;
