@@ -192,18 +192,18 @@ TagMap<GEXDistortChromaEffectParams> distortChromaTagMap_{
 
 TagMap<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS,
-        GradientBezierControlPoint, Vector4f),
-    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS, CornerRadius, float),
+        gradientBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH,
-        InnerFrameWidth, PairFloat),
+        innerFrameWidth, PairFloat),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH,
-        MiddleFrameWidth, PairFloat),
+        middleFrameWidth, PairFloat),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH,
-        OutsideFrameWidth, PairFloat),
+        outsideFrameWidth, PairFloat),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH, RRectWH, PairFloat),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS, RRectPos, PairFloat),
-    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE, Slope, float),
-    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS, Progress, float),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE, slope, float),
+    ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS, progress, float),
 };
 
 #undef ADD_TAG_HANDLER
