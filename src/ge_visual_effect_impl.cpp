@@ -75,6 +75,21 @@ TagMap<GEXAIBarGlowEffectParams> AIBarGlowEffectTagMap_{
     ADD_TAG_HANDLER(GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW_STRENGTH, strengths, Vector4f),
 };
 
+TagMap<GEXAIBarRectHaloEffectParams> AIBarRectHaloEffectTagMap_{
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_LTWH, LTWH, Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_COLOR0, colors[0], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_COLOR1, colors[1], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_COLOR2, colors[2], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_COLOR3, colors[3], Vector4f),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_POS0, positions[0], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_POS1, positions[1], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_POS2, positions[2], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_POS3, positions[3], PairFloat),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_BRIGHTNESS, brightness, float),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO_STRENGTH, strengths, Vector4f),
+};
+
 TagMap<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectTagMap_{
     ADD_TAG_HANDLER(GEXRoundedRectFlowlightEffectParams, GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS,
         startEndPosition, PairFloat),
@@ -427,6 +442,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeAIBarGlowEffectParams();
         }
     },
+    { GEX_SHADER_AIBAR_RECT_HALO,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::AIBAR_RECT_HALO);
+            impl->MakeAIBarRectHaloEffectParams();
+        }
+    },
     { GEX_SHADER_ROUNDED_RECT_FLOWLIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::ROUNDED_RECT_FLOWLIGHT);
@@ -770,6 +791,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
             break;
         }
+        case FilterType::AIBAR_RECT_HALO: {
+            ApplyTagParams(tag, param, AIBarRectHaloEffectParams_, AIBarRectHaloEffectTagMap_);
+            break;
+        }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
             ApplyTagParams(tag, param, roundedRectFlowlightEffectParams_, roundedRectFlowlightEffectTagMap_);
             break;
@@ -1005,6 +1030,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::AIBAR_GLOW: {
             ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            break;
+        }
+        case FilterType::AIBAR_RECT_HALO: {
+            ApplyTagParams(tag, param, AIBarRectHaloEffectParams_, AIBarRectHaloEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {
@@ -1480,6 +1509,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::AIBAR_GLOW: {
             ApplyTagParams(tag, param, AIBarGlowEffectParams_, AIBarGlowEffectTagMap_);
+            break;
+        }
+        case FilterType::AIBAR_RECT_HALO: {
+            ApplyTagParams(tag, param, AIBarRectHaloEffectParams_, AIBarRectHaloEffectTagMap_);
             break;
         }
         case FilterType::ROUNDED_RECT_FLOWLIGHT: {

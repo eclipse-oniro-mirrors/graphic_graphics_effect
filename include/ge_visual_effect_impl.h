@@ -543,6 +543,16 @@ public:
         return AIBarGlowEffectParams_;
     }
 
+    void MakeAIBarRectHaloEffectParams()
+    {
+        AIBarRectHaloEffectParams_ = std::make_shared<GEXAIBarRectHaloEffectParams>();
+    }
+
+    const std::shared_ptr<GEXAIBarRectHaloEffectParams>& GetAIBarRectHaloEffectParams() const
+    {
+        return AIBarRectHaloEffectParams_;
+    }
+
     void MakeRoundedRectFlowlightEffectParams()
     {
         roundedRectFlowlightEffectParams_ = std::make_shared<GEXRoundedRectFlowlightEffectParams>();
@@ -754,6 +764,7 @@ private:
     std::shared_ptr<GEXDupoliNoiseMaskParams> dupoliNoiseMaskParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
     std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
+    std::shared_ptr<GEXAIBarRectHaloEffectParams> AIBarRectHaloEffectParams_ = nullptr;
     std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;

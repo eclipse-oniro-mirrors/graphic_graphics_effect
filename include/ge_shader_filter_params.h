@@ -960,6 +960,29 @@ struct GEXAIBarGlowEffectParams {
     float progress;
 };
 
+constexpr char GEX_SHADER_AIBAR_RECT_HALO[] = "AIBarRectHalo";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_LTWH[] = "AIBarRectHalo_LTWH";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR0[] = "AIBarRectHalo_Color0";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR1[] = "AIBarRectHalo_Color1";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR2[] = "AIBarRectHalo_Color2";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR3[] = "AIBarRectHalo_Color3";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS0[] = "AIBarRectHalo_Position0";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS1[] = "AIBarRectHalo_Position1";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS2[] = "AIBarRectHalo_Position2";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS3[] = "AIBarRectHalo_Position3";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_STRENGTH[] = "AIBarRectHalo_Strength";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_BRIGHTNESS[] = "AIBarRectHalo_Brightness";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_PROGRESS[] = "AIBarRectHalo_Progress";
+struct GEXAIBarRectHaloEffectParams {
+    Vector4f LTWH;
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
+    Vector4f strengths;
+    float brightness = 1.0f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(AIBAR_RECT_HALO, GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO);
+
 constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
 constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
 constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH[] = "RoundedRectFlowlight_WaveLength";
