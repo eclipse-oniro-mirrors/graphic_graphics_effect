@@ -1175,7 +1175,7 @@ struct GEXNoisyFrameGradientMaskParams {
     float slope;
     float progres;
 };
-REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientParams,
+REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
                                 GEX_MASK_NOISY_FRAME_GRADIENT);
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing
