@@ -1163,7 +1163,7 @@ constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH[] = "NoisyFrame
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH[] = "NoisyFrameGradientMask_RRectWH";
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS[] = "NoisyFrameGradientMask_RRectPos";
 constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE[] = "NoisyFrameGradientMask_Slope";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS[] = "NoisyFrameGradientMask_Progres";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS[] = "NoisyFrameGradientMask_Progress";
 struct GEXNoisyFrameGradientMaskParams {
     Vector4f gradientBezierControlPoints;
     float cornerRadius = 0.0f;
@@ -1173,7 +1173,7 @@ struct GEXNoisyFrameGradientMaskParams {
     std::pair<float, float> RRectWH;
     std::pair<float, float> RRectPos;
     float slope;
-    float progres;
+    float progress;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
                                 GEX_MASK_NOISY_FRAME_GRADIENT);
