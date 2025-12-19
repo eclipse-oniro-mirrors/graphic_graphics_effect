@@ -166,7 +166,31 @@ TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
         std::shared_ptr<Drawing::GEShaderMask>),
     };
 
-TagMap<GEXNoisyFrameGradientParams> noisyFrameGradientMaskTagMap_{
+TagMap<GEXDupoliNoiseMaskParams> dupoliNoiseMaskTagMap_{
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_GRANULARITY, granularity, float),
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_VERTICALMOVEDISTANCE, verticalMoveDistance, float),
+    ADD_TAG_HANDLER(GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE_PROGRESS, progress, float),
+};
+
+TagMap<GEXDistortChromaEffectParams> distortChromaTagMap_{
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_PROGRESS, progress, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_TURBULENTMASK, turbulentMask,
+                    std::shared_ptr<Drawing::GEShaderMask>),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_MASK, mask,
+                    std::shared_ptr<Drawing::GEShaderMask>),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_GRANULARITY, granularity, Vector2f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_FREQUENCY, frequency, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_SHARPNESS, sharpness, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_BRIGHTNESS, brightness, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_DISTORTFACTOR, distortFactor, Vector2f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_DISPERSION, dispersion, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_SATURATION, saturation, float),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_COLORSTRENGTH, colorStrength, Vector3f),
+    ADD_TAG_HANDLER(GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA_VERTICALMOVEDISTANCE,
+                    verticalMoveDistance, float),
+};
+
+TagMap<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS,
         GradientBezierControlPoint, Vector4f),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS, CornerRadius, float),
@@ -180,7 +204,7 @@ TagMap<GEXNoisyFrameGradientParams> noisyFrameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS, RRectPos, PairFloat),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE, Slope, float),
     ADD_TAG_HANDLER(GEXNoisyFrameGradientMaskParams, GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS, Progress, float),
-    };
+};
 
 #undef ADD_TAG_HANDLER
 }
@@ -430,6 +454,18 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::FRAME_GRADIENT_MASK);
             impl->MakeFrameGradientMaskParams();
+        }
+    },
+    { GEX_MASK_DUPOLI_NOISE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DUPOLI_NOISE_MASK);
+            impl->MakeDupoliNoiseMaskParams();
+        }
+    },
+    { GEX_SHADER_DISTORT_CHROMA,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISTORT_CHROMA);
+            impl->MakeDistortChromaParams();
         }
     },
     { GE_FILTER_FROSTED_GLASS,
@@ -784,6 +820,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetFrostedGlassBlurParams(tag, param);
             break;
         }
+        case FilterType::DUPOLI_NOISE_MASK: {
+            ApplyTagParams(tag, param, dupoliNoiseMaskParams_, dupoliNoiseMaskTagMap_);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
         case FilterType::NOISY_FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
             break;
@@ -1002,6 +1046,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::NOISY_FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
+            break;
+        }
+        case FilterType::DUPOLI_NOISE_MASK: {
+            ApplyTagParams(tag, Vector2f(param.first, param.second), dupoliNoiseMaskParams_, dupoliNoiseMaskTagMap_);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, Vector2f(param.first, param.second), distortChromaParams_, distortChromaTagMap_);
             break;
         }
         default:
@@ -1248,6 +1300,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
         default:
             break;
     }
@@ -1374,6 +1430,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         }
         case FilterType::FROSTED_GLASS_EFFECT: {
             SetFrostedGlassEffectParams(tag, param);
+            break;
+        }
+        case FilterType::DISTORT_CHROMA: {
+            ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
             break;
         }
         default:
@@ -2490,6 +2550,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
     if (tag == GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE) {
         frostedGlassParams_->baseMaterialType = param;
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARK_SCALE) {
+        constexpr float MIN_S = 0.0f;
+        constexpr float MAX_S = 1.0f;
+        frostedGlassParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -2535,6 +2600,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassRates(const std::string& tag, cons
         frostedGlassParams_->bgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
             std::clamp(param.second, V_MIN, V_MAX));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES) {
+        frostedGlassParams_->darkModeBgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
  
     if (tag == GE_FILTER_FROSTED_GLASS_SDRATES) {
         frostedGlassParams_->sdRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
@@ -2560,6 +2629,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassWeights(const std::string& tag, co
         frostedGlassParams_->weightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS) {
+        frostedGlassParams_->darkModeWeightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
  
     if (tag == GE_FILTER_FROSTED_GLASS_WEIGHTSEDL) {
         frostedGlassParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
@@ -2577,15 +2650,19 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         constexpr float MIN_V = 0.0f;
         frostedGlassParams_->borderSize = Vector2f(std::max(param.first, MIN_V), std::max(param.second, MIN_V));
     }
- 
-    if (tag == GE_FILTER_FROSTED_GLASS_BLURPARAMS) {
+    {
         constexpr float MIN_V = 1e-6f;
         constexpr float MAX_V = 200.0f;
         constexpr float MIN_K = 1.0f;
         constexpr float MAX_K = 200.0f;
-        frostedGlassParams_->blurParams = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
- 
-        std::clamp(param.second, MIN_K, MAX_K));
+        if (tag == GE_FILTER_FROSTED_GLASS_BLURPARAMS) {
+            frostedGlassParams_->blurParams =
+                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_K, MAX_K));
+        }
+        if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM) {
+            frostedGlassParams_->darkModeBlurParam =
+                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_K, MAX_K));
+        }
     }
     
     HandleSetFrostedGlassWeights(tag, param);
@@ -2632,6 +2709,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassKBS(const std::string& tag, const 
         frostedGlassParams_->bgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
             std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS) {
+        frostedGlassParams_->darkModeBgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
  
     if (tag == GE_FILTER_FROSTED_GLASS_SDKBS) {
         frostedGlassParams_->sdKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
@@ -2658,9 +2739,17 @@ void GEVisualEffectImpl::HandleSetFrostedGlassPosNegCoefs(const std::string& tag
         frostedGlassParams_->bgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS) {
+        frostedGlassParams_->darkModeBgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
 
     if (tag == GE_FILTER_FROSTED_GLASS_BGNEG) {
         frostedGlassParams_->bgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG) {
+        frostedGlassParams_->darkModeBgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
     }
 

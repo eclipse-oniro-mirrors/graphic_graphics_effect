@@ -44,8 +44,8 @@ protected:
     Drawing::GEVariableRadiusBlurShaderFilterParams params_;
 
 private:
-    static void MakeHorizontalBoxBlurEffect();
-    static void MakeVerticalBoxBlurEffect();
+    static void MakeHorizontalBoxBlurEffect(bool applyInsideMask = false);
+    static void MakeVerticalBoxBlurEffect(bool applyInsideMask = false);
     static void MakeTextureShaderEffect();
 
     static std::shared_ptr<Drawing::Image> DrawBoxLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,

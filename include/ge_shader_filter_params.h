@@ -549,6 +549,7 @@ constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask"
 struct GEVariableRadiusBlurShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     float blurRadius;
+    bool applyInsideMask = false;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShaderFilterParams,
                                 GE_FILTER_VARIABLE_RADIUS_BLUR);
@@ -725,6 +726,46 @@ struct GEXLightCaveShaderParams {
     float progress = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams, GEX_SHADER_LIGHT_CAVE);
+
+constexpr char GEX_MASK_DUPOLI_NOISE[] = "DupoliNoiseMask";
+constexpr char GEX_MASK_DUPOLI_NOISE_PROGRESS[] = "DupoliNoiseMask_Progress";
+constexpr char GEX_MASK_DUPOLI_NOISE_GRANULARITY[] = "DupoliNoiseMask_Granularity";
+constexpr char GEX_MASK_DUPOLI_NOISE_VERTICALMOVEDISTANCE[] = "DupoliNoiseMask_VerticalMoveDistance";
+struct GEXDupoliNoiseMaskParams {
+    float progress = 0.0f;
+    float granularity = 0.0f;
+    float verticalMoveDistance = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(DUPOLI_NOISE_MASK, GEXDupoliNoiseMaskParams, GEX_MASK_DUPOLI_NOISE);
+
+constexpr char GEX_SHADER_DISTORT_CHROMA[] = "DistortChroma";
+constexpr char GEX_SHADER_DISTORT_CHROMA_PROGRESS[] = "DistortChroma_Progress";
+constexpr char GEX_SHADER_DISTORT_CHROMA_TURBULENTMASK[] = "DistortChroma_TurbulentMask";
+constexpr char GEX_SHADER_DISTORT_CHROMA_MASK[] = "DistortChroma_Mask";
+constexpr char GEX_SHADER_DISTORT_CHROMA_GRANULARITY[] = "DistortChroma_Granularity";
+constexpr char GEX_SHADER_DISTORT_CHROMA_FREQUENCY[] = "DistortChroma_Frequency";
+constexpr char GEX_SHADER_DISTORT_CHROMA_SHARPNESS[] = "DistortChroma_Sharpness";
+constexpr char GEX_SHADER_DISTORT_CHROMA_BRIGHTNESS[] = "DistortChroma_Brightness";
+constexpr char GEX_SHADER_DISTORT_CHROMA_DISPERSION[] = "DistortChroma_Dispersion";
+constexpr char GEX_SHADER_DISTORT_CHROMA_DISTORTFACTOR[] = "DistortChroma_DistortFactor";
+constexpr char GEX_SHADER_DISTORT_CHROMA_SATURATION[] = "DistortChroma_Saturation";
+constexpr char GEX_SHADER_DISTORT_CHROMA_COLORSTRENGTH[] = "DistortChroma_ColorStrength";
+constexpr char GEX_SHADER_DISTORT_CHROMA_VERTICALMOVEDISTANCE[] = "DistortChroma_VerticalMoveDistance";
+struct GEXDistortChromaEffectParams {
+    float progress = 0.0f;
+    std::shared_ptr<GEShaderMask> turbulentMask;
+    float frequency = 0.0f;
+    float sharpness = 0.0f;
+    float brightness = 0.0f;
+    float dispersion = 0.0f;
+    float saturation = 0.0f;
+    float verticalMoveDistance = 0.0f;
+    Vector2f granularity =  Vector2f(0.0f, 0.0f);
+    Vector2f distortFactor = Vector2f(0.0f, 0.0f);
+    Vector3f colorStrength = Vector3f(0.0f, 0.0f, 0.0f);
+    std::shared_ptr<GEShaderMask> mask;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(DISTORT_CHROMA, GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA);
 
 constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
 constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
@@ -1051,6 +1092,15 @@ constexpr char GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED[] = "FrostedGlass_Inne
 constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED[] = "FrostedGlass_EnvLightEnabled";
 constexpr char GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED[] = "FrostedGlass_HighLightEnabled";
 
+// Dark mode parameters and scale
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM[] = "FrostedGlass_DarkModeBlurParam";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS[] = "FrostedGlass_DarkModeWeightsEmboss";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES[] = "FrostedGlass_DarkModeBgRates";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS[] = "FrostedGlass_DarkModeBgKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS[] = "FrostedGlass_DarkModeBgPos";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG[] = "FrostedGlass_DarkModeBgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_DARK_SCALE[] = "FrostedGlass_DarkScale";
+
 struct GEFrostedGlassShaderFilterParams {
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
@@ -1092,6 +1142,14 @@ struct GEFrostedGlassShaderFilterParams {
     bool envLightEnabled = true;
     bool highLightEnabled = true;
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    // Dark mode parameters and scale
+    Vector2f darkModeBlurParam = Vector2f(48.0f, 4.0f);
+    Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
+    Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    float darkScale = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
 
