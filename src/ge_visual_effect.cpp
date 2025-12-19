@@ -254,8 +254,8 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             auto mask = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
                 static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK),
-                sizeof(Drawing::GEXNoisyFrameGradientParams),
-                static_cast<void *>(noisyFrameParams.get()));;
+                sizeof(Drawing::GEXNoisyFrameGradientMaskParams),
+                static_cast<void *>(noisyFrameParams.get()));
             if (!mask) {
                 return out;
             }
