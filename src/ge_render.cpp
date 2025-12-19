@@ -490,6 +490,7 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
             ShaderFilterEffectContext geContext { resImage, context.src, context.dst, context.geCacheProvider };
             applyTarget = DispatchGEShaderFilter(canvas, brush, composable, visualEffect, geContext);
+            resImage = geContext.image;
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
             HpsEffectFilter::HpsEffectContext hpsEffectContext = {
                 context.alpha, context.colorFilter, context.maskColor};
