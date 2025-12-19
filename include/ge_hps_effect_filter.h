@@ -34,6 +34,8 @@
 
 namespace OHOS {
 namespace Rosen {
+constexpr int ARRAY_SIZE_DIMENSION = 2;
+
 class HpsEffectFilter {
 public:
     HpsEffectFilter() = default;
@@ -58,11 +60,14 @@ public:
     bool IsNeedUpscale();
     void SetNeedUpscale(bool needUpscale);
 
+    static bool IsMaskParameterChanged(
+        const std::shared_ptr<Drawing::HpsMaskParameter>& pL, const std::shared_ptr<Drawing::HpsMaskParameter>& pR);
+
 private:
     std::vector<std::shared_ptr<Drawing::HpsEffectParameter>> hpsEffect_;
-    bool isBlur_ {false};
     bool needClampFilter_ {true};
     bool needUpscale_ { false };
+    Drawing::Rect originDst_ {};
 
     std::shared_ptr<Drawing::HpsEffectParameter> GenerateMesaBlurEffect(
         const Drawing::GEMESABlurShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst,
@@ -88,11 +93,13 @@ private:
     std::shared_ptr<Drawing::HpsMaskParameter> GenerateRadialGradientShaderMaskParameter(
         const Drawing::GERadialGradientShaderMaskParams& params);
 
-    bool ApplyHpsSmallCanvas(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
+    bool DrawImageWithHpsUpscale(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
+    bool IsNeedDownscale();
+    std::array<int, ARRAY_SIZE_DIMENSION> GetSurfaceSize(
+        Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, bool isDownScaled);
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
-    bool DrawImageWithHps(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
-        std::shared_ptr<Drawing::Image>& outImage, const Drawing::Rect& dst, const HpsEffectContext& hpsContext);
+
     // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases
     static void UnitTestSetExtensionProperties(const std::vector<const char *>& extensionProperties);
 };

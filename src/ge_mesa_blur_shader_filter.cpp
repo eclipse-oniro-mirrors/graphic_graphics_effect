@@ -98,12 +98,6 @@ static bool GetKawaseOriginalEnabled()
 #endif
 }
 
-inline bool GE_GNE(float left, float right) // great not equal
-{
-    constexpr float epsilon = 0.001f;
-    return (left - right) > epsilon;
-}
-
 GEMESABlurShaderFilter::GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFilterParams& params)
     : radius_(params.radius), greyCoef1_(params.greyCoef1), greyCoef2_(params.greyCoef2),
       stretchOffsetX_(params.offsetX), stretchOffsetY_(params.offsetY),
