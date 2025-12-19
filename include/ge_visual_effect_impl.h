@@ -778,7 +778,7 @@ private:
 
     std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
     std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
-    std::shared_ptr<GEXNoisyFrameGradientParams> noisyFrameGradientMaskParams_ = nullptr;
+    std::shared_ptr<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskParams_ = nullptr;
 };
 
 } // namespace Drawing
