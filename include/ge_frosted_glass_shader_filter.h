@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Rosen {
+namespace FrostedGlass {
+GE_EXPORT void InterpolateAdaptiveParams(Drawing::GEFrostedGlassShaderFilterParams& params);
+}
 
 class GEMESABlurShaderFilter;
 class GE_EXPORT GEFrostedGlassShaderFilter : public GEShaderFilter {

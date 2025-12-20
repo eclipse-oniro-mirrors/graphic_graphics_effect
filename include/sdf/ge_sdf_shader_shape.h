@@ -23,7 +23,8 @@ namespace Rosen {
 namespace Drawing {
 
 enum class GESDFShapeType : uint8_t {
-    PIXELMAP = 0,
+    EMPTY = 0,
+    PIXELMAP,
     RRECT,
     TRANSFORM,
     UNION_OP,

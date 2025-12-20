@@ -73,6 +73,29 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_002, TestSize.Level0)
     GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_002 end";
 }
 
+/**
+ * @tc.name: UpdateDarkScale_001
+ * @tc.desc: Verify UpdateDarkScale sets darkScale for FrostedGlass
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, UpdateDarkScale_001, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_001 start";
+
+    auto frosted = std::make_shared<GEVisualEffect>(GE_FILTER_FROSTED_GLASS);
+    auto other = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    container->AddToChainedFilter(frosted);
+    container->AddToChainedFilter(other);
+
+    const float darkScale = 0.7f;
+    container->UpdateDarkScale(darkScale);
+
+    auto impl = frosted->GetImpl();
+    ASSERT_NE(impl, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_001 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

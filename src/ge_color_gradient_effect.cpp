@@ -27,8 +27,8 @@ namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffectHasMask_ = nullptr;
 constexpr static uint8_t GRADIENT_POSITION_CHANNEL = 2;
+constexpr static size_t GRADIENT_ARRAY_NUM = 12;
 constexpr static uint8_t GRADIENT_COLOR_CHANNEL = 4;
-constexpr static uint8_t GRADIENT_ARRAY_NUM = 12;
 constexpr static uint8_t COLOR_R_CHANNEL = 0;
 constexpr static uint8_t COLOR_G_CHANNEL = 1;
 constexpr static uint8_t COLOR_B_CHANNEL = 2;
@@ -187,8 +187,8 @@ void MakeColorGradientEffectWithMask()
 GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffectParams& param)
 {
     paramColorSize_ = static_cast<size_t>(std::max(param.colorNum_, 0.0f));
-    blend_colors_ = std::vector<Drawing::Color4f>(GRADIENT_ARRAY_NUM, {0.0f, 0.0f, 0.0f, 0.0f});
-    auto size = blend_colors_.size();
+    blendColors_ = std::vector<Drawing::Color4f>(GRADIENT_ARRAY_NUM, {0.0f, 0.0f, 0.0f, 0.0f});
+    auto size = blendColors_.size();
     for (size_t i = 0; i < size; i++) {
         colors_.push_back(param.colors_[i]);
         positions_.push_back(param.positions_[i]);
@@ -219,6 +219,10 @@ float GEColorGradientEffect::CalculateCompressRatio()
 
 void GEColorGradientEffect::CalculateBlenderCol()
 {
+    if (paramColorSize_ > GRADIENT_ARRAY_NUM) {
+        LOGE("GEColorGradientEffect::CalculateBlenderCol color size out of bounds %{public}zu", paramColorSize_);
+        return;
+    }
     const float ratio = CalculateCompressRatio();
     for (size_t i = 0; i < paramColorSize_; i++) {
         std::vector<float> weights(paramColorSize_, 0.0f);
@@ -238,7 +242,7 @@ void GEColorGradientEffect::CalculateBlenderCol()
             mixedColor.blueF_ += ratio * colors_[k].blueF_ * weights[k];
             mixedColor.alphaF_ += colors_[k].alphaF_ * weights[k];
         }
-        blend_colors_[i] = mixedColor;
+        blendColors_[i] = mixedColor;
     }
 }
 
@@ -272,10 +276,10 @@ void GEColorGradientEffect::SetUniform(float width, float height)
     CalculateBlenderCol();
     std::vector<float> blendColorArray(GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL, 0.0f);
     for (int i = 0; i < paramColorSize_; i++) {
-        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_R_CHANNEL] = blend_colors_[i].redF_;
-        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_G_CHANNEL] = blend_colors_[i].greenF_;
-        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_B_CHANNEL] = blend_colors_[i].blueF_;
-        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_A_CHANNEL] = blend_colors_[i].alphaF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_R_CHANNEL] = blendColors_[i].redF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_G_CHANNEL] = blendColors_[i].greenF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_B_CHANNEL] = blendColors_[i].blueF_;
+        blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_A_CHANNEL] = blendColors_[i].alphaF_;
     }
 
     float* blendColorArrayPtr = blendColorArray.data();
@@ -293,7 +297,7 @@ void GEColorGradientEffect::SetUniform(float width, float height)
     builder_->SetUniform("gradient_s", strengthArrayPtr, GRADIENT_ARRAY_NUM);
 
     std::vector<float> factorArray(GRADIENT_ARRAY_NUM);
-    for (int i = 0; i < GRADIENT_ARRAY_NUM; i++) {
+    for (size_t i = 0; i < GRADIENT_ARRAY_NUM; i++) {
         factorArray[i] = i < paramColorSize_ ? 1.0f : 0.0f;
     }
     float* factorArrayPtr = factorArray.data();
@@ -327,5 +331,11 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
     }
     drShader_ = colorGradientShader;
 }
+
+Drawing::Rect GEColorGradientEffect::GetSubtractedRect() const
+{
+    return mask_ ? mask_->GetSubtractedRect() : Drawing::Rect();
+}
+
 } // namespace Rosen
 } // namespace OHOS

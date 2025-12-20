@@ -35,9 +35,10 @@ const std::string CIRCLE_FLOWLIGHT_SHADER(
     uniform half4 rotationSeed;
     uniform half4 gradientX;
     uniform half4 gradientY;
+    uniform half strength[4];
+    uniform half distortStrength;
+    uniform half blendGradient;
     uniform half progress;
-
-    const half strength = 1.0;
 
     float randWave(float frequency, float amplitude, float time, float seed)
     {
@@ -74,29 +75,29 @@ const std::string CIRCLE_FLOWLIGHT_SHADER(
         tempPos = rotationMatrix * (vec2(gradientX.w, gradientY.w) * 2.0 - 1.0);
         gradientPos[3] = (tempPos + wave * normalize(tempPos)) * 0.5 + 0.5;
  
-        float distorted_radius = pow(radius, 4.0);
+        float distorted_radius = pow(radius, distortStrength);
         vec2 fragPosNew = fragPos / radius * distorted_radius;
         vec2 gradientUV = fragPosNew * 0.5 + 0.5;
         float gradientTotalWeight = 0.0;
         vec4 gradientInterpColor = vec4(0.0);
  
         float distance0 = max(0.01, length(gradientUV - gradientPos[0]));
-        float weight0 = 1.0 / pow(distance0, strength);
+        float weight0 = strength[0] / pow(distance0, blendGradient);
         gradientInterpColor += weight0 * colorOne;
         gradientTotalWeight += weight0;
  
         float distance1 = max(0.01, length(gradientUV - gradientPos[1]));
-        float weight1 = 1.0 / pow(distance1, strength);
+        float weight1 = strength[1] / pow(distance1, blendGradient);
         gradientInterpColor += weight1 * colorTwo;
         gradientTotalWeight += weight1;
  
         float distance2 = max(0.01, length(gradientUV - gradientPos[2]));
-        float weight2 = 1.0 / pow(distance2, strength);
+        float weight2 = strength[2] / pow(distance2, blendGradient);
         gradientInterpColor += weight2 * colorThree;
         gradientTotalWeight += weight2;
  
         float distance3 = max(0.01, length(gradientUV - gradientPos[3]));
-        float weight3 = 1.0 / pow(distance3, strength);
+        float weight3 = strength[3] / pow(distance3, blendGradient);
         gradientInterpColor += weight3 * colorFour;
         gradientTotalWeight += weight3;
  
@@ -128,8 +129,9 @@ const std::string CIRCLE_FLOWLIGHT_SHADER_WITH_MASK(
     uniform half4 gradientX;
     uniform half4 gradientY;
     uniform half progress;
-
-    const half strength = 1.0;
+    uniform half strength[4];
+    uniform half distortStrength;
+    uniform half blendGradient;
  
     float randWave(float frequency, float amplitude, float time, float seed)
     {
@@ -139,7 +141,7 @@ const std::string CIRCLE_FLOWLIGHT_SHADER_WITH_MASK(
  
     vec4 colorGradient(vec2 fragPos, float radius, float timeValue)
     {
-        vec4 colorOne= color[0];
+        vec4 colorOne = color[0];
         vec4 colorTwo = color[1];
         vec4 colorThree = color[2];
         vec4 colorFour = color[3];
@@ -166,29 +168,29 @@ const std::string CIRCLE_FLOWLIGHT_SHADER_WITH_MASK(
         tempPos = rotationMatrix * (vec2(gradientX.w, gradientY.w) * 2.0 - 1.0);
         gradientPos[3] = (tempPos + wave * normalize(tempPos)) * 0.5 + 0.5;
  
-        float distorted_radius = pow(radius, 4.0);
+        float distorted_radius = pow(radius, distortStrength);
         vec2 fragPosNew = fragPos / radius * distorted_radius;
         vec2 gradientUV = fragPosNew * 0.5 + 0.5;
         float gradientTotalWeight = 0.0;
         vec4 gradientInterpColor = vec4(0.0);
  
         float distance0 = max(0.01, length(gradientUV - gradientPos[0]));
-        float weight0 = 1.0 / pow(distance0, strength);
+        float weight0 = strength[0] / pow(distance0, blendGradient);
         gradientInterpColor += weight0 * colorOne;
         gradientTotalWeight += weight0;
  
         float distance1 = max(0.01, length(gradientUV - gradientPos[1]));
-        float weight1 = 1.0 / pow(distance1, strength);
+        float weight1 = strength[1] / pow(distance1, blendGradient);
         gradientInterpColor += weight1 * colorTwo;
         gradientTotalWeight += weight1;
  
         float distance2 = max(0.01, length(gradientUV - gradientPos[2]));
-        float weight2 = 1.0 / pow(distance2, strength);
+        float weight2 = strength[2] / pow(distance2, blendGradient);
         gradientInterpColor += weight2 * colorThree;
         gradientTotalWeight += weight2;
  
         float distance3 = max(0.01, length(gradientUV - gradientPos[3]));
-        float weight3 = 1.0 / pow(distance3, strength);
+        float weight3 = strength[3] / pow(distance3, blendGradient);
         gradientInterpColor += weight3 * colorFour;
         gradientTotalWeight += weight3;
  
@@ -232,6 +234,9 @@ GECircleFlowlightEffect::GECircleFlowlightEffect(Drawing::GECircleFlowlightEffec
     gradientY_ = param.gradientY;
     progress_ = param.progress;
     mask_ = param.mask;
+    strength_ = param.strength;
+    distortStrength_ = param.distortStrength;
+    blendGradient_ = param.blendGradient;
 }
 
 void GECircleFlowlightEffect::MakeCircleFlowlightEffect()
@@ -282,6 +287,9 @@ void GECircleFlowlightEffect::SetUniform(float width, float height)
     builder_->SetUniform("gradientX", gradientX_.GetData(), ARRAY_NUM);
     builder_->SetUniform("gradientY", gradientY_.GetData(), ARRAY_NUM);
     builder_->SetUniform("progress", progress_);
+    builder_->SetUniform("strength", strength_.GetData(), ARRAY_NUM);
+    builder_->SetUniform("distortStrength", distortStrength_);
+    builder_->SetUniform("blendGradient", blendGradient_);
 }
 
 void GECircleFlowlightEffect::MakeDrawingShader(const Drawing::Rect& rect, float progress)

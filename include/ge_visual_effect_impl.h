@@ -455,7 +455,24 @@ public:
     {
         return lightCaveShaderParams_;
     }
+    void MakeDistortChromaParams()
+    {
+        distortChromaParams_ = std::make_shared<GEXDistortChromaEffectParams>();
+    }
 
+    const std::shared_ptr<GEXDistortChromaEffectParams>& GetDistortChromaParams() const
+    {
+        return distortChromaParams_;
+    }
+    void MakeDupoliNoiseMaskParams()
+    {
+        dupoliNoiseMaskParams_ = std::make_shared<GEXDupoliNoiseMaskParams>();
+    }
+
+    const std::shared_ptr<GEXDupoliNoiseMaskParams>& GetDupoliNoiseMaskParams() const
+    {
+        return dupoliNoiseMaskParams_;
+    }
     void MakeBorderLightParams()
     {
         borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
@@ -524,6 +541,16 @@ public:
     const std::shared_ptr<GEXAIBarGlowEffectParams>& GetAIBarGlowEffectParams() const
     {
         return AIBarGlowEffectParams_;
+    }
+
+    void MakeAIBarRectHaloEffectParams()
+    {
+        AIBarRectHaloEffectParams_ = std::make_shared<GEXAIBarRectHaloEffectParams>();
+    }
+
+    const std::shared_ptr<GEXAIBarRectHaloEffectParams>& GetAIBarRectHaloEffectParams() const
+    {
+        return AIBarRectHaloEffectParams_;
     }
 
     void MakeRoundedRectFlowlightEffectParams()
@@ -616,6 +643,16 @@ public:
         return frostedGlassBlurParams_;
     }
 
+    void MakeNoisyFrameGradientMaskParams()
+    {
+        noisyFrameGradientMaskParams_ = std::make_shared<GEXNoisyFrameGradientMaskParams>();
+    }
+
+    const std::shared_ptr<GEXNoisyFrameGradientMaskParams>& GetNoisyFrameGradientMaskParams() const
+    {
+        return noisyFrameGradientMaskParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -684,6 +721,7 @@ private:
     void HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param);
     void SetFrostedGlassEffectParams(const std::string& tag, const float& param);
     void SetFrostedGlassEffectParams(const std::string& tag, const Vector3f& param);
+    void SetFrostedGlassEffectParams(const std::string& tag, const Vector4f& param);
     void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
     void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetFrostedGlassBlurParams(const std::string& tag, const float& param);
@@ -732,8 +770,11 @@ private:
     std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
     std::shared_ptr<GEHarmoniumEffectShaderParams> harmoniumEffectParams_ = nullptr;
     std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
+    std::shared_ptr<GEXDistortChromaEffectParams> distortChromaParams_ = nullptr;
+    std::shared_ptr<GEXDupoliNoiseMaskParams> dupoliNoiseMaskParams_ = nullptr;
     std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
     std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
+    std::shared_ptr<GEXAIBarRectHaloEffectParams> AIBarRectHaloEffectParams_ = nullptr;
     std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
     std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
@@ -748,6 +789,7 @@ private:
 
     std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
     std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
+    std::shared_ptr<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskParams_ = nullptr;
 };
 
 } // namespace Drawing

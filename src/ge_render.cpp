@@ -19,6 +19,7 @@
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_border_light_shader.h"
 #include "ge_circle_flowlight_effect.h"
+#include "ge_color_gradient_effect.h"
 #include "ge_color_gradient_shader_filter.h"
 #include "ge_content_light_shader_filter.h"
 #include "ge_contour_diagonal_flow_light_shader.h"
@@ -126,7 +127,7 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
                 type, sizeof(GEXColorGradientEffectParams), static_cast<void*>(params.get()));
             if (!impl) {
-                GE_LOGE("GEXColorGradientEffect::CreateDynamicImpl create object failed.");
+                out = std::make_shared<GEColorGradientEffect>(*params);
                 return out;
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
@@ -175,6 +176,27 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
+    {GEVisualEffectImpl::FilterType::DISTORT_CHROMA, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetDistortChromaParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::DISTORT_CHROMA);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXDistortChromaEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXDistortChromaEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
     {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
@@ -201,6 +223,27 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
                 type, sizeof(GEXAIBarGlowEffectParams), static_cast<void*>(params.get()));
             if (!impl) {
                 GE_LOGE("GEXAIBarGlowEffect::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::AIBAR_RECT_HALO, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (!ve) {
+                return out;
+            }
+            const auto& params = ve->GetAIBarRectHaloEffectParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::AIBAR_RECT_HALO);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXAIBarRectHaloEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXAIBarRectHaloShader::CreateDynamicImpl create object failed.");
                 return out;
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
@@ -380,7 +423,7 @@ bool GERender::AfterApplyShaderFilter(Drawing::Canvas& canvas, const Drawing::GE
     // Update information after executing the shader filter
     auto ve = visualEffect.GetImpl();
     ve->SetCache(geShaderFilter.GetCache());
-    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST) {
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY) {
         isGasifyFilter_ = true;
     }
     return true;
