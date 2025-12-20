@@ -240,6 +240,10 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, InitEffect_Twice, TestSize.Level0)
 HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.Level0)
 {
     auto params = MakeParams();
+    Drawing::GESDFRRectShapeParams sdfParam;
+    sdfParam.rrect.width_ = 100.0f;
+    sdfParam.rrect.height_ = 100.0f;
+    params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
 
@@ -275,13 +279,14 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     auto childSml = Drawing::ShaderEffect::CreateImageShader(
         *imgShaderSml, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
-
+    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
     ASSERT_NE(childImage, nullptr);
     ASSERT_NE(childBig, nullptr);
     ASSERT_NE(childSml, nullptr);
+    ASSERT_NE(sdfNormalShader, nullptr);
 
     auto builder = filter.MakeFrostedGlassShader(
-        childImage, childBig, childSml,
+        childImage, childBig, childSml, sdfNormalShader,
         static_cast<float>(imgShaderImg->GetWidth()),
         static_cast<float>(imgShaderImg->GetHeight()));
     EXPECT_NE(builder, nullptr);
@@ -297,8 +302,8 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_WO_SDFShape, Tes
     auto params = MakeParams();
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-
-    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, 100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
+    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, sdfNormalShader, 100.0f, 100.0f);
     EXPECT_NE(builder, nullptr);
 }
 
@@ -311,11 +316,13 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_W_SDFShape, Test
 {
     auto params = MakeParams();
     Drawing::GESDFRRectShapeParams sdfParam;
+    sdfParam.rrect.width_ = 100.0f;
+    sdfParam.rrect.height_ = 100.0f;
     params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-
-    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, 100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
+    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, sdfNormalShader, 100.0f, 100.0f);
     EXPECT_NE(builder, nullptr);
 }
 

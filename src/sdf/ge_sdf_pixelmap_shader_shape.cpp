@@ -126,8 +126,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
     return sdfPixelmapShaderShapeBuilder;
 }
 
-std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateShaderEffect(std::shared_ptr<ShaderEffect> pixelmapShader,
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
+std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateShaderEffect(
+    std::shared_ptr<ShaderEffect> pixelmapShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {
         LOGE("GESDFPixelmapShaderShape::GenerateShaderEffect builder error");
