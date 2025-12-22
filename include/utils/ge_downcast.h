@@ -57,7 +57,7 @@ struct ExactDowncastUtils {
         template<typename T>
         static TypeID Get()
         {
-            constexpr RawTypeID typeHash = CompileTimeHash(__PRETTY_FUNCTION__);
+            static RawTypeID typeHash = CompileTimeHash(__PRETTY_FUNCTION__);
             return TypeID(typeHash);
         };
 
