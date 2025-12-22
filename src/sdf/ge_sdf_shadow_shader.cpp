@@ -17,6 +17,7 @@
  
 #include "ge_log.h"
 #include "sdf/ge_sdf_shadow_shader.h"
+#include "common/rs_common_def.h"
  
 namespace OHOS {
 namespace Rosen {
@@ -31,10 +32,32 @@ void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progr
     drShader_ = MakeSDFShadowShader(rect);
 }
 
+void GESDFShadowShader::UpdateRectForShadow(Drawing::Rect& rect)
+{
+    float radius = std::max(params_.shadow.radius * RADIUS_FACTOR, SDF_SHADOW_MIN_THRESHOLD);
+    float left = params_.shadow.offsetX - radius;
+    float right = params_.shadow.offsetX + radius;
+    float top = params_.shadow.offsetY - radius;
+    float bottom =  params_.shadow.offsetY + radius;
+    if (ROSEN_LNE(left, 0.0f)) {
+        rect.SetLeft(rect.GetLeft() + left);
+    }
+    if (ROSEN_GNE(right, 0.0f)) {
+        rect.SetRight(rect.GetRight() + right);
+    }
+    if (ROSEN_LNE(top, 0.0f)) {
+        rect.SetTop(rect.GetTop() + top);
+    }
+    if (ROSEN_GNE(bottom, 0.0f)) {
+        rect.SetBottom(rect.GetBottom() + bottom);
+    }
+}
+
 void GESDFShadowShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    Preprocess(canvas, rect); // to calculate your cache data
-    MakeDrawingShader(rect, -1.f); // not use progress
+    Drawing::Rect newRect = rect;
+    UpdateRectForShadow(newRect);
+    MakeDrawingShader(newRect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -42,7 +65,7 @@ void GESDFShadowShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect&
     Drawing::Brush brush;
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
-    canvas.DrawRect(rect);
+    canvas.DrawRect(newRect);
     canvas.DetachBrush();
 }
 
