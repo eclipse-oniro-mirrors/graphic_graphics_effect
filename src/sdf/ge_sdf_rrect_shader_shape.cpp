@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
+constexpr float EXTEND = 0.5; // Fixing edge difference between SDF and Skia RRect
 static constexpr char SDF_GRAD_PROG[] = R"(
     uniform vec2 centerPos;
     uniform vec2 halfSize;
@@ -163,8 +164,8 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
 
     builder->SetUniform("centerPos", params_.rrect.left_ + params_.rrect.width_ * HALF,
         params_.rrect.top_ + params_.rrect.height_ * HALF);
-    builder->SetUniform("halfSize", params_.rrect.width_ * HALF, params_.rrect.height_ * HALF);
-    builder->SetUniform("radius", params_.rrect.radiusX_);
+    builder->SetUniform("halfSize", params_.rrect.width_ * HALF + EXTEND, params_.rrect.height_ * HALF + EXTEND);
+    builder->SetUniform("radius", params_.rrect.radiusX_ + EXTEND);
 
     auto sdfRRectShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfRRectShapeShader) {

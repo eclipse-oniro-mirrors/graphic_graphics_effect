@@ -79,7 +79,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const 
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFClipShader::GetSDFClipEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> sdfClipShader = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfClipShader = nullptr;
     if (sdfClipShader == nullptr) {
         sdfClipShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
     }

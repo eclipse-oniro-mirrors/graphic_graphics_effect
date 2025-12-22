@@ -58,10 +58,25 @@ protected:
     virtual void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) {}
 
 protected:
+    /**
+     * @brief Get the rectangle area can be subtracted.
+     * @details Specifies the inner rectangle (in normalized units) to be excluded from the rendering area.
+     *          This is typically used to construct a nine-patch layout where the center region is subtracted to
+     *          reduce the rendered area.
+     * Nine-patch regions: 1 2 3
+     *                     4 5 6
+     *                     7 8 9
+     * Where region 5 (the center) is subtracted, others preserved.
+     * @note If the returned value is empty or invalid, no subtraction should be applied.
+     */
+    virtual Drawing::Rect GetSubtractedRect() const { return Drawing::Rect(); }
     uint32_t hash_ = 0;
     float supportHeadroom_ = 0.0f;
     std::shared_ptr<Drawing::ShaderEffect> drShader_ = nullptr;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
+
+private:
+    bool TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 };
 } // namespace Rosen
 } // namespace OHOS
