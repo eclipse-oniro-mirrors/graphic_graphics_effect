@@ -46,6 +46,10 @@ void GEShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f); // not use progress
     auto shader = GetDrawingShader();
+    if (!shader) {
+        GE_LOGE("GEShader::DrawShader: no shader generated, draw nothing");
+        return;
+    }
     if (TryDrawShaderWithPen(canvas, rect)) {
         return;
     }

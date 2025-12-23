@@ -37,7 +37,23 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+enum class DotMatrixEffectType {
+    NONE,
+    ROTATE,
+    RIPPLE,
+};
 
+enum class DotMatrixDirection {
+    TOP,
+    TOP_RIGHT,
+    RIGHT,
+    BOTTOM_RIGHT,
+    BOTTOM,
+    BOTTOM_LEFT,
+    LEFT,
+    TOP_LEFT,
+    MAX = TOP_LEFT,
+};
 template<typename T>
 struct GEFilterParamsTypeInfo {
     static constexpr GEFilterType ID = GEFilterType::NONE;
@@ -497,6 +513,36 @@ struct GEContentDiagonalFlowLightShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(CONTOUR_DIAGONAL_FLOW_LIGHT, GEContentDiagonalFlowLightShaderParams,
                                 GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
+
+constexpr char GE_SHADER_DOT_MATRIX_SHADER[] = "DotMatrixShader";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_PATHDIRECTION[] = "DotMatrixShader_PathDirection";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_EFFECTCOLORS[] = "DotMatrixShader_EffectColors";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_COLORFRACTIONS[] = "DotMatrixShader_ColorFractions";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_STARTPOINTS[] = "DotMatrixShader_StartPoints";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_PATHWIDTH[] = "DotMatrixShader_PathWidth";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_INVERSEEFFECT[] = "DotMatrixShader_InverseEffect";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_DOTCOLOR[] = "DotMatrixShader_DotColor";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_DOTSPACING[] = "DotMatrixShader_DotSpacing";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_DOTRADIUS[] = "DotMatrixShader_DotRadius";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_BGCOLOR[] = "DotMatrixShader_BgColor";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_EFFECTTYPE[] = "DotMatrixShader_EffectType";
+constexpr char GE_SHADER_DOT_MATRIX_SHADER_PROGRESS[] = "DotMatrixShader_Progress";
+struct GEDotMatrixShaderParams {
+    DotMatrixDirection pathDirection_ = DotMatrixDirection::TOP_LEFT;
+    std::vector<Vector4f> effectColors_{};
+    Vector2f colorFractions_ = Vector2f(0.0f, 0.0f);
+    std::vector<Vector2f> startPoints_{};
+    float pathWidth_ = 0.0f;
+    bool inverseEffect_ = false;
+    Vector4f dotColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float dotSpacing_ = 0.0f;
+    float dotRadius_ = 0.0f;
+    Vector4f bgColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    DotMatrixEffectType effectType_ = DotMatrixEffectType::NONE;
+    float progress_ = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(DOT_MATRIX, GEDotMatrixShaderParams,
+                                GE_SHADER_DOT_MATRIX_SHADER);
 
 // Declare same with in rs_render_shader_base.h
 constexpr char GE_SHADER_WAVY_RIPPLE_LIGHT[] = "WavyRippleLight";

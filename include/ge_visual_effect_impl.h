@@ -61,6 +61,7 @@ public:
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>& param);
     void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
+    void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
@@ -243,6 +244,16 @@ public:
     const std::shared_ptr<GEContentDiagonalFlowLightShaderParams>& GetContenDiagonalParams() const
     {
         return contentDiagonalParams_;
+    }
+
+    void MakeDotMatrixShaderParams()
+    {
+        dotMatrixShaderParams_ = std::make_shared<GEDotMatrixShaderParams>();
+    }
+ 
+    const std::shared_ptr<GEDotMatrixShaderParams>& GetDotMatrixShaderParams() const
+    {
+        return dotMatrixShaderParams_;
     }
 
     void MakeWavyRippleLightParams()
@@ -678,6 +689,11 @@ private:
     void SetContentLightParams(const std::string& tag, float param);
     void SetContentDiagonalFlowParams(const std::string& tag, const Vector4f& param);
     void SetContentDiagonalFlowParams(const std::string& tag, float param);
+    void SetDotMatrixShaderParamsInitData(const std::string &tag, int32_t param);
+    void SetDotMatrixShaderParamsPathDirection(const std::string& tag, int32_t param);
+    void SetDotMatrixShaderParamsEffectType(const std::string& tag, int32_t param);
+    void SetDotMatrixShaderParams(const std::string& tag, float param);
+    void SetDotMatrixShaderParams(const std::string& tag, const Vector4f& param);
     void SetWavyRippleLightParams(const std::string& tag, float param);
     void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
     void SetAuroraNoiseParams(const std::string& tag, float param);
@@ -763,6 +779,7 @@ private:
     std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
+    std::shared_ptr<GEDotMatrixShaderParams> dotMatrixShaderParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
     std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
     std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;

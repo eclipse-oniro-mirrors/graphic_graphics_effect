@@ -95,6 +95,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const std::vector<Vector2f
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const std::vector<Vector4f>& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 void GEVisualEffect::SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param)
 {
     visualEffectImpl_->SetParam(tag, param);
