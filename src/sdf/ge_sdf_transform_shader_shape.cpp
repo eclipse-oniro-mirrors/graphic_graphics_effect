@@ -75,7 +75,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
 
         half4 main(vec2 fragCoord) {
             vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
-            vec2 perspectiveCoord = transformedCoord;
+            vec2 perspectiveCoord = transformedCoord.xy;
             if (abs(transformedCoord.z) > 0.00001) {
                 perspectiveCoord = transformedCoord.xy / transformedCoord.z;
             }
