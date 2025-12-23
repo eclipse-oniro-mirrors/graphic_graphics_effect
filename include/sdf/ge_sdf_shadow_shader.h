@@ -48,6 +48,7 @@ public:
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFShadowEffect();
+    void UpdateRectForShadow(Drawing::Rect& rect);
     Drawing::GESDFShadowShaderParams params_;
 
     inline static const std::string shaderCode_ = R"(
