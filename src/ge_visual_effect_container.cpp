@@ -100,16 +100,17 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
                 vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK, useeffectMask);
             }
         }
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE, cachedImage);
+        }
     }
 }
 
-void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImage,
-    std::shared_ptr<Drawing::Image> blurImageForEdge, float value)
+void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value)
 {
     for (auto vef : GetFilters()) {
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
-            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE, blurImage);
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE, blurImageForEdge);
         }
     }

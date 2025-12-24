@@ -50,8 +50,7 @@ public:
 
     void UpdateDarkScale(float darkScale);
 
-    void UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImage,
-        std::shared_ptr<Drawing::Image> blurImageForEdge, float value);
+    void UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value);
 
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
