@@ -39,6 +39,8 @@ public:
     float height_ = 0.f;
     float cornerRadius_ = 0.f;
     float borderWidth_ = 0.f;
+    float zoomOffsetX_ = 0.f;
+    float zoomOffsetY_ = 0.f;
 
     float shadowOffsetX_ = 0.f;
     float shadowOffsetY_ = 0.f;
