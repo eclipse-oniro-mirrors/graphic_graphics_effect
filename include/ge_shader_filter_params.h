@@ -620,7 +620,6 @@ REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectPar
 
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT[] = "FrostedGlassEffect";
 // Common parameters
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM[] = "FrostedGlassEffect_BlurParam";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS[] = "FrostedGlassEffect_WeightsEmboss"; // envLight, sd
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL[] = "FrostedGlassEffect_WeightsEdl";
 // BG darken parameters
@@ -653,15 +652,15 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS[] = "FrostedGlassEffect_EdL
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLNEG[] = "FrostedGlassEffect_EdLightNeg";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE[] = "FrostedGlassEffect_Shape";
 // Adapt effect component
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK[] = "FrostedGlassEffect_UseEffectMask";
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP[] = "FrostedGlassEffect_MaskLeftTop";
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX[] = "FrostedGlassEffect_MaskMatrix";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE[] = "FrostedGlassEffect_BlurImage";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE[] = "FrostedGlassEffect_BlurImageForEdge";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTRECT[] = "FrostedGlassEffect_SnapshotRect";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTMATRIX[] = "FrostedGlassEffect_SnapshotMatrix";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffect_RefractOutPx";
 
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MATERIALCOLOR[] = "FrostedGlassEffect_MaterialColor";
 
 struct GEFrostedGlassEffectParams {
-    float blurParam = 4.0f;
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     // Background darken parameters
@@ -693,20 +692,23 @@ struct GEFrostedGlassEffectParams {
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     std::shared_ptr<GESDFShaderShape> sdfShape;
     // Adapt effect component
-    std::shared_ptr<GEShaderMask> useEffectMask = nullptr;
-    Vector2f maskLeftTop = Vector2f(0.0f, 0.0f);
-    Drawing::Matrix maskMatrix;
-    float refractOutPx = 0.8f;
+    std::weak_ptr<Drawing::Image> blurImage; // frosted glass blur by ec
+    std::weak_ptr<Drawing::Image> blurImageForEdge; // frosted glass blur downsampled by ec
+    RectF snapshotRect; // effect component snapshot total rect
+    Drawing::Matrix snapshotMatrix; // effect component total matrix
+    float refractOutPx = 0.8f; // envlight refraction outward sampling degree
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
 
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUSSCALE[] = "FrostedGlassBlur_RadiuslScale";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
 struct GEFrostedGlassBlurShaderFilterParams {
-    float radius = 0.0f;
-    float refractOutPx = 0.8f;
+    float radius = 0.0f; // blurParam[0]: blur radius
+    float radiusScale = 4.0f; // blurParam[1]: scale ratio for the blur radius of baseblur and edgeblur
+    float refractOutPx = 0.8f; // envlightParam[0]: envlight refraction outward sampling degree
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_BLUR, GEFrostedGlassBlurShaderFilterParams, GE_FILTER_FROSTED_GLASS_BLUR);
 

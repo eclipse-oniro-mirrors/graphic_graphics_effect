@@ -14,6 +14,7 @@
  */
 #include "ge_frosted_glass_blur_shader_filter.h"
 
+#include "cache/ge_image_cache_provider.h"
 #include "ge_log.h"
 #include "ge_mesa_blur_shader_filter.h"
 
@@ -28,15 +29,36 @@ GEFrostedGlassBlurShaderFilter::GEFrostedGlassBlurShaderFilter(
 std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (ROSEN_LE(blurParams_.radius, 0.0f)) {
-        return image;
+    if (image == nullptr) {
+        GE_LOGE("GEFrostedGlassBlurShaderFilter::OnProcessImage input is valid")
+        return nullptr;
     }
+
     Drawing::GEMESABlurShaderFilterParams params;
     params.radius = blurParams_.radius;
-
     GEMESABlurShaderFilter blurFilter(params);
-    auto blurImage = blurFilter.OnProcessImageWithoutUpSampling(canvas, image, src, dst);
+
+    std::shared_ptr<Drawing::Image> blurImage = image;
+    if (blurParams_.radius > 0) {
+        blurImage = blurFilter.OnProcessImageWithoutUpSampling(canvas, image, src, dst);
+    }
+
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    const float factor = 1.0f / (std::abs(blurParams_.radiusScale) > std::numeric_limits<float>::epsilon() ?
+        blurParams_.radiusScale : 1.0f);
+
+    GEImageCache tmp;
+    tmp.data = blurFilter.DownSamplingForEdge(canvas, blurImage, src, linear, factor);
+    if (cacheProvider_ != nullptr) {
+        cacheProvider_->Store(tmp);
+    }
+
     return blurImage;
+}
+
+void GEFrostedGlassBlurShaderFilter::SetCacheProvider(IGECacheProvier* cacheProvider)
+{
+    cacheProvider_ = cacheProvider;
 }
 } // namespace Rosen
 } // namespace OHOS
