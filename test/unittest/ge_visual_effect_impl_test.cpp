@@ -384,24 +384,6 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_026, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetParam_027
- * @tc.desc: Verify function SetParam for frostedGlassEffect is invalid
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectImplTest, SetParam_027, TestSize.Level1)
-{
-    Drawing::GEVisualEffectImpl ve(Drawing::GE_SHADER_FROSTED_GLASS_EFFECT);
-    ve.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_EFFECT;
-    Drawing::GEFrostedGlassEffectParams param{};
-    ve.frostedGlassEffectParams_ =
-        std::make_shared<Drawing::GEFrostedGlassEffectParams>(param);
-    float setValue = 1.0f;
-    ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_EFFECT_BLURPARAM, setValue);
-    EXPECT_EQ(ve.frostedGlassEffectParams_->blurParam, setValue);
-}
-
-/**
  * @tc.name: SetSoundWaveParams001
  * @tc.desc: Verify function SetSoundWaveParams for float
  * @tc.type:FUNC

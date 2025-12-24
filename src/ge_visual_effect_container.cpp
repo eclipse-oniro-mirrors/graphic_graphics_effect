@@ -132,7 +132,7 @@ void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX, totalMatrix);
         }
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
-            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAOSHOTMATRIX, totalMatrix);
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTMATRIX, totalMatrix);
         }
     }
 }

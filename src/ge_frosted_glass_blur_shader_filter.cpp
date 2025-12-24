@@ -30,7 +30,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(D
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        GE_LOGE("GEFrostedGlassBlurShaderFilter::OnProcessImage input is valid")
+        GE_LOGE("GEFrostedGlassBlurShaderFilter::OnProcessImage input is valid");
         return nullptr;
     }
 
@@ -56,7 +56,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(D
     return blurImage;
 }
 
-void GEFrostedGlassBlurShaderFilter::SetCacheProvider(IGECacheProvier* cacheProvider)
+void GEFrostedGlassBlurShaderFilter::SetCacheProvider(IGECacheProvider* cacheProvider)
 {
     cacheProvider_ = cacheProvider;
 }
