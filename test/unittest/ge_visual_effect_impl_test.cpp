@@ -1299,7 +1299,7 @@ HWTEST_F(GEVisualEffectImplTest, SetUnionOpShapeParamsTest, TestSize.Level1)
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEY, rightShape);
     EXPECT_EQ(geVisualEffectImpl.sdfUnionOpShapeParams_, nullptr);
 
-    geVisualEffectImpl.MakeSDFUnionOpShapeParams(Drawing::GESDFUnionOp::UNION);
+    geVisualEffectImpl.MakeSDFUnionOpShapeParams(Drawing::GESDFUnionOp::SMOOTH_UNION);
     ASSERT_NE(geVisualEffectImpl.GetSDFUnionOpShapeParams(), nullptr);
 
     // test invalid parameter names

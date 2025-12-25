@@ -26,13 +26,16 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShader(f
     if (!params_.shape) {
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFTransformShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShader has builder error");
         return nullptr;
     }
     auto shapeShader = params_.shape->GenerateDrawingShader(width, height);
+    if (!shapeShader) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShader has empty shader");
+        return nullptr;
+    }
     auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
     return sdfTransformShapeShader;
 }
@@ -45,13 +48,16 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
     if (!params_.shape) {
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;
-    builder = GetSDFTransformShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
     }
     auto shapeShader = params_.shape->GenerateDrawingShaderHasNormal(width, height);
+    if (!shapeShader) {
+        LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has empty shader");
+        return nullptr;
+    }
     auto sdfTransformShapeShader = GenerateShaderEffect(width, height, shapeShader, builder);
     return sdfTransformShapeShader;
 }
@@ -69,7 +75,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
 
         half4 main(vec2 fragCoord) {
             vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
-            return shapeShader.eval(transformedCoord.xy);
+            vec2 perspectiveCoord = transformedCoord.xy;
+            if (abs(transformedCoord.z) > 0.00001) {
+                perspectiveCoord = transformedCoord.xy / transformedCoord.z;
+            }
+            return shapeShader.eval(perspectiveCoord);
         }
     )";
 
@@ -91,12 +101,19 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
         return nullptr;
     }
 
-    if (params_.matrix == Drawing::Matrix()) {
+    if (params_.matrix.IsIdentity()) {
         return shapeShader;
     }
 
+    // turn transform  from shape to fragcoord
+    Drawing::Matrix invertMatrix;
+    if (params_.matrix.Invert(invertMatrix)) {
+        builder->SetUniform("transformMatrix", invertMatrix);
+    } else {
+        LOGE("GESDFTransformShaderShape::GenerateShaderEffect, invert matrix failed");
+        builder->SetUniform("transformMatrix", params_.matrix);
+    }
     builder->SetChild("shapeShader", shapeShader);
-    builder->SetUniform("transformMatrix", params_.matrix);
 
     auto sdfTransformShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfTransformShapeShader) {

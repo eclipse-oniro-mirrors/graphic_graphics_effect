@@ -57,11 +57,14 @@ public:
         return params_.op;
     }
 
-    void CopyState(const GESDFUnionOpShaderShape& shape);
+    void CopyState(const GESDFUnionOpShaderShape& shape)
+    {
+        params_ = shape.params_;
+    }
 
 private:
-    std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(bool hasNormal,
-        std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader) const;
+    std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(std::shared_ptr<ShaderEffect> leftShader,
+        std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFUnionBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFSmoothUnionBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFNormalSmoothUnionBuilder() const;

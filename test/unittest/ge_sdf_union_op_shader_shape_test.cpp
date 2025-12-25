@@ -308,7 +308,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, CopyState_001, TestSize.Level1)
 
     GESDFUnionOpShapeParams param2;
     param2.left = CreateTestShape();
-    param2.right = nullptr;
+    param2.right = CreateTestShape();
     param2.op = GESDFUnionOp::SMOOTH_UNION;
     param2.spacing = 10.0f;
 

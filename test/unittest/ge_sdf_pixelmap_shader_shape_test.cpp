@@ -185,6 +185,48 @@ HWTEST_F(GESDFPixelmapShaderShapeTest, CopyState_001, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest CopyState_001 end";
 }
+
+/**
+ * @tc.name: GenerateSDFShaderEffect_001
+ * @tc.desc: Verify GenerateSDFShaderEffect without builder
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPixelmapShaderShapeTest, GenerateSDFShaderEffect_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_001 start";
+    GESDFPixelmapShapeParams param;
+    param.image = std::make_shared<Drawing::Image>();
+
+    GESDFPixelmapShaderShape shape(param);
+    auto pixelmapShader = shape.GeneratePixelmapShader();
+    EXPECT_NE(pixelmapShader, nullptr);
+    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, nullptr);
+    EXPECT_EQ(shader, nullptr);
+
+    GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_001 end";
+}
+
+/**
+ * @tc.name: GenerateSDFShaderEffect_002
+ * @tc.desc: Verify GenerateSDFShaderEffect with builder
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPixelmapShaderShapeTest, GenerateSDFShaderEffect_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_002 start";
+    GESDFPixelmapShapeParams param;
+    param.image = std::make_shared<Drawing::Image>();
+
+    GESDFPixelmapShaderShape shape(param);
+    auto pixelmapShader = shape.GeneratePixelmapShader();
+    EXPECT_NE(pixelmapShader, nullptr);
+    auto builder = shape.GetSDFPixelmapShaderShapeBuilder();
+    EXPECT_NE(builder, nullptr);
+    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, builder);
+    EXPECT_NE(shader, nullptr);
+
+    GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_002 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
