@@ -54,7 +54,6 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/ge_aurora_noise_shader.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_clip_shader.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_from_image_filter.cpp",
-    "${graphics_effect_root}/src/sdf/ge_sdf_pixelmap_shader_shape.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_rrect_shader_shape.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_shader_shape.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_border_shader.cpp",
