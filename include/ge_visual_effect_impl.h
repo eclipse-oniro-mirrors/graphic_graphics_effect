@@ -216,6 +216,16 @@ public:
         return dispersionParams_;
     }
 
+    void MakeSdfFromImageParams()
+    {
+        sdfFromImageParams_ = std::make_shared<GESDFFromImageFilterParams>();
+    }
+
+    const std::shared_ptr<GESDFFromImageFilterParams>& GetSdfFromImageParams() const
+    {
+        return sdfFromImageParams_;
+    }
+
     void MakeDirectionLightParams()
     {
         directionLightParams_ = std::make_shared<GEDirectionLightShaderFilterParams>();
@@ -777,7 +787,8 @@ private:
     std::shared_ptr<GEFrostedGlassShaderFilterParams> frostedGlassParams_ = nullptr;
     std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
     std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
-
+    std::shared_ptr<GESDFFromImageFilterParams> sdfFromImageParams_ = nullptr;
+    
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEDotMatrixShaderParams> dotMatrixShaderParams_ = nullptr;
     std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;

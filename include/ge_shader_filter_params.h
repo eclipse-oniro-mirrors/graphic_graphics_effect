@@ -206,6 +206,15 @@ struct GELinearGradientBlurShaderFilterParams {
 REGISTER_GEFILTERPARAM_TYPEINFO(LINEAR_GRADIENT_BLUR, GELinearGradientBlurShaderFilterParams,
                                 GE_FILTER_LINEAR_GRADIENT_BLUR);
 
+constexpr char GE_FILTER_SDF_FROM_IMAGE[] = "SDF_FROM_IMAGE";
+constexpr char GE_FILTER_SDF_FROM_IMAGE_SPREAD_FACTOR[] = "SDF_FROM_IMAGE_SPREAD_FACTOR";
+constexpr char GE_FILTER_SDF_FROM_IMAGE_GENERATE_DERIVS[] = "SDF_FROM_IMAGE_GENERATE_DERIVS";
+struct GESDFFromImageFilterParams {
+    int spreadFactor;
+    bool generateDerivs;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_FROM_IMAGE, GESDFFromImageFilterParams, GE_FILTER_SDF_FROM_IMAGE);
+
 constexpr char GE_FILTER_MAGNIFIER[] = "MAGNIFIER";
 constexpr char GE_FILTER_MAGNIFIER_FACTOR[] = "FACTOR";
 constexpr char GE_FILTER_MAGNIFIER_WIDTH[] = "WIDTH";

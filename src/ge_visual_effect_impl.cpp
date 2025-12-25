@@ -325,6 +325,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeDirectionLightParams();
         }
     },
+    { GE_FILTER_SDF_FROM_IMAGE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_FROM_IMAGE);
+            impl->MakeSdfFromImageParams();
+        }
+    },
     { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT);
@@ -645,6 +651,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             SetDotMatrixShaderParamsInitData(tag, param);
             break;
         }
+        case FilterType::SDF_FROM_IMAGE: {
+            if (sdfFromImageParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_SDF_FROM_IMAGE_SPREAD_FACTOR) {
+                sdfFromImageParams_->spreadFactor = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -708,6 +724,16 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, bool param)
             }
             if (tag == GE_SHADER_DOT_MATRIX_SHADER_INVERSEEFFECT) {
                 dotMatrixShaderParams_->inverseEffect_ = param;
+            }
+            break;
+        }
+        case FilterType::SDF_FROM_IMAGE: {
+            if (sdfFromImageParams_ == nullptr) {
+                return;
+            }
+
+            if (tag == GE_FILTER_SDF_FROM_IMAGE_GENERATE_DERIVS) {
+                sdfFromImageParams_->generateDerivs = param;
             }
             break;
         }

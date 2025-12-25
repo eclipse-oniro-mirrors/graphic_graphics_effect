@@ -980,6 +980,21 @@ HWTEST_F(GEVisualEffectImplTest, MakePixelMapMaskParams_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MakeSdfFromImageParams_001
+ * @tc.desc: Verify function MakeSdfFromImageParams
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeSdfFromImageParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::SDF_FROM_IMAGE);
+    ASSERT_EQ(geVisualEffectImpl.GetSdfFromImageParams(), nullptr);
+    
+    geVisualEffectImpl.MakeSdfFromImageParams();
+    ASSERT_NE(geVisualEffectImpl.GetSdfFromImageParams(), nullptr);
+}
+
+/**
  * @tc.name: SetAllParam_001
  * @tc.desc: Verify function Set All Param for param is nullptr
  * @tc.type: FUNC
