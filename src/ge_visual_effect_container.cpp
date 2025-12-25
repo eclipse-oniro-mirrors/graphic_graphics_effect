@@ -106,7 +106,8 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
     }
 }
 
-void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value)
+void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge,
+    float value)
 {
     for (auto vef : GetFilters()) {
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
