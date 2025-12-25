@@ -70,6 +70,8 @@ public:
 
     const GE_EXPORT std::string GetDescription() const;
 
+    void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo) override;
+
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMagnifierShader(
         std::shared_ptr<Drawing::ShaderEffect> imageShader, float imageWidth, float imageHeight);

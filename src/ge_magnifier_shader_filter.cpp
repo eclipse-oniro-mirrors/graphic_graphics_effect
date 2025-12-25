@@ -57,8 +57,6 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing:
         return image;
     }
 
-    SetMagnifierOffset(canvasInfo_.mat);
-
     Drawing::Matrix matrix;
     matrix.Rotate(rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
         src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
@@ -260,6 +258,12 @@ void GEMagnifierShaderFilter::ConvertToRgba(uint32_t rgba, float* color, int tup
     color[1] = green * 1.0f / 255.0f;   // 255.0f is the max value, 1 green
     color[2] = blue * 1.0f / 255.0f;    // 255.0f is the max value, 2 blue
     color[3] = alpha * 1.0f / 255.0f;   // 255.0f is the max value, 3 alpha
+}
+
+void GEMagnifierShaderFilter::SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
+{
+    canvasInfo_ = canvasInfo;
+    SetMagnifierOffset(canvasInfo_.mat);
 }
 
 const std::string GEMagnifierShaderFilter::GetDescription() const

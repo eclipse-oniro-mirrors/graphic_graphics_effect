@@ -65,8 +65,8 @@ void GEMagnifierShaderFilterTest::TearDown() { image_ = nullptr; }
  */
 HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level3)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -81,8 +81,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, GetDescription001, TestSize.Level3)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -97,8 +97,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_001, TestSize.Level0)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -112,8 +112,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_002, TestSize.Level0)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_003, TestSize.Level0)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -130,8 +130,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_003, TestSize.Level0)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -149,8 +149,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_004, TestSize.Level0)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_001, TestSize.Level1)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -166,8 +166,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_001, TestSize.Level1)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_002, TestSize.Level1)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
 
@@ -184,8 +184,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_002, TestSize.Level1)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader_001, TestSize.Level1)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
     filter->magnifierPara_ = nullptr;
@@ -206,8 +206,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader_001, TestSize.Level1)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::MAGNIFIER);
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_MAGNIFIER);
@@ -220,8 +220,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
  */
 HWTEST_F(GEMagnifierShaderFilterTest, SetMagnifierOffset_001, TestSize.Level1)
 {
-    Drawing::GEMagnifierShaderFilterParams params{1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000,
-        0x00000000, 0x00000000};
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
     Drawing::Matrix matrix1;
@@ -242,6 +242,40 @@ HWTEST_F(GEMagnifierShaderFilterTest, SetMagnifierOffset_001, TestSize.Level1)
     Drawing::Matrix matrix4; // 0 degree
     filter->SetMagnifierOffset(matrix4);
     ASSERT_EQ(filter->rotateDegree_, 0);
+}
+
+/**
+ * @tc.name: SetShaderFilterCanvasinfo_001
+ * @tc.desc: Verify function SetShaderFilterCanvasinfo
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, SetShaderFilterCanvasinfo_001, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    Drawing::Matrix matrix1;
+    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix1};
+    matrix1.PostRotate(90); // 90 degree
+    filter->SetShaderFilterCanvasinfo(canvasInfo);
+    EXPECT_EQ(filter->rotateDegree_, 270);
+
+    Drawing::Matrix matrix2;
+    matrix2.PostRotate(180); // 180 degree
+    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix2};
+    filter->SetShaderFilterCanvasinfo(canvasInfo);
+    EXPECT_EQ(filter->rotateDegree_, 180);
+
+    Drawing::Matrix matrix3;
+    matrix3.PostRotate(270); // 270 degree
+    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix3};
+    filter->SetShaderFilterCanvasinfo(canvasInfo);
+    EXPECT_EQ(filter->rotateDegree_, 90);
+
+    Drawing::Matrix matrix4; // 0 degree
+    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix4};
+    filter->SetShaderFilterCanvasinfo(canvasInfo);
+    EXPECT_EQ(filter->rotateDegree_, 0);
 }
 
 } // namespace GraphicsEffectEngine
