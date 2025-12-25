@@ -332,9 +332,9 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
     drShader_ = colorGradientShader;
 }
 
-Drawing::Rect GEColorGradientEffect::GetSubtractedRect() const
+Drawing::Rect GEColorGradientEffect::GetSubtractedRect(float width, float height) const
 {
-    return mask_ ? mask_->GetSubtractedRect() : Drawing::Rect();
+    return mask_ ? mask_->GetSubtractedRect(width, height) : Drawing::Rect();
 }
 
 } // namespace Rosen
