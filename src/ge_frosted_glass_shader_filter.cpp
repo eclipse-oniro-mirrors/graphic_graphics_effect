@@ -384,7 +384,6 @@ void InterpolateAdaptiveParams(Drawing::GEFrostedGlassShaderFilterParams& params
     const auto& t = params.darkScale;
     // Only interpolate adaptive parameters defined in the header:
     // Dark-mode set for FrostedGlass shader filter params.
-    params.blurParams = Interpolate(params.blurParams, params.darkModeBlurParam, t);
     params.weightsEmboss = Interpolate(params.weightsEmboss, params.darkModeWeightsEmboss, t);
     params.bgRates = Interpolate(params.bgRates, params.darkModeBgRates, t);
     params.bgKBS = Interpolate(params.bgKBS, params.darkModeBgKBS, t);
