@@ -21,6 +21,9 @@
 
 namespace OHOS {
 namespace Rosen {
+namespace {
+constexpr int MAX_SPREAD_FACTOR = 4096;
+}
 
 static std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
 static std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
@@ -30,19 +33,20 @@ static std::shared_ptr<Drawing::RuntimeEffect> g_sdfFillDerivEffect;
 GESDFFromImageFilter::GESDFFromImageFilter(const Drawing::GESDFFromImageFilterParams& params)
     : spreadFactor_(params.spreadFactor), generateDerivs_(params.generateDerivs)
 {
-    if (!InitJFAPrepareEffect() || !InitJfaIterationEffect() || !InitJfaProcessResultEffect() || !InitFillDerivEffect()) {
+    if (!InitJFAPrepareEffect() || !InitJfaIterationEffect() || !InitJfaProcessResultEffect() ||
+        !InitFillDerivEffect()) {
         LOGE("GESDFFromImageFilter::GESDFFromImageFilter failed");
         return;
     }
 
     if (spreadFactor_ < 1) {
-        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to to 0.", spreadFactor_);
+        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 0.", spreadFactor_);
         spreadFactor_ = 1;
     }
 
-    if (spreadFactor_ > 4096) {
-        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to to 4096.", spreadFactor_);
-        spreadFactor_ = 4096;
+    if (spreadFactor_ > MAX_SPREAD_FACTOR) {
+        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 4096.", spreadFactor_);
+        spreadFactor_ = MAX_SPREAD_FACTOR;
     }
 }
 
