@@ -21,8 +21,8 @@
 namespace OHOS {
 namespace Rosen {
 namespace{
-    static constexpr const char* PROPERTY_DRAW_SHADER_OPT = "persist.sys.graphic.drawShaderOptEnable";
-    static constexpr const char* PROPERTY_DRAW_SHADER_VISUALIZED_OPT = "persist.sys.graphic.drawShaderVisualizedOptEnable";
+static constexpr const char* PROPERTY_DRAW_SHADER_OPT = "persist.sys.graphic.drawShaderOptEnable";
+static constexpr const char* PROPERTY_DRAW_SHADER_VISUALIZED_OPT = "persist.sys.graphic.drawShaderVisualizedOptEnable";
 
 bool GetDrawShaderOptimizationEnabled()
 {
@@ -34,7 +34,8 @@ bool GetDrawShaderVisualizedOptimizationEnabled()
     return GESystemProperties::GetBoolSystemProperty(PROPERTY_DRAW_SHADER_VISUALIZED_OPT, false);
 }
 
-void DrawShaderVisualizedOptimizationEnabled(Drawing::Canvas& canvas, const Drawing::Rect& rect, const Drawing::Rect& subRect)
+void DrawShaderVisualizedOptimizationEnabled(
+    Drawing::Canvas& canvas, const Drawing::Rect& rect, const Drawing::Rect& subRect)
 {
     auto visualizedSubRect = Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width,
             rect.GetTop() + subRect.GetTop() * width,
