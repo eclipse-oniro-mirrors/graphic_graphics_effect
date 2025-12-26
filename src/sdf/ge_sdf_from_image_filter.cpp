@@ -23,7 +23,8 @@ namespace OHOS {
 namespace Rosen {
 namespace {
 constexpr int MAX_SPREAD_FACTOR = 4096;
-}
+constexpr int TWO = 2;
+} // namespace
 
 static std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
 static std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
@@ -307,7 +308,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
             LOGE("GESDFFromImageFilter::OnProcessImage Iteration make image error");
             return image;
         }
-        jfaRadius = std::max(jfaRadius / 2, 1);
+        jfaRadius = std::max(jfaRadius / TWO, 1);
         std::swap(input, output);
     }
     return input; // last output is swapped here at the end of cycle
