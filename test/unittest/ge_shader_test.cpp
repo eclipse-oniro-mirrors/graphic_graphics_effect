@@ -73,7 +73,7 @@ protected:
 
 class GETestSubstractedShader : public GEShader {
 public:
-    GETestSubstractedShader(const Rect& rect)
+    explicit GETestSubstractedShader(const Rect& rect)
     {
         testSubtractedShader = rect;
     }
