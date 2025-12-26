@@ -40,8 +40,8 @@ void DrawShaderVisualizedOptimizationEnabled(
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     auto visualizedSubRect =
-        Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width, rect.GetTop() + subRect.GetTop() * width,
-            rect.GetLeft() + subRect.GetRight() * width, rect.GetTop() + subRect.GetBottom() * width);
+        Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width, rect.GetTop() + subRect.GetTop() * height,
+            rect.GetLeft() + subRect.GetRight() * width, rect.GetTop() + subRect.GetBottom() * height);
     Drawing::Brush brush;
     brush.SetColor(0x88FF0000);
     canvas.AttachBrush(brush);
