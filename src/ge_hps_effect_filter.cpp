@@ -228,7 +228,7 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
     return false;
 }
 
-bool HpsEffectFilter::IsFilterSupport() const
+bool HpsEffectFilter::IsFilterSupported() const
 {
     Drawing::GEVisualEffectImpl::FilterType filterType = Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR;
     auto typeIt = g_hpsSupportEffectExtensions.find(filterType);
