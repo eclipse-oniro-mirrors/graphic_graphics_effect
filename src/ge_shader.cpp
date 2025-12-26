@@ -16,7 +16,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
-#include "ge_trace.h"
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
