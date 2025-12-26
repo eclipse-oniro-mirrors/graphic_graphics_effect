@@ -116,7 +116,7 @@ HWTEST_F(GEShaderEffectTest, GEShaderEffectTest_01, TestSize.Level1)
     EXPECT_EQ(testShader->GetCache(), nullptr);
     testShader->DrawShader(canvas_, rect_);
     EXPECT_NE(testShader->GetCache(), nullptr);
-    EXPECT_FALSE(testShader->TryDrawShaderWithPen(canvas_, rect_), nullptr);
+    EXPECT_FALSE(testShader->TryDrawShaderWithPen(canvas_, rect_));
 }
 
 HWTEST_F(GEShaderEffectTest, GEShaderEffectTest_TryDrawShaderWithPen_Contain, TestSize.Level1)
