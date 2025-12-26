@@ -16,6 +16,7 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -31,6 +32,20 @@ bool GetDrawShaderOptimizationEnabled()
 bool GetDrawShaderVisualizedOptimizationEnabled()
 {
     return GESystemProperties::GetBoolSystemProperty(PROPERTY_DRAW_SHADER_VISUALIZED_OPT, false);
+}
+
+void DrawShaderVisualizedOptimizationEnabled(Drawing::Canvas& canvas, const Drawing::Rect& rect, const Drawing::Rect& subRect)
+{
+    auto visualizedSubRect = Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width,
+            rect.GetTop() + subRect.GetTop() * width,
+            rect.GetLeft() + subRect.GetRight() * width,
+            rect.GetTop() + subRect.GetBottom() * width);
+    Drawing::Brush brush;
+    brush.SetColor(0x88FF0000);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(visualizedSubRect);
+    canvas.DetachBrush();
+    return;
 }
 }
 
@@ -66,16 +81,8 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
     canvas.AttachPen(pen);
     canvas.DrawRect(rect);
     canvas.DetachPen();
-    if (UNLIKELY(!GetDrawShaderVisualizedOptimizationEnabled())) {
-        auto visualizedSubRect = Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width,
-            rect.GetTop() + subRect.GetTop() * width,
-            rect.GetLeft() + subRect.GetRight() * width,
-            rect.GetTop() + subRect.GetBottom() * width);
-        Drawing::Brush brush;
-        brush.SetColor(0x88FF0000);
-        canvas.AttachBrush(brush);
-        canvas.DrawRect(visualizedSubRect);
-        canvas.DetachBrush();
+    if (LIKELY(!GetDrawShaderVisualizedOptimizationEnabled())) {
+        DrawShaderVisualizedOptimizationEnabled(canvas, rect, subRect);
     }
     return true;
 }
