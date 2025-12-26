@@ -247,7 +247,7 @@ void HpsEffectFilter::GenerateBlur(const Drawing::GEKawaseBlurShaderFilterParams
     const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
     const Drawing::CanvasInfo& canvasInfo)
 {
-    auto KawaseParams = GenerateKawaseBlurEffect(*params, src, dst, 1.0f, 1.0f);
+    auto KawaseParams = GenerateKawaseBlurEffect(params, src, dst, 1.0f, 1.0f);
     if (KawaseParams) {
         KawaseParams->transformMatrix = GetTransformMatrix(canvasInfo, image);
         hpsEffect_.push_back(KawaseParams);  // Add hpsEffectParameter to container
