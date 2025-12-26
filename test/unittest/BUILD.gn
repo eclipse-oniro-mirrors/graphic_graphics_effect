@@ -152,6 +152,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_aurora_noise_shader_test.cpp",
     "ge_bezier_warp_shader_filter_test.cpp",
     "ge_border_light_shader_test.cpp",
+    "ge_cache_provider_test.cpp",
     "ge_circle_flowlight_effect_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
     "ge_content_light_shader_filter_test.cpp",

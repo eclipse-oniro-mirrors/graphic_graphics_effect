@@ -100,29 +100,19 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
                 vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_USEEFFECTMASK, useeffectMask);
             }
         }
-        if (vef->GetName() == "FrostedGlassEffect") {
-            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_MASKLEFTTOP, std::make_pair(left, top));
-            if (vef->GetImpl() == nullptr) {
-                continue;
-            }
-            std::shared_ptr<GEFrostedGlassEffectParams> params = vef->GetImpl()->GetFrostedGlassEffectParams();
-            if (params->useEffectMask != nullptr) {
-                GEUseEffectMaskParams maskParam;
-                maskParam.useEffect = params->useEffectMask->GetUseEffect();
-                maskParam.image = cachedImage;
-                std::shared_ptr<GEUseEffectShaderMask> useEffectMask =
-                    std::make_shared<GEUseEffectShaderMask>(maskParam);
-                vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_USEEFFECTMASK, useEffectMask);
-            }
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE, cachedImage);
         }
     }
 }
 
-void GEVisualEffectContainer::UpdateRefractOutValue(float value)
+void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge,
+    float value)
 {
     for (auto vef : GetFilters()) {
-        if (vef->GetName() == "FrostedGlassEffect") {
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE, blurImageForEdge);
         }
     }
 }
@@ -142,8 +132,8 @@ void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX, totalMatrix);
         }
-        if (vef->GetName() == "FrostedGlassEffect") {
-            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_MASKMATRIX, totalMatrix);
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTMATRIX, totalMatrix);
         }
     }
 }

@@ -20,6 +20,7 @@
 #include <optional>
 #include <variant>
 
+#include "cache/ge_cache_provider.h"
 #include "draw/canvas.h"
 #include "ge_filter_type.h"
 #include "ge_shader_filter_params.h"
@@ -83,6 +84,8 @@ public:
     {
         return cacheAnyPtr_;
     }
+
+    virtual void SetCacheProvider(IGECacheProvider* cacheProvider) {}
 
 protected:
     /**

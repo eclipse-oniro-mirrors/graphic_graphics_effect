@@ -349,11 +349,7 @@ void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float pr
         return;
     }
 
-    if (frostedGlassEffectParams_.useEffectMask == nullptr) {
-        GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader useEffectMask is nullptr");
-        return;
-    }
-    std::shared_ptr<Drawing::Image> cachedBlurImage = frostedGlassEffectParams_.useEffectMask->GetImage().lock();
+    std::shared_ptr<Drawing::Image> cachedBlurImage = frostedGlassEffectParams_.blurImage.lock();
     if (cachedBlurImage == nullptr) {
         GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader cachedBlurImage is nullptr");
         return;
@@ -449,9 +445,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     builder->SetUniform("hlK", frostedGlassEffectParams_.edLightKBS[NUM_0]);
     builder->SetUniform("hlB", frostedGlassEffectParams_.edLightKBS[NUM_1]);
     builder->SetUniform("hlS", frostedGlassEffectParams_.edLightKBS[NUM_2]);
-    // Adapt effect component
-    builder->SetUniform("ecOffset", rect.GetLeft() - frostedGlassEffectParams_.maskLeftTop[NUM_0],
-        rect.GetTop() - frostedGlassEffectParams_.maskLeftTop[NUM_1]);
     return builder;
 }
 } // namespace Rosen

@@ -46,6 +46,10 @@ public:
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImageWithoutUpSampling(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst);
 
+    GE_EXPORT std::shared_ptr<Drawing::Image> DownSamplingForEdge(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image>& input, const Drawing::Rect& src,
+        const Drawing::SamplingOptions& linear, float factor) const;
+
 protected:
     struct NewBlurParams {
         int numberOfPasses = 1;     // 1: initial number of passes
@@ -68,10 +72,6 @@ protected:
         Drawing::RuntimeShaderBuilder& blurBuilder, Drawing::RuntimeShaderBuilder& simpleBuilder,
         const std::shared_ptr<Drawing::Image>& image, const std::shared_ptr<Drawing::Image>& input,
         const Drawing::ImageInfo& scaledInfo, const Drawing::SamplingOptions& linear, const NewBlurParams& blur) const;
-
-    GE_EXPORT std::shared_ptr<Drawing::Image> DownSamplingForEdge(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image>& input, const Drawing::Rect& src,
-        const Drawing::SamplingOptions& linear, float factor) const;
 
     GE_EXPORT std::shared_ptr<Drawing::ShaderEffect> DownSampling2X(Drawing::Canvas& canvas,
         Drawing::RuntimeShaderBuilder& blurBuilder,

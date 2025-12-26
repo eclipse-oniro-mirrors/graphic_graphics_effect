@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Rosen {
-
+struct IGECacheProvider;
 class GE_EXPORT GEFrostedGlassBlurShaderFilter : public GEShaderFilter {
 public:
     GEFrostedGlassBlurShaderFilter(const Drawing::GEFrostedGlassBlurShaderFilterParams& params);
@@ -31,8 +31,11 @@ public:
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
+    void SetCacheProvider(IGECacheProvider* cacheProvider) override;
+
 private:
     Drawing::GEFrostedGlassBlurShaderFilterParams blurParams_;
+    IGECacheProvider* cacheProvider_ = nullptr;
 };
 
 } // namespace Rosen
