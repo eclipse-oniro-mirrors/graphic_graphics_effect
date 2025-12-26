@@ -228,6 +228,83 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
     return false;
 }
 
+bool HpsEffectFilter::IsFilterSupported() const
+{
+    Drawing::GEVisualEffectImpl::FilterType filterType = Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR;
+    auto typeIt = g_hpsSupportEffectExtensions.find(filterType);
+    if (typeIt == g_hpsSupportEffectExtensions.end()) {
+        return false;
+    }
+    for (const auto GEExtension : g_extensionProperties) {
+        if (strcmp(GEExtension, typeIt->second) != 0) {
+            continue;
+        }
+    }
+    return false;
+}
+
+void HpsEffectFilter::GenerateBlur(const Drawing::GEKawaseBlurShaderFilterParams& params,
+    const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
+    const Drawing::CanvasInfo& canvasInfo)
+{
+    auto KawaseParams = GenerateKawaseBlurEffect(params, src, dst, 1.0f, 1.0f);
+    if (KawaseParams) {
+        KawaseParams->transformMatrix = GetTransformMatrix(canvasInfo, image);
+        hpsEffect_.push_back(KawaseParams);  // Add hpsEffectParameter to container
+    }
+}
+
+std::shared_ptr<Drawing::Image> HpsEffectFilter::GetBlurForFrostedGlassBlur(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image>& image)
+{
+    if (image == nullptr || hpsEffect_.empty()) {
+        LOGD("HpsEffectFilter::GetBlurForFrostedGlassBlur image is null or hpsEffect_ is empty");
+        return nullptr;
+    }
+
+    auto imageInfo = image->GetImageInfo();
+    if (imageInfo.GetWidth() <= 0 || imageInfo.GetHeight() <= 0) {
+        LOGE("HpsEffectFilter::GetBlurForFrostedGlassBlur image size is zero");
+        return nullptr;
+    }
+    needClampFilter_ = ((imageInfo.GetColorType() == Drawing::ColorType::COLORTYPE_RGBA_F16) ? false : true);
+    bool isDownScaled = IsNeedDownscale();
+    auto dimension = GetSurfaceSize(canvas, image, isDownScaled);
+    if (dimension[0] == 0 || dimension[1] == 0) {
+        LOGE("HpsEffectFilter::GetBlurForFrostedGlassBlur dimension equals zero");
+        return nullptr;
+    }
+    auto surface = canvas.GetSurface();
+    if (surface == nullptr) {
+        return nullptr;
+    }
+    std::shared_ptr<Drawing::Surface> offscreenSurface = surface->MakeSurface(dimension[0], dimension[1]);
+    if (offscreenSurface == nullptr) {
+        return nullptr;
+    }
+    std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
+    if (offscreenCanvas == nullptr) {
+        return nullptr;
+    }
+    if (isDownScaled) {
+        Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
+        for (auto& effectInfo : hpsEffect_) {
+            effectInfo->dst = dimensionRect;
+        }
+    } else {
+        for (auto& effectInfo : hpsEffect_) {
+            effectInfo->dst = effectInfo->src;
+        }
+    }
+    if (!offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) {
+        LOGD("HpsEffectFilter::GetBlurForFrostedGlassBlur DrawImageEffectHPS fail");
+        return nullptr;
+    }
+
+    auto imageCache = offscreenSurface->GetImageSnapshot();
+    return imageCache;
+}
+
 bool HpsEffectFilter::HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer)
 {
     if (!GetHpsEffectEnabled()) {
