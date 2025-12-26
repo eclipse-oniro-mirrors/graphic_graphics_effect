@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Rosen {
-namespace{
+namespace {
 static constexpr const char* PROPERTY_DRAW_SHADER_OPT = "persist.sys.graphic.drawShaderOptEnable";
 static constexpr const char* PROPERTY_DRAW_SHADER_VISUALIZED_OPT = "persist.sys.graphic.drawShaderVisualizedOptEnable";
 
@@ -37,10 +37,11 @@ bool GetDrawShaderVisualizedOptimizationEnabled()
 void DrawShaderVisualizedOptimizationEnabled(
     Drawing::Canvas& canvas, const Drawing::Rect& rect, const Drawing::Rect& subRect)
 {
-    auto visualizedSubRect = Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width,
-            rect.GetTop() + subRect.GetTop() * width,
-            rect.GetLeft() + subRect.GetRight() * width,
-            rect.GetTop() + subRect.GetBottom() * width);
+    auto width = rect.GetWidth();
+    auto height = rect.GetHeight();
+    auto visualizedSubRect =
+        Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width, rect.GetTop() + subRect.GetTop() * width,
+            rect.GetLeft() + subRect.GetRight() * width, rect.GetTop() + subRect.GetBottom() * width);
     Drawing::Brush brush;
     brush.SetColor(0x88FF0000);
     canvas.AttachBrush(brush);
@@ -59,11 +60,9 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
     auto height = rect.GetHeight();
     auto subRect = GetSubtractedRect(width, height);
     bool rectNotValid = subRect.IsEmpty() || !subRect.IsValid();
-
     if (rectNotValid) {
         return false;
     }
-
     auto renderRect = Drawing::Rect(0.f, 0.f, 1.f, 1.f); // normalized render rectangle
     if (subRect.Contains(renderRect)) {
         // The render rectangle is fully subtracted, so the draw call can be skipped.
