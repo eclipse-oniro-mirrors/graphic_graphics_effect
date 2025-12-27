@@ -68,7 +68,6 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
 #else
     auto resultImage = builder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
-
     if (!resultImage) {
         LOGE("GESDFEdgeLight::OnProcessImage resultImage is null");
         return image;
@@ -110,76 +109,78 @@ void GESDFEdgeLight::SetLightMask(std::shared_ptr<Drawing::GEShaderMask> mask)
     lightMask_ = mask;
 }
 
+namespace {
+constexpr char prog[] = R"(
+    uniform vec2 iResolution;
+
+    uniform shader sdfImageShader;
+    uniform shader blurredSdfImageShader;
+    uniform shader lightMaskShader;
+
+    uniform float spreadFactor;
+
+    uniform vec3 lightColor;
+    uniform float bloomIntensityCutoff; // at what intensity is bloom supposed to disappear
+    uniform float maxIntensity;
+    uniform float maxBloomIntensity;
+    uniform float bloomFalloffPow;
+
+    uniform float minBorderWidth;
+    uniform float maxBorderWidth;
+
+    uniform float innerBorderBloomWidth;
+    uniform float outerBorderBloomWidth;
+
+    float bloomMultiplierFromDist(float d) {
+        float dNorm = abs(d) / (d > 0 ? outerBorderBloomWidth : innerBorderBloomWidth);
+        float falloff = max((1 - dNorm) / pow(1 + dNorm, bloomFalloffPow), 0);
+        return maxBloomIntensity * falloff;
+    }
+
+    float edgeThicknessFromIntensity(float intensity) {
+        return smoothstep(0, 1, intensity);
+    }
+
+    float edgeLightFakeBloom(float intensity, float d, float smoothD) {
+        float bloomBorder = 1 - step(outerBorderBloomWidth, d);
+        bloomBorder *= step(-innerBorderBloomWidth, d);
+
+        float edgeThickness = edgeThicknessFromIntensity(intensity) * (maxBorderWidth - minBorderWidth) + minBorderWidth;
+        float thinBorder = smoothstep(edgeThickness, 0, d);
+        thinBorder *= smoothstep(-edgeThickness, 0, d);
+
+        float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) * bloomBorder * bloomMultiplierFromDist(smoothD));
+        return b;
+    }
+
+    vec4 decodeSdfMap(vec4 inputSdfMap) {
+        vec4 result = (inputSdfMap * 2.0 - vec4(1.0)) * spreadFactor;
+        result.xy = (result.x != 0 || result.y != 0) ? normalize(result.xy) : vec2(0);
+        return result;
+    }
+
+    half4 main(vec2 fragCoord)
+    {
+        vec2 uv = (fragCoord.xy - iResolution.xy / 2) / iResolution.yy; // (0,0) in screen center
+
+        float lightMaskValue = lightMaskShader.eval(fragCoord).r;
+
+        half4 result = half4(0, 0, 0, 1);
+
+        vec4 sdfMapSample = decodeSdfMap(sdfImageShader.eval(fragCoord));
+        vec4 blurredSdfMapSample = decodeSdfMap(blurredSdfImageShader.eval(fragCoord));
+
+        float edgeLightIntensity = lightMaskValue;
+        result += lightColor.rgb1 * edgeLightFakeBloom(lightMaskValue, sdfMapSample.a, blurredSdfMapSample.a);
+
+        return result;
+    }
+)";
+}
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(float imageWidth, float imageHeight)
 {
     static std::shared_ptr<Drawing::RuntimeEffect> effectShader_;
-
-    static constexpr char prog[] = R"(
-        uniform vec2 iResolution;
-
-        uniform shader sdfImageShader;
-        uniform shader blurredSdfImageShader;
-        uniform shader lightMaskShader;
-
-        uniform float spreadFactor;
-
-        uniform vec3 lightColor;
-        uniform float bloomIntensityCutoff; // at what intensity is bloom supposed to disappear
-        uniform float maxIntensity;
-        uniform float maxBloomIntensity;
-        uniform float bloomFalloffPow;
-
-        uniform float minBorderWidth;
-        uniform float maxBorderWidth;
-
-        uniform float innerBorderBloomWidth;
-        uniform float outerBorderBloomWidth;
-
-        float bloomMultiplierFromDist(float d) {
-            float dNorm = abs(d) / (d > 0 ? outerBorderBloomWidth : innerBorderBloomWidth);
-            float falloff = max((1 - dNorm) / pow(1 + dNorm, bloomFalloffPow), 0);
-            return maxBloomIntensity * falloff;
-        }
-
-        float edgeThicknessFromIntensity(float intensity) {
-            return smoothstep(0, 1, intensity);
-        }
-
-        float edgeLightFakeBloom(float intensity, float d, float smoothD) {
-            float bloomBorder = 1 - step(outerBorderBloomWidth, d);
-            bloomBorder *= step(-innerBorderBloomWidth, d);
-
-            float edgeThickness = edgeThicknessFromIntensity(intensity) * (maxBorderWidth - minBorderWidth) + minBorderWidth;
-            float thinBorder = smoothstep(edgeThickness, 0, d);
-            thinBorder *= smoothstep(-edgeThickness, 0, d);
-
-            float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) * bloomBorder * bloomMultiplierFromDist(smoothD));
-            return b;
-        }
-
-        vec4 decodeSdfMap(vec4 inputSdfMap) {
-            vec4 result = (inputSdfMap * 2.0 - vec4(1.0)) * spreadFactor;
-            result.xy = (result.x != 0 || result.y != 0) ? normalize(result.xy) : vec2(0);
-            return result;
-        }
-
-        half4 main(vec2 fragCoord)
-        {
-            vec2 uv = (fragCoord.xy - iResolution.xy / 2) / iResolution.yy; // (0,0) in screen center
-
-            float lightMaskValue = lightMaskShader.eval(fragCoord).r;
-
-            half4 result = half4(0, 0, 0, 1);
-
-            vec4 sdfMapSample = decodeSdfMap(sdfImageShader.eval(fragCoord));
-            vec4 blurredSdfMapSample = decodeSdfMap(blurredSdfImageShader.eval(fragCoord));
-
-            float edgeLightIntensity = lightMaskValue;
-            result += lightColor.rgb1 * edgeLightFakeBloom(lightMaskValue, sdfMapSample.a, blurredSdfMapSample.a);
-
-            return result;
-        }
-    )";
 
     if (!effectShader_) {
         effectShader_ = Drawing::RuntimeEffect::CreateForShader(prog);
