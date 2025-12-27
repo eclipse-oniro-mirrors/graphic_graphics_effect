@@ -110,7 +110,7 @@ void GESDFEdgeLight::SetLightMask(std::shared_ptr<Drawing::GEShaderMask> mask)
 }
 
 namespace {
-constexpr char prog[] = R"(
+constexpr char SHADER[] = R"(
     uniform vec2 iResolution;
 
     uniform shader sdfImageShader;
@@ -145,11 +145,13 @@ constexpr char prog[] = R"(
         float bloomBorder = 1 - step(outerBorderBloomWidth, d);
         bloomBorder *= step(-innerBorderBloomWidth, d);
 
-        float edgeThickness = edgeThicknessFromIntensity(intensity) * (maxBorderWidth - minBorderWidth) + minBorderWidth;
+        float edgeThickness = edgeThicknessFromIntensity(intensity) *
+                              (maxBorderWidth - minBorderWidth) + minBorderWidth;
         float thinBorder = smoothstep(edgeThickness, 0, d);
         thinBorder *= smoothstep(-edgeThickness, 0, d);
 
-        float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) * bloomBorder * bloomMultiplierFromDist(smoothD));
+        float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) *
+                  bloomBorder * bloomMultiplierFromDist(smoothD));
         return b;
     }
 
@@ -183,7 +185,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(
     static std::shared_ptr<Drawing::RuntimeEffect> effectShader_;
 
     if (!effectShader_) {
-        effectShader_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        effectShader_ = Drawing::RuntimeEffect::CreateForShader(SHADER);
         if (!effectShader_) {
             LOGE("MakeEffectShader::RuntimeShader effect error\n");
             return nullptr;
