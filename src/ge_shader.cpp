@@ -53,7 +53,7 @@ void DrawShaderVisualizedOptimizationEnabled(
 
 bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    if (UNLIKELY(!GetDrawShaderOptimizationEnabled())) {
+    if (!GetDrawShaderOptimizationEnabled()) {
         return false;
     }
     auto width = rect.GetWidth();
@@ -81,7 +81,7 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
     canvas.AttachPen(pen);
     canvas.DrawRect(rect);
     canvas.DetachPen();
-    if (UNLIKELY(GetDrawShaderVisualizedOptimizationEnabled())) {
+    if (GetDrawShaderVisualizedOptimizationEnabled()) {
         DrawShaderVisualizedOptimizationEnabled(canvas, rect, subRect);
     }
     return true;
