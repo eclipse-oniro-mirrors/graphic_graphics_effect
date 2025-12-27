@@ -14,23 +14,23 @@
  */
 
 #include "sdf/ge_sdf_edge_light.h"
-#include "ge_ripple_shader_mask.h"
-
-#include "ge_mesa_blur_shader_filter.h"
 
 #include <unordered_map>
 
 #include "ge_log.h"
+#include "ge_mesa_blur_shader_filter.h"
+#include "ge_ripple_shader_mask.h"
 
-namespace OHOS::Rosen { 
-
-GESDFEdgeLight::GESDFEdgeLight(const Drawing::GESDFEdgeLightFilterParams& params) :
-    sdfSpreadFactor_(params.sdfSpreadFactor), bloomIntensityCutoff_(params.bloomIntensityCutoff),
-    maxIntensity_(params.maxIntensity), maxBloomIntensity_(params.maxBloomIntensity),
-    bloomFalloffPow_(params.bloomFalloffPow), minBorderWidth_(params.minBorderWidth),
-    maxBorderWidth_(params.maxBorderWidth), innerBorderBloomWidth_(params.innerBorderBloomWidth),
-    outerBorderBloomWidth_(params.outerBorderBloomWidth), sdfImage_(params.sdfImage),
-    lightMask_(params.lightMask)
+namespace OHOS::Rosen {
+namespace {
+constexpr float DEFAULT_RADIUS = 6.0f;
+}
+GESDFEdgeLight::GESDFEdgeLight(const Drawing::GESDFEdgeLightFilterParams& params)
+    : sdfSpreadFactor_(params.sdfSpreadFactor), bloomIntensityCutoff_(params.bloomIntensityCutoff),
+      maxIntensity_(params.maxIntensity), maxBloomIntensity_(params.maxBloomIntensity),
+      bloomFalloffPow_(params.bloomFalloffPow), minBorderWidth_(params.minBorderWidth),
+      maxBorderWidth_(params.maxBorderWidth), innerBorderBloomWidth_(params.innerBorderBloomWidth),
+      outerBorderBloomWidth_(params.outerBorderBloomWidth), sdfImage_(params.sdfImage), lightMask_(params.lightMask)
 {}
 
 std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& canvas,
@@ -52,9 +52,9 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
     }
 
     if (!blurredSdfImage_) {
-        blurredSdfImage_ = BlurSdfMap(canvas, image, 6.0);
+        blurredSdfImage_ = BlurSdfMap(canvas, image, DEFAULT_RADIUS);
     }
-    
+
     float imageWidth = image->GetWidth();
     float imageHeight = image->GetHeight();
     auto builder = MakeEffectShader(imageWidth, imageHeight);
@@ -77,14 +77,15 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
     return resultImage;
 }
 
-std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius)
+std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
+    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius)
 {
     if (sdfImage == nullptr) {
         LOGE("GESDFEdgeLight::BlurSdfMap input is invalid");
         return nullptr;
     }
 
-    Drawing::Rect imageRect = {0, 0, sdfImage->GetWidth(), sdfImage->GetHeight()};
+    Drawing::Rect imageRect = { 0, 0, sdfImage->GetWidth(), sdfImage->GetHeight() };
 
     Drawing::GEMESABlurShaderFilterParams params;
     params.radius = radius;
@@ -219,4 +220,4 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(
 
     return builder;
 }
-}
+} // namespace OHOS::Rosen

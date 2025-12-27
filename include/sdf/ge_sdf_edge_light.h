@@ -17,17 +17,18 @@
 #ifndef GRAPHICS_EFFECT_GE_SDF_EDGE_LIGHT_H
 #define GRAPHICS_EFFECT_GE_SDF_EDGE_LIGHT_H
 
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+#include "effect/shader_effect.h"
 #include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
-#include "effect/runtime_effect.h"
-#include "effect/runtime_shader_builder.h"
-#include "effect/shader_effect.h"
 
 namespace OHOS::Rosen {
 class GESDFEdgeLight final : public GEShaderFilter {
-    std::shared_ptr<Drawing::Image> BlurSdfMap(Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius);
+    std::shared_ptr<Drawing::Image> BlurSdfMap(
+        Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeEffectShader(float imageWidth, float imageHeight);
 
@@ -37,15 +38,15 @@ public:
     GESDFEdgeLight(GESDFEdgeLight&& edgeLight) = delete;
     GESDFEdgeLight(const GESDFEdgeLight& edgeLight) = delete;
 
-    GESDFEdgeLight& operator = (GESDFEdgeLight&& edgeLight) = delete;
-    GESDFEdgeLight& operator = (const GESDFEdgeLight& edgeLight) = delete;
+    GESDFEdgeLight& operator=(GESDFEdgeLight&& edgeLight) = delete;
+    GESDFEdgeLight& operator=(const GESDFEdgeLight& edgeLight) = delete;
 
     DECLARE_GEFILTER_TYPEFUNC(GESDFEdgeLight, Drawing::GESDFEdgeLightFilterParams);
-    
-    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
-        const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
 
-    GE_EXPORT void SetSDFImage(std::shared_ptr<Drawing::Image> sdfImage); 
+    GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+
+    GE_EXPORT void SetSDFImage(std::shared_ptr<Drawing::Image> sdfImage);
     GE_EXPORT void SetLightMask(std::shared_ptr<Drawing::GEShaderMask> mask);
 
 private:
@@ -67,6 +68,6 @@ private:
 
     std::shared_ptr<Drawing::GEShaderMask> lightMask_ = nullptr;
 };
-}
+} // namespace OHOS::Rosen
 
-#endif // GRAPHICS_EFFECT_GE_SDF_EDGE_LIGHT_H
+#endif // GRAPHICS_EFFECT_GE_SDF_EDGE_LIGHT_H
