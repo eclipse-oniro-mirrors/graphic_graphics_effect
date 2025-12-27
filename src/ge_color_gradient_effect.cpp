@@ -26,13 +26,13 @@ namespace Rosen {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffectHasMask_ = nullptr;
-constexpr static uint8_t GRADIENT_POSITION_CHANNEL = 2;
+constexpr static size_t GRADIENT_POSITION_CHANNEL = 2;
 constexpr static size_t GRADIENT_ARRAY_NUM = 12;
-constexpr static uint8_t GRADIENT_COLOR_CHANNEL = 4;
-constexpr static uint8_t COLOR_R_CHANNEL = 0;
-constexpr static uint8_t COLOR_G_CHANNEL = 1;
-constexpr static uint8_t COLOR_B_CHANNEL = 2;
-constexpr static uint8_t COLOR_A_CHANNEL = 3;
+constexpr static size_t GRADIENT_COLOR_CHANNEL = 4;
+constexpr static size_t COLOR_R_CHANNEL = 0;
+constexpr static size_t COLOR_G_CHANNEL = 1;
+constexpr static size_t COLOR_B_CHANNEL = 2;
+constexpr static size_t COLOR_A_CHANNEL = 3;
 
 const std::string COLOR_GRADIENT_SHADER_HEAD(
     R"(
@@ -275,7 +275,8 @@ void GEColorGradientEffect::SetUniform(float width, float height)
     builder_->SetUniform("iResolution", width, height);
     CalculateBlenderCol();
     std::vector<float> blendColorArray(GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL, 0.0f);
-    for (int i = 0; i < paramColorSize_; i++) {
+    size_t size = std::min(paramColorSize_, GRADIENT_ARRAY_NUM);
+    for (size_t i = 0; i < size; i++) {
         blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_R_CHANNEL] = blendColors_[i].redF_;
         blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_G_CHANNEL] = blendColors_[i].greenF_;
         blendColorArray[i * GRADIENT_COLOR_CHANNEL + COLOR_B_CHANNEL] = blendColors_[i].blueF_;
@@ -286,7 +287,7 @@ void GEColorGradientEffect::SetUniform(float width, float height)
     builder_->SetUniform("blend_c", blendColorArrayPtr, GRADIENT_ARRAY_NUM * GRADIENT_COLOR_CHANNEL);
 
     std::vector<float> positionArray(GRADIENT_ARRAY_NUM * GRADIENT_POSITION_CHANNEL);
-    for (int i = 0; i < GRADIENT_ARRAY_NUM; i++) {
+    for (size_t i = 0; i < GRADIENT_ARRAY_NUM; i++) {
         positionArray[i * GRADIENT_POSITION_CHANNEL + 0] = positions_[i].GetX();
         positionArray[i * GRADIENT_POSITION_CHANNEL + 1] = positions_[i].GetY();
     }
