@@ -63,7 +63,7 @@ public:
         return hash_;
     }
 
-    void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
+    virtual void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
     {
         canvasInfo_ = canvasInfo;
     }
