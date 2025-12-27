@@ -270,7 +270,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect001, TestSize.Level0)
     const Drawing::SamplingOptions sampling;
     auto geRender = std::make_shared<GERender>();
     ASSERT_NE(geRender, nullptr);
-    auto outImage = geRender->ApplyImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+    auto outImage = geRender->ApplyImageEffect(*canvas_, *veContainer, {image, src, dst}, sampling);
     EXPECT_TRUE(outImage == image);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_001 end";

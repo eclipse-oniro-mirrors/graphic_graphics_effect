@@ -85,6 +85,7 @@ enum class GEFilterType : int32_t {
     FROSTED_GLASS_BLUR,
     FROSTED_GLASS_EFFECT,
     DISTORT_CHROMA,
+    SDF_FROM_IMAGE,
     MAX,
 };
 

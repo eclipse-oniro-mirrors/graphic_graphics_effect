@@ -50,7 +50,7 @@ public:
 
     void UpdateDarkScale(float darkScale);
 
-    void UpdateRefractOutValue(float value);
+    void UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value);
 
 private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);

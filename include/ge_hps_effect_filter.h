@@ -36,7 +36,7 @@ namespace OHOS {
 namespace Rosen {
 constexpr int ARRAY_SIZE_DIMENSION = 2;
 
-class HpsEffectFilter {
+class GE_EXPORT HpsEffectFilter {
 public:
     HpsEffectFilter() = default;
     HpsEffectFilter(Drawing::Canvas& canvas);
@@ -51,11 +51,17 @@ public:
     bool HpsSupportEffectGE(const Drawing::GEVisualEffectContainer& veContainer);
     bool IsHpsEffectEnabled() const;
     bool IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef);
+    bool IsFilterSupported() const;
     void GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::GEVisualEffectImpl>& visualEffectImpl,
         const Drawing::Rect& src, const Drawing::Rect& dst, float saturationForHPS, float brightnessForHPS,
         const std::shared_ptr<Drawing::Image>& image);
+    void GenerateBlur(const Drawing::GEKawaseBlurShaderFilterParams& params,
+        const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
+        const Drawing::CanvasInfo& canvasInfo);
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
+    std::shared_ptr<Drawing::Image> GetBlurForFrostedGlassBlur(Drawing::Canvas& canvas,
+        const std::shared_ptr<Drawing::Image>& image);
 
     bool IsNeedUpscale();
     void SetNeedUpscale(bool needUpscale);

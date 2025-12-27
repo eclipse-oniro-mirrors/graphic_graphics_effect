@@ -14,6 +14,7 @@
  */
 #ifndef GRAPHICS_EFFECT_GE_DOWNCAST_H
 #define GRAPHICS_EFFECT_GE_DOWNCAST_H
+#include <cstdint>
 namespace OHOS {
 namespace Rosen {
 
@@ -27,16 +28,26 @@ namespace Rosen {
 // not matched with the *exact* type id will fail, including casting from derived type to parent type.
 // In other words, `is-a` subclass traversal is NOT supported.
 struct ExactDowncastUtils {
-    // In C++, the address of a static member function of a class template is guaranteed to be unique
-    // for each template specialization. We use it as a type id here.
-    template<typename T>
-    struct TypeTag {
-        static void id() {}
-    };
+    // We use a 64-bit FNV-1a hash function to generate a unique id of each class in compile time.
+    // 64-bit hashing is statistically safe to avoid collisions in our compile-time typeid use case.
+    template<size_t LEN>
+    static constexpr uint64_t CompileTimeHash(const char (&str)[LEN])
+    {
+        // FNV-1a 64-bit constants
+        constexpr uint64_t prime = 0x100000001b3ULL;
+        constexpr uint64_t basis = 0xcbf29ce484222325ULL;
 
-    // A type-safe wrapper of TypeTag::id
+        uint64_t hash = basis;
+        for (std::size_t i = 0; i < LEN; ++i) {
+            hash ^= str[i];
+            hash *= prime;
+        }
+        return hash;
+    }
+
+    // A type-safe wrapper to avoid accidentially cast from raw int
     struct TypeID {
-        using RawTypeID = void (*)(); // the address of a static member function, see TypeTag
+        using RawTypeID = uint64_t;
         explicit TypeID(RawTypeID impl) : id(impl) {}
         bool operator==(const TypeID& other) const
         {
@@ -46,7 +57,8 @@ struct ExactDowncastUtils {
         template<typename T>
         static TypeID Get()
         {
-            return TypeID(&TypeTag<std::remove_cv_t<std::remove_pointer_t<std::remove_reference_t<T>>>>::id);
+            static RawTypeID typeHash = CompileTimeHash(__PRETTY_FUNCTION__);
+            return TypeID(typeHash);
         };
 
         RawTypeID id;

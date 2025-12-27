@@ -18,6 +18,7 @@
 
 #include <memory>
 
+#include "cache/ge_cache_provider.h"
 #include "draw/brush.h"
 #include "draw/canvas.h"
 #include "draw/pen.h"
@@ -47,6 +48,12 @@ public:
     void DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::SamplingOptions& sampling);
+    struct ShaderFilterEffectContext {
+        std::shared_ptr<Drawing::Image> image {};
+        Drawing::Rect src {};
+        Drawing::Rect dst {};
+        IGECacheProvider* geCacheProvider {};
+    };
     /**
      * @brief Applies a sequence of visual effects to an image using the GE (Graphics Effect) pipeline.
      *
@@ -66,17 +73,15 @@ public:
      * @param canvas Reference to the Drawing::Canvas used for rendering context.
      * @param veContainer Reference to the GEVisualEffectContainer containing the sequence
      *                    of visual effects to apply.
-     * @param image Shared pointer to the input image to process.
-     * @param src Source rectangle defining the region of the input image to process.
-     * @param dst Destination rectangle defining where to draw the result.
+     * @param context Rendering context for the effect application.
      * @param sampling Sampling options for image scaling and filtering.
      *
      * @return Shared pointer to the resulting image after all effects have been applied.
      *         Returns nullptr if the input image is null or processing fails.
      */
     std::shared_ptr<Drawing::Image> ApplyImageEffect(Drawing::Canvas& canvas,
-        Drawing::GEVisualEffectContainer& veContainer, const std::shared_ptr<Drawing::Image>& image,
-        const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::SamplingOptions& sampling);
+        Drawing::GEVisualEffectContainer& veContainer, const ShaderFilterEffectContext& context,
+        const Drawing::SamplingOptions& sampling);
 
     struct HpsGEImageEffectContext {
         std::shared_ptr<Drawing::Image> image {};
@@ -88,6 +93,7 @@ public:
         uint32_t maskColor {};
         float saturationForHPS {};
         float brightnessForHPS {};
+        IGECacheProvider* geCacheProvider {};
     };
 
     /**
@@ -156,12 +162,6 @@ public:
     static void SetMesablurAllEnabledByCCM(bool flag);
 
 private:
-    struct ShaderFilterEffectContext {
-        std::shared_ptr<Drawing::Image> image {};
-        Drawing::Rect src {};
-        Drawing::Rect dst {};
-    };
-
     // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
     enum class ApplyShaderFilterTarget { Error, DrawOnImage, DrawOnCanvas };
 

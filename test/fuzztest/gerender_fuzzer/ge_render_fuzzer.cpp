@@ -66,7 +66,7 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest002()
     Drawing::Rect src{fLeft, fTop, fWidth, fHeight};
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
 
-    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
     return resImg;
 }
 
@@ -83,7 +83,7 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest003()
     Drawing::Rect src{fLeft, fTop, fWidth, fHeight};
     Drawing::Rect dst{fLeft, fTop, fWidth, fHeight};
     Drawing::SamplingOptions sampling;
-    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
     return resImg;
 }
 
@@ -119,7 +119,7 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest004()
     Drawing::Rect src = GETest::GetPlainData<Drawing::Rect>();
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
     Drawing::SamplingOptions sampling;
-    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
     return resImg;
 }
 
@@ -152,7 +152,7 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest005()
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
     Drawing::SamplingOptions sampling;
 
-    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
     return resImg;
 }
 
@@ -189,7 +189,7 @@ std::shared_ptr<Drawing::Image> GERenderFuzzTest006()
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
     Drawing::SamplingOptions sampling;
 
-    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
     return resImg;
 }
 
