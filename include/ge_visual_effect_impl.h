@@ -226,6 +226,16 @@ public:
         return sdfFromImageParams_;
     }
 
+    void MakeSdfEdgeLightPrams()
+    {
+        sdfEdgeLightParams_ = std::make_shared<GESDFEdgeLightFilterParams>();
+    }
+
+    const std::shared_ptr<GESDFEdgeLightFilterParams>& GetSDFEdgeLightParams() const
+    {
+        return sdfEdgeLightParams_;
+    }
+
     void MakeDirectionLightParams()
     {
         directionLightParams_ = std::make_shared<GEDirectionLightShaderFilterParams>();
@@ -674,6 +684,8 @@ public:
         return noisyFrameGradientMaskParams_;
     }
 
+    void SetSDFEdgeLightParams(const std::string& tag, float param);
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
@@ -788,6 +800,7 @@ private:
     std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
     std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
     std::shared_ptr<GESDFFromImageFilterParams> sdfFromImageParams_ = nullptr;
+    std::shared_ptr<GESDFEdgeLightFilterParams> sdfEdgeLightParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEDotMatrixShaderParams> dotMatrixShaderParams_ = nullptr;

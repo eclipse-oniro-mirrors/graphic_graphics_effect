@@ -331,6 +331,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSdfFromImageParams();
         }
     },
+    { GE_FILTER_SDF_EDGE_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT);
+            impl->MakeSdfEdgeLightPrams();
+        }
+    },
     { GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT);
@@ -921,6 +927,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
             break;
         }
+        case FilterType::SDF_EDGE_LIGHT: {
+            SetSDFEdgeLightParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -990,6 +1000,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE) {
                 frostedGlassEffectParams_->blurImageForEdge = param;
+            }
+            break;
+        }
+        case FilterType::SDF_EDGE_LIGHT: {
+            if (sdfEdgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_SDF_EDGE_LIGHT_SDF_IMAGE) {
+                sdfEdgeLightParams_->sdfImage = param;
             }
             break;
         }
@@ -1433,6 +1452,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
         }
         case FilterType::DISTORT_CHROMA: {
             ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
+        case FilterType::SDF_EDGE_LIGHT: {
+            if (sdfEdgeLightParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_FILTER_SDF_EDGE_LIGHT_LIGHT_MASK) {
+                sdfEdgeLightParams_->lightMask = param;
+            }
             break;
         }
         default:
@@ -3326,6 +3354,45 @@ void GEVisualEffectImpl::SetFrostedGlassBlurParams(const std::string& tag, const
     }
     if (tag == GE_FILTER_FROSTED_GLASS_BLUR_RADIUSSCALE) {
         frostedGlassBlurParams_->radiusScale = param;
+    }
+}
+
+void GEVisualEffectImpl::SetSDFEdgeLightParams(const std::string& tag, float param)
+{
+    constexpr float MIN_SDF_SPREAD_FACTOR = 0.0f;
+    constexpr float MAX_SDF_SPREAD_FACTOR = 4096.0f;
+
+    if (sdfEdgeLightParams_ == nullptr) {
+        GE_LOGE("GEVisualEffectImpl::SetSDFEdgeLightParams sdfEdgeLightParams_ is nullptr");
+        return;
+    }
+
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR) {
+        sdfEdgeLightParams_->sdfSpreadFactor = std::clamp(param, MIN_SDF_SPREAD_FACTOR, MAX_SDF_SPREAD_FACTOR);
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_BLOOM_INTENSITY_CUTOFF) {
+        sdfEdgeLightParams_->bloomIntensityCutoff = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_MAX_INTENSITY) {
+        sdfEdgeLightParams_->maxIntensity = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_MAX_BLOOM_INTENSITY) {
+        sdfEdgeLightParams_->maxBloomIntensity = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_BLOOM_FALLOFF_POW) {
+        sdfEdgeLightParams_->bloomFalloffPow = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_MIN_BORDER_WIDTH) {
+        sdfEdgeLightParams_->minBorderWidth = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_MAX_BORDER_WIDTH) {
+        sdfEdgeLightParams_->maxBorderWidth = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_INNER_BORDER_BLOOM_WIDTH) {
+        sdfEdgeLightParams_->innerBorderBloomWidth = param;
+    }
+    if (tag == GE_FILTER_SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH) {
+        sdfEdgeLightParams_->outerBorderBloomWidth = param;
     }
 }
 } // namespace Drawing

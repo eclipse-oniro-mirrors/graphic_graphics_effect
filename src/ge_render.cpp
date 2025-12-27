@@ -55,6 +55,7 @@
 #include "sdf/ge_sdf_border_shader.h"
 #include "sdf/ge_sdf_clip_shader.h"
 #include "sdf/ge_sdf_shadow_shader.h"
+#include "sdf/ge_sdf_edge_light.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -875,6 +876,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
             shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT: {
+            const auto& params = ve->GetSDFEdgeLightParams();
+            shaderFilter = std::make_shared<GESDFEdgeLight>(*params);
             break;
         }
         default:
