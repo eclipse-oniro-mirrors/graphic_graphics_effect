@@ -256,6 +256,33 @@ struct GEMagnifierShaderFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(MAGNIFIER, GEMagnifierShaderFilterParams, GE_FILTER_MAGNIFIER);
 
+constexpr char GE_FILTER_SDF_EDGE_LIGHT[] = "SDFEdgeLight";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR[] = "SDFEdgeLight_SpreadFactor";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_BLOOM_INTENSITY_CUTOFF[] = "SDFEdgeLight_BloomIntensityCutoff";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_MAX_INTENSITY[] = "SDFEdgeLight_LightMaxIntensity";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_MAX_BLOOM_INTENSITY[] = "SDFEdgeLight_MaxBloomIntensity";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_BLOOM_FALLOFF_POW[] = "SDFEdgeLight_BloomFalloffPow";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_MIN_BORDER_WIDTH[] = "SDFEdgeLight_MinBorderWidth";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_MAX_BORDER_WIDTH[] = "SDFEdgeLight_MaxBorderWidth";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_INNER_BORDER_BLOOM_WIDTH[] = "SDFEdgeLight_InnerBorderBloomWidth";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH[] = "SDFEdgeLight_OuterBorderBloomWidth";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_SDF_IMAGE[] = "SDFEdgeLight_SDFImage";
+constexpr char GE_FILTER_SDF_EDGE_LIGHT_LIGHT_MASK[] = "SDFEdgeLight_LightMask";
+struct GESDFEdgeLightFilterParams {
+    float sdfSpreadFactor;
+    float bloomIntensityCutoff;
+    float maxIntensity;
+    float maxBloomIntensity;
+    float bloomFalloffPow;
+    float minBorderWidth;
+    float maxBorderWidth;
+    float innerBorderBloomWidth;
+    float outerBorderBloomWidth;
+    std::shared_ptr<Drawing::Image> sdfImage = nullptr;
+    std::shared_ptr<GEShaderMask> lightMask = nullptr;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_EDGE_LIGHT, GESDFEdgeLightFilterParams, GE_FILTER_SDF_EDGE_LIGHT);
+
 constexpr char GE_MASK_RIPPLE[] = "RippleMask";
 constexpr char GE_MASK_RIPPLE_CENTER[] = "RippleMask_Center";
 constexpr char GE_MASK_RIPPLE_RADIUS[] = "RippleMask_Radius";
