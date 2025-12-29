@@ -15,47 +15,12 @@
 #include "ge_shader.h"
 
 #include "ge_log.h"
-#include "ge_system_properties.h"
-#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
-namespace {
-static constexpr const char* PROPERTY_DRAW_SHADER_OPT = "persist.sys.graphic.drawShaderOptEnable";
-static constexpr const char* PROPERTY_DRAW_SHADER_VISUALIZED_OPT = "persist.sys.graphic.drawShaderVisualizedOptEnable";
-
-bool GetDrawShaderOptimizationEnabled()
-{
-    return GESystemProperties::GetBoolSystemProperty(PROPERTY_DRAW_SHADER_OPT, true);
-}
-
-bool GetDrawShaderVisualizedOptimizationEnabled()
-{
-    return GESystemProperties::GetBoolSystemProperty(PROPERTY_DRAW_SHADER_VISUALIZED_OPT, false);
-}
-
-void DrawShaderVisualizedOptimizationEnabled(
-    Drawing::Canvas& canvas, const Drawing::Rect& rect, const Drawing::Rect& subRect)
-{
-    auto width = rect.GetWidth();
-    auto height = rect.GetHeight();
-    auto visualizedSubRect =
-        Drawing::Rect(rect.GetLeft() + subRect.GetLeft() * width, rect.GetTop() + subRect.GetTop() * height,
-            rect.GetLeft() + subRect.GetRight() * width, rect.GetTop() + subRect.GetBottom() * height);
-    Drawing::Brush brush;
-    brush.SetColor(0x88FF0000);
-    canvas.AttachBrush(brush);
-    canvas.DrawRect(visualizedSubRect);
-    canvas.DetachBrush();
-    return;
-}
-}
 
 bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    if (!GetDrawShaderOptimizationEnabled()) {
-        return false;
-    }
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     auto subRect = GetSubtractedRect(width, height);
@@ -81,9 +46,6 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
     canvas.AttachPen(pen);
     canvas.DrawRect(rect);
     canvas.DetachPen();
-    if (GetDrawShaderVisualizedOptimizationEnabled()) {
-        DrawShaderVisualizedOptimizationEnabled(canvas, rect, subRect);
-    }
     return true;
 }
 
