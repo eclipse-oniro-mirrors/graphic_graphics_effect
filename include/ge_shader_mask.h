@@ -43,7 +43,7 @@ public:
      * Where region 5 (the center) is subtracted, others preserved.
      * @note If the returned value is empty or invalid, no subtraction should be applied.
      */
-    virtual Drawing::Rect GetSubtractedRect() const { return Drawing::Rect(); }
+    virtual Drawing::Rect GetSubtractedRect(float width, float height) const { return Drawing::Rect(); }
 
     virtual std::weak_ptr<Drawing::Image> GetImage() const
     {

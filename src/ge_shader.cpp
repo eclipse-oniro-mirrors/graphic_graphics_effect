@@ -21,14 +21,22 @@ namespace Rosen {
 
 bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
-    auto subRect = GetSubtractedRect();
-    bool rectNotValid = subRect.IsEmpty() || !subRect.IsValid() || !rect.Contains(subRect);
+    auto width = rect.GetWidth();
+    auto height = rect.GetHeight();
+    auto subRect = GetSubtractedRect(width, height);
+    bool rectNotValid = subRect.IsEmpty() || !subRect.IsValid();
     if (rectNotValid) {
         return false;
     }
-
-    auto width = rect.GetWidth();
-    auto height = rect.GetHeight();
+    auto renderRect = Drawing::Rect(0.f, 0.f, 1.f, 1.f); // normalized render rectangle
+    if (subRect.Contains(renderRect)) {
+        // The render rectangle is fully subtracted, so the draw call can be skipped.
+        return true;
+    }
+    if (!renderRect.Contains(subRect)) {
+        // No optimazition for the subRect which reaches the edge of the render rectangle in any direction
+        return false;
+    }
     float maxWidth = std::max({ width * subRect.GetLeft(), width * (1.f - subRect.GetRight()),
         height * subRect.GetTop(), height * (1.f - subRect.GetBottom())});
     float penWidth = maxWidth * 2.f; // needs to be doubled since the border meets the middle of pen
