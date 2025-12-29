@@ -255,8 +255,8 @@ HWTEST_F(GEMagnifierShaderFilterTest, SetShaderFilterCanvasinfo_001, TestSize.Le
         1.f, 1.f, 1.f, 1.f, 1.f, 1.0, 1.0, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     Drawing::Matrix matrix1;
-    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix1};
     matrix1.PostRotate(90); // 90 degree
+    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix1};
     filter->SetShaderFilterCanvasinfo(canvasInfo);
     EXPECT_EQ(filter->rotateDegree_, 270);
 
