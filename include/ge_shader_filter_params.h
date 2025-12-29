@@ -269,15 +269,15 @@ constexpr char GE_FILTER_SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH[] = "SDFEdgeLig
 constexpr char GE_FILTER_SDF_EDGE_LIGHT_SDF_IMAGE[] = "SDFEdgeLight_SDFImage";
 constexpr char GE_FILTER_SDF_EDGE_LIGHT_LIGHT_MASK[] = "SDFEdgeLight_LightMask";
 struct GESDFEdgeLightFilterParams {
-    float sdfSpreadFactor;
-    float bloomIntensityCutoff;
-    float maxIntensity;
-    float maxBloomIntensity;
-    float bloomFalloffPow;
-    float minBorderWidth;
-    float maxBorderWidth;
-    float innerBorderBloomWidth;
-    float outerBorderBloomWidth;
+    float sdfSpreadFactor = 64.0f;
+    float bloomIntensityCutoff = 0.1f;
+    float maxIntensity = 1.0f;
+    float maxBloomIntensity = 1.0f;
+    float bloomFalloffPow = 2.0f;
+    float minBorderWidth = 2.0f;
+    float maxBorderWidth = 5.0f;
+    float innerBorderBloomWidth = 30.0f;
+    float outerBorderBloomWidth = 30.0f;
     std::shared_ptr<Drawing::Image> sdfImage = nullptr;
     std::shared_ptr<GEShaderMask> lightMask = nullptr;
 };
