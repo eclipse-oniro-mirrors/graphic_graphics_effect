@@ -52,7 +52,7 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
     }
 
     if (!blurredSdfImage_) {
-        blurredSdfImage_ = BlurSdfMap(canvas, image, DEFAULT_RADIUS);
+        blurredSdfImage_ = BlurSdfMap(canvas, sdfImage_, DEFAULT_RADIUS);
     }
 
     float imageWidth = image->GetWidth();
