@@ -62,9 +62,9 @@ private:
     float outerBorderBloomWidth_ = 30;
 
     std::shared_ptr<Drawing::Image> blurredSdfImage_;
-    std::shared_ptr<Drawing::GEShaderMask> lightMask_;
+    std::shared_ptr<Drawing::Image> sdfImage_;
     std::shared_ptr<Drawing::GESDFShaderShape> sdfShape_;
-    std::shared_ptr<Drawing::ShaderEffect> sdfShader_;
+    std::shared_ptr<Drawing::GEShaderMask> lightMask_;
 };
 } // namespace OHOS::Rosen
 
