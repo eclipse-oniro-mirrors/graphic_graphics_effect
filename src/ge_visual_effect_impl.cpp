@@ -1524,6 +1524,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_EDGE_LIGHT: {
+            if (sdfEdgeLightParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_FILTER_SDF_EDGE_LIGHT_SDF_SHAPE) {
+                sdfEdgeLightParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }
