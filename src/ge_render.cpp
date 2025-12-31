@@ -523,14 +523,15 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
     if (!ComposeEffects(canvas, visualEffects, context, composables)) {
         return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
     }
-    auto resImage = context.image;
+    auto currentImage = context.image;
+    std::shared_ptr<Drawing::Image> resImage = nullptr;
     bool appliedHpsBlur = false;
     bool lastAppliedHpsBlur = false;
     ApplyShaderFilterTarget applyTarget = ApplyShaderFilterTarget::Error; // Last applied target
     for (auto& composable: composables) {
-        auto currentImage = resImage;
+        resImage = nullptr; // cleared the out variable to determine errors in hps call
         if (auto visualEffect = composable.GetEffect(); visualEffect != nullptr) {
-            ShaderFilterEffectContext geContext { resImage, context.src, context.dst, context.geCacheProvider };
+            ShaderFilterEffectContext geContext { currentImage, context.src, context.dst, context.geCacheProvider };
             applyTarget = DispatchGEShaderFilter(canvas, brush, composable, visualEffect, geContext);
             resImage = geContext.image;
         } else if (auto hpsEffect = composable.GetHpsEffect(); hpsEffect != nullptr) {
@@ -543,6 +544,10 @@ GERender::ApplyHpsGEResult GERender::ApplyHpsGEImageEffect(Drawing::Canvas& canv
         } else {
             LOGE("GERender::ApplyHpsGEImageEffect unhandled composable type");
         }
+        if (resImage == nullptr) { // On error early returns
+            return ApplyHpsGEResult::CanvasNotDrawnAndHpsNotApplied();
+        }
+        currentImage = resImage;
     }
 
     outImage = resImage;
