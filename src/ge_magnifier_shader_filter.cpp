@@ -105,7 +105,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
         return nullptr;
     }
 
-    float maxZoomOffsetX = (imageWidth - magnifierPara_->width_ * scaleX_ / magnifierPara_->factor_) / 2.0f;
     float maxZoomOffsetY = (imageHeight - magnifierPara_->height_ * scaleY_ / magnifierPara_->factor_) / 2.0f;
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
@@ -117,8 +116,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     builder->SetUniform("size", magnifierPara_->width_ * scaleX_, magnifierPara_->height_ * scaleY_);
     builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_ * scaleY_);
     builder->SetUniform("borderWidth", magnifierPara_->borderWidth_ * scaleY_);
-    builder->SetUniform("zoomOffset",
-        std::clamp(magnifierPara_->zoomOffsetX_, -maxZoomOffsetX, maxZoomOffsetX) / imageWidth,
+    builder->SetUniform("zoomOffset", magnifierPara_->zoomOffsetX_ / imageWidth,
         std::clamp(magnifierPara_->zoomOffsetY_, -maxZoomOffsetY, maxZoomOffsetY) / imageHeight);
 
     builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_ * scaleX_,
