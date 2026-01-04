@@ -26,25 +26,25 @@ namespace {
 constexpr float DEFAULT_RADIUS = 6.0f;
 
 std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::GESDFShaderShape>& sdfShape_, float imageWidth, float imageHeight,
+    const std::shared_ptr<Drawing::GESDFShaderShape>& sdfShape, float imageWidth, float imageHeight,
     const Drawing::ImageInfo& imageInfo)
 {
-    if (!sdfShape_) {
+    if (!sdfShape) {
         LOGE("GESDFEdgeLight::OnProcessImage sdfShape_ is null");
         return nullptr;
     }
-    auto shader = sdfShape_->GenerateDrawingShader(imageWidth, imageHeight);
+    auto shader = sdfShape->GenerateDrawingShader(imageWidth, imageHeight);
     if (!shader) {
         LOGE("GESDFEdgeLight::OnProcessImage GenerateDrawingShader failed");
         return nullptr;
     }
 
     constexpr char PASS_THROUGH[] = R"(
-                uniform shader inputShader;
-                vec4 main(vec2 fragCoord) {
-                    return inputShader.eval(fragCoord);
-                }
-            )";
+        uniform shader inputShader;
+        vec4 main(vec2 fragCoord) {
+            return inputShader.eval(fragCoord);
+        }
+    )";
     static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(PASS_THROUGH);
 
     Drawing::RuntimeShaderBuilder builder(passThroughEffect);
@@ -146,11 +146,7 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
         return image;
     }
 
-#ifdef RS_ENABLE_GPU
     auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
-#else
-    auto resultImage = builder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
-#endif
     if (!resultImage) {
         LOGE("GESDFEdgeLight::OnProcessImage resultImage is null");
         return image;
