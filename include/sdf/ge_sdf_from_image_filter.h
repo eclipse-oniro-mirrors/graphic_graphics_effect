@@ -18,14 +18,14 @@
 
 #include <memory>
 
-#include "ge_filter_type_info.h"
-#include "ge_shader_filter.h"
-#include "ge_visual_effect.h"
-
 #include "draw/canvas.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_filter_type_info.h"
+#include "ge_shader_filter.h"
+#include "ge_visual_effect.h"
 #include "image/image.h"
+
 #include "utils/matrix.h"
 #include "utils/rect.h"
 
@@ -53,16 +53,19 @@ private:
     bool InitFillDerivEffect();
 
     std::shared_ptr<Drawing::Image> RunJFAPrepareEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
-        const Drawing::SamplingOptions& samplingOptions, const Drawing::Rect& src, const Drawing::Rect& dst);
+        const Drawing::SamplingOptions& samplingOptions, const Drawing::Rect& src, const Drawing::Rect& dst,
+        const Drawing::ColorType& outputColorType);
 
     std::shared_ptr<Drawing::Image> RunJfaIterationsEffect(Drawing::Canvas& canvas,
-        std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions);
+        std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
+        const Drawing::ColorType& outputColorType);
 
     std::shared_ptr<Drawing::Image> RunJfaProcessResultEffect(Drawing::Canvas& canvas,
-        std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions);
+        std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
+        const Drawing::ColorType& outputColorType);
 
     std::shared_ptr<Drawing::Image> RunFillDerivEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
-        const Drawing::SamplingOptions& samplingOptions);
+        const Drawing::SamplingOptions& samplingOptions, const Drawing::ColorType& outputColorType);
 
     bool IsInputValid(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
         const Drawing::Rect& dst);

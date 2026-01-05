@@ -63,24 +63,25 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Ca
         return image;
     }
 
-    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    static const Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    static const Drawing::SamplingOptions nearest(Drawing::FilterMode::NEAREST, Drawing::MipmapMode::NONE);
 
     std::shared_ptr<Drawing::Image> initOutput = nullptr;
-    initOutput = RunJFAPrepareEffect(canvas, image, linear, src, dst);
+    initOutput = RunJFAPrepareEffect(canvas, image, linear, src, dst, Drawing::ColorType::COLORTYPE_RGBA_F16);
     if (!initOutput) {
         LOGE("GESDFFromImageFilter::OnProcessImage Init make image error");
         return image;
     }
 
     std::shared_ptr<Drawing::Image> iterationsOutput = nullptr;
-    iterationsOutput = RunJfaIterationsEffect(canvas, initOutput, linear);
+    iterationsOutput = RunJfaIterationsEffect(canvas, initOutput, nearest, Drawing::ColorType::COLORTYPE_RGBA_F16);
     if (!iterationsOutput) {
         LOGE("GESDFFromImageFilter::OnProcessImage Iterations make image error");
         return image;
     }
 
     std::shared_ptr<Drawing::Image> sdfOutput = nullptr;
-    sdfOutput = RunJfaProcessResultEffect(canvas, iterationsOutput, linear);
+    sdfOutput = RunJfaProcessResultEffect(canvas, iterationsOutput, nearest, image->GetColorType());
     if (!sdfOutput) {
         LOGE("GESDFFromImageFilter::OnProcessImage ProcessResult make image error");
         return image;
@@ -91,7 +92,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Ca
     }
 
     std::shared_ptr<Drawing::Image> derivOutput = nullptr;
-    derivOutput = RunFillDerivEffect(canvas, sdfOutput, linear);
+    derivOutput = RunFillDerivEffect(canvas, sdfOutput, linear, image->GetColorType());
     if (!derivOutput) {
         LOGE("GESDFFromImageFilter::OnProcessImage fillDeriv make image error");
         return sdfOutput;
@@ -107,16 +108,41 @@ bool GESDFFromImageFilter::InitJFAPrepareEffect()
 
     static const std::string shaderString(R"(
         uniform shader imageInput;
+        uniform float spreadFactor;
+
+        const float SQRT_2 = 1.41421356;
+
+        vec2 getGradient(vec2 fragCoord) {
+            const vec2 h = vec2(0.5, 0);
+            return vec2(imageInput.eval(fragCoord + h.xy).a - imageInput.eval(fragCoord - h.xy).a,
+  			            imageInput.eval(fragCoord + h.yx).a - imageInput.eval(fragCoord - h.yx).a);
+        }
         
         half4 main(vec2 fragCoord) {
-            half4 O = half4(0.5);
+            vec2 centerFragCoord = fragCoord + vec2(0.5);
 
-            half imageSample = step(1.0, imageInput.eval(fragCoord).a);
+            float imageSample = imageInput.eval(centerFragCoord).a;
+          
+          	if (imageSample == 0) {
+              return half4(1, 1, 0.5, 0.5);
+            }
+          	if (imageSample == 1) {
+              return half4(0.5, 0.5, 1, 1);
+            }
+          
+          	vec2 grad = getGradient(centerFragCoord);
+          	vec2 normGrad = normalize(grad);
+          	vec2 edgeCoords = vec2(0.5);
 
-            O.xy += 0.5 * half2(1.0 - imageSample);
-            O.zw += 0.5 * half2(imageSample);
+          	float borderCoeff = (imageSample - 0.5) * SQRT_2; // determine how far the actual border is from sample value
+          	edgeCoords -= normGrad * borderCoeff / (2 * spreadFactor);
+          
+          	if (borderCoeff < 0)
+            {
+              return half4(edgeCoords, 0.5, 0.5);
+            }
             
-            return O;
+            return half4(0.5, 0.5, edgeCoords);
         }
     )");
 
@@ -258,7 +284,7 @@ bool GESDFFromImageFilter::InitFillDerivEffect()
 
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
-    const Drawing::Rect& src, const Drawing::Rect& dst)
+    const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::ColorType& outputColorType)
 {
     auto imageInfo = image->GetImageInfo();
     auto width = image->GetWidth();
@@ -268,12 +294,13 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawin
     auto outputHeight = std::max(static_cast<int>(std::ceil(dst.GetHeight())), height);
     Drawing::Matrix stretchMatrix = BuildStretchMatrix(src, dst, width, height);
     auto outputImageInfo = Drawing::ImageInfo(
-        outputWidth, outputHeight, imageInfo.GetColorType(), imageInfo.GetAlphaType(), imageInfo.GetColorSpace());
+        outputWidth, outputHeight, outputColorType, imageInfo.GetAlphaType(), imageInfo.GetColorSpace());
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, samplingOptions, stretchMatrix);
     Drawing::RuntimeShaderBuilder JFAPrepareBuilder(g_JFAPrepareEffect);
     JFAPrepareBuilder.SetChild("imageInput", imageShader);
+    JFAPrepareBuilder.SetUniform("spreadFactor", static_cast<float>(spreadFactor_));
 #ifdef RS_ENABLE_GPU
     return JFAPrepareBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, outputImageInfo, false);
 #else
@@ -282,9 +309,13 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawin
 }
 
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions)
+    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
+    const Drawing::ColorType& outputColorType)
 {
     Drawing::Matrix identityMatrix;
+
+    auto outputImageInfo = image->GetImageInfo();
+    outputImageInfo.SetColorType(outputColorType);
 
     std::shared_ptr<Drawing::Image> input = image;
     std::shared_ptr<Drawing::Image> output = nullptr;
@@ -300,9 +331,9 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
         jfaIterationBuilder.SetUniform("jfaRadius", static_cast<float>(jfaRadius));
         jfaIterationBuilder.SetUniform("spreadFactor", static_cast<float>(spreadFactor_));
 #ifdef RS_ENABLE_GPU
-        output = jfaIterationBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+        output = jfaIterationBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, outputImageInfo, false);
 #else
-        output = jfaIterationBuilder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
+        output = jfaIterationBuilder.MakeImage(nullptr, nullptr, outputImageInfo, false);
 #endif
         if (!output) {
             LOGE("GESDFFromImageFilter::OnProcessImage Iteration make image error");
@@ -315,32 +346,40 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
 }
 
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaProcessResultEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions)
+    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
+    const Drawing::ColorType& outputColorType)
 {
+    auto outputImageInfo = image->GetImageInfo();
+    outputImageInfo.SetColorType(outputColorType);
+
     Drawing::Matrix identityMatrix;
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, samplingOptions, identityMatrix);
     Drawing::RuntimeShaderBuilder jfaProcessResultBuilder(g_jfaProcessResultEffect);
     jfaProcessResultBuilder.SetChild("imageInput", imageShader);
 #ifdef RS_ENABLE_GPU
-    return jfaProcessResultBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+    return jfaProcessResultBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, outputImageInfo, false);
 #else
-    return jfaProcessResultBuilder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
+    return jfaProcessResultBuilder.MakeImage(nullptr, nullptr, outputImageInfo, false);
 #endif
 }
 
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunFillDerivEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions)
+    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
+    const Drawing::ColorType& outputColorType)
 {
+    auto outputImageInfo = image->GetImageInfo();
+    outputImageInfo.SetColorType(outputColorType);
+
     Drawing::Matrix identityMatrix;
     auto imageInputShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, samplingOptions, identityMatrix);
     Drawing::RuntimeShaderBuilder fillDerivBuilder(g_sdfFillDerivEffect);
     fillDerivBuilder.SetChild("imageInput", imageInputShader);
 #ifdef RS_ENABLE_GPU
-    return fillDerivBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+    return fillDerivBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, outputImageInfo, false);
 #else
-    return fillDerivBuilder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
+    return fillDerivBuilder.MakeImage(nullptr, nullptr, outputImageInfo, false);
 #endif
 }
 
