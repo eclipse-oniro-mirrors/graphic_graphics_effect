@@ -39,13 +39,13 @@ std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
         return nullptr;
     }
 
-    constexpr char PASS_THROUGH[] = R"(
+    constexpr char passThrough[] = R"(
         uniform shader inputShader;
         vec4 main(vec2 fragCoord) {
             return inputShader.eval(fragCoord);
         }
     )";
-    static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(PASS_THROUGH);
+    static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(passThrough);
 
     Drawing::RuntimeShaderBuilder builder(passThroughEffect);
     builder.SetChild("inputShader", shader);
@@ -198,7 +198,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(
     builder->SetUniform("iResolution", imageWidth, imageHeight);
 
     builder->SetChild("sdfImageShader", Drawing::ShaderEffect::CreateImageShader(*sdfImage_, Drawing::TileMode::CLAMP,
-                                            Drawing::TileMode::CLAMP, sampling, matrix));
+        Drawing::TileMode::CLAMP, sampling, matrix));
 
     builder->SetChild("blurredSdfImageShader", Drawing::ShaderEffect::CreateImageShader(
         *blurredSdfImage_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
