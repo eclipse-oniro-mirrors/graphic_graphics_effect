@@ -87,7 +87,7 @@ Drawing::GESDFEdgeLightFilterParams GESDFEdgeLightTest::MakeParams()
     p.maxBorderWidth = 5.0f;
     p.innerBorderBloomWidth = 30.0f;
     p.outerBorderBloomWidth = 30.0f;
-    // sdfImage and lightMask will be set via setters in tests
+    // sdfImage and lightMask can be set in the params before constructing the filter
     return p;
 }
 
@@ -112,16 +112,21 @@ HWTEST_F(GESDFEdgeLightTest, OnProcessImage_InvalidInputs, TestSize.Level0)
     EXPECT_EQ(out2.get(), image_.get());
 
     // Case 3: sdf set but mask missing → should return original image
-    filter->SetSDFImage(sdfImage_);
-    auto out3 = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    auto params3 = MakeParams();
+    params3.sdfImage = sdfImage_;
+    // lightMask is not set (nullptr)
+    auto filter3 = std::make_unique<GESDFEdgeLight>(params3);
+    auto out3 = filter3->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(out3.get(), image_.get());
 
     // Case 4: mask set but sdf missing → should return original image
     Drawing::GEDoubleRippleShaderMaskParams mp;
     auto mask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
-    auto filter2 = std::make_unique<GESDFEdgeLight>(params);
-    filter2->SetLightMask(mask);
-    auto out4 = filter2->OnProcessImage(canvas_, image_, src_, dst_);
+    auto params4 = MakeParams();
+    params4.lightMask = mask;
+    // sdfImage and sdfShape are not set (nullptr)
+    auto filter4 = std::make_unique<GESDFEdgeLight>(params4);
+    auto out4 = filter4->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(out4.get(), image_.get());
 }
 
@@ -132,17 +137,15 @@ HWTEST_F(GESDFEdgeLightTest, OnProcessImage_InvalidInputs, TestSize.Level0)
  */
 HWTEST_F(GESDFEdgeLightTest, OnProcessImage_CPUFallback, TestSize.Level0)
 {
-    auto params = MakeParams();
-    auto filter = std::make_unique<GESDFEdgeLight>(params);
-
     ASSERT_NE(image_, nullptr);
     ASSERT_NE(sdfImage_, nullptr);
 
-    // Provide required resources
-    filter->SetSDFImage(sdfImage_);
+    // Provide required resources via constructor params
+    auto params = MakeParams();
+    params.sdfImage = sdfImage_;
     Drawing::GEDoubleRippleShaderMaskParams mp; // default mask params
-    auto mask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
-    filter->SetLightMask(mask);
+    params.lightMask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
+    auto filter = std::make_unique<GESDFEdgeLight>(params);
 
     // On CPU canvas, builder->MakeImage usually returns nullptr, so OnProcessImage should return the input image.
     auto out = filter->OnProcessImage(canvas_, image_, src_, dst_);
@@ -150,34 +153,37 @@ HWTEST_F(GESDFEdgeLightTest, OnProcessImage_CPUFallback, TestSize.Level0)
 }
 
 /**
- * @tc.name: Setters_Smoke
- * @tc.desc: Verify SetSDFImage and SetLightMask do not crash and processing returns original image on CPU.
+ * @tc.name: ParameterVariations_Smoke
+ * @tc.desc: Verify different parameter combinations work correctly on CPU (returns original image).
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFEdgeLightTest, Setters_Smoke, TestSize.Level0)
+HWTEST_F(GESDFEdgeLightTest, ParameterVariations_Smoke, TestSize.Level0)
 {
-    auto params = MakeParams();
-    auto filter = std::make_unique<GESDFEdgeLight>(params);
-
-    // Set initial resources
-    filter->SetSDFImage(sdfImage_);
-    Drawing::GEDoubleRippleShaderMaskParams mp;
-    auto mask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
-    filter->SetLightMask(mask);
-
     ASSERT_NE(image_, nullptr);
-    auto out1 = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    ASSERT_NE(sdfImage_, nullptr);
+
+    // Test with initial SDF image
+    auto params1 = MakeParams();
+    params1.sdfImage = sdfImage_;
+    Drawing::GEDoubleRippleShaderMaskParams mp;
+    params1.lightMask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
+    auto filter1 = std::make_unique<GESDFEdgeLight>(params1);
+    auto out1 = filter1->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(out1.get(), image_.get());
 
-    // Change SDF image and process again
+    // Test with different SDF image
     Drawing::Bitmap newSdfBmp;
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     newSdfBmp.Build(NUM_2, NUM_2, fmt);
     newSdfBmp.ClearWithColor(Drawing::Color::COLOR_GREEN);
     auto newSdfImage = newSdfBmp.MakeImage();
     ASSERT_NE(newSdfImage, nullptr);
-    filter->SetSDFImage(newSdfImage);
-    auto out2 = filter->OnProcessImage(canvas_, image_, src_, dst_);
+
+    auto params2 = MakeParams();
+    params2.sdfImage = newSdfImage;
+    params2.lightMask = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
+    auto filter2 = std::make_unique<GESDFEdgeLight>(params2);
+    auto out2 = filter2->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(out2.get(), image_.get());
 }
 

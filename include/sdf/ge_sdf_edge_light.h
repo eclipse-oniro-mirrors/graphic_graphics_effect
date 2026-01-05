@@ -23,6 +23,7 @@
 #include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
+#include "sdf/ge_sdf_shader_shape.h"
 
 
 namespace OHOS::Rosen {
@@ -46,9 +47,6 @@ public:
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
-    GE_EXPORT void SetSDFImage(std::shared_ptr<Drawing::Image> sdfImage);
-    GE_EXPORT void SetLightMask(std::shared_ptr<Drawing::GEShaderMask> mask);
-
 private:
     float sdfSpreadFactor_ = 64.0f;
 
@@ -63,10 +61,10 @@ private:
     float innerBorderBloomWidth_ = 30;
     float outerBorderBloomWidth_ = 30;
 
-    std::shared_ptr<Drawing::Image> sdfImage_ = nullptr;
-    std::shared_ptr<Drawing::Image> blurredSdfImage_ = nullptr;
-
-    std::shared_ptr<Drawing::GEShaderMask> lightMask_ = nullptr;
+    std::shared_ptr<Drawing::Image> blurredSdfImage_;
+    std::shared_ptr<Drawing::Image> sdfImage_;
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape_;
+    std::shared_ptr<Drawing::GEShaderMask> lightMask_;
 };
 } // namespace OHOS::Rosen
 

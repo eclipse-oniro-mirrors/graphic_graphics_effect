@@ -24,92 +24,34 @@
 namespace OHOS::Rosen {
 namespace {
 constexpr float DEFAULT_RADIUS = 6.0f;
-}
-GESDFEdgeLight::GESDFEdgeLight(const Drawing::GESDFEdgeLightFilterParams& params)
-    : sdfSpreadFactor_(params.sdfSpreadFactor), bloomIntensityCutoff_(params.bloomIntensityCutoff),
-      maxIntensity_(params.maxIntensity), maxBloomIntensity_(params.maxBloomIntensity),
-      bloomFalloffPow_(params.bloomFalloffPow), minBorderWidth_(params.minBorderWidth),
-      maxBorderWidth_(params.maxBorderWidth), innerBorderBloomWidth_(params.innerBorderBloomWidth),
-      outerBorderBloomWidth_(params.outerBorderBloomWidth), sdfImage_(params.sdfImage), lightMask_(params.lightMask)
-{}
 
-std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
+std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::GESDFShaderShape>& sdfShape, float imageWidth, float imageHeight,
+    const Drawing::ImageInfo& imageInfo)
 {
-    if (!image) {
-        LOGE("GESDFEdgeLight::OnProcessImage image is null");
-        return image;
+    if (!sdfShape) {
+        LOGE("GESDFEdgeLight::OnProcessImage sdfShape_ is null");
+        return nullptr;
     }
-
-    if (!sdfImage_) {
-        LOGE("GESDFEdgeLight::OnProcessImage sdfImage_ is null");
-        return image;
-    }
-
-    if (!lightMask_) {
-        LOGE("GESDFEdgeLight::OnProcessImage lightMask_ is null");
-        return image;
-    }
-
-    if (!blurredSdfImage_) {
-        blurredSdfImage_ = BlurSdfMap(canvas, sdfImage_, DEFAULT_RADIUS);
-    }
-
-    float imageWidth = image->GetWidth();
-    float imageHeight = image->GetHeight();
-    auto builder = MakeEffectShader(imageWidth, imageHeight);
-    if (!builder) {
-        LOGE("GESDFEdgeLight::OnProcessImage builder is null");
-        return image;
-    }
-
-#ifdef RS_ENABLE_GPU
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
-#else
-    auto resultImage = builder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
-#endif
-    if (!resultImage) {
-        LOGE("GESDFEdgeLight::OnProcessImage resultImage is null");
-        return image;
-    }
-
-    return resultImage;
-}
-
-std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
-    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius)
-{
-    if (sdfImage == nullptr) {
-        LOGE("GESDFEdgeLight::BlurSdfMap input is invalid");
+    auto shader = sdfShape->GenerateDrawingShader(imageWidth, imageHeight);
+    if (!shader) {
+        LOGE("GESDFEdgeLight::OnProcessImage GenerateDrawingShader failed");
         return nullptr;
     }
 
-    Drawing::Rect imageRect = { 0, 0, sdfImage->GetWidth(), sdfImage->GetHeight() };
+    constexpr char passThrough[] = R"(
+        uniform shader inputShader;
+        vec4 main(vec2 fragCoord) {
+            return inputShader.eval(fragCoord);
+        }
+    )";
+    static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(passThrough);
 
-    Drawing::GEMESABlurShaderFilterParams params;
-    params.radius = radius;
-    GEMESABlurShaderFilter blurFilter(params);
-
-    auto blurImage = blurFilter.OnProcessImage(canvas, sdfImage, imageRect, imageRect);
-    if (blurImage == nullptr) {
-        LOGE("GESDFEdgeLight::BlurSdfMap blur error");
-        return sdfImage;
-    }
-    return blurImage;
+    Drawing::RuntimeShaderBuilder builder(passThroughEffect);
+    builder.SetChild("inputShader", shader);
+    return builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 }
 
-void GESDFEdgeLight::SetSDFImage(std::shared_ptr<Drawing::Image> sdfImage)
-{
-    sdfImage_ = sdfImage;
-    blurredSdfImage_ = nullptr;
-}
-
-void GESDFEdgeLight::SetLightMask(std::shared_ptr<Drawing::GEShaderMask> mask)
-{
-    lightMask_ = mask;
-}
-
-namespace {
 constexpr char SHADER[] = R"(
     uniform vec2 iResolution;
 
@@ -158,45 +100,108 @@ constexpr char SHADER[] = R"(
     {
         float lightMaskValue = lightMaskShader.eval(fragCoord).r;
 
-        half4 result = half4(0, 0, 0, 1);
-
         vec4 sdfMapSample = decodeSdfMap(sdfImageShader.eval(fragCoord));
         vec4 blurredSdfMapSample = decodeSdfMap(blurredSdfImageShader.eval(fragCoord));
 
-        result += lightColor.rgb1 * edgeLightFakeBloom(lightMaskValue, sdfMapSample.a, blurredSdfMapSample.a);
-
-        return result;
+        half3 rgb = lightColor * edgeLightFakeBloom(lightMaskValue, sdfMapSample.a, blurredSdfMapSample.a);
+        return half4(rgb, rgb.r);
     }
 )";
+} // namespace
+
+GESDFEdgeLight::GESDFEdgeLight(const Drawing::GESDFEdgeLightFilterParams& params)
+    : sdfSpreadFactor_(params.sdfSpreadFactor), bloomIntensityCutoff_(params.bloomIntensityCutoff),
+      maxIntensity_(params.maxIntensity), maxBloomIntensity_(params.maxBloomIntensity),
+      bloomFalloffPow_(params.bloomFalloffPow), minBorderWidth_(params.minBorderWidth),
+      maxBorderWidth_(params.maxBorderWidth), innerBorderBloomWidth_(params.innerBorderBloomWidth),
+      outerBorderBloomWidth_(params.outerBorderBloomWidth), sdfImage_(params.sdfImage), sdfShape_(params.sdfShape),
+      lightMask_(params.lightMask)
+{}
+
+std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& canvas,
+    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
+{
+    if (!image) {
+        LOGE("GESDFEdgeLight::OnProcessImage image is null");
+        return image;
+    }
+    if (!lightMask_) {
+        LOGE("GESDFEdgeLight::OnProcessImage lightMask_ is null");
+        return image;
+    }
+
+    const float imageWidth = image->GetWidth();
+    const float imageHeight = image->GetHeight();
+    // Priority: sdfImage_ > sdfShape_
+    // Generate SDF image from shape if needed
+    if (!sdfImage_) {
+        sdfImage_ = GenerateSDFFromShape(canvas, sdfShape_, imageWidth, imageHeight, image->GetImageInfo());
+    }
+    if (!blurredSdfImage_) {
+        blurredSdfImage_ = BlurSdfMap(canvas, sdfImage_, DEFAULT_RADIUS);
+    }
+    auto builder = MakeEffectShader(imageWidth, imageHeight);
+    if (!builder) {
+        LOGE("GESDFEdgeLight::OnProcessImage builder is null");
+        return image;
+    }
+
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+    if (!resultImage) {
+        LOGE("GESDFEdgeLight::OnProcessImage resultImage is null");
+        return image;
+    }
+
+    return resultImage;
+}
+
+std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
+    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius)
+{
+    if (!sdfImage) {
+        LOGE("GESDFEdgeLight::BlurSdfMap input is invalid");
+        return nullptr;
+    }
+
+    Drawing::Rect imageRect = { 0, 0, sdfImage->GetWidth(), sdfImage->GetHeight() };
+
+    Drawing::GEMESABlurShaderFilterParams params;
+    params.radius = radius;
+    GEMESABlurShaderFilter blurFilter(params);
+
+    auto blurImage = blurFilter.OnProcessImage(canvas, sdfImage, imageRect, imageRect);
+    if (!blurImage) {
+        LOGE("GESDFEdgeLight::BlurSdfMap blur error");
+        return sdfImage;
+    }
+    return blurImage;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(float imageWidth, float imageHeight)
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> effectShader_;
+    static auto effectShader = Drawing::RuntimeEffect::CreateForShader(SHADER);
+    if (!effectShader) {
+        LOGE("MakeEffectShader::RuntimeShader effect error\n");
+        return nullptr;
+    }
+
     if (!sdfImage_ || !blurredSdfImage_ || !lightMask_) {
         LOGE("GESDFEdgeLight::MakeEffectShader input is invalid");
         return nullptr;
     }
-    if (!effectShader_) {
-        effectShader_ = Drawing::RuntimeEffect::CreateForShader(SHADER);
-        if (!effectShader_) {
-            LOGE("MakeEffectShader::RuntimeShader effect error\n");
-            return nullptr;
-        }
-    }
 
-    Drawing::Matrix matrix;
+    const Drawing::Matrix matrix;
+    const Drawing::SamplingOptions sampling(Drawing::FilterMode::LINEAR);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
-        std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader_);
+        std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader);
 
     builder->SetUniform("iResolution", imageWidth, imageHeight);
 
-    auto sdfImageShader = Drawing::ShaderEffect::CreateImageShader(*sdfImage_, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    builder->SetChild("sdfImageShader", sdfImageShader);
-    auto blurredSdfImageShader = Drawing::ShaderEffect::CreateImageShader(*blurredSdfImage_, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    builder->SetChild("blurredSdfImageShader", blurredSdfImageShader);
+    builder->SetChild("sdfImageShader", Drawing::ShaderEffect::CreateImageShader(*sdfImage_, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, sampling, matrix));
+
+    builder->SetChild("blurredSdfImageShader", Drawing::ShaderEffect::CreateImageShader(
+        *blurredSdfImage_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
     auto lightMaskShader = lightMask_->GenerateDrawingShader(imageWidth, imageHeight);
     builder->SetChild("lightMaskShader", lightMaskShader);
 
