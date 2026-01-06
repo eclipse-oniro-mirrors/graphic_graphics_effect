@@ -761,7 +761,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NormalCase, TestSize.Level1)
 
     EXPECT_FALSE(result.isHpsBlurApplied);
     EXPECT_FALSE(result.hasDrawnOnCanvas);
-    // Currently, grey can only be consumed by hps build pass. If hps is not supported, it will be null. 
+    // Currently, grey can only be consumed by hps build pass. If hps is not supported, it will be null.
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(*canvas_);
     if (hpsEffectFilter->IsEffectSupported(visualEffect)) {
         EXPECT_NE(outImage, nullptr);
