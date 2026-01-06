@@ -17,6 +17,7 @@
 
 #include "ge_render.h"
 #include "ge_visual_effect_impl.h"
+#include "pipeline/rs_paint_filter_canvas.h"
 #include "render_context/render_context.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 
@@ -74,7 +75,10 @@ void GERenderTest::SetUp()
     imageInfo_ = Drawing::ImageInfo { rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_8888,
         Drawing::AlphaType::ALPHATYPE_OPAQUE };
     surface_ = CreateSurface();
-    canvas_ = surface_->GetCanvas();
+    ASSERT_NE(surface_, nullptr);
+    canvas_ = std::make_shared<RSPaintFilterCanvas>(surface_.get());
+    ASSERT_NE(canvas_, nullptr);
+    HpsEffectFilter::UnitTestSetExtensionProperties({}); // reset hps extensions to prevent side effects
 }
 
 void GERenderTest::TearDown() {}
@@ -757,7 +761,13 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NormalCase, TestSize.Level1)
 
     EXPECT_FALSE(result.isHpsBlurApplied);
     EXPECT_FALSE(result.hasDrawnOnCanvas);
-    EXPECT_NE(outImage, nullptr);
+    // Currently, grey can only be consumed by hps build pass. If hps is not supported, it will be null.
+    auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(*canvas_);
+    if (hpsEffectFilter->IsEffectSupported(visualEffect)) {
+        EXPECT_NE(outImage, nullptr);
+    } else {
+        EXPECT_EQ(outImage, nullptr);
+    }
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_NormalCase end";
 }
