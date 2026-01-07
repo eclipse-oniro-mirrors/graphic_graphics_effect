@@ -47,11 +47,6 @@ private:
     int spreadFactor_ = 64;
     bool generateDerivs_ = true;
 
-    bool InitJFAPrepareEffect();
-    bool InitJfaIterationEffect();
-    bool InitJfaProcessResultEffect();
-    bool InitFillDerivEffect();
-
     std::shared_ptr<Drawing::Image> RunJFAPrepareEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
         const Drawing::SamplingOptions& samplingOptions, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::ColorType& outputColorType);
