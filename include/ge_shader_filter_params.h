@@ -748,6 +748,14 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX[] = "FrostedGlassEffe
 
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MATERIALCOLOR[] = "FrostedGlassEffect_MaterialColor";
 
+// Dark mode parameters and scale
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_WEIGHTSEMBOSS[] = "FrostedGlassEffect_DarkModeWeightsEmboss";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGRATES[] = "FrostedGlassEffect_DarkModeBgRates";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGKBS[] = "FrostedGlassEffect_DarkModeBgKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGPOS[] = "FrostedGlassEffect_DarkModeBgPos";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGNEG[] = "FrostedGlassEffect_DarkModeBgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE[] = "FrostedGlassEffect_DarkScale";
+
 struct GEFrostedGlassEffectParams {
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
@@ -786,6 +794,13 @@ struct GEFrostedGlassEffectParams {
     Drawing::Matrix snapshotMatrix; // effect component total matrix
     float refractOutPx = 0.8f; // envlight refraction outward sampling degree
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    // Dark mode parameters and scale
+    Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
+    Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    float darkScale = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
 

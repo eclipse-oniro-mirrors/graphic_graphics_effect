@@ -153,6 +153,9 @@ void GEVisualEffectContainer::UpdateDarkScale(float darkScale)
         if (vef->GetName() == GE_FILTER_FROSTED_GLASS) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_DARK_SCALE, darkScale);
         }
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE, darkScale);
+        }
     }
 }
 
