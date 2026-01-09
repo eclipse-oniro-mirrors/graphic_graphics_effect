@@ -672,6 +672,7 @@ bool HpsEffectFilter::DrawImageWithHpsUpscale(Drawing::Canvas& canvas,
     canvas.AttachBrush(brush);
     canvas.DrawRect(originDst_);
     canvas.DetachBrush();
+    outImage = imageCache;
     return true;
 }
 
@@ -763,6 +764,7 @@ bool HpsEffectFilter::IsNeedDownscale()
 bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
     std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext)
 {
+    outImage = nullptr;
     if (image == nullptr || hpsEffect_.empty()) {
         LOGD("HpsEffectFilter::ApplyHpsEffect image is null or hpsEffect_ is empty");
         return false;
