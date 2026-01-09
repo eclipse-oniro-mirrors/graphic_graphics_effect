@@ -30,34 +30,33 @@ const std::string JFA_PREPARE_SHADER = R"(
     uniform float spreadFactor;
     const float SQRT_2 = 1.41421356;
 
-    vec2 getGradient(vec2 fragCoord) { 
-        const vec2 h = vec2(0.5, 0); 
-        return vec2(imageInput.eval(fragCoord + h.xy).a - imageInput.eval(fragCoord - h.xy).a, 
-                imageInput.eval(fragCoord + h.yx).a - imageInput.eval(fragCoord - h.yx).a); 
-    } 
-    
-    half4 main(vec2 fragCoord) { 
-        vec2 centerFragCoord = fragCoord + vec2(0.5); 
+    vec2 getGradient(vec2 fragCoord) {
+        const vec2 h = vec2(0.5, 0);
+        return vec2(imageInput.eval(fragCoord + h.xy).a - imageInput.eval(fragCoord - h.xy).a,
+                imageInput.eval(fragCoord + h.yx).a - imageInput.eval(fragCoord - h.yx).a);
+    }
+    half4 main(vec2 fragCoord) {
+        vec2 centerFragCoord = fragCoord + vec2(0.5);
 
-        float imageSample = imageInput.eval(centerFragCoord).a; 
-    
-        if (imageSample == 0) { 
-            return half4(1, 1, 0.5, 0.5); 
-        } 
-        if (imageSample == 1) { 
-            return half4(0.5, 0.5, 1, 1); 
-        } 
-        vec2 grad = getGradient(centerFragCoord); 
-        vec2 normGrad = normalize(grad); 
-        vec2 edgeCoords = vec2(0.5); 
+        float imageSample = imageInput.eval(centerFragCoord).a;
 
-        float borderCoeff = (imageSample - 0.5) * SQRT_2; // determine how far the actual border is from sample value 
-        edgeCoords -= normGrad * borderCoeff / (2 * spreadFactor); 
-    
-        if (borderCoeff < 0) { 
-            return half4(edgeCoords, 0.5, 0.5); 
-        } 
-        return half4(0.5, 0.5, edgeCoords); 
+        if (imageSample == 0) {
+            return half4(1, 1, 0.5, 0.5);
+        }
+        if (imageSample == 1) {
+            return half4(0.5, 0.5, 1, 1);
+        }
+        vec2 grad = getGradient(centerFragCoord);
+        vec2 normGrad = normalize(grad);
+        vec2 edgeCoords = vec2(0.5);
+
+        float borderCoeff = (imageSample - 0.5) * SQRT_2; // determine how far the actual border is from sample value
+        edgeCoords -= normGrad * borderCoeff / (2 * spreadFactor);
+
+        if (borderCoeff < 0) {
+            return half4(edgeCoords, 0.5, 0.5);
+        }
+        return half4(0.5, 0.5, edgeCoords);
     }
 )";
 
