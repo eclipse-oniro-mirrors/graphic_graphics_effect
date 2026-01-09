@@ -27,16 +27,36 @@ constexpr int TWO = 2;
 
 const std::string JFA_PREPARE_SHADER = R"(
     uniform shader imageInput;
+    uniform float spreadFactor;
+    const float SQRT_2 = 1.41421356;
 
+    vec2 getGradient(vec2 fragCoord) {
+        const vec2 h = vec2(0.5, 0);
+        return vec2(imageInput.eval(fragCoord + h.xy).a - imageInput.eval(fragCoord - h.xy).a,
+                imageInput.eval(fragCoord + h.yx).a - imageInput.eval(fragCoord - h.yx).a);
+    }
     half4 main(vec2 fragCoord) {
-        half4 O = half4(0.5);
+        vec2 centerFragCoord = fragCoord + vec2(0.5);
 
-        half imageSample = step(1.0, imageInput.eval(fragCoord).a);
+        float imageSample = imageInput.eval(centerFragCoord).a;
 
-        O.xy += 0.5 * half2(1.0 - imageSample);
-        O.zw += 0.5 * half2(imageSample);
+        if (imageSample == 0) {
+            return half4(1, 1, 0.5, 0.5);
+        }
+        if (imageSample == 1) {
+            return half4(0.5, 0.5, 1, 1);
+        }
+        vec2 grad = getGradient(centerFragCoord);
+        vec2 normGrad = normalize(grad);
+        vec2 edgeCoords = vec2(0.5);
 
-        return O;
+        float borderCoeff = (imageSample - 0.5) * SQRT_2; // determine how far the actual border is from sample value
+        edgeCoords -= normGrad * borderCoeff / (2 * spreadFactor);
+
+        if (borderCoeff < 0) {
+            return half4(edgeCoords, 0.5, 0.5);
+        }
+        return half4(0.5, 0.5, edgeCoords);
     }
 )";
 
