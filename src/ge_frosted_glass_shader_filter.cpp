@@ -389,6 +389,8 @@ void InterpolateAdaptiveParams(Drawing::GEFrostedGlassShaderFilterParams& params
     params.bgKBS = Interpolate(params.bgKBS, params.darkModeBgKBS, t);
     params.bgPos = Interpolate(params.bgPos, params.darkModeBgPos, t);
     params.bgNeg = Interpolate(params.bgNeg, params.darkModeBgNeg, t);
+    params.edLightAngles = Interpolate(params.edLightAngles, params.darkModeEdLightAngles, t);
+    params.edLightKBS = Interpolate(params.edLightKBS, params.darkModeEdLightKBS, t);
 }
 } // namespace FrostedGlass
 

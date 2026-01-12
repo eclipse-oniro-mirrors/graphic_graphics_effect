@@ -754,6 +754,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGRATES[] = "FrostedGlass
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGKBS[] = "FrostedGlassEffect_DarkModeBgKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGPOS[] = "FrostedGlassEffect_DarkModeBgPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGNEG[] = "FrostedGlassEffect_DarkModeBgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTANGLES[] = "FrostedGlassEffect_DarkModeEdLightAngles";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTKBS[] = "FrostedGlassEffect_DarkModeEdLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE[] = "FrostedGlassEffect_DarkScale";
 
 struct GEFrostedGlassEffectParams {
@@ -800,6 +802,8 @@ struct GEFrostedGlassEffectParams {
     Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
     Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
     Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
     float darkScale = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams, GE_SHADER_FROSTED_GLASS_EFFECT);
@@ -1229,6 +1233,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES[] = "FrostedGlass_DarkMo
 constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS[] = "FrostedGlass_DarkModeBgKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS[] = "FrostedGlass_DarkModeBgPos";
 constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG[] = "FrostedGlass_DarkModeBgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTANGLES[] = "FrostedGlass_DarkModeEdLightAngles";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTKBS[] = "FrostedGlass_DarkModeEdLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_DARK_SCALE[] = "FrostedGlass_DarkScale";
 
 struct GEFrostedGlassShaderFilterParams {
@@ -1279,6 +1285,8 @@ struct GEFrostedGlassShaderFilterParams {
     Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
     Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
     Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
     float darkScale = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
