@@ -2932,6 +2932,15 @@ void GEVisualEffectImpl::HandleSetFrostedGlassWeights(const std::string& tag, co
     }
 }
 
+namespace {
+Vector2f ClampAnglePair(const std::pair<float, float>& param)
+{
+    constexpr float MIN_V = 0.0f;
+    constexpr float MAX_V = 360.0f;
+    return Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_V, MAX_V));
+};
+} // namespace
+
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param)
 {
     if (frostedGlassParams_ == nullptr) {
@@ -2967,17 +2976,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassParams_->edLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassParams_->darkModeEdLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassParams_->darkModeEdLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLDIR) {
@@ -3158,17 +3161,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassEffectParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassEffectParams_->edLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassEffectParams_->darkModeEdLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassEffectParams_->darkModeEdLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR) {
