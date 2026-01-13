@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_GE_COLOR_GRADIENT_EFFECT_H
 
 #include "ge_common.h"
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_visual_effect.h"
 
@@ -33,6 +34,7 @@ public:
     GEColorGradientEffect(const GEColorGradientEffect&&) = delete;
     GEColorGradientEffect& operator=(const GEColorGradientEffect&) = delete;
     GEColorGradientEffect& operator=(const GEColorGradientEffect&&) = delete;
+    DECLARE_GEFILTER_TYPEFUNC(GEColorGradientEffect, Drawing::GEXColorGradientEffectParams);
 
     const std::string GetDescription() const { return "GEColorGradientEffect"; }
 
