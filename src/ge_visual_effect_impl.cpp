@@ -2543,6 +2543,8 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, fl
             [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[10] = p;}},
         {GEX_SHADER_COLOR_GRADIENT_EFFECT_STRENGTH11,
             [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->strengths_[11] = p;}},
+        {GEX_SHADER_COLOR_GRADIENT_EFFECT_BRIGHTNESS,
+            [](GEVisualEffectImpl* obj, float p) {obj->colorGradientEffectParams_->brightness_ = p;}},
     };
     auto it = actions.find(tag);
     if (it != actions.end()) {
