@@ -54,6 +54,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
     float gradientBlend_ = 6.0f;
     float gradientBlendK_ = 20.0f;
+    float brightness_ = 0.0f;
 };
 
 } // namespace Rosen

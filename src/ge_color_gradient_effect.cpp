@@ -26,6 +26,8 @@ namespace Rosen {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffectHasMask_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_brightnessShaderEffect_ = nullptr;
+
 constexpr static size_t GRADIENT_POSITION_CHANNEL = 2;
 constexpr static size_t GRADIENT_ARRAY_NUM = 12;
 constexpr static size_t GRADIENT_COLOR_CHANNEL = 4;
@@ -155,6 +157,21 @@ const std::string COLOR_GRADIENT_SHADER_COMMN(
     }
     )");
 
+const std::string BRIGHTNESS_SHADER_CODE(
+    R"(
+        uniform float brightness;
+        uniform shader coloGradientShader;
+        half4 main(vec2 fragCoord)
+        {
+            half4 color = colorGradientShader.eval(fragCoord);
+            color = unpremul(color);
+            color.rgb += brightness;
+            color.rgb *= color.a;
+            return color;
+        }
+    )"
+)
+
 const std::string COLOR_GRADIENT_SHADER_STRING = COLOR_GRADIENT_SHADER_HEAD +
     COLOR_GRADIENT_SHADER_COMMN + COLOR_GRADIENT_SHADER_END;
 const std::string COLOR_GRADIENT_SHADER_STRING_WITH_MASK = COLOR_GRADIENT_SHADER_WITH_MASK_HEAD +
@@ -182,6 +199,23 @@ void MakeColorGradientEffectWithMask()
         LOGE("GEColorGradientEffect::MakeColorGradientEffectWithMask colorGradientShaderEffect create failed");
     }
 }
+
+void MakeBrightnessEffect()
+{
+    if (g_brightnessShaderEffect_ != nullptr) {
+        return;
+    }
+    g_brightnessShaderEffect_ =
+        Drawing::RuntimeEffect::CreateForShader(BRIGHTNESS_SHADER_CODE);
+    if (g_brightnessShaderEffect_ == nullptr) {
+        LOGE("GEColorGradientEffect::MakeColorGradientEffectWithMask brightnessShaderEffect create failed");
+    }
+}
+
+inline bool COLOR_GRADIENT_NEQ(float x, float y, float epsilon)
+{
+    return (std::abs((x) - (y)) > (epsilon));
+}
 } // namespace
 
 GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffectParams& param)
@@ -197,6 +231,7 @@ GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffe
     mask_ = param.mask_;
     gradientBlend_ = param.blend_;
     gradientBlendK_ = param.blendk_;
+    brightness_ = param.brightness_;
 }
 
 float GEColorGradientEffect::CalculateCompressRatio()
@@ -265,6 +300,8 @@ bool GEColorGradientEffect::CreateShaderEffect(float width, float height)
         MakeColorGradientEffect();
         isCreated = g_colorGradientShaderEffect_ != nullptr;
     }
+    MakeBrightnessEffect()
+    isCreated = isCreated && (g_brightnessShaderEffect_ != nullptr);
     return isCreated;
 }
 
@@ -331,6 +368,12 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
         return;
     }
     drShader_ = colorGradientShader;
+    if (COLOR_GRADIENT_NEQ(brightness_, 0.0f, 0.0001f)) {
+        auto brightnessBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_brightnessShaderEffect_);
+        brightnessBuilder->SetUniform("brightness", brightness_);
+        brightnessBuilder->SetUniform("ColorGradientShader", colorGradientShader);
+        drShader_ = brightnessBuilder->MakeShader(nullptr, false);
+    }
 }
 
 Drawing::Rect GEColorGradientEffect::GetSubtractedRect(float width, float height) const
