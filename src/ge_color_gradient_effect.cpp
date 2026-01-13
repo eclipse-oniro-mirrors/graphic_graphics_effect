@@ -169,8 +169,7 @@ const std::string BRIGHTNESS_SHADER_CODE(
             color.rgb *= color.a;
             return color;
         }
-    )"
-)
+    )");
 
 const std::string COLOR_GRADIENT_SHADER_STRING = COLOR_GRADIENT_SHADER_HEAD +
     COLOR_GRADIENT_SHADER_COMMN + COLOR_GRADIENT_SHADER_END;
@@ -300,7 +299,7 @@ bool GEColorGradientEffect::CreateShaderEffect(float width, float height)
         MakeColorGradientEffect();
         isCreated = g_colorGradientShaderEffect_ != nullptr;
     }
-    MakeBrightnessEffect()
+    MakeBrightnessEffect();
     isCreated = isCreated && (g_brightnessShaderEffect_ != nullptr);
     return isCreated;
 }
@@ -371,7 +370,7 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
     if (COLOR_GRADIENT_NEQ(brightness_, 0.0f, 0.0001f)) {
         auto brightnessBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_brightnessShaderEffect_);
         brightnessBuilder->SetUniform("brightness", brightness_);
-        brightnessBuilder->SetUniform("ColorGradientShader", colorGradientShader);
+        brightnessBuilder->SetChild("ColorGradientShader", colorGradientShader);
         drShader_ = brightnessBuilder->MakeShader(nullptr, false);
     }
 }
