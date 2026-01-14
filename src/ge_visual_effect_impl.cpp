@@ -2932,6 +2932,15 @@ void GEVisualEffectImpl::HandleSetFrostedGlassWeights(const std::string& tag, co
     }
 }
 
+namespace {
+Vector2f ClampAnglePair(const std::pair<float, float>& param)
+{
+    constexpr float MIN_V = 0.0f;
+    constexpr float MAX_V = 360.0f;
+    return Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_V, MAX_V));
+};
+} // namespace
+
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param)
 {
     if (frostedGlassParams_ == nullptr) {
@@ -2967,10 +2976,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassParams_->edLightAngles = ClampAnglePair(param);
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTANGLES) {
+        frostedGlassParams_->darkModeEdLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLDIR) {
@@ -3018,6 +3028,11 @@ void GEVisualEffectImpl::HandleSetFrostedGlassKBS(const std::string& tag, const 
 
     if (tag == GE_FILTER_FROSTED_GLASS_EDLKBS) {
         frostedGlassParams_->edLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTKBS) {
+        frostedGlassParams_->darkModeEdLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
             std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 }
@@ -3124,6 +3139,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
         constexpr float MAX_S = 500.0f;
         frostedGlassEffectParams_->refractOutPx = std::clamp(param, MIN_S, MAX_S);
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE) {
+        constexpr float MIN_S = 0.0f;
+        constexpr float MAX_S = 1.0f;
+        frostedGlassEffectParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, const std::pair<float, float>& param)
@@ -3141,10 +3161,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES) {
-        constexpr float MIN_V = 0.0f;
-        constexpr float MAX_V = 360.0f;
-        frostedGlassEffectParams_->edLightAngles = Vector2f(std::clamp(param.first, MIN_V, MAX_V),
-            std::clamp(param.second, MIN_V, MAX_V));
+        frostedGlassEffectParams_->edLightAngles = ClampAnglePair(param);
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTANGLES) {
+        frostedGlassEffectParams_->darkModeEdLightAngles = ClampAnglePair(param);
     }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR) {
@@ -3174,6 +3195,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectRates(const std::string& tag
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGRATES) {
         frostedGlassEffectParams_->bgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
+            std::clamp(param.second, V_MIN, V_MAX));
+    }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGRATES) {
+        frostedGlassEffectParams_->darkModeBgRates = Vector2f(std::clamp(param.first, V_MIN, V_MAX),
             std::clamp(param.second, V_MIN, V_MAX));
     }
 
@@ -3214,6 +3239,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
         frostedGlassEffectParams_->weightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_WEIGHTSEMBOSS) {
+        frostedGlassEffectParams_->darkModeWeightsEmboss = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
+            std::clamp(param.second, MIN_W, MAX_W));
+    }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL) {
         frostedGlassEffectParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
@@ -3235,6 +3264,10 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectKBS(const std::string& tag, 
         frostedGlassEffectParams_->bgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
             std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGKBS) {
+        frostedGlassEffectParams_->darkModeBgKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SDKBS) {
         frostedGlassEffectParams_->sdKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
@@ -3248,6 +3281,11 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectKBS(const std::string& tag, 
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS) {
         frostedGlassEffectParams_->edLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
+            std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTKBS) {
+        frostedGlassEffectParams_->darkModeEdLightKBS = Vector3f(std::clamp(param[NUM_0], KB_MIN, KB_MAX),
             std::clamp(param[NUM_1], KB_MIN, KB_MAX), std::clamp(param[NUM_2], S_MIN, S_MAX));
     }
 }
@@ -3264,9 +3302,17 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectPosNegCoefs(const std::strin
         frostedGlassEffectParams_->bgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
     }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGPOS) {
+        frostedGlassEffectParams_->darkModeBgPos = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
 
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG) {
         frostedGlassEffectParams_->bgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
+            std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
+    }
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGNEG) {
+        frostedGlassEffectParams_->darkModeBgNeg = Vector3f(std::clamp(param[NUM_0], V_MIN, V_MAX),
             std::clamp(param[NUM_1], V_MIN, V_MAX), std::clamp(param[NUM_2], V_MIN, V_MAX));
     }
 

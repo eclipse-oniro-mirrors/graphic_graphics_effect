@@ -23,6 +23,30 @@
 namespace OHOS {
 namespace Rosen {
 
+namespace {
+template<typename V>
+inline V Interpolate(const V& base, const V& dark, float t)
+{
+    return base * (1.0f - t) + dark * t;
+}
+} // namespace
+
+namespace FrostedGlassEffect {
+void InterpolateAdaptiveParams(Drawing::GEFrostedGlassEffectParams& params)
+{
+    const auto& t = params.darkScale;
+    // Only interpolate adaptive parameters defined in the header:
+    // Dark-mode set for FrostedGlassEffect params.
+    params.weightsEmboss = Interpolate(params.weightsEmboss, params.darkModeWeightsEmboss, t);
+    params.bgRates = Interpolate(params.bgRates, params.darkModeBgRates, t);
+    params.bgKBS = Interpolate(params.bgKBS, params.darkModeBgKBS, t);
+    params.bgPos = Interpolate(params.bgPos, params.darkModeBgPos, t);
+    params.bgNeg = Interpolate(params.bgNeg, params.darkModeBgNeg, t);
+    params.edLightAngles = Interpolate(params.edLightAngles, params.darkModeEdLightAngles, t);
+    params.edLightKBS = Interpolate(params.edLightKBS, params.darkModeEdLightKBS, t);
+}
+} // namespace FrostedGlassEffect
+
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShaderEffect = nullptr;
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
@@ -400,6 +424,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
             return nullptr;
         }
     }
+    FrostedGlassEffect::InterpolateAdaptiveParams(frostedGlassEffectParams_);
 
     std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader;
     if (auto shape = frostedGlassEffectParams_.sdfShape) {

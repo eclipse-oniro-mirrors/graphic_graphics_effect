@@ -25,6 +25,10 @@
 
 namespace OHOS {
 namespace Rosen {
+namespace FrostedGlassEffect {
+GE_EXPORT void InterpolateAdaptiveParams(Drawing::GEFrostedGlassEffectParams& params);
+}
+
 class GEFrostedGlassEffect : public GEShader {
 public:
     GEFrostedGlassEffect(const Drawing::GEFrostedGlassEffectParams& params);
