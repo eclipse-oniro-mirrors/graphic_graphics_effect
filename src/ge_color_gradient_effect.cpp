@@ -160,7 +160,7 @@ const std::string COLOR_GRADIENT_SHADER_COMMN(
 const std::string BRIGHTNESS_SHADER_CODE(
     R"(
         uniform float brightness;
-        uniform shader coloGradientShader;
+        uniform shader colorGradientShader;
         half4 main(vec2 fragCoord)
         {
             half4 color = colorGradientShader.eval(fragCoord);
@@ -207,7 +207,7 @@ void MakeBrightnessEffect()
     g_brightnessShaderEffect_ =
         Drawing::RuntimeEffect::CreateForShader(BRIGHTNESS_SHADER_CODE);
     if (g_brightnessShaderEffect_ == nullptr) {
-        LOGE("GEColorGradientEffect::MakeColorGradientEffectWithMask brightnessShaderEffect create failed");
+        LOGE("GEColorGradientEffect::MakeBrightnessEffect brightnessShaderEffect create failed");
     }
 }
 
@@ -371,7 +371,13 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
         auto brightnessBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_brightnessShaderEffect_);
         brightnessBuilder->SetUniform("brightness", brightness_);
         brightnessBuilder->SetChild("ColorGradientShader", colorGradientShader);
-        drShader_ = brightnessBuilder->MakeShader(nullptr, false);
+        auto brightnessShader = brightnessBuilder->MakeShader(nullptr, false);
+        if (!brightnessShader) {
+            LOGE("GEColorGradientEffect::MakeDrawingShader brightnessShader is nullptr");
+            drShader_ = nullptr;
+            return;
+        }
+        drShader_ = brightnessShader;
     }
 }
 
