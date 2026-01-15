@@ -27,7 +27,7 @@ namespace Rosen {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorGradientShaderEffectHasMask_ = nullptr;
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_brightnessShaderEffect_ = nullptr;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> g_brightnessShaderEffect_ = nullptr;
 
 constexpr static size_t GRADIENT_POSITION_CHANNEL = 2;
 constexpr static size_t GRADIENT_ARRAY_NUM = 12;
@@ -210,11 +210,6 @@ void MakeBrightnessEffect()
     if (g_brightnessShaderEffect_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeBrightnessEffect brightnessShaderEffect create failed");
     }
-}
-
-inline bool COLOR_GRADIENT_NEQ(float x, float y, float epsilon)
-{
-    return (std::abs((x) - (y)) > (epsilon));
 }
 } // namespace
 
