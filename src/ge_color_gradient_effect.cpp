@@ -16,6 +16,7 @@
 #include "ge_color_gradient_effect.h"
 
 #include <cmath>
+#include "ge_common.h"
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_tone_mapping_helper.h"
@@ -367,7 +368,7 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
         return;
     }
     drShader_ = colorGradientShader;
-    if (COLOR_GRADIENT_NEQ(brightness_, 0.0f, 0.0001f)) {
+    if (!GE_EQ(brightness_, 0.0f, 0.0001f)) {
         auto brightnessBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_brightnessShaderEffect_);
         brightnessBuilder->SetUniform("brightness", brightness_);
         brightnessBuilder->SetChild("colorGradientShader", colorGradientShader);
