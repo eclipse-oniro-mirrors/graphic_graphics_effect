@@ -37,7 +37,7 @@ public:
 
     void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
-    void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    virtual void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
     uint32_t Hash() const { return hash_; }
 
