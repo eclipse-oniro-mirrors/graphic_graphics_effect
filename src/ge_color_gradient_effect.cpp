@@ -226,7 +226,7 @@ GEColorGradientEffect::GEColorGradientEffect(const Drawing::GEXColorGradientEffe
     mask_ = param.mask_;
     gradientBlend_ = param.blend_;
     gradientBlendK_ = param.blendk_;
-    brightness_ = param.brightness_;
+    brightness_ = std::clamp(param.brightness_, -1.0f, 1.0f);
 }
 
 float GEColorGradientEffect::CalculateCompressRatio()
