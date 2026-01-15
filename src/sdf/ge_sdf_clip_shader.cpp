@@ -24,7 +24,7 @@ namespace Rosen {
 GESDFClipShader::GESDFClipShader(const Drawing::GESDFClipShaderParams& params) : params_(params)
 {}
 
-void GESDFClipShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f);
