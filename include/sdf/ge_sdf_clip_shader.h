@@ -35,7 +35,7 @@ public:
 
     const std::string GetDescription() const { return "GESDFClipShader"; }
 
-    void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+    void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 

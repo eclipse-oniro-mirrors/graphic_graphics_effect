@@ -53,7 +53,7 @@ void GESDFShadowShader::UpdateRectForShadow(Drawing::Rect& rect)
     }
 }
 
-void GESDFShadowShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Drawing::Rect newRect = rect;
     UpdateRectForShadow(newRect);

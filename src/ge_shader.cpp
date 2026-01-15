@@ -15,6 +15,7 @@
 #include "ge_shader.h"
 
 #include "ge_log.h"
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -49,13 +50,13 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
     return true;
 }
 
-void GEShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+void GEShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (!shader) {
-        GE_LOGE("GEShader::DrawShader: no shader generated, draw nothing");
+        GE_LOGE("GEShader::OnDrawShader: no shader generated, draw nothing");
         return;
     }
     if (TryDrawShaderWithPen(canvas, rect)) {
@@ -66,6 +67,13 @@ void GEShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
     canvas.AttachBrush(brush);
     canvas.DrawRect(rect);
     canvas.DetachBrush();
+}
+
+void GEShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    GE_TRACE_NAME_FMT("GEShader::DrawShader, Type: %s, Rect Width: %f, Height: %f",
+        TypeName().data(), rect.GetWidth(), rect.GetHeight());
+    OnDrawShader(canvas, rect);
 }
 } // namespace Rosen
 } // namespace OHOS

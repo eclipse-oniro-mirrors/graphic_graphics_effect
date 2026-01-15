@@ -2952,17 +2952,16 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const std
         frostedGlassParams_->borderSize = Vector2f(std::max(param.first, MIN_V), std::max(param.second, MIN_V));
     }
     {
-        constexpr float MIN_V = 1e-6f;
+        constexpr float MIN_V = 0.0f;
         constexpr float MAX_V = 200.0f;
-        constexpr float MIN_K = 1.0f;
         constexpr float MAX_K = 200.0f;
         if (tag == GE_FILTER_FROSTED_GLASS_BLURPARAMS) {
             frostedGlassParams_->blurParams =
-                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_K, MAX_K));
+                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_V, MAX_K));
         }
         if (tag == GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM) {
             frostedGlassParams_->darkModeBlurParam =
-                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_K, MAX_K));
+                Vector2f(std::clamp(param.first, MIN_V, MAX_V), std::clamp(param.second, MIN_V, MAX_K));
         }
     }
 

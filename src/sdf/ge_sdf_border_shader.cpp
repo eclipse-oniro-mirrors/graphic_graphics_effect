@@ -31,7 +31,7 @@ void GESDFBorderShader::MakeDrawingShader(const Drawing::Rect &rect, float progr
     drShader_ = MakeSDFBorderShader(rect);
 }
 
-void GESDFBorderShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+void GESDFBorderShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f); // not use progress
