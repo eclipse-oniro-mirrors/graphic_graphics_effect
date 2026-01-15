@@ -370,7 +370,7 @@ void GEColorGradientEffect::MakeDrawingShader(const Drawing::Rect& rect, float p
     if (COLOR_GRADIENT_NEQ(brightness_, 0.0f, 0.0001f)) {
         auto brightnessBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_brightnessShaderEffect_);
         brightnessBuilder->SetUniform("brightness", brightness_);
-        brightnessBuilder->SetChild("ColorGradientShader", colorGradientShader);
+        brightnessBuilder->SetChild("colorGradientShader", colorGradientShader);
         auto brightnessShader = brightnessBuilder->MakeShader(nullptr, false);
         if (!brightnessShader) {
             LOGE("GEColorGradientEffect::MakeDrawingShader brightnessShader is nullptr");
