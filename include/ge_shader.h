@@ -35,7 +35,9 @@ public:
 
     virtual const std::shared_ptr<Drawing::ShaderEffect>& GetDrawingShader() { return drShader_; }
 
-    virtual void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+    void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
+
+    virtual void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
     uint32_t Hash() const { return hash_; }
 

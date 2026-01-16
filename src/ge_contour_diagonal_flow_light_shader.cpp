@@ -1318,41 +1318,41 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     return blendBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 }
 
-void GEContourDiagonalFlowLightShader::DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+void GEContourDiagonalFlowLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     if (!rect.IsValid()) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader canvas is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader canvas is nullptr.");
         return;
     }
     Preprocess(canvas, rect); // to calculate your cache data
     if (cacheAnyPtr_ == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader cache is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader cache is nullptr.");
         return;
     }
     auto precalculationImage = std::any_cast<CacheDataType>(*cacheAnyPtr_).blurredSdfMaskImg;
     if (precalculationImage == nullptr) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader cache img is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader cache img is nullptr.");
         return;
     }
     auto lightImg = DrawRuntimeShader(canvas, rect);
     if (!lightImg) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader light img is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader light img is nullptr.");
         return;
     }
     float lightCoreBlurRadius = 3.0; // 3.0: blur radius for light core for anti-aliasing
     auto blurredLightImg = BlurImg(canvas, rect, lightImg, lightCoreBlurRadius);
     if (!blurredLightImg) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader blurredLightImg is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader blurredLightImg is nullptr.");
         return;
     }
     auto blurImg = blurShader_->ProcessImage(canvas, lightImg, rect, rect);
     if (!blurImg) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader halo img is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader halo img is nullptr.");
         return;
     }
     auto resImg = BlendImg(canvas, precalculationImage, blurredLightImg, blurImg);
     if (!resImg) {
-        GE_LOGE("GEContourDiagonalFlowLightShader DrawShader blendimg is nullptr.");
+        GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader blendimg is nullptr.");
         return;
     }
     Drawing::Brush brush;
