@@ -693,6 +693,7 @@ constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_MASK[] = "ColorGradientEffect_Ma
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR_NUMBER[] = "ColorGradientEffect_ColorNumber";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND[] = "ColorGradientEffect_Blend";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_BLEND_K[] = "ColorGradientEffect_BlendK";
+constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_BRIGHTNESS[] = "ColorGradientEffect_Brightness";
 
 constexpr int COLOR_GRADIENT_ARRAY_SIZE = 12;
 struct GEXColorGradientEffectParams {
@@ -703,6 +704,7 @@ struct GEXColorGradientEffectParams {
     float blend_ = 0.0f;
     float blendk_ = 0.0f;
     std::shared_ptr<GEShaderMask> mask_;
+    float brightness_ = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
