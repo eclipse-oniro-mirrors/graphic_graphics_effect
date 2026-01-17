@@ -14,7 +14,9 @@
  */
 
 #include "sdf/ge_sdf_pixelmap_shader_shape.h"
+
 #include "ge_log.h"
+
 #include "utils/ge_trace.h"
 
 namespace OHOS {
@@ -38,14 +40,13 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(fl
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has empty shader");
         return nullptr;
     }
-    auto sdfPixelmapShapeShader = GenerateSDFShaderEffect(pixelmapShader, builder);
+    auto sdfPixelmapShapeShader = GenerateSDFShaderEffect(pixelmapShader, params_.image->GetImageInfo(), builder);
     return sdfPixelmapShapeShader;
 }
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    GE_TRACE_NAME_FMT("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g",
-        width, height);
+    GE_TRACE_NAME_FMT("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
     if (params_.image == nullptr) {
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal has empty image");
         return nullptr;
@@ -60,15 +61,16 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShaderHas
         LOGE("GESDFPixelmapShaderShape::GenerateDrawingShaderHasNormal has empty shader");
         return nullptr;
     }
-    auto sdfPixelmapShapeShader = GenerateSDFNormalShaderEffect(pixelmapShader, width, height, builder);
+    auto sdfPixelmapShapeShader =
+        GenerateSDFNormalShaderEffect(pixelmapShader, params_.image->GetImageInfo(), width, height, builder);
     return sdfPixelmapShapeShader;
 }
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GeneratePixelmapShader() const
 {
     Drawing::Matrix matrix;
-    return Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    return Drawing::ShaderEffect::CreateImageShader(*params_.image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFPixelmapShaderShapeBuilder() const
@@ -80,10 +82,19 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
 
     static constexpr char prog[] = R"(
         uniform shader pixelmapShader;
+        uniform vec2 pixelmapSize;
+
+        vec4 SafeFetch(vec2 fragCoord) {
+            if (fragCoord.x < 0 || fragCoord.x >= pixelmapSize.x || fragCoord.y < 0 || fragCoord.y >= pixelmapSize.y) {
+                return vec4(0.5, 0.5, 0.0, 1);
+            }
+            return pixelmapShader.eval(fragCoord);
+        }
+
         half4 main(vec2 fragCoord)
         {
             // SDF will be mapped from [0, 1] to [-63.5, 64]
-            vec4 pixelmapShape = pixelmapShader.eval(fragCoord);
+            vec4 pixelmapShape = SafeFetch(fragCoord);
             return half4(pixelmapShape.xyz, pixelmapShape.a * 127.5 - 63.5);
         }
     )";
@@ -107,6 +118,15 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
 
     static constexpr char prog[] = R"(
         uniform shader pixelmapShader;
+        uniform vec2 pixelmapSize;
+
+        vec4 SafeFetch(vec2 fragCoord) {
+            if (fragCoord.x < 0 || fragCoord.x >= pixelmapSize.x || fragCoord.y < 0 || fragCoord.y >= pixelmapSize.y) {
+                return vec4(0.5, 0.5, 0.0, 1);
+            }
+            return pixelmapShader.eval(fragCoord);
+        }
+
         uniform vec2 centerPos;
         const float N_SCALE = 2048.0;
 
@@ -121,7 +141,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
         {
             // Gradient(rg channel) will be mapped from [0, 1] to [-1, 1]
             // SDF(a channel) will be mapped from [0, 1] to [-63.5, 64]
-            vec4 pixelmapShape = pixelmapShader.eval(fragCoord);
+            vec4 pixelmapShape = SafeFetch(fragCoord);
             return half4(pixelmapShape.xy * 2 - 1, EncodeDir(fragCoord - centerPos), pixelmapShape.a * 127.5 - 63.5);
         }
     )";
@@ -137,7 +157,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
 }
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFShaderEffect(
-    std::shared_ptr<ShaderEffect> pixelmapShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
+    std::shared_ptr<ShaderEffect> pixelmapShader, const Drawing::ImageInfo& pixelmapInfo,
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {
         LOGE("GESDFPixelmapShaderShape::GenerateSDFShaderEffect builder error");
@@ -145,6 +166,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFShaderEffect(
     }
 
     builder->SetChild("pixelmapShader", pixelmapShader);
+    builder->SetUniform("pixelmapSize", pixelmapInfo.GetWidth(), pixelmapInfo.GetHeight());
 
     auto sdfPixelmapShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfPixelmapShapeShader) {
@@ -154,7 +176,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFShaderEffect(
 }
 
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFNormalShaderEffect(
-    std::shared_ptr<ShaderEffect> pixelmapShader, float width, float height,
+    std::shared_ptr<ShaderEffect> pixelmapShader, const Drawing::ImageInfo& pixelmapInfo, float width, float height,
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
 {
     if (!builder) {
@@ -164,6 +186,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFNormalShaderE
 
     builder->SetChild("pixelmapShader", pixelmapShader);
     builder->SetUniform("centerPos", width * HALF, height * HALF);
+    builder->SetUniform("pixelmapSize", pixelmapInfo.GetWidth(), pixelmapInfo.GetHeight());
 
     auto sdfPixelmapShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfPixelmapShapeShader) {
@@ -172,6 +195,6 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFNormalShaderE
     return sdfPixelmapShapeShader;
 }
 
-} // Drawing
+} // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -14,8 +14,10 @@
  */
 
 #include "sdf/ge_sdf_union_op_shader_shape.h"
-#include "utils/ge_trace.h"
+
 #include "ge_log.h"
+
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -88,7 +90,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFUn
         {
             vec4 leftShape = left.eval(fragCoord);
             vec4 rightShape = right.eval(fragCoord);
-            return min(leftShape, rightShape);
+
+            // It is required for input SDF to be in this format: vec4(any, any, any, SDF)
+            return leftShape.a < rightShape.a ? leftShape : rightShape;
         }
     )";
 
@@ -216,6 +220,6 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateSmoothUnionShader
     }
     return sdfSmoothUnionShapeShader;
 }
-} // Drawing
+} // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -200,7 +200,8 @@ HWTEST_F(GESDFPixelmapShaderShapeTest, GenerateSDFShaderEffect_001, TestSize.Lev
     GESDFPixelmapShaderShape shape(param);
     auto pixelmapShader = shape.GeneratePixelmapShader();
     EXPECT_NE(pixelmapShader, nullptr);
-    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, nullptr);
+    Drawing::ImageInfo info;
+    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, info, nullptr);
     EXPECT_EQ(shader, nullptr);
 
     GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_001 end";
@@ -222,7 +223,8 @@ HWTEST_F(GESDFPixelmapShaderShapeTest, GenerateSDFShaderEffect_002, TestSize.Lev
     EXPECT_NE(pixelmapShader, nullptr);
     auto builder = shape.GetSDFPixelmapShaderShapeBuilder();
     EXPECT_NE(builder, nullptr);
-    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, builder);
+    Drawing::ImageInfo info;
+    auto shader = shape.GenerateSDFShaderEffect(pixelmapShader, info, builder);
     EXPECT_NE(shader, nullptr);
 
     GTEST_LOG_(INFO) << "GESDFPixelmapShaderShapeTest GenerateSDFShaderEffect_002 end";

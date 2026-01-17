@@ -23,7 +23,7 @@
 
 namespace OHOS::Rosen {
 namespace {
-constexpr float DEFAULT_RADIUS = 6.0f;
+constexpr float DEFAULT_RADIUS = 3.0f;
 
 std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::GESDFShaderShape>& sdfShape, float imageWidth, float imageHeight,
@@ -42,14 +42,18 @@ std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
     constexpr char passThrough[] = R"(
         uniform shader inputShader;
         vec4 main(vec2 fragCoord) {
-            return inputShader.eval(fragCoord);
+            return (inputShader.eval(fragCoord) + 63.5) / 127.5;
         }
     )";
     static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(passThrough);
 
     Drawing::RuntimeShaderBuilder builder(passThroughEffect);
     builder.SetChild("inputShader", shader);
-    return builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+
+    // Use f16 format to avoid quantization issues with [-64, 64] range
+    Drawing::ImageInfo f16ImageInfo = imageInfo;
+    f16ImageInfo.SetColorType(Drawing::ColorType::COLORTYPE_RGBA_F16);
+    return builder.MakeImage(canvas.GetGPUContext().get(), nullptr, f16ImageInfo, false);
 }
 
 constexpr char SHADER[] = R"(
