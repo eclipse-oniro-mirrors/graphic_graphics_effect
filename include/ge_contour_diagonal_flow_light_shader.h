@@ -89,6 +89,8 @@ private:
         int gridIndex, const Drawing::Rect& wholeRect, const Drawing::Rect& rect);
     void ConvertImage(Drawing::Canvas& canvas, const Drawing::Rect& rect,
         const std::shared_ptr<Drawing::Image>& sdfImg);
+    std::shared_ptr<Drawing::Image> DrawWithLightSurface(Drawing::Canvas& canvas,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder, const Drawing::ImageInfo& imageInfo);
 private:
     size_t numCurves_ = 0;
     std::shared_ptr<Drawing::Surface> offscreenSurface_;
@@ -97,13 +99,14 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
     std::vector<float> controlPoints_{};
     size_t pointCnt_ = 0; // real input Point Cnt
-    std::shared_ptr<GEKawaseBlurShaderFilter> blurShader_ = nullptr;
 
     // grid : curves, boundingbox(xmin, xmax, ymin, ymax)
     std::vector<std::pair<std::vector<float>, Grid>> curvesInGrid_{};
     std::vector<std::vector<float>> segmentIndex_{};
     std::vector<float> curveWeightPrefix_{};
     std::vector<float> curveWeightCurrent_{};
+    Drawing::ImageInfo imgInfo_{};
+    std::shared_ptr<Drawing::Surface> lightSurface_ = nullptr;
 };
 } // namespace Rosen
 } // namespace OHOS

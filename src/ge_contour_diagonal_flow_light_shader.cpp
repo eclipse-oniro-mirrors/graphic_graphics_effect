@@ -17,6 +17,10 @@
 
 #include <algorithm>
 #include <array>
+#ifdef GE_OHOS
+#include <charconv>
+#include <cstdlib>
+#endif
 #include <iomanip>
 #include <sstream>
 #include <string>
@@ -24,9 +28,13 @@
 #include "common/rs_vector2.h"
 #include "draw/surface.h"
 #include "ge_kawase_blur_shader_filter.h"
+#include "ge_mesa_blur_shader_filter.h"
 #include "ge_log.h"
+#ifdef GE_OHOS
+#include "ge_system_properties.h"
+#endif
 #include "ge_visual_effect_impl.h"
- 
+
 #ifdef USE_M133_SKIA
 #include "src/core/SkChecksum.h"
 #else
@@ -35,6 +43,33 @@
 
 namespace OHOS {
 namespace Rosen {
+
+#ifdef GE_OHOS
+int ConvertToInt(const char* originValue, int defaultValue)
+{
+    if (originValue == nullptr) {
+        return defaultValue;
+    }
+    int value = defaultValue;
+    auto result = std::from_chars(originValue, originValue + std::strlen(originValue), value);
+    if (result.ec == std::errc()) {
+        return value;
+    } else {
+        return defaultValue;
+    }
+}
+#endif
+
+bool GetSwitchMESABlurEnable()
+{
+#ifdef GE_OHOS
+    static CachedHandle handle = CachedParameterCreate("persist.graphic.contourdiagnalmesa.enabled", "1");
+    int32_t changed = 0;
+    return ConvertToInt(CachedParameterGetChanged(handle, &changed), 1) != 0;
+#else
+    return true;
+#endif
+}
 
 using CacheDataType = struct CacheData {
     std::shared_ptr<Drawing::Image> precalculationImg = nullptr;
@@ -539,6 +574,9 @@ static constexpr char PRECALCULATIONFORMORECURVES_PROG[] = R"(
 )";
 
 static constexpr char BLEND_IMG_PROG[] = R"(
+    uniform vec2 factorlight;
+    uniform vec2 factorhalo;
+    uniform vec2 factorprecalc;
     uniform shader precalculationImage;
     uniform shader image1;
     uniform shader image2;
@@ -549,10 +587,10 @@ static constexpr char BLEND_IMG_PROG[] = R"(
 
     vec4 main(vec2 fragCoord)
     {
-        vec4 c1 = image1.eval(fragCoord).rgba;
-        vec4 c2 = image2.eval(fragCoord).rgba;
+        vec4 c1 = image1.eval(fragCoord * factorlight).rgba;
+        vec4 c2 = image2.eval(fragCoord * factorhalo).rgba;
         float totalWeight = (lightWeight + haloWeight < 1e-5) ? 1.0 : lightWeight + haloWeight;
-        float contourWeight = precalculationImage.eval(fragCoord).r;
+        float contourWeight = precalculationImage.eval(fragCoord * factorprecalc).r;
         contourWeight *= blurRadius / 50.0; // 50.0: default blur radius
         vec4 blendColor = c1 + c2 * haloWeight * haloWeight / (totalWeight * lightWeight) * contourWeight;
         vec4 lnValue = log(blendColor + vec4(1.0, 1.0, 1.0, 1.0));
@@ -685,9 +723,6 @@ GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader() {}
 GEContourDiagonalFlowLightShader::GEContourDiagonalFlowLightShader(GEContentDiagonalFlowLightShaderParams& param)
 {
     contourDiagonalFlowLightParams_ = param;
-    Drawing::GEKawaseBlurShaderFilterParams blurParas{contourDiagonalFlowLightParams_.haloRadius_};
-    blurShader_ = std::make_shared<GEKawaseBlurShaderFilter>(blurParas);
-    blurShader_->SetFactor(0.0f); // not need noise
 }
 
 void GEContourDiagonalFlowLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress) {}
@@ -740,6 +775,12 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
 std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlurImg(Drawing::Canvas& canvas,
     const Drawing::Rect& rect, std::shared_ptr<Drawing::Image> image, float blurRadius)
 {
+    if (GetSwitchMESABlurEnable()) {
+        Drawing::GEMESABlurShaderFilterParams mesaParams{};
+        mesaParams.radius = blurRadius;
+        auto blurImgShader = std::make_shared<GEMESABlurShaderFilter>(mesaParams);
+        return blurImgShader->OnProcessImageWithoutUpSampling(canvas, image, rect, rect);
+    }
     Drawing::GEKawaseBlurShaderFilterParams blurImgParas{blurRadius};
     std::shared_ptr<GEKawaseBlurShaderFilter> blurImgShader = std::make_shared<GEKawaseBlurShaderFilter>(blurImgParas);
     blurImgShader->SetFactor(0.0f); // not need noise
@@ -1078,8 +1119,29 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawRuntimeSha
         std::clamp(contourDiagonalFlowLightParams_.line2Color_[NUM2], 0.0f, 1.0f));
     builder_->SetUniform("lineThickness", std::clamp(contourDiagonalFlowLightParams_.thickness_, 0.0f, 1.0f));
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    auto img = builder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
-    return img;
+    return DrawWithLightSurface(canvas, builder_, imageInfo);
+}
+
+std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::DrawWithLightSurface(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder, const Drawing::ImageInfo& imageInfo)
+{
+    if (lightSurface_ == nullptr) {
+        lightSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
+    }
+    if (builder == nullptr || lightSurface_ == nullptr) {
+        return nullptr;
+    }
+    auto lightCanvas = lightSurface_->GetCanvas();
+    auto shader = builder->MakeShader(nullptr, false);
+    if (lightCanvas == nullptr || shader == nullptr) {
+        return nullptr;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    lightCanvas->AttachBrush(brush);
+    lightCanvas->DrawRect(Drawing::Rect{0, 0, imageInfo.GetWidth(), imageInfo.GetHeight()});
+    lightCanvas->DetachBrush();
+    return lightSurface_->GetImageSnapshot();
 }
 
 void GEContourDiagonalFlowLightShader::ResizeCurvesData(int gridIndex, size_t subCurveCnt, size_t perSubCurveSize)
@@ -1307,6 +1369,16 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     auto haloShader = Drawing::ShaderEffect::CreateImageShader(*haloImg, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    auto imageInfo = imgInfo_;
+    blendBuilder->SetUniform("factorlight",
+        static_cast<float>(lightImg->GetWidth()) / static_cast<float>(imageInfo.GetWidth()),
+        static_cast<float>(lightImg->GetHeight()) / static_cast<float>(imageInfo.GetHeight()));
+    blendBuilder->SetUniform("factorhalo",
+        static_cast<float>(haloImg->GetWidth()) / static_cast<float>(imageInfo.GetWidth()),
+        static_cast<float>(haloImg->GetHeight()) / static_cast<float>(imageInfo.GetHeight()));
+    blendBuilder->SetUniform("factorprecalc",
+        static_cast<float>(precalculationImg->GetWidth()) / static_cast<float>(imageInfo.GetWidth()),
+        static_cast<float>(precalculationImg->GetHeight()) / static_cast<float>(imageInfo.GetHeight()));
     blendBuilder->SetChild("precalculationImage", precalculationImgShader);
     blendBuilder->SetChild("image1", lightShader);
     blendBuilder->SetChild("image2", haloShader);
@@ -1314,8 +1386,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     blendBuilder->SetUniform("haloWeight", contourDiagonalFlowLightParams_.haloWeight_);
     blendBuilder->SetUniform("blurRadius", contourDiagonalFlowLightParams_.haloRadius_);
     blendBuilder->SetUniform("headRoom", std::max(supportHeadroom_, 1.0f));
-    auto imageInfo = lightImg->GetImageInfo();
-    return blendBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+    return DrawWithLightSurface(canvas, blendBuilder, imageInfo);
 }
 
 void GEContourDiagonalFlowLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
@@ -1339,13 +1410,14 @@ void GEContourDiagonalFlowLightShader::OnDrawShader(Drawing::Canvas& canvas, con
         GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader light img is nullptr.");
         return;
     }
+    imgInfo_ = lightImg->GetImageInfo();
     float lightCoreBlurRadius = 3.0; // 3.0: blur radius for light core for anti-aliasing
     auto blurredLightImg = BlurImg(canvas, rect, lightImg, lightCoreBlurRadius);
     if (!blurredLightImg) {
         GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader blurredLightImg is nullptr.");
         return;
     }
-    auto blurImg = blurShader_->ProcessImage(canvas, lightImg, rect, rect);
+    auto blurImg = BlurImg(canvas, rect, lightImg, contourDiagonalFlowLightParams_.haloRadius_);
     if (!blurImg) {
         GE_LOGE("GEContourDiagonalFlowLightShader OnDrawShader halo img is nullptr.");
         return;

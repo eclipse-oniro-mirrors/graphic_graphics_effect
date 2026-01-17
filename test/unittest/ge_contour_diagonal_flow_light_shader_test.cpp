@@ -1156,5 +1156,20 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, Type_001, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest Type_001 end";
 }
+
+/**
+ * @tc.name: DrawWithLightSurfaceTest
+ * @tc.desc: test function DrawWithLightSurface
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawWithLightSurfaceTest, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest DrawWithLightSurfaceTest start";
+    auto filter = std::make_unique<GEContourDiagonalFlowLightShader>();
+    filter->DrawWithLightSurface(*canvas_, nullptr, imageInfo_);
+    filter->DrawWithLightSurface(*canvas_, filter->GetContourDiagonalFlowLightBuilder(), imageInfo_);
+    EXPECT_NE(filter->lightSurface_, nullptr);
+    GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest DrawWithLightSurfaceTest end";
+}
 } // namespace Rosen
 } // namespace OHOS
