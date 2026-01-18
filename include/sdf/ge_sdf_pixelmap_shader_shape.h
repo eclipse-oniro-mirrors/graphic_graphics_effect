@@ -51,12 +51,13 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFPixelmapShaderShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFPixelmapNormalShaderShapeBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateSDFShaderEffect(std::shared_ptr<ShaderEffect> pixelmapShader,
-        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+        const Drawing::ImageInfo& pixelmapInfo, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     std::shared_ptr<ShaderEffect> GenerateSDFNormalShaderEffect(std::shared_ptr<ShaderEffect> pixelmapShader,
-    float width, float height, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+        const Drawing::ImageInfo& pixelmapInfo, float width, float height,
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFPixelmapShapeParams params_ {};
 };
-} // Drawing
+} // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
 
