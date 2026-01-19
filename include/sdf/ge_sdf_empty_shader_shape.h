@@ -30,6 +30,11 @@ public:
     {
         return GESDFShapeType::EMPTY;
     }
+
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return type == GESDFShapeType::EMPTY;
+    }
 };
 } // namespace Drawing
 } // namespace Rosen

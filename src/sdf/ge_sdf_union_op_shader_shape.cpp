@@ -220,6 +220,20 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateSmoothUnionShader
     }
     return sdfSmoothUnionShapeShader;
 }
+
+bool GESDFUnionOpShaderShape::HasType(const GESDFShapeType type) const
+{
+    if (type == GetSDFShapeType()) {
+        return true;
+    }
+    if (params_.left ? params_.left->HasType(type) : false) {
+        return true;
+    }
+    if (params_.right ? params_.right->HasType(type) : false) {
+        return true;
+    }
+    return false;
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

@@ -17,7 +17,9 @@
  
 #include "ge_log.h"
 #include "sdf/ge_sdf_clip_shader.h"
- 
+#include "sdf/ge_sdf_shader_shape.h"
+#include "utils/ge_trace.h"
+
 namespace OHOS {
 namespace Rosen {
 
@@ -26,12 +28,19 @@ GESDFClipShader::GESDFClipShader(const Drawing::GESDFClipShaderParams& params) :
 
 void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
+    if (params_.shape && params_.shape->HasType(Drawing::GESDFShapeType::PIXELMAP)) {
+        GE_TRACE_NAME_FMT("GESDFClipShader::OnDrawShader, pixelmap type");
+        return;
+    }
     Preprocess(canvas, rect); // to calculate your cache data
     MakeDrawingShader(rect, -1.f);
     auto shader = GetDrawingShader();
     Drawing::Brush brush;
     if (shader == nullptr) {
+        GE_TRACE_NAME_FMT("GESDFClipShader::OnDrawShader, empty type");
         brush.SetColor(Drawing::Color::COLOR_TRANSPARENT);
+    } else {
+        GE_TRACE_NAME_FMT("GESDFClipShader::OnDrawShader, normal type");
     }
     brush.SetBlendMode(Drawing::BlendMode::DST_IN);
     brush.SetShaderEffect(shader);
@@ -55,7 +64,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const 
         GE_LOGE("GESDFClipShader::MakeSDFClipShader mask is invalid.");
         return nullptr;
     }
-
+    GE_TRACE_NAME_FMT("GESDFClipShader::MakeSDFClipShader, normal type");
     auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFClipShader: failed generate GESDFClipShader.");

@@ -121,6 +121,17 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
     }
     return sdfTransformShapeShader;
 }
+
+bool GESDFTransformShaderShape::HasType(const GESDFShapeType type) const
+{
+    if (type == GetSDFShapeType()) {
+        return true;
+    }
+    if (params_.shape ? params_.shape->HasType(type) : false) {
+        return true;
+    }
+    return false;
+}
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS

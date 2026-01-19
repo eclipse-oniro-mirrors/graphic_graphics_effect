@@ -41,7 +41,7 @@ public:
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
     virtual GESDFShapeType GetSDFShapeType() const = 0;
-
+    virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);
 };
 } // Drawing

@@ -46,6 +46,11 @@ public:
         params_ = shape.params_;
     }
 
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return type == GESDFShapeType::PIXELMAP;
+    }
+
 private:
     std::shared_ptr<ShaderEffect> GeneratePixelmapShader() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFPixelmapShaderShapeBuilder() const;

@@ -32,6 +32,10 @@ public:
     {
         return type_;
     }
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return true;
+    }
 private:
     GESDFShapeType type_;
 };
