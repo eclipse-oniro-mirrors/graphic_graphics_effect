@@ -48,7 +48,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
     if (!params_.shape) {
         return nullptr;
     }
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderHasNormalShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has builder error");
         return nullptr;
@@ -91,6 +91,61 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
 
     sdfTransformShaderShapeBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfTransformShaderBuilderEffect);
     return sdfTransformShaderShapeBuilder;
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDFTransformShaderHasNormalShapeBuilder()
+    const
+{
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfTransformShaderHasNormalShapeBuilder = nullptr;
+    if (sdfTransformShaderHasNormalShapeBuilder) {
+        return sdfTransformShaderHasNormalShapeBuilder;
+    }
+
+    static constexpr char prog[] = R"(
+        uniform shader shapeShader;
+        uniform float3x3 transformMatrix;
+        const float nScale = 2048.0;
+        float EncodeDir(vec2 dir)
+        {
+            float xPos = floor(dir.x + nScale);
+            float yPos = floor(dir.y + nScale);
+            return xPos + (yPos / nScale) / 2.0;
+        }
+        vec2 DecodeDir(float z) {
+            float xPos = floor(z);
+            float yPos = (z - xPos) * nScale * 2.0 - nScale;
+            xPos -= nScale;
+            return vec2(xPos, yPos);
+        }
+        half4 main(vec2 fragCoord) {
+            // only apply transform to rgba's a pipeline
+            float2x2 invtransformMatrix =
+                float2x2(transformMatrix[0][0], transformMatrix[1][0], transformMatrix[0][1], transformMatrix[1][1]);
+            vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
+            vec2 perspectiveCoord = transformedCoord.xy;
+
+            // but scaling may be applied to all ?
+            if (abs(transformedCoord.z) > 0.00001) {
+                perspectiveCoord = transformedCoord.xy / transformedCoord.z;
+            }
+            // calculate rgb
+            half4 res = shapeShader.eval(perspectiveCoord);
+            res.rg = invtransformMatrix * res.rg;
+            vec2 centerVec = invtransformMatrix * DecodeDir(res.b);
+            res.b = EncodeDir(centerVec);
+            return res;
+        }
+    )";
+
+    auto sdfTransformShaderHasNormalBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    if (!sdfTransformShaderHasNormalBuilderEffect) {
+        LOGE("GESDFTransformShaderShape::sdfTransformShaderHasNormalShapeBuilder effect error");
+        return nullptr;
+    }
+
+    sdfTransformShaderHasNormalShapeBuilder =
+        std::make_shared<Drawing::RuntimeShaderBuilder>(sdfTransformShaderHasNormalBuilderEffect);
+    return sdfTransformShaderHasNormalShapeBuilder;
 }
 
 std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(float width, float height,
