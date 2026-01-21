@@ -59,8 +59,11 @@ private:
         std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
         const Drawing::ColorType& outputColorType);
 
+    std::shared_ptr<Drawing::Image> FakeBlur(Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> edgeImage);
+
     std::shared_ptr<Drawing::Image> RunFillDerivEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
-        const Drawing::SamplingOptions& samplingOptions, const Drawing::ColorType& outputColorType);
+        const std::shared_ptr<Drawing::Image> blurredSDFImage, const Drawing::SamplingOptions& samplingOptions,
+        const Drawing::ColorType& outputColorType);
 
     bool IsInputValid(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src,
         const Drawing::Rect& dst);

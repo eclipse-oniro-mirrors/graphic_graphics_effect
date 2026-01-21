@@ -46,6 +46,11 @@ public:
         params_ = shape.params_;
     }
 
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return type == GESDFShapeType::RRECT;
+    }
+
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectShaderShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectNormalShapeBuilder() const;

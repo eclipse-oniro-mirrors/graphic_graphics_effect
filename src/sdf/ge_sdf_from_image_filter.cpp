@@ -18,6 +18,7 @@
 #include "ge_log.h"
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
+#include "ge_mesa_blur_shader_filter.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -122,21 +123,24 @@ const std::string JFA_PROCESS_RESULT_SHADER = R"(
 
 const std::string SDF_FILL_DERIV_SHADER = R"(
     uniform shader imageInput;
+    uniform shader blurredSDFInput;
 
     const vec2 h = vec2(1, 0);
 
     float decodeSdf(float sdf) {
-        return sdf * 2 - 1;
+        return sdf * 2 - 1; // Real pixel distances
     }
 
     half4 main(vec2 fragCoord) {
         float sdf0TextureVal = imageInput.eval(fragCoord).a;
-        float dx = decodeSdf(imageInput.eval(fragCoord + h.xy).a) - decodeSdf(imageInput.eval(fragCoord - h.xy).a);
-        float dy = decodeSdf(imageInput.eval(fragCoord + h.yx).a) - decodeSdf(imageInput.eval(fragCoord - h.yx).a);
+        float dx =
+            decodeSdf(blurredSDFInput.eval(fragCoord + h.xy).a) - decodeSdf(blurredSDFInput.eval(fragCoord - h.xy).a);
+        float dy =
+            decodeSdf(blurredSDFInput.eval(fragCoord + h.yx).a) - decodeSdf(blurredSDFInput.eval(fragCoord - h.yx).a);
 
         half4 O = half4(0);
-        O.x = clamp((dx + 1) / 2.0, 0, 1);
-        O.y = clamp((dy + 1) / 2.0, 0, 1);
+        O.x = -clamp((dx + 1) / 2.0, 0, 1);
+        O.y = -clamp((dy + 1) / 2.0, 0, 1);
         O.w = sdf0TextureVal;
         return O;
     }
@@ -186,6 +190,77 @@ int GESDFFromImageFilter::GetSpreadFactor() const
     return spreadFactor_;
 }
 
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_sampleShaderEffect = nullptr;
+
+inline static const std::string g_shaderStringSampleFrag = R"(
+    uniform shader image;
+    uniform float iScale;
+    vec4 main(vec2 fragCoord)
+    {
+        float s = max(iScale, 1.0);
+        float2 base = floor(fragCoord / s) * s;
+        float2 sampleCoord = base + 0.5 *s;
+        return iImage1.eval(sampleCoord);
+    }
+)";
+
+std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &canvas,
+    const std::shared_ptr<Drawing::Image> edgeImage)
+{
+    if (!g_sampleShaderEffect) {
+        g_sampleShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringSampleFrag);
+        if (g_sampleShaderEffect == nullptr) {
+            LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
+            return nullptr;
+        }
+    }
+    constexpr float MIN_IMAGE_BLOOM_SIZE = 16.0; // < MIN_IMAGE_BLOOM_SIZE, not bloom, return image.
+
+    // check image width and height in IsInputImageValid;
+    auto imageInfo = edgeImage->GetImageInfo();
+    float imageHeight = imageInfo.GetHeight();
+    float imageWidth = imageInfo.GetWidth();
+    if (imageHeight < MIN_IMAGE_BLOOM_SIZE || imageWidth < MIN_IMAGE_BLOOM_SIZE) {
+        LOGD("GESDFFromImageFilter::FakeBlur image size is too small to bloom, return edgeImage."
+            "H:[%{public}f] W:[%{public}f]", imageHeight, imageWidth);
+            return edgeImage;
+    }
+
+    auto sampleBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_sampleShaderEffect);
+
+    Drawing::Matrix edgeMatrix;
+    auto edgeShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), edgeMatrix);
+    if (edgeShader == nullptr) {
+        LOGE("GESDFFromImageFilter::FakeBlur create edgeShader failed.");
+        return nullptr;
+    }
+    Drawing::Matrix matrix;
+    Drawing::Matrix imageBlurShaderMatrix;
+
+    auto blurImageV = edgeImage;
+    auto scaledInfo = imageInfo;
+    auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*blurImageV, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (srcImageShader == nullptr) {
+        LOGE("GESDFFromImageFilter::FakeBlur create srcImageShaderV failed.");
+        return nullptr;
+    }
+    sampleBuilder->SetChild("image", srcImageShader);
+    sampleBuilder->SetUniform("iScale", 6.0f);
+
+#ifdef RS_ENABLE_GPU
+    auto blurImageH = sampleBuilder->MakeImage(canvas.GetGPUContext().get(), nullptr, scaledInfo, false);
+#else
+    auto blurImageH = sampleBuilder->MakeImage(nullptr, nullptr, scaledInfo, false);
+#endif
+    if (blurImageH == nullptr) {
+        LOGE("GESDFFromImageFilter::FakeBlur blurImageH make image failed.");
+        return nullptr;
+    }
+    return blurImageH;
+}
+
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
@@ -221,8 +296,14 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Ca
         return sdfOutput;
     }
 
+    // Downsample SDF
+    auto blurredSdfImage = FakeBlur(canvas, sdfOutput);
+    if (!blurredSdfImage) {
+        return sdfOutput;
+    }
+
     std::shared_ptr<Drawing::Image> derivOutput = nullptr;
-    derivOutput = RunFillDerivEffect(canvas, sdfOutput, linear, image->GetColorType());
+    derivOutput = RunFillDerivEffect(canvas, sdfOutput, blurredSdfImage, linear, image->GetColorType());
     if (!derivOutput) {
         LOGE("GESDFFromImageFilter::OnProcessImage fillDeriv make image error");
         return sdfOutput;
@@ -313,8 +394,8 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaProcessResultEffect(
 }
 
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunFillDerivEffect(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
-    const Drawing::ColorType& outputColorType)
+    const std::shared_ptr<Drawing::Image> image, const std::shared_ptr<Drawing::Image> blurredSDFImage,
+    const Drawing::SamplingOptions& samplingOptions, const Drawing::ColorType& outputColorType)
 {
     auto outputImageInfo = image->GetImageInfo();
     outputImageInfo.SetColorType(outputColorType);
@@ -322,8 +403,11 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunFillDerivEffect(Drawing
     Drawing::Matrix identityMatrix;
     auto imageInputShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, samplingOptions, identityMatrix);
+    auto blurredSDFInputShader = Drawing::ShaderEffect::CreateImageShader(
+        *blurredSDFImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, samplingOptions, identityMatrix);
     Drawing::RuntimeShaderBuilder fillDerivBuilder(GetSdfFillDerivEffect());
     fillDerivBuilder.SetChild("imageInput", imageInputShader);
+    fillDerivBuilder.SetChild("blurredSDFInput", blurredSDFInputShader);
 #ifdef RS_ENABLE_GPU
     return fillDerivBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, outputImageInfo, false);
 #else

@@ -62,6 +62,7 @@ public:
         params_ = shape.params_;
     }
 
+    bool HasType(const GESDFShapeType type) const override;
 private:
     std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(std::shared_ptr<ShaderEffect> leftShader,
         std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const;
