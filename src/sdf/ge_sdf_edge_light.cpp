@@ -191,7 +191,7 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeImageMerger(
     Drawing::Image& image, Drawing::Image& composeImage)
 {
-    constexpr char shadeCode[] = R"( 
+    constexpr char shadeCode[] = R"(
         uniform shader image;
         uniform shader composeImage;
         vec4 main(vec2 fragCoord) {
@@ -211,9 +211,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeImageMerger(
     const Drawing::SamplingOptions sampling(Drawing::FilterMode::LINEAR);
 
     builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(
-                                   image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
+        image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
     builder->SetChild("composeImage", Drawing::ShaderEffect::CreateImageShader(composeImage, Drawing::TileMode::CLAMP,
-                                          Drawing::TileMode::CLAMP, sampling, matrix));
+        Drawing::TileMode::CLAMP, sampling, matrix));
 
     return builder;
 }
