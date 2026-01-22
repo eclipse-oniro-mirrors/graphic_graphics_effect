@@ -175,12 +175,12 @@ GESDFFromImageFilter::GESDFFromImageFilter(const Drawing::GESDFFromImageFilterPa
     : spreadFactor_(params.spreadFactor), generateDerivs_(params.generateDerivs)
 {
     if (spreadFactor_ < 1) {
-        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 0.", spreadFactor_);
+        GE_LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 0.", spreadFactor_);
         spreadFactor_ = 1;
     }
 
     if (spreadFactor_ > MAX_SPREAD_FACTOR) {
-        LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 4096.", spreadFactor_);
+        GE_LOGD("GESDFFromImageFilter spreadFactor_(%{public}d) should be [1, 4096], changing to 4096.", spreadFactor_);
         spreadFactor_ = MAX_SPREAD_FACTOR;
     }
 }
@@ -200,7 +200,7 @@ inline static const std::string g_shaderStringSampleFrag = R"(
         float s = max(iScale, 1.0);
         float2 base = floor(fragCoord / s) * s;
         float2 sampleCoord = base + 0.5 *s;
-        return iImage1.eval(sampleCoord);
+        return image.eval(sampleCoord);
     }
 )";
 
@@ -210,7 +210,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     if (!g_sampleShaderEffect) {
         g_sampleShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringSampleFrag);
         if (g_sampleShaderEffect == nullptr) {
-            LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
+            GE_LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
             return nullptr;
         }
     }
@@ -221,7 +221,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     float imageHeight = imageInfo.GetHeight();
     float imageWidth = imageInfo.GetWidth();
     if (imageHeight < MIN_IMAGE_BLOOM_SIZE || imageWidth < MIN_IMAGE_BLOOM_SIZE) {
-        LOGD("GESDFFromImageFilter::FakeBlur image size is too small to bloom, return edgeImage."
+        GE_LOGD("GESDFFromImageFilter::FakeBlur image size is too small to bloom, return edgeImage."
             "H:[%{public}f] W:[%{public}f]", imageHeight, imageWidth);
             return edgeImage;
     }
@@ -232,7 +232,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     auto edgeShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), edgeMatrix);
     if (edgeShader == nullptr) {
-        LOGE("GESDFFromImageFilter::FakeBlur create edgeShader failed.");
+        GE_LOGE("GESDFFromImageFilter::FakeBlur create edgeShader failed.");
         return nullptr;
     }
     Drawing::Matrix matrix;
@@ -243,7 +243,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*blurImageV, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     if (srcImageShader == nullptr) {
-        LOGE("GESDFFromImageFilter::FakeBlur create srcImageShaderV failed.");
+        GE_LOGE("GESDFFromImageFilter::FakeBlur create srcImageShaderV failed.");
         return nullptr;
     }
     sampleBuilder->SetChild("image", srcImageShader);
@@ -255,7 +255,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     auto blurImageH = sampleBuilder->MakeImage(nullptr, nullptr, scaledInfo, false);
 #endif
     if (blurImageH == nullptr) {
-        LOGE("GESDFFromImageFilter::FakeBlur blurImageH make image failed.");
+        GE_LOGE("GESDFFromImageFilter::FakeBlur blurImageH make image failed.");
         return nullptr;
     }
     return blurImageH;
@@ -274,38 +274,40 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Ca
     std::shared_ptr<Drawing::Image> initOutput = nullptr;
     initOutput = RunJFAPrepareEffect(canvas, image, linear, src, dst, Drawing::ColorType::COLORTYPE_RGBA_F16);
     if (!initOutput) {
-        LOGE("GESDFFromImageFilter::OnProcessImage Init make image error");
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage Init make image error");
         return image;
     }
 
     std::shared_ptr<Drawing::Image> iterationsOutput = nullptr;
     iterationsOutput = RunJfaIterationsEffect(canvas, initOutput, nearest, Drawing::ColorType::COLORTYPE_RGBA_F16);
     if (!iterationsOutput) {
-        LOGE("GESDFFromImageFilter::OnProcessImage Iterations make image error");
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage Iterations make image error");
         return image;
     }
 
     std::shared_ptr<Drawing::Image> sdfOutput = nullptr;
     sdfOutput = RunJfaProcessResultEffect(canvas, iterationsOutput, nearest, image->GetColorType());
     if (!sdfOutput) {
-        LOGE("GESDFFromImageFilter::OnProcessImage ProcessResult make image error");
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage ProcessResult make image error");
         return image;
     }
 
     if (!generateDerivs_) {
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage generateDerivs_ is nullptr");
         return sdfOutput;
     }
 
     // Downsample SDF
     auto blurredSdfImage = FakeBlur(canvas, sdfOutput);
     if (!blurredSdfImage) {
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage FakeBlur make image error");
         return sdfOutput;
     }
 
     std::shared_ptr<Drawing::Image> derivOutput = nullptr;
     derivOutput = RunFillDerivEffect(canvas, sdfOutput, blurredSdfImage, linear, image->GetColorType());
     if (!derivOutput) {
-        LOGE("GESDFFromImageFilter::OnProcessImage fillDeriv make image error");
+        GE_LOGE("GESDFFromImageFilter::OnProcessImage fillDeriv make image error");
         return sdfOutput;
     }
     return derivOutput;
@@ -365,7 +367,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
         output = jfaIterationBuilder.MakeImage(nullptr, nullptr, outputImageInfo, false);
 #endif
         if (!output) {
-            LOGE("GESDFFromImageFilter::OnProcessImage Iteration make image error");
+            GE_LOGE("GESDFFromImageFilter::OnProcessImage Iteration make image error");
             return image;
         }
         jfaRadius = std::max(jfaRadius / TWO, 1);
@@ -420,7 +422,7 @@ bool GESDFFromImageFilter::IsInputValid(Drawing::Canvas& canvas, const std::shar
 {
     if (!image || !GetJFAPrepareEffect() || !GetJfaIterationEffect() || !GetJfaProcessResultEffect() ||
         (!GetSdfFillDerivEffect() && generateDerivs_)) {
-        LOGE("GESDFFromImageFilter::IsInputValid invalid shader or image");
+        GE_LOGE("GESDFFromImageFilter::IsInputValid invalid shader or image");
         return false;
     }
     return true;
