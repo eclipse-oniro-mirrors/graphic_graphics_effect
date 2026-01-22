@@ -49,6 +49,7 @@ public:
     bool HasType(const GESDFShapeType type) const override;
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFTransformShaderShapeBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFTransformShaderHasNormalShapeBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateShaderEffect(float width, float height,
         std::shared_ptr<ShaderEffect> shapeShader, std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFTransformShapeParams params_ {};
