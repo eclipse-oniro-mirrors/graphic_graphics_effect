@@ -156,7 +156,14 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::OnProcessImage(Drawing::Canvas& 
         return image;
     }
 
-    return resultImage;
+    return MergeImage(canvas, image, resultImage);
+}
+
+std::shared_ptr<Drawing::Image> GESDFEdgeLight::MergeImage(
+    Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image, std::shared_ptr<Drawing::Image> compositeImage)
+{
+    auto builder = MakeImageMerger(*image, *compositeImage);
+    return builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 }
 
 std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
@@ -179,6 +186,36 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::BlurSdfMap(
         return sdfImage;
     }
     return blurImage;
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeImageMerger(
+    Drawing::Image& image, Drawing::Image& composeImage)
+{
+    constexpr char shadeCode[] = R"( 
+        uniform shader image;
+        uniform shader composeImage;
+        vec4 main(vec2 fragCoord) {
+            vec4 imageColor = image.eval(fragCoord);
+            vec4 composeImageColor = composeImage.eval(fragCoord);
+            return vec4(imageColor.rgb + composeImageColor.rgb, imageColor.a);
+        }
+    )";
+    static auto effectShader = Drawing::RuntimeEffect::CreateForShader(shadeCode);
+    if (!effectShader) {
+        return nullptr;
+    }
+
+    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader);
+
+    const Drawing::Matrix matrix;
+    const Drawing::SamplingOptions sampling(Drawing::FilterMode::LINEAR);
+
+    builder->SetChild("image", Drawing::ShaderEffect::CreateImageShader(
+                                   image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
+    builder->SetChild("composeImage", Drawing::ShaderEffect::CreateImageShader(composeImage, Drawing::TileMode::CLAMP,
+                                          Drawing::TileMode::CLAMP, sampling, matrix));
+
+    return builder;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(float imageWidth, float imageHeight)
