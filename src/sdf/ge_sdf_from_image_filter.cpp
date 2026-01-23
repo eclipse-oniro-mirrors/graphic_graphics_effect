@@ -19,6 +19,7 @@
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
 #include "ge_mesa_blur_shader_filter.h"
+#include "utils/ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -82,23 +83,28 @@ const std::string JFA_ITERATION_SHADER = R"(
         return (coordsToDecode * 2 - 1) * spreadFactor + fragCoord;
     }
 
+    void SearchNeighbors(inout vec4 O, vec2 fragCoord, vec2 sampleCoord)
+    {
+        vec4 imgSample = SafeFetch(sampleCoord);
+        vec4 a = vec4(DecodeCoords(imgSample.xy, sampleCoord), DecodeCoords(imgSample.zw, sampleCoord));
+        if (imgSample.x < 1 && imgSample.y < 1 && imgSample.x > 0 && imgSample.y > 0) {
+            O.xy = length(fragCoord - a.xy) < length(O.xy - fragCoord) ? a.xy : O.xy;
+        }
+        if (imgSample.z < 1 && imgSample.w < 1 && imgSample.z > 0 && imgSample.w > 0) {
+            O.zw = length(fragCoord - a.zw) < length(O.zw - fragCoord) ? a.zw : O.zw;
+        }
+    }
+
     half4 main(vec2 fragCoord) {
         vec4 O = imageInput.eval(fragCoord);
         O = vec4(DecodeCoords(O.xy, fragCoord), DecodeCoords(O.zw, fragCoord));
 
-        for (int x = -1; x <= 1; ++x) {
-            for (int y = -1; y <= 1; ++y) {
-                vec2 sampleCoord = fragCoord + jfaRadius * vec2(x, y);
-                vec4 imgSample = SafeFetch(sampleCoord);
-                vec4 a = vec4(DecodeCoords(imgSample.xy, sampleCoord), DecodeCoords(imgSample.zw, sampleCoord));
-                if (imgSample.x < 1 && imgSample.y < 1 && imgSample.x > 0 && imgSample.y > 0) {
-                    O.xy = length(fragCoord - a.xy) < length(O.xy - fragCoord) ? a.xy : O.xy;
-                }
-                if (imgSample.z < 1 && imgSample.w < 1 && imgSample.z > 0 && imgSample.w > 0) {
-                    O.zw = length(fragCoord - a.zw) < length(O.zw - fragCoord) ? a.zw : O.zw;
-                }
-            }
-        }
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, -1));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, 0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, 1));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(-1, 0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(1, 0));
+
         O = vec4(EncodeCoords(O.xy, fragCoord), EncodeCoords(O.zw, fragCoord));
         return O;
     }
@@ -207,10 +213,11 @@ inline static const std::string g_shaderStringSampleFrag = R"(
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> edgeImage)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::FakeBlur Run FakeBlur function.");
     if (!g_sampleShaderEffect) {
         g_sampleShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringSampleFrag);
         if (g_sampleShaderEffect == nullptr) {
-            GE_LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
+            GE_LOGE("GEEdgeLightShaderFilter::RuntimeShader g_shaderStringSampleFrag create failed.");
             return nullptr;
         }
     }
@@ -264,6 +271,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
 std::shared_ptr<Drawing::Image> GESDFFromImageFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::OnProcessImage Convert image to SDF once");
     if (!IsInputValid(canvas, image, src, dst)) {
         return image;
     }
@@ -317,6 +325,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawin
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::ColorType& outputColorType)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJFAPrepareEffect Run JFA Prepare function.");
     auto imageInfo = image->GetImageInfo();
     auto width = image->GetWidth();
     auto height = image->GetHeight();
@@ -343,6 +352,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::ColorType& outputColorType)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaIterationsEffect Run JFA Iteration function.");
     Drawing::Matrix identityMatrix;
 
     auto outputImageInfo = image->GetImageInfo();
@@ -380,6 +390,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaProcessResultEffect(
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::ColorType& outputColorType)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaProcessResultEffect Run JFA ProcessResult function.");
     auto outputImageInfo = image->GetImageInfo();
     outputImageInfo.SetColorType(outputColorType);
 
@@ -399,6 +410,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunFillDerivEffect(Drawing
     const std::shared_ptr<Drawing::Image> image, const std::shared_ptr<Drawing::Image> blurredSDFImage,
     const Drawing::SamplingOptions& samplingOptions, const Drawing::ColorType& outputColorType)
 {
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunFillDerivEffect Run JFA FillDeriv function.");
     auto outputImageInfo = image->GetImageInfo();
     outputImageInfo.SetColorType(outputColorType);
 
