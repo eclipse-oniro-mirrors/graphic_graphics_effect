@@ -135,23 +135,34 @@ const std::string SDF_FILL_DERIV_SHADER = R"(
     uniform shader imageInput;
     uniform shader blurredSDFInput;
 
-    const vec2 h = vec2(1.0, 0.0);
-
-    float decodeSdf(float sdf) {
-        return sdf * 2.0 - 1.0; // Real pixel distances
-    }
-
     half4 main(vec2 fragCoord) {
-        float sdf0TextureVal = imageInput.eval(fragCoord).a;
-        float dx =
-            decodeSdf(blurredSDFInput.eval(fragCoord + h.xy).a) - decodeSdf(blurredSDFInput.eval(fragCoord - h.xy).a);
-        float dy =
-            decodeSdf(blurredSDFInput.eval(fragCoord + h.yx).a) - decodeSdf(blurredSDFInput.eval(fragCoord - h.yx).a);
+        const float bevelWidth = 20.0;  // Slope width
+        const float sdfRange = 128.0;   // SDF phyical width
+        const float strength = 1.2;     // Slope strength
 
-        half4 O = half4(0.0);
-        O.x = clamp((dx + 1.0) / 2.0, 0.0, 1.0);
-        O.y = clamp((dy + 1.0) / 2.0, 0.0, 1.0);
-        O.w = sdf0TextureVal;
+        float sdfRaw = blurredSDFInput.eval(fragCoord).a;
+        float d0 = sdfRaw * 2.0 - 1.0; 
+        float dist = abs(d0) * sdfRange; 
+
+        float h = 1.5 + dist * 0.1;
+        float dx = blurredSDFInput.eval(fragCoord + vec2(h, 0)).a - 
+                blurredSDFInput.eval(fragCoord - vec2(h, 0)).a;
+        float dy = blurredSDFInput.eval(fragCoord + vec2(0, h)).a - 
+                blurredSDFInput.eval(fragCoord - vec2(0, h)).a;
+        vec2 dir = normalize(vec2(dx, dy) + 0.00001);
+
+        float t = clamp(dist / bevelWidth, 0.0, 1.0);
+        float fakeMag = sin(t * 3.1415926) * strength;
+
+        vec2 finalGrad = dir * fakeMag;
+        
+        if (d0 > 0.0) {
+            finalGrad = dir * exp(-dist * 0.2) * strength;
+        }
+        
+        half4 O = half4(0);
+        O.xy = half2(clamp(finalGrad * 0.5 + 0.5, 0.0, 1.0));
+        O.w = half(imageInput.eval(fragCoord).a);
         return O;
     }
 )";
