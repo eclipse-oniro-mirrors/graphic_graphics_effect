@@ -33,7 +33,7 @@ const std::string JFA_PREPARE_SHADER = R"(
     const float SQRT_2 = 1.41421356;
 
     vec2 getGradient(vec2 fragCoord) {
-        const vec2 h = vec2(0.5, 0);
+        const vec2 h = vec2(0.5, 0.0);
         return vec2(imageInput.eval(fragCoord + h.xy).a - imageInput.eval(fragCoord - h.xy).a,
                 imageInput.eval(fragCoord + h.yx).a - imageInput.eval(fragCoord - h.yx).a);
     }
@@ -43,19 +43,19 @@ const std::string JFA_PREPARE_SHADER = R"(
         float imageSample = imageInput.eval(centerFragCoord).a;
 
         if (imageSample == 0) {
-            return half4(1, 1, 0.5, 0.5);
+            return half4(1.0, 1.0, 0.5, 0.5);
         }
         if (imageSample == 1) {
-            return half4(0.5, 0.5, 1, 1);
+            return half4(0.5, 0.5, 1.0, 1.0);
         }
         vec2 grad = getGradient(centerFragCoord);
         vec2 normGrad = normalize(grad);
         vec2 edgeCoords = vec2(0.5);
 
         float borderCoeff = (imageSample - 0.5) * SQRT_2; // determine how far the actual border is from sample value
-        edgeCoords -= normGrad * borderCoeff / (2 * spreadFactor);
+        edgeCoords -= normGrad * borderCoeff / (2.0 * spreadFactor);
 
-        if (borderCoeff < 0) {
+        if (borderCoeff < 0.0) {
             return half4(edgeCoords, 0.5, 0.5);
         }
         return half4(0.5, 0.5, edgeCoords);
@@ -70,28 +70,32 @@ const std::string JFA_ITERATION_SHADER = R"(
 
     vec4 SafeFetch(vec2 fragCoord) {
         if (fragCoord.x < 0 || fragCoord.x > iResolution.x || fragCoord.y < 0 || fragCoord.y > iResolution.y) {
-            return vec4(1e6);
+            return vec4(1000.0);
         }
         return imageInput.eval(fragCoord);
     }
 
     vec2 EncodeCoords(vec2 coordsToEncode, vec2 fragCoord) {
-        return clamp(((coordsToEncode - fragCoord) / spreadFactor + 1) / 2.0, 0, 1);
+        return clamp(((coordsToEncode - fragCoord) / spreadFactor + 1.0) / 2.0, 0.0, 1.0);
     }
 
     vec2 DecodeCoords(vec2 coordsToDecode, vec2 fragCoord) {
-        return (coordsToDecode * 2 - 1) * spreadFactor + fragCoord;
+        return (coordsToDecode * 2.0 - 1.0) * spreadFactor + fragCoord;
     }
 
     void SearchNeighbors(inout vec4 O, vec2 fragCoord, vec2 sampleCoord)
     {
         vec4 imgSample = SafeFetch(sampleCoord);
         vec4 a = vec4(DecodeCoords(imgSample.xy, sampleCoord), DecodeCoords(imgSample.zw, sampleCoord));
-        if (imgSample.x < 1 && imgSample.y < 1 && imgSample.x > 0 && imgSample.y > 0) {
-            O.xy = length(fragCoord - a.xy) < length(O.xy - fragCoord) ? a.xy : O.xy;
+        if (imgSample.x < 1.0 && imgSample.y < 1.0 && imgSample.x > 0.0 && imgSample.y > 0.0) {
+            vec2 diffA = fragCoord - a.xy;
+            vec2 diffO = O.xy - fragCoord;
+            O.xy = dot(diffA, diffA) < dot(diffO, diffO) ? a.xy : O.xy;
         }
-        if (imgSample.z < 1 && imgSample.w < 1 && imgSample.z > 0 && imgSample.w > 0) {
-            O.zw = length(fragCoord - a.zw) < length(O.zw - fragCoord) ? a.zw : O.zw;
+        if (imgSample.z < 1.0 && imgSample.w < 1.0 && imgSample.z > 0.0 && imgSample.w > 0.0) {
+            vec2 diffA = fragCoord - a.zw;
+            vec2 diffO = O.zw - fragCoord;
+            O.zw = dot(diffA, diffA) < dot(diffO, diffO) ? a.zw : O.zw;
         }
     }
 
@@ -99,11 +103,11 @@ const std::string JFA_ITERATION_SHADER = R"(
         vec4 O = imageInput.eval(fragCoord);
         O = vec4(DecodeCoords(O.xy, fragCoord), DecodeCoords(O.zw, fragCoord));
 
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, -1));
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, 0));
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0, 1));
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(-1, 0));
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(1, 0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, -1.0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, 0.0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, 1.0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(-1.0, 0.0));
+        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(1.0, 0.0));
 
         O = vec4(EncodeCoords(O.xy, fragCoord), EncodeCoords(O.zw, fragCoord));
         return O;
@@ -117,12 +121,12 @@ const std::string JFA_PROCESS_RESULT_SHADER = R"(
         half4 O = half4(0.0);
 
         vec4 imageSample = imageInput.eval(fragCoord);
-        vec2 xy = imageSample.xy * 2 - 1;
-        vec2 zw = imageSample.zw * 2 - 1;
+        vec2 xy = imageSample.xy * 2.0 - 1.0;
+        vec2 zw = imageSample.zw * 2.0 - 1.0;
 
         O.a = length(xy) - length(zw);
         O.a = (O.a + 1.0) / 2.0;
-        O.a = clamp(O.a, 0, 1);
+        O.a = clamp(O.a, 0.0, 1.0);
         return O;
     }
 )";
@@ -131,10 +135,10 @@ const std::string SDF_FILL_DERIV_SHADER = R"(
     uniform shader imageInput;
     uniform shader blurredSDFInput;
 
-    const vec2 h = vec2(1, 0);
+    const vec2 h = vec2(1.0, 0.0);
 
     float decodeSdf(float sdf) {
-        return sdf * 2 - 1; // Real pixel distances
+        return sdf * 2.0 - 1.0; // Real pixel distances
     }
 
     half4 main(vec2 fragCoord) {
@@ -144,9 +148,9 @@ const std::string SDF_FILL_DERIV_SHADER = R"(
         float dy =
             decodeSdf(blurredSDFInput.eval(fragCoord + h.yx).a) - decodeSdf(blurredSDFInput.eval(fragCoord - h.yx).a);
 
-        half4 O = half4(0);
-        O.x = -clamp((dx + 1) / 2.0, 0, 1);
-        O.y = -clamp((dy + 1) / 2.0, 0, 1);
+        half4 O = half4(0.0);
+        O.x = clamp((dx + 1.0) / 2.0, 0.0, 1.0);
+        O.y = clamp((dy + 1.0) / 2.0, 0.0, 1.0);
         O.w = sdf0TextureVal;
         return O;
     }
