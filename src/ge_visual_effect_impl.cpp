@@ -144,10 +144,13 @@ TagMap<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectTagMap_{
 };
 
 TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
-    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS,
-        gradientBezierControlPoints, Vector4f),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_INNER_BEZIER, innerBezier, Vector4f),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_OUTER_BEZIER, outerBezier, Vector4f),
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_CORNER_RADIUS, cornerRadius, float),
-    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_FRAME_WIDTH, frameWidth, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_INNER_FRAME_WIDTH, innerFrameWidth, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH, outerFrameWidth, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_RECT_WH, rectWH, PairFloat),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_RECT_POS, rectPos, PairFloat),
 };
 
 TagMap<GEGridWarpShaderFilterParams> gridWarpShaderFilterTagMap_{
@@ -1187,6 +1190,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::DISTORT_CHROMA: {
             ApplyTagParams(tag, Vector2f(param.first, param.second), distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
+        case FilterType::FRAME_GRADIENT_MASK: {
+            ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
         default:
