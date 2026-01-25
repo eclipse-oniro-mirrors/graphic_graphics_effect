@@ -140,7 +140,7 @@ const std::string SDF_FILL_DERIV_SHADER = R"(
         float alpha = imageInput.eval(fragCoord).a;
         float sdfRaw = blurredSDFInput.eval(fragCoord).a;
         
-        float d0 = sdfRaw * 2.0 - 1.0; 
+        float d0 = sdfRaw * 2.0 - 1.0;
         float dist = abs(d0) * spreadFactor;
 
         float h = 2.0 + clamp(dist * 0.2, 0.0, 8.0);
@@ -244,13 +244,12 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     }
 
     auto sampleBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_sampleShaderEffect);
-    auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, 
-        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, 
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix());
+    auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix());
     
     if (srcImageShader == nullptr) {
         GE_LOGE("GESDFFromImageFilter::FakeBlur create srcImageShader failed.");
-        return nullptr;
+        return edgeImage;
     }
 
     sampleBuilder->SetChild("image", srcImageShader);
