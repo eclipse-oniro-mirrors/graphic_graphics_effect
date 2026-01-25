@@ -246,7 +246,6 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
     auto sampleBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_sampleShaderEffect);
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix());
-    
     if (srcImageShader == nullptr) {
         GE_LOGE("GESDFFromImageFilter::FakeBlur create srcImageShader failed.");
         return edgeImage;
