@@ -140,6 +140,7 @@ void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
 
 void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
 {
+    LOGD("GEVisualEffectContainer::SetDisplayHeadroom headroom=%{public}f", headroom);
     for (auto vef : GetFilters()) {
         if (vef) {
             vef->SetSupportHeadroom(headroom);
