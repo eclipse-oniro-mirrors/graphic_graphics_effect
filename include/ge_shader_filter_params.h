@@ -177,6 +177,8 @@ struct GEMESABlurShaderFilterParams {
     int tileMode;
     float width;
     float height;
+    bool isDirection = false;
+    float angle = 0.0;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(MESA_BLUR, GEMESABlurShaderFilterParams, GE_FILTER_MESA_BLUR);
 
@@ -651,6 +653,15 @@ struct GELinearGradientShaderMaskParams {
     Drawing::Point endPosition;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(LINEAR_GRADIENT_MASK, GELinearGradientShaderMaskParams, GE_MASK_LINEAR_GRADIENT);
+
+constexpr char GE_FILTER_COLOR_REMAP[] = "ColorRemap";
+constexpr char GE_FILTER_COLOR_REMAP_COLORS[] = "ColorRemap_Colors";
+constexpr char GE_FILTER_COLOR_REMAP_POSITIONS[] = "ColorRemap_Positions";
+struct GEColorRemapFilterParams {
+    std::vector<Vector4f> colors;
+    std::vector<float> positions;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_REMAP, GEColorRemapFilterParams, GE_FILTER_COLOR_REMAP);
 
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT[] = "ColorGradientEffect";
 constexpr char GEX_SHADER_COLOR_GRADIENT_EFFECT_COLOR0[] = "ColorGradientEffect_Color0";

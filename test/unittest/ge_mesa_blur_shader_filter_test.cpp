@@ -268,5 +268,23 @@ HWTEST_F(GEMESABlurShaderFilterTest, Type_001, TestSize.Level1)
     EXPECT_EQ(geMESABlurShaderFilter->Type(), Drawing::GEFilterType::MESA_BLUR);
     EXPECT_EQ(geMESABlurShaderFilter->TypeName(), Drawing::GE_FILTER_MESA_BLUR);
 }
+
+/**
+ * @tc.name: DirectionBlur_001
+ * @tc.desc: test Blur by Direction
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, DirectionBlur_001, TestSize.Level1)
+{
+    // 10, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f valid MESA blur params
+    Drawing::GEMESABlurShaderFilterParams params {10, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
+    EXPECT_EQ(geMESABlurShaderFilter->isDirection_,  false);
+
+    params.isDirection_ = true;
+    geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
+    auto image = geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(image, image_);
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

@@ -50,6 +50,8 @@ public:
         const std::shared_ptr<Drawing::Image>& input, const Drawing::Rect& src,
         const Drawing::SamplingOptions& linear, float factor) const;
 
+    GE_EXPORT static std::pair<float, float> AngleToDirection(float angle);
+
 protected:
     struct NewBlurParams {
         int numberOfPasses = 1;     // 1: initial number of passes
@@ -119,10 +121,13 @@ protected:
     Drawing::TileMode tileMode_ = Drawing::TileMode::CLAMP;
     float width_ = 0.0f;
     float height_ = 0.0f;
+    bool isDirection_ = false;
+    float angle_ = 0.0f;
     static GE_EXPORT int g_isSimpleX;
 
 private:
     bool InitBlurEffect();
+    bool InitDirectionBlurEffect();
     bool InitMixEffect();
     bool InitSimpleFilter();
     bool InitGreyAdjustmentEffect();

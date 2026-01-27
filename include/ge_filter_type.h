@@ -87,6 +87,8 @@ enum class GEFilterType : int32_t {
     DISTORT_CHROMA,
     SDF_FROM_IMAGE,
     SDF_EDGE_LIGHT,
+    COLOR_REMAP,
+    GAMMA_CORRECTION,
     MAX,
 };
 
