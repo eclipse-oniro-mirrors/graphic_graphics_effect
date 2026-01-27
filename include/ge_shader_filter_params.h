@@ -717,6 +717,7 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGRATES[] = "FrostedGlassEffect_Bg
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGKBS[] = "FrostedGlassEffect_BgKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGPOS[] = "FrostedGlassEffect_BgPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG[] = "FrostedGlassEffect_BgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA[] = "FrostedGlassEffect_BgAlpha";
 // Refraction parameters
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTPARAMS[] = "FrostedGlassEffect_RefractParams";
 // Inner shadow parameters
@@ -768,6 +769,7 @@ struct GEFrostedGlassEffectParams {
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
     Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
     Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    float bgAlpha = 1.0f;
     // Refraction params
     Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
     // Inner shadow parameters
@@ -1194,6 +1196,7 @@ constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
 constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
 constexpr char GE_FILTER_FROSTED_GLASS_BGPOS[] = "FrostedGlass_BgPos";
 constexpr char GE_FILTER_FROSTED_GLASS_BGNEG[] = "FrostedGlass_BgNeg";
+constexpr char GE_FILTER_FROSTED_GLASS_BGALPHA[] = "FrostedGlass_BgAlpha";
 // Refraction parameters
 constexpr char GE_FILTER_FROSTED_GLASS_REFRACTPARAMS[] = "FrostedGlass_RefractParams";
 // Inner shadow parameters
@@ -1248,6 +1251,7 @@ struct GEFrostedGlassShaderFilterParams {
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
     Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
     Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    float bgAlpha = 1.0f;
     // Refraction params
     Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
     // Inner shadow parameters
