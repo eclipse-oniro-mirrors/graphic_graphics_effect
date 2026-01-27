@@ -54,6 +54,7 @@
 #include "ge_wavy_ripple_light_shader.h"
 #include "sdf/ge_sdf_border_shader.h"
 #include "sdf/ge_sdf_clip_shader.h"
+#include "sdf/ge_sdf_color_shader.h"
 #include "sdf/ge_sdf_shadow_shader.h"
 #include "sdf/ge_sdf_edge_light.h"
 
@@ -343,7 +344,19 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             const auto& params = ve->GetSDFClipShaderParams();
             out = std::make_shared<GESDFClipShader>(*params);
-        return out;
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_COLOR, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                LOGE("GERender::GenerateShaderEffect GEVisualEffectImpl is null");
+                return out;
+            }
+            const auto& params = ve->GetSDFColorShaderParams();
+            out = std::make_shared<GESDFColorShader>(*params);
+            return out;
         }
     },
     {GEVisualEffectImpl::FilterType::CIRCLE_FLOWLIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
