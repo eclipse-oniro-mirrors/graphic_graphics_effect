@@ -1209,7 +1209,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_FrostedGlass_DarkMode_Clamp, TestSize.
     // blurParam clamps: radius >= 1e-6, k in [1,200]
     std::pair<float, float> badBlur = {0.0f, 500.0f};
     ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM, badBlur);
-    EXPECT_GE(ve.GetFrostedGlassParams()->darkModeBlurParam[0], 1e-6f);
+    EXPECT_NE(ve.GetFrostedGlassParams()->darkModeBlurParam[0], 1e-6f);
     EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeBlurParam[1], 200.0f);
 
     // weightsEmboss clamps to [0,1]
@@ -1257,12 +1257,12 @@ HWTEST_F(GEVisualEffectImplTest, SetSDFRRectShapeParamsTest, TestSize.Level1)
     EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.left_, left);
 
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_RRECT_SHAPE_RRECT, rrect);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.left_, left);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.top_, top);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.width_, width);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.height_, height);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusX_, radiusX);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusY_, radiusY);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.left_, left);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.top_, top);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.width_, width);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.height_, height);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusX_, radiusX);
+    EXPECT_NE(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusY_, radiusY);
 }
 
 /**

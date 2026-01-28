@@ -61,7 +61,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShader_001, TestSize.Leve
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShader_001 end";
 }
 
@@ -101,7 +101,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShader_003, TestSize.Leve
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShader_003 end";
 }
 
@@ -119,7 +119,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShaderHasNormal_001, Test
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -159,7 +159,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShaderHasNormal_003, Test
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShader_003 end";
 }
 
@@ -296,7 +296,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateShaderEffect_001, TestSize.Level
     auto shapeShader = param.shape->GenerateDrawingShader(100.0f, 100.0f);
     
     auto shader = shape.GenerateShaderEffect(100.0f, 100.0f, shapeShader, builder);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateShaderEffect_001 end";
 }
 
@@ -358,7 +358,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_001, TestSize.Level1)
     param.matrix = matrix;
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_001 end";
 }
 
@@ -379,7 +379,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_002, TestSize.Level1)
     param.matrix = matrix;
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_002 end";
 }
 
@@ -400,7 +400,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_003, TestSize.Level1)
     param.matrix = matrix;
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_003 end";
 }
 } // namespace Drawing

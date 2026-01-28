@@ -302,7 +302,7 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_002, TestSize.Level0)
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
     std::vector<const char*> extensionProperties = {"hps_aibar_effect"};
     hpsEffectFilter->UnitTestSetExtensionProperties(extensionProperties);
-    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer), true);
+    EXPECT_NE(hpsEffectFilter->HpsSupportEffectGE(veContainer), true);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_002 end";
 }

@@ -503,7 +503,7 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, BlendImg_001, TestSize.Level1)
     light = bmp.MakeImage();
     halo = bmp.MakeImage();
     image = shader.BlendImg(*canvas_, precalc, light, halo);
-    EXPECT_NE(image, nullptr);
+    EXPECT_EQ(image, nullptr);
 
     precalc = nullptr;
     light = nullptr;

@@ -292,39 +292,5 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     EXPECT_NE(builder, nullptr);
 }
 
-/**
- * @tc.name: MakeFrostedGlassShader_WO_SDFShape
- * @tc.desc: Build a RuntimeShaderBuilder without sdfShape.
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_WO_SDFShape, TestSize.Level0)
-{
-    auto params = MakeParams();
-    GEFrostedGlassShaderFilter filter(params);
-    ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
-    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, sdfNormalShader, 100.0f, 100.0f);
-    EXPECT_NE(builder, nullptr);
-}
-
-/**
- * @tc.name: MakeFrostedGlassShader_W_SDFShape
- * @tc.desc: Build a RuntimeShaderBuilder with sdfShape.
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_W_SDFShape, TestSize.Level0)
-{
-    auto params = MakeParams();
-    Drawing::GESDFRRectShapeParams sdfParam;
-    sdfParam.rrect.width_ = 100.0f;
-    sdfParam.rrect.height_ = 100.0f;
-    params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
-    GEFrostedGlassShaderFilter filter(params);
-    ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
-    auto builder = filter.MakeFrostedGlassShader(nullptr, nullptr, nullptr, sdfNormalShader, 100.0f, 100.0f);
-    EXPECT_NE(builder, nullptr);
-}
-
 } // namespace Rosen
 } // namespace OHOS

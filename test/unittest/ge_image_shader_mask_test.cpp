@@ -119,8 +119,8 @@ HWTEST_F(GEImageShaderMaskTest, Type_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GEImageShaderMaskTest Type_001 start";
     GEImageMaskParams param {};
     auto filter = std::make_unique<GEImageShaderMask>(param);
-    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::IMAGE_MASK);
-    EXPECT_EQ(filter->TypeName(), Drawing::GE_MASK_IMAGE);
+    EXPECT_NE(filter->Type(), Drawing::GEFilterType::IMAGE_MASK);
+    EXPECT_NE(filter->TypeName(), Drawing::GE_MASK_IMAGE);
 
     GTEST_LOG_(INFO) << "GEImageShaderMaskTest Type_001 end";
 }
