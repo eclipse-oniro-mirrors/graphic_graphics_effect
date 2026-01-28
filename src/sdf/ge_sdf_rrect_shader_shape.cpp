@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "sdf/ge_sdf_cascade_manager.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "ge_log.h"
 #include "utils/ge_trace.h"
@@ -22,20 +23,14 @@ namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
 constexpr float EXTEND = 0.5; // Fixing edge difference between SDF and Skia RRect
-static constexpr char SDF_GRAD_PROG[] = R"(
-    uniform vec2 centerPos;
-    uniform vec2 halfSize;
-    uniform float radius;
-
-    const float N_EPS = 1e-6;
-    const float N_SCALE = 2048.0;
-
+static const std::string shaderStringFunc = R"(
     vec2 safeNorm(vec2 v)
     {
+        float N_EPS = 1e-6;
         return v / max(length(v), N_EPS);
     }
 
-    vec3 sdgRRect(vec2 p, vec2 b, float r)
+    vec3 ComputeSdg(vec2 p, vec2 b, float r)
     {
         float rr = clamp(r, 0.0, min(b.x, b.y));
 
@@ -57,23 +52,72 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         return vec3(sd, grad);
     }
 
-    float EncodeDir(vec2 dir)
+    float EncodeDir_RRect(vec2 dir)
     {
+        float N_SCALE = 2048.0;
         float xPos = floor(dir.x + N_SCALE);
         float yPos = floor(dir.y + N_SCALE);
         return xPos + (yPos / N_SCALE) / 2.0;
     }
 
-    vec4 main(float2 fragCoord)
+    // Calling from main function
+    vec4 sdgRRect(vec2 fragCoord, float3x3 transformMatrix, vec2 centerPos, vec2 halfSize, float radius)
     {
+        // only apply transform to rgba's a pipeline
+        float2x2 invtransformMatrix =
+            float2x2(transformMatrix[0][0], transformMatrix[1][0], transformMatrix[0][1], transformMatrix[1][1]);
+        vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
+        fragCoord = abs(transformedCoord.z) > 0.00001 ? transformedCoord.xy / transformedCoord.z : transformedCoord.xy;
         vec2 posFromCenter = fragCoord - centerPos;
-        vec3 sdg = sdgRRect(posFromCenter, halfSize, radius);
-        float packedDir = EncodeDir(posFromCenter);
+        vec3 sdg = ComputeSdg(posFromCenter, halfSize, radius);
+        sdg.yz = invtransformMatrix * sdg.yz;
+        float packedDir = EncodeDir_RRect(invtransformMatrix * posFromCenter);
         return vec4(sdg.yz, packedDir, sdg.x);
     }
 )";
 
-std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float width, float height) const
+static const std::string shaderStringMain = R"(
+    uniform vec2 centerPos;
+    uniform vec2 halfSize;
+    uniform float radius;
+
+    vec4 main(float2 fragCoord)
+    {
+       float3x3 identity = float3x3(1.0); // To use the public sdgRRect function
+       return sdgRRect(fragCoord, identity, centerPos, halfSize, radius);
+    }
+)";
+
+bool GESDFRRectShaderShape::GenerateCascadeShaderHasNormal(
+    GESDFCascadeManager& manager, float width, float height) const
+{
+    GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateCascadeShaderHasNormal, Width: %g, Height: %g", width, height);
+    bool hasType = manager.AddSDFType(GESDFShapeType::RRECT);
+    if (!hasType) {
+        manager.PrependShaderFunction(shaderStringFunc);
+    }
+    auto thisUniformIndex = manager.GenerateUniformIndex();
+    this->SetUniformIndex(thisUniformIndex);
+    const Drawing::Matrix& thisMatrix = this->GetTransMatrix();
+    Vector2f centerPos = Vector2f(params_.rrect.left_ + params_.rrect.width_ * HALF,
+        params_.rrect.top_ + params_.rrect.height_ * HALF);
+    Vector2f halfSize = Vector2f(params_.rrect.width_ * HALF, params_.rrect.height_ * HALF);
+    UniformData transformMatrixUniform = {SDFUniformType::MATRIX, "transformMatrix", thisMatrix};
+    UniformData centerPosUniform = {SDFUniformType::VECTOR2F, "centerPos", centerPos};
+    UniformData halfSizeUniform  = {SDFUniformType::VECTOR2F, "halfSize", halfSize};
+    UniformData radiusUniform = {SDFUniformType::FLOAT, "radius", std::min(
+        std::max(0.0f, params_.rrect.radiusX_ + EXTEND), std::min(halfSize.x_ + EXTEND, halfSize.y_ + EXTEND))};
+    manager.AddUniformData(thisUniformIndex,
+        {transformMatrixUniform, centerPosUniform, halfSizeUniform, radiusUniform});
+    
+    std::ostringstream sdfCallOss;
+    sdfCallOss << "sdgRRect(fragCoord, transformMatrix" << thisUniformIndex << ", centerPos" << thisUniformIndex
+        << ", halfSize" << thisUniformIndex << ", radius" << thisUniformIndex << ")";
+    manager.AppendSDFCall(thisUniformIndex, sdfCallOss.str());
+    return true;
+}
+
+    std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFRRectShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFRRectShaderShapeBuilder();
@@ -137,7 +181,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectNormalShaderShapeBuilder;
     }
 
-    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfRRectNormalShaderBuilderEffect =
+        Drawing::RuntimeEffect::CreateForShader(shaderStringFunc + shaderStringMain);
     if (!sdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GettSDFRRectNormalShapeBuilder effect error");
         return nullptr;

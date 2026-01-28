@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "sdf/ge_sdf_cascade_manager.h"
 #include "sdf/ge_sdf_union_op_shader_shape.h"
 
 #include "ge_log.h"
@@ -22,6 +23,54 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+static const std::string shaderStringFunc = R"(
+    vec4 sdgSmoothUnion(vec4 d1, vec4 d2, float k)
+    {
+        k *= 4.0;
+        float h = max(k - abs(d1.a - d2.a), 0.0) / (2.0 * k);
+        return vec4(mix(d1.xyz, d2.xyz, (d1.a < d2.a) ? h : 1.0 - h), min (d1.a, d2.a) - h * h *k);
+    }
+)";
+
+bool GESDFUnionOpShaderShape::GenerateCascadeShaderHasNormal(
+    GESDFCascadeManager& manager, float width, float height) const
+{
+    if (!params_.left && !params_.right) {
+        return false;
+    }
+    // Pass matrix through child shape
+    if (params_.left) {
+        params_.left->SetTransMatrix(this->GetTransMatrix());
+    }
+    if (params_.right) {
+        params_.right->SetTransMatrix(this->GetTransMatrix());
+    }
+
+    bool leftResult = params_.left->GenerateCascadeShaderHasNormal(manager, width, height);
+    bool rightResult = params_.right->GenerateCascadeShaderHasNormal(manager, width, height);
+    if (leftResult && rightResult) {
+        bool hasType = manager.AddSDFType(GESDFShapeType::UNION_OP);
+        if (!hasType) {
+            manager.PrependShaderFunction(shaderStringFunc);
+        }
+        auto thisUniformIndex = manager.GenerateUniformIndex();
+        this->SetUniformIndex(thisUniformIndex);
+        UniformData spacingUniform = {SDFUniformType::FLOAT, "spacing", std::max(params_.spacing, 0.0001f)};
+        manager.AddUniformData(thisUniformIndex, {spacingUniform});
+        auto leftName = params_.left->GetUniformIndex();
+        auto rightName = params_.right->GetUniformIndex();
+        std::ostringstream sdfCallOss;
+        sdfCallOss << "sdgSmoothUnion(sdf" << leftName << ", sdf"
+                   << rightName << ", spacing" << thisUniformIndex << ")";
+        manager.AppendSDFCall(thisUniformIndex, sdfCallOss.str());
+    } else if (leftResult) {
+        this->SetUniformIndex(params_.left->GetUniformIndex());
+    } else if (rightResult) {
+        this->SetUniformIndex(params_.right->GetUniformIndex());
+    }
+    return leftResult || rightResult;
+}
+
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShader, Type: %s , Width: %g, Height: %g",
@@ -46,21 +95,41 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShaderHasNormal, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
-    auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
-    auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
-    if (!leftShader && !rightShader) {
+    if (!params_.left && !params_.right) {
         return nullptr;
     }
-
-    if (!leftShader) {
-        return rightShader;
+    if (!params_.left) {
+        return params_.right->GenerateDrawingShaderHasNormal(width, height);
+    }
+    if (!params_.right) {
+        return params_.left->GenerateDrawingShaderHasNormal(width, height);
     }
 
-    if (!rightShader) {
-        return leftShader;
+    GESDFCascadeManager manager;
+    bool leftResult = params_.left->GenerateCascadeShaderHasNormal(manager, width, height);
+    bool rightResult = params_.right->GenerateCascadeShaderHasNormal(manager, width, height);
+    auto leftUniformIndex = params_.left->GetUniformIndex();
+    auto rightUniformIndex = params_.right->GetUniformIndex();
+    if (leftResult && rightResult) {
+        bool hasType = manager.AddSDFType(GESDFShapeType::UNION_OP);
+        auto thisUniformIndex = manager.GenerateUniformIndex();
+        this->SetUniformIndex(thisUniformIndex);
+        if (!hasType) {
+            manager.PrependShaderFunction(shaderStringFunc);
+        }
+        UniformData spacingUniform = {SDFUniformType::FLOAT, "spacing", std::max(params_.spacing, 0.0001f)};
+        manager.AddUniformData(thisUniformIndex, {spacingUniform});
+        std::ostringstream sdfCallOss;
+        sdfCallOss << "sdgSmoothUnion(sdf" << leftUniformIndex << ", sdf" << rightUniformIndex << ", spacing"
+                   << thisUniformIndex << ")";
+        manager.AppendSDFCall(thisUniformIndex, sdfCallOss.str());
+        manager.AppendReturnCall(thisUniformIndex);
+    } else if (leftResult) {
+        manager.AppendReturnCall(leftUniformIndex);
+    } else if (rightResult) {
+        manager.AppendReturnCall(rightUniformIndex);
     }
-
-    return GenerateUnionOpDrawingShader(leftShader, rightShader, true);
+    return manager.GenerateShaderEffectOnePass();
 }
 
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(

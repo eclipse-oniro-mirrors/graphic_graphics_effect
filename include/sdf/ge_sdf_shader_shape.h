@@ -22,11 +22,14 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+class GESDFCascadeManager;
+
 enum class GESDFShapeType : uint8_t {
     EMPTY = 0,
     PIXELMAP,
     RRECT,
     TRANSFORM,
+    G2RRECT,
     UNION_OP,
     MAX = UNION_OP,
 };
@@ -37,12 +40,35 @@ public:
     GESDFShaderShape(const GESDFShaderShape&) = delete;
     virtual ~GESDFShaderShape() = default;
 
+    virtual bool GenerateCascadeShaderHasNormal(GESDFCascadeManager& manager, float width, float height) const;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
     virtual GESDFShapeType GetSDFShapeType() const = 0;
     virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);
+
+    void SetUniformIndex(const uint16_t& uniformIndex) const
+    {
+        uniformIndex_ = uniformIndex;
+    }
+
+    const uint16_t& GetUniformIndex() const
+    {
+        return uniformIndex_;
+    }
+
+    void SetTransMatrix(const Drawing::Matrix& matrix) {
+        matrix_ = matrix;
+    }
+
+    const Drawing::Matrix& GetTransMatrix() const
+    {
+        return matrix_;
+    }
+private:
+    mutable uint16_t uniformIndex_;
+    mutable Drawing::Matrix matrix_;
 };
 } // Drawing
 } // namespace Rosen
