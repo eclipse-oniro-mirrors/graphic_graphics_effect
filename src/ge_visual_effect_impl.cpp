@@ -2867,6 +2867,9 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
         constexpr float MAX_S = 1.0f;
         frostedGlassParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
     }
+    if (tag == GE_FILTER_FROSTED_GLASS_BGALPHA) {
+        frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -3162,6 +3165,10 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
         constexpr float MIN_S = 0.0f;
         constexpr float MAX_S = 1.0f;
         frostedGlassEffectParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA) {
+        frostedGlassEffectParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid range is between 0.0f and 1.0f
     }
 }
 
