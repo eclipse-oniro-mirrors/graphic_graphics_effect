@@ -71,6 +71,8 @@ public:
     void SetParam(const std::string& tag, const GESDFBorderParams& param);
     void SetParam(const std::string& tag, const GESDFShadowParams& param);
 
+    const std::shared_ptr<Drawing::GEShaderShape> GetGEShaderShape(const std::string& tag) const;
+
     const std::string& GetName() const
     {
         return visualEffectName_;

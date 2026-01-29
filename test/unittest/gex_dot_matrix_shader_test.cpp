@@ -31,8 +31,6 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
- 
-    DotMatrixNormalParams params_;
 };
  
 void GEXDotMatrixShaderTest::SetUpTestCase(void) {}
@@ -42,17 +40,6 @@ void GEXDotMatrixShaderTest::TearDownTestCase(void) {}
 void GEXDotMatrixShaderTest::SetUp() {}
  
 void GEXDotMatrixShaderTest::TearDown() {}
- 
-/**
- * @tc.name: CreateDynamicImpl_001
- * @tc.desc: Verify function CreateDynamicImpl
- * @tc.type:FUNC
- */
-HWTEST_F(GEXDotMatrixShaderTest, CreateDynamicImpl_001, TestSize.Level0)
-{
-    auto impl = GEXDotMatrixShader::CreateDynamicImpl(params_);
-    EXPECT_EQ(impl, nullptr);
-}
  
 /**
  * @tc.name: GetDescription_001

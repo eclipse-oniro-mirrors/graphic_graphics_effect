@@ -99,15 +99,29 @@ const std::string JFA_ITERATION_SHADER = R"(
         }
     }
 
+    void SearchNeighbors(inout vec4 O, vec2 fragCoord, vec2 sampleCoord)
+    {
+        vec4 imgSample = SafeFetch(sampleCoord);
+        vec4 a = vec4(DecodeCoords(imgSample.xy, sampleCoord), DecodeCoords(imgSample.zw, sampleCoord));
+        if (imgSample.x < 1.0 && imgSample.y < 1.0 && imgSample.x > 0.0 && imgSample.y > 0.0) {
+            vec2 diffA = fragCoord - a.xy;
+            vec2 diffO = O.xy - fragCoord;
+            O.xy = dot(diffA, diffA) < dot(diffO, diffO) ? a.xy : O.xy;
+        }
+        if (imgSample.z < 1.0 && imgSample.w < 1.0 && imgSample.z > 0.0 && imgSample.w > 0.0) {
+            vec2 diffA = fragCoord - a.zw;
+            vec2 diffO = O.zw - fragCoord;
+            O.zw = dot(diffA, diffA) < dot(diffO, diffO) ? a.zw : O.zw;
+        }
+    }
+
     half4 main(vec2 fragCoord) {
         vec4 O = imageInput.eval(fragCoord);
         O = vec4(DecodeCoords(O.xy, fragCoord), DecodeCoords(O.zw, fragCoord));
-
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, -1.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, 1.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(-1.0, 0.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(1.0, 0.0));
-
         O = vec4(EncodeCoords(O.xy, fragCoord), EncodeCoords(O.zw, fragCoord));
         return O;
     }
@@ -387,7 +401,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaProcessResultEffect(
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::ColorType& outputColorType)
 {
-    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaProcessResultEffect Run JFA ProcessResult function.");
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaProcessResultEffect Run JFA ProcessResult Function.");
     auto outputImageInfo = image->GetImageInfo();
     outputImageInfo.SetColorType(outputColorType);
 

@@ -52,9 +52,9 @@ public:
 
     void UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value);
 
-private:
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 
+private:
     std::vector<std::shared_ptr<GEVisualEffect>> filterVec_;
 };
 

@@ -32,6 +32,10 @@ class GESDFEdgeLight final : public GEShaderFilter {
         Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> sdfImage, float radius);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeEffectShader(float imageWidth, float imageHeight);
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeImageMerger(Drawing::Image& image, Drawing::Image& composeImage);
+
+    std::shared_ptr<Drawing::Image> MergeImage(
+        Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image, std::shared_ptr<Drawing::Image> compositeImage);
 
 public:
     explicit GESDFEdgeLight(const Drawing::GESDFEdgeLightFilterParams& params);
