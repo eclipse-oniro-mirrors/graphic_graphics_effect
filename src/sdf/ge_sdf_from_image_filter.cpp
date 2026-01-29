@@ -104,7 +104,6 @@ const std::string JFA_ITERATION_SHADER = R"(
         O = vec4(DecodeCoords(O.xy, fragCoord), DecodeCoords(O.zw, fragCoord));
 
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, -1.0));
-        SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, 0.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(0.0, 1.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(-1.0, 0.0));
         SearchNeighbors(O, fragCoord, fragCoord + jfaRadius * vec2(1.0, 0.0));
@@ -323,7 +322,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawin
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::Rect& src, const Drawing::Rect& dst, const Drawing::ColorType& outputColorType)
 {
-    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJFAPrepareEffect Run JFA Prepare function.");
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJFAPrepareEffect Run JFA Prepare Function.");
     auto imageInfo = image->GetImageInfo();
     auto width = image->GetWidth();
     auto height = image->GetHeight();
@@ -350,7 +349,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJfaIterationsEffect(Dra
     const std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
     const Drawing::ColorType& outputColorType)
 {
-    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaIterationsEffect Run JFA Iteration function.");
+    GE_TRACE_NAME_FMT("GESDFFromImageFilter::RunJfaIterationsEffect Run JFA Iteration Function.");
     Drawing::Matrix identityMatrix;
 
     auto outputImageInfo = image->GetImageInfo();
