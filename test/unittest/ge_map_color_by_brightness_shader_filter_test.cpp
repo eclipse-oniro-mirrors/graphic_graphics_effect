@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ge_color_remap_shader_filter.h"
+#include "ge_map_color_by_brightness_shader_filter.h"
 
 #include "draw/color.h"
 #include "image/bitmap.h"
@@ -28,7 +28,7 @@ namespace GraphicsEffectEngine {
 
 using namespace Rosen;
 
-class GEColorRemapShaderFilterTest : public testing::Test {
+class GEMapColorByBrightnessShaderFilterTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
@@ -43,11 +43,11 @@ public:
     Drawing::Rect dst_ { 1.0f, 1.0f, 2.0f, 2.0f };
 };
 
-void GEColorRemapShaderFilterTest::SetUpTestCase(void) {}
+void GEMapColorByBrightnessShaderFilterTest::SetUpTestCase(void) {}
 
-void GEColorRemapShaderFilterTest::TearDownTestCase(void) {}
+void GEMapColorByBrightnessShaderFilterTest::TearDownTestCase(void) {}
 
-void GEColorRemapShaderFilterTest::SetUp()
+void GEMapColorByBrightnessShaderFilterTest::SetUp()
 {
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
@@ -57,21 +57,21 @@ void GEColorRemapShaderFilterTest::SetUp()
     src_ = image_->GetImageInfo().GetBound();
 }
 
-void GEColorRemapShaderFilterTest::TearDown() { image_ = nullptr; }
+void GEMapColorByBrightnessShaderFilterTest::TearDown() { image_ = nullptr; }
 
 /**
  * @tc.name: OnProcessImage_001
  * @tc.desc: Verify function OnProcessImage with nullptr image
  * @tc.type:FUNC
  */
-HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_001, TestSize.Level0)
+HWTEST_F(GEMapColorByBrightnessShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    Drawing::GEColorRemapFilterParams colorParams;
-    auto colorRemapFilter = std::make_shared<GEColorRemapShaderFilter>(colorParams);
-    ASSERT_TRUE(colorRemapFilter != nullptr);
+    Drawing::GEMapColorByBrightnessFilterParams colorParams;
+    auto filter = std::make_shared<GEMapColorByBrightnessShaderFilter>(colorParams);
+    ASSERT_TRUE(filter != nullptr);
 
     std::shared_ptr<Drawing::Image> image = nullptr;
-    EXPECT_EQ(colorRemapFilter->OnProcessImage(canvas_, image, src_, dst_), image);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
 }
 
 /**
@@ -79,7 +79,7 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_001, TestSize.Level0)
  * @tc.desc: Verify function OnProcessImage width valid params
  * @tc.type:FUNC
  */
-HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_002, TestSize.Level0)
+HWTEST_F(GEMapColorByBrightnessShaderFilterTest, OnProcessImage_002, TestSize.Level0)
 {
     // init valid colors params
     Vector4f color1 = {1.0f, 0.0f, 0.5f, 1.0f}; // color rgba
@@ -87,10 +87,10 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_002, TestSize.Level0)
     Vector4f color3 = {0.0f, 0.5f, 0.5f, 1.0f}; // color rgba
     std::vector<Vector4f> colors = {color1, color3, color3};
     std::vector<float> positions = {0.2f, 0.1f, 0.7f};
-    Drawing::GEColorRemapFilterParams colorParams = {colors, positions};
-    auto colorRemapFilter = std::make_shared<GEColorRemapShaderFilter>(colorParams);
-    ASSERT_TRUE(colorRemapFilter != nullptr);
-    EXPECT_EQ(colorRemapFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    Drawing::GEMapColorByBrightnessFilterParams colorParams = {colors, positions};
+    auto filter = std::make_shared<GEMapColorByBrightnessShaderFilter>(colorParams);
+    ASSERT_TRUE(filter != nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -98,7 +98,7 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_002, TestSize.Level0)
  * @tc.desc: Verify function OnProcessImage width invalid params
  * @tc.type:FUNC
  */
-HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_003, TestSize.Level0)
+HWTEST_F(GEMapColorByBrightnessShaderFilterTest, OnProcessImage_003, TestSize.Level0)
 {
     // init valid colors params
     Vector4f color1 = {1.0f, 0.0f, 0.5f, 1.0f}; // color rgba
@@ -107,10 +107,10 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_003, TestSize.Level0)
     Vector4f color4 = {1.0f, 1.0f, 0.5f, 1.0f}; // color rgba
     std::vector<Vector4f> colors = {color1, color3, color3, color4};
     std::vector<float> positions = {0.2f, 0.1f, 0.7f, 0.8f};
-    Drawing::GEColorRemapFilterParams colorParams = {colors, positions};
-    auto colorRemapFilter = std::make_shared<GEColorRemapShaderFilter>(colorParams);
-    ASSERT_TRUE(colorRemapFilter != nullptr);
-    EXPECT_EQ(colorRemapFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    Drawing::GEMapColorByBrightnessFilterParams colorParams = {colors, positions};
+    auto filter = std::make_shared<GEMapColorByBrightnessShaderFilter>(colorParams);
+    ASSERT_TRUE(filter != nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -118,17 +118,17 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_003, TestSize.Level0)
  * @tc.desc: Verify function OnProcessImage width invalid params with positions is empty
  * @tc.type:FUNC
  */
-HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_004, TestSize.Level0)
+HWTEST_F(GEMapColorByBrightnessShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 {
     // init colors params
     Vector4f color1 = {1.0f, 0.0f, 0.5f, 1.0f}; // color rgba
     Vector4f color2 = {1.0f, 0.5f, 0.5f, 1.0f}; // color rgba
     std::vector<Vector4f> colors = {color1, color2};
     std::vector<float> positions = {};
-    Drawing::GEColorRemapFilterParams colorParams = {colors, positions};
-    auto colorRemapFilter = std::make_shared<GEColorRemapShaderFilter>(colorParams);
-    ASSERT_TRUE(colorRemapFilter != nullptr);
-    EXPECT_EQ(colorRemapFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    Drawing::GEMapColorByBrightnessFilterParams colorParams = {colors, positions};
+    auto filter = std::make_shared<GEMapColorByBrightnessShaderFilter>(colorParams);
+    ASSERT_TRUE(filter != nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -136,15 +136,15 @@ HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_004, TestSize.Level0)
  * @tc.desc: Verify function OnProcessImage width invalid params with colors is empty
  * @tc.type:FUNC
  */
-HWTEST_F(GEColorRemapShaderFilterTest, OnProcessImage_005, TestSize.Level0)
+HWTEST_F(GEMapColorByBrightnessShaderFilterTest, OnProcessImage_005, TestSize.Level0)
 {
     // init colors params
     std::vector<Vector4f> colors = {};
     std::vector<float> positions = {0.5f, 1.0f};
-    Drawing::GEColorRemapFilterParams colorParams = {colors, positions};
-    auto colorRemapFilter = std::make_shared<GEColorRemapShaderFilter>(colorParams);
-    ASSERT_TRUE(colorRemapFilter != nullptr);
-    EXPECT_EQ(colorRemapFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    Drawing::GEMapColorByBrightnessFilterParams colorParams = {colors, positions};
+    auto filter = std::make_shared<GEMapColorByBrightnessShaderFilter>(colorParams);
+    ASSERT_TRUE(filter != nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

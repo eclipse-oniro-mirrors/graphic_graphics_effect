@@ -16,8 +16,8 @@
 #include <algorithm>
 #include <cmath>
 
-#include "ge_color_remap_shader_filter.h"
 #include "ge_log.h"
+#include "ge_map_color_by_brightness_shader_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 
@@ -29,12 +29,12 @@ constexpr static uint8_t REMAP_COLOR_CHANNEL = 3; // 3 len of rgb
 constexpr static uint8_t COLOR_ARRAY_SIZE = 5;  // 5 len of array
 } // namespace
 
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_colorRemapShaderEffect_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_mapColorByBrightnessShaderEffect_ = nullptr;
 
-GEColorRemapShaderFilter::GEColorRemapShaderFilter(
-    const Drawing::GEColorRemapFilterParams &params) : params_(params) {}
+GEMapColorByBrightnessShaderFilter::GEMapColorByBrightnessShaderFilter(
+    const Drawing::GEMapColorByBrightnessFilterParams &params) : params_(params) {}
 
-static const std::string colorRemapEffect(R"(
+static const std::string mapColorByBrightnessEffect(R"(
     uniform shader ImageShader;
     uniform vec3 colors[5];
     uniform float positions[5];
@@ -91,20 +91,20 @@ static const std::string colorRemapEffect(R"(
     }
 )");
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorRemapShaderFilter::MakeColorRemapBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMapColorByBrightnessShaderFilter::MakeMapColorByBrightnessBuilder()
 {
-    if (g_colorRemapShaderEffect_ == nullptr) {
-        g_colorRemapShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(colorRemapEffect);
-        if (g_colorRemapShaderEffect_ == nullptr) {
-            LOGE("MakeColorRemapBuilder effect error\n");
+    if (g_mapColorByBrightnessShaderEffect_ == nullptr) {
+        g_mapColorByBrightnessShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(mapColorByBrightnessEffect);
+        if (g_mapColorByBrightnessShaderEffect_ == nullptr) {
+            LOGE("MakeMapColorByBrightnessBuilder effect error\n");
             return nullptr;
         }
     }
 
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_colorRemapShaderEffect_);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_mapColorByBrightnessShaderEffect_);
 }
 
-bool GEColorRemapShaderFilter::CheckInColorRemapParams(float* color, float* position)
+bool GEMapColorByBrightnessShaderFilter::CheckInMapColorByBrightnessParams(float* color, float* position)
 {
     if (params_.colors.empty() || params_.positions.empty()) {
         LOGE("updateColorParams colors or positions is invalid");
@@ -113,44 +113,39 @@ bool GEColorRemapShaderFilter::CheckInColorRemapParams(float* color, float* posi
 
     size_t n = std::min(params_.positions.size(), params_.colors.size());
     n = n > COLOR_ARRAY_SIZE ? COLOR_ARRAY_SIZE : n;
-    for (size_t i = 0; i < n - 1; ++i) {
-        bool swapped = false;
-        for (size_t j = 0; j < n - i - 1; ++j) {
-            if (params_.positions[j] > params_.positions[j + 1]) {
-                std::swap(params_.positions[j], params_.positions[j + 1]);
-                std::swap(params_.colors[j], params_.colors[j + 1]);
-                swapped = true;
-            }
-        }
-        if (!swapped) {
-            break;
-        }
+    std::vector<size_t> idx(n);
+    for (size_t i = 0; i < n; i++) {
+        idx[i] = i;
     }
 
+    std::sort(idx.begin(), idx.end(), [&](size_t a, size_t b) {
+        return params_.positions[a] < params_.positions[b];
+    });
+
     for (size_t i = 0; i < n; i++) {
-        color[i * REMAP_COLOR_CHANNEL + 0] = params_.colors[i][0];   // 0 red
-        color[i * REMAP_COLOR_CHANNEL + 1] = params_.colors[i][1];   // 1 green
-        color[i * REMAP_COLOR_CHANNEL + 2] = params_.colors[i][2];   // 2 blur
-        position[i] = params_.positions[i];   // 0 x
+        color[i * REMAP_COLOR_CHANNEL + 0] = params_.colors[idx[i]][0];   // 0 red
+        color[i * REMAP_COLOR_CHANNEL + 1] = params_.colors[idx[i]][1];   // 1 green
+        color[i * REMAP_COLOR_CHANNEL + 2] = params_.colors[idx[i]][2];   // 2 blur
+        position[i] = params_.positions[idx[i]];   // 0 x
     }
-    tailColor_ = params_.colors[n - 1];
-    tailPosition_ = params_.positions[n - 1];
+    tailColor_ = params_.colors[idx[n - 1]];
+    tailPosition_ = params_.positions[idx[n - 1]];
     return true;
 }
 
-std::shared_ptr<Drawing::Image> GEColorRemapShaderFilter::OnProcessImage(
+std::shared_ptr<Drawing::Image> GEMapColorByBrightnessShaderFilter::OnProcessImage(
     Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> image,
     const Drawing::Rect &src, const Drawing::Rect &dst)
 {
     if (image == nullptr || image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
-        LOGE("GEColorRemapShaderFilter input is invalid.");
+        LOGE("GEMapColorByBrightnessShaderFilter input is invalid.");
         return nullptr;
     }
 
     float color[COLOR_ARRAY_SIZE * REMAP_COLOR_CHANNEL] = {0.0}; // 0.0 default
     float position[COLOR_ARRAY_SIZE] = {0.0}; // 0.0 default
-    if (!CheckInColorRemapParams(color, position)) {
-        LOGE("GEColorRemapShaderFilter CheckInColorRemapParams failed");
+    if (!CheckInMapColorByBrightnessParams(color, position)) {
+        LOGE("GEMapColorByBrightnessShaderFilter CheckInMapColorByBrightnessParams failed");
         return image;
     };
 
@@ -158,13 +153,13 @@ std::shared_ptr<Drawing::Image> GEColorRemapShaderFilter::OnProcessImage(
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
     if (srcImageShader == nullptr) {
-        LOGE("GEColorRemapShaderFilter srcImageShader is null");
+        LOGE("GEMapColorByBrightnessShaderFilter srcImageShader is null");
         return image;
     }
 
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = MakeColorRemapBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = MakeMapColorByBrightnessBuilder();
     if (!builder) {
-        LOGE("GEColorRemapShaderFilter MakeColorRemapBuilder builder error\n");
+        LOGE("GEMapColorByBrightnessShaderFilter MakeMapColorByBrightnessBuilder builder error\n");
         return image;
     }
 
@@ -177,7 +172,7 @@ std::shared_ptr<Drawing::Image> GEColorRemapShaderFilter::OnProcessImage(
 
     auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
     if (resultImage == nullptr) {
-        LOGE("GEColorRemapShaderFilter resultImage is null");
+        LOGE("GEMapColorByBrightnessShaderFilter resultImage is null");
         return image;
     }
     return resultImage;

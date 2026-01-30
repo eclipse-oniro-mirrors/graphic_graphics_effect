@@ -35,8 +35,8 @@ public:
         const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
     const std::string GetDescription() const {
-        std::string desc = "GEGammaCorrectionFilter";
-        desc.append(" gamma_:").append(std::to_string(gamma_));
+        std::string desc = "GEGammaCorrectionFilter gamma_:";
+        desc += std::to_string(gamma_);
         return desc;
     }
 
@@ -44,9 +44,8 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeGammaCorrectionBuilder();
 
     float gamma_ = 1.0;
-    static const std::string type_;
 };
 
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_GEX_GAMMA_CORRECTION_SHADER_FILTER_H
+#endif // GRAPHICS_EFFECT_GE_GAMMA_CORRECTION_FILTER_H

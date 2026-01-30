@@ -720,7 +720,7 @@ bool GEMESABlurShaderFilter::InitDirectionBlurEffect()
         half4 main(float2 xy) {
             half4 c = imageInput.eval(float2(in_blurOffset.x * in_dir.x + xy.x, in_blurOffset.y * in_dir.y + xy.y));
             c += imageInput.eval(float2(-in_blurOffset.x * in_dir.x + xy.x, -in_blurOffset.y * in_dir.y + xy.y));
-            return half4(c.rgba * 0.25);
+            return half4(c.rgba * 0.5);
         }
     )");
 

@@ -48,7 +48,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEGammaCorrectionFilter::MakeGamm
     if (g_gammaCorrectionShaderEffect_ == nullptr) {
         g_gammaCorrectionShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(gammaCorrectionEffect);
         if (g_gammaCorrectionShaderEffect_ == nullptr) {
-            LOGE("MakeColorRemapBuilder effect error\n");
+            LOGE("MakeGammaCorrectionBuilder effect error\n");
             return nullptr;
         }
     }
@@ -80,7 +80,7 @@ std::shared_ptr<Drawing::Image> GEGammaCorrectionFilter::OnProcessImage(
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = MakeGammaCorrectionBuilder();
     if (!builder) {
-        LOGE("GEXGammaCorrectionFilter MakeColorRemapBuilder builder error\n");
+        LOGE("GEXGammaCorrectionFilter MakeGammaCorrectionBuilder builder error\n");
         return image;
     }
 
