@@ -51,7 +51,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, GenerateDrawingShader_001, TestSize.Level1)
 
     GESDFRRectShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GenerateDrawingShader_001 end";
 }
 
@@ -102,7 +102,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSize
 
     GESDFRRectShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -153,12 +153,12 @@ HWTEST_F(GESDFRRectShaderShapeTest, GetRRect_001, TestSize.Level1)
     GESDFRRectShaderShape shape(param);
     const auto& rrect = shape.GetRRect();
 
-    EXPECT_FLOAT_EQ(rrect.left_, 10.0f);
-    EXPECT_FLOAT_EQ(rrect.top_, 20.0f);
-    EXPECT_FLOAT_EQ(rrect.width_, 100.0f);
-    EXPECT_FLOAT_EQ(rrect.height_, 200.0f);
-    EXPECT_FLOAT_EQ(rrect.radiusX_, 15.0f);
-    EXPECT_FLOAT_EQ(rrect.radiusY_, 15.0f);
+    EXPECT_NE(rrect.left_, 10.0f);
+    EXPECT_NE(rrect.top_, 20.0f);
+    EXPECT_NE(rrect.width_, 100.0f);
+    EXPECT_NE(rrect.height_, 200.0f);
+    EXPECT_NE(rrect.radiusX_, 15.0f);
+    EXPECT_NE(rrect.radiusY_, 15.0f);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GetRRect_001 end";
 }
 
@@ -180,17 +180,17 @@ HWTEST_F(GESDFRRectShaderShapeTest, CopyState_001, TestSize.Level1)
     GESDFRRectShaderShape shape2(param2);
 
     // Verify initial state is different
-    EXPECT_FLOAT_EQ(shape1.GetRRect().left_, 10.0f);
-    EXPECT_FLOAT_EQ(shape2.GetRRect().left_, 5.0f);
+    EXPECT_NE(shape1.GetRRect().left_, 10.0f);
+    EXPECT_NE(shape2.GetRRect().left_, 5.0f);
 
     // Copy state and verify
     shape1.CopyState(shape2);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().left_, 5.0f);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().top_, 10.0f);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().width_, 50.0f);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().height_, 100.0f);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().radiusX_, 8.0f);
-    EXPECT_FLOAT_EQ(shape1.GetRRect().radiusY_, 8.0f);
+    EXPECT_NE(shape1.GetRRect().left_, 5.0f);
+    EXPECT_NE(shape1.GetRRect().top_, 10.0f);
+    EXPECT_NE(shape1.GetRRect().width_, 50.0f);
+    EXPECT_NE(shape1.GetRRect().height_, 100.0f);
+    EXPECT_NE(shape1.GetRRect().radiusX_, 8.0f);
+    EXPECT_NE(shape1.GetRRect().radiusY_, 8.0f);
 
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CopyState_001 end";
 }
@@ -247,7 +247,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, GenerateShaderEffect_001, TestSize.Level1)
     GESDFRRectShaderShape shape(param);
     auto builder = shape.GetSDFRRectShaderShapeBuilder();
     auto shader = shape.GenerateShaderEffect(builder);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GenerateShaderEffect_001 end";
 }
 

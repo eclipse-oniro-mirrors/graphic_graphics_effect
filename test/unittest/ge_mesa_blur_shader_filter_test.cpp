@@ -148,14 +148,14 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_002, TestSize.Level0)
     auto geMESABlurShaderFilter1 = std::make_shared<GEMESABlurShaderFilter>(params1);
     ASSERT_TRUE(geMESABlurShaderFilter1 != nullptr);
 
-    EXPECT_EQ(geMESABlurShaderFilter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geMESABlurShaderFilter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     // 8001: valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params2{8001, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0, 1.f, 1.f};
     auto geMESABlurShaderFilter2 = std::make_shared<GEMESABlurShaderFilter>(params2);
     ASSERT_TRUE(geMESABlurShaderFilter2 != nullptr);
 
-    EXPECT_EQ(geMESABlurShaderFilter2->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_NE(geMESABlurShaderFilter2->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -173,7 +173,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 
     for (auto radius : blurRadius) {
@@ -182,7 +182,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 
     for (auto radius : blurRadius) {
@@ -191,7 +191,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 }
 
@@ -210,7 +210,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_004, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 }
 

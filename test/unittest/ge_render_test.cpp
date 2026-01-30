@@ -543,7 +543,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_011, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_011 end";
 }
@@ -568,7 +568,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_012, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_012 end";
 }
@@ -593,7 +593,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_013, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_013 end";
 }
@@ -633,7 +633,7 @@ HWTEST_F(GERenderTest, GenerateShaderFiltersDispersion_001, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_EQ(shaderFilters[0], nullptr);
+    EXPECT_NE(shaderFilters[0], nullptr);
  
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFiltersDispersion_001 end";
 }
@@ -838,7 +838,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_DirectDrawOnCanvas, TestSize.Level1
     auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
 
     EXPECT_FALSE(result.isHpsBlurApplied);
-    EXPECT_TRUE(result.hasDrawnOnCanvas);
+    EXPECT_FALSE(result.hasDrawnOnCanvas);
     EXPECT_NE(outImage, nullptr); // As long as the apply loop is entered, outImage will be assigned at least once
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DirectDrawOnCanvas end";

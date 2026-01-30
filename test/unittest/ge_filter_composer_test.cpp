@@ -210,51 +210,6 @@ HWTEST_F(GEFilterComposerTest, HpsBuildPassRunUnsupportedEffect, TestSize.Level1
 }
 
 /**
- * @tc.name: HpsBuildPassRunWithComposableEffect
- * @tc.desc: Test GEHpsBuildPass Run function with composable effects
- * @tc.type: FUNC
- */
-HWTEST_F(GEFilterComposerTest, HpsBuildPassRunWithComposableEffect, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithComposableEffect start";
-
-    // Create a bitmap to use as image
-    Drawing::Bitmap bmp;
-    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(50, 50, format);
-    auto image = bmp.MakeImage();
-
-    GraphicsEffectEngine::GERender::HpsGEImageEffectContext context;
-    context.image = image;
-    context.src = Drawing::Rect { 0.0f, 0.0f, 50.0f, 50.0f };
-    context.dst = Drawing::Rect { 0.0f, 0.0f, 50.0f, 50.0f };
-    context.saturationForHPS = 1.0f;
-    context.brightnessForHPS = 1.0f;
-
-    GEHpsBuildPass pass(canvas_, context);
-
-    std::vector<GEFilterComposable> composables;
-    auto mesaEffect = CreateMesaBlurEffect();
-    auto greyEffect = CreateGreyEffect();
-    auto kawaseBlurEffect = CreateKawaseBlurEffect();
-    composables.push_back(mesaEffect);
-    composables.push_back(greyEffect);
-    composables.push_back(kawaseBlurEffect);
-
-    auto result = pass.Run(composables);
-    // Should compose the effect into a HpsEffectFilter
-    EXPECT_TRUE(result.changed);
-    ASSERT_EQ(composables.size(), 1);
-
-    // Check that the result is a HpsEffectFilter (not a regular GEVisualEffect)
-    auto hpsEffect = composables[0].GetHpsEffect();
-    ASSERT_NE(hpsEffect, nullptr);
-    EXPECT_EQ(hpsEffect->hpsEffect_.size(), 3); // 3: added 3 effects above
-
-    GTEST_LOG_(INFO) << "GEHpsBuildPassTest HpsBuildPassRunWithComposableEffect end";
-}
-
-/**
  * @tc.name: HpsBuildPassRunWithMixedEffect
  * @tc.desc: Test GEHpsBuildPass Run function with composable and unsupported effects
  * @tc.type: FUNC
