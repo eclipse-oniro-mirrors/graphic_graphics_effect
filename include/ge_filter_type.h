@@ -88,6 +88,8 @@ enum class GEFilterType : int32_t {
     SDF_FROM_IMAGE,
     SDF_EDGE_LIGHT,
     SDF_COLOR,
+    MAP_COLOR_BY_BRIGHTNESS,
+    GAMMA_CORRECTION,
     MAX,
 };
 

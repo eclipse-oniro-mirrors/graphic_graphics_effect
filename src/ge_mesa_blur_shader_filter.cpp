@@ -40,6 +40,9 @@ static constexpr float BLUR_SCALE_1 = 0.25f; // 0.25 : downSample scale for step
 static constexpr float BLUR_SCALE_2 = 0.125f; // 0.125 : downSample scale for step1p5
 static constexpr float BLUR_SCALE_3 = 0.0625f; // 0.0625 : downSample scale for step2
 static constexpr float BLUR_SCALE_4 = 0.03125f; // 0.03125 : downSample scale for step3
+static constexpr float PI_F = 3.14159265358979323846f; // convert to radians
+static constexpr float ANGLE_MIN_VAL = 0.0f;
+static constexpr float ANGLE_MAX_VAL = 180.0f;
 static const std::array BLUR_RADIUS = {
     8,  // 8: BLUR_RADIUS_1
     20,     // 20: BLUR_RADIUS_1P5
@@ -49,6 +52,7 @@ static const std::array BLUR_RADIUS = {
     200     // 200: BLUR_RADIUS_3
 };
 static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffect;
+static std::shared_ptr<Drawing::RuntimeEffect> g_directionBlurEffect;
 static std::shared_ptr<Drawing::RuntimeEffect> g_mixEffect;
 static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
 static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
@@ -102,9 +106,14 @@ GEMESABlurShaderFilter::GEMESABlurShaderFilter(const Drawing::GEMESABlurShaderFi
     : radius_(params.radius), greyCoef1_(params.greyCoef1), greyCoef2_(params.greyCoef2),
       stretchOffsetX_(params.offsetX), stretchOffsetY_(params.offsetY),
       stretchOffsetZ_(params.offsetZ), stretchOffsetW_(params.offsetW),
-      tileMode_(static_cast<Drawing::TileMode>(params.tileMode)), width_(params.width), height_(params.height)
+      tileMode_(static_cast<Drawing::TileMode>(params.tileMode)), width_(params.width), height_(params.height),
+      isDirection_(params.isDirection), angle_(params.angle)
 {
     if (!InitBlurEffect() || !InitMixEffect() || !InitSimpleFilter()) {
+        return;
+    }
+
+    if (isDirection_ && !InitDirectionBlurEffect()) {
         return;
     }
 
@@ -488,6 +497,26 @@ Drawing::ImageInfo GEMESABlurShaderFilter::ComputeImageInfo(const Drawing::Image
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
 }
 
+std::pair<float, float> GEMESABlurShaderFilter::AngleToDirection(float angle)
+{
+    angle = std::clamp(angle, ANGLE_MIN_VAL, ANGLE_MAX_VAL);
+    const float epsilon = 1e-6f;
+    if (angle < epsilon) {
+        return {1.0f, 0.0f};
+    }
+
+    if (std::abs(angle - 90.0f) < epsilon) { // 90.0f: is vertical direction
+        return {0.0f, 1.0f};
+    }
+
+    if (std::abs(angle - ANGLE_MAX_VAL) < epsilon) {
+        return {-1.0f, 0.0f};
+    }
+
+    float rad = angle * PI_F / ANGLE_MAX_VAL;
+    return {std::cos(rad), -std::sin(rad)};
+}
+
 std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
@@ -514,6 +543,13 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpS
     auto height = std::max(static_cast<int>(std::ceil(dst.GetHeight())), input->GetHeight());
     auto scaledInfo = ComputeImageInfo(originImageInfo, width, height);
     Drawing::RuntimeShaderBuilder blurBuilder(g_blurEffect);
+
+    if (isDirection_) {
+        // 1.1. Set the direction of the blur width angle.
+        blurBuilder = Drawing::RuntimeShaderBuilder(g_directionBlurEffect);
+        auto dirXY = GEMESABlurShaderFilter::AngleToDirection(angle_);
+        blurBuilder.SetUniform("in_dir", dirXY.first, dirXY.second);
+    }
     Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
 
     // Step2. Apply downsampling and fuzed effect such as grey adjustment and pixel stretch
@@ -664,6 +700,33 @@ bool GEMESABlurShaderFilter::InitBlurEffect()
     g_blurEffect = Drawing::RuntimeEffect::CreateForShader(blurStringMESA);
     if (g_blurEffect == nullptr) {
         LOGE("GEMESABlurShaderFilter::RuntimeShader blurEffect create failed");
+        return false;
+    }
+
+    return true;
+}
+
+bool GEMESABlurShaderFilter::InitDirectionBlurEffect()
+{
+    if (g_directionBlurEffect != nullptr) {
+        return true;
+    }
+
+    static const std::string directionBlurStringMESA(R"(
+        uniform shader imageInput;
+        uniform float2 in_blurOffset;
+        uniform float2 in_dir;
+
+        half4 main(float2 xy) {
+            half4 c = imageInput.eval(float2(in_blurOffset.x * in_dir.x + xy.x, in_blurOffset.y * in_dir.y + xy.y));
+            c += imageInput.eval(float2(-in_blurOffset.x * in_dir.x + xy.x, -in_blurOffset.y * in_dir.y + xy.y));
+            return half4(c.rgba * 0.5);
+        }
+    )");
+
+    g_directionBlurEffect = Drawing::RuntimeEffect::CreateForShader(directionBlurStringMESA);
+    if (g_directionBlurEffect == nullptr) {
+        LOGE("GEMESABlurShaderFilter::RuntimeShader directionBlurEffect create failed");
         return false;
     }
 
