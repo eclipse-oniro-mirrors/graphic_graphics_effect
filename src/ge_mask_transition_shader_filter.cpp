@@ -25,6 +25,12 @@ GEMaskTransitionShaderFilter::GEMaskTransitionShaderFilter(const Drawing::GEMask
     : params_(params)
 {}
 
+void GEMaskTransitionShaderFilter::SetCache(std::shared_ptr<Drawing::Image> topLayerCache, Drawing::Matrix cacheMatrix)
+{
+    GEShaderFilter::SetCache(std::make_shared<std::any>(
+        std::make_pair(std::shared_ptr<Drawing::Image>(topLayerCache), cacheMatrix)));
+}
+
 std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
@@ -43,13 +49,13 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
 
     auto cache = GetCache();
     if (cache == nullptr) {
-        SetCache(std::make_shared<std::any>(std::make_pair(std::shared_ptr<Drawing::Image>(image), invertMatrix)));
+        GEShaderFilter::SetCache(
+            std::make_shared<std::any>(std::make_pair(std::shared_ptr<Drawing::Image>(image), invertMatrix)));
         return image;
     }
 
     auto cachedData = std::any_cast<std::pair<std::shared_ptr<Drawing::Image>, Drawing::Matrix>>(*cache);
     auto cacheImage = cachedData.first;
-    Drawing::Matrix cacheMatrix = cachedData.second;
 
     if (cacheImage == nullptr || cacheImage.get() == nullptr) {
         GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage cacheImage is nullptr");
@@ -69,7 +75,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
     }
     
     auto topLayer = Drawing::ShaderEffect::CreateImageShader(*cacheImage, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), cacheMatrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), cachedData.second);
     auto bottomLayer = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     builder->SetChild("alphaMask", maskEffectShader);
