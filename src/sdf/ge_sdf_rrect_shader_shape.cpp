@@ -162,8 +162,11 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
 
     builder->SetUniform("centerPos", params_.rrect.left_ + params_.rrect.width_ * HALF,
         params_.rrect.top_ + params_.rrect.height_ * HALF);
-    builder->SetUniform("halfSize", params_.rrect.width_ * HALF + EXTEND, params_.rrect.height_ * HALF + EXTEND);
-    builder->SetUniform("radius", params_.rrect.radiusX_ + EXTEND);
+    auto halfWidth = params_.rrect.width_ * HALF + EXTEND;
+    auto halfHeight = params_.rrect.height_ * HALF + EXTEND;
+    builder->SetUniform("halfSize", halfWidth, halfHeight);
+    builder->SetUniform("radius", std::min(std::max(0.0f, params_.rrect.radiusX_ + EXTEND),
+        std::min(halfWidth, halfHeight)));
 
     auto sdfRRectShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfRRectShapeShader) {

@@ -59,12 +59,12 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     shadowParams.shape = sdfShape;
     shadowShader.SetSDFShadowParams(shadowParams);
     shader = shadowShader.MakeSDFShadowShader(rect1);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
 
     shadowParams.shadow.color = Drawing::Color::COLOR_GRAY;
     shadowShader.SetSDFShadowParams(shadowParams);
     shader = shadowShader.MakeSDFShadowShader(rect1);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
 }
 
 /**

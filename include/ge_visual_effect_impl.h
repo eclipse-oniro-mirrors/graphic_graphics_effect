@@ -76,6 +76,8 @@ public:
     void SetParam(const std::string& tag, const GESDFBorderParams& param);
     void SetParam(const std::string& tag, const GESDFShadowParams& param);
 
+    const std::shared_ptr<Drawing::GEShaderShape> GetGEShaderShape(const std::string& tag) const;
+
     void SetFilterType(FilterType type)
     {
         filterType_ = type;
@@ -467,6 +469,16 @@ public:
         sdfClipShaderParams_ = std::make_shared<GESDFClipShaderParams>();
     }
 
+    const std::shared_ptr<GESDFColorShaderParams>& GetSDFColorShaderParams() const
+    {
+        return sdfColorShaderParams_;
+    }
+
+    void MakeSDFColorShaderParams()
+    {
+        sdfColorShaderParams_ = std::make_shared<GESDFColorShaderParams>();
+    }
+
     void MakeColorGradientEffectParams()
     {
         colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
@@ -821,6 +833,7 @@ private:
     std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
 
     std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
+    std::shared_ptr<GESDFColorShaderParams> sdfColorShaderParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;

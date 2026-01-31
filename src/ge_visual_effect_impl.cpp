@@ -558,6 +558,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFClipParams();
         }
     },
+    { GE_SHADER_SDF_COLOR,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_COLOR);
+            impl->MakeSDFColorShaderParams();
+        }
+    },
     { GE_SHADER_SDF_SHADOW,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_SHADOW);
@@ -1497,6 +1503,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             SetSDFClipParams(tag, param);
             break;
         }
+        case FilterType::SDF_COLOR: {
+            if (sdfColorShaderParams_ && param && tag == GE_SHADER_SDF_COLOR_SHAPE) {
+                sdfColorShaderParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         case FilterType::FROSTED_GLASS: {
             if (frostedGlassParams_ == nullptr || !param) {
                 return;
@@ -1705,6 +1717,12 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::NOISY_FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
+            break;
+        }
+        case FilterType::SDF_COLOR: {
+            if (sdfColorShaderParams_ && tag == GE_SHADER_SDF_COLOR_COLOR) {
+                sdfColorShaderParams_->color = param;
+            }
             break;
         }
         default:
@@ -2849,6 +2867,9 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const flo
         constexpr float MAX_S = 1.0f;
         frostedGlassParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
     }
+    if (tag == GE_FILTER_FROSTED_GLASS_BGALPHA) {
+        frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -3144,6 +3165,10 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
         constexpr float MIN_S = 0.0f;
         constexpr float MAX_S = 1.0f;
         frostedGlassEffectParams_->darkScale = std::clamp(param, MIN_S, MAX_S);
+    }
+
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA) {
+        frostedGlassEffectParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid range is between 0.0f and 1.0f
     }
 }
 
@@ -3451,6 +3476,34 @@ void GEVisualEffectImpl::SetSDFEdgeLightParams(const std::string& tag, float par
         sdfEdgeLightParams_->outerBorderBloomWidth = param;
     }
 }
+
+const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImpl::GetGEShaderShape(const std::string& tag) const
+{
+    switch (filterType_) {
+        case FilterType::FROSTED_GLASS: {
+            if (!frostedGlassParams_) {
+                return nullptr;
+            }
+            if (tag == GE_FILTER_FROSTED_GLASS_SHAPE) {
+                return frostedGlassParams_->sdfShape;
+            }
+            break;
+        }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            if (!frostedGlassEffectParams_) {
+                return nullptr;
+            }
+            if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE) {
+                return frostedGlassEffectParams_->sdfShape;
+            }
+            break;
+        }
+        default:
+            return nullptr;
+    }
+    return nullptr;
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

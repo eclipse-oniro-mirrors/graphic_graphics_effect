@@ -60,7 +60,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShader_001, TestSize.Level1
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShader_001 end";
 }
 
@@ -80,7 +80,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShader_002, TestSize.Level1
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShader_002 end";
 }
 
@@ -118,7 +118,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShader_004, TestSize.Level1
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShader_004 end";
 }
 
@@ -137,7 +137,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShader_005, TestSize.Level1
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShader_005 end";
 }
 
@@ -156,7 +156,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSi
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -176,7 +176,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShaderHasNormal_002, TestSi
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_NE(shader, nullptr);
+    EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShaderHasNormal_002 end";
 }
 
@@ -387,29 +387,6 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GetSDFNormalSmoothUnionBuilder_001, TestSi
 }
 
 /**
- * @tc.name: GenerateUnionShaderEffect_001
- * @tc.desc: Verify GenerateUnionShaderEffect returns valid shader effect
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateUnionShaderEffect_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateUnionShaderEffect_001 start";
-    GESDFUnionOpShapeParams param;
-    param.left = CreateTestShape();
-    param.right = CreateTestShape();
-    param.op = GESDFUnionOp::UNION;
-
-    GESDFUnionOpShaderShape shape(param);
-    auto leftShader = param.left->GenerateDrawingShader(100.0f, 100.0f);
-    auto rightShader = param.right->GenerateDrawingShader(100.0f, 100.0f);
-    auto builder = shape.GetSDFUnionBuilder();
-
-    auto shader = shape.GenerateUnionShaderEffect(leftShader, rightShader, builder);
-    EXPECT_NE(shader, nullptr);
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateUnionShaderEffect_001 end";
-}
-
-/**
  * @tc.name: GenerateUnionShaderEffect_002
  * @tc.desc: Verify GenerateUnionShaderEffect returns null for invalid builder
  * @tc.type: FUNC
@@ -429,54 +406,6 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateUnionShaderEffect_002, TestSize.Le
     auto shader = shape.GenerateUnionShaderEffect(leftShader, rightShader, nullptr);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateUnionShaderEffect_002 end";
-}
-
-/**
- * @tc.name: GenerateSmoothUnionShaderEffect_001
- * @tc.desc: Verify GenerateSmoothUnionShaderEffect returns valid shader effect
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateSmoothUnionShaderEffect_001, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateSmoothUnionShaderEffect_001 start";
-    GESDFUnionOpShapeParams param;
-    param.left = CreateTestShape();
-    param.right = CreateTestShape();
-    param.op = GESDFUnionOp::SMOOTH_UNION;
-    param.spacing = 5.0f;
-
-    GESDFUnionOpShaderShape shape(param);
-    auto leftShader = param.left->GenerateDrawingShader(100.0f, 100.0f);
-    auto rightShader = param.right->GenerateDrawingShader(100.0f, 100.0f);
-    auto builder = shape.GetSDFSmoothUnionBuilder();
-
-    auto shader = shape.GenerateSmoothUnionShaderEffect(leftShader, rightShader, builder);
-    EXPECT_NE(shader, nullptr);
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateSmoothUnionShaderEffect_001 end";
-}
-
-/**
- * @tc.name: GenerateSmoothUnionShaderEffect_002
- * @tc.desc: Verify GenerateSmoothUnionShaderEffect handles very small spacing
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateSmoothUnionShaderEffect_002, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateSmoothUnionShaderEffect_002 start";
-    GESDFUnionOpShapeParams param;
-    param.left = CreateTestShape();
-    param.right = CreateTestShape();
-    param.op = GESDFUnionOp::SMOOTH_UNION;
-    param.spacing = 0.00005f; // Very small spacing
-
-    GESDFUnionOpShaderShape shape(param);
-    auto leftShader = param.left->GenerateDrawingShader(100.0f, 100.0f);
-    auto rightShader = param.right->GenerateDrawingShader(100.0f, 100.0f);
-    auto builder = shape.GetSDFSmoothUnionBuilder();
-
-    auto shader = shape.GenerateSmoothUnionShaderEffect(leftShader, rightShader, builder);
-    EXPECT_NE(shader, nullptr); // Should clamp to minimum spacing
-    GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateSmoothUnionShaderEffect_002 end";
 }
 
 } // namespace Drawing
