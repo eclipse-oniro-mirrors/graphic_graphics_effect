@@ -524,12 +524,6 @@ std::shared_ptr<Drawing::HpsEffectParameter> HpsEffectFilter::GenerateEdgeLightE
         edgeThreshold, edgeIntensity, edgeSoftThreshold, edgeDetectColor};
     auto edgeLightParamPtr = std::make_shared<Drawing::HpsEdgeLightParameter>(
         src, dst, alpha, bloom, useRawColor, color, mask, edgeSobelParam, 0);
-    if (g_lastEdgeLightParameter) {
-        edgeLightParamPtr->updatedType = GetUpdatedTypeForEdgeLight(
-            g_lastEdgeLightParameter, edgeLightParamPtr, g_lastEdgeLightImageID, image ? image->GetUniqueID() : 0);
-    }
-    g_lastEdgeLightParameter = edgeLightParamPtr;
-    g_lastEdgeLightImageID = image ? image->GetUniqueID() : 0;
     return edgeLightParamPtr;
 }
 
@@ -620,6 +614,22 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
         return Drawing::RuntimeEffect::CreateForShader(mixString);
     }();
     return s_upscaleEffect;
+}
+
+void HpsEffectFilter::UpdateHpsEffectCacheParameter(const std::shared_ptr<Drawing::Image>& image)
+{
+    for (auto& effectInfo : hpsEffect_) {
+        if (effectInfo->GetEffectType() == Drawing::HpsEffect::EDGE_LIGHT) {
+            auto edgeLightInfo = std::static_pointer_cast<Drawing::HpsEdgeLightParameter>(effectInfo);
+            if (g_lastEdgeLightParameter) {
+                // DTK side use this parameter to optimize computational load
+                edgeLightInfo->updatedType = GetUpdatedTypeForEdgeLight(g_lastEdgeLightParameter,
+                    edgeLightInfo, g_lastEdgeLightImageID, image ? image->GetUniqueID() : 0);
+            }
+            g_lastEdgeLightParameter = edgeLightInfo;
+            g_lastEdgeLightImageID = image ? image->GetUniqueID() : 0;
+        }
+    }
 }
 
 bool HpsEffectFilter::DrawImageWithHpsUpscale(Drawing::Canvas& canvas,
@@ -783,9 +793,7 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
         return false;
     }
     auto surface = canvas.GetSurface();
-    if (surface == nullptr) {
-        return false;
-    }
+    if (surface == nullptr) { return false; }
     std::shared_ptr<Drawing::Surface> offscreenSurface = surface->MakeSurface(dimension[0], dimension[1]);
     if (offscreenSurface == nullptr) { return false; }
     std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
@@ -800,6 +808,7 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
             effectInfo->dst = effectInfo->src;
         }
     }
+    UpdateHpsEffectCacheParameter(image);
     if (!offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) {
         LOGD("HpsEffectFilter::ApplyHpsEffect DrawImageEffectHPS fail");
         return false;
