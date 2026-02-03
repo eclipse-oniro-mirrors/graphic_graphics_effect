@@ -1342,6 +1342,43 @@ struct GEXNoisyFrameGradientMaskParams {
 REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
                                 GEX_MASK_NOISY_FRAME_GRADIENT);
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
+
+struct GEWaterGlassDataParams final {
+    Drawing::Point waveCenter = { 0.0f, 0.0f };
+    Drawing::Point waveSourceXY = { 0.0f, 0.0f };
+    Drawing::Point waveDistortXY = { 0.28f, 0.11f };
+    Drawing::Point waveDensityXY = { 5.28f, 5.22f };
+    float waveStrength = 2.6f;
+    float waveLightStrength = 0.12f;
+    float waveRefraction = 25.0f;
+    float waveSpecular = 0.4f;
+    float waveFrequency = 4.3f;
+    float waveShapeDistortion = 1.2f;
+    float waveNoiseStrength = 0.1f;
+    Drawing::Point waveMaskSize = { 0.5f, 0.5f };
+    float waveMaskRadius = 0.0f;
+    float borderRadius = 0.0f;
+    float borderThickness = 0.0f;
+    float borderScope = 0.05f;
+    float borderStrength = 0.39f;
+    float progress = 0.0f;
+};
+
+struct GEReededGlassDataParams final {
+    float refractionFactor = 0.2f;
+    float dispersionStrength = 0.0f;
+    float roughness = 0.0f;
+    float noiseFrequency = 210.0f;
+    float horizontalPatternNumber = 10.0f;
+    float saturationFactor = 1.3f;
+    float borderLightStrength = 0.1f;
+    float borderLightWidth = 0.1f;
+    Drawing::Color4f pointLightColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+    Drawing::Point pointLight1Position = { 1.0f, 0.5f };
+    float pointLight1Strength = 0.1f;
+    Drawing::Point pointLight2Position = { 0.0f, 0.5f };
+    float pointLight2Strength = 0.1f;
+};
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
