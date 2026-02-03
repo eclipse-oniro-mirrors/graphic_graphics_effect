@@ -40,6 +40,7 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     std::shared_ptr<ShaderEffect> CreateFrameGradientMaskShader(float width, float height) const;
 private:
+    Drawing::Rect GetSubtractedRect(float width, float height) const override;
     bool ValidateParams(float width, float height) const;
     void MakeFrameGradientMaskShaderEffect() const;
     Vector4f innerBezier_;

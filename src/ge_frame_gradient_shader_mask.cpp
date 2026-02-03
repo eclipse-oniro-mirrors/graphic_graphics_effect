@@ -24,6 +24,8 @@ namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> frameGradientMaskShaderEffect_ = nullptr;
 
 static constexpr float EPSILON = 1e-6;
+static constexpr float SQRT_2 = 1.41421356f;
+static constexpr float NORMALIZATION_FACTOR = 2.0f;
 
 inline static const std::string maskString = R"(
     uniform half2 iResolution;
@@ -136,9 +138,9 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::CreateFrameGradientMask
         outerBezier_[1], outerBezier_[2], outerBezier_[3]};
     maskBuilder->SetUniform("innerBezier", innerBezier.data(), ARRAY_SIZE_FOUR);
     maskBuilder->SetUniform("outerBezier", outerBezier.data(), ARRAY_SIZE_FOUR);
-    maskBuilder->SetUniform("cornerRadius", cornerRadius_ * 2.0 / height);
-    maskBuilder->SetUniform("innerFrameWidth", innerFrameWidth_ * 2.0 / height);
-    maskBuilder->SetUniform("outerFrameWidth", outerFrameWidth_ * 2.0 / height);
+    maskBuilder->SetUniform("cornerRadius", cornerRadius_ * NORMALIZATION_FACTOR / height);
+    maskBuilder->SetUniform("innerFrameWidth", innerFrameWidth_ * NORMALIZATION_FACTOR / height);
+    maskBuilder->SetUniform("outerFrameWidth", outerFrameWidth_ * NORMALIZATION_FACTOR / height);
     maskBuilder->SetUniform("rectWH", rectWH_.first, rectWH_.second);
     maskBuilder->SetUniform("rectPos", rectPos_.first, rectPos_.second);
     auto maskShader = maskBuilder->MakeShader(nullptr, false);
@@ -158,6 +160,72 @@ void GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect() const
     if (frameGradientMaskShaderEffect_ == nullptr) {
         LOGE("GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect error");
     }
+}
+
+Drawing::Rect GEFrameGradientShaderMask::GetSubtractedRect(float width, float height) const
+{
+    if (!ValidateParams(width, height)) {
+        LOGE("GEFrameGradientShaderMask::GetSubtractedRect invalid input");
+        return Drawing::Rect();
+    }
+
+    float screenRatio = height / width;
+
+    // rectPos_ [-1, 1] Normalized to [0, 1]
+    float centerXNormalized = (rectPos_.first + 1.0f) / NORMALIZATION_FACTOR;
+    float centerYNormalized = (rectPos_.second + 1.0f) / NORMALIZATION_FACTOR;
+
+    // Calculate top-left coordinates of the rounded rectangle
+    float rectLeft = centerXNormalized - rectWH_.first / NORMALIZATION_FACTOR;
+    float rectTop = centerYNormalized - rectWH_.second / NORMALIZATION_FACTOR;
+    float rectRight = rectLeft + rectWH_.first;
+    float rectBottom = rectTop + rectWH_.second;
+
+    // Calculate half of the inner border width
+    float innerBorderWidth = innerFrameWidth_ / height;
+
+    // Calculate minimum edge to determine real corner radius
+    float minEdge = std::min(height * rectWH_.second, width * rectWH_.first) / NORMALIZATION_FACTOR;
+    float realCornerRadius = std::min(cornerRadius_, minEdge) / height;
+
+    // EPSILON:Small offset for precision
+    // Calculate initial adjusted boundary values based on border width
+    float adjustedLeft = rectLeft + innerBorderWidth * screenRatio + EPSILON;
+    float adjustedTop = rectTop + innerBorderWidth + EPSILON;
+    float adjustedRight = rectRight - innerBorderWidth * screenRatio - EPSILON;
+    float adjustedBottom = rectBottom - innerBorderWidth - EPSILON;
+
+    // If border width is greater than or equal to corner radius, calculate inscribed rectangle directly by border width
+    if (innerBorderWidth < realCornerRadius) {
+        // Calculate inscribed rectangle based on aspect ratio and corner radius relationship
+        if (std::abs(screenRatio * rectWH_.second - rectWH_.first) > realCornerRadius) {
+            if (screenRatio * rectWH_.second > rectWH_.first) {
+                // Vertical rectangle case
+                adjustedTop = rectTop + realCornerRadius;
+                adjustedBottom = rectBottom - realCornerRadius;
+            } else {
+                // Horizontal rectangle case
+                adjustedLeft = rectLeft + realCornerRadius * screenRatio;
+                adjustedRight = rectRight - realCornerRadius * screenRatio;
+            }
+        } else {
+            // Calculate inscribed rectangle for corner area (diagonal case)
+            float innerRadius = realCornerRadius - innerBorderWidth;
+            float diagonalOffset = realCornerRadius - innerRadius / SQRT_2;
+            adjustedTop = rectTop + diagonalOffset + EPSILON;
+            adjustedBottom = rectBottom - diagonalOffset - EPSILON;
+            adjustedLeft = rectLeft + diagonalOffset * screenRatio + EPSILON;
+            adjustedRight = rectRight - diagonalOffset * screenRatio - EPSILON;
+        }
+    }
+    LOGD("GEFrameGradientShaderMask::GetSubtractedRect "
+        "l: %{public}f, t: %{public}f, r: %{public}f, b: %{public}f, radius: %{public}f;",
+        adjustedLeft, adjustedTop, adjustedRight, adjustedBottom, realCornerRadius);
+    // Check rectangle validity
+    if (adjustedLeft > adjustedRight || adjustedTop > adjustedBottom) {
+        return Drawing::Rect();
+    }
+    return Drawing::Rect(adjustedLeft, adjustedTop, adjustedRight, adjustedBottom);
 }
 
 } // namespace Drawing
