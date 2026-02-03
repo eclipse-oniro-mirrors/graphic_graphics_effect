@@ -100,7 +100,7 @@ bool GEFrameGradientShaderMask::ValidateParams(float width, float height) const
         return false;
     }
 
-    LOGD("GEFrameGradientShaderMask::CreateFrameGradientMaskShader -> "
+    GE_LOGD("GEFrameGradientShaderMask::CreateFrameGradientMaskShader -> "
         "innerFrameWidth: %{public}f, outerFrameWidth: %{public}f, cornerRadius: %{public}f, "
         "rectPos: (%{public}f, %{public}f), "
         "rectWH: (%{public}f, %{public}f), "
@@ -126,7 +126,7 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::CreateFrameGradientMask
 {
     MakeFrameGradientMaskShaderEffect();
     if (!frameGradientMaskShaderEffect_ || !ValidateParams(width, height)) {
-        LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader create builder error");
+        GE_LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader create builder error");
         return nullptr;
     }
 
@@ -145,7 +145,7 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::CreateFrameGradientMask
     maskBuilder->SetUniform("rectPos", rectPos_.first, rectPos_.second);
     auto maskShader = maskBuilder->MakeShader(nullptr, false);
     if (!maskShader) {
-        LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader fail");
+        GE_LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader fail");
     }
     return maskShader;
 }
@@ -158,14 +158,14 @@ void GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect() const
 
     frameGradientMaskShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(maskString);
     if (frameGradientMaskShaderEffect_ == nullptr) {
-        LOGE("GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect error");
+        GE_LOGE("GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect error");
     }
 }
 
 Drawing::Rect GEFrameGradientShaderMask::GetSubtractedRect(float width, float height) const
 {
     if (!ValidateParams(width, height)) {
-        LOGE("GEFrameGradientShaderMask::GetSubtractedRect invalid input");
+        GE_LOGE("GEFrameGradientShaderMask::GetSubtractedRect invalid input");
         return Drawing::Rect();
     }
 
@@ -218,7 +218,7 @@ Drawing::Rect GEFrameGradientShaderMask::GetSubtractedRect(float width, float he
             adjustedRight = rectRight - diagonalOffset * screenRatio - EPSILON;
         }
     }
-    LOGD("GEFrameGradientShaderMask::GetSubtractedRect "
+    GE_LOGD("GEFrameGradientShaderMask::GetSubtractedRect "
         "l: %{public}f, t: %{public}f, r: %{public}f, b: %{public}f, radius: %{public}f;",
         adjustedLeft, adjustedTop, adjustedRight, adjustedBottom, realCornerRadius);
     // Check rectangle validity
