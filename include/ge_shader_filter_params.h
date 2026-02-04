@@ -633,6 +633,37 @@ struct GEMaskTransitionShaderFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(MASK_TRANSITION, GEMaskTransitionShaderFilterParams, GE_FILTER_MASK_TRANSITION);
 
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION[] = "WaterDropletTransition";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_INVERSE[] = "WaterDropletTransition_Inverse";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_PROGRESS[] = "WaterDropletTransition_Progress";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_RADIUS[] = "WaterDropletTransition_Radius";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_TRANSITIONFADEWIDTH[] = "WaterDropletTransition_TransitionFadeWidth";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_DISTORTIONINTENSITY[] = "WaterDropletTransition_DistortionIntensity";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_DISTORTIONTHICKNESS[] = "WaterDropletTransition_DistortionThickness";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_LIGHTSTRENGTH[] = "WaterDropletTransition_LightStrength";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_LIGHTSOFTNESS[] = "WaterDropletTransition_LightSoftness";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESCALEX[] = "WaterDropletTransition_NoiseScaleX";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESCALEY[] = "WaterDropletTransition_NoiseScaleY";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESTRENGTHX[] = "WaterDropletTransition_NoiseStrengthX";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESTRENGTHY[] = "WaterDropletTransition_NoiseStrengthY";
+struct GEWaterDropletTransitionFilterParams {
+    std::shared_ptr<Drawing::Image> topLayer = nullptr;
+    bool inverse = false;
+    float progress = 0.0f;
+    float radius = 0.0f;
+    float transitionFadeWidth = 0.0f;
+    float distortionIntensity = 0.0f;
+    float distortionThickness = 0.0f;
+    float lightStrength = 0.0f;
+    float lightSoftness = 0.0f;
+    float noiseScaleX = 0.0f;
+    float noiseScaleY = 0.0f;
+    float noiseStrengthX = 0.0f;
+    float noiseStrengthY = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(WATER_DROPLET_TRANSITION, GEWaterDropletTransitionFilterParams,
+    GE_FILTER_WATER_DROPLET_TRANSITION);
+
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR[] = "VariableRadiusBlur";
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS[] = "VariableRadiusBlur_Radius";
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask";
