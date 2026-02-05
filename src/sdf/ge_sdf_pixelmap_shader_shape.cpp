@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "sdf/ge_sdf_cascade_manager.h"
 #include "sdf/ge_sdf_pixelmap_shader_shape.h"
 
 #include "ge_log.h"
@@ -23,6 +24,78 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
+static const std::string shaderStringFunc = R"(
+    bool SafeFetch(vec2 fragCoord, vec2 pixelmapSize) {
+        if (fragCoord.x < 0 || fragCoord.x >= pixelmapSize.x || fragCoord.y < 0 || fragCoord.y >= pixelmapSize.y) {
+            return false;
+        }
+        return true;
+    }
+
+    vec2 ComputeCoord(vec2 fragCoord, float3x3 transformMatrix) {
+        vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
+        return abs(transformedCoord.z) > 0.00001 ? transformedCoord.xy / transformedCoord.z : transformedCoord.xy;
+    }
+    
+    float EncodeDir_Pixelmap(vec2 dir)
+    {
+        float N_SCALE = 2048.0;
+        float xPos = floor(dir.x + N_SCALE);
+        float yPos = floor(dir.y + N_SCALE);
+        return xPos + (yPos / N_SCALE) / 2.0;
+    }
+
+    // Calling from main function
+    vec4 sdgPixelmap(vec4 pixelmapShape, vec2 pixelmapCoord, vec2 centerPos, float3x3 transformMatrix) {
+        // only apply transform to rgba's a pipeline
+        float2x2 invtransformMatrix =
+            float2x2(transformMatrix[0][0], transformMatrix[1][0], transformMatrix[0][1], transformMatrix[1][1]);
+        vec2 normal = invtransformMatrix * (pixelmapShape.xy * 2 - 1);
+        float packedDir = EncodeDir_Pixelmap(invtransformMatrix * (pixelmapCoord - centerPos));
+        return half4(normal, packedDir, pixelmapShape.a * 127.5 - 63.5);
+    }
+)";
+
+bool GESDFPixelmapShaderShape::GenerateCascadeShaderHasNormal(
+    GESDFCascadeManager& manager, float width, float height) const
+{
+    if (params_.image == nullptr) {
+        LOGE("GESDFPixelmapShaderShape::GenerateDrawingShader has empty image");
+        return false;
+    }
+    bool hasType = manager.AddSDFType(GESDFShapeType::PIXELMAP);
+    if (!hasType) {
+        manager.PrependShaderFunction(shaderStringFunc);
+    }
+    auto thisUniformIndex = manager.GenerateUniformIndex();
+    auto& thisMatrix = this->GetTransMatrix();
+    auto thisImageInfo = params_.image->GetImageInfo();
+    this->SetUniformIndex(thisUniformIndex);
+    UniformData transformMatrixUniform = {SDFUniformType::MATRIX, "transformMatrix", thisMatrix};
+    UniformData pixelmapUniform = {SDFUniformType::SHADER, "pixelmapShader", GeneratePixelmapShader()};
+    UniformData pixelmapSizeUniform = {SDFUniformType::VECTOR2F, "pixelmapSize",
+        Vector2f(thisImageInfo.GetWidth(), thisImageInfo.GetHeight())};
+    UniformData centerPosUniform = {SDFUniformType::VECTOR2F, "centerPos", Vector2f(width * HALF, height * HALF)};
+    manager.AddUniformData(thisUniformIndex,
+        {transformMatrixUniform, pixelmapUniform, pixelmapSizeUniform, centerPosUniform});
+
+    std::ostringstream mainCallOss;
+    std::ostringstream sdfCallOss;
+    // Compute fragCoord
+    mainCallOss << "vec2 pixelmapCoord" << thisUniformIndex << " = ComputeCoord(fragCoord, transformMatrix"
+                << thisUniformIndex << ");";
+    // Compute pixelmap
+    mainCallOss << "vec4 pixelmapShape" << thisUniformIndex << " = SafeFetch(pixelmapCoord" << thisUniformIndex
+                << ", pixelmapSize" << thisUniformIndex << ") ? pixelmapShader" << thisUniformIndex
+                << ".eval(pixelmapCoord" << thisUniformIndex << ") : vec4(0.5, 0.5, 0.0, 1.0);";
+    sdfCallOss << "sdgPixelmap(pixelmapShape" << thisUniformIndex << ", pixelmapCoord" << thisUniformIndex
+               << ", centerPos" << thisUniformIndex << ", transformMatrix" << thisUniformIndex << ")";
+
+    manager.AppendMainCall(mainCallOss.str());
+    manager.AppendSDFCall(thisUniformIndex, sdfCallOss.str());
+    return true;
+}
+
 std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFPixelmapShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);

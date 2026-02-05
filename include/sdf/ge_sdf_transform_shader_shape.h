@@ -29,6 +29,7 @@ public:
     GESDFTransformShaderShape(const GESDFTransformShaderShape&) = delete;
     virtual ~GESDFTransformShaderShape() = default;
 
+    bool GenerateCascadeShaderHasNormal(GESDFCascadeManager& manager, float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     GESDFShapeType GetSDFShapeType() const override

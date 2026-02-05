@@ -63,6 +63,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/sdf/ge_sdf_transform_shader_shape.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_pixelmap_shader_shape.cpp",
     "${graphics_effect_root}/src/sdf/ge_sdf_edge_light.cpp",
+    "${graphics_effect_root}/src/sdf/ge_sdf_cascade_manager.cpp",
     "${graphics_effect_root}/src/ge_bezier_warp_shader_filter.cpp",
     "${graphics_effect_root}/src/ge_border_light_shader.cpp",
     "${graphics_effect_root}/src/ge_circle_flowlight_effect.cpp",

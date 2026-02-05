@@ -111,6 +111,7 @@ ohos_source_set("graphics_effect_src") {
     "src/sdf/ge_sdf_transform_shader_shape.cpp",
     "src/sdf/ge_sdf_union_op_shader_shape.cpp",
     "src/sdf/ge_sdf_from_image_filter.cpp",
+    "src/sdf/ge_sdf_cascade_manager.cpp",
     "src/ge_shader.cpp",
     "src/ge_shader_filter.cpp",
     "src/ge_sound_wave_filter.cpp",
