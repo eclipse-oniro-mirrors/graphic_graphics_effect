@@ -30,6 +30,7 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    GEFrameGradientMaskParams CreateValidParams();
 };
 
 void GEFrameGradientShaderMaskTest::SetUpTestCase(void) {}
@@ -40,131 +41,166 @@ void GEFrameGradientShaderMaskTest::SetUp() {}
 
 void GEFrameGradientShaderMaskTest::TearDown() {}
 
+GEFrameGradientMaskParams GEFrameGradientShaderMaskTest::CreateValidParams()
+{
+    GEFrameGradientMaskParams param;
+    param.innerBezier = {0.0f, 0.0f, 0.0f, 0.0f};
+    param.outerBezier = {0.0f, 0.0f, 0.0f, 0.0f};
+    param.cornerRadius = 0.5f;
+    param.innerFrameWidth = 0.1f;
+    param.outerFrameWidth = 0.1f;
+    param.rectWH = {1.0f, 1.0f};
+    param.rectPos = {0.0f, 0.0f};
+    return param;
+}
+
 /**
- * @tc.name: GenerateDrawingShader_001
+ * @tc.name: GenerateDrawingShaderWrongWidth
  * @tc.desc: Verify the GenerateDrawingShader function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShader_001, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderWrongWidth, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_001 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongWidth start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = 0.0f;
-    param.frameWidth = 0.0f;
-
+    GEFrameGradientMaskParams param = CreateValidParams();
     GEFrameGradientShaderMask mask(param);
     auto shaderEffect = mask.GenerateDrawingShader(0.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_001 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongWidth end";
 }
 
 /**
- * @tc.name: GenerateDrawingShader_002
+ * @tc.name: GenerateDrawingShaderWrongRectWH
  * @tc.desc: Verify the GenerateDrawingShader function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShader_002, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderWrongRectWH, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_002 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongRectWH start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = -1.0f;
-    param.frameWidth = 0.0f;
+    GEFrameGradientMaskParams param = CreateValidParams();
+    param.rectWH = {-1.0f, -1.0f};
+    GEFrameGradientShaderMask mask(param);
+    auto shaderEffect = mask.GenerateDrawingShader(50.f, 50.f);
+    EXPECT_EQ(shaderEffect, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongRectWH end";
+}
+
+/**
+ * @tc.name: GenerateDrawingShaderWrongFrameWidth
+ * @tc.desc: Verify the GenerateDrawingShader function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderWrongFrameWidth, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongFrameWidth start";
+
+    GEFrameGradientMaskParams param = CreateValidParams();
+    param.innerFrameWidth = -1.0f;
+    param.outerFrameWidth = -1.0f;
 
     GEFrameGradientShaderMask mask(param);
     auto shaderEffect = mask.GenerateDrawingShader(50.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_002 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderWrongFrameWidth end";
 }
 
 /**
- * @tc.name: GenerateDrawingShader_003
+ * @tc.name: GenerateDrawingShaderSuccess
  * @tc.desc: Verify the GenerateDrawingShader function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShader_003, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderSuccess, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_003 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderSuccess start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = 0.0f;
-    param.frameWidth = -1.0f;
+    GEFrameGradientMaskParams param = CreateValidParams();
 
     GEFrameGradientShaderMask mask(param);
     auto shaderEffect = mask.GenerateDrawingShader(50.f, 50.f);
-    EXPECT_EQ(shaderEffect, nullptr);
+    EXPECT_NE(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShader_003 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderSuccess end";
 }
 
 /**
- * @tc.name: GenerateDrawingShaderHasNormal_001
+ * @tc.name: GenerateDrawingShaderHasNormalWrongWidth
  * @tc.desc: Verify the GenerateDrawingShaderHasNormal function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormal_001, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormalWrongWidth, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_001 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalWrongWidth start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = 0.0f;
-    param.frameWidth = 0.0f;
+    GEFrameGradientMaskParams param = CreateValidParams();
 
     GEFrameGradientShaderMask mask(param);
     auto shaderEffect = mask.GenerateDrawingShaderHasNormal(0.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_001 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalWrongWidth end";
 }
 
 /**
- * @tc.name: GenerateDrawingShaderHasNormal_002
+ * @tc.name: GenerateDrawingShaderHasNormalRectWH
  * @tc.desc: Verify the GenerateDrawingShaderHasNormal function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormal_002, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormalRectWH, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_002 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalRectWH start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = -1.0f;
-    param.frameWidth = 0.0f;
+    GEFrameGradientMaskParams param = CreateValidParams();
+    param.rectWH = {-1.0f, -1.0f};
+    GEFrameGradientShaderMask mask(param);
+    auto shaderEffect = mask.GenerateDrawingShaderHasNormal(50.f, 50.f);
+    EXPECT_EQ(shaderEffect, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalRectWH end";
+}
+
+/**
+ * @tc.name: GenerateDrawingShaderHasNormalWrongFrameWidth
+ * @tc.desc: Verify the GenerateDrawingShaderHasNormal function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormalWrongFrameWidth, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalWrongFrameWidth start";
+
+    GEFrameGradientMaskParams param = CreateValidParams();
+    param.innerFrameWidth = -1.0f;
+    param.outerFrameWidth = -1.0f;
 
     GEFrameGradientShaderMask mask(param);
     auto shaderEffect = mask.GenerateDrawingShaderHasNormal(50.f, 50.f);
     EXPECT_EQ(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_002 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalWrongFrameWidth end";
 }
 
 /**
- * @tc.name: GenerateDrawingShaderHasNormal_003
- * @tc.desc: Verify the GenerateDrawingShader function
+ * @tc.name: GenerateDrawingShaderHasNormalSuccess
+ * @tc.desc: Verify the GenerateDrawingShaderHasNormal function
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormal_003, TestSize.Level1)
+HWTEST_F(GEFrameGradientShaderMaskTest, GenerateDrawingShaderHasNormalSuccess, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_003 start";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalSuccess start";
 
-    GEFrameGradientMaskParams param;
-    param.gradientBezierControlPoints = {0.0f, 0.0f, 0.0f, 0.0f};
-    param.cornerRadius = 0.0f;
-    param.frameWidth = -1.0f;
+    GEFrameGradientMaskParams param = CreateValidParams();
 
     GEFrameGradientShaderMask mask(param);
-    auto shaderEffect = mask.GenerateDrawingShader(50.f, 50.f);
-    EXPECT_EQ(shaderEffect, nullptr);
+    auto shaderEffect = mask.GenerateDrawingShaderHasNormal(50.f, 50.f);
+    EXPECT_NE(shaderEffect, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormal_003 end";
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateDrawingShaderHasNormalSuccess end";
 }
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
