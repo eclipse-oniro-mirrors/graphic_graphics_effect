@@ -346,7 +346,7 @@ public:
     const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
  	{
         return waveDisturbanceMaskParams_;
- 	}
+    }
 
     void MakeRadialGradientMaskParams()
     {
