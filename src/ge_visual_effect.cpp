@@ -206,7 +206,7 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             return std::make_shared<GERippleShaderMask>(*rippleParams);
         }
         case GEVisualEffectImpl::FilterType::WAVE_DISTURBANCE_MASK: {
- 	        auto waveDisturbParams = impl->GetWaveDisturbanceMaskParams();
+            auto waveDisturbParams = impl->GetWaveDisturbanceMaskParams();
  	        if (waveDisturbParams == nullptr) {
  	            return nullptr;
  	        }
