@@ -207,11 +207,11 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
         }
         case GEVisualEffectImpl::FilterType::WAVE_DISTURBANCE_MASK: {
             auto waveDisturbParams = impl->GetWaveDisturbanceMaskParams();
- 	        if (waveDisturbParams == nullptr) {
- 	            return nullptr;
- 	        }
- 	        return std::make_shared<GEWaveDisturbanceShaderMask>(*waveDisturbParams);
- 	    }
+            if (waveDisturbParams == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GEWaveDisturbanceShaderMask>(*waveDisturbParams);
+        }
         case GEVisualEffectImpl::FilterType::IMAGE_MASK: {
             auto imageParams = impl->GetImageMaskParams();
             if (imageParams == nullptr) {
