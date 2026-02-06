@@ -26,6 +26,7 @@
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
+#include "ge_wave_disturb_shader_mask.h"
 #include "sdf/ge_sdf_empty_shader_shape.h"
 #include "sdf/ge_sdf_pixelmap_shader_shape.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
@@ -204,6 +205,13 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             }
             return std::make_shared<GERippleShaderMask>(*rippleParams);
         }
+        case GEVisualEffectImpl::FilterType::WAVE_DISTURBANCE_MASK: {
+ 	        auto waveDisturbParams = impl->GetWaveDisturbanceMaskParams();
+ 	        if (waveDisturbParams == nullptr) {
+ 	            return nullptr;
+ 	        }
+ 	        return std::make_shared<GEWaveDisturbanceShaderMask>(*waveDisturbParams);
+ 	    }
         case GEVisualEffectImpl::FilterType::IMAGE_MASK: {
             auto imageParams = impl->GetImageMaskParams();
             if (imageParams == nullptr) {
