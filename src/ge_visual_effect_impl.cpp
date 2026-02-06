@@ -2004,37 +2004,37 @@ void GEVisualEffectImpl::SetMagnifierParamsFloat(const std::string& tag, float p
 
 void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, float param)
 {
- 	if (waveDisturbanceMaskParams_ == nullptr) {
- 	    return;
- 	}
- 	if (tag == GE_MASK_DISTURBANCE_PROGRESS) {
- 	    waveDisturbanceMaskParams_->progress = param;
- 	}
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_PROGRESS) {
+        waveDisturbanceMaskParams_->progress = param;
+    }
 }
 
 void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param)
 {
- 	if (waveDisturbanceMaskParams_ == nullptr) {
- 	    return;
- 	}
- 	if (tag == GE_MASK_DISTURBANCE_CLICKPOS) {
- 	    waveDisturbanceMaskParams_->clickPos[0] = param.first;
- 	    waveDisturbanceMaskParams_->clickPos[1] = param.second;
- 	}
- 	if (tag == GE_MASK_DISTURBANCE_WAVERD) {
- 	    waveDisturbanceMaskParams_->waveRD[0] = param.first;
- 	    waveDisturbanceMaskParams_->waveRD[1] = param.second;
- 	}
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_CLICKPOS) {
+        waveDisturbanceMaskParams_->clickPos[0] = param.first;
+        waveDisturbanceMaskParams_->clickPos[1] = param.second;
+    }
+    if (tag == GE_MASK_DISTURBANCE_WAVERD) {
+        waveDisturbanceMaskParams_->waveRD[0] = param.first;
+        waveDisturbanceMaskParams_->waveRD[1] = param.second;
+    }
 }
 
 void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param)
 {
- 	if (waveDisturbanceMaskParams_ == nullptr) {
- 	    return;
- 	}
- 	if (tag == GE_MASK_DISTURBANCE_WAVELWH) {
- 	    waveDisturbanceMaskParams_->waveLWH = param;
- 	}
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_WAVELWH) {
+        waveDisturbanceMaskParams_->waveLWH = param;
+    }
 }
 
 void GEVisualEffectImpl::SetWaveGradientMaskParamsFloat(const std::string& tag, float param)
