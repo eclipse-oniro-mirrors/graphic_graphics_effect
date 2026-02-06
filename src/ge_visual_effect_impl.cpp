@@ -1499,7 +1499,7 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
  	        }
  	        break;
  	    }
- 	    case FilterType::FROSTED_GLASS: {
+        case FilterType::FROSTED_GLASS: {
  	        if (frostedGlassParams_ == nullptr || !param) {
  	            return;
  	        }
