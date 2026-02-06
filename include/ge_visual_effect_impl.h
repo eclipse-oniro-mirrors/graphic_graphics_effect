@@ -343,7 +343,7 @@ public:
  	    waveDisturbanceMaskParams_ = std::make_shared<GEWaveDisturbanceShaderMaskParams>();
  	}
 
- 	const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
+    const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
  	{
  	    return waveDisturbanceMaskParams_;
  	}
