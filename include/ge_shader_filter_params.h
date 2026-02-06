@@ -516,6 +516,19 @@ struct GEWaveGradientShaderMaskParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(WAVE_GRADIENT_MASK, GEWaveGradientShaderMaskParams, GE_MASK_WAVE_GRADIENT);
 
+constexpr char GE_MASK_DISTURBANCE[] = "WaveDisturbanceMask";
+constexpr char GE_MASK_DISTURBANCE_CLICKPOS[] = "WaveDisturbanceMask_ClickPos";
+constexpr char GE_MASK_DISTURBANCE_PROGRESS[] = "WaveDisturbanceMask_Progress";
+constexpr char GE_MASK_DISTURBANCE_WAVERD[] = "WaveDisturbanceMask_WaveRD";
+constexpr char GE_MASK_DISTURBANCE_WAVELWH[] = "WaveDisturbanceMask_WaveLWH";
+struct GEWaveDisturbanceShaderMaskParams {
+ 	Vector2f clickPos = Vector2f(50.f, 50.f);
+ 	float progress = 0.5f;
+ 	Vector2f waveRD = Vector2f(2.5f, 0.7f);
+ 	Vector3f waveLWH = Vector3f(150.f, 0.f, 20.f);
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(WAVE_DISTURBANCE_MASK, GEWaveDisturbanceShaderMaskParams, GE_MASK_DISTURBANCE);
+
 constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
 constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLightPosition";
 constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLightColor";
@@ -785,6 +798,7 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS[] = "FrostedGlassEffect_EdL
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS[] = "FrostedGlassEffect_EdLightPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLNEG[] = "FrostedGlassEffect_EdLightNeg";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SHAPE[] = "FrostedGlassEffect_Shape";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WAVE[] = "FrostedGlassEffect_WaveMask";
 // Adapt effect component
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE[] = "FrostedGlassEffect_BlurImage";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE[] = "FrostedGlassEffect_BlurImageForEdge";
@@ -836,6 +850,7 @@ struct GEFrostedGlassEffectParams {
     Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     std::shared_ptr<GESDFShaderShape> sdfShape;
+    std::shared_ptr<GEShaderMask> waveDisturbance;
     // Adapt effect component
     std::weak_ptr<Drawing::Image> blurImage; // frosted glass blur by ec
     std::weak_ptr<Drawing::Image> blurImageForEdge; // frosted glass blur downsampled by ec
@@ -1280,6 +1295,7 @@ constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
 constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
 constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
 constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
+constexpr char GE_FILTER_FROSTED_GLASS_WAVE[] = "FrostedGlass_WaveMask";
 // Switch params
 constexpr char GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED[] = "FrostedGlass_BaseVibrancyEnabled";
 constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMaterialType";
@@ -1335,6 +1351,7 @@ struct GEFrostedGlassShaderFilterParams {
     Vector2f borderSize = Vector2f(200.0f, 100.0f);
     float cornerRadius = 100.0f;
     std::shared_ptr<GESDFShaderShape> sdfShape;
+    std::shared_ptr<GEShaderMask> waveDisturbance;
     bool baseVibrancyEnabled = true;
     float baseMaterialType = 0.0f;
     bool refractEnabled = true;
