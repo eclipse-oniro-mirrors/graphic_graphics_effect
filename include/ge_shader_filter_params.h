@@ -522,10 +522,10 @@ constexpr char GE_MASK_DISTURBANCE_PROGRESS[] = "WaveDisturbanceMask_Progress";
 constexpr char GE_MASK_DISTURBANCE_WAVERD[] = "WaveDisturbanceMask_WaveRD";
 constexpr char GE_MASK_DISTURBANCE_WAVELWH[] = "WaveDisturbanceMask_WaveLWH";
 struct GEWaveDisturbanceShaderMaskParams {
- 	Vector2f clickPos = Vector2f(50.f, 50.f);
- 	float progress = 0.5f;
- 	Vector2f waveRD = Vector2f(2.5f, 0.7f);
- 	Vector3f waveLWH = Vector3f(150.f, 0.f, 20.f);
+    Vector2f clickPos = Vector2f(50.f, 50.f);
+    float progress = 0.5f;
+    Vector2f waveRD = Vector2f(2.5f, 0.7f);
+    Vector3f waveLWH = Vector3f(150.f, 0.f, 20.f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(WAVE_DISTURBANCE_MASK, GEWaveDisturbanceShaderMaskParams, GE_MASK_DISTURBANCE);
 
