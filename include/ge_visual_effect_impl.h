@@ -339,12 +339,12 @@ public:
     }
 
     void MakeWaveDisturbanceMaskParams()
- 	{
- 	    waveDisturbanceMaskParams_ = std::make_shared<GEWaveDisturbanceShaderMaskParams>();
- 	}
+    {
+        waveDisturbanceMaskParams_ = std::make_shared<GEWaveDisturbanceShaderMaskParams>();
+    }
 
     const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
- 	{
+    {
         return waveDisturbanceMaskParams_;
     }
 
@@ -725,8 +725,8 @@ private:
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveDisturbanceMaskParams(const std::string& tag, float param);
- 	void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);
- 	void SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param);
+    void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param);
     void SetSoundWaveParams(const std::string& tag, float param);
     void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
     void SetDirectionLightParamsFloat(const std::string& tag, float param);
