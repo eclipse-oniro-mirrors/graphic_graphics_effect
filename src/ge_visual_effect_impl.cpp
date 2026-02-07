@@ -376,6 +376,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeDoubleRippleMaskParams();
         }
     },
+    { GE_MASK_DISTURBANCE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::WAVE_DISTURBANCE_MASK);
+            impl->MakeWaveDisturbanceMaskParams();
+        }
+    },
     { GE_MASK_RADIAL_GRADIENT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK);
@@ -803,6 +809,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetWaveGradientMaskParamsFloat(tag, param);
             break;
         }
+        case FilterType::WAVE_DISTURBANCE_MASK : {
+            SetWaveDisturbanceMaskParams(tag, param);
+            break;
+        }
         case FilterType::SOUND_WAVE: {
             SetSoundWaveParams(tag, param);
             break;
@@ -1084,6 +1094,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             if (tag == GE_MASK_RIPPLE_CENTER) {
                 rippleMaskParams_->center_ = param;
             }
+            break;
+        }
+        case FilterType::WAVE_DISTURBANCE_MASK: {
+            SetWaveDisturbanceMaskParams(tag, param);
             break;
         }
         case FilterType::DOUBLE_RIPPLE_MASK: {
@@ -1476,6 +1490,24 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::FROSTED_GLASS_EFFECT: {
+            if (frostedGlassEffectParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WAVE) {
+                frostedGlassEffectParams_->waveDisturbance = param;
+            }
+            break;
+        }
+        case FilterType::FROSTED_GLASS: {
+            if (frostedGlassParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_FILTER_FROSTED_GLASS_WAVE) {
+                frostedGlassParams_->waveDisturbance = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1597,6 +1629,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
+            break;
+        }
+        case FilterType::WAVE_DISTURBANCE_MASK: {
+            SetWaveDisturbanceMaskParams(tag, param);
             break;
         }
         case FilterType::HARMONIUM_EFFECT: {
@@ -1963,6 +1999,41 @@ void GEVisualEffectImpl::SetMagnifierParamsFloat(const std::string& tag, float p
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, float param)
+{
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_PROGRESS) {
+        waveDisturbanceMaskParams_->progress = param;
+    }
+}
+
+void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_CLICKPOS) {
+        waveDisturbanceMaskParams_->clickPos[0] = param.first;
+        waveDisturbanceMaskParams_->clickPos[1] = param.second;
+    }
+    if (tag == GE_MASK_DISTURBANCE_WAVERD) {
+        waveDisturbanceMaskParams_->waveRD[0] = param.first;
+        waveDisturbanceMaskParams_->waveRD[1] = param.second;
+    }
+}
+
+void GEVisualEffectImpl::SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param)
+{
+    if (waveDisturbanceMaskParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_MASK_DISTURBANCE_WAVELWH) {
+        waveDisturbanceMaskParams_->waveLWH = param;
     }
 }
 

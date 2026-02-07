@@ -338,6 +338,16 @@ public:
         return doubleRippleMaskParams_;
     }
 
+    void MakeWaveDisturbanceMaskParams()
+    {
+        waveDisturbanceMaskParams_ = std::make_shared<GEWaveDisturbanceShaderMaskParams>();
+    }
+
+    const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
+    {
+        return waveDisturbanceMaskParams_;
+    }
+
     void MakeRadialGradientMaskParams()
     {
         radialGradientMaskParams_ = std::make_shared<GERadialGradientShaderMaskParams>();
@@ -714,6 +724,9 @@ private:
     void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
+    void SetWaveDisturbanceMaskParams(const std::string& tag, float param);
+    void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param);
     void SetSoundWaveParams(const std::string& tag, float param);
     void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
     void SetDirectionLightParamsFloat(const std::string& tag, float param);
@@ -796,6 +809,7 @@ private:
     std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
     std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
     std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
+    std::shared_ptr<GEWaveDisturbanceShaderMaskParams> waveDisturbanceMaskParams_ = nullptr;
     std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;
     std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
     std::shared_ptr<GEGasifyScaleTwistFilterParams> gasifyScaleTwistFilterParams_ = nullptr;
