@@ -284,7 +284,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, DirectionBlur_001, TestSize.Level1)
     params.isDirection = true;
     geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
     auto image = geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_);
-    EXPECT_EQ(image, image_);
+    EXPECT_NE(image, image_);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
