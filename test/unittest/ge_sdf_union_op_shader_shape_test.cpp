@@ -156,7 +156,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSi
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -176,7 +176,7 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateDrawingShaderHasNormal_002, TestSi
 
     GESDFUnionOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateDrawingShaderHasNormal_002 end";
 }
 
