@@ -16,7 +16,7 @@
 #define GRAPHICS_EFFECT_GE_IMAGE_CACHE_PROVIDER_H
 #include <memory>
 
-#include "cache/ge_cache_provider.h"
+#include "ge_cache_provider.h"
 #include "image/image.h"
 
 namespace OHOS {

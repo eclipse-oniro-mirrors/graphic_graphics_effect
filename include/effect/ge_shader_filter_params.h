@@ -32,7 +32,7 @@
 // ge
 #include "ge_filter_type.h"
 #include "ge_shader_mask.h"
-#include "sdf/ge_sdf_shader_shape.h"
+#include "ge_sdf_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {

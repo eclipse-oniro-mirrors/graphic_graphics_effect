@@ -18,7 +18,7 @@
 
 #include <memory>
 
-#include "cache/ge_cache_provider.h"
+#include "ge_cache_provider.h"
 #include "draw/brush.h"
 #include "draw/canvas.h"
 #include "draw/pen.h"

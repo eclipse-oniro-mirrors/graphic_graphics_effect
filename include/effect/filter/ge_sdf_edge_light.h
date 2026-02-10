@@ -23,7 +23,7 @@
 #include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
-#include "sdf/ge_sdf_shader_shape.h"
+#include "ge_sdf_shader_shape.h"
 
 
 namespace OHOS::Rosen {
