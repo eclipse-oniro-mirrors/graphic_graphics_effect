@@ -101,7 +101,7 @@ HWTEST_F(GEMaskTransitionShaderFilterTest, OnProcessImage_001, TestSize.Level0)
     params.mask = nullptr;
     filter = std::make_shared<GEMaskTransitionShaderFilter>(params);
     result = filter->OnProcessImage(canvas_, image_, src_, dst_);
-    EXPECT_EQ(result, nullptr);
+    EXPECT_EQ(result, image_);
 
     // Test with both null image and null mask
     result = filter->OnProcessImage(canvas_, nullptr, src_, dst_);

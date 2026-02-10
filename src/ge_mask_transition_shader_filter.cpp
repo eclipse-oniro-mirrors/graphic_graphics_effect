@@ -27,8 +27,7 @@ GEMaskTransitionShaderFilter::GEMaskTransitionShaderFilter(const Drawing::GEMask
 
 void GEMaskTransitionShaderFilter::SetCache(std::shared_ptr<Drawing::Image> topLayerCache, Drawing::Matrix cacheMatrix)
 {
-    GEShaderFilter::SetCache(std::make_shared<std::any>(
-        std::make_pair(std::shared_ptr<Drawing::Image>(topLayerCache), cacheMatrix)));
+    GEShaderFilter::SetCache(std::make_shared<std::any>(std::make_pair(topLayerCache, cacheMatrix)));
 }
 
 std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
@@ -49,8 +48,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
 
     auto cache = GetCache();
     if (cache == nullptr) {
-        GEShaderFilter::SetCache(
-            std::make_shared<std::any>(std::make_pair(std::shared_ptr<Drawing::Image>(image), invertMatrix)));
+        GEShaderFilter::SetCache(std::make_shared<std::any>(std::make_pair(image, invertMatrix)));
         return image;
     }
 
