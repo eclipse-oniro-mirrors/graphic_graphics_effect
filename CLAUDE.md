@@ -17,7 +17,6 @@ This project uses GN (Generate Ninja) as its build system, which is standard for
 ./build.sh --product-name <product> --build-target graphics_effect:graphics_effect_core
 
 # Build with specific platform flags (defined in config.gni)
-# Platforms: ohos, ios, mac, win, linux
 ```
 
 ### Running Tests
@@ -52,7 +51,7 @@ The codebase follows a three-layer architecture:
 - **Location**: `src/ge_visual_effect.cpp`, `include/ge_visual_effect.h`
 - **Purpose**: Individual visual effect implementations
 - **Pattern**: Each effect is parameterized via `SetParam()` with string tags
-- **Types**: Blur filters, shader filters, masks, and composited effects
+- **Types**: Blur filters, shader filters, masks, shapes, and composited effects
 
 ### 3. GEVisualEffectContainer (Effect Container)
 - **Location**: `src/ge_visual_effect_container.cpp`, `include/ge_visual_effect_container.h`
@@ -69,7 +68,8 @@ IGEFilterType (base interface in ge_filter_type.h)
 │   ├── Color filters (Grey, Color Gradient, Dispersion)
 │   └── Light/Glow filters (Edge Light, Content Light, Border Light)
 ├── GEShader (ge_shader.h) - Direct shader effects
-└── GEShaderMask (ge_shader_mask.h) - Masking operations
+├── GEShaderMask (ge_shader_mask.h) - Masking operations
+└── GEShaderShape (ge_shader_shape.h) - Shapes operations
 ```
 
 ## Key Subsystems
@@ -84,15 +84,6 @@ IGEFilterType (base interface in ge_filter_type.h)
   - `GESDFEdgeLight` - SDF-based edge lighting effects
   - `GESDFShadowShader` - SDF-based shadow rendering
   - `GESDFFromImageFilter` - Converts images to SDF representation
-
-### External Dynamic Loader
-- **Location**: `src/ext/`, `include/ext/`
-- **Purpose**: Framework for dynamically loading custom shader algorithms
-- **Components**:
-  - `gex_dot_matrix_shader` - Dot matrix effect
-  - `gex_flow_light_sweep_shader` - Flow light sweep effect
-  - `gex_complex_shader` - Complex shader compositions
-  - `gex_marshalling_helper` - Serialization support
 
 ### Filter Composition
 - **Location**: `src/ge_filter_composer.cpp`, `include/ge_filter_composer.h`
@@ -152,9 +143,3 @@ Visual effects use a strongly-typed parameter system via overloaded `SetParam()`
 - SDF parameters: `GESDFBorderParams`, `GESDFShadowParams`
 
 Parameters are identified by string tags defined in `ge_shader_filter_params.h`.
-
-## Current Branch Context
-
-Working on branch: `1227_SDF_edgelight`
-
-Recent work involves SDF edge lighting shader optimization and shader code extraction. When making changes to SDF-related code, ensure consistency with the existing SDF shape hierarchy and edge lighting parameters.
