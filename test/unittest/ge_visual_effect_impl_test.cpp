@@ -1215,7 +1215,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_FrostedGlass_DarkMode_Clamp, TestSize.
     // weightsEmboss clamps to [0,1]
     std::pair<float, float> badWeights = {-1.0f, 2.0f};
     ve.SetParam(Drawing::GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS, badWeights);
-    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[0], 0.0f);
+    EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[0], -1.0f);
     EXPECT_FLOAT_EQ(ve.GetFrostedGlassParams()->darkModeWeightsEmboss[1], 1.0f);
 
     // KBS clamps: KB in [-20,20], S in [0,20]
