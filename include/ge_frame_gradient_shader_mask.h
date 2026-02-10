@@ -18,9 +18,9 @@
 
 #include "draw/canvas.h"
 #include "ge_filter_type_info.h"
+#include "ge_log.h"
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
-#include "ge_log.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -33,16 +33,23 @@ public:
     GEFrameGradientShaderMask(GEFrameGradientShaderMask&&) = delete;
     GEFrameGradientShaderMask& operator=(GEFrameGradientShaderMask&&) = delete;
     ~GEFrameGradientShaderMask() override = default;
+
     DECLARE_GEFILTER_TYPEFUNC(GEFrameGradientShaderMask, GEFrameGradientMaskParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-
+    std::shared_ptr<ShaderEffect> CreateFrameGradientMaskShader(float width, float height) const;
 private:
+    Drawing::Rect GetSubtractedRect(float width, float height) const override;
+    bool ValidateParams(float width, float height) const;
     void MakeFrameGradientMaskShaderEffect() const;
-    Vector4f gradientBezierControlPoints_;
+    Vector4f innerBezier_;
+    Vector4f outerBezier_;
     float cornerRadius_ = 0.0f;
-    float frameWidth_ = 0.0f;
+    float innerFrameWidth_ = 0.0f;
+    float outerFrameWidth_ = 0.0f;
+    std::pair<float, float> rectWH_;
+    std::pair<float, float> rectPos_;
 };
 } // Drawing
 } // namespace Rosen

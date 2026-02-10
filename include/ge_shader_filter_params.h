@@ -1164,14 +1164,21 @@ struct GEXGradientFlowColorsEffectParams {
 };
 
 constexpr char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
-constexpr char GE_MASK_FRAME_GRADIENT_GRADIENT_BEZIER_CONTROL_POINTS[] =
-    "FrameGradientMask_GradientBezierControlPoints";
+constexpr char GE_MASK_FRAME_GRADIENT_INNER_BEZIER[] = "FrameGradientMask_InnerBezier";
+constexpr char GE_MASK_FRAME_GRADIENT_OUTER_BEZIER[] = "FrameGradientMask_OuterBezier";
 constexpr char GE_MASK_FRAME_GRADIENT_CORNER_RADIUS[] = "FrameGradientMask_CornerRadius";
-constexpr char GE_MASK_FRAME_GRADIENT_FRAME_WIDTH[] = "FrameGradientMask_FrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "FrameGradientMask_InnerFrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH[] = "FrameGradientMask_OuterFrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_RECT_WH[] = "FrameGradientMask_RectWH";
+constexpr char GE_MASK_FRAME_GRADIENT_RECT_POS[] = "FrameGradientMask_RectPos";
 struct GEFrameGradientMaskParams {
-    Vector4f gradientBezierControlPoints;
+    Vector4f innerBezier;
+    Vector4f outerBezier;
     float cornerRadius = 0.0f;
-    float frameWidth = 0.0f;
+    float innerFrameWidth = 0.0f;
+    float outerFrameWidth = 0.0f;
+    std::pair<float, float> rectWH;
+    std::pair<float, float> rectPos;
 };
 
 constexpr char GE_FILTER_GASIFY_SCALE_TWIST[] = "GasifyScaleTwist";
