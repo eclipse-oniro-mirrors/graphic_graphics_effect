@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "ge_log.h"
-#include "ext/gex_flow_light_sweep_shader.h"
+#include "gex_flow_light_sweep_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_external_dynamic_loader.h"
 
