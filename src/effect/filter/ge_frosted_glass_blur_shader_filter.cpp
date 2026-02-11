@@ -14,7 +14,7 @@
  */
 #include "ge_frosted_glass_blur_shader_filter.h"
 
-#include "cache/ge_image_cache_provider.h"
+#include "ge_image_cache_provider.h"
 #include "ge_log.h"
 #include "ge_mesa_blur_shader_filter.h"
 
