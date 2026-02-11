@@ -137,7 +137,6 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/mask/ge_wave_gradient_shader_mask.cpp",
     "src/effect/mask/ge_wave_disturb_shader_mask.cpp",
     "src/effect/shape/ge_sdf_shader_shape.cpp",
-    "src/effect/shape/ge_sdf_empty_shader_shape.cpp",
     "src/effect/shape/ge_sdf_rrect_shader_shape.cpp",
     "src/effect/shape/ge_sdf_pixelmap_shader_shape.cpp",
     "src/effect/shape/ge_sdf_transform_shader_shape.cpp",
