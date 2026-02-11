@@ -19,7 +19,7 @@
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
 #include "ge_mesa_blur_shader_filter.h"
-#include "utils/ge_trace.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {

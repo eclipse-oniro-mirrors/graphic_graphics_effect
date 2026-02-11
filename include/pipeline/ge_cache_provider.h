@@ -14,7 +14,7 @@
  */
 #ifndef GRAPHICS_EFFECT_GE_CACHE_PROVIDER_H
 #define GRAPHICS_EFFECT_GE_CACHE_PROVIDER_H
-#include "utils/ge_downcast.h"
+#include "ge_downcast.h"
 
 namespace OHOS {
 namespace Rosen {

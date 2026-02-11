@@ -23,7 +23,7 @@
 #include "ge_hps_effect_filter.h"
 #include "ge_visual_effect.h"
 
-#include "utils/ge_downcast.h"
+#include "ge_downcast.h"
 
 namespace OHOS {
 namespace Rosen {

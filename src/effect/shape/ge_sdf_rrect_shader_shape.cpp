@@ -16,7 +16,7 @@
 #include "sdf/ge_sdf_cascade_manager.h"
 #include "sdf/ge_sdf_rrect_shader_shape.h"
 #include "ge_log.h"
-#include "utils/ge_trace.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {

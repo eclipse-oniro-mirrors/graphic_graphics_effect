@@ -15,7 +15,7 @@
 
 #include "ge_wave_disturb_shader_mask.h"
 #include "ge_log.h"
-#include "utils/ge_trace.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {

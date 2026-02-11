@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #include "ge_shader_filter.h"
-#include "utils/ge_trace.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {

@@ -17,7 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_radial_gradient_shader_mask.h"
-#include "utils/ge_trace.h"
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
