@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_edge_light.h"
+#include "ge_sdf_edge_light.h"
 
 #include <unordered_map>
 

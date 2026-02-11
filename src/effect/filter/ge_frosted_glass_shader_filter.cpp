@@ -16,7 +16,7 @@
 
 #include "ge_log.h"
 #include "ge_mesa_blur_shader_filter.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {

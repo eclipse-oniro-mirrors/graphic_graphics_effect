@@ -20,7 +20,7 @@
 #include "ge_ripple_shader_mask.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
 #include "utils/rect.h"
 
 using namespace testing;

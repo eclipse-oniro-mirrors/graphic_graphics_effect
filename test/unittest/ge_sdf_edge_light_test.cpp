@@ -20,7 +20,7 @@
 #include "ge_double_ripple_shader_mask.h"
 #include "image/bitmap.h"
 #include "image/image.h"
-#include "sdf/ge_sdf_edge_light.h"
+#include "ge_sdf_edge_light.h"
 
 using namespace testing;
 using namespace testing::ext;

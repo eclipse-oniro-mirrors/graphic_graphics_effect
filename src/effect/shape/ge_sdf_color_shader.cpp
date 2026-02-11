@@ -16,7 +16,7 @@
 #include <chrono>
  
 #include "ge_log.h"
-#include "sdf/ge_sdf_color_shader.h"
+#include "ge_sdf_color_shader.h"
  
 namespace OHOS {
 namespace Rosen {

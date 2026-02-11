@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_cascade_manager.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_cascade_manager.h"
+#include "ge_sdf_rrect_shader_shape.h"
 #include "ge_log.h"
 #include "ge_trace.h"
 

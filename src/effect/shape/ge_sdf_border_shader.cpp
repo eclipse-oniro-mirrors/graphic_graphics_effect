@@ -16,7 +16,7 @@
 #include <chrono>
 
 #include "ge_log.h"
-#include "sdf/ge_sdf_border_shader.h"
+#include "ge_sdf_border_shader.h"
 
 
 namespace OHOS {

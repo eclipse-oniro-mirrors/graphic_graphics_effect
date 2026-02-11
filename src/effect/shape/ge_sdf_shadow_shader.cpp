@@ -16,7 +16,7 @@
 #include <chrono>
  
 #include "ge_log.h"
-#include "sdf/ge_sdf_shadow_shader.h"
+#include "ge_sdf_shadow_shader.h"
 #include "common/rs_common_def.h"
  
 namespace OHOS {

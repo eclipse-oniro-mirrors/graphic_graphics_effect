@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_from_image_filter.h"
+#include "ge_sdf_from_image_filter.h"
 
 #include "ge_log.h"
 #include "ge_system_properties.h"

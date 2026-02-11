@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_cascade_manager.h"
+#include "ge_sdf_cascade_manager.h"
 #include "ge_log.h"
 
 namespace OHOS {

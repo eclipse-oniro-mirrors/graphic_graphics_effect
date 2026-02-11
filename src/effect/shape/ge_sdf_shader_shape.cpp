@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "sdf/ge_sdf_shader_shape.h"
-#include "sdf/ge_sdf_pixelmap_shader_shape.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
-#include "sdf/ge_sdf_transform_shader_shape.h"
-#include "sdf/ge_sdf_union_op_shader_shape.h"
+#include "ge_sdf_shader_shape.h"
+#include "ge_sdf_pixelmap_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_transform_shader_shape.h"
+#include "ge_sdf_union_op_shader_shape.h"
 
 #include "ge_log.h"
 

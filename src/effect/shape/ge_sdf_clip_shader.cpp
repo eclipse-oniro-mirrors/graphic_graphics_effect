@@ -16,8 +16,8 @@
 #include <chrono>
  
 #include "ge_log.h"
-#include "sdf/ge_sdf_clip_shader.h"
-#include "sdf/ge_sdf_shader_shape.h"
+#include "ge_sdf_clip_shader.h"
+#include "ge_sdf_shader_shape.h"
 #include "ge_trace.h"
 
 namespace OHOS {

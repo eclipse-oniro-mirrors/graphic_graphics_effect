@@ -52,11 +52,11 @@
 #include "ge_visual_effect_impl.h"
 #include "ge_water_ripple_filter.h"
 #include "ge_wavy_ripple_light_shader.h"
-#include "sdf/ge_sdf_border_shader.h"
-#include "sdf/ge_sdf_clip_shader.h"
-#include "sdf/ge_sdf_color_shader.h"
-#include "sdf/ge_sdf_shadow_shader.h"
-#include "sdf/ge_sdf_edge_light.h"
+#include "ge_sdf_border_shader.h"
+#include "ge_sdf_clip_shader.h"
+#include "ge_sdf_color_shader.h"
+#include "ge_sdf_shadow_shader.h"
+#include "ge_sdf_edge_light.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
