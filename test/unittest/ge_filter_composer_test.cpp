@@ -23,6 +23,7 @@
 #include "ge_filter_type_info.h"
 #include "ge_direct_draw_on_canvas_pass.h"
 #include "ge_hps_build_pass.h"
+#include "ge_hps_upscale_pass.h"
 #include "ge_mesa_fusion_pass.h"
 #include "ge_render.h"
 #include "ge_visual_effect_impl.h"
@@ -531,6 +532,94 @@ HWTEST_F(GEFilterComposerTest, GEDirectDrawOnCanvasPassRunNullEffect, TestSize.L
     EXPECT_FALSE(result.changed);
 
     GTEST_LOG_(INFO) << "GEFilterComposerTest GEDirectDrawOnCanvasPassRunNullEffect end";
+}
+
+/**
+ * @tc.name: HpsUpscalePassGetLogName
+ * @tc.desc: Test GEHpsUpscalePass GetLogName function
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, HpsUpscalePassGetLogName, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassGetLogName start";
+
+    GEHpsUpscalePass pass;
+
+    auto name = pass.GetLogName();
+    EXPECT_EQ(name, "GEHpsUpscalePass");
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassGetLogName end";
+}
+
+/**
+ * @tc.name: HpsUpscalePassRunEmptyComposables
+ * @tc.desc: Test GEHpsUpscalePass Run function with empty composables
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, HpsUpscalePassRunEmptyComposables, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunEmptyComposables start";
+
+    GEHpsUpscalePass pass;
+    std::vector<GEFilterComposable> composables;
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunEmptyComposables end";
+}
+
+/**
+ * @tc.name: HpsUpscalePassRunOnlyHpsEffect
+ * @tc.desc: Test GEHpsUpscalePass Run function with only HPS effect (last one, no upscale needed)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, HpsUpscalePassRunOnlyHpsEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunOnlyHpsEffect start";
+
+    // Create a HpsEffectFilter with needUpscale initially set to true
+    auto hpsEffect = std::make_shared<HpsEffectFilter>(canvas_);
+    hpsEffect->SetNeedUpscale(true);
+
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(GEFilterComposable(hpsEffect));
+
+    GEHpsUpscalePass pass;
+    auto result = pass.Run(composables);
+
+    // Should disable upscale for the last (only) HPS effect
+    EXPECT_TRUE(result.changed);
+    EXPECT_FALSE(hpsEffect->IsNeedUpscale());
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunOnlyHpsEffect end";
+}
+
+/**
+ * @tc.name: HpsUpscalePassRunHpsEffectWithGEAfter
+ * @tc.desc: Test GEHpsUpscalePass Run function with HPS effect followed by GE effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, HpsUpscalePassRunHpsEffectWithGEAfter, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunHpsEffectWithGEAfter start";
+
+    // Create a HpsEffectFilter with needUpscale initially set to false
+    auto hpsEffect = std::make_shared<HpsEffectFilter>(canvas_);
+    hpsEffect->SetNeedUpscale(false);
+
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(GEFilterComposable(hpsEffect));
+    composables.push_back(CreateGreyEffect()); // GE effect after HPS
+
+    GEHpsUpscalePass pass;
+    auto result = pass.Run(composables);
+
+    // Should enable upscale since GE effect follows HPS
+    EXPECT_TRUE(result.changed);
+    EXPECT_TRUE(hpsEffect->IsNeedUpscale());
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest HpsUpscalePassRunHpsEffectWithGEAfter end";
 }
 
 } // namespace Rosen
