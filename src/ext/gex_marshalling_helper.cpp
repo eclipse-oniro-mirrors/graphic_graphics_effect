@@ -14,9 +14,9 @@
  */
 
 #include "ge_log.h"
-#include "ext/gex_dot_matrix_shader.h"
-#include "ext/gex_flow_light_sweep_shader.h"
-#include "ext/gex_complex_shader.h"
+#include "gex_dot_matrix_shader.h"
+#include "gex_flow_light_sweep_shader.h"
+#include "gex_complex_shader.h"
 #include "transaction/rs_marshalling_helper.h"
 
 namespace OHOS {

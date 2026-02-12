@@ -14,8 +14,8 @@
  */
 
 #include <gtest/gtest.h>
-#include "sdf/ge_sdf_union_op_shader_shape.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_union_op_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;

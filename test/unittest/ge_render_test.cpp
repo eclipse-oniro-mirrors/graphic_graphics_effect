@@ -19,7 +19,7 @@
 #include "ge_visual_effect_impl.h"
 #include "pipeline/rs_paint_filter_canvas.h"
 #include "render_context/render_context.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;

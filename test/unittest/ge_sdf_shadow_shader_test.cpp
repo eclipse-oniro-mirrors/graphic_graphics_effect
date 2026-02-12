@@ -15,8 +15,8 @@
 
 #include <gtest/gtest.h>
 
-#include "sdf/ge_sdf_shadow_shader.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_shadow_shader.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 #include "draw/color.h"
 

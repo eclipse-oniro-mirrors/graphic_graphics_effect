@@ -18,7 +18,7 @@
 
 #include "draw/color.h"
 #include "image/bitmap.h"
-#include "sdf/ge_sdf_from_image_filter.h"
+#include "ge_sdf_from_image_filter.h"
 
 using namespace testing;
 using namespace testing::ext;
