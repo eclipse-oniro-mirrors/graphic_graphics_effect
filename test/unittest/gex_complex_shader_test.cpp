@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ext/gex_complex_shader.h"
+#include "gex_complex_shader.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_external_dynamic_loader.h"
 

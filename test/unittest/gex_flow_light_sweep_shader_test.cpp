@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ext/gex_flow_light_sweep_shader.h"
+#include "gex_flow_light_sweep_shader.h"
 
 #include "draw/color.h"
 #include "image/bitmap.h"
