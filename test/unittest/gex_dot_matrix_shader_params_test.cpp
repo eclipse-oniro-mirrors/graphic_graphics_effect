@@ -15,7 +15,7 @@
 
 #include <gtest/gtest.h>
 
-#include "ext/gex_dot_matrix_shader_params.h"
+#include "gex_dot_matrix_shader_params.h"
 
 using namespace testing;
 using namespace testing::ext;

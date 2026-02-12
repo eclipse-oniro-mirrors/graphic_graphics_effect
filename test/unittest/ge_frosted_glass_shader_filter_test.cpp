@@ -21,7 +21,7 @@
 #include "draw/canvas.h"
 #include "image/bitmap.h"
 #include "image/image.h"
-#include "sdf/ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;

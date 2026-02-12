@@ -14,7 +14,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "sdf/ge_sdf_empty_shader_shape.h"
+#include "ge_sdf_empty_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;

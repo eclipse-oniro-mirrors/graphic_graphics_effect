@@ -14,8 +14,8 @@
  */
 #include <gtest/gtest.h>
 
-#include "cache/ge_cache_provider.h"
-#include "cache/ge_image_cache_provider.h"
+#include "ge_cache_provider.h"
+#include "ge_image_cache_provider.h"
 
 using namespace testing;
 using namespace testing::ext;
