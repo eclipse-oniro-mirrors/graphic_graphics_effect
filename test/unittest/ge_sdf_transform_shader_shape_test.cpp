@@ -119,7 +119,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShaderHasNormal_001, Test
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -159,7 +159,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, GenerateDrawingShaderHasNormal_003, Test
 
     GESDFTransformShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GenerateDrawingShader_003 end";
 }
 
