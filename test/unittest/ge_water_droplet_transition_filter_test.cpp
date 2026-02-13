@@ -91,15 +91,15 @@ HWTEST_F(GEWaterDropletTransitionFilterTest, OnProcessImage_001, TestSize.Level0
     auto filter = std::make_shared<GEWaterDropletTransitionFilter>(params);
     EXPECT_EQ(filter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
 
+    // Test with inverse = true
+    params.inverse = true;
+    filter = std::make_shared<GEWaterDropletTransitionFilter>(params);
+    EXPECT_NE(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
+
     // Test null image returns nullptr
     params.topLayer = nullptr;
     filter = std::make_shared<GEWaterDropletTransitionFilter>(params);
     EXPECT_EQ(filter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
-
-    // Test with inverse = true
-    params.inverse = true;
-    filter = std::make_shared<GEWaterDropletTransitionFilter>(params);
-    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(GEWaterDropletTransitionFilterTest, OnProcessImage_003, TestSize.Level0
     auto topLayer = CreateTestImage(100, 100); // 100x100 blue top image
     params.topLayer = topLayer;
     filter = std::make_shared<GEWaterDropletTransitionFilter>(params);
-    EXPECT_EQ(filter->OnProcessImage(canvas_, invalidImage, src_, dst_), nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, invalidImage, src_, dst_), invalidImage);
 
     // Test with different image size (100x200)
     auto tallImage = CreateTestImage(100, 200); // 100x200 blue bottom image
