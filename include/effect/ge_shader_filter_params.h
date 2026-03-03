@@ -1403,24 +1403,31 @@ REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradient
 #undef REGISTER_GEFILTERPARAM_TYPEINFO
 
 struct GEWaterGlassDataParams final {
-    Drawing::Point waveCenter = {0.0f, 0.0f};
-    Drawing::Point waveSourceXY = {0.0f, 0.0f};
-    Drawing::Point waveDistortXY = {0.28f, 0.11f};
-    Drawing::Point waveDensityXY = {5.28f, 5.22f};
-    float waveStrength = 2.6f;
-    float waveLightStrength = 0.12f;
-    float waveRefraction = 25.0f;
-    float waveSpecular = 0.4f;
-    float waveFrequency = 4.3f;
-    float waveShapeDistortion = 1.2f;
-    float waveNoiseStrength = 0.1f;
-    Drawing::Point waveMaskSize = {0.5f, 0.5f};
-    float waveMaskRadius = 0.0f;
-    float borderRadius = 0.0f;
-    float borderThickness = 0.0f;
-    float borderScope = 0.05f;
-    float borderStrength = 0.39f;
+    float speed = 0.38f;
+    float distortSpeed = 0.2f;
+    Drawing::Point refractionSpeed = {1.18f, 0.47f};
     float progress = 0.0f;
+    Drawing::Point shakingDirection1 = {0.0f, 0.0f};
+    Drawing::Point shakingDirection2 = {0.0f, 0.0f};
+    Drawing::Point waveDensityXY = {4.8f, 14.6f};
+    float waveStrength = 5.8f;
+    float waveRefraction = 0.2f;
+    float waveSpecular = 0.32f;
+    float waveFrequency = 6.15f;
+    float waveShapeDistortion = 0.54f;
+    float waveDistortionAngle = 0.93f;
+    float rippleXWave = 0.01f;
+    float rippleYWave = 0.04f;
+    float borderRadius = 0.1f;
+    float borderThickness = 0.1f;
+    Drawing::Point waveInnerMaskXY = {0.85f, 0.9f};
+    float waveInnerMaskRadius = 0.59f;
+    float waveInnerMaskSmoothness = 1.0f;
+    float waveOuterMaskPadding = 0.04f;
+    float waveSpecularPower = 50.0f;
+    float refractionDetailDark = 0.85f;
+    float refractionDetailWhite = 0.48f;
+    float detailStrength = 0.61f;
 };
 
 struct GEReededGlassDataParams final {
