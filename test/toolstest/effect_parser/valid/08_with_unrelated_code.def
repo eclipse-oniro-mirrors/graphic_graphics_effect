@@ -1,0 +1,34 @@
+/*
+ * Test case with unrelated constants and type definitions
+ */
+
+// Unrelated constants
+constexpr int UNRELATED_CONSTANT = 12345;
+const float UNRELATED_FLOAT = 3.14f;
+
+// Unrelated enum
+enum UnrelatedEnum {
+    VALUE_A,
+    VALUE_B,
+    VALUE_C
+};
+
+// Unrelated typedef
+using UnrelatedType = int;
+
+// Unrelated struct (without ge::params attribute)
+struct UnrelatedStruct {
+    int x;
+    int y;
+};
+
+// The actual params struct we want to parse
+struct [[ge::params(type=TEST_UNRELATED, name="TestUnrelated")]] TestUnrelatedParams {
+    float value1;
+    int value2;
+};
+
+// More unrelated code after
+namespace UnrelatedNamespace {
+    constexpr int NAMESPACE_CONSTANT = 999;
+}

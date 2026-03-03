@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing comma in attribute parameters
+ */
+
+struct [[ge::params(type=TEST_NO_COMMA name="TestNoComma")]] TestNoCommaParams {
+    float value1;
+    int value2;
+};

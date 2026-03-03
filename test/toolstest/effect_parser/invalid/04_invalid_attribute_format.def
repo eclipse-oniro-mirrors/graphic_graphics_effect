@@ -1,0 +1,13 @@
+/*
+ * Invalid: Malformed attribute
+ */
+
+struct [[ge::params(type=TEST_BAD_ATTR, name="TestBadAttr")]] TestBadAttrParams {
+    float value1;
+    int value2;
+};
+
+// This should fail - attribute with wrong namespace
+struct [[wrong::params(type=TEST_WRONG_NS, name="TestWrongNS")]] TestWrongNSParams {
+    float value1;
+};

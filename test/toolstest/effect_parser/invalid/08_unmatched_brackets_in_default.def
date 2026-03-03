@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unmatched brackets in default value
+ */
+
+struct [[ge::params(type=TEST_UNMATCHED, name="TestUnmatched")]] TestUnmatchedParams {
+    Vector2f vec2 = {1.0f, 2.0f; // Missing closing brace
+    int value2;
+};

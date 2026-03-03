@@ -1,0 +1,11 @@
+/*
+ * Test case with brace initialization for default values
+ */
+
+struct [[ge::params(type=TEST_BRACE_INIT, name="TestBraceInit")]] TestBraceInitParams {
+    Vector2f vec2 = {1.0f, 2.0f};
+    Vector3f vec3 = {1.0f, 2.0f, 3.0f};
+    Vector4f vec4 = {1.0f, 0.0f, 0.0f, 1.0f};
+    std::array<int, 3> arr = {1, 2, 3};
+    int values[4] = {1, 2, 3, 4};
+};

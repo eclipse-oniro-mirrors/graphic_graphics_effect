@@ -1,0 +1,31 @@
+/*
+ * Valid: Mixed standard and custom attributes on fields
+ */
+
+struct [[ge::params(type=TEST_MIXED_ATTR, name="TestMixedAttr")]] TestMixedAttrParams {
+    // Standard attribute first, then custom
+    [[maybe_unused]]
+    [[ge::prop("Value1")]]
+    float value1 = 1.0f;
+
+    // Custom attribute first, then standard
+    [[ge::prop("Value2")]]
+    [[nodiscard]]
+    int value2;
+
+    // Multiple standard + custom attributes
+    [[maybe_unused]]
+    [[nodiscard]]
+    [[ge::prop("Value3")]]
+    [[deprecated]]
+    double value3 = 3.14;
+
+    // Just standard attributes, no custom
+    [[gnu::unused, maybe_unused]]
+    bool flag;
+
+    // Multiple custom attributes
+    [[ge::prop("Value4")]]
+    [[ge::alias("alias_value4")]]
+    char ch = 'x';
+};

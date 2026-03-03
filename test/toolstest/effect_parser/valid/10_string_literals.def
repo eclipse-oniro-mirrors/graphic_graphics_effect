@@ -1,0 +1,12 @@
+/*
+ * Test case with string literals in default values
+ */
+
+struct [[ge::params(type=TEST_STRINGS, name="TestStrings")]] TestStringsParams {
+    std::string emptyString = "";
+    std::string helloString = "Hello, World!";
+    std::string escapedString = "Line1\nLine2\tTabbed";
+    std::string quotedString = "He said \"Hello\"";
+    std::string pathString = "C:\\Users\\Test\\file.txt";
+    const char* cString = "C-style string";
+};

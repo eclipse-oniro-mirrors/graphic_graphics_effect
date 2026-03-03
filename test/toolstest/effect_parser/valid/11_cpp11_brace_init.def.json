@@ -1,0 +1,112 @@
+{
+  "name": "11_cpp11_brace_init",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestCpp11BraceParams",
+      "enum_type": "TEST_CPP11_BRACE",
+      "filter_name": "TestCpp11Brace",
+      "fields": [
+        {
+          "type": "int",
+          "name": "emptyInt",
+          "default_value": "{}",
+          "prop_name": ""
+        },
+        {
+          "type": "float",
+          "name": "emptyFloat",
+          "default_value": "{}",
+          "prop_name": ""
+        },
+        {
+          "type": "double",
+          "name": "emptyDouble",
+          "default_value": "{}",
+          "prop_name": ""
+        },
+        {
+          "type": "bool",
+          "name": "emptyBool",
+          "default_value": "{}",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "singleInt",
+          "default_value": "{42}",
+          "prop_name": ""
+        },
+        {
+          "type": "float",
+          "name": "singleFloat",
+          "default_value": "{3.14f}",
+          "prop_name": ""
+        },
+        {
+          "type": "double",
+          "name": "singleDouble",
+          "default_value": "{2.718}",
+          "prop_name": ""
+        },
+        {
+          "type": "bool",
+          "name": "singleBool",
+          "default_value": "{true}",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "tradInit",
+          "default_value": "0",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "braceInit",
+          "default_value": "{0}",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "emptyStr",
+          "default_value": "{}",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "helloStr",
+          "default_value": "{Hello, World!}",
+          "prop_name": ""
+        },
+        {
+          "type": "std::shared_ptr<GEShaderMask>",
+          "name": "mask",
+          "default_value": "{nullptr}",
+          "prop_name": ""
+        },
+        {
+          "type": "std::array<int,3>",
+          "name": "arr",
+          "default_value": "{1,2,3}",
+          "prop_name": ""
+        },
+        {
+          "type": "Vector2f",
+          "name": "vec2",
+          "default_value": "{1.0f,2.0f}",
+          "prop_name": ""
+        },
+        {
+          "type": "std::vector<std::pair<int,float>>",
+          "name": "pairs",
+          "default_value": "{{1,1.0f},{2,2.0f}}",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

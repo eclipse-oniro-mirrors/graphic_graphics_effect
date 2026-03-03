@@ -1,0 +1,9 @@
+/*
+ * Basic valid test case
+ */
+
+struct [[ge::params(type=TEST_BASIC, name="TestBasic")]] TestBasicParams {
+    float value1;
+    int value2;
+    bool flag;
+};

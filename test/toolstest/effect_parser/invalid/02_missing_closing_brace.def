@@ -1,0 +1,9 @@
+/*
+ * Invalid: Missing closing brace
+ */
+
+struct [[ge::params(type=TEST_NO_BRACE, name="TestNoBrace")]] TestNoBraceParams {
+    float value1;
+    int value2;
+    bool flag;
+// Missing closing brace here

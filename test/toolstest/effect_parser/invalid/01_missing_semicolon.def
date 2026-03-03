@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing semicolon after field declaration
+ */
+
+struct [[ge::params(type=TEST_NO_SEMI, name="TestNoSemi")]] TestNoSemiParams {
+    float value1
+    int value2;
+};

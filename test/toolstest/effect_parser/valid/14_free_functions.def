@@ -1,0 +1,28 @@
+/*
+ * Valid: File with free functions (should be ignored, only structs parsed)
+ */
+
+[[maybe_unused]] static void helper_function() {
+    // This is a free function - should be ignored
+}
+
+[[nodiscard]] int calculate_value(int x, int y) {
+    return x + y;
+}
+
+struct [[ge::params(type=TEST_FUNCS, name="TestFuncs")]] TestFuncsParams {
+    float value1;
+    int value2;
+};
+
+// Another free function after the struct
+[[deprecated("Use new_version instead")]]
+void old_version() {
+}
+
+// Template function
+template<typename T>
+[[nodiscard]]
+T get_default_value() {
+    return T{};
+}

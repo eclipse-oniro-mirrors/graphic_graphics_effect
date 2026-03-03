@@ -1,0 +1,8 @@
+/*
+ * Valid: Attribute with balanced brackets and nested structures
+ */
+
+struct [[ge::params(type=TEST_BALANCED_BRACKETS, name="TestBalancedBrackets", values=[1, 2, 3], nested={a: 1, b: 2})]] TestBalancedBracketsParams {
+    float value1;
+    int value2;
+};

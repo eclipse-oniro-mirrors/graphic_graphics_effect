@@ -1,0 +1,52 @@
+{
+  "name": "10_string_literals",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestStringsParams",
+      "enum_type": "TEST_STRINGS",
+      "filter_name": "TestStrings",
+      "fields": [
+        {
+          "type": "std::string",
+          "name": "emptyString",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "helloString",
+          "default_value": "Hello, World!",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "escapedString",
+          "default_value": "Line1\\nLine2\\tTabbed",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "quotedString",
+          "default_value": "He said \\\"Hello\\\"",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "pathString",
+          "default_value": "C:\\\\Users\\\\Test\\\\file.txt",
+          "prop_name": ""
+        },
+        {
+          "type": "const char*",
+          "name": "cString",
+          "default_value": "C-style string",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

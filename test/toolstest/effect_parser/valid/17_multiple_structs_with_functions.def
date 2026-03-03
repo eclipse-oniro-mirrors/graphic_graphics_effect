@@ -1,0 +1,31 @@
+/*
+ * Valid: Multiple structs with functions between them
+ */
+
+[[maybe_unused]] void global_func1() {
+}
+
+struct [[ge::params(type=TEST_MULTI_1, name="TestMulti1")]] TestMulti1Params {
+    float value1;
+    int value2;
+};
+
+[[nodiscard]] int global_func2() {
+    return 42;
+}
+
+struct [[ge::params(type=TEST_MULTI_2, name="TestMulti2")]] TestMulti2Params {
+    bool flag;
+    double value = 3.14;
+};
+
+template<typename T>
+T global_func3(T x) {
+    return x;
+}
+
+struct [[ge::params(type=TEST_MULTI_3, name="TestMulti3")]] TestMulti3Params {
+    int a;
+    float b;
+    char c;
+};

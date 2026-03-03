@@ -1,0 +1,11 @@
+/*
+ * Invalid: Empty attribute
+ */
+
+struct [[ge::params(type=TEST_EMPTY_ATTR, name="TestEmptyAttr")]] TestEmptyAttrParams {
+    float value1 = 1.0f;
+
+    // Empty attribute - just [[]]
+    [[]]
+    int value2;
+};

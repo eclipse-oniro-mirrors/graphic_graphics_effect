@@ -1,0 +1,26 @@
+/*
+ * Valid: Standard C++ attributes like [[maybe_unused]], [[nodiscard]], etc.
+ */
+
+struct [[ge::params(type=TEST_STD_ATTR, name="TestStdAttr")]] TestStdAttrParams {
+    [[maybe_unused]]
+    float value1 = 1.0f;
+
+    [[nodiscard]]
+    int value2;
+
+    [[deprecated("Use new_field instead")]]
+    bool old_flag;
+
+    [[maybe_unused, nodiscard]]
+    double value3 = 3.14;
+
+    [[gnu::unused]]
+    char ch = 'a';
+
+    [[fallthrough]]
+    int value4;
+
+    [[gnu::always_inline]]
+    void* ptr = nullptr;
+};

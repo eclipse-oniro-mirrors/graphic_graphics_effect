@@ -1,0 +1,74 @@
+{
+  "name": "16_mixed_attributes",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestMixedAttrParams",
+      "enum_type": "TEST_MIXED_ATTR",
+      "filter_name": "TestMixedAttr",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "1.0f",
+          "prop_name": "Value1",
+          "prop_attributes": [
+            {
+              "name": "Value1",
+              "array_accessor_length": null,
+              "alias": null
+            }
+          ]
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "Value2",
+          "prop_attributes": [
+            {
+              "name": "Value2",
+              "array_accessor_length": null,
+              "alias": null
+            }
+          ]
+        },
+        {
+          "type": "double",
+          "name": "value3",
+          "default_value": "3.14",
+          "prop_name": "Value3",
+          "prop_attributes": [
+            {
+              "name": "Value3",
+              "array_accessor_length": null,
+              "alias": null
+            }
+          ]
+        },
+        {
+          "type": "bool",
+          "name": "flag",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "char",
+          "name": "ch",
+          "default_value": "x",
+          "prop_name": "Value4",
+          "prop_attributes": [
+            {
+              "name": "Value4",
+              "array_accessor_length": null,
+              "alias": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

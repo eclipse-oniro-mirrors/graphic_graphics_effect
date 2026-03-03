@@ -1,0 +1,28 @@
+{
+  "name": "20_balanced_brackets_in_attr",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestBalancedBracketsParams",
+      "enum_type": "TEST_BALANCED_BRACKETS",
+      "filter_name": "TestBalancedBrackets",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

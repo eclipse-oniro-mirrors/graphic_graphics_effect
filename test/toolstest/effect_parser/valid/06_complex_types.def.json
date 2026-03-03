@@ -1,0 +1,64 @@
+{
+  "name": "06_complex_types",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestComplexParams",
+      "enum_type": "TEST_COMPLEX",
+      "filter_name": "TestComplex",
+      "fields": [
+        {
+          "type": "std::shared_ptr<Drawing::Image>",
+          "name": "image",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "std::shared_ptr<GEShaderMask>",
+          "name": "mask",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "std::shared_ptr<Drawing::GESDFShaderShape>",
+          "name": "shape",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "std::string",
+          "name": "stringField",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "Vector2f",
+          "name": "vec2",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "Vector3f",
+          "name": "vec3",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "Vector4f",
+          "name": "vec4",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "std::pair<int,float>",
+          "name": "pairField",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

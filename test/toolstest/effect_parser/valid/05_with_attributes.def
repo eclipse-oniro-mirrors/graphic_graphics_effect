@@ -1,0 +1,13 @@
+/*
+ * Test case with field-level attributes
+ */
+
+struct [[ge::params(type=TEST_ATTRS, name="TestAttrs")]] TestAttrsParams {
+    [[ge::prop("Custom_Property_Name")]]
+    float value1 = 1.0f;
+
+    [[ge::prop("Another_Property")]]
+    int value2;
+
+    bool flag; // No attribute
+};

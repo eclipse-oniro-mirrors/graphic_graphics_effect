@@ -1,0 +1,11 @@
+{
+  "name": "09_missing_comma_in_attribute",
+  "should_parse": false,
+  "expected_error_count": 2,
+  "expected_errors": [
+    "invalid/09_missing_comma_in_attribute.def:line 5, column 8: line 5, column 8: Missing comma in attribute parameters (after 'type')",
+    "invalid/09_missing_comma_in_attribute.def:line 5, column 8: Warning: Struct has [[ge::params(...)]] attribute but is missing a struct name"
+  ],
+  "structs": [],
+  "notes": ""
+}

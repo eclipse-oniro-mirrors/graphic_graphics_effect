@@ -1,0 +1,14 @@
+/*
+ * Test case with extra whitespace between tokens
+ * This should still parse correctly
+ */
+
+struct    [[ge::params(  type  =  TEST_WHITESPACE  ,  name  =  "TestWhitespace"  )]]    TestWhitespaceParams
+{
+    float    value1    ;
+    int     value2     ;
+    bool    flag    ;
+
+    double    extra    =    3.14    ;
+};
+

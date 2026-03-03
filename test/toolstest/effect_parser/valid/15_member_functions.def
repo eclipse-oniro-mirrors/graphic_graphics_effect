@@ -1,0 +1,22 @@
+/*
+ * Valid: Struct with member functions (should only parse data fields)
+ */
+
+struct [[ge::params(type=TEST_MEMBER_FUNCS, name="TestMemberFuncs")]] TestMemberFuncsParams {
+    float value1;
+    int value2;
+
+    // Member function - should be ignored
+    [[nodiscard]] bool is_valid() const {
+        return value1 > 0;
+    }
+
+    // Static member function - should be ignored
+    static void reset() {
+    }
+
+    double value3 = 3.14;
+
+    [[maybe_unused]] void helper() {
+    }
+};

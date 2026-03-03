@@ -1,0 +1,8 @@
+/*
+ * Valid: Attribute with raw string literal
+ */
+
+struct [[ge::params(type=TEST_RAW_STRING_ATTR, name="TestRawStringAttr", pattern=R"(\w+\d+)")]] TestRawStringAttrParams {
+    float value1;
+    int value2;
+};

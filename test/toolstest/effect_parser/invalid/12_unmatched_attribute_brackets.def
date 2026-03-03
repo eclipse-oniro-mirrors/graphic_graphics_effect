@@ -1,0 +1,12 @@
+/*
+ * Invalid: Unmatched brackets in attribute
+ */
+
+struct [[ge::params(type=TEST_UNMATCHED_ATTR, name="TestUnmatchedAttr")]] TestUnmatchedAttrParams {
+    [[ge::prop("value")]]
+    float value1 = 1.0f;
+
+    // Unmatched bracket - missing closing ]]
+    [[ge::prop("broken"
+    int value2;
+};

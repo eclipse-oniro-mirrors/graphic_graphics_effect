@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unmatched brackets in attribute
+ */
+
+struct [[ge::params(type=TEST_UNMATCHED_BRACKETS, name="TestBrackets", values=[1, 2, 3)]] TestUnmatchedBracketsParams {
+    float value1;
+    int value2;
+};

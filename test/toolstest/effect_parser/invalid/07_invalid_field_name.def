@@ -1,0 +1,8 @@
+/*
+ * Invalid: Field with no name (just type)
+ */
+
+struct [[ge::params(type=TEST_NO_FIELD_NAME, name="TestNoFieldName")]] TestNoFieldNameParams {
+    float;
+    int value2;
+};

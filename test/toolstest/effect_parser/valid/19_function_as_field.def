@@ -1,0 +1,9 @@
+/*
+ * Edge case: Function syntax looks like a field declaration
+ */
+
+struct [[ge::params(type=TEST_FUNC_FIELD, name="TestFuncField")]] TestFuncFieldParams {
+    // This looks like a function declaration (void func();)
+    // Not a valid field
+    void some_function();
+};

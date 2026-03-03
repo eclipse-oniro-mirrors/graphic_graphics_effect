@@ -1,0 +1,10 @@
+/*
+ * Test case with tabs and various newline styles
+ */
+
+struct		[[ge::params(type=TEST_TABS,		name="TestTabs")]]		TestTabsParams
+{
+	float		value1	;	int		value2	;	bool		flag	;	double		complex		=	1.23	;
+
+
+}	;

@@ -1,0 +1,40 @@
+{
+  "name": "09_tabs_and_newlines",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestTabsParams",
+      "enum_type": "TEST_TABS",
+      "filter_name": "TestTabs",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "bool",
+          "name": "flag",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "double",
+          "name": "complex",
+          "default_value": "1.23",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

@@ -1,0 +1,20 @@
+/*
+ * Test case with various comment styles
+ */
+
+// Single-line comment before struct
+struct [[ge::params(type=TEST_COMMENTS, name="TestComments")]] TestCommentsParams {
+    // This is a single-line comment
+    float value1; // inline comment
+
+    /* This is a
+     * multi-line comment */
+    int value2;
+
+    /* Another multi-line comment */ bool flag;
+
+    /**
+     * Documentation-style comment
+     */
+    double value3;
+};

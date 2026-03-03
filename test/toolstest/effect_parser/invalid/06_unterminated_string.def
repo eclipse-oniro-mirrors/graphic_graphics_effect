@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unterminated string literal in attribute
+ */
+
+struct [[ge::params(type=TEST_UNTERM_STR, name="TestUnterminated)]] TestUnterminatedParams {
+    float value1;
+    int value2;
+};

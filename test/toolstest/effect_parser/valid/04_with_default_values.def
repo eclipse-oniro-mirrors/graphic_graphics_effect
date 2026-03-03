@@ -1,0 +1,17 @@
+/*
+ * Test case with various default value styles
+ */
+
+struct [[ge::params(type=TEST_DEFAULTS, name="TestDefaults")]] TestDefaultsParams {
+    float floatValue = 1.5f;
+    double doubleValue = 3.14159;
+    int intValue = 42;
+    bool boolValue = true;
+    bool boolValue2 = false;
+    char charValue = 'x';
+    int hexValue = 0xFF;
+    int binaryValue = 0b1010;
+    int octalValue = 0755;
+    float scientificNotation = 1.5e10;
+    double negativeValue = -123.456;
+};

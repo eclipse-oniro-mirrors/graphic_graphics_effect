@@ -1,0 +1,6 @@
+/*
+ * Edge case: Empty struct (should parse but with no fields)
+ */
+
+struct [[ge::params(type=TEST_EMPTY, name="TestEmpty")]] TestEmptyParams {
+};

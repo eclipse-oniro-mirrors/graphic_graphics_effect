@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing opening brace
+ */
+
+struct [[ge::params(type=TEST_NO_OPEN_BRACE, name="TestNoOpenBrace")]] TestNoOpenBraceParams
+    float value1;
+    int value2;
+};

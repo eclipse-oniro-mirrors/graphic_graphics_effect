@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing struct name after attribute
+ */
+
+struct [[ge::params(type=TEST_NO_NAME, name="TestNoName")]] {
+    float value1;
+    int value2;
+};

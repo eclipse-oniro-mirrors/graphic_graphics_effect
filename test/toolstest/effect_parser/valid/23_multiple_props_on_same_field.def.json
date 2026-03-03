@@ -1,0 +1,52 @@
+{
+  "name": "23_multiple_props_on_same_field",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "BezierWarpParams",
+      "enum_type": "BEZIER_WARP",
+      "filter_name": "BezierWarp",
+      "fields": [
+        {
+          "type": "std::array<int,PATCH_POINT_COUNT>",
+          "name": "destinationPatch",
+          "default_value": "",
+          "prop_name": "BEZIER_WARP_DESTINATION_PATCH",
+          "prop_attributes": [
+            {
+              "name": "BEZIER_WARP_DESTINATION_PATCH",
+              "array_accessor_length": null,
+              "alias": null
+            },
+            {
+              "name": "BezierWarp_ControlPoint",
+              "array_accessor_length": 12,
+              "alias": null
+            }
+          ]
+        },
+        {
+          "type": "std::array<float,5>",
+          "name": "colorPalette",
+          "default_value": "",
+          "prop_name": "COLOR_PALETTE",
+          "prop_attributes": [
+            {
+              "name": "COLOR_PALETTE",
+              "array_accessor_length": null,
+              "alias": null
+            },
+            {
+              "name": "PaletteColor",
+              "array_accessor_length": 5,
+              "alias": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unterminated raw string in attribute
+ */
+
+struct [[ge::params(type=TEST_UNTERM_RAW_STR, name="TestUnterminatedRaw", pattern=R"(\w+] )]] TestUnterminatedRawStringParams {
+    float value1;
+    int value2;
+};

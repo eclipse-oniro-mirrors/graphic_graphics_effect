@@ -1,0 +1,22 @@
+/*
+ * Test case for named parameter syntax with name and array_accessor_length
+ * This tests the new syntax: [[ge::prop(name="MY_ARR", array_accessor_length=10)]] std::array<int, 10> myArr;
+ */
+
+struct [[ge::params(type=TEST_ARRAY, name="TestArray")]] TestArrayParams {
+    // Named parameters with both name and array_accessor_length
+    [[ge::prop(name="MY_ARR", array_accessor_length=10)]]
+    std::array<int, 10> myArr;
+
+    // Backward compatibility: single value should be treated as name
+    [[ge::prop("MY_OTHER_ARR")]]
+    std::array<float, 5> myOtherArr;
+
+    // Explicit name parameter (should work like single value)
+    [[ge::prop(name="MY_THIRD_ARR")]]
+    std::array<bool, 3> myThirdArr;
+
+    // Mix with old-style prop attribute
+    [[ge::prop("REGULAR_PROP")]]
+    int regularField;
+};
