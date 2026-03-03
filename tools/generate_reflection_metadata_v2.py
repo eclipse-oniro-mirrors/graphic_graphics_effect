@@ -553,14 +553,14 @@ Examples:
         '--params-dir',
         type=str,
         default=None,
-        help='Directory containing .def files (default: include/params)'
+        help='Directory containing .def files (default: include/effect/params)'
     )
 
     parser.add_argument(
         '--output-file',
         type=str,
         default=None,
-        help='Output header file path (default: include/ge_params_reflection_v2.h)'
+        help='Output header file path (default: include/effect/ge_params_reflection_v2.h)'
     )
 
     args = parser.parse_args()
@@ -569,8 +569,8 @@ Examples:
     root_dir = script_dir.parent
 
     # Use command line args or defaults
-    params_dir = Path(args.params_dir) if args.params_dir else root_dir / "include" / "params"
-    output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "ge_params_reflection_v2.h"
+    params_dir = Path(args.params_dir) if args.params_dir else root_dir / "include" / "effect" / "params"
+    output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "effect" / "ge_params_reflection_v2.h"
 
     # Find all .def files
     def_files = list(params_dir.glob("*.def"))
