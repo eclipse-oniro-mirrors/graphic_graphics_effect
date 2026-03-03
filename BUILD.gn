@@ -110,7 +110,6 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/filter/ge_sdf_edge_light.cpp",
     "src/effect/filter/ge_sdf_from_image_filter.cpp",
     "src/effect/filter/ge_variable_radius_blur_shader_filter.cpp",
-    "src/effect/filter/ge_water_droplet_transition_filter.cpp",
     "src/effect/filter/ge_water_ripple_filter.cpp",
     "src/effect/shader/ge_shader.cpp",
     "src/effect/shader/ge_aurora_noise_shader.cpp",
