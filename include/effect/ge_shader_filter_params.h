@@ -1339,6 +1339,16 @@ struct GESDFRRectShapeParams {
     GERRect rrect;
 };
 
+constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE[] = "SDFTriangleShape";
+constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0[] = "SDFTriangleShape_vertex0";
+constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX1[] = "SDFTriangleShape_vertex1";
+constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2[] = "SDFTriangleShape_vertex2";
+struct GESDFTriangleShapeParams {
+    Vector2f vertex0 = Vector2f(0.0f, 0.0f);
+    Vector2f vertex1 = Vector2f(0.0f, 0.0f);
+    Vector2f vertex2 = Vector2f(0.0f, 0.0f);
+};
+
 constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
 constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
 struct GESDFPixelmapShapeParams {

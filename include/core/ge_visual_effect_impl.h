@@ -60,6 +60,7 @@ public:
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>& param);
     void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
+    void SetParam(const std::string& tag, const Vector2f& param);
     void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
@@ -436,6 +437,16 @@ public:
     void MakeSDFRRectShapeParams()
     {
         sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
+    }
+
+    const std::shared_ptr<GESDFTriangleShapeParams>& GetSDFTriangleShapeParams() const
+    {
+        return sdfTriangleShapeParams_;
+    }
+
+    void MakeSDFTriangleShapeParams()
+    {
+        sdfTriangleShapeParams_ = std::make_shared<GESDFTriangleShapeParams>();
     }
 
     const std::shared_ptr<GESDFPixelmapShapeParams>& GetSDFPixelmapShapeParams() const
@@ -849,6 +860,7 @@ private:
     std::shared_ptr<GESDFColorShaderParams> sdfColorShaderParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFTriangleShapeParams> sdfTriangleShapeParams_ = nullptr;
     std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
