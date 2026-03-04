@@ -663,6 +663,7 @@ constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESCALEX[] = "WaterDropletT
 constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESCALEY[] = "WaterDropletTransition_NoiseScaleY";
 constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESTRENGTHX[] = "WaterDropletTransition_NoiseStrengthX";
 constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_NOISESTRENGTHY[] = "WaterDropletTransition_NoiseStrengthY";
+constexpr char GE_FILTER_WATER_DROPLET_TRANSITION_POSITION[] = "WaterDropletTransition_Position";
 struct GEWaterDropletTransitionFilterParams {
     std::shared_ptr<Drawing::Image> topLayer = nullptr;
     bool inverse = false;
@@ -677,6 +678,7 @@ struct GEWaterDropletTransitionFilterParams {
     float noiseScaleY = 0.0f;
     float noiseStrengthX = 0.0f;
     float noiseStrengthY = 0.0f;
+    Vector2f position = Vector2f(0.5f, 0.5f);
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(WATER_DROPLET_TRANSITION, GEWaterDropletTransitionFilterParams,
     GE_FILTER_WATER_DROPLET_TRANSITION);
