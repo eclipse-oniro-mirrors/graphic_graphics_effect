@@ -10,7 +10,7 @@ import re
 from typing import Dict, List, Tuple, Any, Optional
 
 # Import Token from cpp_tokenizer module
-from tools.cpp_tokenizer import Token
+from tool.effectgen.cpp_tokenizer import Token
 
 
 class AttributeParser:

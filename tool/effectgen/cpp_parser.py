@@ -9,9 +9,9 @@ from typing import List, Optional
 from dataclasses import dataclass, field
 
 # Import Token from cpp_tokenizer module
-from tools.cpp_tokenizer import Token
+from tool.effectgen.cpp_tokenizer import Token
 # Import AttributeParser from attribute_parser module
-from tools.attribute_parser import AttributeParser
+from tool.effectgen.attribute_parser import AttributeParser
 
 
 @dataclass

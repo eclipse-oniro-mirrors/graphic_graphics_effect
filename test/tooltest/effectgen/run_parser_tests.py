@@ -16,12 +16,12 @@ from dataclasses import dataclass, asdict
 
 # Add parent directory to path to import the parser module
 script_dir = Path(__file__).parent
-root_dir = script_dir.parent
+root_dir = script_dir.parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
-from tools.cpp_tokenizer import CppTokenizer, Token
-from tools.cpp_parser import CppParser
-from tools.attribute_parser import AttributeParser
+from tool.effectgen.cpp_tokenizer import CppTokenizer, Token
+from tool.effectgen.cpp_parser import CppParser
+from tool.effectgen.attribute_parser import AttributeParser
 
 
 @dataclass

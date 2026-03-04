@@ -14,11 +14,11 @@ import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import parser modules
-from tools.cpp_tokenizer import CppTokenizer
-from tools.cpp_parser import CppParser, StructInfo, FieldInfo
+from tool.effectgen.cpp_tokenizer import CppTokenizer
+from tool.effectgen.cpp_parser import CppParser, StructInfo, FieldInfo
 
 # Copyright header for generated files
 COPYRIGHT_HEADER = """/*
@@ -565,8 +565,7 @@ Examples:
 
     args = parser.parse_args()
 
-    script_dir = Path(__file__).parent
-    root_dir = script_dir.parent
+    root_dir = Path(__file__).parent.parent.parent
 
     # Use command line args or defaults
     params_dir = Path(args.params_dir) if args.params_dir else root_dir / "include" / "effect" / "params"
