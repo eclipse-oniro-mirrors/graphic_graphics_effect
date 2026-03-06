@@ -4,29 +4,28 @@ This file provides guidance to Agents when working with code in this repository.
 
 ## Overview
 
-This is `graphics_effect`, a component of OpenHarmony's graphics subsystem providing visual effects algorithm capabilities including blur, shadow, gradient, grayscale, edge lighting, and other shader-based effects. The library is part of the OpenHarmony foundation graphics stack and integrates with the 2D graphics rendering pipeline.
+This is `graphics_effect`, often abbreviated as `GE`, a component of OpenHarmony's graphics subsystem providing visual effects algorithm capabilities including blur, shadow, gradient, grayscale, edge lighting, and other shader-based effects. The library is part of the OpenHarmony foundation graphics stack and integrates with the 2D graphics rendering pipeline.
 
 ## Build System
 
 This project uses GN (Generate Ninja) as its build system, which is standard for OpenHarmony projects.
 
-### Building the Library
+### Building
+
+Build commands are typically run from the OpenHarmony root directory (not this repository root):
 
 ```bash
-# Build the main graphics_effect library
-./build.sh --product-name <product> --build-target graphics_effect:graphics_effect_core
-
-# Build with specific platform flags (defined in config.gni)
+hb build graphics_effect -i # full build of graphics_effect
+hb build graphics_effect -i --skip-download --build-target <target> # fast incremental build
 ```
 
-### Running Tests
+### Testing
 
 ```bash
-# Build and run unit tests
-./build.sh --product-name <product> --build-target graphics_effect:GraphicsEffectTest
-
-# Build fuzz tests
-./build.sh --product-name <product> --build-target graphics_effect:fuzztest
+# Build all tests for graphics_effect
+hb build graphics_effect -t
+# Fast rebuild of specific target. Full path usually works
+hb build graphics_effect -t --skip-download --build-target <target>
 ```
 
 ### Test Organization
@@ -49,7 +48,7 @@ graphics_effect/
 │   │   ├── mask/        # Masking operations
 │   │   └── shape/       # Shape-based effects (including SDF)
 │   ├── pipeline/        # Rendering pipeline and composition
-│   ├── hps/             # HPS (High Performance System) integration
+│   ├── hps/             # HPS (High Performance Shaders) integration
 │   ├── ext/             # Extension functionality
 │   └── util/            # Utility classes
 ├── src/                 # Implementation files (mirrors include structure)
@@ -83,6 +82,7 @@ The codebase follows a modular, layered architecture:
   - `DrawImageEffect()` - Applies effects and draws to canvas
   - `ApplyImageEffect()` - Applies effects and returns resulting image
   - `DrawShaderEffect()` - Draws shader-based effects
+  - `ApplyHpsGEImageEffect()` - Applies effects using mixed GE/HPS pipeline with composition system
 - **GEFilterComposer** (`ge_filter_composer.h`) - Multi-pass effect composition system
 - **Rendering Passes**:
   - `GEDirectDrawOnCanvasPass` - Direct drawing to canvas
@@ -103,7 +103,7 @@ Shader-based image processing filters (all inherit from `GEShaderFilter`):
 - **Light/Glow filters**: Edge light, Content light, Direction light, Border light
 - **SDF filters**: SDF edge light, SDF from image
 - **Transition filters**: Mask transition
-- **Other**: AI bar, Sound wave, Water ripple, Mask transition
+- **Other**: AI bar, Sound wave, Water ripple
 
 #### Shader Effects (`effect/shader/`)
 Direct shader effects (inherit from `GEShader`):
@@ -138,7 +138,7 @@ Shape-based effects including SDF (Signed Distance Field) system:
 - **Base**: `GEShaderShape` (`ge_shader_shape.h`) - Base shape interface
 
 ### 4. HPS Layer (`include/hps/`, `src/hps/`)
-- **GEHPSEffectFilter** (`ge_hps_effect_filter.h`) - HPS-specific effect filter integration
+- **HpsEffectFilter** (`ge_hps_effect_filter.h`) - HPS-specific effect filter integration
 
 ### 5. Extension Layer (`include/ext/`, `src/ext/`)
 - **GEExternalDynamicLoader** (`ge_external_dynamic_loader.h`) - Dynamic loading of external effects
@@ -180,6 +180,7 @@ IGEFilterType (base interface in core/ge_filter_type.h)
 ## Key Subsystems
 
 ### SDF (Signed Distance Field) System
+
 - **Location**: `src/effect/shape/`, `include/effect/shape/`
 - **Purpose**: SDF-based shape rendering and effects (edge lighting, shadows, borders, clipping)
 - **Components**:
@@ -196,6 +197,7 @@ IGEFilterType (base interface in core/ge_filter_type.h)
   - `GESDFFromImageFilter` (in `effect/filter/`) - Converts images to SDF representation
 
 ### Filter Composition Pipeline
+
 - **Location**: `src/pipeline/`, `include/pipeline/`
 - **Purpose**: Multi-pass effect composition system with different rendering strategies
 - **Components**:
@@ -207,14 +209,17 @@ IGEFilterType (base interface in core/ge_filter_type.h)
   - `GEFilterComposerPass` - Generic filter composition pass
 
 ### Rendering System
+
 - **Location**: `src/pipeline/ge_render.cpp`, `include/pipeline/ge_render.h`
 - **Purpose**: Main rendering interface and effect pipeline orchestration
 - **Key APIs**:
   - `DrawImageEffect()` - Applies effects and draws to canvas
   - `ApplyImageEffect()` - Applies effects and returns resulting image
   - `DrawShaderEffect()` - Draws shader-based effects
+  - `ApplyHpsGEImageEffect()` - Applies effects using mixed GE/HPS pipeline with composition system
 
 ### Caching System
+
 - **Location**: `src/pipeline/`, `include/pipeline/`
 - **Purpose**: Provides caching infrastructure for rendered images
 - **Interface**:
@@ -222,12 +227,14 @@ IGEFilterType (base interface in core/ge_filter_type.h)
   - `GEImageCacheProvider` - Image-based caching implementation
 
 ### HPS Integration
+
 - **Location**: `src/hps/`, `include/hps/`
-- **Purpose**: High Performance System (HPS) integration for optimized rendering
+- **Purpose**: High Performance Shaders (HPS) integration for optimized rendering
 - **Components**:
-  - `GEHPSEffectFilter` - HPS-specific effect filter integration
+  - `HpsEffectFilter` - HPS-specific effect filter integration
 
 ### Extension System
+
 - **Location**: `src/ext/`, `include/ext/`
 - **Purpose**: Dynamic loading and marshalling for external effects
 - **Components**:
@@ -237,6 +244,7 @@ IGEFilterType (base interface in core/ge_filter_type.h)
 ## Code Conventions
 
 ### Naming
+
 - **Classes**: `GE` prefix for Graphics Effect classes (e.g., `GERender`, `GEVisualEffect`)
 - **Files**: Match class names with snake_case (e.g., `ge_render.cpp` for `GERender`)
 - **Parameters**: Shader parameters use string tags (e.g., `"radius"`, `"intensity"`)
@@ -244,11 +252,13 @@ IGEFilterType (base interface in core/ge_filter_type.h)
 - **Extension classes**: `GEX` prefix (e.g., `GEXDotMatrixShader`)
 
 ### Platform Macros
+
 - `GE_OHOS` - OpenHarmony platform
 - `GE_PLATFORM_UNIX` - Unix-like platforms (Linux, OHOS)
 - `USE_M133_SKIA` - Skia version flag (M133+)
 
 ### Compilation Flags
+
 - C++17 standard (`-std=c++17`)
 - Security hardening: `-D_FORTIFY_SOURCE=2`, `-ftrapv`
 - Hidden visibility by default: `-fvisibility=hidden`
@@ -282,14 +292,3 @@ Visual effects use a strongly-typed parameter system via overloaded `SetParam()`
 - SDF parameters: `GESDFBorderParams`, `GESDFShadowParams`
 
 Parameters are identified by string tags defined in `effect/ge_shader_filter_params.h`.
-
-## Recently Removed Features
-
-The following features have been removed from the codebase:
-
-- **Water Droplet Transition Filter** (`ge_water_droplet_transition_filter`) - Removed in commit 5606f01
-- **Gamma Correction Filter** (`ge_gamma_correction_filter`) - Removed in commit c5f6715
-- **Map Color by Brightness Filter** (`ge_map_color_by_brightness_shader_filter`) - Removed in commit c5f6715
-- **SDF Cascade Manager** (`ge_sdf_cascade_manager`) - Removed in commit e4be434 (reverted SDF refactor)
-
-These removals were part of code cleanup and refactoring efforts.
