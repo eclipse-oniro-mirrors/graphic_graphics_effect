@@ -1434,22 +1434,13 @@ struct GEWaterGlassDataParams final {
 
 struct GEReededGlassDataParams final {
     float refractionFactor = 0.3f;
-    float dispersionStrength = 0.0f;
-    float roughness = 0.0f;
-    float noiseFrequency = 100.0f;
-    float horizontalPatternNumber = 20.0f;
-    float saturationFactor = 1.0f;
+    uint8_t horizontalPatternNumber = 20;
     float gridLightStrength = 0.1f;
     float gridLightPositionStart = 0.97f;
     float gridLightPositionEnd = 0.92f;
     float gridShadowStrength = 0.02f;
     float gridShadowPositionStart = 0.0f;
     float gridShadowPositionEnd = 0.7f;
-    Drawing::Color4f pointLightColor = {1.0f, 1.0f, 1.0f, 1.0f};
-    Drawing::Point pointLight1Position = {1.0f, 0.5f};
-    float pointLight1Strength = 0.0f;
-    Drawing::Point pointLight2Position = {0.0f, 0.5f};
-    float pointLight2Strength = 0.0f;
     Drawing::Point portalLightSize = {0.2f, 0.01f};
     Drawing::Point portalLightTilt = {0.526f, 0.46f};
     Drawing::Point portalLightPosition = {0.55f, 0.7f};
