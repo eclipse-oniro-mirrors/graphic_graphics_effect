@@ -15,17 +15,21 @@ This project uses GN (Generate Ninja) as its build system, which is standard for
 Build commands are typically run from the OpenHarmony root directory (not this repository root):
 
 ```bash
-hb build graphics_effect -i # full build of graphics_effect
-hb build graphics_effect -i --skip-download --build-target <target> # fast incremental build
+# Build the main graphics_effect library
+# Build with part of OH code, independently built by component
+hb build graphics_effect -i
+# Build with full of OH code, product could be rk3568 etc.
+./build.sh --product-name <product> --build-target graphics_effect
 ```
 
 ### Testing
 
 ```bash
 # Build all tests for graphics_effect
+# Build with part of OH code, independently built by component
 hb build graphics_effect -t
-# Fast rebuild of specific target. Full path usually works
-hb build graphics_effect -t --skip-download --build-target <target>
+# Build with full of OH code, product could be rk3568 etc.
+./build.sh --product-name <product> --build-target graphics_effect_test
 ```
 
 ### Test Organization
