@@ -1215,10 +1215,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
-        case FilterType::NOISY_FRAME_GRADIENT_MASK: {
-            ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
-            break;
-        }
         default:
             break;
     }
@@ -1268,27 +1264,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::vector<Vect
             }
             if (tag == GE_SHADER_DOT_MATRIX_SHADER_STARTPOINTS) {
                 dotMatrixShaderParams_->startPoints_ = param;
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector2f& param)
-{
-    switch (filterType_) {
-        case FilterType::SDF_TRIANGLE_SHAPE: {
-            if (sdfTriangleShapeParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0) {
-                sdfTriangleShapeParams_->vertex0 = param;
-            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX1) {
-                sdfTriangleShapeParams_->vertex1 = param;
-            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2) {
-                sdfTriangleShapeParams_->vertex2 = param;
             }
             break;
         }

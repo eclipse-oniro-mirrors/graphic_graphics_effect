@@ -60,7 +60,6 @@ public:
     void SetParam(const std::string& tag, const std::pair<float, float>& param);
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>& param);
     void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
-    void SetParam(const std::string& tag, const Vector2f& param);
     void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
