@@ -166,7 +166,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
         builder->SetUniform("transformMatrix", invertMatrix);
     } else {
         LOGE("GESDFTransformShaderShape::GenerateShaderEffect, invert matrix failed");
-        builder->SetUniform("transformMatrix", params_.matrix);
+        return Drawing::ShaderEffect::CreateColorShader(0);
     }
     builder->SetChild("shapeShader", shapeShader);
 
