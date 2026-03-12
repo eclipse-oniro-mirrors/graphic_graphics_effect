@@ -51,6 +51,11 @@ public:
         return params_.vertex2;
     }
 
+    const float& GetRadius() const
+    {
+        return params_.radius;
+    }
+
     void CopyState(const GESDFTriangleShaderShape& shape)
     {
         params_ = shape.params_;

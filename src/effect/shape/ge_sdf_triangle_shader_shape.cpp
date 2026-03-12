@@ -25,6 +25,7 @@ static constexpr char SDF_GRAD_PROG[] = R"(
     uniform vec2 vertex0;
     uniform vec2 vertex1;
     uniform vec2 vertex2;
+    uniform float radius;
 
     const float N_EPS = 1e-6;
     const float N_SCALE = 2048.0;
@@ -44,6 +45,10 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         vec2 e0 = v1 - v0;
         vec2 e1 = v2 - v1;
         float crossValue = e0.x * e1.y - e0.y * e1.x;
+        // 退化三角形检测
+        if (abs(crossValue) < 1e-6) {
+            return 1e6;
+        }
         bool isClockwise = crossValue > 0.0;
 
         vec2 adjustedV1 = isClockwise ? v1 : v2;
@@ -81,6 +86,40 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         return vec3(sd, grad);
     }
 
+    vec3 sdgRoundedTriangle(vec2 p, vec2 v0, vec2 v1, vec2 v2, float r)
+    {
+        // 计算边长
+        float a = length(v1 - v0);
+        float b = length(v2 - v1);
+        float c = length(v0 - v2);
+        float perimeter = a + b + c;
+
+        // 退化三角形检测
+        if (perimeter < 1e-6) {
+            return vec3(1e6, vec2(0.0, 0.0));
+        }
+
+        // 计算内切圆圆心和半径
+        vec2 incenter = (b * v0 + c * v1 + a * v2) / perimeter;
+        float area = abs((v1.x - v0.x) * (v2.y - v0.y) - (v2.x - v0.x) * (v1.y - v0.y)) * 0.5;
+        float inradius = area / (perimeter * 0.5);
+
+        // 限制 radius 不超过内切圆半径
+        float clampedR = clamp(r, 0.0, inradius);
+
+        // 计算新三角形顶点（以内切圆圆心为中心缩放）
+        float scale = (inradius - clampedR) / inradius;
+        vec2 v0p = incenter + (v0 - incenter) * scale;
+        vec2 v1p = incenter + (v1 - incenter) * scale;
+        vec2 v2p = incenter + (v2 - incenter) * scale;
+
+        // 计算新三角形的 SDG
+        vec3 sdg = sdgTriangle(p, v0p, v1p, v2p);
+
+        // 外扩圆角：SDF 减去 r，梯度不变
+        return vec3(sdg.x - clampedR, sdg.yz);
+    }
+
     float EncodeDir(vec2 dir)
     {
         float xPos = floor(dir.x + N_SCALE);
@@ -90,7 +129,7 @@ static constexpr char SDF_GRAD_PROG[] = R"(
 
     vec4 main(float2 fragCoord)
     {
-        vec3 sdg = sdgTriangle(fragCoord, vertex0, vertex1, vertex2);
+        vec3 sdg = sdgRoundedTriangle(fragCoord, vertex0, vertex1, vertex2, radius);
         float packedDir = EncodeDir(sdg.yz);
         return vec4(sdg.yz, packedDir, sdg.x);
     }
@@ -131,6 +170,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTriangleShaderShape::GetSDFT
         uniform vec2 vertex0;
         uniform vec2 vertex1;
         uniform vec2 vertex2;
+        uniform float radius;
 
         float sign2(vec2 p, vec2 v0, vec2 v1)
         {
@@ -142,6 +182,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTriangleShaderShape::GetSDFT
             vec2 e0 = v1 - v0;
             vec2 e1 = v2 - v1;
             float crossValue = e0.x * e1.y - e0.y * e1.x;
+             // 修复1：预判三角形是否退化为线/点（面积趋近于0），直接返回极大值
+            if (abs(crossValue) < 1e-6) {
+                return 1e6;
+            }
             bool isClockwise = crossValue > 0.0;
 
             vec2 adjustedV1 = isClockwise ? v1 : v2;
@@ -170,9 +214,40 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTriangleShaderShape::GetSDFT
             return sqrt(d) * (inside ? -1.0 : 1.0);
         }
 
+        float sdfRoundedTriangle(vec2 p, vec2 v0, vec2 v1, vec2 v2, float r)
+        {
+            // 计算边长
+            float a = length(v1 - v0);
+            float b = length(v2 - v1);
+            float c = length(v0 - v2);
+            float perimeter = a + b + c;
+
+            // 退化三角形检测
+            if (perimeter < 1e-6) {
+                return 1e6;
+            }
+
+            // 计算内切圆圆心和半径
+            vec2 incenter = (b * v0 + c * v1 + a * v2) / perimeter;
+            float area = abs((v1.x - v0.x) * (v2.y - v0.y) - (v2.x - v0.x) * (v1.y - v0.y)) * 0.5;
+            float inradius = area / (perimeter * 0.5);
+
+            // 限制 radius 不超过内切圆半径
+            float clampedR = clamp(r, 0.0, inradius);
+
+            // 计算新三角形顶点（以内切圆圆心为中心缩放）
+            float scale = (inradius - clampedR) / inradius;
+            vec2 v0p = incenter + (v0 - incenter) * scale;
+            vec2 v1p = incenter + (v1 - incenter) * scale;
+            vec2 v2p = incenter + (v2 - incenter) * scale;
+
+            // 外扩圆角 SDF = 新三角形 SDF - r
+            return sdfTriangle(p, v0p, v1p, v2p) - clampedR;
+        }
+
         half4 main(vec2 fragCoord)
         {
-            float sdf = sdfTriangle(fragCoord, vertex0, vertex1, vertex2);
+            float sdf = sdfRoundedTriangle(fragCoord, vertex0, vertex1, vertex2, radius);
             return half4(0, 0, 0, sdf);
         }
     )";
@@ -216,6 +291,7 @@ std::shared_ptr<ShaderEffect> GESDFTriangleShaderShape::GenerateShaderEffect(
     builder->SetUniform("vertex0", params_.vertex0.x_, params_.vertex0.y_);
     builder->SetUniform("vertex1", params_.vertex1.x_, params_.vertex1.y_);
     builder->SetUniform("vertex2", params_.vertex2.x_, params_.vertex2.y_);
+    builder->SetUniform("radius", std::max(0.0f, params_.radius));
 
     auto sdfTriangleShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfTriangleShapeShader) {

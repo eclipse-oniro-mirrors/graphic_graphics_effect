@@ -951,6 +951,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetSDFEdgeLightParams(tag, param);
             break;
         }
+        case FilterType::SDF_TRIANGLE_SHAPE: {
+            if (sdfTriangleShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_RADIUS) {
+                sdfTriangleShapeParams_->radius = param;
+            }
+            break;
+        }
         default:
             break;
     }

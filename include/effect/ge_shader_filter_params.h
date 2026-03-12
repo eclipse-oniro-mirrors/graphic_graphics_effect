@@ -1343,10 +1343,12 @@ constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE[] = "SDFTriangleShape";
 constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0[] = "SDFTriangleShape_Vertex0";
 constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX1[] = "SDFTriangleShape_Vertex1";
 constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2[] = "SDFTriangleShape_Vertex2";
+constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_RADIUS[] = "SDFTriangleShape_Radius";
 struct GESDFTriangleShapeParams {
     Vector2f vertex0 = Vector2f(0.0f, 0.0f);
     Vector2f vertex1 = Vector2f(0.0f, 0.0f);
     Vector2f vertex2 = Vector2f(0.0f, 0.0f);
+    float radius = 0.0f;
 };
 
 constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
