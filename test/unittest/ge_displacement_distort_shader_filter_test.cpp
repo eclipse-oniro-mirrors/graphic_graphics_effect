@@ -42,19 +42,18 @@ public:
 };
  
 void GEDisplacementDistortShaderFilterTest::SetUpTestCase(void) {}
-
 void GEDisplacementDistortShaderFilterTest::TearDownTestCase(void) {}
-
 void GEDisplacementDistortShaderFilterTest::SetUp()
 {
+    canvas_.Restore();
+
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
 }
-
-void GEDisplacementDistortShaderFilterTest::TearDown() { image_ = nullptr; }
+void GEDisplacementDistortShaderFilterTest::TearDown() {}
  
 /**
  * @tc.name: OnProcessImage_001
@@ -67,7 +66,7 @@ HWTEST_F(GEDisplacementDistortShaderFilterTest, OnProcessImage_001, TestSize.Lev
     auto geDisplacementDistortFilter = std::make_shared<GEDisplacementDistortFilter>(geDisplacementDistortFilterParams);
     EXPECT_EQ(geDisplacementDistortFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
- 
+
 /**
  * @tc.name: OnProcessImage_002
  * @tc.desc: Verify function OnProcessImage

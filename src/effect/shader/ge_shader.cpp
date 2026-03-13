@@ -35,7 +35,7 @@ bool GEShader::TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect
         return true;
     }
     if (!renderRect.Contains(subRect)) {
-        // No optimazition for the subRect which reaches the edge of the render rectangle in any direction
+        // No optimazation for the subRect which reaches the edge of the render rectangle in any direction
         return false;
     }
     float maxWidth = std::max({ width * subRect.GetLeft(), width * (1.f - subRect.GetRight()),

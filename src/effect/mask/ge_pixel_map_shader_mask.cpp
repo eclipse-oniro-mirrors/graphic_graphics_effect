@@ -29,7 +29,8 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-GEPixelMapShaderMask::GEPixelMapShaderMask(const GEPixelMapMaskParams& param) : param_(param) {
+GEPixelMapShaderMask::GEPixelMapShaderMask(const GEPixelMapMaskParams& param) : param_(param)
+{
     for (size_t i = 0; i < Vector4f::V4SIZE; ++i) {
         param_.fillColor.data_[i] = std::clamp(param_.fillColor.data_[i], 0.f, 1.f);
     }
@@ -60,7 +61,7 @@ bool GEPixelMapShaderMask::IsValid() const
     return true;
 }
 
-GEPixelMapMaskParams GEPixelMapShaderMask::GetGEPixelMapMaskParams()
+const GEPixelMapMaskParams& GEPixelMapShaderMask::GetGEPixelMapMaskParams()
 {
     return param_;
 }
@@ -68,6 +69,7 @@ GEPixelMapMaskParams GEPixelMapShaderMask::GetGEPixelMapMaskParams()
 std::shared_ptr<ShaderEffect> GEPixelMapShaderMask::GenerateDrawingShader(float width, float height) const
 {
     if (!IsValid()) {
+        LOGE("GEPixelMapShaderMask::GenerateDrawingShader param is invalid");
         return nullptr;
     }
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = nullptr;

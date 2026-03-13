@@ -163,6 +163,10 @@ std::shared_ptr<Drawing::Image> GESDFEdgeLight::MergeImage(
     Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image, std::shared_ptr<Drawing::Image> compositeImage)
 {
     auto builder = MakeImageMerger(*image, *compositeImage);
+    if (builder == nullptr) {
+        LOGE("GESDFEdgeLight::MergeImage builder is null");
+        return image;
+    }
     return builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 }
 

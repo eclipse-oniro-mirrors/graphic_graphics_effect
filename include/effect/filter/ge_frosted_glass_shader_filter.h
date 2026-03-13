@@ -29,7 +29,7 @@ class GEMESABlurShaderFilter;
 class GE_EXPORT GEFrostedGlassShaderFilter : public GEShaderFilter {
 public:
     GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params);
-    ~GEFrostedGlassShaderFilter() override = default;
+    virtual ~GEFrostedGlassShaderFilter() override = default;
     DECLARE_GEFILTER_TYPEFUNC(GEFrostedGlassShaderFilter, Drawing::GEFrostedGlassShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image,
@@ -56,11 +56,11 @@ private:
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(float width, float height) const;
-
-    Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
     bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
         const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
         std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder);
+
+    Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
 };
 
 } // namespace Rosen

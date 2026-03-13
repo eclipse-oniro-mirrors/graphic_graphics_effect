@@ -35,11 +35,9 @@ public:
 };
 
 void GEPixelMapShaderMaskTest::SetUpTestCase(void) {}
-
 void GEPixelMapShaderMaskTest::TearDownTestCase(void) {}
 
 void GEPixelMapShaderMaskTest::SetUp() {}
-
 void GEPixelMapShaderMaskTest::TearDown() {}
 
 static std::shared_ptr<Drawing::Image> MakeImage()

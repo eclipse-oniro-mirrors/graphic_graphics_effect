@@ -25,24 +25,38 @@ GEFilterComposerPassResult GEHpsBuildPass::Run(std::vector<GEFilterComposable>& 
 {
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(canvas_);
     const auto& context = context_.get();
-    if (!hpsEffectFilter->IsHpsEffectEnabled() || composables.empty()) {
+    if (!hpsEffectFilter->IsHpsEffectEnabled()) {
         return GEFilterComposerPassResult { false };
     }
     std::vector<GEFilterComposable> resultComposables;
-    std::shared_ptr<HpsEffectFilter> composedHpsFilter = std::make_shared<HpsEffectFilter>(canvas_);
+    std::shared_ptr<HpsEffectFilter> composedHpsFilter = nullptr;
+    bool composed = false;
     for (auto& composable : composables) {
         auto effect = composable.GetEffect();
         if (effect == nullptr || !hpsEffectFilter->IsEffectSupported(effect)) {
-            return GEFilterComposerPassResult { false }; // Only compose when all effects in the sequence support HPS
+            if (composedHpsFilter != nullptr) { // save the composed hps filter and leave non-VisualEffects as is
+                resultComposables.push_back(composedHpsFilter);
+                composedHpsFilter = nullptr;
+            }
+            resultComposables.push_back(composable);
+            continue;
+        }
+        if (composedHpsFilter == nullptr) {
+            composedHpsFilter = std::make_shared<HpsEffectFilter>(canvas_);
         }
         composedHpsFilter->GenerateVisualEffectFromGE(effect->GetImpl(), context.src, context.dst,
             context.saturationForHPS, context.brightnessForHPS, context.image);
+        composed = true;
     }
-    // All effects are traversed and are hps-composable.
-    resultComposables.push_back(composedHpsFilter);
-    composables.swap(resultComposables);
-    LOGD("GEHpsBuildPass::Run HPS filter composed");
-    return GEFilterComposerPassResult { true };
+    if (composedHpsFilter != nullptr) {
+        resultComposables.push_back(composedHpsFilter);
+        composedHpsFilter = nullptr;
+    }
+    if (composed) {
+        composables.swap(resultComposables);
+        LOGD("GEHpsBuildPass::Run HPS filter composed");
+    }
+    return GEFilterComposerPassResult { composed };
 }
 
 } // namespace Rosen

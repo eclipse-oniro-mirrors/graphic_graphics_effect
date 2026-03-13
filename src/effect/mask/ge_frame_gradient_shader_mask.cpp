@@ -52,7 +52,7 @@ inline static const std::string maskString = R"(
 
     half4 main(float2 fragCoord) {
         half2 uv = fragCoord / iResolution.xy;
-        half2 centeredUvs = uv * 2.0 - 1.0 - rectPos;
+        half2 centeredUvs = (uv - 0.5) * 2.0 - rectPos;
         half screenRatio = iResolution.x / iResolution.y;
         centeredUvs.x *= screenRatio;
 
@@ -61,7 +61,7 @@ inline static const std::string maskString = R"(
 
         half2 sdfInOut = half2(sdfrect, -sdfrect) + half2(innerFrameWidth, outerFrameWidth);
 
-        sdfInOut /= half2(innerFrameWidth, outerFrameWidth) + 1e-6;
+        sdfInOut /= half2(innerFrameWidth, outerFrameWidth) + 1e-5;
 
         half gradient = min(sdfInOut.x, sdfInOut.y);
 

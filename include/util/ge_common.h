@@ -15,6 +15,7 @@
 
 #ifndef GRAPHICS_EFFECT_COMMON_H
 #define GRAPHICS_EFFECT_COMMON_H
+
 #include <cmath>
 #include <memory>
 
@@ -63,13 +64,13 @@ inline bool GE_LNE(float left, float right) // less not equal
     return (left - right) < epsilon;
 }
 
-inline bool GE_GNE(float left, float right) // great not equal
+inline bool GE_GNE(float left, float right) // greater not equal
 {
     constexpr float epsilon = 0.001f;
     return (left - right) > epsilon;
 }
 
-inline bool GE_GE(float left, float right) // great or equal
+inline bool GE_GE(float left, float right) // greater or equal
 {
     constexpr float epsilon = -0.001f;
     return (left - right) > epsilon;

@@ -22,10 +22,12 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFUnionOpShaderShape::GenerateDrawingShader, Type: %s , Width: %g, Height: %g",
         params_.op == GESDFUnionOp::UNION ? "UNION" : "SMOOTH_UNION", width, height);
+
     auto leftShader = params_.left ? params_.left->GenerateDrawingShader(width, height) : nullptr;
     auto rightShader = params_.right ? params_.right->GenerateDrawingShader(width, height) : nullptr;
     if (!leftShader && !rightShader) {

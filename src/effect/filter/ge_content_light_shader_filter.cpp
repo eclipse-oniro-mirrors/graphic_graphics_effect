@@ -24,6 +24,8 @@ constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 constexpr size_t NUM_4 = 4;
+constexpr float MIN_LIGHT_POSITION = -10.0f;
+constexpr float MAX_LIGHT_POSITION = 10.0f;
 
 std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShaderEffect_ = nullptr;
 
@@ -49,6 +51,7 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Ca
     if (height < 1e-6 || width < 1e-6) {
         return nullptr;
     }
+    ClampLightValue();
     GenerateContentLightEffect();
 
     float lightColor[NUM_4] = {lightColor_[NUM_0], lightColor_[NUM_1], lightColor_[NUM_2], lightColor_[NUM_3]};
@@ -69,6 +72,22 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Ca
         return nullptr;
     }
     return invertedImage;
+}
+
+float GEContentLightFilter::ClampValue(float x, float minValue, float maxValue)
+{
+    return std::min(std::max(x, minValue), maxValue);
+}
+
+void GEContentLightFilter::ClampLightValue()
+{
+    for (size_t idx = 0; idx < NUM_3; idx ++) {
+        lightPosition_[idx] = ClampValue(lightPosition_[idx], MIN_LIGHT_POSITION, MAX_LIGHT_POSITION);
+    }
+    for (size_t idx = 0; idx < NUM_4; idx ++) {
+        lightColor_[idx] = ClampValue(lightColor_[idx], 0.0f, 1.0f);
+    }
+    lightIntensity_ = ClampValue(lightIntensity_, 0.0f, 1.0f);
 }
 
 void GEContentLightFilter::GenerateContentLightEffect()

@@ -32,9 +32,8 @@ public:
     void SetUp() override;
     void TearDown() override;
 };
- 
-void GEXDotMatrixShaderTest::SetUpTestCase(void) {}
 
+void GEXDotMatrixShaderTest::SetUpTestCase(void) {}
 void GEXDotMatrixShaderTest::TearDownTestCase(void) {}
  
 void GEXDotMatrixShaderTest::SetUp() {}

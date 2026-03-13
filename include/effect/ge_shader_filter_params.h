@@ -19,16 +19,17 @@
 #include <vector>
 #include <array>
 #include <utility>
-#include <optional>
-#include <variant>
 #include <type_traits>
 
+#include <optional>
+#include <variant>
 // rs
 #include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 // drawing
 #include "utils/matrix.h"
+
 // ge
 #include "ge_filter_type.h"
 #include "ge_shader_mask.h"
@@ -44,7 +45,7 @@ enum class DotMatrixEffectType {
 };
 
 enum class DotMatrixDirection {
-    TOP,
+    TOP = 0,
     TOP_RIGHT,
     RIGHT,
     BOTTOM_RIGHT,
@@ -52,7 +53,7 @@ enum class DotMatrixDirection {
     BOTTOM_LEFT,
     LEFT,
     TOP_LEFT,
-    MAX = TOP_LEFT,
+    MAX = 7,
 };
 template<typename T>
 struct GEFilterParamsTypeInfo {
@@ -116,7 +117,7 @@ constexpr char GE_FILTER_SOUND_WAVE_COLOR_A[] = "SoundWave_ColorA";
 constexpr char GE_FILTER_SOUND_WAVE_COLOR_B[] = "SoundWave_ColorB";
 constexpr char GE_FILTER_SOUND_WAVE_COLOR_C[] = "SoundWave_ColorC";
 constexpr char GE_FILTER_SOUND_WAVE_COLORPROGRESS[] = "SoundWave_ColorProgress";
-constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SoundWave_Intersity";
+constexpr char GE_FILTER_SOUND_WAVE_SOUNDINTENSITY[] = "SoundWave_Intensity";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_A[] = "SoundWave_AlphaA";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEALPHA_B[] = "SoundWave_AlphaB";
 constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_A[] = "SoundWave_ProgressA";
@@ -124,9 +125,9 @@ constexpr char GE_FILTER_SOUND_WAVE_SHOCKWAVEPROGRESS_B[] = "SoundWave_ProgressB
 constexpr char GE_FILTER_SOUND_WAVE_TOTAL_ALPHA[] = "SoundWave_TotalAlpha";
 struct GESoundWaveFilterParams {
     // sound wave
-    Drawing::Color4f colorA = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorB = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorC = {1.0, 1.0, 1.0, 1.0};
+    Drawing::Color4f colorA = {1.0f, 1.0f, 1.0f, 1.0f};
+    Drawing::Color4f colorB = {1.0f, 1.0f, 1.0f, 1.0f};
+    Drawing::Color4f colorC = {1.0f, 1.0f, 1.0f, 1.0f};
     float colorProgress = 0.0f;
     float soundIntensity = 0.0f;
 
@@ -530,10 +531,10 @@ struct GEWaveDisturbanceShaderMaskParams {
 REGISTER_GEFILTERPARAM_TYPEINFO(WAVE_DISTURBANCE_MASK, GEWaveDisturbanceShaderMaskParams, GE_MASK_DISTURBANCE);
 
 constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
-constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLightPosition";
-constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLightColor";
-constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "ContentLightIntensity";
-constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "ContentLightRotationAngle";
+constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLight_Position";
+constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLight_Color";
+constexpr char GE_FILTER_CONTENT_LIGHT_INTENSITY[] = "ContentLight_Intensity";
+constexpr char GE_FILTER_CONTENT_LIGHT_ROTATION_ANGLE[] = "ContentLight_RotationAngle";
 struct GEContentLightFilterParams {
     Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
     Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
@@ -704,6 +705,40 @@ struct GELinearGradientShaderMaskParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(LINEAR_GRADIENT_MASK, GELinearGradientShaderMaskParams, GE_MASK_LINEAR_GRADIENT);
 
+constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";
+constexpr char GEX_SHADER_LIGHT_CAVE_COLORC[] = "LightCave_ColorC";
+constexpr char GEX_SHADER_LIGHT_CAVE_POSITION[] = "LightCave_Position";
+constexpr char GEX_SHADER_LIGHT_CAVE_RADIUSXY[] = "LightCave_RadiusXY";
+constexpr char GEX_SHADER_LIGHT_CAVE_PROGRESS[] = "LightCave_Progress";
+struct GEXLightCaveShaderParams {
+    Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector4f colorC = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    Vector2f position = Vector2f(0.0f, 0.0f);
+    Vector2f radiusXY = Vector2f(0.0f, 0.0f);
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams, GEX_SHADER_LIGHT_CAVE);
+
+constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
+constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLight_Position";
+constexpr char GE_SHADER_BORDER_LIGHT_COLOR[] = "BorderLight_Color";
+constexpr char GE_SHADER_BORDER_LIGHT_INTENSITY[] = "BorderLight_Intensity";
+constexpr char GE_SHADER_BORDER_LIGHT_WIDTH[] = "BorderLight_Width";
+constexpr char GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE[] = "BorderLight_RotationAngle";
+constexpr char GE_SHADER_BORDER_LIGHT_CORNER_RADIUS[] = "BorderLight_CornerRadius";
+struct GEBorderLightShaderParams {
+    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float intensity = 0.0f;
+    float width = 0.0f;
+    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
+    float cornerRadius = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
+
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS[] = "MapColorByBrightness";
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS_COLORS[] = "MapColorByBrightness_Colors";
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS_POSITIONS[] = "MapColorByBrightness_Positions";
@@ -770,6 +805,261 @@ struct GEXColorGradientEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST[] = "GasifyScaleTwist";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS[] = "GasifyScaleTwist_Progress";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE[] = "GasifyScaleTwist_SourceImage";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SCALE[] = "GasifyScaleTwist_Scale";
+constexpr char GE_FILTER_GASIFY_SCALE_TWIST_MASK[] = "GasifyScaleTwist_Mask";
+struct GEGasifyScaleTwistFilterParams {
+    std::pair<float, float> scale_ = {1.0f, 1.0f};
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GASIFY_SCALE_TWIST, GEGasifyScaleTwistFilterParams, GE_FILTER_GASIFY_SCALE_TWIST);
+
+constexpr char GE_FILTER_GASIFY_BLUR[] = "GasifyBlur";
+constexpr char GE_FILTER_GASIFY_BLUR_PROGRESS[] = "GasifyBlur_Progress";
+constexpr char GE_FILTER_GASIFY_BLUR_SOURCEIMAGE[] = "GasifyBlur_SourceImage";
+constexpr char GE_FILTER_GASIFY_BLUR_MASK[] = "GasifyBlur_Mask";
+struct GEGasifyBlurFilterParams {
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GASIFY_BLUR, GEGasifyBlurFilterParams, GE_FILTER_GASIFY_BLUR);
+
+constexpr char GE_FILTER_GASIFY[] = "Gasify";
+constexpr char GE_FILTER_GASIFY_PROGRESS[] = "Gasify_Progress";
+constexpr char GE_FILTER_GASIFY_SOURCEIMAGE[] = "Gasify_SourceImage";
+constexpr char GE_FILTER_GASIFY_MASK[] = "Gasify_Mask";
+struct GEGasifyFilterParams {
+    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
+    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
+    float progress_ = 0.f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GASIFY, GEGasifyFilterParams, GE_FILTER_GASIFY);
+
+constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
+constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
+constexpr char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";
+constexpr char GEX_SHADER_AIBAR_GLOW_BAR_ANGLE[] = "AIBarGlow_BarAngle";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR0[] = "AIBarGlow_Color0";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR1[] = "AIBarGlow_Color1";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR2[] = "AIBarGlow_Color2";
+constexpr char GEX_SHADER_AIBAR_GLOW_COLOR3[] = "AIBarGlow_Color3";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS0[] = "AIBarGlow_Position0";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS1[] = "AIBarGlow_Position1";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS2[] = "AIBarGlow_Position2";
+constexpr char GEX_SHADER_AIBAR_GLOW_POS3[] = "AIBarGlow_Position3";
+constexpr char GEX_SHADER_AIBAR_GLOW_STRENGTH[] = "AIBarGlow_Strength";
+constexpr char GEX_SHADER_AIBAR_GLOW_BRIGHTNESS[] = "AIBarGlow_Brightness";
+constexpr char GEX_SHADER_AIBAR_GLOW_PROGRESS[] = "AIBarGlow_Progress";
+struct GEXAIBarGlowEffectParams {
+    Vector4f LTWH;
+    float stretchFactor = 0.0f;
+    float barAngle = 0.0f;
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
+    Vector4f strengths;
+    float brightness = 1.0f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(AIBAR_GLOW, GEXAIBarGlowEffectParams, GEX_SHADER_AIBAR_GLOW);
+
+constexpr char GEX_SHADER_AIBAR_RECT_HALO[] = "AIBarRectHalo";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_LTWH[] = "AIBarRectHalo_LTWH";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR0[] = "AIBarRectHalo_Color0";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR1[] = "AIBarRectHalo_Color1";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR2[] = "AIBarRectHalo_Color2";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR3[] = "AIBarRectHalo_Color3";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS0[] = "AIBarRectHalo_Position0";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS1[] = "AIBarRectHalo_Position1";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS2[] = "AIBarRectHalo_Position2";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS3[] = "AIBarRectHalo_Position3";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_STRENGTH[] = "AIBarRectHalo_Strength";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_BRIGHTNESS[] = "AIBarRectHalo_Brightness";
+constexpr char GEX_SHADER_AIBAR_RECT_HALO_PROGRESS[] = "AIBarRectHalo_Progress";
+struct GEXAIBarRectHaloEffectParams {
+    Vector4f LTWH;
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
+    Vector4f strengths;
+    float brightness = 1.0f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(AIBAR_RECT_HALO, GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO);
+
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH[] = "RoundedRectFlowlight_WaveLength";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP[] = "RoundedRectFlowlight_WaveTop";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS[] = "RoundedRectFlowlight_CornerRadius";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS[] = "RoundedRectFlowlight_Brightness";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE[] = "RoundedRectFlowlight_Scale";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING[] = "RoundedRectFlowlight_Sharping";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING[] = "RoundedRectFlowlight_Feathering";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS[] =
+    "RoundedRectFlowlight_FeatheringBezierControlPoints";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS[] =
+    "RoundedRectFlowlight_GradientBezierControlPoints";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR[] = "RoundedRectFlowlight_Color";
+constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS[] = "RoundedRectFlowlight_Progress";
+struct GEXRoundedRectFlowlightEffectParams {
+    std::pair<float, float> startEndPosition;
+    float waveLength = 0.0f;
+    float waveTop = 0.0f;
+    float cornerRadius = 0.0f;
+    float brightness = 0.0f;
+    float scale = 0.0f;
+    float sharping = 0.0f;
+    float feathering = 0.0f;
+    Vector4f featheringBezierControlPoints;
+    Vector4f gradientBezierControlPoints;
+    Vector4f color;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(ROUNDED_RECT_FLOWLIGHT, GEXRoundedRectFlowlightEffectParams,
+                                GEX_SHADER_ROUNDED_RECT_FLOWLIGHT);
+
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS[] = "GradientFlowColors";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0[] = "GradientFlowColors_Color0";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1[] = "GradientFlowColors_Color1";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2[] = "GradientFlowColors_Color2";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3[] = "GradientFlowColors_Color3";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN[] = "GradientFlowColors_GradientBegin";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END[] = "GradientFlowColors_GradientEnd";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA[] = "GradientFlowColors_EffectAlpha";
+constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS[] = "GradientFlowColors_Progress";
+struct GEXGradientFlowColorsEffectParams {
+    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    float gradientBegin = 0.0f;
+    float gradientEnd = 0.0f;
+    float effectAlpha = 0.0f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GRADIENT_FLOW_COLORS, GEXGradientFlowColorsEffectParams,
+                                GEX_SHADER_GRADIENT_FLOW_COLORS);
+
+constexpr char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
+constexpr char GE_MASK_FRAME_GRADIENT_INNER_BEZIER[] = "FrameGradientMask_InnerBezier";
+constexpr char GE_MASK_FRAME_GRADIENT_OUTER_BEZIER[] = "FrameGradientMask_OuterBezier";
+constexpr char GE_MASK_FRAME_GRADIENT_CORNER_RADIUS[] = "FrameGradientMask_CornerRadius";
+constexpr char GE_MASK_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "FrameGradientMask_InnerFrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH[] = "FrameGradientMask_OuterFrameWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_RECT_WH[] = "FrameGradientMask_RectWH";
+constexpr char GE_MASK_FRAME_GRADIENT_RECT_POS[] = "FrameGradientMask_RectPos";
+struct GEFrameGradientMaskParams {
+    Vector4f innerBezier;
+    Vector4f outerBezier;
+    float cornerRadius = 0.0f;
+    float innerFrameWidth = 0.0f;
+    float outerFrameWidth = 0.0f;
+    std::pair<float, float> rectWH;
+    std::pair<float, float> rectPos;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FRAME_GRADIENT_MASK, GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT);
+
+constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
+// Common parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BLURPARAMS[] = "FrostedGlass_BlurParams";
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS[] = "FrostedGlass_WeightsEmboss"; // envLight, sd
+constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEDL[] = "FrostedGlass_WeightsEdl";
+// BG darken parameters
+constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
+constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_BGPOS[] = "FrostedGlass_BgPos";
+constexpr char GE_FILTER_FROSTED_GLASS_BGNEG[] = "FrostedGlass_BgNeg";
+constexpr char GE_FILTER_FROSTED_GLASS_BGALPHA[] = "FrostedGlass_BgAlpha";
+// Refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_REFRACTPARAMS[] = "FrostedGlass_RefractParams";
+// Inner shadow parameters
+constexpr char GE_FILTER_FROSTED_GLASS_SDPARAMS[] = "FrostedGlass_SdParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_SDRATES[] = "FrostedGlass_SdRates";
+constexpr char GE_FILTER_FROSTED_GLASS_SDKBS[] = "FrostedGlass_SdKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_SDPOS[] = "FrostedGlass_SdPos";
+constexpr char GE_FILTER_FROSTED_GLASS_SDNEG[] = "FrostedGlass_SdNeg";
+// Env refraction parameters
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS[] = "FrostedGlass_EnvLightParams"; // OutPx, width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates"; // cubic, quad
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS[] = "FrostedGlass_EnvLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS[] = "FrostedGlass_EnvLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG[] = "FrostedGlass_EnvLightNeg";
+// Edge highlights parameters
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPARAMS[] = "FrostedGlass_EdLightParams"; // width. featherPx
+constexpr char GE_FILTER_FROSTED_GLASS_EDLANGLES[] = "FrostedGlass_EdLightAngles"; // AngleDeg, featherDeg
+constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir"; // x, y
+constexpr char GE_FILTER_FROSTED_GLASS_EDLRATES[] = "FrostedGlass_EdLightRates";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLKBS[] = "FrostedGlass_EdLightKBS";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLPOS[] = "FrostedGlass_EdLightPos";
+constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
+// Dark mode parameters and scale
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM[] = "FrostedGlass_DarkModeBlurParam";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS[] = "FrostedGlass_DarkModeWeightsEmboss";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES[] = "FrostedGlass_DarkModeBgRates";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS[] = "FrostedGlass_DarkModeBgKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS[] = "FrostedGlass_DarkModeBgPos";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG[] = "FrostedGlass_DarkModeBgNeg";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTANGLES[] = "FrostedGlass_DarkModeEdLightAngles";
+constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTKBS[] = "FrostedGlass_DarkModeEdLightKBS";
+constexpr char GE_SHADER_FROSTED_GLASS_DARK_SCALE[] = "FrostedGlass_DarkScale";
+// SDF shape
+constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
+constexpr char GE_FILTER_FROSTED_GLASS_WAVE[] = "FrostedGlass_WaveMask";
+// Switch params
+constexpr char GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED[] = "FrostedGlass_BaseVibrancyEnabled";
+constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMaterialType";
+constexpr char GE_FILTER_FROSTED_GLASS_MATERIALCOLOR[] = "FrostedGlass_MaterialColor";
+struct GEFrostedGlassShaderFilterParams {
+    Vector2f blurParams = Vector2f(48.0f, 4.0f);
+    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    std::shared_ptr<GESDFShaderShape> sdfShape;
+    std::shared_ptr<GEShaderMask> waveDisturbance;
+    // Background darken parameters
+    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    float bgAlpha = 1.0f;
+    // Refraction params
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
+    // Inner shadow parameters
+    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
+    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Env refraction parameters
+    Vector3f envLightParams = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
+    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Edge highlights parameters
+    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
+    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
+    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    // Dark mode parameters and scale
+    Vector2f darkModeBlurParam = Vector2f(48.0f, 4.0f);
+    Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
+    Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);
+    Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
+    Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
+    float darkScale = 0.0f;
+    bool baseVibrancyEnabled = true;
+    float baseMaterialType = 0.0f;
+    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
+
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT[] = "FrostedGlassEffect";
 // Common parameters
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEMBOSS[] = "FrostedGlassEffect_WeightsEmboss"; // envLight, sd
@@ -790,8 +1080,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDPOS[] = "FrostedGlassEffect_SdPo
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_SDNEG[] = "FrostedGlassEffect_SdNeg";
 // Env refraction parameters
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPARAMS[] =
-    "FrostedGlassEffect_EnvLightParams"; // width. featherPx, OutPx
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES[] = "FrostedGlassEffect_EnvLightRates"; // 3, 2
+    "FrostedGlassEffect_EnvLightParams"; // width. featherPx
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTRATES[] = "FrostedGlassEffect_EnvLightRates"; // cubic, quad
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTKBS[] = "FrostedGlassEffect_EnvLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS[] = "FrostedGlassEffect_EnvLightPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTNEG[] = "FrostedGlassEffect_EnvLightNeg";
@@ -878,7 +1168,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_EFFECT, GEFrostedGlassEffectParams
 
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
-constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUSSCALE[] = "FrostedGlassBlur_RadiuslScale";
+constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUSSCALE[] = "FrostedGlassBlur_RadiusScaleK";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_REFRACTOUTPX[] = "FrostedGlassBlur_RefractOutPx";
 struct GEFrostedGlassBlurShaderFilterParams {
     float radius = 0.0f; // blurParam[0]: blur radius
@@ -886,23 +1176,6 @@ struct GEFrostedGlassBlurShaderFilterParams {
     float refractOutPx = 0.8f; // envlightParam[0]: envlight refraction outward sampling degree
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS_BLUR, GEFrostedGlassBlurShaderFilterParams, GE_FILTER_FROSTED_GLASS_BLUR);
-
-constexpr char GEX_SHADER_LIGHT_CAVE[] = "LightCave";
-constexpr char GEX_SHADER_LIGHT_CAVE_COLORA[] = "LightCave_ColorA";
-constexpr char GEX_SHADER_LIGHT_CAVE_COLORB[] = "LightCave_ColorB";
-constexpr char GEX_SHADER_LIGHT_CAVE_COLORC[] = "LightCave_ColorC";
-constexpr char GEX_SHADER_LIGHT_CAVE_POSITION[] = "LightCave_Position";
-constexpr char GEX_SHADER_LIGHT_CAVE_RADIUSXY[] = "LightCave_RadiusXY";
-constexpr char GEX_SHADER_LIGHT_CAVE_PROGRESS[] = "LightCave_Progress";
-struct GEXLightCaveShaderParams {
-    Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector4f colorC = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    Vector2f position = Vector2f(0.0f, 0.0f);
-    Vector2f radiusXY = Vector2f(0.0f, 0.0f);
-    float progress = 0.0f;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(LIGHT_CAVE, GEXLightCaveShaderParams, GEX_SHADER_LIGHT_CAVE);
 
 constexpr char GEX_MASK_DUPOLI_NOISE[] = "DupoliNoiseMask";
 constexpr char GEX_MASK_DUPOLI_NOISE_PROGRESS[] = "DupoliNoiseMask_Progress";
@@ -944,48 +1217,6 @@ struct GEXDistortChromaEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(DISTORT_CHROMA, GEXDistortChromaEffectParams, GEX_SHADER_DISTORT_CHROMA);
 
-constexpr char GE_SHADER_BORDER_LIGHT[] = "BorderLight";
-constexpr char GE_SHADER_BORDER_LIGHT_POSITION[] = "BorderLightPosition";
-constexpr char GE_SHADER_BORDER_LIGHT_COLOR[] = "BorderLightColor";
-constexpr char GE_SHADER_BORDER_LIGHT_INTENSITY[] = "BorderLightIntensity";
-constexpr char GE_SHADER_BORDER_LIGHT_WIDTH[] = "BorderLightWidth";
-constexpr char GE_SHADER_BORDER_LIGHT_ROTATION_ANGLE[] = "BorderLightRotationAngle";
-constexpr char GE_SHADER_BORDER_LIGHT_CORNER_RADIUS[] = "BorderLightCornerRadius";
-struct GEBorderLightShaderParams {
-    Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
-    Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    float intensity = 0.0f;
-    float width = 0.0f;
-    Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
-    float cornerRadius = 0.0f;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
-
-constexpr char GE_FILTER_GRID_WARP[] = "GridWarp";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT0[] = "GridWarp_GridPoint0";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT1[] = "GridWarp_GridPoint1";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT2[] = "GridWarp_GridPoint2";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT3[] = "GridWarp_GridPoint3";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT4[] = "GridWarp_GridPoint4";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT5[] = "GridWarp_GridPoint5";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT6[] = "GridWarp_GridPoint6";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT7[] = "GridWarp_GridPoint7";
-constexpr char GE_FILTER_GRID_WARP_GRID_POINT8[] = "GridWarp_GridPoint8";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE0[] = "GridWarp_RotationAngle0";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE1[] = "GridWarp_RotationAngle1";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE2[] = "GridWarp_RotationAngle2";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE3[] = "GridWarp_RotationAngle3";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE4[] = "GridWarp_RotationAngle4";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE5[] = "GridWarp_RotationAngle5";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE6[] = "GridWarp_RotationAngle6";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE7[] = "GridWarp_RotationAngle7";
-constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE8[] = "GridWarp_RotationAngle8";
-struct GEGridWarpShaderFilterParams {
-    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
-    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(GRID_WARP, GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP);
-
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT[] = "CircleFlowlight";
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR0[] = "CircleFlowlight_Color0";
 constexpr char GE_SHADER_CIRCLE_FLOWLIGHT_COLOR1[] = "CircleFlowlight_Color1";
@@ -1017,16 +1248,65 @@ struct GECircleFlowlightEffectParams {
 REGISTER_GEFILTERPARAM_TYPEINFO(CIRCLE_FLOWLIGHT, GECircleFlowlightEffectParams,
                                 GE_SHADER_CIRCLE_FLOWLIGHT);
 
+constexpr char GE_FILTER_GRID_WARP[] = "GridWarp";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT0[] = "GridWarp_GridPoint0";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT1[] = "GridWarp_GridPoint1";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT2[] = "GridWarp_GridPoint2";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT3[] = "GridWarp_GridPoint3";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT4[] = "GridWarp_GridPoint4";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT5[] = "GridWarp_GridPoint5";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT6[] = "GridWarp_GridPoint6";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT7[] = "GridWarp_GridPoint7";
+constexpr char GE_FILTER_GRID_WARP_GRID_POINT8[] = "GridWarp_GridPoint8";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE0[] = "GridWarp_RotationAngle0";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE1[] = "GridWarp_RotationAngle1";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE2[] = "GridWarp_RotationAngle2";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE3[] = "GridWarp_RotationAngle3";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE4[] = "GridWarp_RotationAngle4";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE5[] = "GridWarp_RotationAngle5";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE6[] = "GridWarp_RotationAngle6";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE7[] = "GridWarp_RotationAngle7";
+constexpr char GE_FILTER_GRID_WARP_ROTATION_ANGLE8[] = "GridWarp_RotationAngle8";
+struct GEGridWarpShaderFilterParams {
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
+    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(GRID_WARP, GEGridWarpShaderFilterParams, GE_FILTER_GRID_WARP);
+
+
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT[] = "NoisyFrameGradientMask";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS[] =
+    "NoisyFrameGradientMask_GradientBezierControlPoints";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS[] = "NoisyFrameGradientMask_CornerRadius";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "NoisyFrameGradientMask_InnerFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH[] = "NoisyFrameGradientMask_MiddleFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH[] = "NoisyFrameGradientMask_OutsideFrameWidth";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH[] = "NoisyFrameGradientMask_RRectWH";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS[] = "NoisyFrameGradientMask_RRectPos";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE[] = "NoisyFrameGradientMask_Slope";
+constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS[] = "NoisyFrameGradientMask_Progress";
+struct GEXNoisyFrameGradientMaskParams {
+    Vector4f gradientBezierControlPoints;
+    float cornerRadius = 0.0f;
+    std::pair<float, float> innerFrameWidth;
+    std::pair<float, float> middleFrameWidth;
+    std::pair<float, float> outsideFrameWidth;
+    std::pair<float, float> RRectWH;
+    std::pair<float, float> RRectPos;
+    float slope = 0.0f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
+                                GEX_MASK_NOISY_FRAME_GRADIENT);
+#undef REGISTER_GEFILTERPARAM_TYPEINFO
+
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
     SMOOTH_UNION,
     MAX = SMOOTH_UNION,
 };
 
-class GERRect {
-public:
-    GERRect(float l = 0.f, float t = 0.f, float w = 0.f,
-            float h = 0.f, float rx = 0.f, float ry = 0.f) {}
+struct GERRect {
     float left_ = 0.f;
     float top_ = 0.f;
     float width_ = 0.f;
@@ -1059,18 +1339,18 @@ struct GESDFRRectShapeParams {
     GERRect rrect;
 };
 
+constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
+constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
+struct GESDFPixelmapShapeParams {
+    std::shared_ptr<Drawing::Image> image;
+};
+
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX[] = "SDFTransformShape_Matrix";
 struct GESDFTransformShapeParams {
     std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix = Drawing::Matrix();
-};
-
-constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE[] = "SDFPixelmapShape";
-constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
-struct GESDFPixelmapShapeParams {
-    std::shared_ptr<Drawing::Image> image;
 };
 
 constexpr char GE_SHAPE_SDF_EMPTY_SHAPE[] = "SDFEmptyShape";
@@ -1118,291 +1398,6 @@ struct GESDFColorShaderParams final {
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     Vector4f color;
 };
-
-constexpr char GEX_SHADER_AIBAR_GLOW[] = "AIBarGlow";
-constexpr char GEX_SHADER_AIBAR_GLOW_LTWH[] = "AIBarGlow_LTWH";
-constexpr char GEX_SHADER_AIBAR_GLOW_STRECTCH_FACTOR[] = "AIBarGlow_StretchFactor";
-constexpr char GEX_SHADER_AIBAR_GLOW_BAR_ANGLE[] = "AIBarGlow_BarAngle";
-constexpr char GEX_SHADER_AIBAR_GLOW_COLOR0[] = "AIBarGlow_Color0";
-constexpr char GEX_SHADER_AIBAR_GLOW_COLOR1[] = "AIBarGlow_Color1";
-constexpr char GEX_SHADER_AIBAR_GLOW_COLOR2[] = "AIBarGlow_Color2";
-constexpr char GEX_SHADER_AIBAR_GLOW_COLOR3[] = "AIBarGlow_Color3";
-constexpr char GEX_SHADER_AIBAR_GLOW_POS0[] = "AIBarGlow_Position0";
-constexpr char GEX_SHADER_AIBAR_GLOW_POS1[] = "AIBarGlow_Position1";
-constexpr char GEX_SHADER_AIBAR_GLOW_POS2[] = "AIBarGlow_Position2";
-constexpr char GEX_SHADER_AIBAR_GLOW_POS3[] = "AIBarGlow_Position3";
-constexpr char GEX_SHADER_AIBAR_GLOW_STRENGTH[] = "AIBarGlow_Strength";
-constexpr char GEX_SHADER_AIBAR_GLOW_BRIGHTNESS[] = "AIBarGlow_Brightness";
-constexpr char GEX_SHADER_AIBAR_GLOW_PROGRESS[] = "AIBarGlow_Progress";
-struct GEXAIBarGlowEffectParams {
-    Vector4f LTWH;
-    float stretchFactor = 0.0f;
-    float barAngle = 0.0f;
-    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
-    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
-    Vector4f strengths;
-    float brightness;
-    float progress;
-};
-
-constexpr char GEX_SHADER_AIBAR_RECT_HALO[] = "AIBarRectHalo";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_LTWH[] = "AIBarRectHalo_LTWH";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR0[] = "AIBarRectHalo_Color0";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR1[] = "AIBarRectHalo_Color1";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR2[] = "AIBarRectHalo_Color2";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_COLOR3[] = "AIBarRectHalo_Color3";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS0[] = "AIBarRectHalo_Position0";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS1[] = "AIBarRectHalo_Position1";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS2[] = "AIBarRectHalo_Position2";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_POS3[] = "AIBarRectHalo_Position3";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_STRENGTH[] = "AIBarRectHalo_Strength";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_BRIGHTNESS[] = "AIBarRectHalo_Brightness";
-constexpr char GEX_SHADER_AIBAR_RECT_HALO_PROGRESS[] = "AIBarRectHalo_Progress";
-struct GEXAIBarRectHaloEffectParams {
-    Vector4f LTWH;
-    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
-    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
-    Vector4f strengths;
-    float brightness = 1.0f;
-    float progress = 0.0f;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(AIBAR_RECT_HALO, GEXAIBarRectHaloEffectParams, GEX_SHADER_AIBAR_RECT_HALO);
-
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT[] = "RoundedRectFlowlight";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_START_END_POS[] = "RoundedRectFlowlight_StartEndPosition";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH[] = "RoundedRectFlowlight_WaveLength";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_WAVE_TOP[] = "RoundedRectFlowlight_WaveTop";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS[] = "RoundedRectFlowlight_CornerRadius";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS[] = "RoundedRectFlowlight_Brightness";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SCALE[] = "RoundedRectFlowlight_Scale";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_SHARPING[] = "RoundedRectFlowlight_Sharping";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING[] = "RoundedRectFlowlight_Feathering";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS[] =
-    "RoundedRectFlowlight_FeatheringBezierControlPoints";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS[] =
-    "RoundedRectFlowlight_GradientBezierControlPoints";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_COLOR[] = "RoundedRectFlowlight_Color";
-constexpr char GEX_SHADER_ROUNDED_RECT_FLOWLIGHT_PROGRESS[] = "RoundedRectFlowlight_Progress";
-struct GEXRoundedRectFlowlightEffectParams {
-    std::pair<float, float> startEndPosition;
-    float waveLength = 0.0f;
-    float waveTop = 0.0f;
-    float cornerRadius = 0.0f;
-    float brightness = 0.0f;
-    float scale = 0.0f;
-    float sharping = 0.0f;
-    float feathering = 0.0f;
-    Vector4f featheringBezierControlPoints;
-    Vector4f gradientBezierControlPoints;
-    Vector4f color;
-    float progress = 0.0f;
-};
-
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS[] = "GradientFlowColors";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR0[] = "GradientFlowColors_Color0";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR1[] = "GradientFlowColors_Color1";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR2[] = "GradientFlowColors_Color2";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_COLOR3[] = "GradientFlowColors_Color3";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_BEGIN[] = "GradientFlowColors_GradientBegin";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_GRADIENT_END[] = "GradientFlowColors_GradientEnd";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_EFFECT_ALPHA[] = "GradientFlowColors_EffectAlpha";
-constexpr char GEX_SHADER_GRADIENT_FLOW_COLORS_PROGRESS[] = "GradientFlowColors_Progress";
-struct GEXGradientFlowColorsEffectParams {
-    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
-    float gradientBegin = 0.0f;
-    float gradientEnd = 0.0f;
-    float effectAlpha = 0.0f;
-    float progress = 0.0f;
-};
-
-constexpr char GE_MASK_FRAME_GRADIENT[] = "FrameGradientMask";
-constexpr char GE_MASK_FRAME_GRADIENT_INNER_BEZIER[] = "FrameGradientMask_InnerBezier";
-constexpr char GE_MASK_FRAME_GRADIENT_OUTER_BEZIER[] = "FrameGradientMask_OuterBezier";
-constexpr char GE_MASK_FRAME_GRADIENT_CORNER_RADIUS[] = "FrameGradientMask_CornerRadius";
-constexpr char GE_MASK_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "FrameGradientMask_InnerFrameWidth";
-constexpr char GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH[] = "FrameGradientMask_OuterFrameWidth";
-constexpr char GE_MASK_FRAME_GRADIENT_RECT_WH[] = "FrameGradientMask_RectWH";
-constexpr char GE_MASK_FRAME_GRADIENT_RECT_POS[] = "FrameGradientMask_RectPos";
-struct GEFrameGradientMaskParams {
-    Vector4f innerBezier;
-    Vector4f outerBezier;
-    float cornerRadius = 0.0f;
-    float innerFrameWidth = 0.0f;
-    float outerFrameWidth = 0.0f;
-    std::pair<float, float> rectWH;
-    std::pair<float, float> rectPos;
-};
-
-constexpr char GE_FILTER_GASIFY_SCALE_TWIST[] = "GasifyScaleTwist";
-constexpr char GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS[] = "GasifyScaleTwist_Progress";
-constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE[] = "GasifyScaleTwist_SourceImage";
-constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SCALE[] = "GasifyScaleTwist_Scale";
-constexpr char GE_FILTER_GASIFY_SCALE_TWIST_MASK[] = "GasifyScaleTwist_Mask";
-struct GEGasifyScaleTwistFilterParams {
-    std::pair<float, float> scale_ = {1.0f, 1.0f};
-    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
-    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
-    float progress_ = 0.f;
-};
-
-constexpr char GE_FILTER_GASIFY_BLUR[] = "GasifyBlur";
-constexpr char GE_FILTER_GASIFY_BLUR_PROGRESS[] = "GasifyBlur_Progress";
-constexpr char GE_FILTER_GASIFY_BLUR_SOURCEIMAGE[] = "GasifyBlur_SourceImage";
-constexpr char GE_FILTER_GASIFY_BLUR_MASK[] = "GasifyBlur_Mask";
-struct GEGasifyBlurFilterParams {
-    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
-    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
-    float progress_ = 0.f;
-};
-
-constexpr char GE_FILTER_GASIFY[] = "Gasify";
-constexpr char GE_FILTER_GASIFY_PROGRESS[] = "Gasify_Progress";
-constexpr char GE_FILTER_GASIFY_SOURCEIMAGE[] = "Gasify_SourceImage";
-constexpr char GE_FILTER_GASIFY_MASK[] = "Gasify_Mask";
-struct GEGasifyFilterParams {
-    std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
-    std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
-    float progress_ = 0.f;
-};
-
-constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
-// Common parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BLURPARAMS[] = "FrostedGlass_BlurParams";
-constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS[] = "FrostedGlass_WeightsEmboss"; // envLight, sd
-constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEDL[] = "FrostedGlass_WeightsEdl";
-// BG darken parameters
-constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
-constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
-constexpr char GE_FILTER_FROSTED_GLASS_BGPOS[] = "FrostedGlass_BgPos";
-constexpr char GE_FILTER_FROSTED_GLASS_BGNEG[] = "FrostedGlass_BgNeg";
-constexpr char GE_FILTER_FROSTED_GLASS_BGALPHA[] = "FrostedGlass_BgAlpha";
-// Refraction parameters
-constexpr char GE_FILTER_FROSTED_GLASS_REFRACTPARAMS[] = "FrostedGlass_RefractParams";
-// Inner shadow parameters
-constexpr char GE_FILTER_FROSTED_GLASS_SDPARAMS[] = "FrostedGlass_SdParams"; // width. featherPx
-constexpr char GE_FILTER_FROSTED_GLASS_SDRATES[] = "FrostedGlass_SdRates";
-constexpr char GE_FILTER_FROSTED_GLASS_SDKBS[] = "FrostedGlass_SdKBS";
-constexpr char GE_FILTER_FROSTED_GLASS_SDPOS[] = "FrostedGlass_SdPos";
-constexpr char GE_FILTER_FROSTED_GLASS_SDNEG[] = "FrostedGlass_SdNeg";
-// Env refraction parameters
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS[] = "FrostedGlass_EnvLightParams"; // width. featherPx, OutPx
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates"; // 3, 2
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS[] = "FrostedGlass_EnvLightKBS";
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS[] = "FrostedGlass_EnvLightPos";
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG[] = "FrostedGlass_EnvLightNeg";
-// Edge highlights parameters
-constexpr char GE_FILTER_FROSTED_GLASS_EDLPARAMS[] = "FrostedGlass_EdLightParams"; // width. featherPx
-constexpr char GE_FILTER_FROSTED_GLASS_EDLANGLES[] = "FrostedGlass_EdLightAngles"; // AngleDeg, featherDeg
-constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir"; // x, y
-constexpr char GE_FILTER_FROSTED_GLASS_EDLRATES[] = "FrostedGlass_EdLightRates";
-constexpr char GE_FILTER_FROSTED_GLASS_EDLKBS[] = "FrostedGlass_EdLightKBS";
-constexpr char GE_FILTER_FROSTED_GLASS_EDLPOS[] = "FrostedGlass_EdLightPos";
-constexpr char GE_FILTER_FROSTED_GLASS_EDLNEG[] = "FrostedGlass_EdLightNeg";
-constexpr char GE_FILTER_FROSTED_GLASS_BORDERSIZE[] = "FrostedGlass_BorderSize";
-constexpr char GE_FILTER_FROSTED_GLASS_CORNERRADIUS[] = "FrostedGlass_CornerRadius";
-constexpr char GE_FILTER_FROSTED_GLASS_SHAPE[] = "FrostedGlass_Shape";
-constexpr char GE_FILTER_FROSTED_GLASS_WAVE[] = "FrostedGlass_WaveMask";
-// Switch params
-constexpr char GE_FILTER_FROSTED_GLASS_BASEVIBRANCYENABLED[] = "FrostedGlass_BaseVibrancyEnabled";
-constexpr char GE_FILTER_FROSTED_GLASS_BASEMATERIALTYPE[] = "FrostedGlass_BaseMaterialType";
-constexpr char GE_FILTER_FROSTED_GLASS_MATERIALCOLOR[] = "FrostedGlass_MaterialColor";
-constexpr char GE_FILTER_FROSTED_GLASS_REFRACTENABLED[] = "FrostedGlass_RefractEnabled";
-constexpr char GE_FILTER_FROSTED_GLASS_INNERSHADOWENABLED[] = "FrostedGlass_InnerShadowEnabled";
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTENABLED[] = "FrostedGlass_EnvLightEnabled";
-constexpr char GE_FILTER_FROSTED_GLASS_HIGHLIGHTENABLED[] = "FrostedGlass_HighLightEnabled";
-
-// Dark mode parameters and scale
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BLURPARAM[] = "FrostedGlass_DarkModeBlurParam";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_WEIGHTSEMBOSS[] = "FrostedGlass_DarkModeWeightsEmboss";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGRATES[] = "FrostedGlass_DarkModeBgRates";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGKBS[] = "FrostedGlass_DarkModeBgKBS";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGPOS[] = "FrostedGlass_DarkModeBgPos";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_BGNEG[] = "FrostedGlass_DarkModeBgNeg";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTANGLES[] = "FrostedGlass_DarkModeEdLightAngles";
-constexpr char GE_SHADER_FROSTED_GLASS_DARKMODE_EDLIGHTKBS[] = "FrostedGlass_DarkModeEdLightKBS";
-constexpr char GE_SHADER_FROSTED_GLASS_DARK_SCALE[] = "FrostedGlass_DarkScale";
-
-struct GEFrostedGlassShaderFilterParams {
-    Vector2f blurParams = Vector2f(48.0f, 4.0f);
-    Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
-    Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
-    // Background darken parameters
-    Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
-    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
-    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
-    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
-    float bgAlpha = 1.0f;
-    // Refraction params
-    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
-    // Inner shadow parameters
-    Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
-    Vector2f sdRates = Vector2f(0.0f, 0.0f);
-    Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
-    Vector3f sdPos = Vector3f(1.0f, 1.5f, 2.0f);
-    Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
-    // Env refraction parameters
-    Vector3f envLightParams = Vector3f(0.8f, 0.2745f, 2.0f);
-    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
-    Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
-    Vector3f envLightPos = Vector3f(1.0f, 1.5f, 2.0f);
-    Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
-    // Edge highlights parameters
-    Vector2f edLightParams = Vector2f(2.0f, -1.0f);
-    Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
-    Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
-    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
-    Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
-    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
-    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
-    Vector2f borderSize = Vector2f(200.0f, 100.0f);
-    float cornerRadius = 100.0f;
-    std::shared_ptr<GESDFShaderShape> sdfShape;
-    std::shared_ptr<GEShaderMask> waveDisturbance;
-    bool baseVibrancyEnabled = true;
-    float baseMaterialType = 0.0f;
-    bool refractEnabled = true;
-    bool innerShadowEnabled = true;
-    bool envLightEnabled = true;
-    bool highLightEnabled = true;
-    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    // Dark mode parameters and scale
-    Vector2f darkModeBlurParam = Vector2f(48.0f, 4.0f);
-    Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
-    Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);
-    Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
-    Vector3f darkModeBgPos = Vector3f(0.3f, 0.5f, 1.0f);
-    Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
-    Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
-    Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
-    float darkScale = 0.0f;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(FROSTED_GLASS, GEFrostedGlassShaderFilterParams, GE_FILTER_FROSTED_GLASS);
-
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT[] = "NoisyFrameGradientMask";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_GRADIENT_BEZIER_COMTROL_POINTS[] =
-    "NoisyFrameGradientMask_GradientBezierControlPoints";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_CORNER_RADIUS[] = "NoisyFrameGradientMask_CornerRadius";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "NoisyFrameGradientMask_InnerFrameWidth";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_MIDDLE_FRAME_WIDTH[] = "NoisyFrameGradientMask_MiddleFrameWidth";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_OUTSIDE_FRAME_WIDTH[] = "NoisyFrameGradientMask_OutsideFrameWidth";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_WH[] = "NoisyFrameGradientMask_RRectWH";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_RRECT_POS[] = "NoisyFrameGradientMask_RRectPos";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_SLOPE[] = "NoisyFrameGradientMask_Slope";
-constexpr char GEX_MASK_NOISY_FRAME_GRADIENT_PROGRESS[] = "NoisyFrameGradientMask_Progress";
-struct GEXNoisyFrameGradientMaskParams {
-    Vector4f gradientBezierControlPoints;
-    float cornerRadius = 0.0f;
-    std::pair<float, float> innerFrameWidth;
-    std::pair<float, float> middleFrameWidth;
-    std::pair<float, float> outsideFrameWidth;
-    std::pair<float, float> RRectWH;
-    std::pair<float, float> RRectPos;
-    float slope;
-    float progress;
-};
-REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
-                                GEX_MASK_NOISY_FRAME_GRADIENT);
-#undef REGISTER_GEFILTERPARAM_TYPEINFO
 
 struct GEWaterGlassDataParams final {
     float speed = 0.38f;

@@ -36,7 +36,12 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Draw
     Drawing::Matrix matrix = canvasInfo_.mat;
     matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
-    matrix.Invert(invertMatrix);
+    
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEDisplacementDistortFilter::ProcessImage Invert matrix failed");
+        return image;
+    }
+    
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     auto imageInfo = image->GetImageInfo();

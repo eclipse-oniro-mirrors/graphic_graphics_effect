@@ -18,10 +18,10 @@
 #include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
- 
+
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
- 
+
 namespace OHOS {
 namespace Rosen {
 
@@ -51,14 +51,13 @@ private:
         half4 main(float2 fragCoord)
         {
             vec2 uv = fragCoord.xy/iResolution.xy;
-
             vec4 maskColor = maskEffect.eval(fragCoord);
             vec4 finalColor = vec4(0.0);
             if (maskColor.a > 0.0) {
                 //Distortion Effects
                 vec2 directionVector = 2.0 * (maskColor.rg - 0.5);
                 vec2 normal = directionVector * factor;
-                vec2 refractedUVs = clamp(mix(uv, uv - normal, 0.05), 0.001, 0.999);
+                vec2 refractedUVs = clamp(uv - normal * 0.05, 0.001, 0.999);
                 finalColor = image.eval(iResolution.xy * refractedUVs);
             } else {
                 finalColor = image.eval(fragCoord);
@@ -67,7 +66,7 @@ private:
         }
     )";
 };
- 
+
 } // namespace Rosen
 } // namespace OHOS
  

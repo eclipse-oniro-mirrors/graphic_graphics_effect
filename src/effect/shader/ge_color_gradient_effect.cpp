@@ -80,7 +80,7 @@ const std::string COLOR_GRADIENT_SHADER_WITH_MASK_END(
         half2 uv = fragCoord / iResolution.xy;
         half4 sum = interpolate(uv);
         sum.rgb += screenSpaceDither(fragCoord, 50.0).rgb;
-        return half4(sum.rgb, 1.0) * sum.a;
+        return half4(sum.rgb, 1.0) * sum.a * maskValue;
     }
     )");
 
@@ -249,7 +249,7 @@ float GEColorGradientEffect::CalculateCompressRatio()
 
 void GEColorGradientEffect::CalculateBlenderCol()
 {
-    if (paramColorSize_ > GRADIENT_ARRAY_NUM) {
+    if (paramColorSize_ > static_cast<size_t>(GRADIENT_ARRAY_NUM)) {
         LOGE("GEColorGradientEffect::CalculateBlenderCol color size out of bounds %{public}zu", paramColorSize_);
         return;
     }

@@ -363,13 +363,13 @@ namespace {
                 // Return the first color when pt.x is to the left of the halo
                 step(STOP_POS0, t) * step(t, STOP_POS1) *
                 mix(STOP_COLOR0, STOP_COLOR1,
-                    (t - STOP_POS0) / (STOP_POS1 - STOP_POS0)) +  // 0.00 < t <= 0.22
+                    (t - STOP_POS0) / (STOP_POS1 - STOP_POS0)) +  // 0.00 < t <= 0.25
                 step(STOP_POS1, t) * step(t, STOP_POS2) *
                 mix(STOP_COLOR1, STOP_COLOR2,
-                    (t - STOP_POS1) / (STOP_POS2 - STOP_POS1)) +  // 0.22 < t <= 0.75
+                    (t - STOP_POS1) / (STOP_POS2 - STOP_POS1)) +  // 0.25 < t <= 0.75
                 step(STOP_POS2, t) * step(t, STOP_POS3) *
                 mix(STOP_COLOR2, STOP_COLOR3,
-                    (t - STOP_POS2) / (STOP_POS3 - STOP_POS2)) +  // 0.75 < t <= 0.90
+                    (t - STOP_POS2) / (STOP_POS3 - STOP_POS2)) +  // 0.75 < t <= 0.96
                 step(STOP_POS3, t) * step(t, STOP_POS4) *
                 mix(STOP_COLOR3, STOP_COLOR4,
                     (t - STOP_POS3) / (STOP_POS4 - STOP_POS3)) +  // 0.90 < t <= 1.00
@@ -605,7 +605,7 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeSingleParticle
 
     singleParticleHaloBuilder_ = GetSingleParticleHaloBuilder();
     if (singleParticleHaloBuilder_ == nullptr) {
-        GE_LOGE("GEParticleCircularHaloShader MakeParticleHaloShader singleParticleHaloBuilder_ is nullptr.");
+        GE_LOGE("GEParticleCircularHaloShader::MakeSingleParticleHaloShader singleParticleHaloBuilder_ is nullptr.");
         return nullptr;
     }
     singleParticleHaloBuilder_->SetUniform("iResolution", width, height);
@@ -613,7 +613,7 @@ std::shared_ptr<Drawing::Image> GEParticleCircularHaloShader::MakeSingleParticle
     auto singleParticleHaloShader =
         singleParticleHaloBuilder_->MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
     if (singleParticleHaloShader == nullptr) {
-        GE_LOGE("GEParticleCircularHaloShader MakeSingleParticleHaloShader is nullptr.");
+        GE_LOGE("GEParticleCircularHaloShader::MakeSingleParticleHaloShader is nullptr.");
         return nullptr;
     }
     return singleParticleHaloShader;

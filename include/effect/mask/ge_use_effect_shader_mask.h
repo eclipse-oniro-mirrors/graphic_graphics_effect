@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_GE_USE_EFFECT_SHADER_MASK_H
  
 #include "common/rs_vector4.h"
+#include "ge_filter_type_info.h"
 #include "ge_log.h"
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
@@ -30,6 +31,8 @@ public:
     GEUseEffectShaderMask(const GEUseEffectMaskParams& param) : param_(param) {}
     GEUseEffectShaderMask(const GEUseEffectShaderMask&) = delete;
     virtual ~GEUseEffectShaderMask() = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GEUseEffectShaderMask, GEUseEffectMaskParams);
  
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

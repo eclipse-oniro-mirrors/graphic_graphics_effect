@@ -22,10 +22,9 @@
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 
- 
 namespace OHOS {
 namespace Rosen {
- 
+
 class GESDFShadowShader : public GEShader {
 public:
     GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params);

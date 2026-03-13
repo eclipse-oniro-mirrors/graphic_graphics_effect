@@ -47,7 +47,6 @@ private:
     static void MakeHorizontalBoxBlurEffect(bool applyInsideMask = false);
     static void MakeVerticalBoxBlurEffect(bool applyInsideMask = false);
     static void MakeTextureShaderEffect();
-
     static std::shared_ptr<Drawing::Image> DrawBoxLinearGradientBlur(const std::shared_ptr<Drawing::Image>& image,
         Drawing::Canvas& canvas, float radius, std::shared_ptr<Drawing::ShaderEffect> alphaGradientShader,
         const Drawing::Rect& dst);

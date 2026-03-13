@@ -283,11 +283,11 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::BuildBoxLinear
         Drawing::RuntimeShaderBuilder blurBuilder = isHorizontal ? hBlurBuilder : vBlurBuilder;
         isHorizontal = !isHorizontal;
         blurBuilder.SetChild("imageShader", blurImageShader);
-        localImage =
+        
 #ifdef RS_ENABLE_GPU
-            blurBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, scaledInfo, false);
+        localImage = blurBuilder.MakeImage(canvas.GetGPUContext().get(), nullptr, scaledInfo, false);
 #else
-            blurBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
+        localImage = blurBuilder.MakeImage(nullptr, nullptr, scaledInfo, false);
 #endif
         if (!localImage) {
             LOGE("GEVariableRadiusBlurShaderFilter::BuildBoxLinearGradientBlur fail to make blur image");

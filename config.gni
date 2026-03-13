@@ -13,8 +13,8 @@
 
 import("//build/ohos.gni")
 
-declare_args() {
-  graphics_effect_feature_upgrade_skia = false
+declare_args() { 
+    graphics_effect_feature_upgrade_skia = false 
 }
 graphics_effect_root = "//foundation/graphic/graphics_effect"
 

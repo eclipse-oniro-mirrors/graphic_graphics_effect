@@ -13,16 +13,14 @@
  * limitations under the License.
  */
 
-#include "ge_grid_warp_shader_filter.h"
-
-#include "draw/surface.h"
 #include "ge_log.h"
-
+#include "draw/surface.h"
+#include "ge_grid_warp_shader_filter.h"
 
 namespace OHOS {
 namespace Rosen {
 
-constexpr float DEGREE_180 = 180.0f;
+static constexpr float DEGREE_180 = 180.0f;
 
 GEGridWarpShaderFilter::GEGridWarpShaderFilter(const Drawing::GEGridWarpShaderFilterParams& params)
 {
@@ -53,7 +51,7 @@ GEGridWarpShaderFilter::GEGridWarpShaderFilter(const Drawing::GEGridWarpShaderFi
     }
 }
 
-Drawing::Point GEGridWarpShaderFilter::CalcPointCoord(int index, const float pointsDistance,
+Drawing::Point GEGridWarpShaderFilter::CalcPointCoord(const int index, const float pointsDistance,
     LocationType location)
 {
     const auto& coord = gridPointsCoords_[index];
@@ -109,7 +107,7 @@ GEGridWarpShaderFilter::BezierPatchArray GEGridWarpShaderFilter::CalculateBezier
 // +----+----+
 GEGridWarpShaderFilter::GridTextureCoords GEGridWarpShaderFilter::CalcTexCoords(int imageWidth, int imageHeight)
 {
-    GridTextureCoords texCoords;
+    std::array<std::array<Drawing::Point, GRID_TEXTURE_COORDS_NUM>, GRID_NUM> texCoords;
     for (size_t i = 0; i < GRID_NUM; i++) {
         float offsetX = 0.5f * (i % 2); // 0.5 & 2:corresponding to 2*2 grid
         float offsetY = 0.5f * (i / 2); // 0.5 & 2:corresponding to 2*2 grid
@@ -137,7 +135,8 @@ std::shared_ptr<Drawing::Image> GEGridWarpShaderFilter::OnProcessImage(Drawing::
     }
     auto brush = GetBrush(image);
 
-    auto texCoords = CalcTexCoords(imageWidth, imageHeight);
+    std::array<std::array<Drawing::Point, GRID_TEXTURE_COORDS_NUM>, GRID_NUM> texCoords =
+        CalcTexCoords(imageWidth, imageHeight);
 
     std::array<std::array<Drawing::Point, BEZIER_WARP_POINT_NUM>, GRID_NUM> realBezierPatch;
     for (size_t i = 0; i < GRID_NUM; i++) {

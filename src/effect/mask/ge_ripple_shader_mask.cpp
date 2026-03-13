@@ -70,8 +70,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
             MaskCenterUVs.x *= screenRatio;
             half offsetWidth = rippleWidth * widthCenterOffset;
             half uvDistance = length(MaskCenterUVs) - rippleRadius;
-            half maskAlpha = smoothstep(rippleWidth, offsetWidth, uvDistance)
-                            * smoothstep(-rippleWidth, offsetWidth, uvDistance);
+            half maskAlpha = smoothstep(rippleWidth, offsetWidth, uvDistance) *
+                             smoothstep(-rippleWidth, offsetWidth, uvDistance);
             return half4(maskAlpha);
         }
     )";
@@ -124,8 +124,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERippleShaderMask::GetRippleShad
 
         half4 main(vec2 fragCoord)
         {
-            half2 uv = fragCoord.xy/iResolution.xy;
-            half screenRatio = iResolution.x/iResolution.y;
+            half2 uv = fragCoord.xy / iResolution.xy;
+            half screenRatio = iResolution.x / iResolution.y;
             // Mask Info
             half2 MaskCenterUVs = uv - centerPos;
             MaskCenterUVs.x *= screenRatio;

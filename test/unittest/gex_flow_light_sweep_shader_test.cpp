@@ -37,11 +37,8 @@ public:
 };
 
 void GEXFlowLightSweepShaderTest::SetUpTestCase() {}
-
 void GEXFlowLightSweepShaderTest::TearDownTestCase() {}
-
 void GEXFlowLightSweepShaderTest::SetUp() {}
-
 void GEXFlowLightSweepShaderTest::TearDown() {}
 
 /**

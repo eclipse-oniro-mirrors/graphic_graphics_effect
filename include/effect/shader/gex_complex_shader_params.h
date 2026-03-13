@@ -14,7 +14,7 @@
  */
 #ifndef GRAPHICS_EFFECT_EXT_COMPLEX_SHADER_PARAMS_H
 #define GRAPHICS_EFFECT_EXT_COMPLEX_SHADER_PARAMS_H
- 
+
 #include <vector>
 
 #include "ge_common.h"
@@ -38,9 +38,6 @@ enum class GexComplexShaderType: uint32_t {
     SDF_HEAVY_SNOW,
     BACKGROUND_GRADIENT,
     BACKGROUND_GRADIENT_RIPPLE,
-    WAVY_RIPPLE_LIGHT,
-    AURORA_NOISE,
-    CONTOUR_DIAGONAL_FLOW_LIGHT,
     MAX
 };
 
@@ -55,5 +52,5 @@ struct GE_EXPORT GEXComplexShaderParams {
 
 } // namespace Rosen
 } // namespace OHOS
- 
+
 #endif // GRAPHICS_EFFECT_EXT_COMPLEX_SHADER_PARAMS_H

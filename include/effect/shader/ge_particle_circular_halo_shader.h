@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Rosen {
-
 class GE_EXPORT GEParticleCircularHaloShader : public GEShader {
 public:
     GEParticleCircularHaloShader();

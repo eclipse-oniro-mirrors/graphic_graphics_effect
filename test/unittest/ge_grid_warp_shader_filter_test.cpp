@@ -70,13 +70,9 @@ void GEGridWarpShaderFilterTest::TearDown()
  */
 HWTEST_F(GEGridWarpShaderFilterTest, OnProcessImage_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEGridWarpShaderFilterTest OnProcessImage_001 start";
-
     Drawing::GEGridWarpShaderFilterParams geGridWarpShaderFilterParams;
     auto geGridWarpShaderFilter = std::make_unique<GEGridWarpShaderFilter>(geGridWarpShaderFilterParams);
     EXPECT_EQ(geGridWarpShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
-
-    GTEST_LOG_(INFO) << "GEGridWarpShaderFilterTest OnProcessImage_001 end";
 }
 
 /**

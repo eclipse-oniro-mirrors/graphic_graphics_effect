@@ -47,6 +47,11 @@ private:
     int spreadFactor_ = 64;
     bool generateDerivs_ = true;
 
+    bool InitJFAPrepareEffect();
+    bool InitJfaIterationEffect();
+    bool InitJfaProcessResultEffect();
+    bool InitFillDerivEffect();
+
     std::shared_ptr<Drawing::Image> RunJFAPrepareEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
         const Drawing::SamplingOptions& samplingOptions, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::ColorType& outputColorType);
@@ -59,7 +64,8 @@ private:
         std::shared_ptr<Drawing::Image> image, const Drawing::SamplingOptions& samplingOptions,
         const Drawing::ColorType& outputColorType);
 
-    std::shared_ptr<Drawing::Image> FakeBlur(Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> edgeImage);
+    std::shared_ptr<Drawing::Image> FakeBlur(Drawing::Canvas &canvas, const std::shared_ptr<Drawing::Image> edgeImage,
+        const Drawing::SamplingOptions& samplingOptions);
 
     std::shared_ptr<Drawing::Image> RunFillDerivEffect(Drawing::Canvas& canvas, std::shared_ptr<Drawing::Image> image,
         const std::shared_ptr<Drawing::Image> blurredSDFImage, const Drawing::SamplingOptions& samplingOptions,

@@ -55,7 +55,7 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
     params.shape = sdfShape;
     clipShader.SetSDFClipParams(params);
     shader = clipShader.MakeSDFClipShader(rect);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
 }
 } // namespace Rosen
 } // namespace OHOS

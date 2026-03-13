@@ -170,7 +170,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFShaderEffect(
 
     auto sdfPixelmapShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfPixelmapShapeShader) {
-        LOGE("GESDFRRectShaderShape::GenerateSDFShaderEffect shaderEffect error");
+        LOGE("GESDFPixelmapShaderShape::GenerateSDFShaderEffect shaderEffect error");
     }
     return sdfPixelmapShapeShader;
 }
@@ -190,7 +190,7 @@ std::shared_ptr<ShaderEffect> GESDFPixelmapShaderShape::GenerateSDFNormalShaderE
 
     auto sdfPixelmapShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfPixelmapShapeShader) {
-        LOGE("GESDFRRectShaderShape::GenerateSDFNormalShaderEffect shaderEffect error");
+        LOGE("GESDFPixelmapShaderShape::GenerateSDFNormalShaderEffect shaderEffect error");
     }
     return sdfPixelmapShapeShader;
 }

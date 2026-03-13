@@ -43,11 +43,6 @@ struct GECacheProvider : IGECacheProvider {
     {
         return ExactDowncastUtils::TypeID::Get<Derived>();
     }
-
-    IGECacheProvider* AsBase() const
-    {
-        return static_cast<IGECacheProvider*>(this);
-    }
 };
 
 } // namespace Rosen

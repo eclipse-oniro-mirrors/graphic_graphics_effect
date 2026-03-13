@@ -299,6 +299,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::ConvertColorSpace(Drawi
     Drawing::Matrix matrix;
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (srcImageShader == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::ConvertColorSpace create srcImageShader failed.");
+        return nullptr;
+    }
     auto convertBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_convertShaderEffect);
     convertBuilder->SetChild("image", srcImageShader);
 #ifdef RS_ENABLE_GPU
@@ -322,6 +326,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::DetectEdge(Drawing::Can
     Drawing::Matrix detectEdgeShaderMatrix;
     auto srcImageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), detectEdgeShaderMatrix);
+    if (srcImageShader == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::DetectEdge create srcImageShader failed.");
+        return nullptr;
+    }
     auto detectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_detectShaderEffect);
     detectBuilder->SetChild("image", srcImageShader);
     detectBuilder->SetUniform("edgeThreshold", 0.3f);
@@ -364,6 +372,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
     Drawing::Matrix edgeMatrix;
     auto edgeShader = Drawing::ShaderEffect::CreateImageShader(*edgeImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), edgeMatrix);
+    if (edgeShader == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::GaussianBlur create edgeShader failed.");
+        return nullptr;
+    }
     compositeBuilder->SetChild("imageBlur0", edgeShader);
     float imageScale = 1.0f;
     auto blurImageV = edgeImage;
@@ -382,6 +394,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
         // step 1: Horizontal Gaussian blur
         auto srcImageShaderV = Drawing::ShaderEffect::CreateImageShader(*blurImageV, Drawing::TileMode::CLAMP,
             Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrixV);
+        if (srcImageShaderV == nullptr) {
+            LOGE("GEEdgeLightShaderFilter::GaussianBlur create srcImageShaderV failed.");
+            return nullptr;
+        }
         gaussianBuilder->SetChild("image", srcImageShaderV);
         gaussianBuilder->SetUniform("blurDirection", 0.0f);
         gaussianBuilder->SetUniform("sigma", 3.0f);
@@ -397,6 +413,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
         // step 2: Vertical Gaussian blur
         auto srcImageShaderH = Drawing::ShaderEffect::CreateImageShader(*blurImageH, Drawing::TileMode::CLAMP,
             Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrixH);
+        if (srcImageShaderH == nullptr) {
+            LOGE("GEEdgeLightShaderFilter::GaussianBlur create srcImageShaderH failed.");
+            return nullptr;
+        }
         gaussianBuilder->SetChild("image", srcImageShaderH);
         gaussianBuilder->SetUniform("blurDirection", 1.0f);
         gaussianBuilder->SetUniform("sigma", 3.0f);
@@ -413,6 +433,10 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
         imageBlurShaderMatrix.SetScale(std::ceil(imageWidth / newWidth), std::ceil(imageHeight / newHeight));
         auto imageBlurShader = Drawing::ShaderEffect::CreateImageShader(*blurImageV, Drawing::TileMode::CLAMP,
             Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), imageBlurShaderMatrix);
+        if (imageBlurShader == nullptr) {
+            LOGE("GEEdgeLightShaderFilter::GaussianBlur create imageBlurShader failed.");
+            return nullptr;
+        }
         compositeBuilder->SetChild("imageBlur" + std::to_string(i), imageBlurShader);
     }
     auto compImageInfo = Drawing::ImageInfo(imageInfo.GetWidth(), imageInfo.GetHeight(), imageInfo.GetColorType(),
@@ -450,9 +474,16 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::MergeImage(Drawing::Can
     Drawing::Matrix imageMatrix = canvasInfo_.mat;
     imageMatrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertImageMatrix;
-    imageMatrix.Invert(invertImageMatrix);
+    if (!imageMatrix.Invert(invertImageMatrix)) {
+        LOGE("GEEdgeLightShaderFilter::MergeImage invert imageMatrix failed.");
+        return image;
+    }
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertImageMatrix);
+    if (imageShader == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::MergeImage create imageShader failed.");
+        return nullptr;
+    }
     mergeBuilder->SetChild("image", imageShader);
 
     // set mergeMatrix
@@ -470,10 +501,17 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::MergeImage(Drawing::Can
     compositeMatrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     compositeMatrix.PostScale(scaleWRatio, scaleHRatio);
     Drawing::Matrix invertCompositeMatrix;
-    compositeMatrix.Invert(invertCompositeMatrix);
+    if (!compositeMatrix.Invert(invertCompositeMatrix)) {
+        LOGE("GEEdgeLightShaderFilter::MergeImage invert compositeMatrix failed.");
+        return image;
+    }
 
     auto compositeImageShader = Drawing::ShaderEffect::CreateImageShader(*compositeImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertCompositeMatrix);
+    if (compositeImageShader == nullptr) {
+        LOGE("GEEdgeLightShaderFilter::MergeImage create compositeImageShader failed.");
+        return nullptr;
+    }
     mergeBuilder->SetChild("imageBloom", compositeImageShader);
 
     // mergeBuilder set uniforms

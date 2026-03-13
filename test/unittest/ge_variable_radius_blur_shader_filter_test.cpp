@@ -106,9 +106,8 @@ HWTEST_F(GEVariableRadiusBlurShaderFilterTest, GetDescriptionTest, TestSize.Leve
     auto variableRadiusBlurShaderFilter = CreateVariableRadiusBlurShaderFilter();
     ASSERT_NE(variableRadiusBlurShaderFilter, nullptr);
 
-    std::string emptyString = "";
-    EXPECT_NE(variableRadiusBlurShaderFilter->GetDescription(), emptyString);
-    EXPECT_NE(variableRadiusBlurShaderFilter->GetDetailedDescription(), emptyString);
+    EXPECT_FALSE(variableRadiusBlurShaderFilter->GetDescription().empty());
+    EXPECT_FALSE(variableRadiusBlurShaderFilter->GetDetailedDescription().empty());
 }
 
 /**

@@ -60,7 +60,6 @@ private:
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_ = nullptr;
 };
-
 } // namespace Rosen
 } // namespace OHOS
 #endif // GRAPHICS_EFFECT_GE_CIRCLE_FLOWLIGHT_EFFECT_H

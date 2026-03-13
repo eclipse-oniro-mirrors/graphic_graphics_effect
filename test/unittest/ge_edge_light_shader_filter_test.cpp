@@ -57,6 +57,8 @@ void GEEdgeLightShaderFilterTest::TearDownTestCase(void) {}
 
 void GEEdgeLightShaderFilterTest::SetUp()
 {
+    canvas_.Restore();
+ 
     Rosen::Drawing::Bitmap bmp;
     Rosen::Drawing::BitmapFormat format { Rosen::Drawing::COLORTYPE_RGBA_8888, Rosen::Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size

@@ -954,7 +954,7 @@ void GEContourDiagonalFlowLightShader::ComputeAllCurveBoundingBoxes(
         float acc = 0.0f;
         for (size_t i = 0; i < numCurves_; ++i) {
             float weight = rawWeight[i] / sumWeight;
-            curveWeightPrefix_[i] = acc;
+            curveWeightPrefix_[i]  = acc;
             curveWeightCurrent_[i] = weight;
             acc += weight;
         }

@@ -59,7 +59,6 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         thisPixelmap->CopyState(*pixelmapShape);
     }
 }
-
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS

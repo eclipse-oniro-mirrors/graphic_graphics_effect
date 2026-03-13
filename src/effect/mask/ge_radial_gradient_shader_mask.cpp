@@ -31,7 +31,7 @@ constexpr static float RADIUS_SCALE = 2.0f;
 
 GERadialGradientShaderMask::GERadialGradientShaderMask(GERadialGradientShaderMaskParams param) : param_(param) {}
 
-GERadialGradientShaderMaskParams GERadialGradientShaderMask::GetGERadialGradientShaderMaskParams()
+const GERadialGradientShaderMaskParams& GERadialGradientShaderMask::GetGERadialGradientShaderMaskParams()
 {
     return param_;
 }

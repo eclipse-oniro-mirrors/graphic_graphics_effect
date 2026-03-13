@@ -64,6 +64,7 @@ public:
 
     bool HasType(const GESDFShapeType type) const override;
 private:
+    GESDFUnionOpShapeParams params_ {};
     std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(std::shared_ptr<ShaderEffect> leftShader,
         std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFUnionBuilder() const;
@@ -75,7 +76,6 @@ private:
     std::shared_ptr<ShaderEffect> GenerateSmoothUnionShaderEffect(
         std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader,
         std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
-    GESDFUnionOpShapeParams params_ {};
 };
 } // Drawing
 } // namespace Rosen

@@ -22,6 +22,7 @@
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 
+
 namespace OHOS {
 namespace Rosen {
  

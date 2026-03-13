@@ -46,11 +46,12 @@ public:
 };
 
 void GEBezierWarpShaderFilterTest::SetUpTestCase(void) {}
-
 void GEBezierWarpShaderFilterTest::TearDownTestCase(void) {}
 
 void GEBezierWarpShaderFilterTest::SetUp()
 {
+    canvas_.Restore();
+
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(imageWidth_, imageHeight_, format); // 50, 50  bitmap size
@@ -58,7 +59,10 @@ void GEBezierWarpShaderFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GEBezierWarpShaderFilterTest::TearDown() { image_ = nullptr; }
+void GEBezierWarpShaderFilterTest::TearDown()
+{
+    image_ = nullptr;
+}
 
 /**
  * @tc.name: OnProcessImage_001

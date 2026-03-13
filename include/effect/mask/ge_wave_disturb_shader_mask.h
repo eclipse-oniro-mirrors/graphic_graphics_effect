@@ -48,4 +48,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
  
-#endif // GRAPHICS_EFFECT_GE_WAVE_Disturbance_MASK_H
+#endif // GRAPHICS_EFFECT_GE_WAVE_DISTURBANCE_MASK_H

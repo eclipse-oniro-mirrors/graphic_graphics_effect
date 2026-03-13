@@ -108,7 +108,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
         std::make_shared<Drawing::RuntimeShaderBuilder>(g_magnifierShaderEffect);
     builder->SetChild("imageShader", imageShader);
-    builder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    builder->SetUniform("iResolution", imageWidth, imageHeight);
 
     builder->SetUniform("factor", magnifierPara_->factor_);
     builder->SetUniform("size", magnifierPara_->width_ * scaleX_, magnifierPara_->height_ * scaleY_);

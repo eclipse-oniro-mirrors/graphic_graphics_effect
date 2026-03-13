@@ -15,11 +15,11 @@
 #include <vector>
 
 #include "ge_double_ripple_shader_mask.h"
+#include "ge_external_dynamic_loader.h"
 #include "ge_frame_gradient_shader_mask.h"
 #include "ge_image_shader_mask.h"
 #include "ge_use_effect_shader_mask.h"
 #include "ge_log.h"
-#include "ge_external_dynamic_loader.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "ge_radial_gradient_shader_mask.h"
 #include "ge_ripple_shader_mask.h"
@@ -32,7 +32,6 @@
 #include "ge_sdf_rrect_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
-#include "ge_external_dynamic_loader.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -76,12 +75,12 @@ void GEVisualEffect::SetParam(const std::string& tag, const std::shared_ptr<Draw
     visualEffectImpl_->SetParam(tag, param);
 }
 
-void GEVisualEffect::SetParam(const std::string& tag, const std::pair<float, float>& param)
+void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Matrix param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }
 
-void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Matrix param)
+void GEVisualEffect::SetParam(const std::string& tag, const std::pair<float, float>& param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }
@@ -147,6 +146,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const Vector4f& param)
 }
 
 void GEVisualEffect::SetParam(const std::string& tag, const GERRect& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
+void GEVisualEffect::SetParam(const std::string& tag, const RectF& param)
 {
     visualEffectImpl_->SetParam(tag, param);
 }
@@ -263,9 +267,6 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
             return gexShaderMask;
         }
         case GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK: {
-            if (impl == nullptr) {
-                return nullptr;
-            }
             auto noisyFrameParams = impl->GetNoisyFrameGradientMaskParams();
             if (noisyFrameParams == nullptr) {
                 return nullptr;
@@ -307,19 +308,19 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
             }
             return GenerateExtShaderRRect(params);
         }
-        case GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE: {
-            auto params = impl->GetSDFTransformShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GESDFTransformShaderShape>(*params);
-        }
         case GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE: {
             auto params = impl->GetSDFPixelmapShapeParams();
             if (params == nullptr) {
                 return nullptr;
             }
             return std::make_shared<GESDFPixelmapShaderShape>(*params);
+        }
+        case GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE: {
+            auto params = impl->GetSDFTransformShapeParams();
+            if (params == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GESDFTransformShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE: {
             return std::make_shared<GESDFEmptyShaderShape>();

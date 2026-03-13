@@ -24,6 +24,9 @@ constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
 constexpr size_t NUM_3 = 3;
 constexpr size_t NUM_4 = 4;
+constexpr float MIN_LIGHT_POSITION = -10.0f;
+constexpr float MAX_LIGHT_POSITION = 10.0f;
+constexpr float MAX_LIGHT_WIDTH = 30.0f;
 
 GEBorderLightShader::GEBorderLightShader() {}
 
@@ -35,6 +38,11 @@ GEBorderLightShader::GEBorderLightShader(Drawing::GEBorderLightShaderParams& par
 void GEBorderLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = MakeBorderLightShader(rect);
+}
+
+float GEBorderLightShader::ClampValue(float x, float minValue, float maxValue)
+{
+    return std::min(std::max(x, minValue), maxValue);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLightBuilder()
@@ -168,6 +176,19 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
     return std::make_shared<Drawing::RuntimeShaderBuilder>(borderLightShaderEffect_);
 }
 
+void GEBorderLightShader::ClampLightValue()
+{
+    for (size_t idx = 0; idx < NUM_3; idx ++) {
+        borderLightParams_.position[idx] =
+            ClampValue(borderLightParams_.position[idx], MIN_LIGHT_POSITION, MAX_LIGHT_POSITION);
+    }
+    for (size_t idx = 0; idx < NUM_4; idx ++) {
+        borderLightParams_.color[idx] = ClampValue(borderLightParams_.color[idx], 0.0f, 1.0f);
+    }
+    borderLightParams_.intensity = ClampValue(borderLightParams_.intensity, 0.0f, 1.0f);
+    borderLightParams_.width = ClampValue(borderLightParams_.width, 0.0f, MAX_LIGHT_WIDTH);
+}
+
 std::shared_ptr<Drawing::ShaderEffect> GEBorderLightShader::MakeBorderLightShader(const Drawing::Rect& rect)
 {
     auto width = rect.GetWidth();
@@ -175,6 +196,10 @@ std::shared_ptr<Drawing::ShaderEffect> GEBorderLightShader::MakeBorderLightShade
     float lightColor[NUM_4] = {borderLightParams_.color[NUM_0], borderLightParams_.color[NUM_1],
         borderLightParams_.color[NUM_2], borderLightParams_.color[NUM_3]};
     builder_ = GetBorderLightBuilder();
+    if (builder_ == nullptr) {
+        GE_LOGE("GEBorderLightShader::MakeBorderLightShader builder_ is nullptr.");
+        return nullptr;
+    }
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("lightPosition", borderLightParams_.position[NUM_0],
         borderLightParams_.position[NUM_1], borderLightParams_.position[NUM_2]);

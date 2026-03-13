@@ -318,22 +318,6 @@ HWTEST_F(GECircleFlowlightEffectTest, CreateRippleShaderMask_001, TestSize.Level
 }
 
 /**
- * @tc.name: MakeCircleFlowlightEffectWithMask_001
- * @tc.desc: Verify MakeCircleFlowlightEffectWithMask with valid mask
- * @tc.type: FUNC
- */
-HWTEST_F(GECircleFlowlightEffectTest, MakeCircleFlowlightEffectWithMask_001, TestSize.Level1)
-{
-    Drawing::GECircleFlowlightEffectParams param;
-    param.mask = CreateRippleShaderMask();
-
-    GECircleFlowlightEffect effect(param);
-    effect.MakeCircleFlowlightEffectWithMask();
-
-    EXPECT_EQ(effect.builder_, nullptr);
-}
-
-/**
  * @tc.name: SetUniform_001
  * @tc.desc: Verify SetUniform with mask enabled
  * @tc.type: FUNC

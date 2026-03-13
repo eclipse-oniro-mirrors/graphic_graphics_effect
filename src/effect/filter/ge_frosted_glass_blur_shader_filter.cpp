@@ -20,6 +20,7 @@
 
 namespace OHOS {
 namespace Rosen {
+
 GEFrostedGlassBlurShaderFilter::GEFrostedGlassBlurShaderFilter(
     const Drawing::GEFrostedGlassBlurShaderFilterParams& params)
 {
@@ -30,7 +31,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(D
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        GE_LOGE("GEFrostedGlassBlurShaderFilter::OnProcessImage input is valid");
+        GE_LOGE("GEFrostedGlassBlurShaderFilter::OnProcessImage input is invalid");
         return nullptr;
     }
 
@@ -48,6 +49,7 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassBlurShaderFilter::OnProcessImage(D
         blurParams_.radiusScale : 1.0f);
 
     GEImageCache tmp;
+
     tmp.data = blurFilter.DownSamplingForEdge(canvas, blurImage, src, linear, factor);
     if (cacheProvider_ != nullptr) {
         cacheProvider_->Store(tmp);

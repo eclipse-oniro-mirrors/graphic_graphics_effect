@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 #include "ge_circle_flowlight_effect.h"
 
 #include "ge_log.h"
@@ -45,16 +44,18 @@ const std::string CIRCLE_FLOWLIGHT_SHADER(
         // 78.233 is a random seed
         return amplitude * sin(dot(vec2(time, seed), vec2(frequency, 78.233)));
     }
- 
+
     vec4 colorGradient(vec2 fragPos, float radius, float timeValue)
     {
         vec4 colorOne = color[0];
         vec4 colorTwo = color[1];
         vec4 colorThree = color[2];
         vec4 colorFour = color[3];
- 
-        if (radius >= 1.0) {return vec4(0.0);}
- 
+
+        if (radius >= 1.0) {
+            return vec4(0.0);
+        }
+
         float freqTime = -2.0 * timeValue;
         mat2 rotationMatrix = mat2(cos(freqTime), sin(freqTime), -sin(freqTime), cos(freqTime));
         vec2 gradientPos[4];
@@ -104,12 +105,12 @@ const std::string CIRCLE_FLOWLIGHT_SHADER(
         gradientInterpColor = pow(gradientInterpColor / gradientTotalWeight, vec4(1.0 / 2.2));
         return gradientInterpColor;
     }
- 
+
     float sdf_circle(vec2 uv, vec2 centerPos, float radius)
     {
         return length(uv - centerPos) - radius;
     }
- 
+
     half4 main(vec2 fragCoord) {
         vec2 fragPos = fragCoord.xy / iResolution.xy * 2.0 - 1.0;
         float radius = length(fragPos);
@@ -146,7 +147,9 @@ const std::string CIRCLE_FLOWLIGHT_SHADER_WITH_MASK(
         vec4 colorThree = color[2];
         vec4 colorFour = color[3];
  
-        if (radius >= 1.0) {return vec4(0.0);}
+        if (radius >= 1.0) {
+            return vec4(0.0);
+        }
  
         float freqTime = -2.0 * timeValue;
         mat2 rotationMatrix = mat2(cos(freqTime), sin(freqTime), -sin(freqTime), cos(freqTime));
@@ -208,11 +211,11 @@ const std::string CIRCLE_FLOWLIGHT_SHADER_WITH_MASK(
         if (maskValue < 0.0) {
             return half4(0.0);
         }
- 
+
         vec2 fragPos = fragCoord.xy / iResolution.xy * 2.0 - 1.0;
         float radius = length(fragPos);
         vec4 gradient_color = colorGradient(fragPos, radius, progress);
-        
+
         gradient_color *= maskValue;
         return gradient_color;
     }
@@ -314,7 +317,6 @@ void GECircleFlowlightEffect::MakeDrawingShader(const Drawing::Rect& rect, float
     }
 
     SetUniform(width, height);
-
     if (mask_) {
         auto maskImageShader = mask_->GenerateDrawingShader(width, height);
         if (!maskImageShader) {

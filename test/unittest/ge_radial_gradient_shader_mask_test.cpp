@@ -176,47 +176,47 @@ HWTEST_F(GERadialGradientShaderMaskTest, GenerateShaderEffect_002, TestSize.Leve
 
     // colorSize != positionSize
     GERadialGradientShaderMaskParams param2;
-    param2.center_ = {0.5f, 0.5f};
-    param2.radiusX_ = 1.0f;
-    param2.radiusY_ = 1.0f;
-    param2.colors_.assign(12, 1.0f);
-    param2.positions_ = {0.0f, 1.0f};
+    param2.center_ = {0.5f, 0.5f}; // {0.5f, 0.5f} is the center of the screen.
+    param2.radiusX_ = 1.0f; // 1.0f is the value of the major axis.
+    param2.radiusY_ = 1.0f; // 1.0f is the value of the minor axis.
+    param2.colors_.assign(12, 1.0f); // 1.0f means opaque, 12 means the amount of colors.
+    param2.positions_ = {0.0f, 1.0f}; // 0.0f means the center, 1.0f is the maximum value along the radial direction.
     GERadialGradientShaderMask mask2(param2);
-    auto shader2 = mask2.GenerateDrawingShader(100.0f, 100.0f);
+    auto shader2 = mask2.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader2, nullptr);
 
     // colorSize > SIZE_ARRAY
-    param2.colors_.assign(15, 1.0f);
+    param2.colors_.assign(15, 1.0f); // 1.0f means opaque, 15 means the amount of colors.
     GERadialGradientShaderMask mask3(param2);
-    auto shader3 = mask3.GenerateDrawingShader(100.0f, 100.0f);
+    auto shader3 = mask3.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader3, nullptr);
 
     // width < 0.01f || height < 0.01f
-    param2.colors_ = {0.0f, 1.0f};
-    param2.positions_ = {0.0f, 1.0f};
+    param2.colors_ = {0.0f, 1.0f}; // 0.0f means transparent, 1.0f means opaque
+    param2.positions_ = {0.0f, 1.0f}; // 0.0f means the center, 1.0f is the maximum value along the radial direction.
     GERadialGradientShaderMask mask4(param2);
-    auto shader4 = mask4.GenerateDrawingShader(0.0f, 100.0f);
+    auto shader4 = mask4.GenerateDrawingShader(0.0f, 100.0f); // 0.0f and 100.0f means the width and height of image.
     EXPECT_EQ(shader4, nullptr);
     GERadialGradientShaderMask mask5(param2);
-    auto shader5 = mask5.GenerateDrawingShader(100.0f, 0.0f);
+    auto shader5 = mask5.GenerateDrawingShader(100.0f, 0.0f); // 100.0f and 0.0f means the width and height of image.
     EXPECT_EQ(shader5, nullptr);
 
     // param_.radiusX_ < 0.001f || param_.radiusY_ < 0.001f
-    param2.radiusX_ = 0.0f;
+    param2.radiusX_ = 0.0f; // 0.0f is the value of the major axis.
     GERadialGradientShaderMask mask6(param2);
-    auto shader6 = mask6.GenerateDrawingShader(100.0f, 100.0f);
+    auto shader6 = mask6.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader6, nullptr);
-    param2.radiusX_ = 1.0f;
-    param2.radiusY_ = 0.0f;
+    param2.radiusX_ = 1.0f; // 1.0f is the value of the major axis.
+    param2.radiusY_ = 0.0f; // 0.0f is the value of the minor axis.
     GERadialGradientShaderMask mask7(param2);
-    auto shader7 = mask7.GenerateDrawingShader(100.0f, 100.0f);
+    auto shader7 = mask7.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader7, nullptr);
 
-    // position[i] < position[i - 1]
-    param2.radiusY_ = 1.0f;
-    param2.positions_ = {1.0f, 0.0f};
+    // position[i] < position[i - 1], position should
+    param2.radiusY_ = 1.0f; // 1.0f is the value of the minor axis.
+    param2.positions_ = {1.0f, 0.0f}; // 1.0f is the maximum value along the radial direction, 0.0f means the center.
     GERadialGradientShaderMask mask8(param2);
-    auto shader8 = mask8.GenerateDrawingShader(100.0f, 100.0f);
+    auto shader8 = mask8.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader8, nullptr);
 
     GTEST_LOG_(INFO) << "GERadialGradientShaderMaskTest GenerateShaderEffect_002 end";

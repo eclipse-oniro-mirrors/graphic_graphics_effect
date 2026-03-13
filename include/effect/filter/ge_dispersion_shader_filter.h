@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_DISPERSION_SHADER_FILTER_H
 #define GRAPHICS_EFFECT_DISPERSION_SHADER_FILTER_H
 
+#include "ge_filter_type_info.h"
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
@@ -29,6 +30,7 @@ class GE_EXPORT GEDispersionShaderFilter : public GEShaderFilter {
 public:
     GEDispersionShaderFilter(const Drawing::GEDispersionShaderFilterParams& params);
     ~GEDispersionShaderFilter() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GEDispersionShaderFilter, Drawing::GEDispersionShaderFilterParams);
 
     std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas &canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst) override;
