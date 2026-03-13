@@ -115,7 +115,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_ * scaleY_);
     builder->SetUniform("borderWidth", magnifierPara_->borderWidth_ * scaleY_);
     builder->SetUniform("zoomOffset", magnifierPara_->zoomOffsetX_ / imageWidth,
-        magnifierPara_->zoomOffsetY_ / imageHeight);
+        magnifierPara_->zoomOffsetY_ / imageWidth);
 
     builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_ * scaleX_,
         magnifierPara_->shadowOffsetY_ * scaleY_);
