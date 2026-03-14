@@ -47,7 +47,7 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         float crossValue = e0.x * e1.y - e0.y * e1.x;
         // 退化三角形检测
         if (abs(crossValue) < 1e-6) {
-            return 1e6;
+            return vec3(1e6, vec2(0.0, 0.0));
         }
         bool isClockwise = crossValue > 0.0;
 
