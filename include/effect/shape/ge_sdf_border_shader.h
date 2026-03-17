@@ -66,6 +66,34 @@ private:
             if (d < -borderWidth && d >= (-borderWidth - 1.0)) {
                 color = vec4(borderColor, 1.0) * smoothstep(-borderWidth - 1.0, -borderWidth, d);
             }
+
+            return color;
+        }
+
+        half4 main(float2 fragCoord)
+        {
+            vec4 color = vec4(0.0);
+            float d = sdfShape.eval(fragCoord).a;
+            color = borderEffect(d, color, u_borderColor, u_borderWidth);
+            return half4(color);
+        }
+    )";
+
+    inline static const std::string outlineShaderCode_ = R"(
+        uniform shader sdfShape;
+        uniform vec3 u_borderColor;
+        uniform float u_borderWidth;
+
+        vec4 borderEffect(float d, vec4 color, vec3 borderColor, float borderWidth)
+        {
+            if (d >= 0.0 && d <= borderWidth) {
+                color = vec4(borderColor, 1.0) * smoothstep(0.0, 1.0, d);
+            }
+
+            if (d > borderWidth && d <= (borderWidth + 1.0)) {
+                color = vec4(borderColor, 1.0) * (1.0 - smoothstep(borderWidth, borderWidth + 1.0, d));
+            }
+
             return color;
         }
 

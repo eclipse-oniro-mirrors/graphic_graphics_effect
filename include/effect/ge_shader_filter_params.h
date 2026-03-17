@@ -1370,6 +1370,7 @@ constexpr char GE_SHAPE_SDF_EMPTY_SHAPE[] = "SDFEmptyShape";
 struct GESDFBorderParams final {
     Color color;
     float width = 0.0f;
+    bool isOutline = false;
 };
 
 constexpr char GE_SHADER_SDF_BORDER[] = "SDFBorder";

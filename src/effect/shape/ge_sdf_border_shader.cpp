@@ -85,11 +85,19 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(co
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFBorderShader::GetSDFBorderEffect()
 {
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfBorderShader = nullptr;
-    if (sdfBorderShader == nullptr) {
-        sdfBorderShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+    if (params_.border.isOutline) {
+        thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfOutlineBorderEffect = nullptr;
+        if (sdfOutlineBorderEffect == nullptr) {
+            sdfOutlineBorderEffect = Drawing::RuntimeEffect::CreateForShader(outlineShaderCode_);
+        }
+        return sdfOutlineBorderEffect;
+    } else {
+        thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfBorderEffect = nullptr;
+        if (sdfBorderEffect == nullptr) {
+            sdfBorderEffect = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+        }
+        return sdfBorderEffect;
     }
-    return sdfBorderShader;
 }
 }
 }
