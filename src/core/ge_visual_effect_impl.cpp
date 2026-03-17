@@ -1224,6 +1224,19 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
+        case FilterType::SDF_TRIANGLE_SHAPE: {
+            if (sdfTriangleShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0) {
+                sdfTriangleShapeParams_->vertex0 = Vector2f(param.first, param.second);
+            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX1) {
+                sdfTriangleShapeParams_->vertex1 = Vector2f(param.first, param.second);
+            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2) {
+                sdfTriangleShapeParams_->vertex2 = Vector2f(param.first, param.second);
+            }
+            break;
+        }
         default:
             break;
     }

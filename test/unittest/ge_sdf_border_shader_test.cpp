@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include "ge_sdf_border_shader.h"
 #include "ge_sdf_rrect_shader_shape.h"
-#include "draw/color.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -25,47 +24,53 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// 测试用RRect形状参数
-static Drawing::GESDFRRectShapeParams testRRectParams = {
-    {10.0f, 10.0f, 200.0f, 200.0f, 20.0f, 20.0f}
-};
-
-// 测试用border参数（内描边）
-static Drawing::GESDFBorderParams testBorderParams = {
-    Drawing::Color::COLOR_RED,  // color
-    10.0f,                       // width
-    false                          // isOutline (内描边)
-};
-
-// 测试用border参数（外描边）
-static Drawing::GESDFBorderParams testOutlineParams = {
-    Drawing::Color::COLOR_BLUE,  // color
-    10.0f,                        // width
-    true                           // isOutline (外描边)
-};
-
 class GESDFBorderShaderTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     void SetUp() override {}
     void TearDown() override {}
+
+    std::shared_ptr<GESDFShaderShape> CreateTestShape() const
+    {
+        GESDFRRectShapeParams param;
+        param.rrect = {10.0f, 10.0f, 200.0f, 200.0f, 20.0f, 20.0f};
+        return std::make_shared<GESDFRRectShaderShape>(param);
+    }
+
+    GESDFBorderParams GetTestBorderParams() const
+    {
+        GESDFBorderParams params;
+        params.color = Color::COLOR_RED;
+        params.width = 10.0f;
+        params.isOutline = false;
+        return params;
+    }
+
+    GESDFBorderParams GetTestOutlineParams() const
+    {
+        GESDFBorderParams params;
+        params.color = Color::COLOR_BLUE;
+        params.width = 10.0f;
+        params.isOutline = true;
+        return params;
+    }
 };
 
 /**
  * @tc.name: GetSDFBorderEffect_Inner_001
- * @tc.desc: 验证 isOutline=false 时返回内描边RuntimeEffect
+ * @tc.desc: isOutline=false Test
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Inner_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Inner_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
+    GESDFBorderShader borderShader(params);
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Inner_001 end";
@@ -73,18 +78,18 @@ HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Inner_001, TestSize.Level1)
 
 /**
  * @tc.name: GetSDFBorderEffect_Outline_001
- * @tc.desc: 验证 isOutline=true 时返回外描边RuntimeEffect
+ * @tc.desc: isOutline=true Test
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Outline_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Outline_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testOutlineParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestOutlineParams();
     params.border.isOutline = true;
 
-    Drawing::GESDFBorderShader borderShader(params);
+    GESDFBorderShader borderShader(params);
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Outline_001 end";
@@ -92,59 +97,59 @@ HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Outline_001, TestSize.Level1)
 
 /**
  * @tc.name: GetSDFBorderEffect_Cache_Inner_001
- * @tc.desc: 验证重复调用返回同一内描边缓存实例
+ * @tc.desc: Validate repeated calls return the same inner border cache instance
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Cache_Inner_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Cache_Inner_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
+    GESDFBorderShader borderShader(params);
     auto effect1 = borderShader.GetSDFBorderEffect();
     auto effect2 = borderShader.GetSDFBorderEffect();
-    EXPECT_EQ(effect1, effect2);  // 同一缓存实例
+    EXPECT_EQ(effect1, effect2);
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Cache_Inner_001 end";
 }
 
 /**
  * @tc.name: GetSDFBorderEffect_Cache_Outline_001
- * @tc.desc: 验证重复调用返回同一外描边缓存实例
+ * @tc.desc: Validate repeated calls return the same outer border cache instance
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, GetSDFBorderEffect_Cache_Outline_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Cache_Outline_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testOutlineParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestOutlineParams();
     params.border.isOutline = true;
 
-    Drawing::GESDFBorderShader borderShader(params);
+    GESDFBorderShader borderShader(params);
     auto effect1 = borderShader.GetSDFBorderEffect();
     auto effect2 = borderShader.GetSDFBorderEffect();
-    EXPECT_EQ(effect1, effect2);  // 同一缓存实例
+    EXPECT_EQ(effect1, effect2);
     GTEST_LOG_(INFO) << "GetSDFBorderEffect_Cache_Outline_001 end";
 }
 
 /**
  * @tc.name: MakeSDFBorderShader_Inner_001
- * @tc.desc: 验证内描边shader正确生成
+ * @tc.desc: Validate inner border shader generation
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Inner_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Inner_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 300.0f};
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 300.0f};
     auto shader = borderShader.MakeSDFBorderShader(rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Inner_001 end";
@@ -152,19 +157,19 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Inner_001, TestSize.Level1)
 
 /**
  * @tc.name: MakeSDFBorderShader_Outline_001
- * @tc.desc: 验证外描边shader正确生成
+ * @tc.desc: Validate outer border shader generation
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Outline_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Outline_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testOutlineParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestOutlineParams();
     params.border.isOutline = true;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 300.0f};
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 300.0f};
     auto shader = borderShader.MakeSDFBorderShader(rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Outline_001 end";
@@ -172,18 +177,18 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Outline_001, TestSize.Level1
 
 /**
  * @tc.name: MakeSDFBorderShader_NullShape_001
- * @tc.desc: 验证shape为nullptr时的处理
+ * @tc.desc: Validate null shape handling
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_NullShape_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_NullShape_001 start";
-    Drawing::GESDFBorderShaderParams params;
+    GESDFBorderShaderParams params;
     params.shape = nullptr;
-    params.border = testBorderParams;
+    params.border = GetTestBorderParams();
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 300.0f};
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 300.0f};
     auto shader = borderShader.MakeSDFBorderShader(rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_NullShape_001 end";
@@ -191,19 +196,19 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_NullShape_001, TestSize.Leve
 
 /**
  * @tc.name: MakeSDFBorderShader_ZeroWidth_001
- * @tc.desc: 验证rect宽度为0时的处理
+ * @tc.desc: Validate zero width rect handling
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroWidth_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroWidth_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 0.0f, 300.0f};  // 宽度为0
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 0.0f, 300.0f};
     auto shader = borderShader.MakeSDFBorderShader(rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroWidth_001 end";
@@ -211,19 +216,19 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroWidth_001, TestSize.Leve
 
 /**
  * @tc.name: MakeSDFBorderShader_ZeroHeight_001
- * @tc.desc: 验证rect高度为0时的处理
+ * @tc.desc: Validate zero height rect handling
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroHeight_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroHeight_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 0.0f};  // 高度为0
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 0.0f};
     auto shader = borderShader.MakeSDFBorderShader(rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroHeight_001 end";
@@ -231,19 +236,19 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroHeight_001, TestSize.Lev
 
 /**
  * @tc.name: MakeSDFBorderShader_InnerBorder_001
- * @tc.desc: 验证内描边完整流程
+ * @tc.desc: Validate inner border full process
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_InnerBorder_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_InnerBorder_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testBorderParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestBorderParams();
     params.border.isOutline = false;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 300.0f};
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 300.0f};
 
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);
@@ -255,19 +260,19 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_InnerBorder_001, TestSize.Le
 
 /**
  * @tc.name: MakeSDFBorderShader_OutlineBorder_001
- * @tc.desc: 验证外描边完整流程
+ * @tc.desc: Validate outer border full process
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_OutlineBorder_001, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_OutlineBorder_001 start";
-    Drawing::GESDFBorderShaderParams params;
-    params.shape = std::make_shared<Drawing::GESDFRRectShaderShape>(testRRectParams);
-    params.border = testOutlineParams;
+    GESDFBorderShaderParams params;
+    params.shape = CreateTestShape();
+    params.border = GetTestOutlineParams();
     params.border.isOutline = true;
 
-    Drawing::GESDFBorderShader borderShader(params);
-    Drawing::Rect rect {0, 0, 300.0f, 300.0f};
+    GESDFBorderShader borderShader(params);
+    Rect rect {0, 0, 300.0f, 300.0f};
 
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);

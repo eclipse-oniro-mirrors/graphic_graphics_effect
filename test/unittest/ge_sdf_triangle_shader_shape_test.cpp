@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,7 +52,7 @@ HWTEST_F(GESDFTriangleShaderShapeTest, GenerateDrawingShader_001, TestSize.Level
 
     GESDFTriangleShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(300.0f, 300.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTriangleShaderShapeTest GenerateDrawingShader_001 end";
 }
 
@@ -66,7 +66,7 @@ HWTEST_F(GESDFTriangleShaderShapeTest, GenerateDrawingShader_002, TestSize.Level
     GTEST_LOG_(INFO) << "GESDFTriangleShaderShapeTest GenerateDrawingShader_002 start";
     GESDFTriangleShapeParams param;
     param.vertex0 = Vector2f(100.0f, 100.0f);
-    param.vertex1 = Vector2f(200.0f, 100.0f);
+    param.vertex1 = Vector2f(100.0f, 100.0f);
     param.vertex2 = Vector2f(150.0f, 200.0f);
     param.radius = 0.0f;
 
@@ -92,7 +92,7 @@ HWTEST_F(GESDFTriangleShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestS
 
     GESDFTriangleShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(300.0f, 300.0f);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTriangleShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
 
@@ -105,9 +105,9 @@ HWTEST_F(GESDFTriangleShaderShapeTest, GenerateDrawingShaderHasNormal_002, TestS
 {
     GTEST_LOG_(INFO) << "GESDFTriangleShaderShapeTest GenerateDrawingShaderHasNormal_002 start";
     GESDFTriangleShapeParams param;
-    param.vertex0 = Vector2f(100.0f, 100.0f);
+    param.vertex0 = Vector2f(200.0f, 100.0f);
     param.vertex1 = Vector2f(200.0f, 100.0f);
-    param.vertex2 = Vector2f(150.0f, 200.0f);
+    param.vertex2 = Vector2f(200.0f, 200.0f);
     param.radius = 1.0f;
 
     GESDFTriangleShaderShape shape(param);
@@ -318,7 +318,7 @@ HWTEST_F(GESDFTriangleShaderShapeTest, GenerateShaderEffect_001, TestSize.Level1
     GESDFTriangleShaderShape shape(param);
     auto builder = shape.GetSDFTriangleShaderShapeBuilder();
     auto shader = shape.GenerateShaderEffect(builder);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFTriangleShaderShapeTest GenerateShaderEffect_001 end";
 }
 
