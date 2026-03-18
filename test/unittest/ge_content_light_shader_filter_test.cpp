@@ -101,13 +101,16 @@ HWTEST_F(GEContentLightShaderFilterTest, OnProcessImage_002, TestSize.Level0)
     auto filter = std::make_unique<GEContentLightFilter>(params);
     EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
-    Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    Vector3f lightPosition = Vector3f(15.0f, 0.0f, 0.0f);
     Vector4f lightColor = Vector4f(0.2f, 0.4f, 0.6f, 0.5f);
     float lightIntentsity = 0.6f;
     Vector3f rotateAngle = Vector3f(0.1f, 0.2f, 0.3f);
-
     Drawing::GEContentLightFilterParams params1 { lightPosition, lightColor, lightIntentsity, rotateAngle };
     auto filter1 = std::make_unique<GEContentLightFilter>(params1);
+    filter1->ClampLightValue();
+    filter1->lightPosition_[0] =
+        filter1->ClampValue(filter1->lightPosition_[0], -10.0f, 8.0f);
+    EXPECT_FLOAT_EQ(filter1->lightPosition_[0], 8.0f);
     EXPECT_EQ(filter1->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
 
     GTEST_LOG_(INFO) << "GEContentLightShaderFilterTest OnProcessImage_002 end";

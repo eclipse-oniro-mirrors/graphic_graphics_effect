@@ -65,7 +65,6 @@ std::shared_ptr<Drawing::Surface> GERenderTest::CreateSurface()
 }
 
 void GERenderTest::SetUpTestCase(void) {}
-
 void GERenderTest::TearDownTestCase(void) {}
 
 void GERenderTest::SetUp()
@@ -838,7 +837,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_DirectDrawOnCanvas, TestSize.Level1
     auto result = geRender->ApplyHpsGEImageEffect(*canvas_, veContainer, context, outImage, brush);
 
     EXPECT_FALSE(result.isHpsBlurApplied);
-    EXPECT_FALSE(result.hasDrawnOnCanvas);
+    EXPECT_TRUE(result.hasDrawnOnCanvas);
     EXPECT_NE(outImage, nullptr); // As long as the apply loop is entered, outImage will be assigned at least once
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyHpsGEImageEffect_DirectDrawOnCanvas end";

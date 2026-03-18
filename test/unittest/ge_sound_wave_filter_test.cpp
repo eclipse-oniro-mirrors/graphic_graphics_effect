@@ -43,11 +43,12 @@ public:
 };
 
 void GESoundWaveFilterTest::SetUpTestCase(void) {}
-
 void GESoundWaveFilterTest::TearDownTestCase(void) {}
 
 void GESoundWaveFilterTest::SetUp()
 {
+    canvas_.Restore();
+
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -55,7 +56,7 @@ void GESoundWaveFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GESoundWaveFilterTest::TearDown() { image_ = nullptr; }
+void GESoundWaveFilterTest::TearDown() {}
 
 /**
  * @tc.name: OnProcessImage001
@@ -73,7 +74,6 @@ HWTEST_F(GESoundWaveFilterTest, OnProcessImage001, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImage001 end";
 }
-
 
 /**
  * @tc.name: OnProcessImage002

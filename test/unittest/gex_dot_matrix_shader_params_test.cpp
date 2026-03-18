@@ -38,11 +38,8 @@ public:
 };
 
 void DotMatrixShaderParamsTest::SetUpTestCase() {}
-
 void DotMatrixShaderParamsTest::TearDownTestCase() {}
-
 void DotMatrixShaderParamsTest::SetUp() {}
-
 void DotMatrixShaderParamsTest::TearDown() {}
 
 /**

@@ -33,7 +33,7 @@ const std::vector<Vector2f> g_hdrCurveAnchors = {
 // Bezier curves describing tone mapping rule, control points define
 const std::vector<Vector2f> g_hdrCurveControlPoint = {
     {0.375f, 0.375f}, {0.875f, 0.875f}, {1.125f, 0.9625f}, {1.375f, 0.9725f},
-    {1.625f, 0.98f}, {1.825f, 0.99f}, {1.95f, 0.998f},  // 1 less than anchors
+    {1.625f, 0.98f}, {1.825f, 0.99f}, {1.95f, 0.998f},  // control points one less than anchor points
 };
 
 constexpr float SDR_LUMINANCE = 1.0f;
@@ -101,6 +101,7 @@ Drawing::Color4f GEToneMappingHelper::GetBrightnessMapping(float brightness, Dra
 bool GEToneMappingHelper::CalcBezierResultY(
     const Vector2f& start, const Vector2f& end, const Vector2f& control, float x, float& y)
 {
+    // Solve quadratic beziier formula with root formula
     const float a = start[0] - 2 * control[0] + end[0];
     const float b = 2 * (control[0] - start[0]);
     const float c = start[0] - x;

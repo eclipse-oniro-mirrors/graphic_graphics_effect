@@ -56,6 +56,10 @@ bool RotateEffectParams::Unmarshalling(Parcel& parcel)
         GE_LOGE("RotateEffectParams::Unmarshalling Read pathDirection failed!");
         return false;
     }
+    if (valueUint32 > static_cast<uint32_t>(Drawing::DotMatrixDirection::MAX)) {
+        GE_LOGE("RotateEffectParams::Unmarshalling pathDirection invalid.");
+        return false;
+    }
     pathDirection_ = static_cast<Drawing::DotMatrixDirection>(valueUint32);
     uint32_t size = 0;
     if (!parcel.ReadUint32(size)) {
@@ -376,5 +380,6 @@ bool GEXComplexShaderParams::Unmarshalling(Parcel& parcel)
     }
     return false;
 }
+
 } // namespace Rosen
 } // namespace OHOS

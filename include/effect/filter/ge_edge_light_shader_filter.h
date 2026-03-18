@@ -40,11 +40,12 @@ public:
 
 protected:
     float alpha_ = 1.0f;
-    bool bloom_ = true;
     Vector4f color_ = {0.2f, 0.7f, 0.1f, 0.0f};
     std::shared_ptr<Drawing::GEShaderMask> mask_ = nullptr;
+    bool bloom_ = true;
     bool useRawColor_ = false;
 
+    static const std::string type_;
 private:
     bool InitConvertFragShaderEffect();
     bool InitDetectFragShaderEffect();

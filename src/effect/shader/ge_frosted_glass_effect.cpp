@@ -195,10 +195,11 @@ static constexpr char MAIN_SHADER_PROG[] = R"(
     // ----- Params -----
     uniform float innerShadowRefractPx;  // inward offset along outward normal (px, full-res)
     uniform float innerShadowWidth;
-    uniform float innerShadowExp;
     uniform float sdK;                   // K/B/S for inner shadow color
     uniform float sdB;
     uniform float sdS;
+
+    const float innerShadowExp = 4.62;
 
     // ----- Functions (wrappers specific to inner shadow coloring) -----
     vec3 InnerShadowVibrancy(vec3 c01)
@@ -373,7 +374,8 @@ void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float pr
         return;
     }
 
-    std::shared_ptr<Drawing::Image> cachedBlurImage = frostedGlassEffectParams_.blurImage.lock();
+    std::shared_ptr<Drawing::Image> cachedBlurImage = nullptr;
+    cachedBlurImage = frostedGlassEffectParams_.blurImage.lock();
     if (cachedBlurImage == nullptr) {
         GE_LOGE("GEFrostedGlassEffect::MakeDrawingShader cachedBlurImage is nullptr");
         return;
@@ -412,6 +414,14 @@ bool GEFrostedGlassEffect::InitFrostedGlassEffect()
     return true;
 }
 
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassEffect::MakeSDFNormalShader(float width, float height) const
+{
+    if (auto shape = frostedGlassEffectParams_.sdfShape) {
+        return shape->GenerateDrawingShaderHasNormal(width, height);
+    }
+    return nullptr;
+}
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrostedGlassShader(
     std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect)
 {
@@ -426,10 +436,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     }
     FrostedGlassEffect::InterpolateAdaptiveParams(frostedGlassEffectParams_);
 
-    std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader;
-    if (auto shape = frostedGlassEffectParams_.sdfShape) {
-        sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
-    } else {
+    auto sdfNormalShader = MakeSDFNormalShader(imageWidth, imageHeight);
+    if (!sdfNormalShader) {
         GE_LOGE("GEFrostedGlassEffect::MakeFrostedGlassShader sdfShapeShader is null");
         return nullptr;
     }
@@ -450,7 +458,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     // Inner shadow parameters
     builder->SetUniform("innerShadowRefractPx", frostedGlassEffectParams_.sdParams[NUM_0]);
     builder->SetUniform("innerShadowWidth", frostedGlassEffectParams_.sdParams[NUM_1]);
-    builder->SetUniform("innerShadowExp", 4.62f);
     builder->SetUniform("sdK", frostedGlassEffectParams_.sdKBS[NUM_0]);
     builder->SetUniform("sdB", frostedGlassEffectParams_.sdKBS[NUM_1]);
     builder->SetUniform("sdS", frostedGlassEffectParams_.sdKBS[NUM_2]);

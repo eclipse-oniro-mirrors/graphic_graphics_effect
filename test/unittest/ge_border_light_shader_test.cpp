@@ -98,6 +98,22 @@ HWTEST_F(GEBorderLightShaderTest, GEBorderLightShaderTest006, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GEBorderLightShaderTest007
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderLightShaderTest, GEBorderLightShaderTest007, TestSize.Level1)
+{
+    Drawing::GEBorderLightShaderParams params{
+        Vector3f{15.0f, 5.0f, 6.0f}, Vector4f{0.5f, 0.6f, 0.7f, 0.8f}, 2.5f, 5.0f, Vector3f{2.0f, 2.0f, 2.0f}};
+    auto shader = GEBorderLightShader(params);
+    shader.borderLightParams_.position[0] = 30.0f;
+    shader.ClampLightValue();
+    shader.borderLightParams_.position[0] =
+        shader.ClampValue(shader.borderLightParams_.position[0], -10.0f, 8.0f);
+    EXPECT_FLOAT_EQ(shader.borderLightParams_.position[0], 8.0f);
+}
+
+/**
  * @tc.name: Type
  * @tc.desc: Verify the Type
  * @tc.type: FUNC

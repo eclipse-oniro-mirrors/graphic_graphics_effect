@@ -30,7 +30,7 @@ std::shared_ptr<Drawing::Image> ProcessImageFuzzTest()
     Drawing::Rect src{fLeft, fTop, fWidth, fHeight};
     Drawing::Rect dst = GETest::GetPlainData<Drawing::Rect>();
 
-    Drawing::GEMagnifierShaderFilterParams params = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+    Drawing::GEMagnifierShaderFilterParams params = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f};
     std::unique_ptr<GEMagnifierShaderFilter> shaderFilter =
         std::make_unique<GEMagnifierShaderFilter>(params);
 
@@ -47,12 +47,14 @@ std::string GetDescriptionFuzzTest()
     float height = GETest::GetPlainData<float>();
     float cornerRadius = GETest::GetPlainData<float>();
     float borderWidth = GETest::GetPlainData<float>();
+    float zoomOffsetX = GETest::GetPlainData<float>();
+    float zoomOffsetY = GETest::GetPlainData<float>();
     float shadowOffsetX = GETest::GetPlainData<float>();
     float shadowOffsetY = GETest::GetPlainData<float>();
     float shadowSize = GETest::GetPlainData<float>();
     float shadowStrength = GETest::GetPlainData<float>();
     Drawing::GEMagnifierShaderFilterParams params = {factor, width, height, cornerRadius, borderWidth,
-        shadowOffsetX, shadowOffsetY, shadowSize, shadowStrength};
+        zoomOffsetX, zoomOffsetY, shadowOffsetX, shadowOffsetY, shadowSize, shadowStrength};
     std::unique_ptr<GEMagnifierShaderFilter> shaderFilter =
         std::make_unique<GEMagnifierShaderFilter>(params);
     std::string res = shaderFilter->GetDescription();

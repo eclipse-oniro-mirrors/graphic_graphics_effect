@@ -32,7 +32,7 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-constexpr size_t POINT_NUM = 12;
+constexpr size_t POINT_NUM = 12; // 12 bezierWarp control points
 constexpr float MAX_CURVE_X = 1.70000000;   // MAX rounded area of a unit rrect
 
 enum class DrawingPaintType { NONE, BRUSH, PEN, PAINT, BRUSH_PEN };
@@ -58,16 +58,19 @@ public:
     void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>&);
     void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
     void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
+    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param) {};
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);
     void SetParam(const std::string& tag, const std::vector<float>& param);
+
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
     void SetParam(const std::string& tag, const Drawing::Color4f& param);
     void SetParam(const std::string& tag, const Vector3f& param);
     void SetParam(const std::string& tag, const Vector4f& param);
     void SetParam(const std::string& tag, const GERRect& param);
+    void SetParam(const std::string& tag, const RectF& param);
     void SetParam(const std::string& tag, const GESDFBorderParams& param);
     void SetParam(const std::string& tag, const GESDFShadowParams& param);
 

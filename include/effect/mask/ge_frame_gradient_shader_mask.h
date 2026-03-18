@@ -25,6 +25,7 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+
 class GE_EXPORT GEFrameGradientShaderMask : public GEShaderMask {
 public:
     explicit GEFrameGradientShaderMask(const GEFrameGradientMaskParams& param);
@@ -39,6 +40,7 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     std::shared_ptr<ShaderEffect> CreateFrameGradientMaskShader(float width, float height) const;
+
 private:
     Drawing::Rect GetSubtractedRect(float width, float height) const override;
     bool ValidateParams(float width, float height) const;

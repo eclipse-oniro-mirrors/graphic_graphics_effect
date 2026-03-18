@@ -15,8 +15,8 @@
 
 #include "ge_visual_effect_container.h"
 
-#include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_log.h"
 #include "ge_use_effect_shader_mask.h"
 
 namespace OHOS {
@@ -41,13 +41,13 @@ void GEVisualEffectContainer::UpdateCacheDataFrom(const std::shared_ptr<GEVisual
         return;
     }
     for (auto vef : ge->GetFilters()) {
-        if (vef == nullptr || vef->GetImpl() == nullptr) {
-            LOGD("GEVisualEffectContainer::UpdateCacheDataFrom vef is null");
+        if (vef == nullptr) {
+            LOGD("GERender::UpdateCacheDataFrom vef is null");
             continue;
         }
         auto vefTarget = GetGEVisualEffect(vef->GetName());
-        if (vefTarget == nullptr || vefTarget->GetImpl() == nullptr) {
-            LOGD("GEVisualEffectContainer::UpdateCacheDataFrom ve is null");
+        if (vef->GetImpl() == nullptr || vefTarget == nullptr || vefTarget->GetImpl() == nullptr) {
+            LOGD("GERender::UpdateCacheDataFrom ve is null");
             continue;
         }
         vefTarget->GetImpl()->SetCache(vef->GetImpl()->GetCache());
@@ -58,7 +58,7 @@ std::shared_ptr<GEVisualEffect> GEVisualEffectContainer::GetGEVisualEffect(const
 {
     for (auto vef : filterVec_) {
         if (vef == nullptr) {
-            LOGD("GEVisualEffectContainer::GetGEVisualEffect vef is null");
+            LOGD("GERender::GetGEVisualEffect vef is null");
             continue;
         }
         if (vef->GetName() == name) {
@@ -113,6 +113,15 @@ void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Dra
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE, blurImageForEdge);
+        }
+    }
+}
+
+void GEVisualEffectContainer::UpdateSnapshotRect(const Drawing::RectF& snapshot)
+{
+    for (auto vef : GetFilters()) {
+        if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
+            vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTRECT, snapshot);
         }
     }
 }

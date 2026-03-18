@@ -19,6 +19,7 @@
 
 #include "draw/color.h"
 #include "image/bitmap.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -34,6 +35,10 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    std::shared_ptr<Drawing::Canvas> canvasGpu_ = nullptr;
+    Drawing::ImageInfo imageInfo_ = {};
 
     static inline Drawing::Canvas canvas_;
     std::shared_ptr<Drawing::Image> image_ { nullptr };
@@ -44,20 +49,42 @@ public:
 };
 
 void GEMESABlurShaderFilterTest::SetUpTestCase(void) {}
-
 void GEMESABlurShaderFilterTest::TearDownTestCase(void) {}
 
 void GEMESABlurShaderFilterTest::SetUp()
 {
+    canvas_.Restore();
+
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
     src_ = image_->GetImageInfo().GetBound();
+    dst_ = src_;
+    imageInfo_ = Drawing::ImageInfo {dst_.GetWidth(), dst_.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
+    surface_ = CreateSurface();
+    if (surface_) {
+        canvasGpu_ = surface_->GetCanvas();
+    }
 }
 
-void GEMESABlurShaderFilterTest::TearDown() { image_ = nullptr; }
+std::shared_ptr<Drawing::Surface> GEMESABlurShaderFilterTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GEMESABlurShaderFilterTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
+}
+
+void GEMESABlurShaderFilterTest::TearDown() {}
 
 /**
  * @tc.name: GetRadius_001
@@ -148,14 +175,14 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_002, TestSize.Level0)
     auto geMESABlurShaderFilter1 = std::make_shared<GEMESABlurShaderFilter>(params1);
     ASSERT_TRUE(geMESABlurShaderFilter1 != nullptr);
 
-    EXPECT_NE(geMESABlurShaderFilter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geMESABlurShaderFilter1->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     // 8001: valid MESA blur params
     Drawing::GEMESABlurShaderFilterParams params2{8001, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 0, 1.f, 1.f};
     auto geMESABlurShaderFilter2 = std::make_shared<GEMESABlurShaderFilter>(params2);
     ASSERT_TRUE(geMESABlurShaderFilter2 != nullptr);
 
-    EXPECT_NE(geMESABlurShaderFilter2->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(geMESABlurShaderFilter2->OnProcessImage(canvas_, image_, src_, dst_), image_);
 }
 
 /**
@@ -173,7 +200,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 
     for (auto radius : blurRadius) {
@@ -182,7 +209,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 
     for (auto radius : blurRadius) {
@@ -191,7 +218,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_003, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 }
 
@@ -210,7 +237,7 @@ HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImage_004, TestSize.Level0)
         auto geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
         ASSERT_TRUE(geMESABlurShaderFilter != nullptr);
 
-        EXPECT_NE(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+        EXPECT_EQ(geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
     }
 }
 
@@ -283,7 +310,8 @@ HWTEST_F(GEMESABlurShaderFilterTest, DirectionBlur_001, TestSize.Level1)
 
     params.isDirection = true;
     geMESABlurShaderFilter = std::make_shared<GEMESABlurShaderFilter>(params);
-    auto image = geMESABlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_);
+    ASSERT_TRUE(canvasGpu_ != nullptr);
+    auto image = geMESABlurShaderFilter->OnProcessImage(*canvasGpu_, image_, src_, dst_);
     EXPECT_NE(image, image_);
 }
 } // namespace GraphicsEffectEngine

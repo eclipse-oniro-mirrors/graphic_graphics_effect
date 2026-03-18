@@ -29,7 +29,7 @@ GEDispersionShaderFilter::GEDispersionShaderFilter(const Drawing::GEDispersionSh
 std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (image == nullptr || params_.mask == nullptr) { return nullptr; }
+    if (image == nullptr || params_.mask == nullptr) { return image; }
 
     auto imageInfo = image->GetImageInfo();
     if (imageInfo.GetHeight() < 1e-6 || imageInfo.GetWidth() < 1e-6) {
@@ -39,7 +39,7 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
     auto dispersionShader = GetDispersionEffect();
     if (dispersionShader == nullptr) {
         LOGE("GEDispersionShaderFilter::OnProcessImage dispersionShader init failed.");
-        return nullptr;
+        return image;
     }
     Drawing::RuntimeShaderBuilder builder(dispersionShader);
 
@@ -48,7 +48,7 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
     Drawing::Matrix invertMatrix;
     if (!matrix.Invert(invertMatrix)) {
         LOGE("GEDispersionShaderFilter::OnProcessImage invert Matrix failed.");
-        return nullptr;
+        return image;
     }
 
     float lowValue = std::min(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
@@ -57,12 +57,16 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
+    if (imageShader == nullptr) {
+        LOGE("GEDispersionShaderFilter::OnProcessImage create imageShader failed.");
+        return image;
+    }
     builder.SetChild("image", imageShader);
 
     auto maskShader = params_.mask->GenerateDrawingShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (maskShader == nullptr) {
         LOGE("GEDispersionShaderFilter::OnProcessImage mask generate failed.");
-        return nullptr;
+        return image;
     }
     builder.SetChild("mask", maskShader);
     builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
@@ -85,11 +89,11 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDispersionShaderFilter::GetDispersionEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> dispersionShader = nullptr;
-    if (dispersionShader == nullptr) {
-        dispersionShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDispersion);
+    static std::shared_ptr<Drawing::RuntimeEffect> g_dispersionShader = nullptr;
+    if (g_dispersionShader == nullptr) {
+        g_dispersionShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDispersion);
     }
-    return dispersionShader;
+    return g_dispersionShader;
 }
 
 } // namespace Rosen

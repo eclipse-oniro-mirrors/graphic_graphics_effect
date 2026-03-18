@@ -33,11 +33,9 @@ public:
 };
 
 void GEVisualEffectContainerTest::SetUpTestCase(void) {}
-
 void GEVisualEffectContainerTest::TearDownTestCase(void) {}
 
 void GEVisualEffectContainerTest::SetUp() {}
-
 void GEVisualEffectContainerTest::TearDown() {}
 
 /**

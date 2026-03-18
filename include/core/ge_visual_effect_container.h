@@ -14,7 +14,7 @@
  */
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_CONTAINER_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_CONTAINER_H
-
+#include <any>
 #include "ge_visual_effect.h"
 
 namespace OHOS {
@@ -42,15 +42,18 @@ public:
 
     void RemoveFilterWithType(int32_t typeToRemove);
 
-    void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage, float left, float top);
+    void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage,
+        float left, float top);
 
     void UpdateCornerRadius(float cornerRadius);
 
     void UpdateTotalMatrix(Drawing::Matrix totalMatrix);
 
-    void UpdateDarkScale(float darkScale);
-
     void UpdateFrostedGlassEffectParams(std::shared_ptr<Drawing::Image> blurImageForEdge, float value);
+
+    void UpdateSnapshotRect(const Drawing::RectF& snapshot);
+
+    void UpdateDarkScale(float darkScale);
 
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 

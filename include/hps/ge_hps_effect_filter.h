@@ -34,8 +34,6 @@
 
 namespace OHOS {
 namespace Rosen {
-constexpr int ARRAY_SIZE_DIMENSION = 2;
-
 class GE_EXPORT HpsEffectFilter {
 public:
     HpsEffectFilter() = default;
@@ -60,7 +58,7 @@ public:
         const Drawing::CanvasInfo& canvasInfo);
     bool ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
-    std::shared_ptr<Drawing::Image> GetBlurForFrostedGlassBlur(Drawing::Canvas& canvas,
+    std::shared_ptr<Drawing::Image> GetBlurImageForFrostedGlass(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image>& image);
 
     bool IsNeedUpscale();
@@ -70,6 +68,8 @@ public:
         const std::shared_ptr<Drawing::HpsMaskParameter>& pL, const std::shared_ptr<Drawing::HpsMaskParameter>& pR);
 
 private:
+    constexpr static size_t ARRAY_SIZE_DIMENSION = 2;
+
     std::vector<std::shared_ptr<Drawing::HpsEffectParameter>> hpsEffect_;
     bool needClampFilter_ {true};
     bool needUpscale_ { false };
@@ -104,7 +104,7 @@ private:
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     bool IsNeedDownscale();
     std::array<int, ARRAY_SIZE_DIMENSION> GetSurfaceSize(
-        Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, bool isDownScaled);
+        Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, bool isDownscaled);
     std::shared_ptr<Drawing::RuntimeEffect> GetUpscaleEffect() const;
 
     // Used in unit tests due to non-Mockable Drawing::GPUContext, don't use in general cases

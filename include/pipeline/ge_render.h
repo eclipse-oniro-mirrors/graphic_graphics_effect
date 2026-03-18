@@ -158,6 +158,12 @@ public:
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
 
     bool IsGasifyFilter();
+    bool IsFrostedGlassFilter(Drawing::GEVisualEffectContainer& veContainer);
+
+    Drawing::Rect GetGasifyRect()
+    {
+        return gasifyRect_;
+    }
 
     static void SetMesablurAllEnabledByCCM(bool flag);
 
@@ -221,6 +227,24 @@ private:
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
 
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderMESABlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderGradientBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
+
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderEdgeLight(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
+
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderDispersion(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasifyScaleTwist(
+        const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
+ 
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasifyBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
+ 
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasify(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
+
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderVariableRadiusBlur(
+        const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+        
     std::shared_ptr<GEShaderFilter> GenerateShaderKawaseBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
 
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlass(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
@@ -228,7 +252,9 @@ private:
     std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlassBlur(
         const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve);
     static bool isMesablurAllEnable_;
+
     bool isGasifyFilter_ = false;
+    Drawing::Rect gasifyRect_ {};
 };
 
 } // namespace GraphicsEffectEngine

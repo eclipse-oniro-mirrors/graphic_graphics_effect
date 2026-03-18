@@ -36,8 +36,8 @@
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
 #include "ge_hps_build_pass.h"
-#include "ge_hps_upscale_pass.h"
 #include "ge_hps_effect_filter.h"
+#include "ge_hps_upscale_pass.h"
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_log.h"
@@ -69,12 +69,10 @@ bool GERender::isMesablurAllEnable_ = false;
 #endif
 using namespace Rosen::Drawing;
 using ShaderCreator = std::function<std::shared_ptr<GEShader>(std::shared_ptr<GEVisualEffectImpl>)>;
-
-static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shaderCreatorLUT = {
-    {GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
+static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderCreatorLUT = {
+    {GEVisualEffectImpl::FilterType::CONTOUR_DIAGONAL_FLOW_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
             std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetContenDiagonalParams() == nullptr) {
+            if (ve == nullptr) {
                 return out;
             }
             const auto& params = ve->GetContenDiagonalParams();
@@ -82,10 +80,9 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return out;
         }
     },
-    {GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
+    {GEVisualEffectImpl::FilterType::WAVY_RIPPLE_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
             std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetWavyRippleLightParams() == nullptr) {
+            if (ve == nullptr) {
                 return out;
             }
             const auto& params = ve->GetWavyRippleLightParams();
@@ -93,10 +90,9 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return out;
         }
     },
-    {GEVisualEffectImpl::FilterType::AURORA_NOISE, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
+    {GEVisualEffectImpl::FilterType::AURORA_NOISE, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
             std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetAuroraNoiseParams() == nullptr) {
+            if (ve == nullptr) {
                 return out;
             }
             const auto& params = ve->GetAuroraNoiseParams();
@@ -104,10 +100,9 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return out;
         }
     },
-    {GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
+    {GEVisualEffectImpl::FilterType::PARTICLE_CIRCULAR_HALO, [] (std::shared_ptr<GEVisualEffectImpl> ve) {
             std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetParticleCircularHaloParams() == nullptr) {
+            if (ve == nullptr) {
                 return out;
             }
             const auto& params = ve->GetParticleCircularHaloParams();
@@ -133,6 +128,38 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::LIGHT_CAVE, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetLightCaveParams();
+            if (params == nullptr) {
+                return out;
+            }
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GEXLightCaveShaderParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                GE_LOGE("GEXLightCaveShader::CreateDynamicImpl create object failed.");
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetBorderLightParams();
+            out = std::make_shared<GEBorderLightShader>(*params);
+            return out;
         }
     },
     {GEVisualEffectImpl::FilterType::COLOR_GRADIENT_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
@@ -177,27 +204,6 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             return dmShader;
         }
     },
-    {GEVisualEffectImpl::FilterType::LIGHT_CAVE, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
-            std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr) {
-                return out;
-            }
-            const auto& params = ve->GetLightCaveParams();
-            if (params == nullptr) {
-                return out;
-            }
-            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
-            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                type, sizeof(GEXLightCaveShaderParams), static_cast<void*>(params.get()));
-            if (!impl) {
-                GE_LOGE("GEXLightCaveShader::CreateDynamicImpl create object failed.");
-                return out;
-            }
-            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
-            return dmShader;
-        }
-    },
     {GEVisualEffectImpl::FilterType::DISTORT_CHROMA, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
@@ -217,17 +223,6 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> g_shade
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
-        }
-    },
-    {GEVisualEffectImpl::FilterType::BORDER_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
-        {
-            std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetBorderLightParams() == nullptr) {
-                return out;
-            }
-            const auto& params = ve->GetBorderLightParams();
-            out = std::make_shared<GEBorderLightShader>(*params);
-            return out;
         }
     },
     {GEVisualEffectImpl::FilterType::AIBAR_GLOW, [] (std::shared_ptr<GEVisualEffectImpl> ve)
@@ -460,6 +455,10 @@ bool GERender::AfterApplyShaderFilter(Drawing::Canvas& canvas, const Drawing::GE
     ve->SetCache(geShaderFilter.GetCache());
     if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY) {
         isGasifyFilter_ = true;
+        gasifyRect_.SetLeft(context.src.GetLeft());
+        gasifyRect_.SetTop(context.src.GetTop());
+        gasifyRect_.SetRight(context.src.GetRight());
+        gasifyRect_.SetBottom(context.src.GetBottom());
     }
     return true;
 }
@@ -470,7 +469,6 @@ GERender::ApplyShaderFilterTarget GERender::DrawShaderFilter(Drawing::Canvas& ca
 {
     std::shared_ptr<GEShaderFilter> geShaderFilter;
     if (!BeforeApplyShaderFilter(canvas, visualEffect, context, geShaderFilter)) {
-        LOGD("GERender::DrawShaderFilter failed before executing shader filter");
         return ApplyShaderFilterTarget::Error;
     }
     // When BeforeApplyShaderFilter returning true, geShaderFilter and visualEffect is guranteed not nullptr
@@ -513,8 +511,8 @@ static bool ComposeEffects(Drawing::Canvas& canvas,
     GEFilterComposer composer;
     composer.Add<GEHpsBuildPass>(canvas, context);
     composer.Add<GEMesaFusionPass>();
-    composer.Add<GEDirectDrawOnCanvasPass>();
     composer.Add<GEHpsUpscalePass>();
+    composer.Add<GEDirectDrawOnCanvasPass>();
     composables = GEFilterComposer::BuildComposables(visualEffects);
     auto composerResult = composer.Run(composables);
     if (!composerResult.anyPassChanged) { // Compatiblity fallback when no change applied to composables
@@ -616,131 +614,39 @@ bool GERender::ApplyHpsImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEff
 }
 
 std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
-    const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
 {
     auto type = ve->GetFilterType();
     switch (type) {
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
-            const auto& mesaParams = ve->GetMESAParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type), sizeof(Drawing::GEMESABlurShaderFilterParams),
-                static_cast<void*>(mesaParams.get()));
-            if (!object) {
-                return std::make_shared<GEMESABlurShaderFilter>(*mesaParams);
-            }
-            std::shared_ptr<GEMESABlurShaderFilter> dmShader(static_cast<GEMESABlurShaderFilter*>(object));
-            return dmShader;
+            return GenerateExtShaderMESABlur(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR: {
-            const auto& linearGradientBlurParams = ve->GetLinearGradientBlurParams();
-            if (linearGradientBlurParams->isRadiusGradient) {
-                auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                    static_cast<uint32_t>(type), sizeof(Drawing::GELinearGradientBlurShaderFilterParams),
-                    static_cast<void*>(linearGradientBlurParams.get()));
-                if (object) {
-                    std::shared_ptr<GELinearGradientBlurShaderFilter>
-                        dmShader(static_cast<GELinearGradientBlurShaderFilter*>(object));
-                    return dmShader;
-                }
-            }
-            return std::make_shared<GELinearGradientBlurShaderFilter>(*linearGradientBlurParams);
+            return GenerateExtShaderGradientBlur(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
-            const auto& edgeLightParams = ve->GetEdgeLightParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type), sizeof(Drawing::GEEdgeLightShaderFilterParams),
-                static_cast<void*>(edgeLightParams.get()));
-            if (!object) {
-                return std::make_shared<GEEdgeLightShaderFilter>(*edgeLightParams);
-            }
-            std::shared_ptr<GEEdgeLightShaderFilter> dmShader(static_cast<GEEdgeLightShaderFilter*>(object));
-            return dmShader;
+            return GenerateExtShaderEdgeLight(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::DISPERSION: {
-            const auto& dispersionParams = ve->GetDispersionParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type), sizeof(Drawing::GEDispersionShaderFilterParams),
-                static_cast<void*>(dispersionParams.get()));
-            if (!object) {
-                return std::make_shared<GEDispersionShaderFilter>(*dispersionParams);
-            }
-            std::shared_ptr<GEDispersionShaderFilter> dmShader(static_cast<GEDispersionShaderFilter*>(object));
-            return dmShader;
+            return GenerateExtShaderDispersion(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST: {
-            const auto& gasifyScaleTwistParams = ve->GetGasifyScaleTwistFilterParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type),
-                sizeof(Drawing::GEGasifyScaleTwistFilterParams),
-                static_cast<void*>(gasifyScaleTwistParams.get()));
-            if (!object) {
-                return nullptr;
-            }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
-            return dmShader;
+            return GenerateExtShaderGasifyScaleTwist(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY_BLUR: {
-            const auto& gasifyBlurParams = ve->GetGasifyBlurFilterParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type),
-                sizeof(Drawing::GEGasifyBlurFilterParams),
-                static_cast<void*>(gasifyBlurParams.get()));
-            if (!object) {
-                return nullptr;
-            }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
-            return dmShader;
+            return GenerateExtShaderGasifyBlur(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY: {
-            const auto& gasifyParams = ve->GetGasifyFilterParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type),
-                sizeof(Drawing::GEGasifyFilterParams),
-                static_cast<void*>(gasifyParams.get()));
-            if (!object) {
-                return nullptr;
-            }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
-            return dmShader;
+            return GenerateExtShaderGasify(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
-            const auto& variableRadiusBlurParams = ve->GetVariableRadiusBlurParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(type),
-                sizeof(Drawing::GEVariableRadiusBlurShaderFilterParams),
-                static_cast<void*>(variableRadiusBlurParams.get()));
-            if (!object) {
-                return std::make_shared<GEVariableRadiusBlurShaderFilter>(*variableRadiusBlurParams);
-            }
-            std::shared_ptr<GEVariableRadiusBlurShaderFilter> dmShader(
-                static_cast<GEVariableRadiusBlurShaderFilter*>(object));
-            return dmShader;
+            return GenerateExtShaderVariableRadiusBlur(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
-            const auto &params = ve->GetFrostedGlassParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS),
-                sizeof(Drawing::GEFrostedGlassShaderFilterParams),
-                static_cast<void *>(params.get()));
-            if (!object) {
-                return std::make_shared<GEFrostedGlassShaderFilter>(*params);
-            }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
-            return dmShader;
-            break;
+            return GenerateExtShaderFrostedGlass(ve);
         }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
-            const auto &params = ve->GetFrostedGlassBlurParams();
-            auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
-                sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
-                static_cast<void *>(params.get()));
-            if (!object) {
-                return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
-            }
-            std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
-            return dmShader;
-            break;
+            return GenerateExtShaderFrostedGlassBlur(ve);
         }
         default:
             break;
@@ -748,18 +654,146 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
     return nullptr;
 }
 
-std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFrostedGlassBlur(
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFrostedGlass(
     const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
 {
-    const auto &params = ve->GetFrostedGlassBlurParams();
+    const auto &params = ve->GetFrostedGlassParams();
     auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
-        sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS),
+        sizeof(Drawing::GEFrostedGlassShaderFilterParams),
         static_cast<void *>(params.get()));
     if (!object) {
-        return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+        return std::make_shared<GEFrostedGlassShaderFilter>(*params);
     }
     std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderMESABlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &mesaParams = ve->GetMESAParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR),
+        sizeof(Drawing::GEMESABlurShaderFilterParams),
+        static_cast<void *>(mesaParams.get()));
+    if (!object) {
+        return std::make_shared<GEMESABlurShaderFilter>(*mesaParams);
+    }
+    std::shared_ptr<GEMESABlurShaderFilter> dmShader(static_cast<GEMESABlurShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderGradientBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &linearGradientBlurParams = ve->GetLinearGradientBlurParams();
+    if (!linearGradientBlurParams) {
+        LOGE("GERender::linearGradientBlurParams is null");
+        return nullptr;
+    }
+    if (linearGradientBlurParams->isRadiusGradient) {
+        auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+            static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR),
+            sizeof(Drawing::GELinearGradientBlurShaderFilterParams),
+            static_cast<void *>(linearGradientBlurParams.get()));
+        if (object) {
+            std::shared_ptr<GELinearGradientBlurShaderFilter> dmShader(
+                static_cast<GELinearGradientBlurShaderFilter *>(object));
+            return dmShader;
+        }
+    }
+    return std::make_shared<GELinearGradientBlurShaderFilter>(*linearGradientBlurParams);
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderEdgeLight(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &edgeLightParams = ve->GetEdgeLightParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT),
+        sizeof(Drawing::GEEdgeLightShaderFilterParams),
+        static_cast<void *>(edgeLightParams.get()));
+    if (!object) {
+        return std::make_shared<GEEdgeLightShaderFilter>(*edgeLightParams);
+    }
+    std::shared_ptr<GEEdgeLightShaderFilter> dmShader(static_cast<GEEdgeLightShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderGasifyScaleTwist(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &mesaParams = ve->GetGasifyScaleTwistFilterParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST),
+        sizeof(Drawing::GEGasifyScaleTwistFilterParams),
+        static_cast<void *>(mesaParams.get()));
+    if (!object) {
+        return nullptr;
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderGasifyBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &mesaParams = ve->GetGasifyBlurFilterParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GASIFY_BLUR),
+        sizeof(Drawing::GEGasifyBlurFilterParams),
+        static_cast<void *>(mesaParams.get()));
+    if (!object) {
+        return nullptr;
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderGasify(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &mesaParams = ve->GetGasifyFilterParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GASIFY),
+        sizeof(Drawing::GEGasifyFilterParams),
+        static_cast<void *>(mesaParams.get()));
+    if (!object) {
+        return nullptr;
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderDispersion(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &dispersionParams = ve->GetDispersionParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::DISPERSION),
+        sizeof(Drawing::GEDispersionShaderFilterParams),
+        static_cast<void *>(dispersionParams.get()));
+    if (!object) {
+        return std::make_shared<GEDispersionShaderFilter>(*dispersionParams);
+    }
+    std::shared_ptr<GEDispersionShaderFilter> dmShader(static_cast<GEDispersionShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderVariableRadiusBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto& variableRadiusBlurParams = ve->GetVariableRadiusBlurParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR),
+        sizeof(Drawing::GEVariableRadiusBlurShaderFilterParams),
+        static_cast<void*>(variableRadiusBlurParams.get()));
+    if (!object) {
+        return std::make_shared<GEVariableRadiusBlurShaderFilter>(*variableRadiusBlurParams);
+    }
+    std::shared_ptr<GEVariableRadiusBlurShaderFilter> dmShader(
+        static_cast<GEVariableRadiusBlurShaderFilter*>(object));
     return dmShader;
 }
 
@@ -782,6 +816,21 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderKawaseBlur(
         return std::make_shared<GEMESABlurShaderFilter>(*mesaParams);
     }
     std::shared_ptr<GEMESABlurShaderFilter> dmShader(static_cast<GEMESABlurShaderFilter*>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFrostedGlassBlur(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &params = ve->GetFrostedGlassBlurParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR),
+        sizeof(Drawing::GEFrostedGlassBlurShaderFilterParams),
+        static_cast<void *>(params.get()));
+    if (!object) {
+        return std::make_shared<GEFrostedGlassBlurShaderFilter>(*params);
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
     return dmShader;
 }
 
@@ -887,13 +936,13 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
             shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
         case Drawing::GEVisualEffectImpl::FilterType::GRID_WARP: {
             const auto &params = ve->GetGridWarpFilterParams();
             shaderFilter = std::make_shared<GEGridWarpShaderFilter>(*params);
-            break;
-        }
-        case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS_BLUR: {
-            shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT: {
@@ -926,7 +975,8 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilters(
 void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
     const Drawing::Rect& bounds)
 {
-    LOGD("GERender::DrawShaderEffect %{public}zu", veContainer.GetFilters().size());
+    LOGD("GERender::shaderEffects %{public}zu", veContainer.GetFilters().size());
+    std::vector<std::shared_ptr<GEShader>> shaderEffects;
     for (auto vef : veContainer.GetFilters()) {
         if (vef == nullptr) {
             LOGD("GERender::DrawShaderEffect vef is null");
@@ -946,8 +996,8 @@ void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffect
 
 std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)
 {
-    auto it = g_shaderCreatorLUT.find(ve->GetFilterType());
-    return it != g_shaderCreatorLUT.end() ? it->second(ve) : nullptr;
+    auto it = shaderCreatorLUT.find(ve->GetFilterType());
+    return it != shaderCreatorLUT.end() ? it->second(ve) : nullptr;
 }
 
 void GERender::SetMesablurAllEnabledByCCM(bool flag)
@@ -960,6 +1010,17 @@ bool GERender::IsGasifyFilter()
     if (isGasifyFilter_) {
         isGasifyFilter_ = false;
         return true;
+    }
+    return false;
+}
+
+bool GERender::IsFrostedGlassFilter(Drawing::GEVisualEffectContainer& veContainer)
+{
+    for (auto& vef: veContainer.GetFilters()) {
+        auto ve = vef->GetImpl();
+        if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS) {
+            return true;
+        }
     }
     return false;
 }

@@ -16,6 +16,7 @@
 #define GRAPHICS_EFFECT_GE_FILTER_TYPE_H
 #include <cstdint>
 #include <string_view>
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
@@ -54,8 +55,8 @@ enum class GEFilterType : int32_t {
     // Shape
     SDF_UNION_OP,
     SDF_RRECT_SHAPE,
-    SDF_TRANSFORM_SHAPE,
     SDF_PIXELMAP_SHAPE,
+    SDF_TRANSFORM_SHAPE,
     SDF_EMPTY_SHAPE,
     // Shader
     DOT_MATRIX,
@@ -73,28 +74,28 @@ enum class GEFilterType : int32_t {
     PARTICLE_CIRCULAR_HALO,
     DIRECTION_LIGHT,
     VARIABLE_RADIUS_BLUR,
-    COLOR_GRADIENT_EFFECT,
-    HARMONIUM_EFFECT,
     GASIFY_SCALE_TWIST,
     GASIFY_BLUR,
     GASIFY,
+    COLOR_GRADIENT_EFFECT,
+    HARMONIUM_EFFECT,
     LIGHT_CAVE,
     AIBAR_GLOW,
     AIBAR_RECT_HALO,
     ROUNDED_RECT_FLOWLIGHT,
     GRADIENT_FLOW_COLORS,
-    SDF_SHADOW,
-    SDF_CLIP,
     FROSTED_GLASS,
     SDF_BORDER,
+    SDF_SHADOW,
+    SDF_CLIP,
     CIRCLE_FLOWLIGHT,
     FROSTED_GLASS_BLUR,
     FROSTED_GLASS_EFFECT,
     DISTORT_CHROMA,
-    SDF_FROM_IMAGE,
     SDF_EDGE_LIGHT,
+    SDF_FROM_IMAGE,
     SDF_COLOR,
-    MAX,
+    MAX
 };
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
@@ -116,6 +117,7 @@ struct IGEFilterType {
         return "IGEFilterType";
     }
 };
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

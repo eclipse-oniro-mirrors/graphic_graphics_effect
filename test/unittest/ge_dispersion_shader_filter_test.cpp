@@ -105,7 +105,7 @@ HWTEST_F(GEDispersionShaderFilterTest, GetDispersionEffectTest, TestSize.Level1)
     ASSERT_NE(dispersionShaderFilter, nullptr);
 
     EXPECT_NE(dispersionShaderFilter->GetDispersionEffect(), nullptr);
-    EXPECT_NE(dispersionShaderFilter->GetDispersionEffect(), nullptr);
+    EXPECT_NE(dispersionShaderFilter->GetDispersionEffect(), nullptr); // different branch
 }
 
 /**
@@ -120,7 +120,7 @@ HWTEST_F(GEDispersionShaderFilterTest, OnProcessImageTest, TestSize.Level1)
 
     EXPECT_EQ(dispersionShaderFilter->OnProcessImage(canvas_, nullptr, src_, dst_), nullptr);
     dispersionShaderFilter->params_.mask = nullptr;
-    EXPECT_EQ(dispersionShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
+    EXPECT_EQ(dispersionShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
     dispersionShaderFilter->params_.mask = CreateDispersionRippleShaderMask();
     EXPECT_EQ(dispersionShaderFilter->OnProcessImage(canvas_, imageEmpty_, src_, dst_), nullptr);

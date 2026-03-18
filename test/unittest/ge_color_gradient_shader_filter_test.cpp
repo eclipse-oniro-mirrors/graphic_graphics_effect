@@ -47,11 +47,12 @@ public:
 };
 
 void GEColorGradientShaderFilterTest::SetUpTestCase(void) {}
-
 void GEColorGradientShaderFilterTest::TearDownTestCase(void) {}
 
 void GEColorGradientShaderFilterTest::SetUp()
 {
+    canvas_.Restore();
+
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format); // 50, 50  bitmap size
@@ -59,7 +60,7 @@ void GEColorGradientShaderFilterTest::SetUp()
     image_ = bmp.MakeImage();
 }
 
-void GEColorGradientShaderFilterTest::TearDown() { image_ = nullptr; }
+void GEColorGradientShaderFilterTest::TearDown() {}
 
 /**
  * @tc.name: OnProcessImage_001
@@ -196,9 +197,9 @@ HWTEST_F(GEColorGradientShaderFilterTest, Type_001, TestSize.Level0)
 
     // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
-    std::vector<float> poitions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
+    std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is positions xy params
     std::vector<float> strengths = { 0.5f }; // 0.5 is strength params
-    Drawing::GEColorGradientShaderFilterParams params { colors, poitions, strengths, nullptr };
+    Drawing::GEColorGradientShaderFilterParams params { colors, positions, strengths, nullptr };
     auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::COLOR_GRADIENT);
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_COLOR_GRADIENT);

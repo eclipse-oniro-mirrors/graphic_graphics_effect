@@ -22,10 +22,9 @@
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 
-
 namespace OHOS {
 namespace Rosen {
- 
+
 class GESDFClipShader : public GEShader {
 public:
     GESDFClipShader(const Drawing::GESDFClipShaderParams& params);

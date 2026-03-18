@@ -21,7 +21,7 @@
 #include "utils/rect.h"
 #include "effect/shader_effect.h"
 #include "ge_common.h"
-#include "ge_filter_type.h"
+#include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -35,18 +35,18 @@ public:
 
     virtual const std::shared_ptr<Drawing::ShaderEffect>& GetDrawingShader() { return drShader_; }
 
+    uint32_t Hash() const { return hash_; }
+
     void DrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
     virtual void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
-    uint32_t Hash() const { return hash_; }
-
-    void SetCache(std::shared_ptr<std::any> cacheData)
+    void SetCache(std::shared_ptr<std::any> cachData)
     {
-        cacheAnyPtr_ = cacheData;
+        cacheAnyPtr_ = cachData;
     }
 
-    std::shared_ptr<std::any> GetCache()
+    std::shared_ptr<std::any> GetCache() const
     {
         return cacheAnyPtr_;
     }

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#include "ge_log.h"
 #include "ge_sdf_transform_shader_shape.h"
+#include "ge_log.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -166,7 +166,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateShaderEffect(fl
         builder->SetUniform("transformMatrix", invertMatrix);
     } else {
         LOGE("GESDFTransformShaderShape::GenerateShaderEffect, invert matrix failed");
-        return Drawing::ShaderEffect::CreateColorShader(0);
+        builder->SetUniform("transformMatrix", params_.matrix);
     }
     builder->SetChild("shapeShader", shapeShader);
 

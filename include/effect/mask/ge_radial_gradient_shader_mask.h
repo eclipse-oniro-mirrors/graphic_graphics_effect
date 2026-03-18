@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H
-#define GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H
+#ifndef GRAPHICS_EFFECT_GE_RADIAL_GRADIENT_MASK_H
+#define GRAPHICS_EFFECT_GE_RADIAL_GRADIENT_MASK_H
 
 #include "draw/canvas.h"
 #include "ge_filter_type_info.h"
@@ -37,7 +37,7 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-    GERadialGradientShaderMaskParams GetGERadialGradientShaderMaskParams();
+    const GERadialGradientShaderMaskParams& GetGERadialGradientShaderMaskParams();
 
 private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetRadialGradientShaderMaskBuilder() const;
@@ -50,4 +50,4 @@ private:
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_RADIENT_GRADIENT_MASK_H
+#endif // GRAPHICS_EFFECT_GE_RADIAL_GRADIENT_MASK_H

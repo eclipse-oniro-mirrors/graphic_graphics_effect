@@ -52,6 +52,7 @@ public:
     }
     void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&) = delete;
     GEContourDiagonalFlowLightShader(const GEContourDiagonalFlowLightShader&&) = delete;

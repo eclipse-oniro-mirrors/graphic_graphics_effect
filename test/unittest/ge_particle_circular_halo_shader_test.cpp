@@ -243,19 +243,35 @@ HWTEST_F(GEParticleCircularHaloShaderTest, PreprocessBranchCoverageTest, TestSiz
     auto glow1 = shader->glowHaloImg_.get();
     EXPECT_NE(particle1, nullptr);
     EXPECT_NE(glow1, nullptr);
-
+ 
     shader->Preprocess(*canvas_, rect_);
     auto particle2 = shader->particleHaloImg_.get();
     auto glow2 = shader->glowHaloImg_.get();
     EXPECT_EQ(particle1, particle2);
     EXPECT_EQ(glow1, glow2);
-
+ 
     shader->particleCircularHaloParams_.noise_ += 0.1f;
     shader->Preprocess(*canvas_, rect_);
     auto particle3 = shader->particleHaloImg_.get();
     auto glow3 = shader->glowHaloImg_.get();
     EXPECT_NE(particle2, particle3);
     EXPECT_EQ(glow2, glow3);
+}
+
+/**
+ * @tc.name: Type_001
+ * @tc.desc: Verify the Type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEParticleCircularHaloShaderTest, Type_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 start";
+
+    auto filter = std::make_unique<GEParticleCircularHaloShader>();
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::PARTICLE_CIRCULAR_HALO);
+    EXPECT_EQ(filter->TypeName(), Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
+
+    GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest Type_001 end";
 }
 }  // namespace Rosen
 }  // namespace OHOS

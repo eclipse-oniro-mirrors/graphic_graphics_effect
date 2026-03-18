@@ -520,23 +520,13 @@ std::pair<float, float> GEMESABlurShaderFilter::AngleToDirection(float angle)
 std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
-    if (!IsInputValid(canvas, image, src, dst)) {
-        return image;
-    }
-    CalculatePixelStretch(image->GetWidth(), image->GetHeight());
-
-    // Even so there is no blur, we may need to make greyadjustment and pixel stretch.
-    if (radius_ <= 0 || radius_ >= 8000 || GetKawaseOriginalEnabled()) {  // 8000 experienced value
-        return OutputImageWithoutBlur(canvas, image, src, dst);
-    }
-
     auto input = image;
     CheckInputImage(canvas, image, input, src);
     NewBlurParams blur;
     // Step1. Set blur params according to our algorithm.
     if (!SetBlurParams(blur)) {
         LOGE("GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling The blur params are not correctly set.");
-        return image;
+        return nullptr;
     }
     auto originImageInfo = input->GetImageInfo();
     auto width = std::max(static_cast<int>(std::ceil(dst.GetWidth())), input->GetWidth());
@@ -556,7 +546,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpS
     auto tmpBlur = DownSamplingFuzedBlur(canvas, blurBuilder, input, src, scaledInfo, width, height, linear, blur);
     if (!tmpBlur) {
         LOGE("GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling make image error when downsampling");
-        return image;
+        return nullptr;
     }
 
     // Step3. Blur iteration.
@@ -569,6 +559,9 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::DownSamplingForEdge(Draw
     const std::shared_ptr<Drawing::Image>& input, const Drawing::Rect& src, const Drawing::SamplingOptions& linear,
     float factor) const
 {
+    if (input == nullptr) {
+        return nullptr;
+    }
     auto width = input->GetWidth();
     auto height = input->GetHeight();
     auto originImageInfo = input->GetImageInfo();
@@ -592,6 +585,15 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::DownSamplingForEdge(Draw
 std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
+    if (!IsInputValid(canvas, image, src, dst)) {
+        return image;
+    }
+    CalculatePixelStretch(image->GetWidth(), image->GetHeight());
+
+    // Even so there is no blur, we may need to make greyadjustment and pixel stretch.
+    if (radius_ <= 0 || radius_ >= 8000 || GetKawaseOriginalEnabled()) {  // 8000 experienced value
+        return OutputImageWithoutBlur(canvas, image, src, dst);
+    }
     auto tmpBlur = OnProcessImageWithoutUpSampling(canvas, image, src, dst);
     if (!tmpBlur) {
         LOGE("GEMESABlurShaderFilter::OnProcessImage make image error in PingPongBlur");

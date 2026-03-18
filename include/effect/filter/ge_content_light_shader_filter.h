@@ -31,7 +31,6 @@
 
 namespace OHOS {
 namespace Rosen {
-
 class GEContentLightFilter : public GEShaderFilter {
 public:
     GE_EXPORT GEContentLightFilter(const Drawing::GEContentLightFilterParams& params);
@@ -43,10 +42,12 @@ public:
 private:
     void GenerateContentLightEffect();
     static std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_;
+    float ClampValue(float x, float minValue, float maxValue);
+    void ClampLightValue();
 
     Vector3f lightPosition_;
     Vector4f lightColor_;
-    float lightIntensity_;
+    float lightIntensity_ = 0.0f;
     Vector3f rotationAngle_;
 };
 

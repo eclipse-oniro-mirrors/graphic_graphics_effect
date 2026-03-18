@@ -34,6 +34,9 @@ class GE_EXPORT GELinearGradientShaderMask : public GEShaderMask {
 public:
     GELinearGradientShaderMask(const GELinearGradientShaderMaskParams& param);
     GELinearGradientShaderMask(const GELinearGradientShaderMask&) = delete;
+    GELinearGradientShaderMask operator=(const GELinearGradientShaderMask&) = delete;
+    GELinearGradientShaderMask(GELinearGradientShaderMask&&) = delete;
+    GELinearGradientShaderMask& operator=(GELinearGradientShaderMask&&) = delete;
     ~GELinearGradientShaderMask() override = default;
     DECLARE_GEFILTER_TYPEFUNC(GELinearGradientShaderMask, GELinearGradientShaderMaskParams);
 
@@ -41,6 +44,8 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
 private:
+    std::shared_ptr<ShaderEffect> MakeCommonMask(float width, float height) const;
+    
     std::vector<std::pair<float, float>> fractionStops_;
     Drawing::Point startPos_;
     Drawing::Point endPos_;

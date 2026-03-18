@@ -42,6 +42,10 @@ public:
         borderLightParams_ = params;
     }
 
+    float ClampValue(float x, float minValue, float maxValue);
+
+    void ClampLightValue();
+
     std::shared_ptr<Drawing::ShaderEffect> MakeBorderLightShader(const Drawing::Rect& rect);
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetBorderLightBuilder();

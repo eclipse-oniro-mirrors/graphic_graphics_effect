@@ -71,7 +71,7 @@ std::shared_ptr<Drawing::Image> GEMaskTransitionShaderFilter::OnProcessImage(Dra
         GE_LOGE("GEMaskTransitionShaderFilter::OnProcessImage get mask transition effect failed");
         return image;
     }
-    
+
     auto topLayer = Drawing::ShaderEffect::CreateImageShader(*cacheImage, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), cachedData.second);
     auto bottomLayer = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,

@@ -14,7 +14,7 @@
  */
 
 #include <chrono>
- 
+
 #include "ge_log.h"
 #include "ge_sdf_clip_shader.h"
 #include "ge_sdf_shader_shape.h"
@@ -64,7 +64,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const 
         GE_LOGE("GESDFClipShader::MakeSDFClipShader mask is invalid.");
         return nullptr;
     }
-    GE_TRACE_NAME_FMT("GESDFClipShader::MakeSDFClipShader, normal type");
+    GE_TRACE_NAME_FMT("GESDFClipShader::GetSDFClipEffect, normal type");
     auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFClipShader: failed generate GESDFClipShader.");

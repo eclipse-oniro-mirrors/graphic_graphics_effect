@@ -402,7 +402,6 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
         LOGE("GEFrostedGlassShaderFilter::PrepareDrawing imageinfo is invalid");
         return false;
     }
-    FrostedGlass::InterpolateAdaptiveParams(frostedGlassParams_);
     matrix = canvasInfo_.mat;
     matrix.PostTranslate(-canvasInfo_.tranX, -canvasInfo_.tranY);
     Drawing::Matrix invertMatrix;
@@ -425,7 +424,7 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
 
     auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (!sdfNormalShader) {
-        LOGE("GEFrostedGlassShaderFilter::create sdfShapeShader failed.");
+        LOGE("GEFrostedGlassShaderFilter::OnProcessImage sdfShapeShader is null");
         return false;
     }
 
@@ -496,8 +495,9 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeLargeRadiusBlurI
 std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurImg(Drawing::Canvas& canvas,
     const Drawing::Rect& src, const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image)
 {
+    const float EPS = 1e-12;
     Drawing::GEMESABlurShaderFilterParams blurImgParas{};
-    blurImgParas.radius = frostedGlassParams_.blurParams[0]/frostedGlassParams_.blurParams[1]; // Radius / k
+    blurImgParas.radius = frostedGlassParams_.blurParams[0] / std::max(frostedGlassParams_.blurParams[1], EPS);
     auto blurShader_ = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
@@ -544,7 +544,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassShaderFilter::MakeF
     builder->SetChild("bgBlurredImg", smallRBlurShader);
     builder->SetUniform("iResolution", imageWidth, imageHeight);
     builder->SetChild("sdfNormalImg", sdfNormalShader);
-    builder->SetUniform("borderWidth", frostedGlassParams_.envLightParams[NUM_1]);
+    builder->SetUniform("borderWidth", frostedGlassParams_.envLightParams[NUM_0]);
     builder->SetUniform("offset", 0.0f);
     builder->SetUniform("downSampleFactor", 1.0f);
     // Background darken parameter

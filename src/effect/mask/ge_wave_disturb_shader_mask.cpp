@@ -61,7 +61,7 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
         float d = length(centerVec);
         float rl = d - radius; // ring length
         if (clickPos.x >= 0 && abs(rl) < 2.0 * waveWidth - 1e-5) {
-            float rate = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown) : 1.;
+            float rate = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown + 1e-5) : 1.;
             float height = waveHeight * rate;
             float uniformRl = abs(rl) * PI / 2.0 / waveWidth;
             float tantheta1 = height * FastSin(uniformRl) * PI / waveWidth + 1e-6;
@@ -69,13 +69,14 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
             float sintheta2 = tantheta1 / sqrt(tantheta1 * tantheta1 + 1.0) / reflectRatio;
             float tantheta2 = sintheta2 / sqrt(1. - sintheta2 * sintheta2);
             float slop = (tantheta0 + tantheta2) / (1. - tantheta0 * tantheta2);
-            float detx = (-height * (FastCos(uniformRl) + 1.0)) / slop;
+            float relativeHeight = (FastCos(uniformRl) + 1.0);
+            float detx = (-height * relativeHeight) / slop;
             detx = rl > 0. ? detx : -detx;
             // move pixel
             vec2 normal = d > 1e-4 ? normalize(centerVec) : vec2(0., 1.);
-            return vec4(normal * detx, height, 0.);
+            return vec4(normal * detx, relativeHeight / 2. * rate, 1.);
         }
-        return vec4(0.);
+        return vec4(0., 0., 0., 1.);
     }
 )";
 

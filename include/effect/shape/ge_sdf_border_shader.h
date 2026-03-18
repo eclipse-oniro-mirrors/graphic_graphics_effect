@@ -66,7 +66,6 @@ private:
             if (d < -borderWidth && d >= (-borderWidth - 1.0)) {
                 color = vec4(borderColor, 1.0) * smoothstep(-borderWidth - 1.0, -borderWidth, d);
             }
-            
             return color;
         }
 

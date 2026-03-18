@@ -95,6 +95,7 @@ public:
 
 protected:
     Drawing::Rect testSubtractedShader;
+
     void Preprocess(Canvas& canvas, const Rect& rect) override
     {
         if (cacheAnyPtr_ == nullptr) {

@@ -33,7 +33,7 @@ constexpr size_t LEFT_TWO_THIRDS     = 10;
 constexpr size_t LEFT_ONE_THIRD      = 11;
 
 GEBezierWarpShaderFilter::GEBezierWarpShaderFilter(const Drawing::GEBezierWarpShaderFilterParams& params)
-    :destinationPatch_(params.destinationPatch)
+    : destinationPatch_(params.destinationPatch)
 {}
 
 std::shared_ptr<Drawing::Image> GEBezierWarpShaderFilter::OnProcessImage(Drawing::Canvas& canvas,

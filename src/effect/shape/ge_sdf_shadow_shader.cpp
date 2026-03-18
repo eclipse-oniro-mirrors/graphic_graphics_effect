@@ -18,7 +18,7 @@
 #include "ge_log.h"
 #include "ge_sdf_shadow_shader.h"
 #include "common/rs_common_def.h"
- 
+
 namespace OHOS {
 namespace Rosen {
 static constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
@@ -35,21 +35,21 @@ void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progr
 void GESDFShadowShader::UpdateRectForShadow(Drawing::Rect& rect)
 {
     float radius = std::max(params_.shadow.radius * RADIUS_FACTOR, SDF_SHADOW_MIN_THRESHOLD);
-    float left = params_.shadow.offsetX - radius;
-    float right = params_.shadow.offsetX + radius;
-    float top = params_.shadow.offsetY - radius;
-    float bottom =  params_.shadow.offsetY + radius;
-    if (ROSEN_LNE(left, 0.0f)) {
-        rect.SetLeft(rect.GetLeft() + left);
+    float offsetLeft = params_.shadow.offsetX - radius;
+    float offsetTop = params_.shadow.offsetY - radius;
+    float offsetRight = params_.shadow.offsetX + radius;
+    float offsetBottom =  params_.shadow.offsetY + radius;
+    if (ROSEN_LNE(offsetLeft, 0.0f)) {
+        rect.SetLeft(rect.GetLeft() + offsetLeft);
     }
-    if (ROSEN_GNE(right, 0.0f)) {
-        rect.SetRight(rect.GetRight() + right);
+    if (ROSEN_LNE(offsetTop, 0.0f)) {
+        rect.SetTop(rect.GetTop() + offsetTop);
     }
-    if (ROSEN_LNE(top, 0.0f)) {
-        rect.SetTop(rect.GetTop() + top);
+    if (ROSEN_GNE(offsetRight, 0.0f)) {
+        rect.SetRight(rect.GetRight() + offsetRight);
     }
-    if (ROSEN_GNE(bottom, 0.0f)) {
-        rect.SetBottom(rect.GetBottom() + bottom);
+    if (ROSEN_GNE(offsetBottom, 0.0f)) {
+        rect.SetBottom(rect.GetBottom() + offsetBottom);
     }
 }
 

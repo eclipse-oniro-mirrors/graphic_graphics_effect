@@ -197,7 +197,7 @@ HWTEST_F(GEHpsEffectFilterTest, ApplyHpsEffect_001, TestSize.Level0)
 
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
     float alpha = 1.0f;
-    std::shared_ptr<Drawing::ColorFilter> colorFilter = nullptr;
+    std::shared_ptr<Drawing::ColorFilter> colorFilter;
     uint32_t maskColor = 255;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
     HpsEffectFilter::HpsEffectContext hpsEffectContext = {alpha, colorFilter, maskColor};
@@ -220,7 +220,7 @@ HWTEST_F(GEHpsEffectFilterTest, ApplyHpsEffect_002, TestSize.Level0)
         Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
     hpsEffectFilter->hpsEffect_.push_back(greyPara);
     float alpha = 1.0f;
-    std::shared_ptr<Drawing::ColorFilter> colorFilter = nullptr;
+    std::shared_ptr<Drawing::ColorFilter> colorFilter;
     uint32_t maskColor = 255;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
     HpsEffectFilter::HpsEffectContext hpsEffectContext = {alpha, colorFilter, maskColor};
@@ -248,7 +248,7 @@ HWTEST_F(GEHpsEffectFilterTest, ApplyHpsEffect_003, TestSize.Level0)
 
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
     float alpha = 1.0f;
-    std::shared_ptr<Drawing::ColorFilter> colorFilter = nullptr;
+    std::shared_ptr<Drawing::ColorFilter> colorFilter;
     uint32_t maskColor = 255;
     std::shared_ptr<Drawing::Image> outImage = nullptr;
     std::shared_ptr<Drawing::HpsEffectParameter> greyPara = std::make_shared<Drawing::HpsGreyParameter>(
@@ -302,7 +302,7 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_002, TestSize.Level0)
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
     std::vector<const char*> extensionProperties = {"hps_aibar_effect"};
     hpsEffectFilter->UnitTestSetExtensionProperties(extensionProperties);
-    EXPECT_NE(hpsEffectFilter->HpsSupportEffectGE(veContainer), true);
+    EXPECT_EQ(hpsEffectFilter->HpsSupportEffectGE(veContainer), true);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest HpsSupportEffectGE_002 end";
 }
@@ -352,7 +352,7 @@ HWTEST_F(GEHpsEffectFilterTest, GetSurfaceSize_002, TestSize.Level0)
 
     kawaseBlurPara->src = Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f);
     kawaseBlurPara->dst = Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f);
-    kawaseBlurPara->sigma = 2.0f;
+    kawaseBlurPara->sigma = 2.0;
     size = hpsEffectFilter->GetSurfaceSize(canvas_, image_, true);
     EXPECT_TRUE(size[0] == 0 && size[1] == 0);
 
@@ -382,7 +382,7 @@ HWTEST_F(GEHpsEffectFilterTest, GetSurfaceSize_003, TestSize.Level0)
 
     measPara->src = Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f);
     measPara->dst = Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f);
-    measPara->sigma = 2.0f;
+    measPara->sigma = 2.0;
     size = hpsEffectFilter->GetSurfaceSize(canvas_, image_, true);
     EXPECT_TRUE(size[0] == 0 && size[1] == 0);
 
@@ -496,8 +496,8 @@ HWTEST_F(GEHpsEffectFilterTest, IsMaskParameterChanged_003, TestSize.Level0)
     auto isChanged = HpsEffectFilter::IsMaskParameterChanged(radialGradientMaskPara1, radialGradientMaskPara1);
     EXPECT_FALSE(isChanged);
 
-    auto radialGradientMaskPara2 = std::make_shared<Drawing::HpsRadialGradientMaskParameter>(
-        0.0f, 0.0f, 0.0f, 1.0f, color, pos);
+    auto radialGradientMaskPara2 =
+        std::make_shared<Drawing::HpsRadialGradientMaskParameter>(0.0f, 0.0f, 0.0f, 1.0f, color, pos);
 
     isChanged = HpsEffectFilter::IsMaskParameterChanged(radialGradientMaskPara1, radialGradientMaskPara2);
     EXPECT_TRUE(isChanged);

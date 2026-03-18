@@ -40,7 +40,7 @@ const std::map<Drawing::GEVisualEffectImpl::FilterType, const char *> g_hpsSuppo
     {Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT, "hps_edgelight_effect"}
 };
 
-const std::unordered_set<Drawing::HpsEffect> g_needDownScaleEffect {
+const std::unordered_set<Drawing::HpsEffect> g_needDownscaleEffect {
     Drawing::HpsEffect::BLUR,
     Drawing::HpsEffect::MESA
 };
@@ -56,7 +56,7 @@ static bool GetHpsEffectEnabled()
 #ifdef GE_OHOS
     // Determine whether the hps effect render should be enabled.
     static bool enabled =
-        std::atoi((system::GetParameter("persist.sys.graphic.hpsEffectEnabled", "0")).c_str()) != 0;
+        std::atoi((system::GetParameter("persist.sys.graphic.hpsEffectEnabled", "1")).c_str()) != 0;
     return enabled;
 #else
     return false;
@@ -125,7 +125,7 @@ void ApplyMaskColorFilter(Drawing::Canvas& offscreenCanvas, uint32_t maskColor)
 static thread_local uint32_t g_lastEdgeLightImageID = 0;
 static thread_local std::shared_ptr<Drawing::HpsEdgeLightParameter> g_lastEdgeLightParameter = nullptr;
 
-// Edge light update type enum
+// EdgeLight updateType enum, related to parameters change
 enum class EdgeLightUpdateType : uint32_t {
     IMAGE = 0x1,
     ALPHA = 0x2,
@@ -134,20 +134,21 @@ enum class EdgeLightUpdateType : uint32_t {
     MASK = 0x10,
 };
 
-// Get EdgeLight updatedType num for hps cache usage
-uint32_t GetUpdatedTypeForEdgeLight(const std::shared_ptr<Drawing::HpsEdgeLightParameter>& paraLeft,
-    const std::shared_ptr<Drawing::HpsEdgeLightParameter>& paraRight, uint32_t imgLeft, uint32_t imgRight)
+// Call this function to compare EdgeLight parameters and calc updatedType for hps cache usage
+// If edge light parameters changed, corresponding bit of updatedType set to 0. If not, set to 1
+uint32_t GetUpdatedTypeForEdgeLight(const std::shared_ptr<Drawing::HpsEdgeLightParameter>& paraL,
+    const std::shared_ptr<Drawing::HpsEdgeLightParameter>& paraR, uint32_t imgL, uint32_t imgR)
 {
-    uint32_t type = 0;
-    type |= imgLeft == imgRight ? static_cast<uint32_t>(EdgeLightUpdateType::IMAGE) : 0;
-    type |= GE_EQ(paraLeft->alpha, paraRight->alpha) ? static_cast<uint32_t>(EdgeLightUpdateType::ALPHA) : 0;
-    type |= (GE_EQ(paraLeft->edgeSobelParams.edgeThreshold, paraRight->edgeSobelParams.edgeThreshold) &&
-             GE_EQ(paraLeft->edgeSobelParams.edgeIntensity, paraRight->edgeSobelParams.edgeIntensity) &&
-             GE_EQ(paraLeft->edgeSobelParams.edgeSoftThreshold, paraRight->edgeSobelParams.edgeSoftThreshold) &&
-             paraLeft->edgeSobelParams.edgeDetectColor == paraRight->edgeSobelParams.edgeDetectColor)
+    uint32_t type = 0;  // Init updateType, set state to all options changed
+    type |= imgL == imgR ? static_cast<uint32_t>(EdgeLightUpdateType::IMAGE) : 0;
+    type |= GE_EQ(paraL->alpha, paraR->alpha) ? static_cast<uint32_t>(EdgeLightUpdateType::ALPHA) : 0;
+    type |= (GE_EQ(paraL->edgeSobelParams.edgeThreshold, paraR->edgeSobelParams.edgeThreshold) &&
+             GE_EQ(paraL->edgeSobelParams.edgeIntensity, paraR->edgeSobelParams.edgeIntensity) &&
+             GE_EQ(paraL->edgeSobelParams.edgeSoftThreshold, paraR->edgeSobelParams.edgeSoftThreshold) &&
+             paraL->edgeSobelParams.edgeDetectColor == paraR->edgeSobelParams.edgeDetectColor)
         ? static_cast<uint32_t>(EdgeLightUpdateType::EDGE_SOBEL) : 0;
-    type |= paraLeft->bloom == paraRight->bloom ? static_cast<uint32_t>(EdgeLightUpdateType::GAUSS_PYRAMID) : 0;
-    type |= HpsEffectFilter::IsMaskParameterChanged(paraLeft->mask, paraRight->mask)
+    type |= paraL->bloom == paraR->bloom ? static_cast<uint32_t>(EdgeLightUpdateType::GAUSS_PYRAMID) : 0;
+    type |= HpsEffectFilter::IsMaskParameterChanged(paraL->mask, paraR->mask)
         ? static_cast<uint32_t>(EdgeLightUpdateType::MASK) : 0;
     return type;
 }
@@ -183,7 +184,7 @@ bool IsGradientSupport(
     return linearGradientBlurParams->isRadiusGradient;
 }
 
-bool IsEffectMaskSupport(
+bool IsEffectMaskSupported(
     Drawing::GEVisualEffectImpl::FilterType type, const std::shared_ptr<Drawing::GEShaderMask>& mask)
 {
     if (mask == nullptr) {
@@ -218,7 +219,7 @@ bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualE
             }
             case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
                 const auto& edgeLightParams = ve->GetEdgeLightParams();
-                return edgeLightParams && edgeLightParams->mask && IsEffectMaskSupport(veType, edgeLightParams->mask);
+                return edgeLightParams && edgeLightParams->mask && IsEffectMaskSupported(veType, edgeLightParams->mask);
             }
             default:
                 return true;
@@ -239,6 +240,7 @@ bool HpsEffectFilter::IsFilterSupported() const
         if (strcmp(GEExtension, typeIt->second) != 0) {
             continue;
         }
+        return true;
     }
     return false;
 }
@@ -247,60 +249,59 @@ void HpsEffectFilter::GenerateBlur(const Drawing::GEKawaseBlurShaderFilterParams
     const Drawing::Rect& src, const Drawing::Rect& dst, const std::shared_ptr<Drawing::Image>& image,
     const Drawing::CanvasInfo& canvasInfo)
 {
-    auto KawaseParams = GenerateKawaseBlurEffect(params, src, dst, 1.0f, 1.0f);
-    if (KawaseParams) {
-        KawaseParams->transformMatrix = GetTransformMatrix(canvasInfo, image);
-        hpsEffect_.push_back(KawaseParams);  // Add hpsEffectParameter to container
+    auto kawaseParams = GenerateKawaseBlurEffect(params, src, dst, 1.0f, 1.0f);
+    if (kawaseParams) {
+        kawaseParams->transformMatrix = GetTransformMatrix(canvasInfo, image);
+        hpsEffect_.push_back(kawaseParams);  // Add hpsEffectParameter to container
     }
 }
 
-std::shared_ptr<Drawing::Image> HpsEffectFilter::GetBlurForFrostedGlassBlur(Drawing::Canvas& canvas,
+std::shared_ptr<Drawing::Image> HpsEffectFilter::GetBlurImageForFrostedGlass(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image>& image)
 {
     if (image == nullptr || hpsEffect_.empty()) {
-        LOGD("HpsEffectFilter::GetBlurForFrostedGlassBlur image is null or hpsEffect_ is empty");
+        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass image is null or hpsEffect_ is empty");
         return nullptr;
     }
-
     auto imageInfo = image->GetImageInfo();
-    if (imageInfo.GetWidth() <= 0 || imageInfo.GetHeight() <= 0) {
-        LOGE("HpsEffectFilter::GetBlurForFrostedGlassBlur image size is zero");
-        return nullptr;
-    }
-    needClampFilter_ = ((imageInfo.GetColorType() == Drawing::ColorType::COLORTYPE_RGBA_F16) ? false : true);
-    bool isDownScaled = IsNeedDownscale();
-    auto dimension = GetSurfaceSize(canvas, image, isDownScaled);
-    if (dimension[0] == 0 || dimension[1] == 0) {
-        LOGE("HpsEffectFilter::GetBlurForFrostedGlassBlur dimension equals zero");
-        return nullptr;
-    }
     auto surface = canvas.GetSurface();
-    if (surface == nullptr) {
+    if (imageInfo.GetWidth() <= 0 || imageInfo.GetHeight() <= 0 || surface == nullptr) {
+        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass image size is zero or surface is nullptr");
+        return nullptr;
+    }
+    std::shared_ptr<const Drawing::HpsBlurParameter> blurParams = nullptr;
+    for (const auto& effectInfo : hpsEffect_) {
+        if (effectInfo->GetEffectType() == Drawing::HpsEffect::BLUR) {
+            auto kawaseParam = std::static_pointer_cast<Drawing::HpsBlurEffectParameter>(effectInfo);
+            blurParams = std::make_shared<const Drawing::HpsBlurParameter>(kawaseParam->src,
+                kawaseParam->dst, kawaseParam->sigma, 1.0f, 1.0f);
+            break;
+        }
+    }
+    if (blurParams == nullptr) {
+        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass blurParams is nullptr");
+        return nullptr;
+    }
+    std::array<int, 2> dimension = canvas.CalcHpsBluredImageDimension(*blurParams); // There are 2 variables
+    auto dst = blurParams->dst;
+    if (dimension[0] <= 0 || dimension[1] <= 0 || dimension[0] >= static_cast<int>(MAX_SURFACE_SIZE)
+        || dimension[1] >= static_cast<int>(MAX_SURFACE_SIZE)) {
         return nullptr;
     }
     std::shared_ptr<Drawing::Surface> offscreenSurface = surface->MakeSurface(dimension[0], dimension[1]);
     if (offscreenSurface == nullptr) {
+        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass offscreenSurface is nullptr");
         return nullptr;
     }
     std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
-    if (offscreenCanvas == nullptr) {
-        return nullptr;
-    }
-    if (isDownScaled) {
-        Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
-        for (auto& effectInfo : hpsEffect_) {
-            effectInfo->dst = dimensionRect;
-        }
-    } else {
-        for (auto& effectInfo : hpsEffect_) {
-            effectInfo->dst = effectInfo->src;
-        }
+    Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
+    for (auto& effectInfo : hpsEffect_) {
+        effectInfo->dst = dimensionRect;
     }
     if (!offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) {
-        LOGD("HpsEffectFilter::GetBlurForFrostedGlassBlur DrawImageEffectHPS fail");
+        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass offscreenCanvas->DrawImageEffectHPS error");
         return nullptr;
     }
-
     auto imageCache = offscreenSurface->GetImageSnapshot();
     return imageCache;
 }
@@ -507,7 +508,7 @@ std::shared_ptr<Drawing::HpsEffectParameter> HpsEffectFilter::GenerateEdgeLightE
     const Drawing::GEEdgeLightShaderFilterParams& params, const Drawing::Rect& src, const Drawing::Rect& dst,
     const std::shared_ptr<Drawing::Image>& image, Drawing::CanvasInfo info)
 {
-    float alpha = params.alpha;
+    float alpha = std::clamp(params.alpha, 0.0f, 1.0f);
     bool bloom = params.bloom;
     bool useRawColor = params.useRawColor;
     std::vector<float> color = {params.color[0], params.color[1], params.color[2], params.color[3]};
@@ -549,7 +550,7 @@ std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GenerateMaskParamete
 std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GeneratePixelMapMaskParameter(
     const Drawing::GEPixelMapMaskParams& params)
 {
-    /* Compare to standard pixel map mask, HSP use difference transform matrix */
+    /* Compare to standard pixel map mask, HPS use difference transform matrix */
     Drawing::Matrix matrix;
     auto sx = params.src.GetWidth() / params.dst.GetWidth();
     auto sy = params.src.GetHeight() / params.dst.GetHeight();
@@ -586,7 +587,7 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
                 half4 finalColor = blurredInput.eval(xy);
                 float noise = mix(-noiseGranularity, noiseGranularity, random(xy));
                 finalColor.rgb += noise;
-                finalColor.rgb = clamp(finalColor.rgb, vec3(0.0), vec3(1.0));
+                finalColor.rgb = clamp(finalColor.rgb, half3(0.0), half3(1.0));
                 return finalColor;
             }
             )");
@@ -686,14 +687,14 @@ bool HpsEffectFilter::DrawImageWithHpsUpscale(Drawing::Canvas& canvas,
     return true;
 }
 
-std::array<int, ARRAY_SIZE_DIMENSION> HpsEffectFilter::GetSurfaceSize(
-    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, bool isDownScaled)
+std::array<int, HpsEffectFilter::ARRAY_SIZE_DIMENSION> HpsEffectFilter::GetSurfaceSize(
+    Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image, bool isDownscaled)
 {
     if (!image) {
         LOGE("HpsEffectFilter::GetSurfaceSize image is null");
         return {0, 0};
     }
-    if (!isDownScaled) {
+    if (!isDownscaled) {
         return {static_cast<int>(image->GetWidth()), static_cast<int>(image->GetHeight())};
     }
     std::shared_ptr<const Drawing::HpsBlurParameter> blurParams = nullptr;
@@ -720,10 +721,6 @@ std::array<int, ARRAY_SIZE_DIMENSION> HpsEffectFilter::GetSurfaceSize(
         dimension[1] >= static_cast<int>(MAX_SURFACE_SIZE)) {
         LOGD("HpsEffectFilter::GetSurfaceSize CalcHpsBluredImageDimension error");
         return {0, 0};
-    }
-    Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
-    for (auto& effectInfo : hpsEffect_) {
-        effectInfo->dst = dimensionRect;
     }
     return dimension;
 }
@@ -761,14 +758,14 @@ bool HpsEffectFilter::IsMaskParameterChanged(
 
 bool HpsEffectFilter::IsNeedDownscale()
 {
-    bool isDownScaled = false;
+    bool isDownscaled = false;
     for (const auto& effectInfo : hpsEffect_) {
-        if (g_needDownScaleEffect.find(effectInfo->GetEffectType()) != g_needDownScaleEffect.end()) {
-            isDownScaled = true;
+        if (g_needDownscaleEffect.find(effectInfo->GetEffectType()) != g_needDownscaleEffect.end()) {
+            isDownscaled = true;
             break;
         }
     }
-    return isDownScaled;
+    return isDownscaled;
 }
 
 bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
@@ -786,8 +783,8 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
         return false;
     }
     needClampFilter_ = ((imageInfo.GetColorType() == Drawing::ColorType::COLORTYPE_RGBA_F16) ? false : true);
-    bool isDownScaled = IsNeedDownscale();
-    auto dimension = GetSurfaceSize(canvas, image, isDownScaled);
+    bool isDownscaled = IsNeedDownscale();
+    auto dimension = GetSurfaceSize(canvas, image, isDownscaled);
     if (dimension[0] == 0 || dimension[1] == 0) {
         LOGE("HpsEffectFilter::ApplyHpsEffect dimension equals zero");
         return false;
@@ -798,7 +795,8 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
     if (offscreenSurface == nullptr) { return false; }
     std::shared_ptr<Drawing::Canvas> offscreenCanvas = offscreenSurface->GetCanvas();
     if (offscreenCanvas == nullptr) { return false; }
-    if (isDownScaled) {
+
+    if (isDownscaled) {
         Drawing::Rect dimensionRect = {0, 0, dimension[0], dimension[1]};
         for (auto& effectInfo : hpsEffect_) {
             effectInfo->dst = dimensionRect;
@@ -813,13 +811,14 @@ bool HpsEffectFilter::ApplyHpsEffect(Drawing::Canvas& canvas, const std::shared_
         LOGD("HpsEffectFilter::ApplyHpsEffect DrawImageEffectHPS fail");
         return false;
     }
-    if (isDownScaled) {
+    if (isDownscaled) {
         ApplyMaskColorFilter(*offscreenCanvas, hpsContext.maskColor);
     }
 
     auto imageCache = offscreenSurface->GetImageSnapshot();
-    if (isDownScaled) {
-        return DrawImageWithHpsUpscale(canvas, imageCache, outImage, hpsContext); // downscale need upscale or drawback
+    if (isDownscaled) {
+        // downscale need upscale or drawback
+        return DrawImageWithHpsUpscale(canvas, imageCache, outImage, hpsContext);
     }
     outImage = imageCache;
     return false;
