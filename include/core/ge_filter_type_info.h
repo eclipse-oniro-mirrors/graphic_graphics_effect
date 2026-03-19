@@ -63,4 +63,4 @@ struct GEFilterTypeInfoStaticCheck {
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
-#endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_H
+#endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_H
