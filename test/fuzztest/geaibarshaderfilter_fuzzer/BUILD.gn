@@ -41,6 +41,7 @@ ohos_fuzztest("GEAIBarShaderFilterFuzzTest") {
   ]
 
   external_deps = [
+    "bounds_checking_function:libsec_shared",
     "graphic_2d:2d_graphics",
     "graphics_effect:graphics_effect_core",
   ]
