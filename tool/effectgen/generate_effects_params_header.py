@@ -2,7 +2,7 @@
 """
 Generate ge_effects_params.h header file.
 
-This script generates a header file that includes all .def files from include/params/.
+This script generates a header file that includes all .params files from effect subdirectories.
 The file is designed to be manually editable if needed.
 """
 
@@ -28,10 +28,11 @@ COPYRIGHT_HEADER = """/*
 """
 
 
-def get_def_files(params_dir: Path) -> List[Path]:
-    """Get all .def files sorted alphabetically."""
-    def_files = sorted(params_dir.glob("*.def"))
-    return def_files
+def get_params_files(params_dirs: List[Path]) -> List[Path]:
+    params_files = []
+    for params_dir in params_dirs:
+        params_files.extend(list(params_dir.glob("*.params")))
+    return sorted(params_files, key=lambda p: p.name)
 
 
 def generate_header() -> str:
@@ -68,15 +69,19 @@ def generate_header() -> str:
     output.append("")
     output.append("// Parameter structure definitions")
 
-    # Include all .def files
     script_dir = Path(__file__).parent
-    root_dir = script_dir.parent
-    params_dir = root_dir / "include" / "params"
+    root_dir = script_dir.parent.parent
+    params_dirs = [
+        root_dir / "include" / "effect" / "filter",
+        root_dir / "include" / "effect" / "mask",
+        root_dir / "include" / "effect" / "shader",
+        root_dir / "include" / "effect" / "shape",
+    ]
 
-    def_files = get_def_files(params_dir)
-    for def_file in def_files:
-        # Use params/ prefix (not include/params/)
-        output.append(f"#include \"params/{def_file.name}\"")
+    params_files = get_params_files(params_dirs)
+    for params_file in params_files:
+        rel_path = params_file.relative_to(root_dir / "include")
+        output.append(f"#include \"{rel_path}\"")
 
     output.append("")
     output.append("} // namespace Drawing")
@@ -89,38 +94,39 @@ def generate_header() -> str:
 
 
 def main():
-    """Main generation function."""
     script_dir = Path(__file__).parent
-    root_dir = script_dir.parent
+    root_dir = script_dir.parent.parent
     output_file = root_dir / "include" / "ge_effects_params.h"
 
-    # Check if params directory exists
-    params_dir = root_dir / "include" / "params"
-    if not params_dir.exists():
-        print(f"Error: {params_dir} does not exist")
+    params_dirs = [
+        root_dir / "include" / "effect" / "filter",
+        root_dir / "include" / "effect" / "mask",
+        root_dir / "include" / "effect" / "shader",
+        root_dir / "include" / "effect" / "shape",
+    ]
+
+    existing_dirs = [d for d in params_dirs if d.exists()]
+    if not existing_dirs:
+        print(f"Error: No params directories found in {params_dirs}")
         return 1
 
-    # Count .def files
-    def_files = get_def_files(params_dir)
-    if not def_files:
-        print(f"No .def files found in {params_dir}")
+    params_files = get_params_files(params_dirs)
+    if not params_files:
+        print(f"No .params files found in {params_dirs}")
         return 1
 
-    print(f"Found {len(def_files)} .def files")
+    print(f"Found {len(params_files)} .params files")
 
-    # Generate header file
     print(f"Generating {output_file.name}...")
     header_content = generate_header()
 
-    # Ensure output directory exists
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Write to file
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(header_content)
 
     print(f"Generated {output_file}")
-    print(f"  - {len(def_files)} parameter definition files included")
+    print(f"  - {len(params_files)} parameter definition files included")
     return 0
 
 

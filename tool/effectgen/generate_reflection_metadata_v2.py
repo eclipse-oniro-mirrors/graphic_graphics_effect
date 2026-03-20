@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate C++ static reflection metadata from .def files (Improved Version).
+Generate C++ static reflection metadata from .params files (Improved Version).
 
 This script provides a best-in-effort C++ parser with:
 - Proper tokenization (handling comments, strings, char literals, etc.)
@@ -540,20 +540,21 @@ def generate_header(structs: List[StructInfo]) -> str:
 def main():
     """Main generation function."""
     parser = argparse.ArgumentParser(
-        description='Generate C++ static reflection metadata from .def files',
+        description='Generate C++ static reflection metadata from .params files',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python generate_reflection_metadata_v2.py
-  python generate_reflection_metadata_v2.py --params-dir custom/params --output-file custom/reflection.h
+  python generate_reflection_metadata_v2.py --params-dirs custom/filter custom/maz --output-file custom/reflection.h
         """
     )
 
     parser.add_argument(
-        '--params-dir',
+        '--params-dirs',
         type=str,
+        nargs='+',
         default=None,
-        help='Directory containing .def files (default: include/effect/params)'
+        help='Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
     )
 
     parser.add_argument(
@@ -567,29 +568,36 @@ Examples:
 
     root_dir = Path(__file__).parent.parent.parent
 
-    # Use command line args or defaults
-    params_dir = Path(args.params_dir) if args.params_dir else root_dir / "include" / "effect" / "params"
+    if args.params_dirs:
+        params_dirs = [Path(d) for d in args.params_dirs]
+    else:
+        params_dirs = [
+            root_dir / "include" / "effect" / "filter",
+            root_dir / "include" / "effect" / "mask",
+            root_dir / "include" / "effect" / "shader",
+            root_dir / "include" / "effect" / "shape",
+        ]
     output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "effect" / "ge_params_reflection_v2.h"
 
-    # Find all .def files
-    def_files = list(params_dir.glob("*.def"))
-    def_files.sort()
+    params_files = []
+    for params_dir in params_dirs:
+        params_files.extend(list(params_dir.glob("*.params")))
+    params_files.sort(key=lambda p: p.name)
 
-    if not def_files:
-        print(f"No .def files found in {params_dir}", file=sys.stderr)
+    if not params_files:
+        print(f"No .params files found in {params_dirs}", file=sys.stderr)
         return 1
 
-    print(f"Found {len(def_files)} .def files in {params_dir}")
+    print(f"Found {len(params_files)} .params files in {params_dirs}")
 
-    # Parse all .def files
     structs = []
-    for def_file in def_files:
-        struct_info = parse_def_file(def_file)
+    for params_file in params_files:
+        struct_info = parse_def_file(params_file)
         if struct_info:
             structs.append(struct_info)
             print(f"  Parsed: {struct_info.name}")
         else:
-            print(f"  Warning: Failed to parse {def_file.name}", file=sys.stderr)
+            print(f"  Warning: Failed to parse {params_file.name}", file=sys.stderr)
 
     if not structs:
         print("No valid structs found!", file=sys.stderr)
