@@ -13,10 +13,13 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=COLOR_GRADIENT, name="ColorGradient")]] GEColorGradientShaderFilterParams {
+    [[ge::prop("ColorGradient_Colors")]]
     std::vector<float> colors;
+    [[ge::prop("ColorGradient_Positions")]]
     std::vector<float> positions;
+    [[ge::prop("ColorGradient_Strengths")]]
     std::vector<float> strengths;
+    [[ge::prop("ColorGradient_Mask")]]
     std::shared_ptr<GEShaderMask> mask = nullptr;
 };

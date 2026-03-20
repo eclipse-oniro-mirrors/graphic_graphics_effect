@@ -13,7 +13,11 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=AURORA_NOISE, name="AuroraNoise")]] GEAuroraNoiseShaderParams {
+    [[ge::prop("AuroraNoise_Noise")]]
     float noise_ = 0.f;
+    [[ge::prop("AuroraNoise_FreqX")]]
+    float freqX_ = 1.0f;
+    [[ge::prop("AuroraNoise_FreqY")]]
+    float freqY_ = 1.0f;
 };

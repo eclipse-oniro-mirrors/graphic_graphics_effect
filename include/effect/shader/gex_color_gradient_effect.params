@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 constexpr int COLOR_GRADIENT_ARRAY_SIZE = 12;
 
 struct [[ge::params(type=COLOR_GRADIENT_EFFECT, name="ColorGradientEffect")]] GEXColorGradientEffectParams {
@@ -25,9 +24,11 @@ struct [[ge::params(type=COLOR_GRADIENT_EFFECT, name="ColorGradientEffect")]] GE
     std::array<float, COLOR_GRADIENT_ARRAY_SIZE> strengths_;
     [[ge::prop("ColorGradientEffect_ColorNumber")]]
     float colorNum_ = 0.0f;
+    [[ge::prop("ColorGradientEffect_Blend")]]
     float blend_ = 0.0f;
     [[ge::prop("ColorGradientEffect_BlendK")]]
     float blendk_ = 0.0f;
     std::shared_ptr<GEShaderMask> mask_;
+    [[ge::prop("ColorGradientEffect_Brightness")]]
     float brightness_ = 0.0f;
 };

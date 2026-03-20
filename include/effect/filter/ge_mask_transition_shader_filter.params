@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=MASK_TRANSITION, name="MaskTransition")]] GEMaskTransitionShaderFilterParams {
+    [[ge::prop("MaskTransition_Mask")]]
     std::shared_ptr<GEShaderMask> mask = nullptr;
+    [[ge::prop("MaskTransition_Factor")]]
     float factor = 1.0f;
+    [[ge::prop("MaskTransition_Inverse")]]
     bool inverse = false;
 };

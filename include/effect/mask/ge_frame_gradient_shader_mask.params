@@ -13,15 +13,12 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=EDGE_LIGHT, name="EdgeLight")]] GEEdgeLightShaderFilterParams {
-    [[ge::prop("EdgeLight_Alpha")]]
-    float alpha = 1.0f;
-    [[ge::prop("EdgeLight_Bloom")]]
-    bool bloom = true;
-    [[ge::prop("EdgeLight_Color")]]
-    Vector4f color = { {0.2f, 0.7f, 0.1f, 0.0f} };
-    [[ge::prop("EdgeLight_Mask")]]
-    std::shared_ptr<GEShaderMask> mask = nullptr;
-    [[ge::prop("EdgeLight_UseRawColor")]]
-    bool useRawColor = false;
+struct [[ge::params(type=FRAME_GRADIENT_MASK, name="FrameGradientMask")]] GEFrameGradientMaskParams {
+    Vector4f innerBezier;
+    Vector4f outerBezier;
+    float cornerRadius = 0.0f;
+    float innerFrameWidth = 0.0f;
+    float outerFrameWidth = 0.0f;
+    std::pair<float, float> rectWH;
+    std::pair<float, float> rectPos;
 };

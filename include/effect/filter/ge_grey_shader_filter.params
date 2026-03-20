@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=GREY, name="GREY")]] GEGreyShaderFilterParams {
     [[ge::prop("GREY_COEF_1")]]
-    float greyCoef1;
+    float greyCoef1 = 0.0f;
     [[ge::prop("GREY_COEF_2")]]
-    float greyCoef2;
+    float greyCoef2 = 0.0f;
 };

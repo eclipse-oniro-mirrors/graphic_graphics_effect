@@ -15,8 +15,10 @@
 
 
 struct [[ge::params(type=FROSTED_GLASS_BLUR, name="FrostedGlassBlur")]] GEFrostedGlassBlurShaderFilterParams {
+    [[ge::prop("FrostedGlassBlur_Radius")]]
     float radius = 0.0f; // blurParam[0]: blur radius
-    [[ge::prop("FrostedGlassBlur_RadiuslScale")]]
-    float radiusScale = 4.0f; // blurParam[1]: scale ratio for the blur radius of baseblur and edgeblur
+    [[ge::prop("FrostedGlassBlur_RadiusScaleK")]]
+    float radiusScale = 4.0f; // blurParam[1]: scale ratio for blur radius of baseblur and edgeblur
+    [[ge::prop("FrostedGlassBlur_RefractOutPx")]]
     float refractOutPx = 0.8f; // envlightParam[0]: envlight refraction outward sampling degree
 };

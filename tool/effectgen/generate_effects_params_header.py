@@ -61,7 +61,7 @@ def generate_header() -> str:
     output.append("// GE types")
     output.append("#include \"ge_filter_type.h\"")
     output.append("#include \"ge_shader_mask.h\"")
-    output.append("#include \"sdf/ge_sdf_shader_shape.h\"")
+    output.append("#include \"ge_sdf_shader_shape.h\"")
     output.append("")
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
@@ -96,7 +96,7 @@ def generate_header() -> str:
 def main():
     script_dir = Path(__file__).parent
     root_dir = script_dir.parent.parent
-    output_file = root_dir / "include" / "ge_effects_params.h"
+    output_file = root_dir / "include" / "effect" / "ge_effects_params.h"
 
     params_dirs = [
         root_dir / "include" / "effect" / "filter",

@@ -13,21 +13,26 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=SDF_EDGE_LIGHT, name="SDFEdgeLight")]] GESDFEdgeLightFilterParams {
     [[ge::prop("SDFEdgeLight_SpreadFactor")]]
     float sdfSpreadFactor = 64.0f;
+    [[ge::prop("SDFEdgeLight_BloomIntensityCutoff")]]
     float bloomIntensityCutoff = 0.1f;
-    [[ge::prop("SDFEdgeLight_LightMaxIntensity")]]
-    float maxIntensity = 1.0f;
+    [[ge::prop("SDFEdgeLight_MaxBloomIntensity")]]
     float maxBloomIntensity = 1.0f;
+    [[ge::prop("SDFEdgeLight_BloomFalloffPow")]]
     float bloomFalloffPow = 2.0f;
+    [[ge::prop("SDFEdgeLight_MinBorderWidth")]]
     float minBorderWidth = 2.0f;
+    [[ge::prop("SDFEdgeLight_MaxBorderWidth")]]
     float maxBorderWidth = 5.0f;
+    [[ge::prop("SDFEdgeLight_InnerBorderBloomWidth")]]
     float innerBorderBloomWidth = 30.0f;
+    [[ge::prop("SDFEdgeLight_OuterBorderBloomWidth")]]
     float outerBorderBloomWidth = 30.0f;
     [[ge::prop("SDFEdgeLight_SDFImage")]]
     std::shared_ptr<Drawing::Image> sdfImage;
+    [[ge::prop("SDFEdgeLight_LightMask")]]
     std::shared_ptr<GEShaderMask> lightMask;
     [[ge::prop("SDFEdgeLight_SDFShape")]]
     std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;

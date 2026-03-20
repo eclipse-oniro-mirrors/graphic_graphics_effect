@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=CONTENT_LIGHT, name="ContentLight")]] GEContentLightFilterParams {
-    [[ge::prop("ContentLightPosition")]]
+    [[ge::prop("ContentLight_Position")]]
     Vector3f position = Vector3f(0.0f, 0.0f, 0.0f);
-    [[ge::prop("ContentLightColor")]]
+    [[ge::prop("ContentLight_Color")]]
     Vector4f color = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    [[ge::prop("ContentLightIntensity")]]
+    [[ge::prop("ContentLight_Intensity")]]
     float intensity = 0.0f;
-    [[ge::prop("ContentLightRotationAngle")]]
+    [[ge::prop("ContentLight_RotationAngle")]]
     Vector3f rotationAngle = Vector3f(0.0f, 0.0f, 0.0f);
 };

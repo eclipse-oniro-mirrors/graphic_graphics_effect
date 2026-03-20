@@ -13,14 +13,17 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=SOUND_WAVE, name="SoundWave")]] GESoundWaveFilterParams {
     // sound wave
-    Drawing::Color4f colorA = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorB = {1.0, 1.0, 1.0, 1.0};
-    Drawing::Color4f colorC = {1.0, 1.0, 1.0, 1.0};
+    [[ge::prop("SoundWave_ColorA")]]
+    Drawing::Color4f colorA = { {1.0, 1.0, 1.0, 1.0} };
+    [[ge::prop("SoundWave_ColorB")]]
+    Drawing::Color4f colorB = { {1.0, 1.0, 1.0, 1.0} };
+    [[ge::prop("SoundWave_ColorC")]]
+    Drawing::Color4f colorC = { {1.0, 1.0, 1.0, 1.0} };
+    [[ge::prop("SoundWave_ColorProgress")]]
     float colorProgress = 0.0f;
-    [[ge::prop("SoundWave_Intersity")]]
+    [[ge::prop("SoundWave_Intensity")]]
     float soundIntensity = 0.0f;
 
     // shock wave

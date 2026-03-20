@@ -13,20 +13,31 @@
  * limitations under the License.
  */
 
-
 constexpr int ARRAY_SIZE_FOUR = 4;
 
 struct [[ge::params(type=CIRCLE_FLOWLIGHT, name="CircleFlowlight")]] GECircleFlowlightEffectParams {
-    [[ge::prop(name="CircleFlowlight_Color", array_accessor_length=4)]]
+    [[ge::prop(name="CircleFlowlight_Color0", array_accessor_length=4)]]
+    [[ge::prop(name="CircleFlowlight_Color1", array_accessor_length=4)]]
+    [[ge::prop(name="CircleFlowlight_Color2", array_accessor_length=4)]]
+    [[ge::prop(name="CircleFlowlight_Color3", array_accessor_length=4)]]
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    [[ge::prop("CircleFlowlight_RotationFrequency")]]
     Vector4f rotationFrequency;
+    [[ge::prop("CircleFlowlight_RotationAmplitude")]]
     Vector4f rotationAmplitude;
+    [[ge::prop("CircleFlowlight_RotationSeed")]]
     Vector4f rotationSeed;
+    [[ge::prop("CircleFlowlight_GradientX")]]
     Vector4f gradientX;
+    [[ge::prop("CircleFlowlight_GradientY")]]
     Vector4f gradientY;
+    [[ge::prop("CircleFlowlight_Progress")]]
     float progress = 0.0f;
+    [[ge::prop("CircleFlowlight_Strength")]]
     Vector4f strength = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    [[ge::prop("CircleFlowlight_DistortStrength")]]
     float distortStrength = 4.0f;
+    [[ge::prop("CircleFlowlight_BlendGradient")]]
     float blendGradient = 1.0f;
     std::shared_ptr<GEShaderMask> mask;
 };
