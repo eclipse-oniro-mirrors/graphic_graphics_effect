@@ -26,6 +26,7 @@ enum class GESDFShapeType : uint8_t {
     EMPTY = 0,
     PIXELMAP,
     RRECT,
+    TRIANGLE,
     TRANSFORM,
     UNION_OP,
     MAX = UNION_OP,

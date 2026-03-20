@@ -438,6 +438,16 @@ public:
         sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
     }
 
+    const std::shared_ptr<GESDFTriangleShapeParams>& GetSDFTriangleShapeParams() const
+    {
+        return sdfTriangleShapeParams_;
+    }
+
+    void MakeSDFTriangleShapeParams()
+    {
+        sdfTriangleShapeParams_ = std::make_shared<GESDFTriangleShapeParams>();
+    }
+
     const std::shared_ptr<GESDFPixelmapShapeParams>& GetSDFPixelmapShapeParams() const
     {
         return sdfPixelmapShapeParams_;
@@ -849,6 +859,7 @@ private:
     std::shared_ptr<GESDFColorShaderParams> sdfColorShaderParams_ = nullptr;
     std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
     std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
+    std::shared_ptr<GESDFTriangleShapeParams> sdfTriangleShapeParams_ = nullptr;
     std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;

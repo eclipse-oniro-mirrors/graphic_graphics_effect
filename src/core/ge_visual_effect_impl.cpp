@@ -443,6 +443,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFRRectShapeParams();
         }
     },
+    { GE_SHAPE_SDF_TRIANGLE_SHAPE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_TRIANGLE_SHAPE);
+            impl->MakeSDFTriangleShapeParams();
+        }
+    },
     { GE_SHAPE_SDF_PIXELMAP_SHAPE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE);
@@ -945,6 +951,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetSDFEdgeLightParams(tag, param);
             break;
         }
+        case FilterType::SDF_TRIANGLE_SHAPE: {
+            if (sdfTriangleShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_RADIUS) {
+                sdfTriangleShapeParams_->radius = param;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1209,8 +1224,17 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
-        case FilterType::NOISY_FRAME_GRADIENT_MASK: {
-            ApplyTagParams(tag, param, noisyFrameGradientMaskParams_, noisyFrameGradientMaskTagMap_);
+        case FilterType::SDF_TRIANGLE_SHAPE: {
+            if (sdfTriangleShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0) {
+                sdfTriangleShapeParams_->vertex0 = Vector2f(param.first, param.second);
+            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX1) {
+                sdfTriangleShapeParams_->vertex1 = Vector2f(param.first, param.second);
+            } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2) {
+                sdfTriangleShapeParams_->vertex2 = Vector2f(param.first, param.second);
+            }
             break;
         }
         default:

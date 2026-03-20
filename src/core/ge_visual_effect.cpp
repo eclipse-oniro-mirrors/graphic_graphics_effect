@@ -30,6 +30,7 @@
 #include "ge_sdf_empty_shader_shape.h"
 #include "ge_sdf_pixelmap_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_triangle_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
 
@@ -307,6 +308,13 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
                 return nullptr;
             }
             return GenerateExtShaderRRect(params);
+        }
+        case GEVisualEffectImpl::FilterType::SDF_TRIANGLE_SHAPE: {
+            auto params = impl->GetSDFTriangleShapeParams();
+            if (params == nullptr) {
+                return nullptr;
+            }
+            return std::make_shared<GESDFTriangleShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE: {
             auto params = impl->GetSDFPixelmapShapeParams();
