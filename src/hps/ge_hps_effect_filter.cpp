@@ -260,7 +260,6 @@ std::shared_ptr<Drawing::Image> HpsEffectFilter::GetBlurImageForFrostedGlass(Dra
     const std::shared_ptr<Drawing::Image>& image)
 {
     if (image == nullptr || hpsEffect_.empty()) {
-        LOGE("HpsEffectFilter::GetBlurImageForFrostedGlass image is null or hpsEffect_ is empty");
         return nullptr;
     }
     auto imageInfo = image->GetImageInfo();
