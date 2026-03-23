@@ -51,7 +51,7 @@ namespace Drawing {
 #include "effect/shader/ge_contour_diagonal_flow_light_shader.params"
 #include "effect/filter/ge_direction_light_shader_filter.params"
 #include "effect/filter/ge_dispersion_shader_filter.params"
-#include "effect/filter/ge_displacement_distortion_distort_shader_filter.params"
+#include "effect/filter/ge_displacement_distort_shader_filter.params"
 #include "effect/shader/ge_dot_matrix_shader.params"
 #include "effect/mask/ge_double_ripple_shader_mask.params"
 #include "effect/filter/ge_edge_light_shader_filter.params"

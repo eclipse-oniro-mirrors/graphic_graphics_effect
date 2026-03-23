@@ -13,11 +13,13 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassShaderFilterParams {
     Vector2f blurParams = Vector2f(48.0f, 4.0f);
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    [[ge::prop("FrostedGlass_Shape")]]
+    std::shared_ptr<GESDFShaderShape> sdfShape;
+    std::shared_ptr<GEShaderMask> waveDisturbance;
     // Background darken parameters
     Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
@@ -46,17 +48,6 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
     Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
-    Vector2f borderSize = Vector2f(200.0f, 100.0f);
-    float cornerRadius = 100.0f;
-    [[ge::prop("FrostedGlass_Shape")]]
-    std::shared_ptr<GESDFShaderShape> sdfShape;
-    bool baseVibrancyEnabled = true;
-    float baseMaterialType = 0.0f;
-    bool refractEnabled = true;
-    bool innerShadowEnabled = true;
-    bool envLightEnabled = true;
-    bool highLightEnabled = true;
-    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     // Dark mode parameters and scale
     Vector2f darkModeBlurParam = Vector2f(48.0f, 4.0f);
     Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
@@ -67,4 +58,7 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
     Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
     float darkScale = 0.0f;
+    bool baseVibrancyEnabled = true;
+    float baseMaterialType = 0.0f;
+    Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
