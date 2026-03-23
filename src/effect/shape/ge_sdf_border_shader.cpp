@@ -72,8 +72,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(co
     }
     auto shaderEffectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfEffect);
     shaderEffectBuilder->SetChild("sdfShape", sdfShader);
-    shaderEffectBuilder->SetUniform("u_borderColor", params_.border.color.GetRedF(), params_.border.color.GetGreenF(),
-        params_.border.color.GetBlueF());
+    shaderEffectBuilder->SetUniformVec4("u_borderColor", params_.border.color.GetRedF(),
+        params_.border.color.GetGreenF(), params_.border.color.GetBlueF(), params_.border.color.GetAlphaF());
     shaderEffectBuilder->SetUniform("u_borderWidth", std::max(params_.border.width, SDF_BORDER_MIN_THRESHOLD));
     auto outShader = shaderEffectBuilder->MakeShader(nullptr, false);
     if (outShader == nullptr) {

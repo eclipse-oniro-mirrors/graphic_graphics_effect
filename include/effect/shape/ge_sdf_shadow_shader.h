@@ -53,7 +53,7 @@ private:
     inline static const std::string shaderCode_ = R"(
         uniform shader sdfShape;
         uniform vec2 iResolution;
-        uniform vec3 shadowColor;
+        uniform vec4 shadowColor;
         uniform vec2 shadowOffset;
         uniform float shadowRadius;
         uniform float isFilled;
@@ -62,11 +62,11 @@ private:
         // vec2 coord - coordinates used to calculate SDFMap
         // vec2 shadowOffset - offset of the shadow
         // float d - current SDF shape distance
-        // vec3 shadowColor - color of the shadow
+        // vec4 shadowColor - color of the shadow
         // float shadowRadius - radius of the shadow
         // bool isFilled - should SDFBody be filled with shadow
         vec4 shadowEffect(vec2 coord, vec2 shadowOffset,
-            float d, vec3 shadowColor, float shadowRadius, bool isFilled)
+            float d, vec4 shadowColor, float shadowRadius, bool isFilled)
         {
             vec4 color = vec4(0.0);
             float alphaFilled = 1.0;
@@ -84,7 +84,7 @@ private:
             if (d <= shadowRadius)
             {
                 float alpha = 1.0 - smoothstep(-shadowRadius, shadowRadius, d);
-                color = vec4(shadowColor, 1.0) * alpha * alphaFilled;
+                color = shadowColor * alpha * alphaFilled;
             }
 
             return color;
