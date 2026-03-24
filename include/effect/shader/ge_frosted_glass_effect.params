@@ -47,6 +47,7 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     [[ge::prop("FrostedGlassEffect_Shape")]]
     std::shared_ptr<GESDFShaderShape> sdfShape;
+    [[ge::prop("FrostedGlassEffect_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;
     // Adapt effect component
     std::weak_ptr<Drawing::Image> blurImage; // frosted glass blur by ec

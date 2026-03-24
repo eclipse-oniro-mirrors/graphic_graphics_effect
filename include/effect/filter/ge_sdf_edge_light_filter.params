@@ -18,7 +18,7 @@ struct [[ge::params(type=SDF_EDGE_LIGHT, name="SDFEdgeLight")]] GESDFEdgeLightFi
     float sdfSpreadFactor = 64.0f;
     [[ge::prop("SDFEdgeLight_BloomIntensityCutoff")]]
     float bloomIntensityCutoff = 0.1f;
-    [[ge::prop("SDFEdgeLight_MaxIntensity")]]
+    [[ge::prop("SDFEdgeLight_LightMaxIntensity")]]
     float maxIntensity = 1.0f;
     [[ge::prop("SDFEdgeLight_MaxBloomIntensity")]]
     float maxBloomIntensity = 1.0f;

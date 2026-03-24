@@ -205,8 +205,8 @@ def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tup
     return '\n'.join(output), struct_tag_ranges
 
 
-def generate_struct_tag_ranges(structs: List[StructInfo], struct_tag_ranges: Dict[str, Tuple[int, int, str]]) -> str:
-    """Generate GEParamsMemberHelper static class with GetParamsMemberTagRange."""
+def generate_struct_tag_ranges_decl(structs: List[StructInfo]) -> str:
+    """Generate GEParamsMemberHelper class declaration."""
     output = []
 
     output.append("")
@@ -221,11 +221,35 @@ def generate_struct_tag_ranges(structs: List[StructInfo], struct_tag_ranges: Dic
     output.append("class GEParamsMemberHelper {")
     output.append("public:")
     output.append("    // Get tag range for a given FilterType (using switch for performance)")
-    output.append("    static std::optional<GEParamsMemberTagRange> GetParamsMemberTagRange(GEFilterType filterType)")
-    output.append("    {")
-    output.append("        switch (filterType) {")
+    output.append("    static std::optional<GEParamsMemberTagRange> GetParamsMemberTagRange(GEFilterType filterType);")
 
-    # Generate macro for reducing repetition
+    output.append("")
+    output.append("    // Set params member by tag (dispatch based on tag value)")
+    output.append("    template<typename ParamsType, typename T>")
+    output.append("    static void SetParamsMemberByTag(ParamsType& params, GEParamsMemberTag tag, const T& value)")
+    output.append("    {")
+    output.append("        switch (tag) {")
+
+    output.append(generate_set_member_cases(structs))
+
+    output.append("        default:")
+    output.append("            break;")
+    output.append("        }")
+    output.append("    }")
+    output.append("};")
+    output.append("")
+
+    return '\n'.join(output)
+
+
+def generate_struct_tag_ranges_impl(structs: List[StructInfo]) -> str:
+    """Generate GEParamsMemberHelper::GetParamsMemberTagRange() implementation."""
+    output = []
+
+    output.append("std::optional<GEParamsMemberTagRange> GEParamsMemberHelper::GetParamsMemberTagRange(GEFilterType filterType)")
+    output.append("{")
+    output.append("    switch (filterType) {")
+
     output.append("#define GE_GET_TAG_RANGE_CASE(EnumType, FirstTag, LastTag) \\")
     output.append("    case GEFilterType::EnumType: \\")
     output.append("        return {{ GEParamsMemberTag::FirstTag, GEParamsMemberTag::LastTag }};")
@@ -248,37 +272,9 @@ def generate_struct_tag_ranges(structs: List[StructInfo], struct_tag_ranges: Dic
     output.append("        default:")
     output.append("            return std::nullopt;")
     output.append("        }")
-    output.append("    }")
-
-    output.append("")
-    output.append("    // Set params member by tag (dispatch based on tag value)")
-    output.append("    template<typename ParamsType, typename T>")
-    output.append("    static void SetParamsMemberByTag(ParamsType& params, GEParamsMemberTag tag, const T& value)")
-    output.append("    {")
-    output.append("        switch (tag) {")
-
-    output.append("#define GE_SET_MEMBER_CASE(Tag) \\")
-    output.append("    case GEParamsMemberTag::Tag: \\")
-    output.append("        if constexpr (std::is_same_v<ParamsType, GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType>) {{ \\")
-    output.append("            GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(params, value); \\")
-    output.append("        }} \\")
-    output.append("        break;")
-    output.append("")
-
-    for struct in structs:
-        for field in struct.fields:
-            for tag_name, _, _, _ in iterate_field_tags(struct, field):
-                output.append(f"        GE_SET_MEMBER_CASE({tag_name})")
-
-    output.append("        default:")
-    output.append("            break;")
-    output.append("        }")
-    output.append("    }")
-
+    output.append("}")
     output.append("")
     output.append("#undef GE_GET_TAG_RANGE_CASE")
-    output.append("#undef GE_SET_MEMBER_CASE")
-    output.append("};")
     output.append("")
 
     return '\n'.join(output)
@@ -373,6 +369,30 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
     return '\n'.join(output)
 
 
+def generate_set_member_cases(structs: List[StructInfo]) -> str:
+    """Generate switch cases for SetParamsMemberByTag template function."""
+    output = []
+
+    output.append("#define GE_SET_MEMBER_CASE(Tag) \\")
+    output.append("    case GEParamsMemberTag::Tag: \\")
+    output.append("        if constexpr (std::is_same_v<ParamsType, GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType>) {{ \\")
+    output.append("            GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(params, value); \\")
+    output.append("        }} \\")
+    output.append("        break;")
+    output.append("")
+
+    for struct in structs:
+        for field in struct.fields:
+            for tag_name, _, _, _ in iterate_field_tags(struct, field):
+                output.append(f"        GE_SET_MEMBER_CASE({tag_name})")
+
+    output.append("")
+    output.append("#undef GE_SET_MEMBER_CASE")
+    output.append("")
+
+    return '\n'.join(output)
+
+
 def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
     """Generate DispatchGEFilterType high-order template function."""
     output = []
@@ -408,8 +428,21 @@ def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
     return '\n'.join(output)
 
 
-def generate_string_to_enum_mapping(structs: List[StructInfo]) -> str:
-    """Generate string-to-enum mapping."""
+def generate_string_to_enum_mapping_decl() -> str:
+    """Generate GEParamsMemberTagFromString() declaration."""
+    output = []
+
+    output.append("// String to enum mapping")
+    output.append("// Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
+    output.append("//       Aliases from [[ge::prop_alias]] are also included")
+    output.append("GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
+    output.append("")
+
+    return '\n'.join(output)
+
+
+def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
+    """Generate GEParamsMemberTagFromString() implementation."""
     output = []
 
     # Collect all string-to-tag mappings, including aliases
@@ -444,10 +477,7 @@ def generate_string_to_enum_mapping(structs: List[StructInfo]) -> str:
                 error_lines.append(f"    - {struct_name}::{tag_name}")
         raise RuntimeError("\n".join(error_lines))
 
-    output.append("// String to enum mapping")
-    output.append("// Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
-    output.append("//       Aliases from [[ge::prop_alias]] are also included")
-    output.append("inline GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)")
+    output.append("GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)")
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEParamsMemberTag> map = {")
 
@@ -487,6 +517,72 @@ def generate_string_to_enum_mapping(structs: List[StructInfo]) -> str:
 
     return '\n'.join(output)
 
+def generate_params_builder_decl() -> str:
+    """Generate GEParamsBuilder helper class declaration."""
+    output = []
+
+    output.append("class GEParamsBuilder {")
+    output.append("public:")
+    output.append("    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);")
+    output.append("};")
+    output.append("")
+
+    return '\n'.join(output)
+
+
+def generate_params_builder_impl(structs: List[StructInfo]) -> str:
+    """Generate GEParamsBuilder::Build() implementation."""
+    output = []
+
+    output.append("std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)")
+    output.append("{")
+    output.append("    switch (filterType) {")
+    output.append("#define GE_BUILD_PARAMS_CASE(EnumType, Struct) \\")
+    output.append("    case GEFilterType::EnumType: \\")
+    output.append("        return GEFilterParams::Box(Struct{});")
+    output.append("")
+
+    for struct in structs:
+        enum_type = struct.enum_type
+        struct_name = struct.name
+        output.append(f"        GE_BUILD_PARAMS_CASE({enum_type}, {struct_name})")
+
+    output.append("        default:")
+    output.append("            return nullptr;")
+    output.append("        }")
+    output.append("}")
+    output.append("")
+    output.append("#undef GE_BUILD_PARAMS_CASE")
+    output.append("")
+
+    return '\n'.join(output)
+
+def generate_type_xmacro(structs: List[StructInfo]) -> str:
+    """Generate X-Macro listing all unique member variable types."""
+    output = []
+
+    unique_types = set()
+    for struct in structs:
+        for field in struct.fields:
+            unique_types.add(field.type)
+
+    sorted_types = sorted(unique_types)
+
+    output.append("// X-Macro listing all unique parameter member types")
+    output.append("// Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X")
+    output.append("#define FOR_EACH_PARAM_TYPE(X) \\")
+
+    for i, type_name in enumerate(sorted_types):
+        if i < len(sorted_types) - 1:
+            output.append(f"    X({type_name}) \\")
+        else:
+            output.append(f"    X({type_name})")
+
+    output.append("")
+    output.append("")
+
+    return '\n'.join(output)
+
 
 def generate_header(structs: List[StructInfo]) -> str:
     """Generate the complete header file."""
@@ -502,6 +598,7 @@ def generate_header(structs: List[StructInfo]) -> str:
     output.append("#include <string_view>")
     output.append("#include <type_traits>")
     output.append("#include \"ge_effects_params.h\"")
+    output.append("#include \"ge_filter_params.h\"")
     output.append("")
 
     output.append("namespace OHOS {")
@@ -509,30 +606,65 @@ def generate_header(structs: List[StructInfo]) -> str:
     output.append("namespace Drawing {")
     output.append("")
 
+    output.append(generate_type_xmacro(structs))
+
     # Generate member enums and tag ranges
     enum_code, struct_tag_ranges = generate_member_enums(structs)
     output.append(enum_code)
 
     # Generate GEFilterParamsTypeInfo specializations
     output.append(generate_filter_params_type_info(structs))
+    output.append(generate_params_builder_decl())
 
     # Generate type traits
     output.append(generate_type_traits(structs))
 
-    # Generate GEParamsMemberHelper (includes GetParamsMemberTagRange and SetParamsMemberByTag)
-    output.append(generate_struct_tag_ranges(structs, struct_tag_ranges))
+    # Generate GEParamsMemberHelper declaration (includes SetParamsMemberByTag template)
+    output.append(generate_struct_tag_ranges_decl(structs))
 
     # Generate DispatchGEFilterType (includes macro definition and undef)
     output.append(generate_dispatch_filter_type(structs))
 
-    # Generate string-to-enum mapping
-    output.append(generate_string_to_enum_mapping(structs))
+    # Generate string-to-enum mapping declaration
+    output.append(generate_string_to_enum_mapping_decl())
 
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_PARAMS_REFLECTION_V2_H")
+
+    return '\n'.join(output)
+
+
+def generate_cpp(structs: List[StructInfo]) -> str:
+    """Generate the complete cpp file."""
+    output = []
+
+    output.append(COPYRIGHT_HEADER)
+    output.append("")
+    output.append("#include \"ge_params_reflection_v2.h\"")
+    output.append("#include <unordered_map>")
+    output.append("")
+
+    output.append("namespace OHOS {")
+    output.append("namespace Rosen {")
+    output.append("namespace Drawing {")
+    output.append("")
+
+    # Generate GEParamsBuilder::Build() implementation
+    output.append(generate_params_builder_impl(structs))
+
+    # Generate GEParamsMemberHelper::GetParamsMemberTagRange() implementation
+    output.append(generate_struct_tag_ranges_impl(structs))
+
+    # Generate GEParamsMemberTagFromString() implementation
+    output.append(generate_string_to_enum_mapping_impl(structs))
+
+    output.append("} // namespace Drawing")
+    output.append("} // namespace Rosen")
+    output.append("} // namespace OHOS")
+    output.append("")
 
     return '\n'.join(output)
 
@@ -564,6 +696,13 @@ Examples:
         help='Output header file path (default: include/effect/ge_params_reflection_v2.h)'
     )
 
+    parser.add_argument(
+        '--output-cpp-file',
+        type=str,
+        default=None,
+        help='Output cpp file path (default: src/effect/ge_params_reflection_v2.cpp)'
+    )
+
     args = parser.parse_args()
 
     root_dir = Path(__file__).parent.parent.parent
@@ -578,6 +717,7 @@ Examples:
             root_dir / "include" / "effect" / "shape",
         ]
     output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "effect" / "ge_params_reflection_v2.h"
+    output_cpp_file = Path(args.output_cpp_file) if args.output_cpp_file else root_dir / "src" / "effect" / "ge_params_reflection_v2.cpp"
 
     params_files = []
     for params_dir in params_dirs:
@@ -619,6 +759,19 @@ Examples:
     print(f"Generated {output_file}")
     print(f"  - {len(structs)} parameter types")
     print(f"  - {sum(len(s.fields) for s in structs)} total fields")
+
+    # Generate cpp file
+    print(f"Generating {output_cpp_file.name}...")
+    cpp_content = generate_cpp(structs)
+
+    # Ensure output directory exists
+    output_cpp_file.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write to file
+    with open(output_cpp_file, 'w', encoding='utf-8') as f:
+        f.write(cpp_content)
+
+    print(f"Generated {output_cpp_file}")
     return 0
 
 

@@ -19,6 +19,7 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     [[ge::prop("FrostedGlass_Shape")]]
     std::shared_ptr<GESDFShaderShape> sdfShape;
+    [[ge::prop("FrostedGlass_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;
     // Background darken parameters
     Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
