@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-constexpr int ARRAY_SIZE_FOUR = 4;
-
 struct [[ge::params(type=CIRCLE_FLOWLIGHT, name="CircleFlowlight")]] GECircleFlowlightEffectParams {
     [[ge::prop(name="CircleFlowlight_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
-    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<Vector4f, 4> colors;
     [[ge::prop("CircleFlowlight_RotationFrequency")]]
     Vector4f rotationFrequency;
     [[ge::prop("CircleFlowlight_RotationAmplitude")]]

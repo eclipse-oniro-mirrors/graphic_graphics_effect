@@ -1,4 +1,7 @@
 {
   "type_aliases": {
+    "int": "int32_t",
+    "GESDFShaderShape": "Drawing::GESDFShaderShape",
+    "std::shared_ptr<GESDFShaderShape>" : "std::shared_ptr<Drawing::GESDFShaderShape>"
   }
 }

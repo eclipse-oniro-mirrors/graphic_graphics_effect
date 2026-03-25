@@ -18,11 +18,13 @@
 
 
 #include "ge_params_reflection_v2.h"
+#include "ge_filter_params.h"
 #include <unordered_map>
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+namespace GEV2 {
 
 std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 {
@@ -2397,7 +2399,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<GESDFShaderShape>& value)
+                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value)
 {
     if (!params) {
         return;
@@ -2414,6 +2416,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
         GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE, value)
         GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE, value)
         GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE, value)
         GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE, value)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE, value)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT, value)
@@ -2517,7 +2520,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const int& value)
+                                                GEParamsMemberTag tag, const int32_t& value)
 {
     if (!params) {
         return;
@@ -2531,6 +2534,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
     switch (tag) {
         GE_VALIDATE_AND_SET(KAWASE_BLUR_RADIUS, value)
         GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_DIRECTION, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE, value)
         GE_VALIDATE_AND_SET(MESA_BLUR_RADIUS, value)
         GE_VALIDATE_AND_SET(MESA_BLUR_TILE_MODE, value)
         GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR, value)
@@ -2584,25 +2588,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const int32_t& value)
-{
-    if (!params) {
-        return;
-    }
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params->GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE, value)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                                 GEParamsMemberTag tag, const GESDFBorderParams& value)
 {
     if (!params) {
@@ -2616,25 +2601,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_BORDER_BORDER, value)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value)
-{
-    if (!params) {
-        return;
-    }
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params->GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE, value)
         default:
             break;
     }
@@ -2732,6 +2698,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
 #undef GE_VALIDATE_AND_SET
 
+} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

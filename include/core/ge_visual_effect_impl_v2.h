@@ -27,7 +27,6 @@
 #include "core/ge_filter_type.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
-#include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
 #include "effect/ge_filter_params.h"
 #include "effect/ge_params_reflection_v2.h"
@@ -70,13 +69,13 @@ public:
     void SetParam(GEParamsMemberTag tag, T value)
     {
         if (!params_) {
-            GE_LOGE("GEVisualEffectImplV2::SetParam: params_ is null");
+            LOGE("GEVisualEffectImplV2::SetParam: params_ is null");
             return;
         }
 
         // Check if tag is valid for the current params type
         if (!IsTagValidForCurrentType(tag)) {
-            GE_LOGE("GEVisualEffectImplV2::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
+            LOGE("GEVisualEffectImplV2::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
             return;
         }
 
@@ -92,7 +91,7 @@ public:
         if (tag != GEParamsMemberTag::INVALID) {
             SetParam(tag, value);
         } else {
-            GE_LOGE("GEVisualEffectImplV2::SetParam: unknown tag '%s'", tagStr.c_str());
+            LOGE("GEVisualEffectImplV2::SetParam: unknown tag '%s'", tagStr.c_str());
         }
     }
 
@@ -132,105 +131,72 @@ public:
     // Backward-compatible convenience methods
     // ========================================================================
 
-    void MakeMESAParams() { MakeParams<GEMESABlurShaderFilterParams>(); }
-    const std::shared_ptr<GEMESABlurShaderFilterParams>& GetMESAParams() const
-    { return GetParams<GEMESABlurShaderFilterParams>(); }
+// #define GE_DECLARE_MAKE_GET_PARAMS(MethodName, ParamsType) \
+//     void Make##MethodName() { MakeParams<ParamsType>(); } \
+//     const std::shared_ptr<ParamsType>& Get##MethodName() const \
+//     { return GetParams<ParamsType>(); }
 
-    void MakeKawaseParams() { MakeParams<GEKawaseBlurShaderFilterParams>(); }
-    const std::shared_ptr<GEKawaseBlurShaderFilterParams>& GetKawaseParams() const
-    { return GetParams<GEKawaseBlurShaderFilterParams>(); }
+//     GE_DECLARE_MAKE_GET_PARAMS(MESAParams, GEMESABlurShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(KawaseParams, GEKawaseBlurShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(AIBarParams, GEAIBarShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GreyParams, GEGreyShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(WaterRippleParams, GEWaterRippleFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(LinearGradientBlurParams, GELinearGradientBlurShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(MagnifierParams, GEMagnifierShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ColorGradientParams, GEColorGradientShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DisplacementDistortParams, GEDisplacementDistortFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SoundWaveParams, GESoundWaveFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(EdgeLightParams, GEEdgeLightShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(BezierWarpParams, GEBezierWarpShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DispersionParams, GEDispersionShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DirectionLightParams, GEDirectionLightShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ContentLightParams, GEContentLightFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ContenDiagonalParams, GEContentDiagonalFlowLightShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DotMatrixShaderParams, GEDotMatrixShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(WavyRippleLightParams, GEWavyRippleLightShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(AuroraNoiseParams, GEAuroraNoiseShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ParticleCircularHaloParams, GEParticleCircularHaloShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(VariableRadiusBlurParams, GEVariableRadiusBlurShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightParams, GESDFEdgeLightFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SdfFromImageParams, GESDFFromImageFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SdfBorderShaderParams, GESDFBorderShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SdfShadowShaderParams, GESDFShadowShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(RippleMaskParams, GERippleShaderMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DoubleRippleMaskParams, GEDoubleRippleShaderMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(WaveDisturbanceMaskParams, GEWaveDisturbanceShaderMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(RadialGradientMaskParams, GERadialGradientShaderMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(PixelMapMaskParams, GEPixelMapMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ImageMaskParams, GEImageMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(UseEffectMaskParams, GEUseEffectMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(WaveGradientMaskParams, GEWaveGradientShaderMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(MaskTransitionParams, GEMaskTransitionShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFUnionOpShapeParams, GESDFUnionOpShapeParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFRRectShapeParams, GESDFRRectShapeParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFPixelmapShapeParams, GESDFPixelmapShapeParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFTransformShapeParams, GESDFTransformShapeParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFClipShaderParams, GESDFClipShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(SDFColorShaderParams, GESDFColorShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(LightCaveParams, GEXLightCaveShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DistortChromaParams, GEXDistortChromaEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(DupoliNoiseMaskParams, GEXDupoliNoiseMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(BorderLightParams, GEBorderLightShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GasifyScaleTwistFilterParams, GEGasifyScaleTwistFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GasifyBlurFilterParams, GEGasifyBlurFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GasifyFilterParams, GEGasifyFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(ColorGradientEffectParams, GEXColorGradientEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(HarmoniumEffectParams, GEHarmoniumEffectShaderParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(AIBarGlowEffectParams, GEXAIBarGlowEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(AIBarRectHaloEffectParams, GEXAIBarRectHaloEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(RoundedRectFlowlightEffectParams, GEXRoundedRectFlowlightEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GradientFlowColorsEffectParams, GEXGradientFlowColorsEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(FrameGradientMaskParams, GEFrameGradientMaskParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(CircleFlowlightEffectParams, GECircleFlowlightEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassEffectParams, GEFrostedGlassEffectParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassBlurParams, GEFrostedGlassBlurShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(GridWarpFilterParams, GEGridWarpShaderFilterParams)
+//     GE_DECLARE_MAKE_GET_PARAMS(NoisyFrameGradientMaskParams, GEXNoisyFrameGradientMaskParams)
 
-    void MakeAIBarParams() { MakeParams<GEAIBarShaderFilterParams>(); }
-    const std::shared_ptr<GEAIBarShaderFilterParams>& GetAIBarParams() const
-    { return GetParams<GEAIBarShaderFilterParams>(); }
-
-    void MakeGreyParams() { MakeParams<GEGreyShaderFilterParams>(); }
-    const std::shared_ptr<GEGreyShaderFilterParams>& GetGreyParams() const
-    { return GetParams<GEGreyShaderFilterParams>(); }
-
-    void MakeWaterRippleParams() { MakeParams<GEWaterRippleFilterParams>(); }
-    const std::shared_ptr<GEWaterRippleFilterParams>& GetWaterRippleParams() const
-    { return GetParams<GEWaterRippleFilterParams>(); }
-
-    void MakeLinearGradientBlurParams() { MakeParams<GELinearGradientBlurShaderFilterParams>(); }
-    const std::shared_ptr<GELinearGradientBlurShaderFilterParams>& GetLinearGradientBlurParams() const
-    { return GetParams<GELinearGradientBlurShaderFilterParams>(); }
-
-    void MakeMagnifierParams() { MakeParams<GEMagnifierShaderFilterParams>(); }
-    const std::shared_ptr<GEMagnifierShaderFilterParams>& GetMagnifierParams() const
-    { return GetParams<GEMagnifierShaderFilterParams>(); }
-
-    void MakeColorGradientParams() { MakeParams<GEColorGradientShaderFilterParams>(); }
-    const std::shared_ptr<GEColorGradientShaderFilterParams>& GetColorGradientParams() const
-    { return GetParams<GEColorGradientShaderFilterParams>(); }
-
-    void MakeDisplacementDistortParams() { MakeParams<GEDisplacementDistortFilterParams>(); }
-    const std::shared_ptr<GEDisplacementDistortFilterParams>& GetDisplacementDistortParams() const
-    { return GetParams<GEDisplacementDistortFilterParams>(); }
-
-    void MakeSoundWaveParams() { MakeParams<GESoundWaveFilterParams>(); }
-    const std::shared_ptr<GESoundWaveFilterParams>& GetSoundWaveParams() const
-    { return GetParams<GESoundWaveFilterParams>(); }
-
-    void MakeEdgeLightParams() { MakeParams<GEEdgeLightShaderFilterParams>(); }
-    const std::shared_ptr<GEEdgeLightShaderFilterParams>& GetEdgeLightParams() const
-    { return GetParams<GEEdgeLightShaderFilterParams>(); }
-
-    void MakeBezierWarpParams() { MakeParams<GEBezierWarpShaderFilterParams>(); }
-    const std::shared_ptr<GEBezierWarpShaderFilterParams>& GetBezierWarpParams() const
-    { return GetParams<GEBezierWarpShaderFilterParams>(); }
-
-    void MakeDispersionParams() { MakeParams<GEDispersionShaderFilterParams>(); }
-    const std::shared_ptr<GEDispersionShaderFilterParams>& GetDispersionParams() const
-    { return GetParams<GEDispersionShaderFilterParams>(); }
-
-    void MakeDirectionLightParams() { MakeParams<GEDirectionLightShaderFilterParams>(); }
-    const std::shared_ptr<GEDirectionLightShaderFilterParams>& GetDirectionLightParams() const
-    { return GetParams<GEDirectionLightShaderFilterParams>(); }
-
-    void MakeContentLightParams() { MakeParams<GEContentLightFilterParams>(); }
-    const std::shared_ptr<GEContentLightFilterParams>& GetContentLightParams() const
-    { return GetParams<GEContentLightFilterParams>(); }
-
-    void MakeContentDiagonalParams() { MakeParams<GEContentDiagonalFlowLightShaderParams>(); }
-    const std::shared_ptr<GEContentDiagonalFlowLightShaderParams>& GetContenDiagonalParams() const
-    { return GetParams<GEContentDiagonalFlowLightShaderParams>(); }
-
-    void MakeDotMatrixShaderParams() { MakeParams<GEDotMatrixShaderParams>(); }
-    const std::shared_ptr<GEDotMatrixShaderParams>& GetDotMatrixShaderParams() const
-    { return GetParams<GEDotMatrixShaderParams>(); }
-
-    void MakeWavyRippleLightParams() { MakeParams<GEWavyRippleLightShaderParams>(); }
-    const std::shared_ptr<GEWavyRippleLightShaderParams>& GetWavyRippleLightParams() const
-    { return GetParams<GEWavyRippleLightShaderParams>(); }
-
-    void MakeAuroraNoiseParams() { MakeParams<GEAuroraNoiseShaderParams>(); }
-    const std::shared_ptr<GEAuroraNoiseShaderParams>& GetAuroraNoiseParams() const
-    { return GetParams<GEAuroraNoiseShaderParams>(); }
-
-    void MakeParticleCircularHaloParams() { MakeParams<GEParticleCircularHaloShaderParams>(); }
-    const std::shared_ptr<GEParticleCircularHaloShaderParams>& GetParticleCircularHaloParams() const
-    { return GetParams<GEParticleCircularHaloShaderParams>(); }
-
-    void MakeVariableRadiusBlurParams() { MakeParams<GEVariableRadiusBlurShaderFilterParams>(); }
-    const std::shared_ptr<GEVariableRadiusBlurShaderFilterParams>& GetVariableRadiusBlurParams() const
-    { return GetParams<GEVariableRadiusBlurShaderFilterParams>(); }
-
-    void MakeSdfEdgeLightParams() { MakeParams<GESDFEdgeLightFilterParams>(); }
-    const std::shared_ptr<GESDFEdgeLightFilterParams>& GetSDFEdgeLightParams() const
-    { return GetParams<GESDFEdgeLightFilterParams>(); }
-
-    void MakeSdfFromImageParams() { MakeParams<GESDFFromImageFilterParams>(); }
-    const std::shared_ptr<GESDFFromImageFilterParams>& GetSdfFromImageParams() const
-    { return GetParams<GESDFFromImageFilterParams>(); }
-
-    void MakeSdfBorderParams() { MakeParams<GESDFBorderShaderParams>(); }
-    const std::shared_ptr<GESDFBorderShaderParams>& GetSdfBorderShaderParams() const
-    { return GetParams<GESDFBorderShaderParams>(); }
-
-    void MakeSdfShadowParams() { MakeParams<GESDFShadowShaderParams>(); }
-    const std::shared_ptr<GESDFShadowShaderParams>& GetSdfShadowShaderParams() const
-    { return GetParams<GESDFShadowShaderParams>(); }
+// #undef GE_DECLARE_MAKE_GET_PARAMS
 
     void SetCanvasInfo(Drawing::CanvasInfo info)
     {
@@ -260,50 +226,18 @@ private:
             return false;
         }
 
-        auto tagRange = GEParamsMemberHelper::GetParamsMemberTagRange(params_->GetType());
-        if (!tagRange) {
-            return false;
-        }
-
-        // Check if tag is in range [RangeStart, RangeEnd]
-        uint32_t tagValue = static_cast<uint32_t>(tag);
-        uint32_t startValue = static_cast<uint32_t>(tagRange->RangeStart);
-        uint32_t endValue = static_cast<uint32_t>(tagRange->RangeEnd);
-        return tagValue >= startValue && tagValue <= endValue;
+        auto tagType = GEParamsMemberHelper::GetFilterTypeFromTag(tag);
+        return tagType == params_->GetType();
     }
 
     /// Internal set param implementation - uses reflection metadata to set field value
-    template<typename T>
-    void SetParamInternal(GEParamsMemberTag tag, T value)
-    {
-        if (!params_) {
-            return;
-        }
+    /// Non-template overloads for each type, generated from FOR_EACH_PARAM_TYPE
+    /// Implementations in ge_visual_effect_impl_v2.cpp
+// #define DECLARE_SET_PARAM_INTERNAL(Type) \
+//     void SetParamInternal(GEParamsMemberTag tag, const Type& value);
 
-        // Dispatch based on filter type using generated high-order template
-        // This will automatically update when metadata is regenerated
-        DispatchGEFilterType<SetParamByTagHelper, T>(params_->GetType(), params_, tag, value);
-    }
-
-    /// Helper functor for DispatchGEFilterType - sets param by tag with value transformation
-    template<typename ParamsType, typename ValueType>
-    struct SetParamByTagHelper {
-        static void Invoke(const std::shared_ptr<GEFilterParams>& boxedParams,
-                          GEParamsMemberTag tag, const ValueType& value)
-        {
-            auto specificParams = GEFilterParams::Unbox<ParamsType>(boxedParams);
-            if (!specificParams) {
-                return;
-            }
-
-            // Apply value transformation using tag-based transformer
-            using Transformer = GEParamsValueTransformer<GEParamsMemberTag(tag), ValueType>;
-            auto transformed = Transformer::Transform(value);
-
-            // Set the field using the generated reflection helper
-            GEParamsMemberHelper::SetParamsMemberByTag(*specificParams, tag, transformed);
-        }
-    };
+//     FOR_EACH_PARAM_TYPE(DECLARE_SET_PARAM_INTERNAL)
+// #undef DECLARE_SET_PARAM_INTERNAL
 
     FilterType filterType_ = GEVisualEffectImplV2::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;

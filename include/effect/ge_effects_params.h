@@ -39,6 +39,7 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+namespace GEV2 {
 
 // Parameter structure definitions
 #include "effect/filter/ge_aibar_shader_filter.params"
@@ -83,6 +84,7 @@ namespace Drawing {
 #include "effect/filter/ge_sdf_edge_light_filter.params"
 #include "effect/filter/ge_sdf_from_image_filter.params"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.params"
+#include "effect/shape/ge_sdf_rrect.params"
 #include "effect/shape/ge_sdf_rrect_shader_shape.params"
 #include "effect/shape/ge_sdf_shadow_shader.params"
 #include "effect/shape/ge_sdf_transform_shader_shape.params"
@@ -105,6 +107,7 @@ namespace Drawing {
 #include "effect/mask/gex_noisy_frame_gradient_mask.params"
 #include "effect/shader/gex_rounded_rect_flowlight_effect.params"
 
+} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

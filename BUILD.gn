@@ -40,6 +40,7 @@ ohos_source_set("graphics_effect_src") {
   }
   cflags = [
     "-Wall",
+    "-Wno-unknown-attributes",
     "-O2",
     "-ftrapv",
     "-FPIC",
@@ -51,6 +52,7 @@ ohos_source_set("graphics_effect_src") {
   ]
   cflags_cc = [
     "-std=c++17",
+    "-Wno-unknown-attributes",
     "-O2",
     "-ftrapv",
     "-FPIC",

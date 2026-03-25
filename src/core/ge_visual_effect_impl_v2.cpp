@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "effect/ge_shader_filter_params.h"
 #include "core/ge_visual_effect_impl_v2.h"
+#include "effect/ge_params_reflection_v2.h"
 #include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
 
@@ -33,6 +33,17 @@ GEVisualEffectImplV2::~GEVisualEffectImplV2()
 {
     // Cleanup handled by smart pointers
 }
+// #define IMPLEMENT_SET_PARAM_INTERNAL(Type) \
+//     void GEVisualEffectImplV2::SetParamInternal(GEParamsMemberTag tag, const Type& value) \
+//     { \
+//         if (!params_) { \
+//             return; \
+//         } \
+//         GEParamsMemberHelper::SetParamsMemberByTag(params_, tag, value); \
+//     }
+
+// FOR_EACH_PARAM_TYPE(IMPLEMENT_SET_PARAM_INTERNAL)
+// #undef IMPLEMENT_SET_PARAM_INTERNAL
 
 } // namespace Drawing
 } // namespace Rosen

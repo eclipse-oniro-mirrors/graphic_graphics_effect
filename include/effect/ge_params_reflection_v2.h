@@ -25,51 +25,55 @@
 #include <string_view>
 #include <type_traits>
 #include "ge_effects_params.h"
-#include "ge_filter_params.h"
 #include "ge_value_transformer.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+namespace GEV2 {
+
+class GEFilterParams;
+
+// Helper macro to escape commas in macro arguments
+#define ESCAPE(...) __VA_ARGS__
 
 // X-Macro listing all unique parameter member types
 // Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X
 #define FOR_EACH_PARAM_TYPE(X) \
-    X(DotMatrixDirection) \
-    X(DotMatrixEffectType) \
-    X(Drawing::Color4f) \
-    X(Drawing::Matrix) \
-    X(Drawing::Point) \
-    X(GERRect) \
-    X(GESDFBorderParams) \
-    X(GESDFShadowParams) \
-    X(GESDFUnionOp) \
-    X(RectF) \
-    X(Vector2f) \
-    X(Vector3f) \
-    X(Vector4f) \
-    X(bool) \
-    X(float) \
-    X(int) \
-    X(int32_t) \
-    X(std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE>) \
-    X(std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE>) \
-    X(std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>) \
-    X(std::array<Vector4f, ARRAY_SIZE_FOUR>) \
-    X(std::array<float, COLOR_GRADIENT_ARRAY_SIZE>) \
-    X(std::array<std::pair<float, float>, ARRAY_SIZE_FOUR>) \
-    X(std::array<std::pair<float, float>, ARRAY_SIZE_NINE>) \
-    X(std::pair<float, float>) \
-    X(std::shared_ptr<Drawing::GESDFShaderShape>) \
-    X(std::shared_ptr<Drawing::Image>) \
-    X(std::shared_ptr<GESDFShaderShape>) \
-    X(std::shared_ptr<GEShaderMask>) \
-    X(std::vector<Vector2f>) \
-    X(std::vector<Vector4f>) \
-    X(std::vector<float>) \
-    X(std::vector<std::pair<float, float>>) \
-    X(std::weak_ptr<Drawing::Image>) \
-    X(uint32_t)
+    X(ESCAPE(DotMatrixDirection)) \
+    X(ESCAPE(DotMatrixEffectType)) \
+    X(ESCAPE(Drawing::Color4f)) \
+    X(ESCAPE(Drawing::Matrix)) \
+    X(ESCAPE(Drawing::Point)) \
+    X(ESCAPE(GERRect)) \
+    X(ESCAPE(GESDFBorderParams)) \
+    X(ESCAPE(GESDFShadowParams)) \
+    X(ESCAPE(GESDFUnionOp)) \
+    X(ESCAPE(RectF)) \
+    X(ESCAPE(Vector2f)) \
+    X(ESCAPE(Vector3f)) \
+    X(ESCAPE(Vector4f)) \
+    X(ESCAPE(bool)) \
+    X(ESCAPE(float)) \
+    X(ESCAPE(int32_t)) \
+    X(ESCAPE(std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE>)) \
+    X(ESCAPE(std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE>)) \
+    X(ESCAPE(std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>)) \
+    X(ESCAPE(std::array<Vector4f, 4>)) \
+    X(ESCAPE(std::array<Vector4f, ARRAY_SIZE_FOUR>)) \
+    X(ESCAPE(std::array<float, COLOR_GRADIENT_ARRAY_SIZE>)) \
+    X(ESCAPE(std::array<std::pair<float, float>, 4>)) \
+    X(ESCAPE(std::array<std::pair<float, float>, ARRAY_SIZE_NINE>)) \
+    X(ESCAPE(std::pair<float, float>)) \
+    X(ESCAPE(std::shared_ptr<Drawing::GESDFShaderShape>)) \
+    X(ESCAPE(std::shared_ptr<Drawing::Image>)) \
+    X(ESCAPE(std::shared_ptr<GEShaderMask>)) \
+    X(ESCAPE(std::vector<Vector2f>)) \
+    X(ESCAPE(std::vector<Vector4f>)) \
+    X(ESCAPE(std::vector<float>)) \
+    X(ESCAPE(std::vector<std::pair<float, float>>)) \
+    X(ESCAPE(std::weak_ptr<Drawing::Image>)) \
+    X(ESCAPE(uint32_t))
 
 
 enum class GEParamsMemberTag : uint32_t {
@@ -573,9 +577,6 @@ enum class GEParamsMemberTag : uint32_t {
 };
 
 
-// Helper macro to escape commas in macro arguments
-#define ESCAPE(...) __VA_ARGS__
-
 // Constraint Metadata Macros
 #define GE_PARAMS_CONSTRAINT_RANGE(Tag, Type, Min, Max) \
     template<> \
@@ -606,6 +607,7 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_RANGE = true; \
         static constexpr bool COMPONENT_WISE = true; \
         static constexpr bool HAS_MIN = true; \
+        static constexpr bool HAS_MAX = false; \
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MIN_COMPONENTS[] = Mins; \
     };
@@ -614,7 +616,9 @@ enum class GEParamsMemberTag : uint32_t {
     template<> \
     struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
         static constexpr bool HAS_RANGE = true; \
+        static constexpr bool COMPONENT_WISE = true; \
         static constexpr bool HAS_MAX = true; \
+        static constexpr bool HAS_MIN = false; \
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MAX_COMPONENTS[] = Maxs; \
     };
@@ -623,7 +627,9 @@ enum class GEParamsMemberTag : uint32_t {
     template<> \
     struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
         static constexpr bool HAS_RANGE = true; \
+        static constexpr bool COMPONENT_WISE = false; \
         static constexpr bool HAS_MIN = true; \
+        static constexpr bool HAS_MAX = false; \
         static constexpr Type MIN = Min; \
     };
 
@@ -631,6 +637,8 @@ enum class GEParamsMemberTag : uint32_t {
     template<> \
     struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
         static constexpr bool HAS_RANGE = true; \
+        static constexpr bool COMPONENT_WISE = false; \
+        static constexpr bool HAS_MIN = false; \
         static constexpr bool HAS_MAX = true; \
         static constexpr Type MAX = Max; \
     };
@@ -725,10 +733,10 @@ GE_PARAMS_CONSTRAINT_RANGE(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float, 0.0, 4096.0)
 #undef GE_PARAMS_CONSTRAINT_MIN
 #undef GE_PARAMS_CONSTRAINT_MAX
 
-// GEFilterParamsTypeInfo template specializations
+// GEFilterParamsTypeInfoV2 template specializations
 // Provides FilterType ID and FilterName for each params type
 template<typename T>
-struct GEFilterParamsTypeInfo {
+struct GEFilterParamsTypeInfoV2 {
     using Self = T;
     static constexpr GEFilterType ID = GEFilterType::NONE;
     static constexpr std::string_view FilterName = "";
@@ -737,7 +745,7 @@ struct GEFilterParamsTypeInfo {
 // Helper macro for GEParamsTypeInfo specializations
 #define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \
     template<> \
-    struct GEFilterParamsTypeInfo<Struct> { \
+    struct GEFilterParamsTypeInfoV2<Struct> { \
         using Self = Struct; \
         static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \
         static constexpr std::string_view FilterName = #FilterNameStr; \
@@ -1362,7 +1370,6 @@ public:
     // All implementations are in the .cpp file
     // Overloaded SetParamsMemberByTag for each unique parameter type
     // These are non-template functions, reducing binary bloat
-    // Generated from FOR_EACH_PARAM_TYPE X-Macro
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const DotMatrixDirection& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1394,8 +1401,6 @@ public:
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const float& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const int& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const int32_t& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>& value);
@@ -1405,8 +1410,6 @@ public:
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const std::shared_ptr<GESDFShaderShape>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<GEShaderMask>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1429,6 +1432,7 @@ public:
 //       Aliases from [[ge::prop_alias]] are also included
 GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);
 
+} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

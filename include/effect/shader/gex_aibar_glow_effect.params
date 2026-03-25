@@ -16,16 +16,14 @@
 // WARNING: This struct is not registered with REGISTER_GEFILTERPARAM_TYPEINFO
 // The type name is guessed from the enum name AIBAR_GLOW
 
-constexpr int ARRAY_SIZE_FOUR = 4;
-
 struct [[ge::params(type=AIBAR_GLOW, name="AIBarGlow")]] GEXAIBarGlowEffectParams {
     Vector4f LTWH;
     float stretchFactor = 0.0f;
     float barAngle = 0.0f;
     [[ge::prop(name="AIBarGlow_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
-    std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
+    std::array<Vector4f, 4> colors;
     [[ge::prop(name="AIBarGlow_Position", array_accessor_length=4, array_accessor_type="std::pair<float, float>")]]
-    std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
+    std::array<std::pair<float, float>, 4> positions;
     [[ge::prop("AIBarGlow_Strength")]]
     Vector4f strengths;
     float brightness;

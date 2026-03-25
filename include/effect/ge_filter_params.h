@@ -15,12 +15,18 @@
 #ifndef GRAPHICS_EFFECT_GE_FILTER_PARAM_H
 #define GRAPHICS_EFFECT_GE_FILTER_PARAM_H
 #include <memory>
+#include <optional>
 
 #include "ge_filter_type.h"
+#include "ge_filter_type_info_v2.h"
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-// Type-erasured params class
+
+namespace GEV2 {
+
+// Type-erased params class
 class GEFilterParams {
 public:
     template<typename T>
@@ -35,9 +41,9 @@ public:
     using OptionalType = typename OptionalTypeTrait<T>::Type;
 
     template<typename T>
-    static constexpr bool IsRegisteredFilterTypeInfo = GEFilterTypeInfo<T>::ID != GEFilterType::NONE;
+    static constexpr bool IsRegisteredFilterTypeInfo = GEFilterTypeInfoV2<T>::ID != GEFilterType::NONE;
     template<typename T>
-    static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfo<T>::ID != GEFilterType::NONE;
+    static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfoV2<T>::ID != GEFilterType::NONE;
 
     template<typename T>
     static OptionalType<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
@@ -58,14 +64,11 @@ template<typename T>
 class GEFilterParamsWrapper : public GEFilterParams {
 public:
     using ParamType = T;
-    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
     static constexpr std::nullopt_t Null = std::nullopt;
-    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
-        "FilterType wrongly registered");
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
     template<typename U>
     GEFilterParamsWrapper(U&& params)
-        : GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::forward<U>(params))
+        : GEFilterParams(GEFilterParamsTypeInfoV2<ParamType>::ID), data(std::forward<U>(params))
     {}
 
     T data;
@@ -76,13 +79,10 @@ template<typename T>
 class GEFilterParamsWrapper<std::shared_ptr<T>> : public GEFilterParams {
 public:
     using ParamType = T;
-    using FilterType = typename GEFilterParamsTypeInfo<T>::FilterType;
     static constexpr std::nullptr_t Null = nullptr;
-    static_assert(std::is_void_v<FilterType> || GEFilterParams::IsRegisteredFilterTypeInfo<FilterType>,
-        "FilterType wrongly registered");
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
     GEFilterParamsWrapper(const std::shared_ptr<T>& params)
-        : GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(params)
+        : GEFilterParams(GEFilterParamsTypeInfoV2<ParamType>::ID), data(params)
     {}
 
     std::shared_ptr<T> data;
@@ -95,13 +95,13 @@ GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFi
     static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
     using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    if (GEFilterParamsTypeInfo<ParamType>::ID == params->id) {
+    if (GEFilterParamsTypeInfoV2<ParamType>::ID == params->id) {
         return std::static_pointer_cast<GEFilterParamsWrapper<T>>(params)->data;
     }
     return GEFilterParamsWrapper<T>::Null;
 }
 
-// Upcast from specific params type to type-erasured GEFilterParams
+// Upcast from specific params type to type-erased GEFilterParams
 template<typename T>
 std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
 {
@@ -112,7 +112,7 @@ std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
     auto p = std::make_shared<GEFilterParamsWrapper<TValue>>(std::forward<T>(params));
     return std::static_pointer_cast<GEFilterParams>(p);
 }
-
+} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

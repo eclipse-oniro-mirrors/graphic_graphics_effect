@@ -12,14 +12,24 @@ This script provides a best-in-effort C++ parser with:
 import sys
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import parser modules
 from tool.effectgen.cpp_tokenizer import CppTokenizer
 from tool.effectgen.cpp_parser import CppParser, StructInfo, FieldInfo
+
+
+@dataclass
+class FilterTypeMacroInfo:
+    """Information about DECLARE_GEFILTER_TYPEFUNC macro usage."""
+    filter_class: str
+    params_type: str
+    header_file: str
 
 # Copyright header for generated files
 COPYRIGHT_HEADER = """/*
@@ -178,6 +188,49 @@ def parse_def_file(file_path: Path, report_errors: bool = True) -> Optional[Stru
     if structs:
         return structs[0]
     return None
+
+
+def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMacroInfo]:
+    """Scan effect directories for DECLARE_GEFILTER_TYPEFUNC macro usage."""
+    macro_infos = []
+
+    for effect_dir in effect_dirs:
+        # Find all .h files in the directory
+        header_files = list(effect_dir.glob("*.h"))
+        for header_file in header_files:
+            try:
+                with open(header_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                # Pattern to match DECLARE_GEFILTER_TYPEFUNC(Class, ParamsType)
+                # This pattern handles:
+                # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams)
+                # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, GEKawaseBlurShaderFilterParams)
+                pattern = r'DECLARE_GEFILTER_TYPEFUNC\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*([a-zA-Z_][a-zA-Z0-9_:<>:]*)\s*\)'
+
+                matches = re.finditer(pattern, content)
+                for match in matches:
+                    filter_class = match.group(1)
+                    params_type = match.group(2)
+
+                    # Get relative path from include directory
+                    # effect_dir is like: .../include/effect/filter
+                    # We want: effect/filter/xxx.h
+                    # header_file is like: .../include/effect/filter/xxx.h
+                    # We need to get the path relative to include/
+                    include_dir = header_file.parent.parent.parent  # .../include
+                    rel_path = header_file.relative_to(include_dir)
+                    header_include = str(rel_path)
+
+                    macro_infos.append(FilterTypeMacroInfo(
+                        filter_class=filter_class,
+                        params_type=params_type,
+                        header_file=header_include
+                    ))
+            except Exception as e:
+                print(f"  Warning: Failed to scan {header_file}: {e}", file=sys.stderr)
+
+    return macro_infos
 
 
 def to_upper_case(name: str) -> str:
@@ -494,13 +547,13 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
 
 
 def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
-    """Generate GEFilterParamsTypeInfo template specializations."""
+    """Generate GEFilterParamsTypeInfoV2 template specializations."""
     output = []
 
-    output.append("// GEFilterParamsTypeInfo template specializations")
+    output.append("// GEFilterParamsTypeInfoV2 template specializations")
     output.append("// Provides FilterType ID and FilterName for each params type")
     output.append("template<typename T>")
-    output.append("struct GEFilterParamsTypeInfo {")
+    output.append("struct GEFilterParamsTypeInfoV2 {")
     output.append("    using Self = T;")
     output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
     output.append("    static constexpr std::string_view FilterName = \"\";")
@@ -510,7 +563,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("// Helper macro for GEParamsTypeInfo specializations")
     output.append("#define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \\")
     output.append("    template<> \\")
-    output.append("    struct GEFilterParamsTypeInfo<Struct> { \\")
+    output.append("    struct GEFilterParamsTypeInfoV2<Struct> { \\")
     output.append("        using Self = Struct; \\")
     output.append("        static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \\")
     output.append("        static constexpr std::string_view FilterName = #FilterNameStr; \\")
@@ -613,7 +666,6 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
 
     output.append("    // Overloaded SetParamsMemberByTag for each unique parameter type")
     output.append("    // These are non-template functions, reducing binary bloat")
-    output.append("    // Generated from FOR_EACH_PARAM_TYPE X-Macro")
 
     # Collect unique field types from all structs
     # For array elements, use array_accessor_type if specified
@@ -839,12 +891,80 @@ def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]
 
     for i, type_name in enumerate(sorted_types):
         if i < len(sorted_types) - 1:
-            output.append(f"    X({type_name}) \\")
+            output.append(f"    X(ESCAPE({type_name})) \\")
         else:
-            output.append(f"    X({type_name})")
+            output.append(f"    X(ESCAPE({type_name}))")
 
     output.append("")
     output.append("")
+
+    return '\n'.join(output)
+
+
+def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo]) -> str:
+    """Generate GEFilterTypeInfoV2 header file content."""
+    output = []
+
+    output.append(COPYRIGHT_HEADER)
+    output.append("")
+    output.append("#ifndef GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_V2_H")
+    output.append("#define GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_V2_H")
+    output.append("")
+    output.append("#include <type_traits>")
+    output.append("#include \"ge_filter_type.h\"")
+    output.append("#include \"ge_params_reflection_v2.h\"")
+    output.append("")
+
+    # Group by header file and add includes
+    header_to_macros = {}
+    for info in macro_infos:
+        if info.header_file not in header_to_macros:
+            header_to_macros[info.header_file] = []
+        header_to_macros[info.header_file].append(info)
+
+    # Add includes for each header file
+    for header_file in sorted(header_to_macros.keys()):
+        output.append(f"#include \"{header_file}\"")
+    output.append("")
+
+    output.append("namespace OHOS {")
+    output.append("namespace Rosen {")
+    output.append("namespace Drawing {")
+    output.append("namespace GEV2 {")
+    output.append("")
+
+    # Base template
+    output.append("// GEFilterTypeInfoV2 - Type information for filter classes")
+    output.append("template<typename T, typename = void>")
+    output.append("struct GEFilterTypeInfoV2 {")
+    output.append("    using FilterClass = T;")
+    output.append("    using ParamType = void;")
+    output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
+    output.append("    static constexpr std::string_view Name = \"\";")
+    output.append("};")
+    output.append("")
+
+    # Specializations for each filter class
+    output.append("// Specializations for filter classes")
+    output.append("// Each filter class uses DECLARE_GEFILTER_TYPEFUNC(FilterClass, ParamType)")
+    output.append("")
+
+    for info in macro_infos:
+        output.append(f"template<>")
+        output.append(f"struct GEFilterTypeInfoV2<{info.filter_class}> {{")
+        output.append(f"    using FilterClass = {info.filter_class};")
+        output.append(f"    using ParamType = {info.params_type};")
+        output.append(f"    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<{info.params_type}>::ID;")
+        output.append(f"    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<{info.params_type}>::FilterName;")
+        output.append("};")
+        output.append("")
+
+    output.append("} // namespace GEV2")
+    output.append("} // namespace Drawing")
+    output.append("} // namespace Rosen")
+    output.append("} // namespace OHOS")
+    output.append("")
+    output.append("#endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_V2_H")
 
     return '\n'.join(output)
 
@@ -943,13 +1063,19 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("#include <string_view>")
     output.append("#include <type_traits>")
     output.append("#include \"ge_effects_params.h\"")
-    output.append("#include \"ge_filter_params.h\"")
     output.append("#include \"ge_value_transformer.h\"")
     output.append("")
 
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
+    output.append("namespace GEV2 {")
+    output.append("")
+    output.append("class GEFilterParams;")
+    output.append("")
+
+    output.append("// Helper macro to escape commas in macro arguments")
+    output.append("#define ESCAPE(...) __VA_ARGS__")
     output.append("")
 
     output.append(generate_type_xmacro(structs, type_aliases))
@@ -959,9 +1085,6 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append(enum_code)
 
     # Generate constraint metadata macros
-    output.append("")
-    output.append("// Helper macro to escape commas in macro arguments")
-    output.append("#define ESCAPE(...) __VA_ARGS__")
     output.append("")
     output.append("// Constraint Metadata Macros")
     output.append("#define GE_PARAMS_CONSTRAINT_RANGE(Tag, Type, Min, Max) \\")
@@ -993,6 +1116,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
+    output.append("        static constexpr bool HAS_MAX = false; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
     output.append("    };")
@@ -1001,6 +1125,8 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("    template<> \\")
     output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
+    output.append("        static constexpr bool HAS_MIN = false; \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
@@ -1010,7 +1136,9 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("    template<> \\")
     output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
+    output.append("        static constexpr bool HAS_MAX = false; \\")
     output.append("        static constexpr Type MIN = Min; \\")
     output.append("    };")
     output.append("")
@@ -1018,6 +1146,8 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("    template<> \\")
     output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("        static constexpr bool HAS_MIN = false; \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
     output.append("        static constexpr Type MAX = Max; \\")
     output.append("    };")
@@ -1040,7 +1170,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("#undef GE_PARAMS_CONSTRAINT_MAX")
     output.append("")
 
-    # Generate GEFilterParamsTypeInfo specializations
+    # Generate GEFilterParamsTypeInfoV2 specializations
     output.append(generate_filter_params_type_info(structs))
     output.append(generate_params_builder_decl())
 
@@ -1053,6 +1183,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     # Generate string-to-enum mapping declaration
     output.append(generate_string_to_enum_mapping_decl())
 
+    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
@@ -1069,12 +1200,14 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     output.append(COPYRIGHT_HEADER)
     output.append("")
     output.append("#include \"ge_params_reflection_v2.h\"")
+    output.append("#include \"ge_filter_params.h\"")
     output.append("#include <unordered_map>")
     output.append("")
 
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
+    output.append("namespace GEV2 {")
     output.append("")
 
     # Generate GEParamsBuilder::Build() implementation
@@ -1092,6 +1225,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     # Generate overloaded SetParamsMemberByTag implementations
     output.append(generate_set_params_member_overloads_impl(structs, type_aliases))
 
+    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
@@ -1141,6 +1275,21 @@ Examples:
         help='Config file path (default: tool/effectgen/config.json)'
     )
 
+    parser.add_argument(
+        '--effect-dirs',
+        type=str,
+        nargs='+',
+        default=None,
+        help='Directories containing effect header files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
+    )
+
+    parser.add_argument(
+        '--filter-type-info-file',
+        type=str,
+        default=None,
+        help='Output GEFilterTypeInfoV2 header file path (default: include/core/ge_filter_type_info_v2.h)'
+    )
+
     args = parser.parse_args()
 
     root_dir = Path(__file__).parent.parent.parent
@@ -1157,6 +1306,17 @@ Examples:
     output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "effect" / "ge_params_reflection_v2.h"
     output_cpp_file = Path(args.output_cpp_file) if args.output_cpp_file else root_dir / "src" / "effect" / "ge_params_reflection_v2.cpp"
     config_file = Path(args.config_file) if args.config_file else Path(__file__).parent / "config.json"
+
+    if args.effect_dirs:
+        effect_dirs = [Path(d) for d in args.effect_dirs]
+    else:
+        effect_dirs = [
+            root_dir / "include" / "effect" / "filter",
+            root_dir / "include" / "effect" / "mask",
+            root_dir / "include" / "effect" / "shader",
+            root_dir / "include" / "effect" / "shape",
+        ]
+    filter_type_info_file = Path(args.filter_type_info_file) if args.filter_type_info_file else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
 
     # Load type aliases from config
     type_aliases = load_config(config_file)
@@ -1188,6 +1348,14 @@ Examples:
 
     print(f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
 
+    # Scan for DECLARE_GEFILTER_TYPEFUNC macros
+    print(f"Scanning for DECLARE_GEFILTER_TYPEFUNC macros...")
+    macro_infos = scan_declare_gefilter_typefunc(effect_dirs)
+    print(f"Found {len(macro_infos)} DECLARE_GEFILTER_TYPEFUNC macros")
+
+    for info in macro_infos:
+        print(f"  {info.filter_class} -> {info.params_type}")
+
     # Generate header file
     print(f"Generating {output_file.name}...")
     header_content = generate_header(structs, type_aliases)
@@ -1215,6 +1383,21 @@ Examples:
         f.write(cpp_content)
 
     print(f"Generated {output_cpp_file}")
+
+    # Generate GEFilterTypeInfoV2 header file
+    print(f"Generating {filter_type_info_file.name}...")
+    filter_type_info_content = generate_filter_type_info_v2_header(macro_infos)
+
+    # Ensure output directory exists
+    filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write to file
+    with open(filter_type_info_file, 'w', encoding='utf-8') as f:
+        f.write(filter_type_info_content)
+
+    print(f"Generated {filter_type_info_file}")
+    print(f"  - {len(macro_infos)} filter type info specializations")
+
     return 0
 
 

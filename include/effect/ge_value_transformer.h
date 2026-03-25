@@ -23,6 +23,7 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+namespace GEV2 {
 // Forward declarations
 enum class GEParamsMemberTag : uint32_t;
 
@@ -89,35 +90,35 @@ struct GEParamsValueTransformer<Tag, Vector2f> {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector2f(
-                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
-                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1])
+                        std::clamp(value.x_, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y_, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1])
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector2f(
-                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
-                        std::max(value.y, Constraint::MIN_COMPONENTS[1])
+                        std::max(value.x_, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y_, Constraint::MIN_COMPONENTS[1])
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector2f(
-                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
-                        std::min(value.y, Constraint::MAX_COMPONENTS[1])
+                        std::min(value.x_, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y_, Constraint::MAX_COMPONENTS[1])
                     );
                 }
             } else {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector2f(
-                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.y, Constraint::MIN, Constraint::MAX)
+                        std::clamp(value.x_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y_, Constraint::MIN, Constraint::MAX)
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector2f(
-                        std::max(value.x, Constraint::MIN),
-                        std::max(value.y, Constraint::MIN)
+                        std::max(value.x_, Constraint::MIN),
+                        std::max(value.y_, Constraint::MIN)
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector2f(
-                        std::min(value.x, Constraint::MAX),
-                        std::min(value.y, Constraint::MAX)
+                        std::min(value.x_, Constraint::MAX),
+                        std::min(value.y_, Constraint::MAX)
                     );
                 }
             }
@@ -134,41 +135,41 @@ struct GEParamsValueTransformer<Tag, Vector3f> {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector3f(
-                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
-                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
-                        std::clamp(value.z, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2])
+                        std::clamp(value.x_, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y_, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
+                        std::clamp(value.z_, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2])
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector3f(
-                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
-                        std::max(value.y, Constraint::MIN_COMPONENTS[1]),
-                        std::max(value.z, Constraint::MIN_COMPONENTS[2])
+                        std::max(value.x_, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y_, Constraint::MIN_COMPONENTS[1]),
+                        std::max(value.z_, Constraint::MIN_COMPONENTS[2])
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector3f(
-                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
-                        std::min(value.y, Constraint::MAX_COMPONENTS[1]),
-                        std::min(value.z, Constraint::MAX_COMPONENTS[2])
+                        std::min(value.x_, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y_, Constraint::MAX_COMPONENTS[1]),
+                        std::min(value.z_, Constraint::MAX_COMPONENTS[2])
                     );
                 }
             } else {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector3f(
-                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.y, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.z, Constraint::MIN, Constraint::MAX)
+                        std::clamp(value.x_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.z_, Constraint::MIN, Constraint::MAX)
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector3f(
-                        std::max(value.x, Constraint::MIN),
-                        std::max(value.y, Constraint::MIN),
-                        std::max(value.z, Constraint::MIN)
+                        std::max(value.x_, Constraint::MIN),
+                        std::max(value.y_, Constraint::MIN),
+                        std::max(value.z_, Constraint::MIN)
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector3f(
-                        std::min(value.x, Constraint::MAX),
-                        std::min(value.y, Constraint::MAX),
-                        std::min(value.z, Constraint::MAX)
+                        std::min(value.x_, Constraint::MAX),
+                        std::min(value.y_, Constraint::MAX),
+                        std::min(value.z_, Constraint::MAX)
                     );
                 }
             }
@@ -185,47 +186,47 @@ struct GEParamsValueTransformer<Tag, Vector4f> {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector4f(
-                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
-                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
-                        std::clamp(value.z, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2]),
-                        std::clamp(value.w, Constraint::MIN_COMPONENTS[3], Constraint::MAX_COMPONENTS[3])
+                        std::clamp(value.x_, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y_, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
+                        std::clamp(value.z_, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2]),
+                        std::clamp(value.w_, Constraint::MIN_COMPONENTS[3], Constraint::MAX_COMPONENTS[3])
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector4f(
-                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
-                        std::max(value.y, Constraint::MIN_COMPONENTS[1]),
-                        std::max(value.z, Constraint::MIN_COMPONENTS[2]),
-                        std::max(value.w, Constraint::MIN_COMPONENTS[3])
+                        std::max(value.x_, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y_, Constraint::MIN_COMPONENTS[1]),
+                        std::max(value.z_, Constraint::MIN_COMPONENTS[2]),
+                        std::max(value.w_, Constraint::MIN_COMPONENTS[3])
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector4f(
-                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
-                        std::min(value.y, Constraint::MAX_COMPONENTS[1]),
-                        std::min(value.z, Constraint::MAX_COMPONENTS[2]),
-                        std::min(value.w, Constraint::MAX_COMPONENTS[3])
+                        std::min(value.x_, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y_, Constraint::MAX_COMPONENTS[1]),
+                        std::min(value.z_, Constraint::MAX_COMPONENTS[2]),
+                        std::min(value.w_, Constraint::MAX_COMPONENTS[3])
                     );
                 }
             } else {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     return Vector4f(
-                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.y, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.z, Constraint::MIN, Constraint::MAX),
-                        std::clamp(value.w, Constraint::MIN, Constraint::MAX)
+                        std::clamp(value.x_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.z_, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.w_, Constraint::MIN, Constraint::MAX)
                     );
                 } else if constexpr (Constraint::HAS_MIN) {
                     return Vector4f(
-                        std::max(value.x, Constraint::MIN),
-                        std::max(value.y, Constraint::MIN),
-                        std::max(value.z, Constraint::MIN),
-                        std::max(value.w, Constraint::MIN)
+                        std::max(value.x_, Constraint::MIN),
+                        std::max(value.y_, Constraint::MIN),
+                        std::max(value.z_, Constraint::MIN),
+                        std::max(value.w_, Constraint::MIN)
                     );
                 } else if constexpr (Constraint::HAS_MAX) {
                     return Vector4f(
-                        std::min(value.x, Constraint::MAX),
-                        std::min(value.y, Constraint::MAX),
-                        std::min(value.z, Constraint::MAX),
-                        std::min(value.w, Constraint::MAX)
+                        std::min(value.x_, Constraint::MAX),
+                        std::min(value.y_, Constraint::MAX),
+                        std::min(value.z_, Constraint::MAX),
+                        std::min(value.w_, Constraint::MAX)
                     );
                 }
             }
@@ -279,6 +280,7 @@ struct GEParamsValueTransformer<Tag, std::pair<float, float>> {
     }
 };
 
+} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
