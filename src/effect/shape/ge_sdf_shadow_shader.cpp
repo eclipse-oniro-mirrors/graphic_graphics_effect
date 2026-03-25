@@ -96,8 +96,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
     auto shaderEffectBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(sdfEffect);
     shaderEffectBuilder->SetChild("sdfShape", sdfShader);
     shaderEffectBuilder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
-    shaderEffectBuilder->SetUniform("shadowColor", params_.shadow.color.GetRedF(),
-        params_.shadow.color.GetGreenF(), params_.shadow.color.GetBlueF());
+    shaderEffectBuilder->SetUniformVec4("shadowColor", params_.shadow.color.GetRedF(),
+        params_.shadow.color.GetGreenF(), params_.shadow.color.GetBlueF(), params_.shadow.color.GetAlphaF());
     shaderEffectBuilder->SetUniform("shadowOffset", params_.shadow.offsetX, params_.shadow.offsetY);
     shaderEffectBuilder->SetUniform("shadowRadius",
         std::max(params_.shadow.radius * RADIUS_FACTOR, SDF_SHADOW_MIN_THRESHOLD));

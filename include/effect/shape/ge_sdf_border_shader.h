@@ -49,22 +49,22 @@ private:
 
     inline static const std::string shaderCode_ = R"(
         uniform shader sdfShape;
-        uniform vec3 u_borderColor;
+        uniform vec4 u_borderColor;
         uniform float u_borderWidth;
 
         // Input data:
         // float d - current SDF shape distance
         // vec4 color - color of the background
-        // vec3 borderColor - color of the border
+        // vec4 borderColor - color of the border
         // float borderWidth - width of the border
-        vec4 borderEffect(float d, vec4 color, vec3 borderColor, float borderWidth)
+        vec4 borderEffect(float d, vec4 color, vec4 borderColor, float borderWidth)
         {
             if (d < 0.0 && d >= -borderWidth) {
-                color = vec4(borderColor, 1.0) * (1.0 - smoothstep(-1.0, 0.0, d));
+                color = borderColor * (1.0 - smoothstep(-1.0, 0.0, d));
             }
 
             if (d < -borderWidth && d >= (-borderWidth - 1.0)) {
-                color = vec4(borderColor, 1.0) * smoothstep(-borderWidth - 1.0, -borderWidth, d);
+                color = borderColor * smoothstep(-borderWidth - 1.0, -borderWidth, d);
             }
 
             return color;
@@ -81,17 +81,17 @@ private:
 
     inline static const std::string outlineShaderCode_ = R"(
         uniform shader sdfShape;
-        uniform vec3 u_borderColor;
+        uniform vec4 u_borderColor;
         uniform float u_borderWidth;
 
-        vec4 borderEffect(float d, vec4 color, vec3 borderColor, float borderWidth)
+        vec4 borderEffect(float d, vec4 color, vec4 borderColor, float borderWidth)
         {
             if (d >= 0.0 && d <= borderWidth) {
-                color = vec4(borderColor, 1.0) * smoothstep(0.0, 1.0, d);
+                color = borderColor * smoothstep(0.0, 1.0, d);
             }
 
             if (d > borderWidth && d <= (borderWidth + 1.0)) {
-                color = vec4(borderColor, 1.0) * (1.0 - smoothstep(borderWidth, borderWidth + 1.0, d));
+                color = borderColor * (1.0 - smoothstep(borderWidth, borderWidth + 1.0, d));
             }
 
             return color;
