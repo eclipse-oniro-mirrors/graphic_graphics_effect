@@ -1,0 +1,366 @@
+#!/usr/bin/env python3
+"""
+GE Effect Generator CLI
+
+A create-react-app style CLI for generating new Graphics Effect templates.
+Supports creating filter, mask, shader, and shape effect types with params files.
+"""
+
+import argparse
+import json
+import re
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+from string import Template
+
+
+def get_copyright_header() -> str:
+    """Generate copyright header with current year."""
+    year = datetime.now().year
+    return f"""/*
+ * Copyright (c) {year} Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+"""
+
+
+class EffectType:
+    FILTER = "filter"
+    MASK = "mask"
+    SHADER = "shader"
+    SHAPE = "shape"
+
+    ALL = [FILTER, MASK, SHADER, SHAPE]
+
+
+def to_snake_case(name: str) -> str:
+    """Convert CamelCase to snake_case."""
+    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+
+
+def to_pascal_case(name: str) -> str:
+    """Convert snake_case to PascalCase."""
+    components = name.split('_')
+    return ''.join(x.title() for x in components)
+
+
+def load_template(template_path: Path) -> Template:
+    """Load a template file."""
+    with open(template_path, 'r') as f:
+        return Template(f.read())
+
+
+def get_effect_info(effect_type: str) -> Dict:
+    """Get information about an effect type."""
+    info = {
+        EffectType.FILTER: {
+            "base_class": "GEShaderFilter",
+            "namespace": "Rosen",
+            "params_suffix": "_shader_filter",
+        },
+        EffectType.MASK: {
+            "base_class": "GEShaderMask",
+            "namespace": "Drawing",
+            "params_suffix": "_shader_mask",
+        },
+        EffectType.SHADER: {
+            "base_class": "GEShader",
+            "namespace": "Rosen",
+            "params_suffix": "_shader",
+        },
+        EffectType.SHAPE: {
+            "base_class": "GESDFShaderShape",
+            "namespace": "Drawing",
+            "params_suffix": "_shader_shape",
+        },
+    }
+    return info.get(effect_type, {})
+
+
+def generate_params_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+    """Generate .params file."""
+    info = get_effect_info(effect_type)
+    snake_name = to_snake_case(name)
+    pascal_name = to_pascal_case(name)
+    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    params_class = f"{class_name}Params"
+
+    file_name = f"{to_snake_case(class_name)}.params"
+
+    template = load_template(templates_dir / f"{effect_type}.params.tpl")
+
+    param_declarations = []
+    for param in params:
+        param_name = param['name']
+        param_type = param['type']
+        default_value = param.get('default', "")
+
+        if default_value:
+            param_declarations.append(f"    {param_type} {param_name} = {default_value};")
+        else:
+            param_declarations.append(f"    {param_type} {param_name};")
+
+    content = template.substitute(
+        YEAR=datetime.now().year,
+        TYPE_ENUM=pascal_name.upper(),
+        DISPLAY_NAME=pascal_name,
+        PARAMS_CLASS=params_class,
+        PARAM_DECLARATIONS='\n'.join(param_declarations) if param_declarations else ""
+    )
+
+    params_file = output_dir / file_name
+    params_file.write_text(content)
+    return params_file
+
+
+def generate_header_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+    """Generate .h file."""
+    info = get_effect_info(effect_type)
+    snake_name = to_snake_case(name)
+    pascal_name = to_pascal_case(name)
+    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    params_class = f"{class_name}Params"
+
+    file_name = f"ge_{snake_name}{info['params_suffix']}.h"
+    header_guard = f"GRAPHICS_EFFECT_{to_snake_case(class_name).upper()}_H"
+
+    template = load_template(templates_dir / f"{effect_type}.h.tpl")
+
+    member_declarations = []
+    for param in params:
+        param_name = param['name']
+        param_type = param['type']
+        member_declarations.append(f"    {param_type} {param_name}_;")
+
+    content = template.substitute(
+        YEAR=datetime.now().year,
+        HEADER_GUARD=header_guard,
+        CLASS_NAME=class_name,
+        PARAMS_CLASS=params_class,
+        MEMBER_DECLARATIONS='\n'.join(member_declarations) if member_declarations else ""
+    )
+
+    header_file = output_dir / file_name
+    header_file.write_text(content)
+    return header_file
+
+
+def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+    """Generate .cpp file."""
+    info = get_effect_info(effect_type)
+    snake_name = to_snake_case(name)
+    pascal_name = to_pascal_case(name)
+    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    params_class = f"{class_name}Params"
+
+    file_name = f"ge_{snake_name}{info['params_suffix']}.cpp"
+    header_file_name = f"ge_{snake_name}{info['params_suffix']}.h"
+
+    template = load_template(templates_dir / f"{effect_type}.cpp.tpl")
+
+    init_list = []
+    for param in params:
+        param_name = param['name']
+        init_list.append(f"    {param_name}_(params.{param_name})")
+
+    initialization = ""
+    if init_list:
+        initialization = ":\n" + ',\n'.join(init_list)
+
+    content = template.substitute(
+        YEAR=datetime.now().year,
+        HEADER_FILE=header_file_name,
+        CLASS_NAME=class_name,
+        PARAMS_CLASS=params_class,
+        INITIALIZATION_LIST=initialization
+    )
+
+    cpp_file = output_dir / file_name
+    cpp_file.write_text(content)
+    return cpp_file
+
+
+def parse_params_file(params_file: Path) -> Tuple[List[str], List[Dict]]:
+    """Parse a JSON file containing parameter definitions."""
+    if not params_file.exists():
+        return [], []
+
+    with open(params_file, 'r') as f:
+        data = json.load(f)
+
+    params = []
+    for param in data.get('params', []):
+        params.append({
+            'name': param['name'],
+            'type': param['type'],
+            'default': param.get('default', ''),
+        })
+
+    return data.get('includes', []), params
+
+
+def get_output_dir(effect_type: str, root_dir: Path) -> Path:
+    """Get the output directory for a given effect type."""
+    if effect_type == EffectType.FILTER:
+        return root_dir / "include" / "effect" / "filter"
+    elif effect_type == EffectType.MASK:
+        return root_dir / "include" / "effect" / "mask"
+    elif effect_type == EffectType.SHADER:
+        return root_dir / "include" / "effect" / "shader"
+    elif effect_type == EffectType.SHAPE:
+        return root_dir / "include" / "effect" / "shape"
+    else:
+        raise ValueError(f"Unknown effect type: {effect_type}")
+
+
+def get_src_output_dir(effect_type: str, root_dir: Path) -> Path:
+    """Get the source output directory for a given effect type."""
+    if effect_type == EffectType.FILTER:
+        return root_dir / "src" / "effect" / "filter"
+    elif effect_type == EffectType.MASK:
+        return root_dir / "src" / "effect" / "mask"
+    elif effect_type == EffectType.SHADER:
+        return root_dir / "src" / "effect" / "shader"
+    elif effect_type == EffectType.SHAPE:
+        return root_dir / "src" / "effect" / "shape"
+    else:
+        raise ValueError(f"Unknown effect type: {effect_type}")
+
+
+def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: Path, templates_dir: Path) -> bool:
+    """Generate all files for a new effect."""
+    try:
+        output_dir = get_output_dir(effect_type, root_dir)
+        src_output_dir = get_src_output_dir(effect_type, root_dir)
+
+        output_dir.mkdir(parents=True, exist_ok=True)
+        src_output_dir.mkdir(parents=True, exist_ok=True)
+
+        print(f"Generating {effect_type} effect: {name}")
+        print(f"  Output directory: {output_dir}")
+
+        params_file = generate_params_file(name, effect_type, params, output_dir, templates_dir)
+        print(f"  Generated: {params_file.name}")
+
+        header_file = generate_header_file(name, effect_type, params, output_dir, templates_dir)
+        print(f"  Generated: {header_file.name}")
+
+        cpp_file = generate_cpp_file(name, effect_type, params, src_output_dir, templates_dir)
+        print(f"  Generated: {cpp_file.name} (in {src_output_dir})")
+
+        print(f"\nSuccessfully generated {name} {effect_type} effect!")
+        return True
+
+    except Exception as e:
+        print(f"Error generating effect: {e}", file=sys.stderr)
+        return False
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="GE Effect Generator - Create new Graphics Effect templates",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Create a filter effect
+  python ge_effect_generator.py my_blur filter
+
+  # Create a filter effect with parameters from JSON file
+  python ge_effect_generator.py my_blur filter --params my_params.json
+
+  # Create a mask effect
+  python ge_effect_generator.py my_gradient mask
+
+  # Create a shader effect
+  python ge_effect_generator.py my_light shader
+
+  # Create a shape effect
+  python ge_effect_generator.py my_shape shape
+
+Available effect types:
+  filter  - Shader-based image processing filters (GEShaderFilter)
+  mask    - Masking operations (GEShaderMask)
+  shader  - Direct shader effects (GEShader)
+  shape   - Shape-based effects (GESDFShaderShape)
+
+Parameter JSON format:
+{
+  "params": [
+    {
+      "name": "radius",
+      "type": "float",
+      "default": "10.0f"
+    },
+    {
+      "name": "intensity",
+      "type": "float",
+      "default": "0.5f"
+    }
+  ]
+}
+        """
+    )
+
+    parser.add_argument(
+        "name",
+        nargs="?",
+        help="Name of the effect (e.g., 'my_blur', 'my_gradient')"
+    )
+
+    parser.add_argument(
+        "type",
+        nargs="?",
+        choices=EffectType.ALL,
+        help="Type of effect to create"
+    )
+
+    parser.add_argument(
+        "--params",
+        type=Path,
+        help="JSON file containing parameter definitions"
+    )
+
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path(__file__).parent.parent,
+        help="Root directory of the graphics_effect project (default: parent of tool directory)"
+    )
+
+    parser.add_argument(
+        "--templates",
+        type=Path,
+        default=Path(__file__).parent / "templates",
+        help="Directory containing template files (default: tool/templates)"
+    )
+
+    args = parser.parse_args()
+
+    if not args.name or not args.type:
+        parser.print_help()
+        return 1
+
+    params = []
+    if args.params:
+        _, params = parse_params_file(args.params)
+        if not params:
+            print(f"Warning: No parameters found in {args.params}", file=sys.stderr)
+
+    return 0 if generate_effect(args.name, args.type, params, args.root, args.templates) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
