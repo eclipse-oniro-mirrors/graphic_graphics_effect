@@ -33,6 +33,15 @@ class PropAttributeExpected:
 
 
 @dataclass
+class RangeAttributeExpected:
+    """Expected result for a range attribute."""
+    min_value: Optional[str] = None
+    min_components: Optional[List[str]] = None
+    max_value: Optional[str] = None
+    max_components: Optional[List[str]] = None
+
+
+@dataclass
 class FieldExpectedResult:
     """Expected result for a parsed field."""
     type: str
@@ -41,6 +50,7 @@ class FieldExpectedResult:
     prop_name: str = ""
     array_accessor_length: Optional[int] = None
     prop_attributes: List[PropAttributeExpected] = None
+    range_attr: Optional[RangeAttributeExpected] = None
 
     def __post_init__(self):
         if self.prop_attributes is None:
@@ -136,7 +146,13 @@ class TestRunner:
                             name=pa.get('name', ''),
                             array_accessor_length=pa.get('array_accessor_length'),
                             alias=pa.get('alias')
-                        ) for pa in f.get('prop_attributes', [])]
+                        ) for pa in f.get('prop_attributes', [])],
+                        range_attr=RangeAttributeExpected(
+                            min_value=f.get('range_attr', {}).get('min_value'),
+                            min_components=f.get('range_attr', {}).get('min_components'),
+                            max_value=f.get('range_attr', {}).get('max_value'),
+                            max_components=f.get('range_attr', {}).get('max_components')
+                        ) if 'range_attr' in f else None
                     ) for f in s.get('fields', [])]
                 ) for s in result_data.get('structs', [])]
 
@@ -185,6 +201,13 @@ class TestRunner:
                                 "alias": pa.alias
                             } for pa in field.prop_attributes
                         ]
+                    if field.range_attr:
+                        field_dict["range_attr"] = {
+                            "min_value": field.range_attr.min_value,
+                            "min_components": field.range_attr.min_components,
+                            "max_value": field.range_attr.max_value,
+                            "max_components": field.range_attr.max_components
+                        }
                     fields_data.append(field_dict)
 
                 struct_data = StructExpectedResult(
@@ -374,7 +397,36 @@ class TestRunner:
                             if exp_prop.array_accessor_length != act_prop.array_accessor_length:
                                 validation['passed'] = False
                                 validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1}, prop_attribute {k+1} array_accessor_length mismatch: expected {exp_prop.array_accessor_length}, got {act_prop.array_accessor_length}"
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} array_accessor_length mismatch: expected {exp_prop.array_accessor_length}, got {act_prop.array_accessor_length}"
+                                )
+
+                        exp_range = exp_field.range_attr
+                        act_range = act_field.range_attr
+                        if (exp_range is None) != (act_range is None):
+                            validation['passed'] = False
+                            validation['differences'].append(
+                                f"Struct {i+1}, field {j+1} range_attr presence mismatch: expected {exp_range is not None}, got {act_range is not None}"
+                            )
+                        elif exp_range is not None and act_range is not None:
+                            if exp_range.min_value != act_range.min_value:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} range_attr min_value mismatch: expected '{exp_range.min_value}', got '{act_range.min_value}'"
+                                )
+                            if exp_range.min_components != act_range.min_components:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} range_attr min_components mismatch: expected {exp_range.min_components}, got {act_range.min_components}"
+                                )
+                            if exp_range.max_value != act_range.max_value:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} range_attr max_value mismatch: expected '{exp_range.max_value}', got '{act_range.max_value}'"
+                                )
+                            if exp_range.max_components != act_range.max_components:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} range_attr max_components mismatch: expected {exp_range.max_components}, got {act_range.max_components}"
                                 )
 
             validation_results.append(validation)

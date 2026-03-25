@@ -193,6 +193,8 @@ constexpr char GE_FILTER_MESA_BLUR_STRETCH_OFFSET_W[] = "OFFSET_W";
 constexpr char GE_FILTER_MESA_BLUR_STRETCH_TILE_MODE[] = "TILE_MODE";
 constexpr char GE_FILTER_MESA_BLUR_STRETCH_WIDTH[] = "WIDTH";
 constexpr char GE_FILTER_MESA_BLUR_STRETCH_HEIGHT[] = "HEIGHT";
+constexpr char GE_FILTER_MESA_BLUR_ANGLE[] = "MESA_BLUR_ANGLE";
+constexpr char GE_FILTER_MESA_BLUR_IS_DIRECTION[] = "MESA_BLUR_IS_DIRECTION";
 struct GEMESABlurShaderFilterParams {
     int radius;
     float greyCoef1;
@@ -761,6 +763,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(WATER_DROPLET_TRANSITION, GEWaterDropletTransiti
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR[] = "VariableRadiusBlur";
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_RADIUS[] = "VariableRadiusBlur_Radius";
 constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_MASK[] = "VariableRadiusBlur_Mask";
+constexpr char GE_FILTER_VARIABLE_RADIUS_BLUR_APPLYINSIDEMASK[] = "VariableRadiusBlur_ApplyInsideMask";
 struct GEVariableRadiusBlurShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     float blurRadius;
@@ -770,6 +773,7 @@ REGISTER_GEFILTERPARAM_TYPEINFO(VARIABLE_RADIUS_BLUR, GEVariableRadiusBlurShader
                                 GE_FILTER_VARIABLE_RADIUS_BLUR);
 
 constexpr char GE_MASK_LINEAR_GRADIENT[] = "MaskLinearGradient";
+constexpr char GE_MASK_LINEAR_GRADIENT_FRACTION_STOPS[] = "MaskLinearGradient_FractionStops";
 constexpr char GE_MASK_LINEAR_GRADIENT_START_POSITION[] = "MaskLinearGradient_StartPosition";
 constexpr char GE_MASK_LINEAR_GRADIENT_END_POSITION[] = "MaskLinearGradient_EndPosition";
 struct GELinearGradientShaderMaskParams {

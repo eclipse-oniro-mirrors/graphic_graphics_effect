@@ -178,6 +178,1006 @@ std::optional<GEParamsMemberTagRange> GEParamsMemberHelper::GetParamsMemberTagRa
 
 #undef GE_GET_TAG_RANGE_CASE
 
+GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
+{
+    switch (tag) {
+        case GEParamsMemberTag::AIBAR_AI_BAR_LOW:
+            return GEFilterType::AIBAR;
+        case GEParamsMemberTag::AIBAR_AI_BAR_HIGH:
+            return GEFilterType::AIBAR;
+        case GEParamsMemberTag::AIBAR_AI_BAR_THRESHOLD:
+            return GEFilterType::AIBAR;
+        case GEParamsMemberTag::AIBAR_AI_BAR_OPACITY:
+            return GEFilterType::AIBAR;
+        case GEParamsMemberTag::AIBAR_AI_BAR_SATURATION:
+            return GEFilterType::AIBAR;
+        case GEParamsMemberTag::AURORA_NOISE_NOISE:
+            return GEFilterType::AURORA_NOISE;
+        case GEParamsMemberTag::AURORA_NOISE_FREQ_X:
+            return GEFilterType::AURORA_NOISE;
+        case GEParamsMemberTag::AURORA_NOISE_FREQ_Y:
+            return GEFilterType::AURORA_NOISE;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH0:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH1:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH2:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH3:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH4:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH5:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH6:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH7:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH8:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH9:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH10:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BEZIER_WARP_DESTINATION_PATCH11:
+            return GEFilterType::BEZIER_WARP;
+        case GEParamsMemberTag::BORDER_LIGHT_POSITION:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::BORDER_LIGHT_COLOR:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::BORDER_LIGHT_INTENSITY:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::BORDER_LIGHT_WIDTH:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::BORDER_LIGHT_ROTATION_ANGLE:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::BORDER_LIGHT_CORNER_RADIUS:
+            return GEFilterType::BORDER_LIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_COLORS0:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_COLORS1:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_COLORS2:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_COLORS3:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_ROTATION_SEED:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_GRADIENT_X:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_GRADIENT_Y:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_PROGRESS:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_STRENGTH:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_DISTORT_STRENGTH:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_BLEND_GRADIENT:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::CIRCLE_FLOWLIGHT_MASK:
+            return GEFilterType::CIRCLE_FLOWLIGHT;
+        case GEParamsMemberTag::COLOR_GRADIENT_COLORS:
+            return GEFilterType::COLOR_GRADIENT;
+        case GEParamsMemberTag::COLOR_GRADIENT_POSITIONS:
+            return GEFilterType::COLOR_GRADIENT;
+        case GEParamsMemberTag::COLOR_GRADIENT_STRENGTHS:
+            return GEFilterType::COLOR_GRADIENT;
+        case GEParamsMemberTag::COLOR_GRADIENT_MASK:
+            return GEFilterType::COLOR_GRADIENT;
+        case GEParamsMemberTag::CONTENT_LIGHT_POSITION:
+            return GEFilterType::CONTENT_LIGHT;
+        case GEParamsMemberTag::CONTENT_LIGHT_COLOR:
+            return GEFilterType::CONTENT_LIGHT;
+        case GEParamsMemberTag::CONTENT_LIGHT_INTENSITY:
+            return GEFilterType::CONTENT_LIGHT;
+        case GEParamsMemberTag::CONTENT_LIGHT_ROTATION_ANGLE:
+            return GEFilterType::CONTENT_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_START:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_LENGTH:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_RADIUS:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_LIGHT_WEIGHT:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_WEIGHT:
+            return GEFilterType::CONTOUR_DIAGONAL_FLOW_LIGHT;
+        case GEParamsMemberTag::DIRECTION_LIGHT_MASK:
+            return GEFilterType::DIRECTION_LIGHT;
+        case GEParamsMemberTag::DIRECTION_LIGHT_MASK_FACTOR:
+            return GEFilterType::DIRECTION_LIGHT;
+        case GEParamsMemberTag::DIRECTION_LIGHT_LIGHT_DIRECTION:
+            return GEFilterType::DIRECTION_LIGHT;
+        case GEParamsMemberTag::DIRECTION_LIGHT_LIGHT_COLOR:
+            return GEFilterType::DIRECTION_LIGHT;
+        case GEParamsMemberTag::DIRECTION_LIGHT_LIGHT_INTENSITY:
+            return GEFilterType::DIRECTION_LIGHT;
+        case GEParamsMemberTag::DISPERSION_MASK:
+            return GEFilterType::DISPERSION;
+        case GEParamsMemberTag::DISPERSION_OPACITY:
+            return GEFilterType::DISPERSION;
+        case GEParamsMemberTag::DISPERSION_RED_OFFSET:
+            return GEFilterType::DISPERSION;
+        case GEParamsMemberTag::DISPERSION_GREEN_OFFSET:
+            return GEFilterType::DISPERSION;
+        case GEParamsMemberTag::DISPERSION_BLUE_OFFSET:
+            return GEFilterType::DISPERSION;
+        case GEParamsMemberTag::DISPLACEMENT_DISTORT_FILTER_FACTOR:
+            return GEFilterType::DISPLACEMENT_DISTORT_FILTER;
+        case GEParamsMemberTag::DISPLACEMENT_DISTORT_FILTER_MASK:
+            return GEFilterType::DISPLACEMENT_DISTORT_FILTER;
+        case GEParamsMemberTag::DOT_MATRIX_PATH_DIRECTION:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_EFFECT_COLORS:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_COLOR_FRACTIONS:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_START_POINTS:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_PATH_WIDTH:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_INVERSE_EFFECT:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_DOT_COLOR:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_DOT_SPACING:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_DOT_RADIUS:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_BG_COLOR:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_EFFECT_TYPE:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOT_MATRIX_PROGRESS:
+            return GEFilterType::DOT_MATRIX;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_CENTER1:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_CENTER2:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_RADIUS:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_WIDTH:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_TURBULENCE:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::DOUBLE_RIPPLE_MASK_HALO_THICKNESS:
+            return GEFilterType::DOUBLE_RIPPLE_MASK;
+        case GEParamsMemberTag::EDGE_LIGHT_ALPHA:
+            return GEFilterType::EDGE_LIGHT;
+        case GEParamsMemberTag::EDGE_LIGHT_BLOOM:
+            return GEFilterType::EDGE_LIGHT;
+        case GEParamsMemberTag::EDGE_LIGHT_COLOR:
+            return GEFilterType::EDGE_LIGHT;
+        case GEParamsMemberTag::EDGE_LIGHT_MASK:
+            return GEFilterType::EDGE_LIGHT;
+        case GEParamsMemberTag::EDGE_LIGHT_USE_RAW_COLOR:
+            return GEFilterType::EDGE_LIGHT;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_INNER_BEZIER:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_OUTER_BEZIER:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_CORNER_RADIUS:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_INNER_FRAME_WIDTH:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_OUTER_FRAME_WIDTH:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_RECT_W_H:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FRAME_GRADIENT_MASK_RECT_POS:
+            return GEFilterType::FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::FROSTED_GLASS_BLUR_RADIUS:
+            return GEFilterType::FROSTED_GLASS_BLUR;
+        case GEParamsMemberTag::FROSTED_GLASS_BLUR_RADIUS_SCALE:
+            return GEFilterType::FROSTED_GLASS_BLUR;
+        case GEParamsMemberTag::FROSTED_GLASS_BLUR_REFRACT_OUT_PX:
+            return GEFilterType::FROSTED_GLASS_BLUR;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_WEIGHTS_EMBOSS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_WEIGHTS_EDL:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BG_RATES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BG_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BG_POS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BG_NEG:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BG_ALPHA:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_REFRACT_PARAMS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SD_PARAMS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SD_RATES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SD_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SD_POS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SD_NEG:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ENV_LIGHT_PARAMS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ENV_LIGHT_RATES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ENV_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ENV_LIGHT_POS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ENV_LIGHT_NEG:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_PARAMS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_ANGLES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_DIR:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_RATES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_POS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_ED_LIGHT_NEG:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SDF_SHAPE:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_WAVE_DISTURBANCE:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BLUR_IMAGE:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_BLUR_IMAGE_FOR_EDGE:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SNAPSHOT_RECT:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_SNAPSHOT_MATRIX:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_REFRACT_OUT_PX:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_MATERIAL_COLOR:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_WEIGHTS_EMBOSS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_BG_RATES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_BG_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_BG_POS:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_BG_NEG:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_EFFECT_DARK_SCALE:
+            return GEFilterType::FROSTED_GLASS_EFFECT;
+        case GEParamsMemberTag::FROSTED_GLASS_BLUR_PARAMS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_WEIGHTS_EMBOSS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_WEIGHTS_EDL:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SDF_SHAPE:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_WAVE_DISTURBANCE:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BG_RATES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BG_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BG_POS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BG_NEG:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BG_ALPHA:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_REFRACT_PARAMS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SD_PARAMS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SD_RATES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SD_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SD_POS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_SD_NEG:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ENV_LIGHT_PARAMS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ENV_LIGHT_RATES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ENV_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ENV_LIGHT_POS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ENV_LIGHT_NEG:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_PARAMS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_ANGLES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_DIR:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_RATES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_POS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_ED_LIGHT_NEG:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_BLUR_PARAM:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_WEIGHTS_EMBOSS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_BG_RATES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_BG_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_BG_POS:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_BG_NEG:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_ED_LIGHT_K_B_S:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_DARK_SCALE:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BASE_VIBRANCY_ENABLED:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_BASE_MATERIAL_TYPE:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::FROSTED_GLASS_MATERIAL_COLOR:
+            return GEFilterType::FROSTED_GLASS;
+        case GEParamsMemberTag::GASIFY_BLUR_SOURCE_IMAGE:
+            return GEFilterType::GASIFY_BLUR;
+        case GEParamsMemberTag::GASIFY_BLUR_MASK_IMAGE:
+            return GEFilterType::GASIFY_BLUR;
+        case GEParamsMemberTag::GASIFY_BLUR_PROGRESS:
+            return GEFilterType::GASIFY_BLUR;
+        case GEParamsMemberTag::GASIFY_SOURCE_IMAGE:
+            return GEFilterType::GASIFY;
+        case GEParamsMemberTag::GASIFY_MASK_IMAGE:
+            return GEFilterType::GASIFY;
+        case GEParamsMemberTag::GASIFY_PROGRESS:
+            return GEFilterType::GASIFY;
+        case GEParamsMemberTag::GASIFY_SCALE_TWIST_SCALE:
+            return GEFilterType::GASIFY_SCALE_TWIST;
+        case GEParamsMemberTag::GASIFY_SCALE_TWIST_SOURCE_IMAGE:
+            return GEFilterType::GASIFY_SCALE_TWIST;
+        case GEParamsMemberTag::GASIFY_SCALE_TWIST_MASK_IMAGE:
+            return GEFilterType::GASIFY_SCALE_TWIST;
+        case GEParamsMemberTag::GASIFY_SCALE_TWIST_PROGRESS:
+            return GEFilterType::GASIFY_SCALE_TWIST;
+        case GEParamsMemberTag::GREY_GREY_COEF1:
+            return GEFilterType::GREY;
+        case GEParamsMemberTag::GREY_GREY_COEF2:
+            return GEFilterType::GREY;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS0:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS1:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS2:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS3:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS4:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS5:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS6:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS7:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_GRID_POINTS8:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES0:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES1:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES2:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES3:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES4:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES5:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES6:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES7:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::GRID_WARP_ROTATION_ANGLES8:
+            return GEFilterType::GRID_WARP;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_MASK:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_MASK_CLOCK:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_MASK_PROGRESS:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_USE_EFFECT_MASK:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_TINT_COLOR:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_RIPPLE_POSITION:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_RIPPLE_PROGRESS:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_DISTORT_PROGRESS:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_DISTORT_FACTOR:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_REFLECTION_FACTOR:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_REFRACTION_FACTOR:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_BLUR_LEFT:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_BLUR_TOP:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_MATERIAL_FACTOR:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_CORNER_RADIUS:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_RATE:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_LIGHT_UP_DEGREE:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_CUBIC_COEFF:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_QUAD_COEFF:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_SATURATION:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_POS_R_G_B:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_NEG_R_G_B:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_FRACTION:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::HARMONIUM_EFFECT_TOTAL_MATRIX:
+            return GEFilterType::HARMONIUM_EFFECT;
+        case GEParamsMemberTag::IMAGE_MASK_IMAGE:
+            return GEFilterType::IMAGE_MASK;
+        case GEParamsMemberTag::KAWASE_BLUR_RADIUS:
+            return GEFilterType::KAWASE_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_BLUR_RADIUS:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_FRACTION_STOPS:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_DIRECTION:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_GEO_WIDTH:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_GEO_HEIGHT:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_MAT:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_TRAN_X:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_TRAN_Y:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_IS_OFFSCREEN_CANVAS:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_BLUR_IS_RADIUS_GRADIENT:
+            return GEFilterType::LINEAR_GRADIENT_BLUR;
+        case GEParamsMemberTag::LINEAR_GRADIENT_MASK_FRACTION_STOPS:
+            return GEFilterType::LINEAR_GRADIENT_MASK;
+        case GEParamsMemberTag::LINEAR_GRADIENT_MASK_START_POSITION:
+            return GEFilterType::LINEAR_GRADIENT_MASK;
+        case GEParamsMemberTag::LINEAR_GRADIENT_MASK_END_POSITION:
+            return GEFilterType::LINEAR_GRADIENT_MASK;
+        case GEParamsMemberTag::MAGNIFIER_FACTOR:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_WIDTH:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_HEIGHT:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_CORNER_RADIUS:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_BORDER_WIDTH:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_ZOOM_OFFSET_X:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_ZOOM_OFFSET_Y:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_SHADOW_OFFSET_X:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_SHADOW_OFFSET_Y:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_SHADOW_SIZE:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_SHADOW_STRENGTH:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_GRADIENT_MASK_COLOR1:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_GRADIENT_MASK_COLOR2:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_OUTER_CONTOUR_COLOR1:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_OUTER_CONTOUR_COLOR2:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAGNIFIER_ROTATE_DEGREE:
+            return GEFilterType::MAGNIFIER;
+        case GEParamsMemberTag::MAP_COLOR_BY_BRIGHTNESS_COLORS:
+            return GEFilterType::MAP_COLOR_BY_BRIGHTNESS;
+        case GEParamsMemberTag::MAP_COLOR_BY_BRIGHTNESS_POSITIONS:
+            return GEFilterType::MAP_COLOR_BY_BRIGHTNESS;
+        case GEParamsMemberTag::MASK_TRANSITION_MASK:
+            return GEFilterType::MASK_TRANSITION;
+        case GEParamsMemberTag::MASK_TRANSITION_FACTOR:
+            return GEFilterType::MASK_TRANSITION;
+        case GEParamsMemberTag::MASK_TRANSITION_INVERSE:
+            return GEFilterType::MASK_TRANSITION;
+        case GEParamsMemberTag::MESA_BLUR_RADIUS:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_GREY_COEF1:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_GREY_COEF2:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_OFFSET_X:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_OFFSET_Y:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_OFFSET_Z:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_OFFSET_W:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_TILE_MODE:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_WIDTH:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_HEIGHT:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_IS_DIRECTION:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::MESA_BLUR_ANGLE:
+            return GEFilterType::MESA_BLUR;
+        case GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_CENTER:
+            return GEFilterType::PARTICLE_CIRCULAR_HALO;
+        case GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_RADIUS:
+            return GEFilterType::PARTICLE_CIRCULAR_HALO;
+        case GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_NOISE:
+            return GEFilterType::PARTICLE_CIRCULAR_HALO;
+        case GEParamsMemberTag::PIXEL_MAP_MASK_IMAGE:
+            return GEFilterType::PIXEL_MAP_MASK;
+        case GEParamsMemberTag::PIXEL_MAP_MASK_SRC:
+            return GEFilterType::PIXEL_MAP_MASK;
+        case GEParamsMemberTag::PIXEL_MAP_MASK_DST:
+            return GEFilterType::PIXEL_MAP_MASK;
+        case GEParamsMemberTag::PIXEL_MAP_MASK_FILL_COLOR:
+            return GEFilterType::PIXEL_MAP_MASK;
+        case GEParamsMemberTag::RADIAL_GRADIENT_MASK_CENTER:
+            return GEFilterType::RADIAL_GRADIENT_MASK;
+        case GEParamsMemberTag::RADIAL_GRADIENT_MASK_RADIUS_X:
+            return GEFilterType::RADIAL_GRADIENT_MASK;
+        case GEParamsMemberTag::RADIAL_GRADIENT_MASK_RADIUS_Y:
+            return GEFilterType::RADIAL_GRADIENT_MASK;
+        case GEParamsMemberTag::RADIAL_GRADIENT_MASK_COLORS:
+            return GEFilterType::RADIAL_GRADIENT_MASK;
+        case GEParamsMemberTag::RADIAL_GRADIENT_MASK_POSITIONS:
+            return GEFilterType::RADIAL_GRADIENT_MASK;
+        case GEParamsMemberTag::RIPPLE_MASK_CENTER:
+            return GEFilterType::RIPPLE_MASK;
+        case GEParamsMemberTag::RIPPLE_MASK_RADIUS:
+            return GEFilterType::RIPPLE_MASK;
+        case GEParamsMemberTag::RIPPLE_MASK_WIDTH:
+            return GEFilterType::RIPPLE_MASK;
+        case GEParamsMemberTag::RIPPLE_MASK_WIDTH_CENTER_OFFSET:
+            return GEFilterType::RIPPLE_MASK;
+        case GEParamsMemberTag::SDF_BORDER_SHAPE:
+            return GEFilterType::SDF_BORDER;
+        case GEParamsMemberTag::SDF_BORDER_BORDER:
+            return GEFilterType::SDF_BORDER;
+        case GEParamsMemberTag::SDF_CLIP_SHAPE:
+            return GEFilterType::SDF_CLIP;
+        case GEParamsMemberTag::SDF_COLOR_SHAPE:
+            return GEFilterType::SDF_COLOR;
+        case GEParamsMemberTag::SDF_COLOR_COLOR:
+            return GEFilterType::SDF_COLOR;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_BLOOM_INTENSITY_CUTOFF:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_MAX_INTENSITY:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_MAX_BLOOM_INTENSITY:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_BLOOM_FALLOFF_POW:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_MIN_BORDER_WIDTH:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_MAX_BORDER_WIDTH:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_INNER_BORDER_BLOOM_WIDTH:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_SDF_IMAGE:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_LIGHT_MASK:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_EDGE_LIGHT_SDF_SHAPE:
+            return GEFilterType::SDF_EDGE_LIGHT;
+        case GEParamsMemberTag::SDF_FROM_IMAGE_SPREAD_FACTOR:
+            return GEFilterType::SDF_FROM_IMAGE;
+        case GEParamsMemberTag::SDF_FROM_IMAGE_GENERATE_DERIVS:
+            return GEFilterType::SDF_FROM_IMAGE;
+        case GEParamsMemberTag::SDF_PIXELMAP_SHAPE_IMAGE:
+            return GEFilterType::SDF_PIXELMAP_SHAPE;
+        case GEParamsMemberTag::SDF_RRECT_SHAPE_RRECT:
+            return GEFilterType::SDF_RRECT_SHAPE;
+        case GEParamsMemberTag::SDF_SHADOW_SHAPE:
+            return GEFilterType::SDF_SHADOW;
+        case GEParamsMemberTag::SDF_SHADOW_SHADOW:
+            return GEFilterType::SDF_SHADOW;
+        case GEParamsMemberTag::SDF_TRANSFORM_SHAPE_SHAPE:
+            return GEFilterType::SDF_TRANSFORM_SHAPE;
+        case GEParamsMemberTag::SDF_TRANSFORM_SHAPE_MATRIX:
+            return GEFilterType::SDF_TRANSFORM_SHAPE;
+        case GEParamsMemberTag::SDF_UNION_OP_SPACING:
+            return GEFilterType::SDF_UNION_OP;
+        case GEParamsMemberTag::SDF_UNION_OP_LEFT:
+            return GEFilterType::SDF_UNION_OP;
+        case GEParamsMemberTag::SDF_UNION_OP_RIGHT:
+            return GEFilterType::SDF_UNION_OP;
+        case GEParamsMemberTag::SDF_UNION_OP_OP:
+            return GEFilterType::SDF_UNION_OP;
+        case GEParamsMemberTag::SOUND_WAVE_COLOR_A:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_COLOR_B:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_COLOR_C:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_COLOR_PROGRESS:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SOUND_INTENSITY:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SHOCK_WAVE_ALPHA_A:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SHOCK_WAVE_ALPHA_B:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SHOCK_WAVE_PROGRESS_A:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SHOCK_WAVE_PROGRESS_B:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA:
+            return GEFilterType::SOUND_WAVE;
+        case GEParamsMemberTag::USE_EFFECT_MASK_IMAGE:
+            return GEFilterType::USE_EFFECT_MASK;
+        case GEParamsMemberTag::USE_EFFECT_MASK_USE_EFFECT:
+            return GEFilterType::USE_EFFECT_MASK;
+        case GEParamsMemberTag::VARIABLE_RADIUS_BLUR_MASK:
+            return GEFilterType::VARIABLE_RADIUS_BLUR;
+        case GEParamsMemberTag::VARIABLE_RADIUS_BLUR_BLUR_RADIUS:
+            return GEFilterType::VARIABLE_RADIUS_BLUR;
+        case GEParamsMemberTag::VARIABLE_RADIUS_BLUR_APPLY_INSIDE_MASK:
+            return GEFilterType::VARIABLE_RADIUS_BLUR;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_TOP_LAYER:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_INVERSE:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_PROGRESS:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_RADIUS:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_TRANSITION_FADE_WIDTH:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_DISTORTION_INTENSITY:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_DISTORTION_THICKNESS:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_LIGHT_STRENGTH:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_LIGHT_SOFTNESS:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_NOISE_SCALE_X:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_NOISE_SCALE_Y:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_NOISE_STRENGTH_X:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_NOISE_STRENGTH_Y:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_DROPLET_TRANSITION_POSITION:
+            return GEFilterType::WATER_DROPLET_TRANSITION;
+        case GEParamsMemberTag::WATER_RIPPLE_PROGRESS:
+            return GEFilterType::WATER_RIPPLE;
+        case GEParamsMemberTag::WATER_RIPPLE_WAVE_COUNT:
+            return GEFilterType::WATER_RIPPLE;
+        case GEParamsMemberTag::WATER_RIPPLE_RIPPLE_CENTER_X:
+            return GEFilterType::WATER_RIPPLE;
+        case GEParamsMemberTag::WATER_RIPPLE_RIPPLE_CENTER_Y:
+            return GEFilterType::WATER_RIPPLE;
+        case GEParamsMemberTag::WATER_RIPPLE_RIPPLE_MODE:
+            return GEFilterType::WATER_RIPPLE;
+        case GEParamsMemberTag::WAVE_DISTURBANCE_MASK_CLICK_POS:
+            return GEFilterType::WAVE_DISTURBANCE_MASK;
+        case GEParamsMemberTag::WAVE_DISTURBANCE_MASK_PROGRESS:
+            return GEFilterType::WAVE_DISTURBANCE_MASK;
+        case GEParamsMemberTag::WAVE_DISTURBANCE_MASK_WAVE_R_D:
+            return GEFilterType::WAVE_DISTURBANCE_MASK;
+        case GEParamsMemberTag::WAVE_DISTURBANCE_MASK_WAVE_L_W_H:
+            return GEFilterType::WAVE_DISTURBANCE_MASK;
+        case GEParamsMemberTag::WAVE_GRADIENT_MASK_CENTER:
+            return GEFilterType::WAVE_GRADIENT_MASK;
+        case GEParamsMemberTag::WAVE_GRADIENT_MASK_WIDTH:
+            return GEFilterType::WAVE_GRADIENT_MASK;
+        case GEParamsMemberTag::WAVE_GRADIENT_MASK_PROPAGATION_RADIUS:
+            return GEFilterType::WAVE_GRADIENT_MASK;
+        case GEParamsMemberTag::WAVE_GRADIENT_MASK_BLUR_RADIUS:
+            return GEFilterType::WAVE_GRADIENT_MASK;
+        case GEParamsMemberTag::WAVE_GRADIENT_MASK_TURBULENCE_STRENGTH:
+            return GEFilterType::WAVE_GRADIENT_MASK;
+        case GEParamsMemberTag::WAVY_RIPPLE_LIGHT_CENTER:
+            return GEFilterType::WAVY_RIPPLE_LIGHT;
+        case GEParamsMemberTag::WAVY_RIPPLE_LIGHT_RADIUS:
+            return GEFilterType::WAVY_RIPPLE_LIGHT;
+        case GEParamsMemberTag::WAVY_RIPPLE_LIGHT_THICKNESS:
+            return GEFilterType::WAVY_RIPPLE_LIGHT;
+        case GEParamsMemberTag::AIBAR_GLOW_L_T_W_H:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_STRETCH_FACTOR:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_BAR_ANGLE:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_COLORS0:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_COLORS1:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_COLORS2:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_COLORS3:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_POSITIONS0:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_POSITIONS1:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_POSITIONS2:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_POSITIONS3:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_STRENGTHS:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_BRIGHTNESS:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_GLOW_PROGRESS:
+            return GEFilterType::AIBAR_GLOW;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_L_T_W_H:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_COLORS0:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_COLORS1:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_COLORS2:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_COLORS3:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_POSITIONS0:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_POSITIONS1:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_POSITIONS2:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_POSITIONS3:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_STRENGTHS:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_BRIGHTNESS:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::AIBAR_RECT_HALO_PROGRESS:
+            return GEFilterType::AIBAR_RECT_HALO;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS0:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS1:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS2:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS3:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS4:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS5:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS6:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS7:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS8:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS9:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS10:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLORS11:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS0:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS1:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS2:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS3:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS4:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS5:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS6:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS7:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS8:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS9:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS10:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_POSITIONS11:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS0:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS1:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS2:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS3:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS4:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS5:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS6:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS7:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS8:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS9:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS10:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_STRENGTHS11:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_COLOR_NUM:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_BLEND:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_BLENDK:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_MASK:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::COLOR_GRADIENT_EFFECT_BRIGHTNESS:
+            return GEFilterType::COLOR_GRADIENT_EFFECT;
+        case GEParamsMemberTag::DISTORT_CHROMA_PROGRESS:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_TURBULENT_MASK:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_FREQUENCY:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_SHARPNESS:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_BRIGHTNESS:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_DISPERSION:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_SATURATION:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_VERTICAL_MOVE_DISTANCE:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_GRANULARITY:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_DISTORT_FACTOR:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_COLOR_STRENGTH:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DISTORT_CHROMA_MASK:
+            return GEFilterType::DISTORT_CHROMA;
+        case GEParamsMemberTag::DUPOLI_NOISE_MASK_PROGRESS:
+            return GEFilterType::DUPOLI_NOISE_MASK;
+        case GEParamsMemberTag::DUPOLI_NOISE_MASK_GRANULARITY:
+            return GEFilterType::DUPOLI_NOISE_MASK;
+        case GEParamsMemberTag::DUPOLI_NOISE_MASK_VERTICAL_MOVE_DISTANCE:
+            return GEFilterType::DUPOLI_NOISE_MASK;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_COLORS0:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_COLORS1:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_COLORS2:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_COLORS3:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_GRADIENT_BEGIN:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_GRADIENT_END:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_EFFECT_ALPHA:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::GRADIENT_FLOW_COLORS_PROGRESS:
+            return GEFilterType::GRADIENT_FLOW_COLORS;
+        case GEParamsMemberTag::LIGHT_CAVE_COLOR_A:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::LIGHT_CAVE_COLOR_B:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::LIGHT_CAVE_COLOR_C:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::LIGHT_CAVE_POSITION:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::LIGHT_CAVE_RADIUS_X_Y:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::LIGHT_CAVE_PROGRESS:
+            return GEFilterType::LIGHT_CAVE;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_GRADIENT_BEZIER_CONTROL_POINTS:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_CORNER_RADIUS:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_INNER_FRAME_WIDTH:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_MIDDLE_FRAME_WIDTH:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_OUTSIDE_FRAME_WIDTH:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_R_RECT_W_H:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_R_RECT_POS:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_SLOPE:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::NOISY_FRAME_GRADIENT_MASK_PROGRESS:
+            return GEFilterType::NOISY_FRAME_GRADIENT_MASK;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_START_END_POSITION:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_WAVE_TOP:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_SCALE:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_SHARPING:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_FEATHERING:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_COLOR:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        case GEParamsMemberTag::ROUNDED_RECT_FLOWLIGHT_PROGRESS:
+            return GEFilterType::ROUNDED_RECT_FLOWLIGHT;
+        default:
+            return GEFilterType::NONE;
+    }
+}
+
 GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
@@ -696,6 +1696,1041 @@ GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)
     }
     return GEParamsMemberTag::INVALID;
 }
+
+// Helper macro to validate and set parameter
+#define GE_VALIDATE_AND_SET(Tag, Value) \
+    case GEParamsMemberTag::Tag: { \
+        using ExpectedType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \
+        using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \
+        auto unboxed = GEFilterParams::Unbox<ExpectedType>(params); \
+        if (!unboxed.has_value()) { \
+            return; \
+        } \
+        auto& actualParams = *unboxed; \
+        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, FieldType>::Transform(Value); \
+        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \
+        break; \
+    }
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const float& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(AIBAR_AI_BAR_LOW, value)
+        GE_VALIDATE_AND_SET(AIBAR_AI_BAR_HIGH, value)
+        GE_VALIDATE_AND_SET(AIBAR_AI_BAR_THRESHOLD, value)
+        GE_VALIDATE_AND_SET(AIBAR_AI_BAR_OPACITY, value)
+        GE_VALIDATE_AND_SET(AIBAR_AI_BAR_SATURATION, value)
+        GE_VALIDATE_AND_SET(AURORA_NOISE_NOISE, value)
+        GE_VALIDATE_AND_SET(AURORA_NOISE_FREQ_X, value)
+        GE_VALIDATE_AND_SET(AURORA_NOISE_FREQ_Y, value)
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_INTENSITY, value)
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_WIDTH, value)
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_PROGRESS, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_DISTORT_STRENGTH, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_BLEND_GRADIENT, value)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_INTENSITY, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_START, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_LENGTH, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_START, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_LENGTH, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_THICKNESS, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_RADIUS, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LIGHT_WEIGHT, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_WEIGHT, value)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_MASK_FACTOR, value)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_INTENSITY, value)
+        GE_VALIDATE_AND_SET(DISPERSION_OPACITY, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_WIDTH, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_DOT_SPACING, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_DOT_RADIUS, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PROGRESS, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_RADIUS, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_WIDTH, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_TURBULENCE, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_HALO_THICKNESS, value)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_ALPHA, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_INNER_FRAME_WIDTH, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_OUTER_FRAME_WIDTH, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_RADIUS_SCALE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_REFRACT_OUT_PX, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_ALPHA, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_REFRACT_OUT_PX, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_SCALE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_ALPHA, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_SCALE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BASE_MATERIAL_TYPE, value)
+        GE_VALIDATE_AND_SET(GASIFY_BLUR_PROGRESS, value)
+        GE_VALIDATE_AND_SET(GASIFY_PROGRESS, value)
+        GE_VALIDATE_AND_SET(GASIFY_SCALE_TWIST_PROGRESS, value)
+        GE_VALIDATE_AND_SET(GREY_GREY_COEF1, value)
+        GE_VALIDATE_AND_SET(GREY_GREY_COEF2, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_MASK_PROGRESS, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_RIPPLE_PROGRESS, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_DISTORT_PROGRESS, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_DISTORT_FACTOR, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_REFLECTION_FACTOR, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_REFRACTION_FACTOR, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_BLUR_LEFT, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_BLUR_TOP, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_MATERIAL_FACTOR, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_RATE, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_LIGHT_UP_DEGREE, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_CUBIC_COEFF, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_QUAD_COEFF, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_SATURATION, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_FRACTION, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_GEO_WIDTH, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_GEO_HEIGHT, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_TRAN_X, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_TRAN_Y, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_FACTOR, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_WIDTH, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_HEIGHT, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_BORDER_WIDTH, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_ZOOM_OFFSET_X, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_ZOOM_OFFSET_Y, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_SHADOW_OFFSET_X, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_SHADOW_OFFSET_Y, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_SHADOW_SIZE, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_SHADOW_STRENGTH, value)
+        GE_VALIDATE_AND_SET(MASK_TRANSITION_FACTOR, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_GREY_COEF1, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_GREY_COEF2, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_OFFSET_X, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_OFFSET_Y, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_OFFSET_Z, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_OFFSET_W, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_WIDTH, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_HEIGHT, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_ANGLE, value)
+        GE_VALIDATE_AND_SET(PARTICLE_CIRCULAR_HALO_RADIUS, value)
+        GE_VALIDATE_AND_SET(PARTICLE_CIRCULAR_HALO_NOISE, value)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_RADIUS_X, value)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_RADIUS_Y, value)
+        GE_VALIDATE_AND_SET(RIPPLE_MASK_RADIUS, value)
+        GE_VALIDATE_AND_SET(RIPPLE_MASK_WIDTH, value)
+        GE_VALIDATE_AND_SET(RIPPLE_MASK_WIDTH_CENTER_OFFSET, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_BLOOM_INTENSITY_CUTOFF, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_MAX_INTENSITY, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_MAX_BLOOM_INTENSITY, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_BLOOM_FALLOFF_POW, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_MIN_BORDER_WIDTH, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_MAX_BORDER_WIDTH, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_INNER_BORDER_BLOOM_WIDTH, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH, value)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_SPACING, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_PROGRESS, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SOUND_INTENSITY, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_ALPHA_A, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_ALPHA_B, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_PROGRESS_A, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_PROGRESS_B, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA, value)
+        GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_PROGRESS, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_RADIUS, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_TRANSITION_FADE_WIDTH, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_DISTORTION_INTENSITY, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_DISTORTION_THICKNESS, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_LIGHT_STRENGTH, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_LIGHT_SOFTNESS, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_NOISE_SCALE_X, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_NOISE_SCALE_Y, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_NOISE_STRENGTH_X, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_NOISE_STRENGTH_Y, value)
+        GE_VALIDATE_AND_SET(WATER_RIPPLE_PROGRESS, value)
+        GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_CENTER_X, value)
+        GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_CENTER_Y, value)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_PROGRESS, value)
+        GE_VALIDATE_AND_SET(WAVE_GRADIENT_MASK_WIDTH, value)
+        GE_VALIDATE_AND_SET(WAVE_GRADIENT_MASK_PROPAGATION_RADIUS, value)
+        GE_VALIDATE_AND_SET(WAVE_GRADIENT_MASK_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(WAVE_GRADIENT_MASK_TURBULENCE_STRENGTH, value)
+        GE_VALIDATE_AND_SET(WAVY_RIPPLE_LIGHT_RADIUS, value)
+        GE_VALIDATE_AND_SET(WAVY_RIPPLE_LIGHT_THICKNESS, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_STRETCH_FACTOR, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_BAR_ANGLE, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_BRIGHTNESS, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_PROGRESS, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_BRIGHTNESS, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_PROGRESS, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS0, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS1, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS2, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS3, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS4, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS5, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS6, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS7, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS8, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS9, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS10, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_STRENGTHS11, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLOR_NUM, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_BLEND, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_BLENDK, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_BRIGHTNESS, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_PROGRESS, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_FREQUENCY, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_SHARPNESS, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_BRIGHTNESS, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_DISPERSION, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_SATURATION, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_VERTICAL_MOVE_DISTANCE, value)
+        GE_VALIDATE_AND_SET(DUPOLI_NOISE_MASK_PROGRESS, value)
+        GE_VALIDATE_AND_SET(DUPOLI_NOISE_MASK_GRANULARITY, value)
+        GE_VALIDATE_AND_SET(DUPOLI_NOISE_MASK_VERTICAL_MOVE_DISTANCE, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_GRADIENT_BEGIN, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_GRADIENT_END, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_EFFECT_ALPHA, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_PROGRESS, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_PROGRESS, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_SLOPE, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_PROGRESS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_WAVE_LENGTH, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_WAVE_TOP, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_CORNER_RADIUS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_BRIGHTNESS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_SCALE, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_SHARPING, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_FEATHERING, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_PROGRESS, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Drawing::Point& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH0, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH1, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH2, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH3, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH4, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH5, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH6, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH7, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH8, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH9, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH10, value)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH11, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_START_POSITION, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_END_POSITION, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS0, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS1, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS2, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS3, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS4, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS5, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS6, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS7, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS8, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS9, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS10, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS11, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Vector3f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_POSITION, value)
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_ROTATION_ANGLE, value)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_POSITION, value)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_ROTATION_ANGLE, value)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_DIRECTION, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_REFRACT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_REFRACT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_K_B_S, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_POS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_NEG, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_K_B_S, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_POS_R_G_B, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_NEG_R_G_B, value)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_L_W_H, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_COLOR_STRENGTH, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Vector4f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_COLOR, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS0, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS1, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS2, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS3, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_SEED, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_X, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_Y, value)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_STRENGTH, value)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_COLOR, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR, value)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR, value)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_COLOR, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_DOT_COLOR, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_BG_COLOR, value)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_COLOR, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_INNER_BEZIER, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_OUTER_BEZIER, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_MATERIAL_COLOR, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_MATERIAL_COLOR, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TINT_COLOR, value)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_FILL_COLOR, value)
+        GE_VALIDATE_AND_SET(SDF_COLOR_COLOR, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_L_T_W_H, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS0, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS1, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS2, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS3, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_STRENGTHS, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_L_T_W_H, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS0, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS1, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS2, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS3, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_STRENGTHS, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS0, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS1, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS2, value)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS3, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_A, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_B, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_C, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_GRADIENT_BEZIER_CONTROL_POINTS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_COLOR, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::shared_ptr<GEShaderMask>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_MASK, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_MASK, value)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_MASK, value)
+        GE_VALIDATE_AND_SET(DISPERSION_MASK, value)
+        GE_VALIDATE_AND_SET(DISPLACEMENT_DISTORT_FILTER_MASK, value)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_MASK, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WAVE_DISTURBANCE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WAVE_DISTURBANCE, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_MASK, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_MASK_CLOCK, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_USE_EFFECT_MASK, value)
+        GE_VALIDATE_AND_SET(MASK_TRANSITION_MASK, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_LIGHT_MASK, value)
+        GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_MASK, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_MASK, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_TURBULENT_MASK, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_MASK, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::vector<float>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_COLORS, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_POSITIONS, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_STRENGTHS, value)
+        GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_POSITIONS, value)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_COLORS, value)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_POSITIONS, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::vector<Vector2f>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR, value)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_START_POINTS, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_RIPPLE_POSITION, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::pair<float, float>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DISPERSION_RED_OFFSET, value)
+        GE_VALIDATE_AND_SET(DISPERSION_GREEN_OFFSET, value)
+        GE_VALIDATE_AND_SET(DISPERSION_BLUE_OFFSET, value)
+        GE_VALIDATE_AND_SET(DISPLACEMENT_DISTORT_FILTER_FACTOR, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_CENTER1, value)
+        GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_CENTER2, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_RECT_W_H, value)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_RECT_POS, value)
+        GE_VALIDATE_AND_SET(GASIFY_SCALE_TWIST_SCALE, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS0, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS1, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS2, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS3, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS4, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS5, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS6, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS7, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_GRID_POINTS8, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES0, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES1, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES2, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES3, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES4, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES5, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES6, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES7, value)
+        GE_VALIDATE_AND_SET(GRID_WARP_ROTATION_ANGLES8, value)
+        GE_VALIDATE_AND_SET(PARTICLE_CIRCULAR_HALO_CENTER, value)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_CENTER, value)
+        GE_VALIDATE_AND_SET(RIPPLE_MASK_CENTER, value)
+        GE_VALIDATE_AND_SET(WAVE_GRADIENT_MASK_CENTER, value)
+        GE_VALIDATE_AND_SET(WAVY_RIPPLE_LIGHT_CENTER, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_POSITIONS0, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_POSITIONS1, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_POSITIONS2, value)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_POSITIONS3, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_POSITIONS0, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_POSITIONS1, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_POSITIONS2, value)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_POSITIONS3, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_INNER_FRAME_WIDTH, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_MIDDLE_FRAME_WIDTH, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_OUTSIDE_FRAME_WIDTH, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_R_RECT_W_H, value)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_R_RECT_POS, value)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_START_END_POSITION, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const DotMatrixDirection& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::vector<Vector4f>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_COLORS, value)
+        GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_COLORS, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Vector2f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_COLOR_FRACTIONS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EMBOSS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EDL, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_ANGLES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_DIR, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_WEIGHTS_EMBOSS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EMBOSS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EDL, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_PARAMS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_ANGLES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_DIR, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BLUR_PARAM, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_WEIGHTS_EMBOSS, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_RATES, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_POSITION, value)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_CLICK_POS, value)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_R_D, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_GRANULARITY, value)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_DISTORT_FACTOR, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_POSITION, value)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_RADIUS_X_Y, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const bool& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_INVERSE_EFFECT, value)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_BLOOM, value)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_USE_RAW_COLOR, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BASE_VIBRANCY_ENABLED, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_OFFSCREEN_CANVAS, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_RADIUS_GRADIENT, value)
+        GE_VALIDATE_AND_SET(MASK_TRANSITION_INVERSE, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_IS_DIRECTION, value)
+        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_GENERATE_DERIVS, value)
+        GE_VALIDATE_AND_SET(USE_EFFECT_MASK_USE_EFFECT, value)
+        GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_APPLY_INSIDE_MASK, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_INVERSE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const DotMatrixEffectType& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::shared_ptr<GESDFShaderShape>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE, value)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT, value)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::weak_ptr<Drawing::Image>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BLUR_IMAGE, value)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BLUR_IMAGE_FOR_EDGE, value)
+        GE_VALIDATE_AND_SET(USE_EFFECT_MASK_IMAGE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const RectF& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_RECT, value)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC, value)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Drawing::Matrix& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_MATRIX, value)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TOTAL_MATRIX, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_MAT, value)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_MATRIX, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(GASIFY_BLUR_SOURCE_IMAGE, value)
+        GE_VALIDATE_AND_SET(GASIFY_BLUR_MASK_IMAGE, value)
+        GE_VALIDATE_AND_SET(GASIFY_SOURCE_IMAGE, value)
+        GE_VALIDATE_AND_SET(GASIFY_MASK_IMAGE, value)
+        GE_VALIDATE_AND_SET(GASIFY_SCALE_TWIST_SOURCE_IMAGE, value)
+        GE_VALIDATE_AND_SET(GASIFY_SCALE_TWIST_MASK_IMAGE, value)
+        GE_VALIDATE_AND_SET(IMAGE_MASK_IMAGE, value)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_IMAGE, value)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_IMAGE, value)
+        GE_VALIDATE_AND_SET(SDF_PIXELMAP_SHAPE_IMAGE, value)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_TOP_LAYER, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const int& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(KAWASE_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_DIRECTION, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_RADIUS, value)
+        GE_VALIDATE_AND_SET(MESA_BLUR_TILE_MODE, value)
+        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_FRACTION_STOPS, value)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_FRACTION_STOPS, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const uint32_t& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(MAGNIFIER_GRADIENT_MASK_COLOR1, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_GRADIENT_MASK_COLOR2, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_OUTER_CONTOUR_COLOR1, value)
+        GE_VALIDATE_AND_SET(MAGNIFIER_OUTER_CONTOUR_COLOR2, value)
+        GE_VALIDATE_AND_SET(WATER_RIPPLE_WAVE_COUNT, value)
+        GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_MODE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const int32_t& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GESDFBorderParams& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_BORDER_BORDER, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GERRect& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_RRECT_SHAPE_RRECT, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GESDFShadowParams& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHADOW, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GESDFUnionOp& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_OP, value)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Drawing::Color4f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B, value)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10, value)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11, value)
+        default:
+            break;
+    }
+}
+
+#undef GE_VALIDATE_AND_SET
 
 } // namespace Drawing
 } // namespace Rosen

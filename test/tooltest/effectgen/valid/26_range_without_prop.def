@@ -1,0 +1,45 @@
+/*
+ * Test case with ge::range attribute but without ge::prop attribute
+ */
+
+struct [[ge::params(type=TEST_RANGE_NO_PROP, name="TestRangeNoProp")]] TestRangeNoPropParams {
+    // Scalar range [min, max] - no prop
+    [[ge::range(min=0.0, max=1.0)]]
+    float progress = 0.0f;
+
+    // Minimum-only constraint [min, ∞) - no prop
+    [[ge::range(min=0.0)]]
+    float radius = 1.0f;
+
+    // Maximum-only constraint (-∞, max] - no prop
+    [[ge::range(max=10.0)]]
+    float intensity = 5.0f;
+
+    // Vector2f - uniform range for both components - no prop
+    [[ge::range(min=0.0, max=1.0)]]
+    Vector2f coord = {0.5f, 0.5f};
+
+    // Vector3f - uniform range for all components - no prop
+    [[ge::range(min=0.0, max=10.0)]]
+    Vector3f position = {1.0f, 1.0f, 1.0f};
+
+    // Vector4f - RGBA clamped to [0.0, 1.0] - no prop
+    [[ge::range(min=0.0, max=1.0)]]
+    Vector4f color = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    // Component-wise ranges (different per component) - no prop
+    [[ge::range(min={0.0, 0.0, -1.0}, max={10.0, 10.0, 1.0})]]
+    Vector3f kbs = {1.0f, 1.0f, 0.0f};
+
+    // Mixed constraints (uniform min, component-wise max) - no prop
+    [[ge::range(min={0.0, 0.0}, max={1.0, 2.0})]]
+    Vector2f asymmetric = {0.5f, 1.0f};
+
+    // Integer range - no prop
+    [[ge::range(min=0, max=100)]]
+    int count = 50;
+
+    // Negative range - no prop
+    [[ge::range(min=-50.0, max=50.0)]]
+    float offset = 0.0f;
+};

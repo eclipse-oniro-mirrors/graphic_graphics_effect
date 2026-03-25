@@ -12,203 +12,272 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #ifndef GRAPHICS_EFFECT_GE_VALUE_TRANSFORMER_H
 #define GRAPHICS_EFFECT_GE_VALUE_TRANSFORMER_H
 
 #include <algorithm>
-#include <cmath>
-
-#include "effect/ge_params_reflection_v2.h"
-#include "common/rs_vector3.h"
-#include "common/rs_vector4.h"
+#include <cstdint>
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// ============================================================================
-// Default Value Transformer (pass-through)
-// ============================================================================
+// Forward declarations
+enum class GEParamsMemberTag : uint32_t;
+
+template<GEParamsMemberTag Tag>
+struct GEParamsConstraintInfo {
+    static constexpr bool HAS_RANGE = false;
+    static constexpr bool COMPONENT_WISE = false;
+    static constexpr bool HAS_MIN = false;
+    static constexpr bool HAS_MAX = false;
+};
 
 template<GEParamsMemberTag Tag, typename T>
 struct GEParamsValueTransformer {
     static T Transform(T value) { return value; }
 };
 
-// ============================================================================
-// Float Clamp Specializations
-// ============================================================================
-
-// Progress values [0.0, 1.0]
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::GASIFY_SCALE_TWIST_PROGRESS, float> {
-    static float Transform(float value) { return std::clamp(value, 0.0f, 1.0f); }
-};
-
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::GASIFY_BLUR_PROGRESS, float> {
-    static float Transform(float value) { return std::clamp(value, 0.0f, 1.0f); }
-};
-
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::GASIFY_PROGRESS, float> {
-    static float Transform(float value) { return std::clamp(value, 0.0f, 1.0f); }
-};
-
-// Particle circular halo radius [0.001, 10.0]
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_RADIUS, float> {
-    static float Transform(float value) { return std::clamp(value, 0.001f, 10.0f); }
-};
-
-// SDF edge light spread factor
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float> {
-    static float Transform(float value)
-    {
-        constexpr float MIN_SDF_SPREAD_FACTOR = 0.0f;
-        constexpr float MAX_SDF_SPREAD_FACTOR = 1.0f;
-        return std::clamp(value, MIN_SDF_SPREAD_FACTOR, MAX_SDF_SPREAD_FACTOR);
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, float> {
+    static float Transform(float value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                return std::clamp(value, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]);
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return std::clamp(value, Constraint::MIN, Constraint::MAX);
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return std::max(value, Constraint::MIN);
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return std::min(value, Constraint::MAX);
+                }
+            }
+        }
+        return value;
     }
 };
 
-// ============================================================================
-// Float Max (non-negative) Specializations
-// ============================================================================
-
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_NOISE, float> {
-    static float Transform(float value) { return std::max(value, 0.0f); }
-};
-
-// ============================================================================
-// Pair<float, float> Component-wise Transformations
-// ============================================================================
-
-// Particle circular halo center - each component clamped to [0.0, 1.0]
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::PARTICLE_CIRCULAR_HALO_CENTER, std::pair<float, float>> {
-    static std::pair<float, float> Transform(const std::pair<float, float>& value)
-    {
-        return {
-            std::clamp(value.first, 0.0f, 1.0f),
-            std::clamp(value.second, 0.0f, 1.0f)
-        };
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, int> {
+    static int Transform(int value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                return std::clamp(value, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]);
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return std::clamp(value, Constraint::MIN, Constraint::MAX);
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return std::max(value, Constraint::MIN);
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return std::min(value, Constraint::MAX);
+                }
+            }
+        }
+        return value;
     }
 };
 
-// Gasify scale twist scale - each component must be non-negative
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::GASIFY_SCALE_TWIST_SCALE, std::pair<float, float>> {
-    static std::pair<float, float> Transform(const std::pair<float, float>& value)
-    {
-        return {
-            std::max(value.first, 0.0f),
-            std::max(value.second, 0.0f)
-        };
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, Vector2f> {
+    static Vector2f Transform(const Vector2f& value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector2f(
+                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1])
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector2f(
+                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y, Constraint::MIN_COMPONENTS[1])
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector2f(
+                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y, Constraint::MAX_COMPONENTS[1])
+                    );
+                }
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector2f(
+                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y, Constraint::MIN, Constraint::MAX)
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector2f(
+                        std::max(value.x, Constraint::MIN),
+                        std::max(value.y, Constraint::MIN)
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector2f(
+                        std::min(value.x, Constraint::MAX),
+                        std::min(value.y, Constraint::MAX)
+                    );
+                }
+            }
+        }
+        return value;
     }
 };
 
-// ============================================================================
-// Vector2f Component-wise Transformations
-// ============================================================================
-
-// Frosted glass corner radius - non-negative
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::FROSTED_GLASS_CORNER_RADIUS, Vector2f> {
-    static Vector2f Transform(const Vector2f& value)
-    {
-        constexpr float V_MIN = 0.0f;
-        return Vector2f(std::max(value.x, V_MIN), std::max(value.y, V_MIN));
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, Vector3f> {
+    static Vector3f Transform(const Vector3f& value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector3f(
+                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
+                        std::clamp(value.z, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2])
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector3f(
+                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y, Constraint::MIN_COMPONENTS[1]),
+                        std::max(value.z, Constraint::MIN_COMPONENTS[2])
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector3f(
+                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y, Constraint::MAX_COMPONENTS[1]),
+                        std::min(value.z, Constraint::MAX_COMPONENTS[2])
+                    );
+                }
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector3f(
+                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.z, Constraint::MIN, Constraint::MAX)
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector3f(
+                        std::max(value.x, Constraint::MIN),
+                        std::max(value.y, Constraint::MIN),
+                        std::max(value.z, Constraint::MIN)
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector3f(
+                        std::min(value.x, Constraint::MAX),
+                        std::min(value.y, Constraint::MAX),
+                        std::min(value.z, Constraint::MAX)
+                    );
+                }
+            }
+        }
+        return value;
     }
 };
 
-// Frosted glass dark scale [0.0, 1.0]
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::FROSTED_GLASS_DARK_SCALE, Vector2f> {
-    static Vector2f Transform(const Vector2f& value)
-    {
-        constexpr float MIN_S = 0.0f;
-        constexpr float MAX_S = 1.0f;
-        return Vector2f(std::clamp(value.x, MIN_S, MAX_S), std::clamp(value.y, MIN_S, MAX_S));
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, Vector4f> {
+    static Vector4f Transform(const Vector4f& value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector4f(
+                        std::clamp(value.x, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.y, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1]),
+                        std::clamp(value.z, Constraint::MIN_COMPONENTS[2], Constraint::MAX_COMPONENTS[2]),
+                        std::clamp(value.w, Constraint::MIN_COMPONENTS[3], Constraint::MAX_COMPONENTS[3])
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector4f(
+                        std::max(value.x, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.y, Constraint::MIN_COMPONENTS[1]),
+                        std::max(value.z, Constraint::MIN_COMPONENTS[2]),
+                        std::max(value.w, Constraint::MIN_COMPONENTS[3])
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector4f(
+                        std::min(value.x, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.y, Constraint::MAX_COMPONENTS[1]),
+                        std::min(value.z, Constraint::MAX_COMPONENTS[2]),
+                        std::min(value.w, Constraint::MAX_COMPONENTS[3])
+                    );
+                }
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return Vector4f(
+                        std::clamp(value.x, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.y, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.z, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.w, Constraint::MIN, Constraint::MAX)
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return Vector4f(
+                        std::max(value.x, Constraint::MIN),
+                        std::max(value.y, Constraint::MIN),
+                        std::max(value.z, Constraint::MIN),
+                        std::max(value.w, Constraint::MIN)
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return Vector4f(
+                        std::min(value.x, Constraint::MAX),
+                        std::min(value.y, Constraint::MAX),
+                        std::min(value.z, Constraint::MAX),
+                        std::min(value.w, Constraint::MAX)
+                    );
+                }
+            }
+        }
+        return value;
     }
 };
 
-// ============================================================================
-// Vector3f Component-wise Transformations
-// ============================================================================
-
-// Frosted glass KBS (kernel, blur, strength) parameters
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::FROSTED_GLASS_BG_KBS, Vector3f> {
-    static Vector3f Transform(const Vector3f& value)
-    {
-        constexpr float KB_MIN = 0.0f;
-        constexpr float KB_MAX = 10.0f;
-        constexpr float S_MIN = -1.0f;
-        constexpr float S_MAX = 1.0f;
-        return Vector3f(
-            std::clamp(value.x, KB_MIN, KB_MAX),
-            std::clamp(value.y, KB_MIN, KB_MAX),
-            std::clamp(value.z, S_MIN, S_MAX)
-        );
+template<GEParamsMemberTag Tag>
+struct GEParamsValueTransformer<Tag, std::pair<float, float>> {
+    static std::pair<float, float> Transform(const std::pair<float, float>& value) {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return std::make_pair(
+                        std::clamp(value.first, Constraint::MIN_COMPONENTS[0], Constraint::MAX_COMPONENTS[0]),
+                        std::clamp(value.second, Constraint::MIN_COMPONENTS[1], Constraint::MAX_COMPONENTS[1])
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return std::make_pair(
+                        std::max(value.first, Constraint::MIN_COMPONENTS[0]),
+                        std::max(value.second, Constraint::MIN_COMPONENTS[1])
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return std::make_pair(
+                        std::min(value.first, Constraint::MAX_COMPONENTS[0]),
+                        std::min(value.second, Constraint::MAX_COMPONENTS[1])
+                    );
+                }
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    return std::make_pair(
+                        std::clamp(value.first, Constraint::MIN, Constraint::MAX),
+                        std::clamp(value.second, Constraint::MIN, Constraint::MAX)
+                    );
+                } else if constexpr (Constraint::HAS_MIN) {
+                    return std::make_pair(
+                        std::max(value.first, Constraint::MIN),
+                        std::max(value.second, Constraint::MIN)
+                    );
+                } else if constexpr (Constraint::HAS_MAX) {
+                    return std::make_pair(
+                        std::min(value.first, Constraint::MAX),
+                        std::min(value.second, Constraint::MAX)
+                    );
+                }
+            }
+        }
+        return value;
     }
 };
-
-// Frosted glass position parameters [0.0, 1.0]
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::FROSTED_GLASS_BG_POS, Vector3f> {
-    static Vector3f Transform(const Vector3f& value)
-    {
-        constexpr float V_MIN = 0.0f;
-        constexpr float V_MAX = 1.0f;
-        return Vector3f(
-            std::clamp(value.x, V_MIN, V_MAX),
-            std::clamp(value.y, V_MIN, V_MAX),
-            std::clamp(value.z, V_MIN, V_MAX)
-        );
-    }
-};
-
-// ============================================================================
-// Vector4f Component-wise Transformations
-// ============================================================================
-
-// Material color [0.0, 1.0] for RGBA
-template<>
-struct GEParamsValueTransformer<GEParamsMemberTag::FROSTED_GLASS_MATERIAL_COLOR, Vector4f> {
-    static Vector4f Transform(const Vector4f& value)
-    {
-        constexpr float MIN_C = 0.0f;
-        constexpr float MAX_C = 1.0f;
-        return Vector4f(
-            std::clamp(value.x, MIN_C, MAX_C),
-            std::clamp(value.y, MIN_C, MAX_C),
-            std::clamp(value.z, MIN_C, MAX_C),
-            std::clamp(value.w, MIN_C, MAX_C)
-        );
-    }
-};
-
-// ============================================================================
-// How to add new value transformers:
-// ============================================================================
-//
-// To add a new transformation, specialize GEParamsValueTransformer for your
-// specific tag and type:
-//
-// template<>
-// struct GEParamsValueTransformer<GEParamsMemberTag::YOUR_TAG, float> {
-//     static float Transform(float value) {
-//         // Your transformation logic here
-//         return std::clamp(value, min_val, max_val);
-//     }
-// };
-//
-// The transformer is automatically applied during SetParam via the
-// generated dispatch code in ge_type_dispatch_gen.h
-//
-// ============================================================================
 
 } // namespace Drawing
 } // namespace Rosen

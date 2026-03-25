@@ -22,9 +22,9 @@ struct [[ge::params(type=AIBAR_GLOW, name="AIBarGlow")]] GEXAIBarGlowEffectParam
     Vector4f LTWH;
     float stretchFactor = 0.0f;
     float barAngle = 0.0f;
-    [[ge::prop(name="AIBarGlow_Color", array_accessor_length=4)]]
+    [[ge::prop(name="AIBarGlow_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
-    [[ge::prop(name="AIBarGlow_Position", array_accessor_length=4)]]
+    [[ge::prop(name="AIBarGlow_Position", array_accessor_length=4, array_accessor_type="std::pair<float, float>")]]
     std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
     [[ge::prop("AIBarGlow_Strength")]]
     Vector4f strengths;

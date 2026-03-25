@@ -1,0 +1,6 @@
+struct [[ge::params(type=TEST_RANGE_INVALID, name="TestRangeInvalid")]] TestRangeInvalidParams {
+    // Empty range attribute
+    [[ge::prop("FIELD1X")]]
+    [[ge::range()]]
+    float field1 = 0.0f;
+};

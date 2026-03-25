@@ -17,7 +17,9 @@ struct [[ge::params(type=AURORA_NOISE, name="AuroraNoise")]] GEAuroraNoiseShader
     [[ge::prop("AuroraNoise_Noise")]]
     float noise_ = 0.f;
     [[ge::prop("AuroraNoise_FreqX")]]
+    [[ge::range(min=0.1, max=5.0)]]
     float freqX_ = 1.0f;
     [[ge::prop("AuroraNoise_FreqY")]]
+    [[ge::range(min=0.1, max=5.0)]]
     float freqY_ = 1.0f;
 };

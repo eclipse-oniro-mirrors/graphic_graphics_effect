@@ -90,6 +90,7 @@ namespace Drawing {
 #include "effect/filter/ge_sound_wave_filter.params"
 #include "effect/mask/ge_use_effect_shader_mask.params"
 #include "effect/filter/ge_variable_radius_blur_shader_filter.params"
+#include "effect/filter/ge_water_droplet_transition_filter.params"
 #include "effect/filter/ge_water_ripple_filter.params"
 #include "effect/mask/ge_wave_disturb_shader_mask.params"
 #include "effect/mask/ge_wave_gradient_shader_mask.params"

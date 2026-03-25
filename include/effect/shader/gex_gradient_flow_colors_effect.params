@@ -19,7 +19,7 @@
 constexpr int ARRAY_SIZE_FOUR = 4;
 
 struct [[ge::params(type=GRADIENT_FLOW_COLORS, name="GradientFlowColors")]] GEXGradientFlowColorsEffectParams {
-    [[ge::prop(name="GradientFlowColors_Color", array_accessor_length=4)]]
+    [[ge::prop(name="GradientFlowColors_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
     float gradientBegin = 0.0f;
     float gradientEnd = 0.0f;

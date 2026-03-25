@@ -18,9 +18,9 @@ constexpr int ARRAY_SIZE_FOUR = 4;
 
 struct [[ge::params(type=AIBAR_RECT_HALO, name="AIBarRectHalo")]] GEXAIBarRectHaloEffectParams {
     Vector4f LTWH;
-    [[ge::prop(name="AIBarRectHalo_Color", array_accessor_length=4)]]
+    [[ge::prop(name="AIBarRectHalo_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
     std::array<Vector4f, ARRAY_SIZE_FOUR> colors;
-    [[ge::prop(name="AIBarRectHalo_Position", array_accessor_length=4)]]
+    [[ge::prop(name="AIBarRectHalo_Position", array_accessor_length=4, array_accessor_type="std::pair<float, float>")]]
     std::array<std::pair<float, float>, ARRAY_SIZE_FOUR> positions;
     [[ge::prop("AIBarRectHalo_Strength")]]
     Vector4f strengths;

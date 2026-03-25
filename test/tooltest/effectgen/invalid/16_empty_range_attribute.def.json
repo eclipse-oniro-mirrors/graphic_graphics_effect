@@ -1,0 +1,31 @@
+{
+  "name": "16_empty_range_attribute",
+  "should_parse": false,
+  "expected_error_count": 1,
+  "expected_errors": [
+    "invalid/16_empty_range_attribute.def:line 4, column 5: Empty range attribute"
+  ],
+  "structs": [
+    {
+      "name": "TestRangeInvalidParams",
+      "enum_type": "TEST_RANGE_INVALID",
+      "filter_name": "TestRangeInvalid",
+      "fields": [
+        {
+          "type": "float",
+          "name": "field1",
+          "default_value": "0.0f",
+          "prop_name": "FIELD1X",
+          "prop_attributes": [
+            {
+              "name": "FIELD1X",
+              "array_accessor_length": null,
+              "alias": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

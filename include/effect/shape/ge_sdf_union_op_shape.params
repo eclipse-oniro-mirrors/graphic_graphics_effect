@@ -19,6 +19,15 @@ enum class GESDFUnionOp : uint8_t {
     MAX = SMOOTH_UNION,
 };
 
+struct GERRect {
+    float left_ = 0.f;
+    float top_ = 0.f;
+    float width_ = 0.f;
+    float height_ = 0.f;
+    float radiusX_ = 0.f;
+    float radiusY_ = 0.f;
+};
+
 struct [[ge::params(type=SDF_UNION_OP, name="SDFUnionOpShape")]] GESDFUnionOpShapeParams {
     [[ge::prop("SDFSmoothUnionOpShape_Spacing")]]
     float spacing = 0.f;

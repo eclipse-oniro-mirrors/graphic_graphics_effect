@@ -5,7 +5,7 @@ This module provides parsing of C++ struct definitions with custom attributes.
 Focuses on parsing struct definitions with [[ge::params(...)]] attributes.
 """
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field
 
 # Import Token from cpp_tokenizer module
@@ -37,7 +37,17 @@ class PropAttribute:
     """Information about a single [[ge::prop]] attribute."""
     name: str
     array_accessor_length: Optional[int] = None
+    array_accessor_type: Optional[str] = None
     alias: Optional[str] = None
+
+
+@dataclass
+class RangeAttribute:
+    """Represents [[ge::range(...)]] attribute."""
+    min_value: Optional[str] = None  # String to preserve type (e.g., "0.0f", "0")
+    min_components: Optional[List[str]] = None
+    max_value: Optional[str] = None
+    max_components: Optional[List[str]] = None
 
 
 @dataclass
@@ -49,6 +59,7 @@ class FieldInfo:
     prop_attributes: List[PropAttribute] = field(default_factory=list)  # All prop attributes
     default_value: Optional[str] = None
     attributes: List[Token] = field(default_factory=list)
+    range_attr: Optional[RangeAttribute] = None
 
 
 @dataclass
@@ -664,7 +675,7 @@ class CppParser:
 
             elif namespace == 'ge' and function == 'prop':
                 # ge::prop can have: prop("name") or prop(name="name") or prop(NAME="name")
-                # or prop(name="NAME", array_accessor_length=N)
+                # or prop(name="NAME", array_accessor_length=N, array_accessor_type="int")
                 params = parsed.get('params', {})
                 current_prop_name = params.get('NAME') or params.get('name') or params.get('_value')
 
@@ -679,11 +690,15 @@ class CppParser:
                             attr.line, attr.column
                         ))
 
+                # Extract array_accessor_type for this prop
+                current_array_type = params.get('array_accessor_type')
+
                 # Add to prop_attributes list
                 if current_prop_name:
                     prop_attributes.append(PropAttribute(
                         name=current_prop_name,
-                        array_accessor_length=current_array_length
+                        array_accessor_length=current_array_length,
+                        array_accessor_type=current_array_type
                     ))
 
                 # For backward compatibility: set prop_name to first prop
@@ -715,11 +730,150 @@ class CppParser:
                     if prop_alias is None:
                         prop_alias = current_alias
 
+        range_attr = None
+        for attr in attributes:
+            parsed = AttributeParser.parse_attribute(attr)
+            namespace = parsed.get('namespace')
+            function = parsed.get('function')
+
+            if namespace == 'ge' and function == 'range':
+                params = parsed.get('params', {})
+                range_attr = self._process_range_attribute(params, field_type, attr.line, attr.column)
+
         return FieldInfo(
             name=field_name,
             type=field_type,
             prop_name=prop_name,
             prop_attributes=prop_attributes,
             default_value=default_value,
-            attributes=attributes
+            attributes=attributes,
+            range_attr=range_attr
         )
+
+    def _process_range_attribute(self, params: Dict[str, Any], field_type: str,
+                              line: int, column: int) -> Optional[RangeAttribute]:
+        """
+        Process [[ge::range(...)]] attribute with comprehensive error handling.
+
+        This function is type-neutral - it does not make assumptions about
+        specific types (float, Vector3f, etc.). Instead, it focuses on:
+        1. Parsing min/max values (scalar or vector)
+        2. Validating consistency between min and max
+        3. Reporting errors with clear messages
+
+        Args:
+            params: Parsed key=value pairs from attribute
+            field_type: Type of the field (e.g., "float", "Vector3f")
+            line: Line number for error reporting
+            column: Column number for error reporting
+
+        Returns:
+            RangeAttribute if valid, None if errors occurred
+        """
+        if not params:
+            self._add_error("Empty range attribute", line, column)
+            return None
+
+        range_attr = RangeAttribute()
+        errors = []
+
+        # Helper function to parse numeric value
+        def parse_numeric(value_str: str, param_name: str) -> Optional[str]:
+            """Validate and return numeric value string, or None if invalid."""
+            value_str = value_str.strip()
+
+            # Check for empty value
+            if not value_str:
+                errors.append(f"Empty numeric value for '{param_name}'")
+                return None
+
+            import re
+            if not re.match(r'^-?\d+\.?\d*f?$', value_str):
+                errors.append(f"Invalid numeric value '{value_str}' for '{param_name}'")
+                return None
+
+            return value_str
+
+        # Helper function to parse vector value
+        def parse_vector(value_str: str, param_name: str) -> Optional[List[str]]:
+            """Parse {v1, v2, ...} vector value."""
+            if not value_str.startswith('{') or not value_str.endswith('}'):
+                errors.append(f"Vector value must use {{}} syntax: '{value_str}'")
+                return None
+
+            inner = value_str[1:-1].strip()
+            if not inner:
+                errors.append(f"Empty vector value for '{param_name}'")
+                return None
+
+            components = [v.strip() for v in inner.split(',')]
+            if not components:
+                errors.append(f"Empty vector value for '{param_name}'")
+                return None
+
+            valid_components = []
+            for comp in components:
+                parsed = parse_numeric(comp, param_name)
+                if parsed:
+                    valid_components.append(parsed)
+
+            if len(valid_components) != len(components):
+                return None
+
+            return valid_components
+
+        # Parse min parameter
+        if 'min' in params:
+            min_val = params['min']
+            if isinstance(min_val, str):
+                if min_val.startswith('{'):
+                    parsed = parse_vector(min_val, 'min')
+                    if parsed:
+                        range_attr.min_components = parsed
+                else:
+                    parsed = parse_numeric(min_val, 'min')
+                    if parsed:
+                        range_attr.min_value = parsed
+            else:
+                errors.append(f"Invalid min parameter type: {type(min_val)}")
+
+        # Parse max parameter
+        if 'max' in params:
+            max_val = params['max']
+            if isinstance(max_val, str):
+                if max_val.startswith('{'):
+                    parsed = parse_vector(max_val, 'max')
+                    if parsed:
+                        range_attr.max_components = parsed
+                else:
+                    parsed = parse_numeric(max_val, 'max')
+                    if parsed:
+                        range_attr.max_value = parsed
+            else:
+                errors.append(f"Invalid max parameter type: {type(max_val)}")
+
+        if range_attr.min_value is None and range_attr.min_components is None and \
+           range_attr.max_value is None and range_attr.max_components is None:
+            errors.append("Range attribute must have 'min' or 'max' parameter")
+
+        if range_attr.min_components and range_attr.max_components:
+            if len(range_attr.min_components) != len(range_attr.max_components):
+                errors.append(
+                    f"Min and max component count mismatch: "
+                    f"{len(range_attr.min_components)} vs {len(range_attr.max_components)}"
+                )
+
+        if (range_attr.min_components and range_attr.max_value) or \
+           (range_attr.min_value and range_attr.max_components):
+            errors.append(
+                "Inconsistent range specification: "
+                "min and max must both be scalars or both be vectors"
+            )
+
+        for error in errors:
+            self._add_error(error, line, column)
+
+        if errors:
+            return None
+
+        return range_attr
