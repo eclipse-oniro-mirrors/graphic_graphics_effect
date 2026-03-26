@@ -42,10 +42,13 @@ ohos_fuzztest("GEKawaseBlurShaderFilterFuzzTest") {
     "-Dprotected=public",
   ]
 
+  deps = [
+    "${graphics_effect_root}:graphics_effect_core",
+  ]
+
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "graphic_2d:2d_graphics",
-    "graphics_effect:graphics_effect_core",
   ]
 
   part_name = "graphics_effect"
