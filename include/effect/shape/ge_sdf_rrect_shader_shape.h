@@ -18,6 +18,7 @@
 
 #include <array>
 
+#include "ge_filter_type_info.h"
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
@@ -30,6 +31,8 @@ public:
     GESDFRRectShaderShape(const GESDFRRectShapeParams& param) : params_(param) {}
     GESDFRRectShaderShape(const GESDFRRectShaderShape&) = delete;
     virtual ~GESDFRRectShaderShape() = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderShape, Drawing::GESDFRRectShapeParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

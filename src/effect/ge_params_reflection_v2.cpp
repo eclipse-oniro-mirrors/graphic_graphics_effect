@@ -1180,7 +1180,7 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
     }
 }
 
-GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)
+GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
 #define GE_STRING_TO_TAG_ENTRY(Tag) \

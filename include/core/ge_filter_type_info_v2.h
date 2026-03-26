@@ -64,7 +64,12 @@
 #include "effect/shader/ge_particle_circular_halo_shader.h"
 #include "effect/shader/ge_wavy_ripple_light_shader.h"
 #include "effect/shape/ge_sdf_border_shader.h"
+#include "effect/shape/ge_sdf_clip_shader.h"
+#include "effect/shape/ge_sdf_color_shader.h"
+#include "effect/shape/ge_sdf_pixelmap_shader_shape.h"
+#include "effect/shape/ge_sdf_rrect_shader_shape.h"
 #include "effect/shape/ge_sdf_shadow_shader.h"
+#include "effect/shape/ge_sdf_transform_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -396,6 +401,22 @@ struct GEFilterTypeInfoV2<GEBorderLightShader> {
 };
 
 template<>
+struct GEFilterTypeInfoV2<GESDFPixelmapShaderShape> {
+    using FilterClass = GESDFPixelmapShaderShape;
+    using ParamType = GESDFPixelmapShapeParams;
+    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GESDFPixelmapShapeParams>::ID;
+    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GESDFPixelmapShapeParams>::FilterName;
+};
+
+template<>
+struct GEFilterTypeInfoV2<GESDFTransformShaderShape> {
+    using FilterClass = GESDFTransformShaderShape;
+    using ParamType = GESDFTransformShapeParams;
+    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GESDFTransformShapeParams>::ID;
+    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GESDFTransformShapeParams>::FilterName;
+};
+
+template<>
 struct GEFilterTypeInfoV2<GESDFShadowShader> {
     using FilterClass = GESDFShadowShader;
     using ParamType = Drawing::GESDFShadowShaderParams;
@@ -409,6 +430,30 @@ struct GEFilterTypeInfoV2<GESDFBorderShader> {
     using ParamType = Drawing::GESDFBorderShaderParams;
     static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFBorderShaderParams>::ID;
     static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFBorderShaderParams>::FilterName;
+};
+
+template<>
+struct GEFilterTypeInfoV2<GESDFRRectShaderShape> {
+    using FilterClass = GESDFRRectShaderShape;
+    using ParamType = Drawing::GESDFRRectShapeParams;
+    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFRRectShapeParams>::ID;
+    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFRRectShapeParams>::FilterName;
+};
+
+template<>
+struct GEFilterTypeInfoV2<GESDFColorShader> {
+    using FilterClass = GESDFColorShader;
+    using ParamType = Drawing::GESDFColorShaderParams;
+    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFColorShaderParams>::ID;
+    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFColorShaderParams>::FilterName;
+};
+
+template<>
+struct GEFilterTypeInfoV2<GESDFClipShader> {
+    using FilterClass = GESDFClipShader;
+    using ParamType = Drawing::GESDFClipShaderParams;
+    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFClipShaderParams>::ID;
+    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFClipShaderParams>::FilterName;
 };
 
 } // namespace GEV2

@@ -396,6 +396,12 @@ def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dic
     output.append("    static GEFilterType GetFilterTypeFromTag(GEParamsMemberTag tag);")
 
     output.append("")
+    output.append("    // Convert string to GEParamsMemberTag")
+    output.append("    // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
+    output.append("    //       Aliases from [[ge::prop_alias]] are also included")
+    output.append("    static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
+
+    output.append("")
     output.append("    // Set params member by tag using overloaded functions (reduces binary bloat)")
     output.append("    // All implementations are in the .cpp file")
     output.append(generate_set_params_member_overloads_decl(structs, type_aliases))
@@ -740,21 +746,11 @@ def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
     return '\n'.join(output)
 
 
-def generate_string_to_enum_mapping_decl() -> str:
-    """Generate GEParamsMemberTagFromString() declaration."""
-    output = []
 
-    output.append("// String to enum mapping")
-    output.append("// Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
-    output.append("//       Aliases from [[ge::prop_alias]] are also included")
-    output.append("GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
-    output.append("")
-
-    return '\n'.join(output)
 
 
 def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
-    """Generate GEParamsMemberTagFromString() implementation."""
+    """Generate GEParamsMemberHelper::GEParamsMemberTagFromString() implementation."""
     output = []
 
     # Collect all string-to-tag mappings, including aliases
@@ -789,7 +785,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
                 error_lines.append(f"    - {struct_name}::{tag_name}")
         raise RuntimeError("\n".join(error_lines))
 
-    output.append("GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str)")
+    output.append("GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)")
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEParamsMemberTag> map = {")
 
@@ -1179,9 +1175,6 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
 
     # Generate GEParamsMemberHelper declaration (includes SetParamsMemberByTag template)
     output.append(generate_struct_tag_ranges_decl(structs, type_aliases))
-
-    # Generate string-to-enum mapping declaration
-    output.append(generate_string_to_enum_mapping_decl())
 
     output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")

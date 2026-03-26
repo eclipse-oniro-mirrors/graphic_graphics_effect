@@ -617,8 +617,8 @@ enum class GEParamsMemberTag : uint32_t {
     struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
         static constexpr bool HAS_RANGE = true; \
         static constexpr bool COMPONENT_WISE = true; \
-        static constexpr bool HAS_MAX = true; \
         static constexpr bool HAS_MIN = false; \
+        static constexpr bool HAS_MAX = true; \
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MAX_COMPONENTS[] = Maxs; \
     };
@@ -1366,6 +1366,11 @@ public:
     // Convert GEParamsMemberTag to corresponding GEFilterType
     static GEFilterType GetFilterTypeFromTag(GEParamsMemberTag tag);
 
+    // Convert string to GEParamsMemberTag
+    // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth
+    //       Aliases from [[ge::prop_alias]] are also included
+    static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);
+
     // Set params member by tag using overloaded functions (reduces binary bloat)
     // All implementations are in the .cpp file
     // Overloaded SetParamsMemberByTag for each unique parameter type
@@ -1426,11 +1431,6 @@ public:
                                      GEParamsMemberTag tag, const uint32_t& value);
 
 };
-
-// String to enum mapping
-// Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth
-//       Aliases from [[ge::prop_alias]] are also included
-GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);
 
 } // namespace GEV2
 } // namespace Drawing

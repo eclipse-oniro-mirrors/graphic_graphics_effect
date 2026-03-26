@@ -1426,7 +1426,6 @@ struct GEXNoisyFrameGradientMaskParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(NOISY_FRAME_GRADIENT_MASK, GEXNoisyFrameGradientMaskParams,
                                 GEX_MASK_NOISY_FRAME_GRADIENT);
-#undef REGISTER_GEFILTERPARAM_TYPEINFO
 
 enum class GESDFUnionOp : uint8_t {
     UNION = 0,
@@ -1529,6 +1528,7 @@ constexpr char GE_SHAPE_SDF_RRECT_SHAPE_RRECT[] = "SDFRRectShape_RRect";
 struct GESDFRRectShapeParams {
     GERRect rrect;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_RRECT_SHAPE, GESDFRRectShapeParams, GE_SHAPE_SDF_RRECT_SHAPE);
 
 constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE[] = "SDFTriangleShape";
 constexpr char GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX0[] = "SDFTriangleShape_Vertex0";
@@ -1547,6 +1547,7 @@ constexpr char GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE[] = "SDFPixelmapShape_Image";
 struct GESDFPixelmapShapeParams {
     std::shared_ptr<Drawing::Image> image;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_PIXELMAP_SHAPE, GESDFPixelmapShapeParams, GE_SHAPE_SDF_PIXELMAP_SHAPE);
 
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
@@ -1565,6 +1566,7 @@ struct GESDFTransformShapeParams {
     float hotZone = 0.0f;
     Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_TRANSFORM_SHAPE, GESDFTransformShapeParams, GE_SHAPE_SDF_TRANSFORM_SHAPE);
 
 constexpr char GE_SHAPE_SDF_EMPTY_SHAPE[] = "SDFEmptyShape";
 
@@ -1604,6 +1606,7 @@ constexpr char GE_SHADER_SDF_CLIP_SHAPE[] = "SDFClip_Shape";
 struct GESDFClipShaderParams final {
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_CLIP, GESDFClipShaderParams, GE_SHADER_SDF_CLIP);
 
 constexpr char GE_SHADER_SDF_COLOR[] = "SDFColor";
 constexpr char GE_SHADER_SDF_COLOR_SHAPE[] = "SDFColor_Shape";
@@ -1612,6 +1615,9 @@ struct GESDFColorShaderParams final {
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     Vector4f color;
 };
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_COLOR, GESDFColorShaderParams, GE_SHADER_SDF_COLOR);
+
+#undef REGISTER_GEFILTERPARAM_TYPEINFO
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
