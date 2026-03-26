@@ -288,6 +288,37 @@ struct GESDFEdgeLightFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(SDF_EDGE_LIGHT, GESDFEdgeLightFilterParams, GE_FILTER_SDF_EDGE_LIGHT);
 
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT[] = "SDFEdgeLightEffect";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_SPREAD_FACTOR[] = "SDFEdgeLightEffect_SpreadFactor";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_BLOOM_INTENSITY_CUTOFF[] = "SDFEdgeLightEffect_BloomIntensityCutoff";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_INTENSITY[] = "SDFEdgeLightEffect_LightMaxIntensity";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_BLOOM_INTENSITY[] = "SDFEdgeLightEffect_MaxBloomIntensity";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_BLOOM_FALLOFF_POW[] = "SDFEdgeLightEffect_BloomFalloffPow";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MIN_BORDER_WIDTH[] = "SDFEdgeLightEffect_MinBorderWidth";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_BORDER_WIDTH[] = "SDFEdgeLightEffect_MaxBorderWidth";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_INNER_BORDER_BLOOM_WIDTH[] = "SDFEdgeLightEffect_InnerBorderBloomWidth";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_OUTER_BORDER_BLOOM_WIDTH[] = "SDFEdgeLightEffect_OuterBorderBloomWidth";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_COLOR[] = "SDFEdgeLightEffect_Color";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_IMAGE[] = "SDFEdgeLightEffect_SDFImage";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_LIGHT_MASK[] = "SDFEdgeLightEffect_LightMask";
+constexpr char GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE[] = "SDFEdgeLightEffect_SDFShape";
+struct GESDFEdgeLightEffectParams {
+    float sdfSpreadFactor = 64.0f;
+    float bloomIntensityCutoff = 0.1f;
+    float maxIntensity = 1.0f;
+    float maxBloomIntensity = 1.0f;
+    float bloomFalloffPow = 2.0f;
+    float minBorderWidth = 2.0f;
+    float maxBorderWidth = 5.0f;
+    float innerBorderBloomWidth = 30.0f;
+    float outerBorderBloomWidth = 30.0f;
+    Vector3f color = Vector3f(1.0f, 1.0f, 1.0f);
+    std::shared_ptr<Drawing::Image> sdfImage;
+    std::shared_ptr<GEShaderMask> lightMask;
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(SDF_EDGE_LIGHT_EFFECT, GESDFEdgeLightEffectParams, GE_SHADER_SDF_EDGE_LIGHT_EFFECT);
+
 constexpr char GE_MASK_RIPPLE[] = "RippleMask";
 constexpr char GE_MASK_RIPPLE_CENTER[] = "RippleMask_Center";
 constexpr char GE_MASK_RIPPLE_RADIUS[] = "RippleMask_Radius";
@@ -949,6 +980,12 @@ constexpr char GE_MASK_FRAME_GRADIENT_INNER_FRAME_WIDTH[] = "FrameGradientMask_I
 constexpr char GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH[] = "FrameGradientMask_OuterFrameWidth";
 constexpr char GE_MASK_FRAME_GRADIENT_RECT_WH[] = "FrameGradientMask_RectWH";
 constexpr char GE_MASK_FRAME_GRADIENT_RECT_POS[] = "FrameGradientMask_RectPos";
+constexpr char GE_MASK_FRAME_GRADIENT_AXIAL_FEATHER_STRENGTH[] = "FrameGradientMask_AxialFeatherStrength";
+constexpr char GE_MASK_FRAME_GRADIENT_AXIAL_CENTER[] = "FrameGradientMask_AxialCenter";
+constexpr char GE_MASK_FRAME_GRADIENT_AXIAL_CORE_WIDTH[] = "FrameGradientMask_AxialCoreWidth";
+constexpr char GE_MASK_FRAME_GRADIENT_AXIAL_DIRECTION[] = "FrameGradientMask_AxialDirection";
+constexpr char GE_MASK_FRAME_GRADIENT_BOX_ANGLE_DEG[] = "FrameGradientMask_BoxAngleDeg";
+
 struct GEFrameGradientMaskParams {
     Vector4f innerBezier;
     Vector4f outerBezier;
@@ -957,6 +994,11 @@ struct GEFrameGradientMaskParams {
     float outerFrameWidth = 0.0f;
     std::pair<float, float> rectWH;
     std::pair<float, float> rectPos;
+    float axialFeatherStrength = 0.0f;
+    float axialCenter = 0.5f;
+    float axialCoreWidth = 1.0f;
+    std::pair<float, float> axialDirection;
+    float boxAngleDeg = 0.0f;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(FRAME_GRADIENT_MASK, GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT);
 
