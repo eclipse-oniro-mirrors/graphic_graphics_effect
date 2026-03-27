@@ -85,376 +85,66 @@ struct GEFilterTypeInfoV2 {
     static constexpr std::string_view Name = "";
 };
 
+#define GE_FILTER_TYPE_INFO(_FilterClass, _ParamType) \
+    template<> \
+    struct GEFilterTypeInfoV2<_FilterClass> { \
+        using FilterClass = _FilterClass; \
+        using ParamType = _ParamType; \
+        static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<_ParamType>::ID; \
+        static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<_ParamType>::FilterName; \
+    };
+
 // Specializations for filter classes
 // Each filter class uses DECLARE_GEFILTER_TYPEFUNC(FilterClass, ParamType)
 
-template<>
-struct GEFilterTypeInfoV2<GEAIBarShaderFilter> {
-    using FilterClass = GEAIBarShaderFilter;
-    using ParamType = Drawing::GEAIBarShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEAIBarShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEAIBarShaderFilterParams>::FilterName;
-};
+GE_FILTER_TYPE_INFO(GEAIBarShaderFilter, GEAIBarShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEMESABlurShaderFilter, GEMESABlurShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEMaskTransitionShaderFilter, GEMaskTransitionShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEDisplacementDistortFilter, GEDisplacementDistortFilterParams)
+GE_FILTER_TYPE_INFO(GEKawaseBlurShaderFilter, GEKawaseBlurShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEEdgeLightShaderFilter, GEEdgeLightShaderFilterParams)
+GE_FILTER_TYPE_INFO(GESDFEdgeLight, GESDFEdgeLightFilterParams)
+GE_FILTER_TYPE_INFO(GEBezierWarpShaderFilter, GEBezierWarpShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEWaterRippleFilter, GEWaterRippleFilterParams)
+GE_FILTER_TYPE_INFO(GEContentLightFilter, GEContentLightFilterParams)
+GE_FILTER_TYPE_INFO(GEDirectionLightShaderFilter, GEDirectionLightShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEDispersionShaderFilter, GEDispersionShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEFrostedGlassBlurShaderFilter, GEFrostedGlassBlurShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEColorGradientShaderFilter, GEColorGradientShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEMagnifierShaderFilter, GEMagnifierShaderFilterParams)
+GE_FILTER_TYPE_INFO(GELinearGradientBlurShaderFilter, GELinearGradientBlurShaderFilterParams)
+GE_FILTER_TYPE_INFO(GESDFFromImageFilter, GESDFFromImageFilterParams)
+GE_FILTER_TYPE_INFO(GEVariableRadiusBlurShaderFilter, GEVariableRadiusBlurShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEGreyShaderFilter, GEGreyShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEFrostedGlassShaderFilter, GEFrostedGlassShaderFilterParams)
+GE_FILTER_TYPE_INFO(GESoundWaveFilter, GESoundWaveFilterParams)
+GE_FILTER_TYPE_INFO(GEGridWarpShaderFilter, GEGridWarpShaderFilterParams)
+GE_FILTER_TYPE_INFO(GEWaveDisturbanceShaderMask, GEWaveDisturbanceShaderMaskParams)
+GE_FILTER_TYPE_INFO(GERippleShaderMask, GERippleShaderMaskParams)
+GE_FILTER_TYPE_INFO(GEWaveGradientShaderMask, GEWaveGradientShaderMaskParams)
+GE_FILTER_TYPE_INFO(GEImageShaderMask, GEImageMaskParams)
+GE_FILTER_TYPE_INFO(GELinearGradientShaderMask, GELinearGradientShaderMaskParams)
+GE_FILTER_TYPE_INFO(GERadialGradientShaderMask, GERadialGradientShaderMaskParams)
+GE_FILTER_TYPE_INFO(GEDoubleRippleShaderMask, GEDoubleRippleShaderMaskParams)
+GE_FILTER_TYPE_INFO(GEUseEffectShaderMask, GEUseEffectMaskParams)
+GE_FILTER_TYPE_INFO(GEFrameGradientShaderMask, GEFrameGradientMaskParams)
+GE_FILTER_TYPE_INFO(GEPixelMapShaderMask, GEPixelMapMaskParams)
+GE_FILTER_TYPE_INFO(GEWavyRippleLightShader, GEWavyRippleLightShaderParams)
+GE_FILTER_TYPE_INFO(GEAuroraNoiseShader, GEAuroraNoiseShaderParams)
+GE_FILTER_TYPE_INFO(GEParticleCircularHaloShader, GEParticleCircularHaloShaderParams)
+GE_FILTER_TYPE_INFO(GEContourDiagonalFlowLightShader, GEContentDiagonalFlowLightShaderParams)
+GE_FILTER_TYPE_INFO(GECircleFlowlightEffect, GECircleFlowlightEffectParams)
+GE_FILTER_TYPE_INFO(GEColorGradientEffect, GEXColorGradientEffectParams)
+GE_FILTER_TYPE_INFO(GEBorderLightShader, GEBorderLightShaderParams)
+GE_FILTER_TYPE_INFO(GESDFPixelmapShaderShape, GESDFPixelmapShapeParams)
+GE_FILTER_TYPE_INFO(GESDFTransformShaderShape, GESDFTransformShapeParams)
+GE_FILTER_TYPE_INFO(GESDFShadowShader, GESDFShadowShaderParams)
+GE_FILTER_TYPE_INFO(GESDFBorderShader, GESDFBorderShaderParams)
+GE_FILTER_TYPE_INFO(GESDFRRectShaderShape, GESDFRRectShapeParams)
+GE_FILTER_TYPE_INFO(GESDFColorShader, GESDFColorShaderParams)
+GE_FILTER_TYPE_INFO(GESDFClipShader, GESDFClipShaderParams)
 
-template<>
-struct GEFilterTypeInfoV2<GEMESABlurShaderFilter> {
-    using FilterClass = GEMESABlurShaderFilter;
-    using ParamType = Drawing::GEMESABlurShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEMESABlurShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEMESABlurShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEMaskTransitionShaderFilter> {
-    using FilterClass = GEMaskTransitionShaderFilter;
-    using ParamType = Drawing::GEMaskTransitionShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEMaskTransitionShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEMaskTransitionShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEDisplacementDistortFilter> {
-    using FilterClass = GEDisplacementDistortFilter;
-    using ParamType = Drawing::GEDisplacementDistortFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEDisplacementDistortFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEDisplacementDistortFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEKawaseBlurShaderFilter> {
-    using FilterClass = GEKawaseBlurShaderFilter;
-    using ParamType = Drawing::GEKawaseBlurShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEKawaseBlurShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEKawaseBlurShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEEdgeLightShaderFilter> {
-    using FilterClass = GEEdgeLightShaderFilter;
-    using ParamType = Drawing::GEEdgeLightShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEEdgeLightShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEEdgeLightShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFEdgeLight> {
-    using FilterClass = GESDFEdgeLight;
-    using ParamType = Drawing::GESDFEdgeLightFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFEdgeLightFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFEdgeLightFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEBezierWarpShaderFilter> {
-    using FilterClass = GEBezierWarpShaderFilter;
-    using ParamType = Drawing::GEBezierWarpShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEBezierWarpShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEBezierWarpShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEWaterRippleFilter> {
-    using FilterClass = GEWaterRippleFilter;
-    using ParamType = Drawing::GEWaterRippleFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEWaterRippleFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEWaterRippleFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEContentLightFilter> {
-    using FilterClass = GEContentLightFilter;
-    using ParamType = Drawing::GEContentLightFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEContentLightFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEContentLightFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEDirectionLightShaderFilter> {
-    using FilterClass = GEDirectionLightShaderFilter;
-    using ParamType = Drawing::GEDirectionLightShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEDirectionLightShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEDirectionLightShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEDispersionShaderFilter> {
-    using FilterClass = GEDispersionShaderFilter;
-    using ParamType = Drawing::GEDispersionShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEDispersionShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEDispersionShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEFrostedGlassBlurShaderFilter> {
-    using FilterClass = GEFrostedGlassBlurShaderFilter;
-    using ParamType = Drawing::GEFrostedGlassBlurShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEFrostedGlassBlurShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEFrostedGlassBlurShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEColorGradientShaderFilter> {
-    using FilterClass = GEColorGradientShaderFilter;
-    using ParamType = Drawing::GEColorGradientShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEColorGradientShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEColorGradientShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEMagnifierShaderFilter> {
-    using FilterClass = GEMagnifierShaderFilter;
-    using ParamType = Drawing::GEMagnifierShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEMagnifierShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEMagnifierShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GELinearGradientBlurShaderFilter> {
-    using FilterClass = GELinearGradientBlurShaderFilter;
-    using ParamType = Drawing::GELinearGradientBlurShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GELinearGradientBlurShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GELinearGradientBlurShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFFromImageFilter> {
-    using FilterClass = GESDFFromImageFilter;
-    using ParamType = Drawing::GESDFFromImageFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFFromImageFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFFromImageFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEVariableRadiusBlurShaderFilter> {
-    using FilterClass = GEVariableRadiusBlurShaderFilter;
-    using ParamType = Drawing::GEVariableRadiusBlurShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEVariableRadiusBlurShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEVariableRadiusBlurShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEGreyShaderFilter> {
-    using FilterClass = GEGreyShaderFilter;
-    using ParamType = Drawing::GEGreyShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEGreyShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEGreyShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEFrostedGlassShaderFilter> {
-    using FilterClass = GEFrostedGlassShaderFilter;
-    using ParamType = Drawing::GEFrostedGlassShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEFrostedGlassShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEFrostedGlassShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESoundWaveFilter> {
-    using FilterClass = GESoundWaveFilter;
-    using ParamType = Drawing::GESoundWaveFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESoundWaveFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESoundWaveFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEGridWarpShaderFilter> {
-    using FilterClass = GEGridWarpShaderFilter;
-    using ParamType = Drawing::GEGridWarpShaderFilterParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEGridWarpShaderFilterParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEGridWarpShaderFilterParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEWaveDisturbanceShaderMask> {
-    using FilterClass = GEWaveDisturbanceShaderMask;
-    using ParamType = GEWaveDisturbanceShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEWaveDisturbanceShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEWaveDisturbanceShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GERippleShaderMask> {
-    using FilterClass = GERippleShaderMask;
-    using ParamType = GERippleShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GERippleShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GERippleShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEWaveGradientShaderMask> {
-    using FilterClass = GEWaveGradientShaderMask;
-    using ParamType = GEWaveGradientShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEWaveGradientShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEWaveGradientShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEImageShaderMask> {
-    using FilterClass = GEImageShaderMask;
-    using ParamType = GEImageMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEImageMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEImageMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GELinearGradientShaderMask> {
-    using FilterClass = GELinearGradientShaderMask;
-    using ParamType = GELinearGradientShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GELinearGradientShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GELinearGradientShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GERadialGradientShaderMask> {
-    using FilterClass = GERadialGradientShaderMask;
-    using ParamType = GERadialGradientShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GERadialGradientShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GERadialGradientShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEDoubleRippleShaderMask> {
-    using FilterClass = GEDoubleRippleShaderMask;
-    using ParamType = GEDoubleRippleShaderMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEDoubleRippleShaderMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEDoubleRippleShaderMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEUseEffectShaderMask> {
-    using FilterClass = GEUseEffectShaderMask;
-    using ParamType = GEUseEffectMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEUseEffectMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEUseEffectMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEFrameGradientShaderMask> {
-    using FilterClass = GEFrameGradientShaderMask;
-    using ParamType = GEFrameGradientMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEFrameGradientMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEFrameGradientMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEPixelMapShaderMask> {
-    using FilterClass = GEPixelMapShaderMask;
-    using ParamType = GEPixelMapMaskParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GEPixelMapMaskParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GEPixelMapMaskParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEWavyRippleLightShader> {
-    using FilterClass = GEWavyRippleLightShader;
-    using ParamType = Drawing::GEWavyRippleLightShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEWavyRippleLightShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEWavyRippleLightShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEAuroraNoiseShader> {
-    using FilterClass = GEAuroraNoiseShader;
-    using ParamType = Drawing::GEAuroraNoiseShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEAuroraNoiseShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEAuroraNoiseShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEParticleCircularHaloShader> {
-    using FilterClass = GEParticleCircularHaloShader;
-    using ParamType = Drawing::GEParticleCircularHaloShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEParticleCircularHaloShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEParticleCircularHaloShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEContourDiagonalFlowLightShader> {
-    using FilterClass = GEContourDiagonalFlowLightShader;
-    using ParamType = Drawing::GEContentDiagonalFlowLightShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEContentDiagonalFlowLightShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEContentDiagonalFlowLightShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GECircleFlowlightEffect> {
-    using FilterClass = GECircleFlowlightEffect;
-    using ParamType = Drawing::GECircleFlowlightEffectParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GECircleFlowlightEffectParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GECircleFlowlightEffectParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEColorGradientEffect> {
-    using FilterClass = GEColorGradientEffect;
-    using ParamType = Drawing::GEXColorGradientEffectParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEXColorGradientEffectParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEXColorGradientEffectParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GEBorderLightShader> {
-    using FilterClass = GEBorderLightShader;
-    using ParamType = Drawing::GEBorderLightShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GEBorderLightShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GEBorderLightShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFPixelmapShaderShape> {
-    using FilterClass = GESDFPixelmapShaderShape;
-    using ParamType = GESDFPixelmapShapeParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GESDFPixelmapShapeParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GESDFPixelmapShapeParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFTransformShaderShape> {
-    using FilterClass = GESDFTransformShaderShape;
-    using ParamType = GESDFTransformShapeParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<GESDFTransformShapeParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<GESDFTransformShapeParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFShadowShader> {
-    using FilterClass = GESDFShadowShader;
-    using ParamType = Drawing::GESDFShadowShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFShadowShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFShadowShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFBorderShader> {
-    using FilterClass = GESDFBorderShader;
-    using ParamType = Drawing::GESDFBorderShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFBorderShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFBorderShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFRRectShaderShape> {
-    using FilterClass = GESDFRRectShaderShape;
-    using ParamType = Drawing::GESDFRRectShapeParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFRRectShapeParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFRRectShapeParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFColorShader> {
-    using FilterClass = GESDFColorShader;
-    using ParamType = Drawing::GESDFColorShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFColorShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFColorShaderParams>::FilterName;
-};
-
-template<>
-struct GEFilterTypeInfoV2<GESDFClipShader> {
-    using FilterClass = GESDFClipShader;
-    using ParamType = Drawing::GESDFClipShaderParams;
-    static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<Drawing::GESDFClipShaderParams>::ID;
-    static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<Drawing::GESDFClipShaderParams>::FilterName;
-};
+#undef GE_FILTER_TYPE_INFO
 
 } // namespace GEV2
 } // namespace Drawing

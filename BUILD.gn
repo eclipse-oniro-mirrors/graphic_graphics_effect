@@ -83,6 +83,7 @@ ohos_source_set("graphics_effect_src") {
     "src/core/ge_visual_effect.cpp",
     "src/core/ge_visual_effect_container.cpp",
     "src/core/ge_visual_effect_impl.cpp",
+    "src/core/ge_visual_effect_impl_v2.cpp",
     "src/pipeline/ge_render.cpp",
     "src/pipeline/ge_filter_composer.cpp",
     "src/pipeline/ge_direct_draw_on_canvas_pass.cpp",

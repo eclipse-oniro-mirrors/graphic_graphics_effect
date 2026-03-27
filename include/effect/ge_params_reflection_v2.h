@@ -40,15 +40,15 @@ class GEFilterParams;
 // X-Macro listing all unique parameter member types
 // Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X
 #define FOR_EACH_PARAM_TYPE(X) \
-    X(ESCAPE(DotMatrixDirection)) \
-    X(ESCAPE(DotMatrixEffectType)) \
     X(ESCAPE(Drawing::Color4f)) \
     X(ESCAPE(Drawing::Matrix)) \
     X(ESCAPE(Drawing::Point)) \
-    X(ESCAPE(GERRect)) \
-    X(ESCAPE(GESDFBorderParams)) \
-    X(ESCAPE(GESDFShadowParams)) \
-    X(ESCAPE(GESDFUnionOp)) \
+    X(ESCAPE(GEV2::DotMatrixDirection)) \
+    X(ESCAPE(GEV2::DotMatrixEffectType)) \
+    X(ESCAPE(GEV2::GERRect)) \
+    X(ESCAPE(GEV2::GESDFBorderParams)) \
+    X(ESCAPE(GEV2::GESDFShadowParams)) \
+    X(ESCAPE(GEV2::GESDFUnionOp)) \
     X(ESCAPE(RectF)) \
     X(ESCAPE(Vector2f)) \
     X(ESCAPE(Vector3f)) \
@@ -56,14 +56,7 @@ class GEFilterParams;
     X(ESCAPE(bool)) \
     X(ESCAPE(float)) \
     X(ESCAPE(int32_t)) \
-    X(ESCAPE(std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE>)) \
-    X(ESCAPE(std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE>)) \
     X(ESCAPE(std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>)) \
-    X(ESCAPE(std::array<Vector4f, 4>)) \
-    X(ESCAPE(std::array<Vector4f, ARRAY_SIZE_FOUR>)) \
-    X(ESCAPE(std::array<float, COLOR_GRADIENT_ARRAY_SIZE>)) \
-    X(ESCAPE(std::array<std::pair<float, float>, 4>)) \
-    X(ESCAPE(std::array<std::pair<float, float>, ARRAY_SIZE_NINE>)) \
     X(ESCAPE(std::pair<float, float>)) \
     X(ESCAPE(std::shared_ptr<Drawing::GESDFShaderShape>)) \
     X(ESCAPE(std::shared_ptr<Drawing::Image>)) \
@@ -820,6 +813,10 @@ GE_PARAMS_TYPE_INFO(GEXRoundedRectFlowlightEffectParams, ROUNDED_RECT_FLOWLIGHT,
 class GEParamsBuilder {
 public:
     static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);
+
+    // Convert filter name string to GEFilterType
+    // Note: Strings are sourced from GEFilterParamsTypeInfoV2<Struct>::FilterName
+    static GEFilterType GetFilterTypeFromString(const std::string& str);
 };
 
 // Type traits for accessing struct fields
@@ -1351,18 +1348,9 @@ GE_PARAMS_FIELD_ACCESSOR(GEXRoundedRectFlowlightEffectParams, progress, ROUNDED_
 #undef GE_PARAMS_ARRAY_ELEMENT_ACCESSOR
 
 
-// FilterType to TagRange mapping
-struct GEParamsMemberTagRange {
-    GEParamsMemberTag RangeStart;
-    GEParamsMemberTag RangeEnd;
-};
-
 // Static helper class for params member tag operations
 class GEParamsMemberHelper {
 public:
-    // Get tag range for a given FilterType (using switch for performance)
-    static std::optional<GEParamsMemberTagRange> GetParamsMemberTagRange(GEFilterType filterType);
-
     // Convert GEParamsMemberTag to corresponding GEFilterType
     static GEFilterType GetFilterTypeFromTag(GEParamsMemberTag tag);
 
@@ -1376,23 +1364,23 @@ public:
     // Overloaded SetParamsMemberByTag for each unique parameter type
     // These are non-template functions, reducing binary bloat
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const DotMatrixDirection& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const DotMatrixEffectType& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Color4f& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GERRect& value);
+                                     GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GESDFBorderParams& value);
+                                     GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GESDFShadowParams& value);
+                                     GEParamsMemberTag tag, const GEV2::GERRect& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GESDFUnionOp& value);
+                                     GEParamsMemberTag tag, const GEV2::GESDFBorderParams& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::GESDFShadowParams& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const RectF& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
