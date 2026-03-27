@@ -272,9 +272,10 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     auto childSml = Drawing::ShaderEffect::CreateImageShader(
         *imgShaderSml, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
-    auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(Drawing::GESDFRRectShapeParams {
-        Drawing::GERRect { 0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f }
-    });
+    Drawing::GESDFRRectShapeParams shapeParam;
+    shapeParam.rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    shapeParam.rrect.SetCornerRadius(10.0f, 10.0f);
+    auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(shapeParam);
     filter.frostedGlassParams_.sdfShape = shape;
     auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
     ASSERT_NE(childImage, nullptr);
@@ -312,7 +313,8 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSDFNormalShader_W_SDFShape, TestSiz
 {
     auto params = MakeParams();
     Drawing::GESDFRRectShapeParams sdfParam;
-    sdfParam.rrect = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+    sdfParam.rrect = {0.0f, 0.0f, 100.0f, 100.0f};
+    sdfParam.rrect.SetCornerRadius(10.0f, 10.0f);
     params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());

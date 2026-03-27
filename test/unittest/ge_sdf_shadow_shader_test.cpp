@@ -54,7 +54,8 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     shader = shadowShader.MakeSDFShadowShader(rect1);
     EXPECT_EQ(shader, nullptr);
 
-    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f, 10.0f, 10.0f}};
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    rectShapeParams.rrect.SetCornerRadius(10.0f, 10.0f);
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     shadowParams.shape = sdfShape;
     shadowShader.SetSDFShadowParams(shadowParams);

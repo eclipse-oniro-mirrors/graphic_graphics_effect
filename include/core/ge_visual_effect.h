@@ -103,8 +103,11 @@ public:
     // refer to skia-SkContinuousRRect.cpp
     static inline bool CanBeContinuous(const std::shared_ptr<GESDFRRectShapeParams>& params)
     {
-        float commonRadius = params->rrect.radiusX_;
-        float extendsRadius = params->rrect.radiusX_ * MAX_CURVE_X;
+        if (!params->rrect.HasUniformCornerRadii() || !params->rrect.HasCircularCornerRadii()) {
+            return false;
+        }
+        float commonRadius = params->rrect.GetCommonRadiusX();
+        float extendsRadius = commonRadius * MAX_CURVE_X;
         if (extendsRadius <= fmin(params->rrect.width_, params->rrect.height_) * 0.5f) {
             return true;
         } else if (ROSEN_EQ(commonRadius, params->rrect.height_ * 0.5f) &&

@@ -1374,8 +1374,53 @@ struct GERRect {
     float top_ = 0.f;
     float width_ = 0.f;
     float height_ = 0.f;
-    float radiusX_ = 0.f;
-    float radiusY_ = 0.f;
+    Vector2f radius_[4] = { { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f } };
+
+    static constexpr uint32_t TOP_LEFT = 0;
+    static constexpr uint32_t TOP_RIGHT = 1;
+    static constexpr uint32_t BOTTOM_RIGHT = 2;
+    static constexpr uint32_t BOTTOM_LEFT = 3;
+    static constexpr uint32_t CORNER_COUNT = 4;
+
+    void SetCornerRadius(float radiusX, float radiusY)
+    {
+        for (uint32_t index = 0; index < CORNER_COUNT; index++) {
+            radius_[index] = Vector2f(radiusX, radiusY);
+        }
+    }
+
+    void SetCornerRadius(const Vector4f& radius)
+    {
+        radius_[TOP_LEFT] = Vector2f(radius[TOP_LEFT], radius[TOP_LEFT]);
+        radius_[TOP_RIGHT] = Vector2f(radius[TOP_RIGHT], radius[TOP_RIGHT]);
+        radius_[BOTTOM_RIGHT] = Vector2f(radius[BOTTOM_RIGHT], radius[BOTTOM_RIGHT]);
+        radius_[BOTTOM_LEFT] = Vector2f(radius[BOTTOM_LEFT], radius[BOTTOM_LEFT]);
+    }
+
+    bool HasCircularCornerRadii() const
+    {
+        for (uint32_t index = 0; index < CORNER_COUNT; index++) {
+            if (!ROSEN_EQ(radius_[index].x_, radius_[index].y_)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool HasUniformCornerRadii() const
+    {
+        for (uint32_t index = 1; index < CORNER_COUNT; index++) {
+            if (!radius_[index].IsNearEqual(radius_[TOP_LEFT])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    float GetCommonRadiusX() const
+    {
+        return radius_[TOP_LEFT].x_;
+    }
 };
 
 using GESDFShapeNode = std::variant<GERRect, GESDFUnionOp>;

@@ -34,7 +34,8 @@ public:
     std::shared_ptr<GESDFShaderShape> CreateTestShape() const
     {
         GESDFRRectShapeParams param;
-        param.rrect = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+        param.rrect = {0.0f, 0.0f, 100.0f, 100.0f};
+        param.rrect.SetCornerRadius(10.0f, 10.0f);
         return std::make_shared<GESDFRRectShaderShape>(param);
     }
 };

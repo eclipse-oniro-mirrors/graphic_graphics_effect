@@ -16,6 +16,8 @@
 #ifndef GRAPHICS_EFFECT_GE_SDF_RRECT_SHAPE_H
 #define GRAPHICS_EFFECT_GE_SDF_RRECT_SHAPE_H
 
+#include <array>
+
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
@@ -54,9 +56,17 @@ public:
     }
 
 private:
+    using CornerRadii = std::array<Vector2f, GERRect::CORNER_COUNT>;
+
+    bool UseUniformRadiusFastPath() const;
+    CornerRadii ResolveCornerRadii(float halfWidth, float halfHeight) const;
+    float ResolveUniformRadius(float halfWidth, float halfHeight) const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetUniformSDFRRectShaderShapeBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetUniformSDFRRectNormalShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectShaderShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectNormalShapeBuilder() const;
-    std::shared_ptr<ShaderEffect> GenerateShaderEffect(std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+    std::shared_ptr<ShaderEffect> GenerateShaderEffect(
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder, bool useUniformRadius) const;
     GESDFRRectShapeParams params_ {};
 };
 } // Drawing
