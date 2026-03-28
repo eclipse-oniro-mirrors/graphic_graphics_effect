@@ -53,15 +53,15 @@ def generate_header() -> str:
     output.append("#include <type_traits>")
     output.append("")
     output.append("// Common types")
-    output.append("#include \"common/rs_vector2.h\"")
-    output.append("#include \"common/rs_vector3.h\"")
-    output.append("#include \"common/rs_vector4.h\"")
+    output.append('#include "common/rs_vector2.h"')
+    output.append('#include "common/rs_vector3.h"')
+    output.append('#include "common/rs_vector4.h"')
     output.append("// Drawing types")
-    output.append("#include \"utils/matrix.h\"")
+    output.append('#include "utils/matrix.h"')
     output.append("// GE types")
-    output.append("#include \"ge_filter_type.h\"")
-    output.append("#include \"ge_shader_mask.h\"")
-    output.append("#include \"ge_sdf_shader_shape.h\"")
+    output.append('#include "ge_filter_type.h"')
+    output.append('#include "ge_shader_mask.h"')
+    output.append('#include "ge_sdf_shader_shape.h"')
     output.append("")
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
@@ -82,7 +82,7 @@ def generate_header() -> str:
     params_files = get_params_files(params_dirs)
     for params_file in params_files:
         rel_path = params_file.relative_to(root_dir / "include")
-        output.append(f"#include \"{rel_path}\"")
+        output.append(f'#include "{rel_path}"')
 
     output.append("")
     output.append("} // namespace GEV2")
@@ -92,7 +92,7 @@ def generate_header() -> str:
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_EFFECTS_PARAMS_H")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def main():
@@ -124,7 +124,7 @@ def main():
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(header_content)
 
     print(f"Generated {output_file}")
@@ -132,5 +132,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

@@ -23,9 +23,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from tool.effectgen.cpp_parser import CppParser, StructInfo, FieldInfo
 from tool.effectgen.cpp_tokenizer import CppTokenizer
 
+
 @dataclass
 class FilterTypeMacroInfo:
     """Information about DECLARE_GEFILTER_TYPEFUNC macro usage."""
+
     filter_class: str
     params_type: str
     header_file: str
@@ -56,9 +58,9 @@ def load_config(config_path: Path) -> Dict[str, str]:
     """Load type aliases from config.json."""
     type_aliases = {}
     try:
-        with open(config_path, 'r', encoding='utf-8') as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
-            type_aliases = config.get('type_aliases', {})
+            type_aliases = config.get("type_aliases", {})
     except FileNotFoundError:
         print(f"Warning: Config file not found at {config_path}", file=sys.stderr)
     except json.JSONDecodeError as e:
@@ -78,10 +80,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
     type_str = type_aliases.get(type_str, type_str)
 
     # Keywords that should preserve space after them
-    preserve_space_keywords = {
-        'const', 'volatile', 'mutable',
-        'unsigned', 'signed', 'short', 'long'
-    }
+    preserve_space_keywords = {"const", "volatile", "mutable", "unsigned", "signed", "short", "long"}
 
     import re
 
@@ -94,37 +93,37 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
         ch = type_str[i]
 
         # Track template depth
-        if ch == '<':
+        if ch == "<":
             depth += 1
             tokens.append(ch)
             i += 1
-        elif ch == '>':
+        elif ch == ">":
             depth = max(0, depth - 1)
             tokens.append(ch)
             i += 1
-        elif ch == ',':
+        elif ch == ",":
             # Commas are preserved inside templates
             tokens.append(ch)
             i += 1
-        elif ch in [' ', '\t', '\n']:
+        elif ch in [" ", "\t", "\n"]:
             # Collect all whitespace
             ws = ch
             i += 1
-            while i < len(type_str) and type_str[i] in [' ', '\t', '\n']:
+            while i < len(type_str) and type_str[i] in [" ", "\t", "\n"]:
                 ws += type_str[i]
                 i += 1
-            tokens.append(('ws', ws))
-        elif ch in ['*', '&']:
+            tokens.append(("ws", ws))
+        elif ch in ["*", "&"]:
             tokens.append(ch)
             i += 1
-        elif ch == ':' and i + 1 < len(type_str) and type_str[i + 1] == ':':
-            tokens.append('::')
+        elif ch == ":" and i + 1 < len(type_str) and type_str[i + 1] == ":":
+            tokens.append("::")
             i += 2
         else:
             # Collect identifier/keyword
             ident = ch
             i += 1
-            while i < len(type_str) and (type_str[i].isalnum() or type_str[i] == '_'):
+            while i < len(type_str) and (type_str[i].isalnum() or type_str[i] == "_"):
                 ident += type_str[i]
                 i += 1
             tokens.append(ident)
@@ -136,7 +135,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
         token = tokens[i]
 
         # Skip whitespace
-        if isinstance(token, tuple) and token[0] == 'ws':
+        if isinstance(token, tuple) and token[0] == "ws":
             i += 1
             continue
 
@@ -144,31 +143,31 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
         result.append(token)
 
         # Check if we need to preserve space after this token
-        if token == ',':
+        if token == ",":
             # Add a space after comma (for template parameters)
-            result.append(' ')
+            result.append(" ")
         elif token in preserve_space_keywords:
             # Look ahead to see if there's a non-whitespace token
             j = i + 1
             while j < len(tokens):
                 next_token = tokens[j]
-                if isinstance(next_token, tuple) and next_token[0] == 'ws':
+                if isinstance(next_token, tuple) and next_token[0] == "ws":
                     j += 1
                     continue
                 break
 
-            if j < len(tokens) and tokens[j] not in ['<', '>', '::', '*', '&', ',']:
+            if j < len(tokens) and tokens[j] not in ["<", ">", "::", "*", "&", ","]:
                 # Add a space
-                result.append(' ')
+                result.append(" ")
 
         i += 1
 
-    return ''.join(result)
+    return "".join(result)
 
 
 def parse_def_file(file_path: Path, report_errors: bool = True) -> Optional[StructInfo]:
     """Parse a .def file and extract struct information."""
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     # Tokenize
@@ -199,14 +198,14 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
         header_files = list(effect_dir.glob("*.h"))
         for header_file in header_files:
             try:
-                with open(header_file, 'r', encoding='utf-8') as f:
+                with open(header_file, "r", encoding="utf-8") as f:
                     content = f.read()
 
                 # Pattern to match DECLARE_GEFILTER_TYPEFUNC(Class, ParamsType)
                 # This pattern handles:
                 # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams)
                 # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, GEKawaseBlurShaderFilterParams)
-                pattern = r'DECLARE_GEFILTER_TYPEFUNC\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*([a-zA-Z_][a-zA-Z0-9_:<>:]*)\s*\)'
+                pattern = r"DECLARE_GEFILTER_TYPEFUNC\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*([a-zA-Z_][a-zA-Z0-9_:<>:]*)\s*\)"
 
                 matches = re.finditer(pattern, content)
                 for match in matches:
@@ -222,11 +221,7 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
                     rel_path = header_file.relative_to(include_dir)
                     header_include = str(rel_path)
 
-                    macro_infos.append(FilterTypeMacroInfo(
-                        filter_class=filter_class,
-                        params_type=params_type,
-                        header_file=header_include
-                    ))
+                    macro_infos.append(FilterTypeMacroInfo(filter_class=filter_class, params_type=params_type, header_file=header_include))
             except Exception as e:
                 print(f"  Warning: Failed to scan {header_file}: {e}", file=sys.stderr)
 
@@ -235,17 +230,17 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
 
 def to_upper_case(name: str) -> str:
     """Convert camelCase or snake_case to UPPER_CASE."""
-    if name.endswith('_'):
+    if name.endswith("_"):
         name = name[:-1]
     result = []
     for c in name:
         if c.isupper():
             if result:
-                result.append('_')
+                result.append("_")
             result.append(c)
         else:
             result.append(c.upper())
-    return ''.join(result)
+    return "".join(result)
 
 
 def to_pascal_case(name: str) -> str:
@@ -257,10 +252,10 @@ def to_pascal_case(name: str) -> str:
         _propName -> PropName (strip leading underscore)
     """
     # Remove trailing underscore
-    if name.endswith('_'):
+    if name.endswith("_"):
         name = name[:-1]
     # Remove leading underscore
-    if name.startswith('_'):
+    if name.startswith("_"):
         name = name[1:]
 
     if not name:
@@ -270,14 +265,14 @@ def to_pascal_case(name: str) -> str:
     result = []
     capitalize_next = True
     for c in name:
-        if c == '_':
+        if c == "_":
             capitalize_next = True
         elif capitalize_next:
             result.append(c.upper())
             capitalize_next = False
         else:
             result.append(c)
-    return ''.join(result)
+    return "".join(result)
 
 
 def to_member_tag_name(enum_type: str, field_name: str, index: Optional[int] = None) -> str:
@@ -370,7 +365,7 @@ def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tup
 
     output.append("};")
     output.append("")
-    return '\n'.join(output), struct_tag_ranges
+    return "\n".join(output), struct_tag_ranges
 
 
 def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -398,7 +393,7 @@ def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dic
     output.append("};")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
@@ -428,7 +423,7 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
     output.append("#undef GE_GET_FILTER_TYPE_CASE")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -506,7 +501,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     output.append("#undef GE_VALIDATE_AND_SET")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
@@ -519,7 +514,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("struct GEFilterParamsTypeInfoV2 {")
     output.append("    using Self = T;")
     output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
-    output.append("    static constexpr std::string_view FilterName = \"\";")
+    output.append('    static constexpr std::string_view FilterName = "";')
     output.append("};")
     output.append("")
 
@@ -543,7 +538,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("#undef GE_PARAMS_TYPE_INFO")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_type_traits(structs: List[StructInfo]) -> str:
@@ -595,7 +590,7 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
     output.append("#undef GE_PARAMS_ARRAY_ELEMENT_ACCESSOR")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_set_member_cases(structs: List[StructInfo]) -> str:
@@ -620,7 +615,7 @@ def generate_set_member_cases(structs: List[StructInfo]) -> str:
     output.append("#undef GE_SET_MEMBER_CASE")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -665,7 +660,7 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
 
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
@@ -700,7 +695,7 @@ def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
     output.append("#undef GE_DISPATCH_CASE_TYPE")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
@@ -733,8 +728,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
             collisions.append((prop_name, tags))
 
     if collisions:
-        error_lines = [
-            "Error: String collision detected in GEParamsMemberTagFromString mapping:"]
+        error_lines = ["Error: String collision detected in GEParamsMemberTagFromString mapping:"]
         for prop_name, tags in collisions:
             error_lines.append(f"\n  String '{prop_name}' is used by multiple fields:")
             for struct_name, tag_name in tags:
@@ -779,7 +773,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
     output.append("}")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_params_builder_decl() -> str:
@@ -796,7 +790,7 @@ def generate_params_builder_decl() -> str:
     output.append("};")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_params_builder_impl(structs: List[StructInfo]) -> str:
@@ -824,7 +818,7 @@ def generate_params_builder_impl(structs: List[StructInfo]) -> str:
     output.append("#undef GE_BUILD_PARAMS_CASE")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
@@ -856,7 +850,7 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     output.append("}")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -897,7 +891,7 @@ def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]
     output.append("")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def simplify_params_type(full_qualified_type: str, known_params_types: List[str]) -> str:
@@ -914,7 +908,7 @@ def simplify_params_type(full_qualified_type: str, known_params_types: List[str]
     1. Exact match with a: known params type
     2. Ends with a known params type (handles namespace prefixes)
     """
-    simple_name = full_qualified_type.split('::')[-1]
+    simple_name = full_qualified_type.split("::")[-1]
 
     if simple_name in known_params_types:
         return simple_name
@@ -923,7 +917,7 @@ def simplify_params_type(full_qualified_type: str, known_params_types: List[str]
         if full_qualified_type.endswith(known_type):
             if len(full_qualified_type) == len(known_type):
                 return known_type
-            elif full_qualified_type[-len(known_type)-2:-len(known_type)] == '::':
+            elif full_qualified_type[-len(known_type) - 2 : -len(known_type)] == "::":
                 return known_type
 
     return full_qualified_type
@@ -941,8 +935,8 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("#define GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_V2_H")
     output.append("")
     output.append("#include <type_traits>")
-    output.append("#include \"ge_filter_type.h\"")
-    output.append("#include \"ge_params_reflection_v2.h\"")
+    output.append('#include "ge_filter_type.h"')
+    output.append('#include "ge_params_reflection_v2.h"')
     output.append("")
 
     # Group by header file and add includes
@@ -954,7 +948,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
 
     # Add includes for each header file
     for header_file in sorted(header_to_macros.keys()):
-        output.append(f"#include \"{header_file}\"")
+        output.append(f'#include "{header_file}"')
     output.append("")
 
     output.append("namespace OHOS {")
@@ -970,7 +964,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("    using FilterClass = T;")
     output.append("    using ParamType = void;")
     output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
-    output.append("    static constexpr std::string_view Name = \"\";")
+    output.append('    static constexpr std::string_view Name = "";')
     output.append("};")
     output.append("")
 
@@ -1006,7 +1000,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_V2_H")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def _infer_numeric_type(value_str: str) -> str:
@@ -1015,9 +1009,9 @@ def _infer_numeric_type(value_str: str) -> str:
     Returns 'float' if the value contains a decimal point or 'f' suffix, otherwise 'int'.
     """
     value = value_str.strip()
-    if '.' in value or value.endswith('f') or value.endswith('F'):
-        return 'float'
-    return 'int'
+    if "." in value or value.endswith("f") or value.endswith("F"):
+        return "float"
+    return "int"
 
 
 def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
@@ -1037,20 +1031,20 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
         mins = range_attr.min_components
         maxs = range_attr.max_components
         component_type = _infer_numeric_type(mins[0])
-        mins_str = ', '.join(mins)
-        maxs_str = ', '.join(maxs)
+        mins_str = ", ".join(mins)
+        maxs_str = ", ".join(maxs)
         output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))")
 
     elif range_attr.min_components is not None:
         mins = range_attr.min_components
         component_type = _infer_numeric_type(mins[0])
-        mins_str = ', '.join(mins)
+        mins_str = ", ".join(mins)
         output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))")
 
     elif range_attr.max_components is not None:
         maxs = range_attr.max_components
         component_type = _infer_numeric_type(maxs[0])
-        maxs_str = ', '.join(maxs)
+        maxs_str = ", ".join(maxs)
         output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))")
 
     elif range_attr.min_value is not None:
@@ -1059,7 +1053,7 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
     elif range_attr.max_value is not None:
         output.append(f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {range_attr.max_value})")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_transform_helper(structs: List[StructInfo]) -> str:
@@ -1086,7 +1080,7 @@ def generate_transform_helper(structs: List[StructInfo]) -> str:
     output.append("};")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -1102,8 +1096,8 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("#include <string>")
     output.append("#include <string_view>")
     output.append("#include <type_traits>")
-    output.append("#include \"ge_effects_params.h\"")
-    output.append("#include \"ge_value_transformer.h\"")
+    output.append('#include "ge_effects_params.h"')
+    output.append('#include "ge_value_transformer.h"')
     output.append("")
 
     output.append("namespace OHOS {")
@@ -1227,7 +1221,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_PARAMS_REFLECTION_V2_H")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
@@ -1236,8 +1230,8 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
 
     output.append(COPYRIGHT_HEADER)
     output.append("")
-    output.append("#include \"ge_params_reflection_v2.h\"")
-    output.append("#include \"ge_filter_params.h\"")
+    output.append('#include "ge_params_reflection_v2.h"')
+    output.append('#include "ge_filter_params.h"')
     output.append("#include <unordered_map>")
     output.append("")
 
@@ -1268,56 +1262,63 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     output.append("} // namespace OHOS")
     output.append("")
 
-    return '\n'.join(output)
+    return "\n".join(output)
 
 
 def main():
     """Main generation function."""
-    parser = argparse.ArgumentParser(description='Generate C++ static reflection metadata from .params files',
+    parser = argparse.ArgumentParser(
+        description="Generate C++ static reflection metadata from .params files",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python generate_reflection_metadata_v2.py
   python generate_reflection_metadata_v2.py --params-dirs custom/filter custom/maz --output-file custom/reflection.h
-        """
+        """,
     )
 
-    parser.add_argument('--params-dirs',
+    parser.add_argument(
+        "--params-dirs",
         type=str,
-        nargs='+',
+        nargs="+",
         default=None,
-        help='Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
+        help="Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)",
     )
 
-    parser.add_argument('--output-file',
+    parser.add_argument(
+        '--output-file',
         type=str,
         default=None,
         help='Output header file path (default: include/effect/ge_params_reflection_v2.h)'
     )
 
-    parser.add_argument('--output-cpp-file',
+    parser.add_argument(
+        '--output-cpp-file',
         type=str,
         default=None,
         help='Output cpp file path (default: src/effect/ge_params_reflection_v2.cpp)'
     )
 
-    parser.add_argument('--config-file',
+    parser.add_argument(
+        '--config-file',
         type=str,
         default=None,
         help='Config file path (default: tool/effectgen/config.json)'
     )
 
-    parser.add_argument('--effect-dirs',
+    parser.add_argument(
+        "--effect-dirs",
         type=str,
-        nargs='+',
+        nargs="+",
         default=None,
-        help='Directories containing effect header files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
+        help="Directories containing effect header files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)",
     )
 
-    parser.add_argument('--filter-type-info-file',
+    parser.add_argument(
+        "--filter-type-info-file",
         type=str,
         default=None,
-        help='Output GEFilterTypeInfoV2 header file path (default: include/core/ge_filter_type_info_v2.h)'
+        help="Output GEFilterTypeInfoV2 header file path (default: include/core/ge_filter_type_info_v2.h)",
     )
 
     args = parser.parse_args()
@@ -1348,8 +1349,10 @@ Examples:
             root_dir / "include" / "effect" / "shader",
             root_dir / "include" / "effect" / "shape",
         ]
-    filter_type_info_file = Path(args.filter_type_info_file) if args.filter_type_info_file else root_dir / \
-        "include" / "core" / "ge_filter_type_info_v2.h"
+    filter_type_info_file = (
+        Path(args.filter_type_info_file) if args.filter_type_info_file 
+                                         else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
+    )
 
     # Load type aliases from config
     type_aliases = load_config(config_file)
@@ -1438,7 +1441,7 @@ Examples:
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Write to file
-    with open(output_file, 'w', encoding='utf-8') as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(header_content)
 
     print(f"Generated {output_file}")
@@ -1453,7 +1456,7 @@ Examples:
     output_cpp_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Write to file
-    with open(output_cpp_file, 'w', encoding='utf-8') as f:
+    with open(output_cpp_file, "w", encoding="utf-8") as f:
         f.write(cpp_content)
 
     print(f"Generated {output_cpp_file}")
@@ -1466,7 +1469,7 @@ Examples:
     filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
 
     # Write to file
-    with open(filter_type_info_file, 'w', encoding='utf-8') as f:
+    with open(filter_type_info_file, "w", encoding="utf-8") as f:
         f.write(filter_type_info_content)
 
     print(f"Generated {filter_type_info_file}")
@@ -1475,5 +1478,5 @@ Examples:
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())
