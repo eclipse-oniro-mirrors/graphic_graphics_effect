@@ -45,6 +45,7 @@ class GEFilterParams;
     X(ESCAPE(Drawing::Point)) \
     X(ESCAPE(GEV2::DotMatrixDirection)) \
     X(ESCAPE(GEV2::DotMatrixEffectType)) \
+    X(ESCAPE(GEV2::GEBezierWarpShaderFilterControlPointArray)) \
     X(ESCAPE(GEV2::GERRect)) \
     X(ESCAPE(GEV2::GESDFBorderParams)) \
     X(ESCAPE(GEV2::GESDFShadowParams)) \
@@ -56,7 +57,6 @@ class GEFilterParams;
     X(ESCAPE(bool)) \
     X(ESCAPE(float)) \
     X(ESCAPE(int32_t)) \
-    X(ESCAPE(std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>)) \
     X(ESCAPE(std::pair<float, float>)) \
     X(ESCAPE(std::shared_ptr<Drawing::GESDFShaderShape>)) \
     X(ESCAPE(std::shared_ptr<Drawing::Image>)) \
@@ -1374,6 +1374,8 @@ public:
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GERRect& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GESDFBorderParams& value);
@@ -1395,8 +1397,6 @@ public:
                                      GEParamsMemberTag tag, const float& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const int32_t& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const std::array<Drawing::Point, GE_FILTER_BEZIER_WARP_POINT_NUM>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::pair<float, float>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,

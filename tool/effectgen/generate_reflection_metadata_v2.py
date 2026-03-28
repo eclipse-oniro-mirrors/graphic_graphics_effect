@@ -431,16 +431,16 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     output = []
 
     output.append("// Helper macro to validate and set parameter")
-    output.append("#define GE_VALIDATE_AND_SET(Tag, Value) \\")
+    output.append("#define GE_VALIDATE_AND_SET(Tag) \\")
     output.append("    case GEParamsMemberTag::Tag: { \\")
-    output.append("        using ExpectedType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \\")
-    output.append("        using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \\")
-    output.append("        auto unboxed = GEFilterParams::Unbox<ExpectedType>(params); \\")
-    output.append("        if (!unboxed.has_value()) { \\")
+    output.append("        using ParamsType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \\")
+    output.append("        using SetterType = std::remove_cv_t<std::remove_reference_t<decltype(value)>>; \\")
+    output.append("        auto unboxed = GEFilterParams::Unbox<std::shared_ptr<ParamsType>>(params); \\")
+    output.append("        if (unboxed == nullptr) { \\")
     output.append("            return; \\")
     output.append("        } \\")
     output.append("        auto& actualParams = *unboxed; \\")
-    output.append("        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, FieldType>::Transform(Value); \\")
+    output.append("        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, SetterType>::Transform(value); \\")
     output.append("        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \\")
     output.append("        break; \\")
     output.append("    }")
@@ -490,7 +490,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
         output.append("    switch (tag) {")
 
         for tag_name, struct_name, field_name in tags:
-            output.append(f"        GE_VALIDATE_AND_SET({tag_name}, value)")
+            output.append(f"        GE_VALIDATE_AND_SET({tag_name})")
 
         output.append("        default:")
         output.append("            break;")
