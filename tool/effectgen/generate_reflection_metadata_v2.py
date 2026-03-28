@@ -60,8 +60,7 @@ def load_config(config_path: Path) -> Dict[str, str]:
             config = json.load(f)
             type_aliases = config.get('type_aliases', {})
     except FileNotFoundError:
-        print(
-            f"Warning: Config file not found at {config_path}", file=sys.stderr)
+        print(f"Warning: Config file not found at {config_path}", file=sys.stderr)
     except json.JSONDecodeError as e:
         print(f"Warning: Failed to parse config file: {e}", file=sys.stderr)
     return type_aliases
@@ -229,8 +228,7 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
                         header_file=header_include
                     ))
             except Exception as e:
-                print(
-                    f"  Warning: Failed to scan {header_file}: {e}", file=sys.stderr)
+                print(f"  Warning: Failed to scan {header_file}: {e}", file=sys.stderr)
 
     return macro_infos
 
@@ -383,26 +381,19 @@ def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dic
     output.append("// Static helper class for params member tag operations")
     output.append("class GEParamsMemberHelper {")
     output.append("public:")
-    output.append(
-        "    // Convert GEParamsMemberTag to corresponding GEFilterType")
-    output.append(
-        "    static GEFilterType GetFilterTypeFromTag(GEParamsMemberTag tag);")
+    output.append("    // Convert GEParamsMemberTag to corresponding GEFilterType")
+    output.append("    static GEFilterType GetFilterTypeFromTag(GEParamsMemberTag tag);")
 
     output.append("")
     output.append("    // Convert string to GEParamsMemberTag")
-    output.append(
-        "    // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
-    output.append(
-        "    //       Aliases from [[ge::prop_alias]] are also included")
-    output.append(
-        "    static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
+    output.append("    // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
+    output.append("    //       Aliases from [[ge::prop_alias]] are also included")
+    output.append("    static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
 
     output.append("")
-    output.append(
-        "    // Set params member by tag using overloaded functions (reduces binary bloat)")
+    output.append("    // Set params member by tag using overloaded functions (reduces binary bloat)")
     output.append("    // All implementations are in the .cpp file")
-    output.append(generate_set_params_member_overloads_decl(
-        structs, type_aliases))
+    output.append(generate_set_params_member_overloads_decl(structs, type_aliases))
 
     output.append("};")
     output.append("")
@@ -414,8 +405,7 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
     """Generate GEParamsMemberHelper::GetFilterTypeFromTag() implementation."""
     output = []
 
-    output.append(
-        "GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)")
+    output.append("GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)")
     output.append("{")
     output.append("    switch (tag) {")
 
@@ -428,8 +418,7 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
         enum_type = struct.enum_type
         for field in struct.fields:
             for tag_name, _, _, _ in iterate_field_tags(struct, field):
-                output.append(
-                    f"        GE_GET_FILTER_TYPE_CASE({tag_name}, {enum_type})")
+                output.append(f"        GE_GET_FILTER_TYPE_CASE({tag_name}, {enum_type})")
 
     output.append("        default:")
     output.append("            return GEFilterType::NONE;")
@@ -449,20 +438,15 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     output.append("// Helper macro to validate and set parameter")
     output.append("#define GE_VALIDATE_AND_SET(Tag, Value) \\")
     output.append("    case GEParamsMemberTag::Tag: { \\")
-    output.append(
-        "        using ExpectedType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \\")
-    output.append(
-        "        using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \\")
-    output.append(
-        "        auto unboxed = GEFilterParams::Unbox<ExpectedType>(params); \\")
+    output.append("        using ExpectedType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \\")
+    output.append("        using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \\")
+    output.append("        auto unboxed = GEFilterParams::Unbox<ExpectedType>(params); \\")
     output.append("        if (!unboxed.has_value()) { \\")
     output.append("            return; \\")
     output.append("        } \\")
     output.append("        auto& actualParams = *unboxed; \\")
-    output.append(
-        "        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, FieldType>::Transform(Value); \\")
-    output.append(
-        "        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \\")
+    output.append("        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, FieldType>::Transform(Value); \\")
+    output.append("        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \\")
     output.append("        break; \\")
     output.append("    }")
     output.append("")
@@ -492,22 +476,18 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
 
                 if normalized_type not in type_to_tags:
                     type_to_tags[normalized_type] = []
-                type_to_tags[normalized_type].append(
-                    (tag_name, struct.name, field.name))
+                type_to_tags[normalized_type].append((tag_name, struct.name, field.name))
 
     # Generate implementations for each type
     for field_type, tags in type_to_tags.items():
-        output.append(
-            f"void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
-        output.append(
-            f"                                                GEParamsMemberTag tag, const {field_type}& value)")
+        output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
+        output.append(f"                                                GEParamsMemberTag tag, const {field_type}& value)")
         output.append("{")
         output.append("    if (!params) {")
         output.append("        return;")
         output.append("    }")
         output.append("")
-        output.append(
-            "    auto expectedFilterType = GetFilterTypeFromTag(tag);")
+        output.append("    auto expectedFilterType = GetFilterTypeFromTag(tag);")
         output.append("    if (params->GetType() != expectedFilterType) {")
         output.append("        return;")
         output.append("    }")
@@ -534,8 +514,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output = []
 
     output.append("// GEFilterParamsTypeInfoV2 template specializations")
-    output.append(
-        "// Provides FilterType ID and FilterName for each params type")
+    output.append("// Provides FilterType ID and FilterName for each params type")
     output.append("template<typename T>")
     output.append("struct GEFilterParamsTypeInfoV2 {")
     output.append("    using Self = T;")
@@ -545,15 +524,12 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("")
 
     output.append("// Helper macro for GEParamsTypeInfo specializations")
-    output.append(
-        "#define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \\")
+    output.append("#define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \\")
     output.append("    template<> \\")
     output.append("    struct GEFilterParamsTypeInfoV2<Struct> { \\")
     output.append("        using Self = Struct; \\")
-    output.append(
-        "        static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \\")
-    output.append(
-        "        static constexpr std::string_view FilterName = #FilterNameStr; \\")
+    output.append("        static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \\")
+    output.append("        static constexpr std::string_view FilterName = #FilterNameStr; \\")
     output.append("    };")
     output.append("")
 
@@ -561,8 +537,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
         enum_type = struct.enum_type
         struct_name = struct.name
         filter_name = struct.filter_name
-        output.append(
-            f"GE_PARAMS_TYPE_INFO({struct_name}, {enum_type}, {filter_name})")
+        output.append(f"GE_PARAMS_TYPE_INFO({struct_name}, {enum_type}, {filter_name})")
 
     output.append("")
     output.append("#undef GE_PARAMS_TYPE_INFO")
@@ -581,41 +556,29 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
     output.append("")
 
     output.append("// Helper macro for generating field accessors")
-    output.append(
-        "#define GE_PARAMS_FIELD_ACCESSOR(Struct, Field, Tag, PropName) \\")
+    output.append("#define GE_PARAMS_FIELD_ACCESSOR(Struct, Field, Tag, PropName) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsFieldAccessor<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsFieldAccessor<GEParamsMemberTag::Tag> { \\")
     output.append("        using ParamsType = Struct; \\")
     output.append("        using FieldType = decltype(Struct::Field); \\")
     output.append("        static constexpr const char name[] = #PropName; \\")
-    output.append(
-        "        static FieldType& Get(ParamsType& params) { return params.Field; } \\")
-    output.append(
-        "        static const FieldType& Get(const ParamsType& params) { return params.Field; } \\")
-    output.append(
-        "        static void Set(ParamsType& params, const FieldType& value) { params.Field = value; } \\")
+    output.append("        static FieldType& Get(ParamsType& params) { return params.Field; } \\")
+    output.append("        static const FieldType& Get(const ParamsType& params) { return params.Field; } \\")
+    output.append("        static void Set(ParamsType& params, const FieldType& value) { params.Field = value; } \\")
     output.append("    };")
     output.append("")
 
     # Helper macro for array element accessors
-    output.append(
-        "// Helper macro for generating array element field accessors")
-    output.append(
-        "#define GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(Struct, Field, Index, Tag, PropName) \\")
+    output.append("// Helper macro for generating array element field accessors")
+    output.append("#define GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(Struct, Field, Index, Tag, PropName) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsFieldAccessor<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsFieldAccessor<GEParamsMemberTag::Tag> { \\")
     output.append("        using ParamsType = Struct; \\")
-    output.append(
-        "        using FieldType = typename decltype(Struct::Field)::value_type; \\")
+    output.append("        using FieldType = typename decltype(Struct::Field)::value_type; \\")
     output.append("        static constexpr const char* name = #PropName; \\")
-    output.append(
-        "        static FieldType& Get(ParamsType& params) { return params.Field[Index]; } \\")
-    output.append(
-        "        static const FieldType& Get(const ParamsType& params) { return params.Field[Index]; } \\")
-    output.append(
-        "        static void Set(ParamsType& params, const FieldType& value) { params.Field[Index] = value; } \\")
+    output.append("        static FieldType& Get(ParamsType& params) { return params.Field[Index]; } \\")
+    output.append("        static const FieldType& Get(const ParamsType& params) { return params.Field[Index]; } \\")
+    output.append("        static void Set(ParamsType& params, const FieldType& value) { params.Field[Index] = value; } \\")
     output.append("    };")
     output.append("")
 
@@ -623,11 +586,9 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
         for field in struct.fields:
             for tag_name, prop_name, is_array_elem, array_idx in iterate_field_tags(struct, field):
                 if is_array_elem:
-                    output.append(
-                        f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {array_idx}, {tag_name}, {prop_name})")
+                    output.append(f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {array_idx}, {tag_name}, {prop_name})")
                 else:
-                    output.append(
-                        f"GE_PARAMS_FIELD_ACCESSOR({struct.name}, {field.name}, {tag_name}, {prop_name})")
+                    output.append(f"GE_PARAMS_FIELD_ACCESSOR({struct.name}, {field.name}, {tag_name}, {prop_name})")
 
     output.append("")
     output.append("#undef GE_PARAMS_FIELD_ACCESSOR")
@@ -643,12 +604,9 @@ def generate_set_member_cases(structs: List[StructInfo]) -> str:
 
     output.append("#define GE_SET_MEMBER_CASE(Tag) \\")
     output.append("    case GEParamsMemberTag::Tag: \\")
-    output.append(
-        "        if constexpr (std::is_same_v<ParamsType, GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType>) {{ \\")
-    output.append(
-        "            auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, T>::Transform(value); \\")
-    output.append(
-        "            GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(params, transformed); \\")
+    output.append("        if constexpr (std::is_same_v<ParamsType, GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType>) {{ \\")
+    output.append("            auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, T>::Transform(value); \\")
+    output.append("            GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(params, transformed); \\")
     output.append("        }} \\")
     output.append("        break;")
     output.append("")
@@ -669,10 +627,8 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     """Generate overloaded SetParamsMemberByTag function declarations."""
     output = []
 
-    output.append(
-        "    // Overloaded SetParamsMemberByTag for each unique parameter type")
-    output.append(
-        "    // These are non-template functions, reducing binary bloat")
+    output.append("    // Overloaded SetParamsMemberByTag for each unique parameter type")
+    output.append("    // These are non-template functions, reducing binary bloat")
 
     # Collect unique field types from all structs
     # For array elements, use array_accessor_type if specified
@@ -704,10 +660,8 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     sorted_types = sorted(normalized_types)
 
     for field_type in sorted_types:
-        output.append(
-            f"    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
-        output.append(
-            f"                                     GEParamsMemberTag tag, const {field_type}& value);")
+        output.append(f"    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
+        output.append(f"                                     GEParamsMemberTag tag, const {field_type}& value);")
 
     output.append("")
 
@@ -718,31 +672,25 @@ def generate_dispatch_filter_type(structs: List[StructInfo]) -> str:
     """Generate DispatchGEFilterType high-order template function."""
     output = []
 
-    output.append(
-        "// High-order template function to dispatch based on GEFilterType")
-    output.append(
-        "// Func should be a template callable: template<typename ParamsType, typename... Args> struct Func")
+    output.append("// High-order template function to dispatch based on GEFilterType")
+    output.append("// Func should be a template callable: template<typename ParamsType, typename... Args> struct Func")
     output.append("// Func must have a static void Invoke(Args...) method")
-    output.append(
-        "template<template<typename, typename...> typename Func, typename... Args>")
-    output.append(
-        "void DispatchGEFilterType(GEFilterType filterType, Args&&... args)")
+    output.append("template<template<typename, typename...> typename Func, typename... Args>")
+    output.append("void DispatchGEFilterType(GEFilterType filterType, Args&&... args)")
     output.append("{")
     output.append("    switch (filterType) {")
 
     output.append("// Helper macro for FilterType dispatch")
     output.append("#define GE_DISPATCH_CASE_TYPE(FilterType, Struct) \\")
     output.append("    case GEFilterType::FilterType: \\")
-    output.append(
-        "        Func<Struct, Args...>::Invoke(std::forward<Args>(args)...); \\")
+    output.append("        Func<Struct, Args...>::Invoke(std::forward<Args>(args)...); \\")
     output.append("        break;")
     output.append("")
 
     for struct in structs:
         enum_type = struct.enum_type
         struct_name = struct.name
-        output.append(
-            f"        GE_DISPATCH_CASE_TYPE({enum_type}, {struct_name})")
+        output.append(f"        GE_DISPATCH_CASE_TYPE({enum_type}, {struct_name})")
 
     output.append("        default:")
     output.append("            break;")
@@ -776,8 +724,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
                     if prop_attr.alias:
                         if prop_attr.alias not in string_to_tags:
                             string_to_tags[prop_attr.alias] = []
-                        string_to_tags[prop_attr.alias].append(
-                            (struct.name, tag_name))
+                        string_to_tags[prop_attr.alias].append((struct.name, tag_name))
 
     # Check for collisions
     collisions = []
@@ -789,22 +736,18 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
         error_lines = [
             "Error: String collision detected in GEParamsMemberTagFromString mapping:"]
         for prop_name, tags in collisions:
-            error_lines.append(
-                f"\n  String '{prop_name}' is used by multiple fields:")
+            error_lines.append(f"\n  String '{prop_name}' is used by multiple fields:")
             for struct_name, tag_name in tags:
                 error_lines.append(f"    - {struct_name}::{tag_name}")
         raise RuntimeError("\n".join(error_lines))
 
-    output.append(
-        "GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)")
+    output.append("GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)")
     output.append("{")
-    output.append(
-        "    static const std::unordered_map<std::string, GEParamsMemberTag> map = {")
+    output.append("    static const std::unordered_map<std::string, GEParamsMemberTag> map = {")
 
     # Helper macro for reducing repetition - uses GEParamsFieldAccessor::name
     output.append("#define GE_STRING_TO_TAG_ENTRY(Tag) \\")
-    output.append(
-        "    { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }")
+    output.append("    { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }")
     output.append("")
 
     # Helper macro for alias entries
@@ -821,8 +764,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
                 if field.prop_attributes and not is_array_elem:
                     prop_attr = field.prop_attributes[0]
                     if prop_attr.alias:
-                        output.append(
-                            f"        GE_STRING_TO_TAG_ALIAS({tag_name}, {prop_attr.alias}),")
+                        output.append(f"        GE_STRING_TO_TAG_ALIAS({tag_name}, {prop_attr.alias}),")
 
     output.append("    };")
     output.append("")
@@ -846,14 +788,11 @@ def generate_params_builder_decl() -> str:
 
     output.append("class GEParamsBuilder {")
     output.append("public:")
-    output.append(
-        "    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);")
+    output.append("    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);")
     output.append("")
     output.append("    // Convert filter name string to GEFilterType")
-    output.append(
-        "    // Note: Strings are sourced from GEFilterParamsTypeInfoV2<Struct>::FilterName")
-    output.append(
-        "    static GEFilterType GetFilterTypeFromString(const std::string& str);")
+    output.append("    // Note: Strings are sourced from GEFilterParamsTypeInfoV2<Struct>::FilterName")
+    output.append("    static GEFilterType GetFilterTypeFromString(const std::string& str);")
     output.append("};")
     output.append("")
 
@@ -864,8 +803,7 @@ def generate_params_builder_impl(structs: List[StructInfo]) -> str:
     """Generate GEParamsBuilder::Build() implementation."""
     output = []
 
-    output.append(
-        "std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)")
+    output.append("std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)")
     output.append("{")
     output.append("    switch (filterType) {")
     output.append("#define GE_BUILD_PARAMS_CASE(EnumType, Struct) \\")
@@ -876,8 +814,7 @@ def generate_params_builder_impl(structs: List[StructInfo]) -> str:
     for struct in structs:
         enum_type = struct.enum_type
         struct_name = struct.name
-        output.append(
-            f"        GE_BUILD_PARAMS_CASE({enum_type}, {struct_name})")
+        output.append(f"        GE_BUILD_PARAMS_CASE({enum_type}, {struct_name})")
 
     output.append("        default:")
     output.append("            return nullptr;")
@@ -894,16 +831,13 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     """Generate GEParamsBuilder::GetFilterTypeFromString() implementation."""
     output = []
 
-    output.append(
-        "GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)")
+    output.append("GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)")
     output.append("{")
-    output.append(
-        "    static const std::unordered_map<std::string, GEFilterType> map = {")
+    output.append("    static const std::unordered_map<std::string, GEFilterType> map = {")
 
     # Helper macro for reducing repetition - uses GEFilterParamsTypeInfoV2::FilterName
     output.append("#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \\")
-    output.append(
-        "    { std::string(GEFilterParamsTypeInfoV2<Struct>::FilterName), GEFilterParamsTypeInfoV2<Struct>::ID }")
+    output.append("    { std::string(GEFilterParamsTypeInfoV2<Struct>::FilterName), GEFilterParamsTypeInfoV2<Struct>::ID }")
     output.append("")
 
     for struct in structs:
@@ -951,8 +885,7 @@ def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]
     sorted_types = sorted(normalized_types)
 
     output.append("// X-Macro listing all unique parameter member types")
-    output.append(
-        "// Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X")
+    output.append("// Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X")
     output.append("#define FOR_EACH_PARAM_TYPE(X) \\")
 
     for i, type_name in enumerate(sorted_types):
@@ -1031,8 +964,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("")
 
     # Base template
-    output.append(
-        "// GEFilterTypeInfoV2 - Type information for filter classes")
+    output.append("// GEFilterTypeInfoV2 - Type information for filter classes")
     output.append("template<typename T, typename = void>")
     output.append("struct GEFilterTypeInfoV2 {")
     output.append("    using FilterClass = T;")
@@ -1048,25 +980,20 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("    struct GEFilterTypeInfoV2<_FilterClass> { \\")
     output.append("        using FilterClass = _FilterClass; \\")
     output.append("        using ParamType = _ParamType; \\")
-    output.append(
-        "        static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<_ParamType>::ID; \\")
-    output.append(
-        "        static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<_ParamType>::FilterName; \\")
+    output.append("        static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<_ParamType>::ID; \\")
+    output.append("        static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<_ParamType>::FilterName; \\")
     output.append("    };")
     output.append("")
 
     # Specializations for each filter class
     output.append("// Specializations for filter classes")
-    output.append(
-        "// Each filter class uses DECLARE_GEFILTER_TYPEFUNC(FilterClass, ParamType)")
+    output.append("// Each filter class uses DECLARE_GEFILTER_TYPEFUNC(FilterClass, ParamType)")
     output.append("")
 
     for info in macro_infos:
         # Simplify params type if it matches a known params type
-        simplified_params_type = simplify_params_type(
-            info.params_type, known_params_types)
-        output.append(
-            f"GE_FILTER_TYPE_INFO({info.filter_class}, {simplified_params_type})")
+        simplified_params_type = simplify_params_type(info.params_type, known_params_types)
+        output.append(f"GE_FILTER_TYPE_INFO({info.filter_class}, {simplified_params_type})")
 
     output.append("")
     output.append("#undef GE_FILTER_TYPE_INFO")
@@ -1104,8 +1031,7 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
     output = []
 
     if range_attr.min_value is not None and range_attr.max_value is not None:
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_RANGE({tag}, {field_type}, {range_attr.min_value}, {range_attr.max_value})")
+        output.append(f"GE_PARAMS_CONSTRAINT_RANGE({tag}, {field_type}, {range_attr.min_value}, {range_attr.max_value})")
 
     elif range_attr.min_components is not None and range_attr.max_components is not None:
         mins = range_attr.min_components
@@ -1113,30 +1039,25 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
         component_type = _infer_numeric_type(mins[0])
         mins_str = ', '.join(mins)
         maxs_str = ', '.join(maxs)
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))")
+        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))")
 
     elif range_attr.min_components is not None:
         mins = range_attr.min_components
         component_type = _infer_numeric_type(mins[0])
         mins_str = ', '.join(mins)
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))")
+        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))")
 
     elif range_attr.max_components is not None:
         maxs = range_attr.max_components
         component_type = _infer_numeric_type(maxs[0])
         maxs_str = ', '.join(maxs)
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))")
+        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))")
 
     elif range_attr.min_value is not None:
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {range_attr.min_value})")
+        output.append(f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {range_attr.min_value})")
 
     elif range_attr.max_value is not None:
-        output.append(
-            f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {range_attr.max_value})")
+        output.append(f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {range_attr.max_value})")
 
     return '\n'.join(output)
 
@@ -1155,10 +1076,8 @@ def generate_transform_helper(structs: List[StructInfo]) -> str:
         for field in struct.fields:
             if field.range_attr:
                 for tag_name, _, _, _ in iterate_field_tags(struct, field):
-                    output.append(
-                        f"            case GEParamsMemberTag::{tag_name}:")
-                    output.append(
-                        f"                return GEParamsValueTransformer<GEParamsMemberTag::{tag_name}, T>::Transform(value);")
+                    output.append(f"            case GEParamsMemberTag::{tag_name}:")
+                    output.append(f"                return GEParamsValueTransformer<GEParamsMemberTag::{tag_name}, T>::Transform(value);")
 
     output.append("            default:")
     output.append("                return value;")
@@ -1210,8 +1129,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("// Constraint Metadata Macros")
     output.append("#define GE_PARAMS_CONSTRAINT_RANGE(Tag, Type, Min, Max) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
@@ -1220,53 +1138,43 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr Type MAX = Max; \\")
     output.append("    };")
     output.append("")
-    output.append(
-        "#define GE_PARAMS_CONSTRAINT_COMPONENTS(Tag, Type, Count, Mins, Maxs) \\")
+    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS(Tag, Type, Count, Mins, Maxs) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
-    output.append(
-        "        static constexpr size_t COMPONENT_COUNT = Count; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
     output.append("    };")
     output.append("")
-    output.append(
-        "#define GE_PARAMS_CONSTRAINT_COMPONENTS_MIN(Tag, Type, Count, Mins) \\")
+    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MIN(Tag, Type, Count, Mins) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
     output.append("        static constexpr bool HAS_MAX = false; \\")
-    output.append(
-        "        static constexpr size_t COMPONENT_COUNT = Count; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
     output.append("    };")
     output.append("")
-    output.append(
-        "#define GE_PARAMS_CONSTRAINT_COMPONENTS_MAX(Tag, Type, Count, Maxs) \\")
+    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MAX(Tag, Type, Count, Maxs) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr bool HAS_MIN = false; \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
-    output.append(
-        "        static constexpr size_t COMPONENT_COUNT = Count; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MIN(Tag, Type, Min) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
@@ -1276,8 +1184,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MAX(Tag, Type, Max) \\")
     output.append("    template<> \\")
-    output.append(
-        "    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_RANGE = true; \\")
     output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr bool HAS_MIN = false; \\")
@@ -1353,8 +1260,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     output.append(generate_string_to_enum_mapping_impl(structs))
 
     # Generate overloaded SetParamsMemberByTag implementations
-    output.append(generate_set_params_member_overloads_impl(
-        structs, type_aliases))
+    output.append(generate_set_params_member_overloads_impl(structs, type_aliases))
 
     output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
@@ -1367,8 +1273,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
 
 def main():
     """Main generation function."""
-    parser = argparse.ArgumentParser(
-        description='Generate C++ static reflection metadata from .params files',
+    parser = argparse.ArgumentParser(description='Generate C++ static reflection metadata from .params files',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -1377,45 +1282,39 @@ Examples:
         """
     )
 
-    parser.add_argument(
-        '--params-dirs',
+    parser.add_argument('--params-dirs',
         type=str,
         nargs='+',
         default=None,
         help='Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
     )
 
-    parser.add_argument(
-        '--output-file',
+    parser.add_argument('--output-file',
         type=str,
         default=None,
         help='Output header file path (default: include/effect/ge_params_reflection_v2.h)'
     )
 
-    parser.add_argument(
-        '--output-cpp-file',
+    parser.add_argument('--output-cpp-file',
         type=str,
         default=None,
         help='Output cpp file path (default: src/effect/ge_params_reflection_v2.cpp)'
     )
 
-    parser.add_argument(
-        '--config-file',
+    parser.add_argument('--config-file',
         type=str,
         default=None,
         help='Config file path (default: tool/effectgen/config.json)'
     )
 
-    parser.add_argument(
-        '--effect-dirs',
+    parser.add_argument('--effect-dirs',
         type=str,
         nargs='+',
         default=None,
         help='Directories containing effect header files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)'
     )
 
-    parser.add_argument(
-        '--filter-type-info-file',
+    parser.add_argument('--filter-type-info-file',
         type=str,
         default=None,
         help='Output GEFilterTypeInfoV2 header file path (default: include/core/ge_filter_type_info_v2.h)'
@@ -1438,8 +1337,7 @@ Examples:
         "include" / "effect" / "ge_params_reflection_v2.h"
     output_cpp_file = Path(args.output_cpp_file) if args.output_cpp_file else root_dir / \
         "src" / "effect" / "ge_params_reflection_v2.cpp"
-    config_file = Path(args.config_file) if args.config_file else Path(
-        __file__).parent / "config.json"
+    config_file = Path(args.config_file) if args.config_file else Path(__file__).parent / "config.json"
 
     if args.effect_dirs:
         effect_dirs = [Path(d) for d in args.effect_dirs]
@@ -1466,8 +1364,7 @@ Examples:
         print(f"No .params files found in {params_dirs}", file=sys.stderr)
         return 1
 
-    print(
-        f"Found {len(params_files)} .params files in {[str(x.relative_to(root_dir)) for x in params_dirs]}")
+    print(f"Found {len(params_files)} .params files in {[str(x.relative_to(root_dir)) for x in params_dirs]}")
 
     structs = []
     for params_file in params_files:
@@ -1476,15 +1373,13 @@ Examples:
             structs.append(struct_info)
             print(f"  Parsed: {struct_info.name}")
         else:
-            print(
-                f"  Warning: Failed to parse {params_file.name}", file=sys.stderr)
+            print(f"  Warning: Failed to parse {params_file.name}", file=sys.stderr)
 
     if not structs:
         print("No valid structs found!", file=sys.stderr)
         return 1
 
-    print(
-        f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
+    print(f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
 
     # Validate type list consistency between SetParamsMemberByTag and FOR_EACH_PARAM_TYPE
     set_params_types = set()
@@ -1494,14 +1389,11 @@ Examples:
                 for prop_attr in field.prop_attributes:
                     if prop_attr.array_accessor_length is not None:
                         if prop_attr.array_accessor_type:
-                            set_params_types.add(normalize_type(
-                                prop_attr.array_accessor_type, type_aliases))
+                            set_params_types.add(normalize_type(prop_attr.array_accessor_type, type_aliases))
                         else:
-                            set_params_types.add(
-                                normalize_type(field.type, type_aliases))
+                            set_params_types.add(normalize_type(field.type, type_aliases))
                     else:
-                        set_params_types.add(
-                            normalize_type(field.type, type_aliases))
+                        set_params_types.add(normalize_type(field.type, type_aliases))
             else:
                 set_params_types.add(normalize_type(field.type, type_aliases))
 
@@ -1512,32 +1404,23 @@ Examples:
                 for prop_attr in field.prop_attributes:
                     if prop_attr.array_accessor_length is not None:
                         if prop_attr.array_accessor_type:
-                            for_each_param_types.add(normalize_type(
-                                prop_attr.array_accessor_type, type_aliases))
+                            for_each_param_types.add(normalize_type(prop_attr.array_accessor_type, type_aliases))
                         else:
-                            for_each_param_types.add(
-                                normalize_type(field.type, type_aliases))
+                            for_each_param_types.add(normalize_type(field.type, type_aliases))
                     else:
-                        for_each_param_types.add(
-                            normalize_type(field.type, type_aliases))
+                        for_each_param_types.add(normalize_type(field.type, type_aliases))
             else:
-                for_each_param_types.add(
-                    normalize_type(field.type, type_aliases))
+                for_each_param_types.add(normalize_type(field.type, type_aliases))
 
     if set_params_types != for_each_param_types:
         print("ERROR: Type list mismatch detected!", file=sys.stderr)
-        print(
-            f"  SetParamsMemberByTag types: {sorted(set_params_types)}", file=sys.stderr)
-        print(
-            f"  FOR_EACH_PARAM_TYPE types: {sorted(for_each_param_types)}", file=sys.stderr)
-        print(
-            f"  Only in SetParamsMemberByTag: {sorted(set_params_types - for_each_param_types)}", file=sys.stderr)
-        print(
-            f"  Only in FOR_EACH_PARAM_TYPE: {sorted(for_each_param_types - set_params_types)}", file=sys.stderr)
+        print(f"  SetParamsMemberByTag types: {sorted(set_params_types)}", file=sys.stderr)
+        print(f"  FOR_EACH_PARAM_TYPE types: {sorted(for_each_param_types)}", file=sys.stderr)
+        print(f"  Only in SetParamsMemberByTag: {sorted(set_params_types - for_each_param_types)}", file=sys.stderr)
+        print(f"  Only in FOR_EACH_PARAM_TYPE: {sorted(for_each_param_types - set_params_types)}", file=sys.stderr)
         return 1
 
-    print(
-        f"Validated: SetParamsMemberByTag and FOR_EACH_PARAM_TYPE type lists are consistent ({len(set_params_types)} types)")
+    print(f"Validated: SetParamsMemberByTag and FOR_EACH_PARAM_TYPE type lists are consistent ({len(set_params_types)} types)")
 
     # Scan for DECLARE_GEFILTER_TYPEFUNC macros
     print(f"Scanning for DECLARE_GEFILTER_TYPEFUNC macros...")
@@ -1577,8 +1460,7 @@ Examples:
 
     # Generate GEFilterTypeInfoV2 header file
     print(f"Generating {filter_type_info_file.name}...")
-    filter_type_info_content = generate_filter_type_info_v2_header(
-        macro_infos, structs)
+    filter_type_info_content = generate_filter_type_info_v2_header(macro_infos, structs)
 
     # Ensure output directory exists
     filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
