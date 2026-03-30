@@ -461,6 +461,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSDFTransformShapeParams();
         }
     },
+    { GE_SHAPE_SDF_DISTORT_OP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_DISTORT_OP_SHAPE);
+            impl->MakeSDFDistortOpShapeParams();
+        }
+    },
     { GE_SHAPE_SDF_EMPTY_SHAPE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE);
@@ -608,6 +614,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK);
             impl->MakeNoisyFrameGradientMaskParams();
+        }
+    },
+    { GE_FILTER_DISTORTION_COLLAPSE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISTORTION_COLLAPSE);
+            impl->MakeDistortionCollapseParams();
         }
     }
 };
@@ -1237,6 +1249,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             }
             break;
         }
+        case FilterType::DISTORTION_COLLAPSE: {
+            SetDistortionCollapseParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            SetSDFDistortOpShapeParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -1605,6 +1625,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            if (sdfDistortOpShapeParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_DISTORT_OP_SHAPE) {
+                sdfDistortOpShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1789,6 +1818,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         case FilterType::SDF_COLOR: {
             if (sdfColorShaderParams_ && tag == GE_SHADER_SDF_COLOR_COLOR) {
                 sdfColorShaderParams_->color = param;
+            }
+            break;
+        }
+        case FilterType::DISTORTION_COLLAPSE: {
+            if (distortionCollapseParams_ && tag == GE_FILTER_DISTORTION_COLLAPSE_BARREL_DISTORTION) {
+                distortionCollapseParams_->barrelDistortion_ = param;
+            }
+            break;
+        }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            if (sdfDistortOpShapeParams_ && tag == GE_SHAPE_SDF_DISTORT_OP_BARREL_DISTORTION) {
+                sdfDistortOpShapeParams_->barrelDistortion = param;
             }
             break;
         }
@@ -2480,6 +2521,47 @@ void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, float 
     }
     if (tag == GE_SHADER_WAVY_RIPPLE_LIGHT_THICKNESS) {
         wavyRippleLightParams_->thickness_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetDistortionCollapseParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (distortionCollapseParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_LU_CORNER) {
+        distortionCollapseParams_->LUCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_RU_CORNER) {
+        distortionCollapseParams_->RUCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_RB_CORNER) {
+        distortionCollapseParams_->RBCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_LB_CORNER) {
+        distortionCollapseParams_->LBCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_BARREL_DISTORTION) {
+        distortionCollapseParams_->barrelDistortion_ = Vector4f(param.first, param.first, param.second, param.second);
+    }
+}
+
+void GEVisualEffectImpl::SetSDFDistortOpShapeParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (sdfDistortOpShapeParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_LU_CORNER) {
+        sdfDistortOpShapeParams_->LUCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_RU_CORNER) {
+        sdfDistortOpShapeParams_->RUCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_RB_CORNER) {
+        sdfDistortOpShapeParams_->RBCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_LB_CORNER) {
+        sdfDistortOpShapeParams_->LBCorner = Drawing::Point(param.first, param.second);
     }
 }
 

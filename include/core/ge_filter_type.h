@@ -58,6 +58,7 @@ enum class GEFilterType : int32_t {
     SDF_PIXELMAP_SHAPE,
     SDF_TRIANGLE_SHAPE,
     SDF_TRANSFORM_SHAPE,
+    SDF_DISTORT_OP_SHAPE,
     SDF_EMPTY_SHAPE,
     // Shader
     DOT_MATRIX,
@@ -96,6 +97,7 @@ enum class GEFilterType : int32_t {
     SDF_EDGE_LIGHT,
     SDF_FROM_IMAGE,
     SDF_COLOR,
+    DISTORTION_COLLAPSE,
     MAX
 };
 

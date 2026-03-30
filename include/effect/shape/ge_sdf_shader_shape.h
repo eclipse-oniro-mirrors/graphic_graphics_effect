@@ -29,7 +29,8 @@ enum class GESDFShapeType : uint8_t {
     TRIANGLE,
     TRANSFORM,
     UNION_OP,
-    MAX = UNION_OP,
+    DISTORT_OP,
+    MAX = DISTORT_OP,
 };
 
 class GE_EXPORT GESDFShaderShape : public GEShaderShape {

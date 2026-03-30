@@ -27,6 +27,7 @@
 #include "ge_visual_effect_impl.h"
 #include "ge_wave_gradient_shader_mask.h"
 #include "ge_wave_disturb_shader_mask.h"
+#include "ge_sdf_distort_op_shader_shape.h"
 #include "ge_sdf_empty_shader_shape.h"
 #include "ge_sdf_pixelmap_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
@@ -297,38 +298,27 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
     switch (impl->GetFilterType()) {
         case GEVisualEffectImpl::FilterType::SDF_UNION_OP: {
             auto params = impl->GetSDFUnionOpShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GESDFUnionOpShaderShape>(*params);
+            return params == nullptr ? nullptr : std::make_shared<GESDFUnionOpShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE: {
             auto params = impl->GetSDFRRectShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return GenerateExtShaderRRect(params);
+            return params == nullptr ? nullptr : GenerateExtShaderRRect(params);
         }
         case GEVisualEffectImpl::FilterType::SDF_TRIANGLE_SHAPE: {
             auto params = impl->GetSDFTriangleShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GESDFTriangleShaderShape>(*params);
+            return params == nullptr ? nullptr : std::make_shared<GESDFTriangleShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_PIXELMAP_SHAPE: {
             auto params = impl->GetSDFPixelmapShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GESDFPixelmapShaderShape>(*params);
+            return params == nullptr ? nullptr : std::make_shared<GESDFPixelmapShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE: {
             auto params = impl->GetSDFTransformShapeParams();
-            if (params == nullptr) {
-                return nullptr;
-            }
-            return std::make_shared<GESDFTransformShaderShape>(*params);
+            return params == nullptr ? nullptr : std::make_shared<GESDFTransformShaderShape>(*params);
+        }
+        case GEVisualEffectImpl::FilterType::SDF_DISTORT_OP_SHAPE: {
+            auto params = impl->GetSDFDistortOpShapeParams();
+            return params == nullptr ? nullptr : std::make_shared<GESDFDistortOpShaderShape>(*params);
         }
         case GEVisualEffectImpl::FilterType::SDF_EMPTY_SHAPE: {
             return std::make_shared<GESDFEmptyShaderShape>();
