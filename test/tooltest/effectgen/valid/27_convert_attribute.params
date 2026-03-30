@@ -1,0 +1,13 @@
+struct [[ge::params(type=TEST_CONVERT, name="TestConvert")]] TestConvertParams {
+    [[ge::convert(cast_from="int32_t")]]
+    BlurMode mode;
+
+    [[ge::convert(custom="Vector4fToColor4fTransformer")]]
+    Drawing::Color4f color;
+
+    [[ge::convert(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
+    std::shared_ptr<Drawing::GESDFShaderShape> shape;
+
+    [[ge::convert(custom="PairToVector2fTransformer")]]
+    Vector2f position;
+};

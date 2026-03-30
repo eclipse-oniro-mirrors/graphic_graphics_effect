@@ -42,6 +42,13 @@ class RangeAttributeExpected:
 
 
 @dataclass
+class ConvertAttributeExpected:
+    """Expected result for a convert attribute."""
+    cast_from: Optional[str] = None
+    custom: Optional[str] = None
+
+
+@dataclass
 class FieldExpectedResult:
     """Expected result for a parsed field."""
     type: str
@@ -51,6 +58,7 @@ class FieldExpectedResult:
     array_accessor_length: Optional[int] = None
     prop_attributes: List[PropAttributeExpected] = None
     range_attr: Optional[RangeAttributeExpected] = None
+    convert_attr: Optional[ConvertAttributeExpected] = None
 
     def __post_init__(self):
         if self.prop_attributes is None:
@@ -122,8 +130,8 @@ class TestRunner:
         """Load expected results from individual JSON files alongside test files."""
         loaded_count = 0
         for test_case in self.test_cases:
-            # Expected result file is named: test_name.def.json (alongside the test file)
-            expected_file = test_case.file_path.with_suffix('.def.json')
+            # Expected result file is named: test_name.params.json (alongside the test file)
+            expected_file = test_case.file_path.with_suffix('.params.json')
 
             if not expected_file.exists():
                 continue
@@ -152,7 +160,11 @@ class TestRunner:
                             min_components=f.get('range_attr', {}).get('min_components'),
                             max_value=f.get('range_attr', {}).get('max_value'),
                             max_components=f.get('range_attr', {}).get('max_components')
-                        ) if 'range_attr' in f else None
+                        ) if 'range_attr' in f else None,
+                        convert_attr=ConvertAttributeExpected(
+                            cast_from=f.get('convert_attr', {}).get('cast_from'),
+                            custom=f.get('convert_attr', {}).get('custom')
+                        ) if 'convert_attr' in f else None
                     ) for f in s.get('fields', [])]
                 ) for s in result_data.get('structs', [])]
 
@@ -169,9 +181,9 @@ class TestRunner:
                 print(f"Error loading expected result from {expected_file}: {e}")
 
         if loaded_count > 0:
-            print(f"Loaded {loaded_count} expected results from .def.json files alongside test files")
+            print(f"Loaded {loaded_count} expected results from .params.json files alongside test files")
         else:
-            print(f"Note: No .def.json files found alongside test files")
+            print(f"Note: No .params.json files found alongside test files")
 
         return loaded_count > 0
 
@@ -207,6 +219,11 @@ class TestRunner:
                             "min_components": field.range_attr.min_components,
                             "max_value": field.range_attr.max_value,
                             "max_components": field.range_attr.max_components
+                        }
+                    if field.convert_attr:
+                        field_dict["convert_attr"] = {
+                            "cast_from": field.convert_attr.cast_from,
+                            "custom": field.convert_attr.custom
                         }
                     fields_data.append(field_dict)
 
@@ -252,15 +269,15 @@ class TestRunner:
                 notes=""
             )
 
-            # Save to a .def.json file next to the test file
-            output_file = test_case.file_path.with_suffix('.def.json')
+            # Save to a .params.json file next to the test file
+            output_file = test_case.file_path.with_suffix('.params.json')
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(asdict(expected_result), f, indent=2, ensure_ascii=False)
 
             saved_count += 1
 
         print(f"\nSaved {saved_count} expected results files alongside test files")
-        print(f"Pattern: <test_file>.def.json")
+        print(f"Pattern: <test_file>.params.json")
 
     def validate_results(self) -> List[Dict[str, Any]]:
         """Validate actual results against expected results."""
@@ -429,6 +446,25 @@ class TestRunner:
                                     f"Struct {i+1}, field {j+1} range_attr max_components mismatch: expected {exp_range.max_components}, got {act_range.max_components}"
                                 )
 
+                        exp_convert = exp_field.convert_attr
+                        act_convert = act_field.convert_attr
+                        if (exp_convert is None) != (act_convert is None):
+                            validation['passed'] = False
+                            validation['differences'].append(
+                                f"Struct {i+1}, field {j+1} convert_attr presence mismatch: expected {exp_convert is not None}, got {act_convert is not None}"
+                            )
+                        elif exp_convert is not None and act_convert is not None:
+                            if exp_convert.cast_from != act_convert.cast_from:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} convert_attr cast_from mismatch: expected '{exp_convert.cast_from}', got '{act_convert.cast_from}'"
+                                )
+                            if exp_convert.custom != act_convert.custom:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} convert_attr custom mismatch: expected '{exp_convert.custom}', got '{act_convert.custom}'"
+                                )
+
             validation_results.append(validation)
 
             # Store validation result in the test case for inline display
@@ -441,7 +477,7 @@ class TestRunner:
     def discover_tests(self):
         """Discover all test cases."""
         # Valid test cases - should parse successfully
-        valid_files = sorted(self.valid_dir.glob("*.def"))
+        valid_files = sorted(self.valid_dir.glob("*.params"))
         for i, file_path in enumerate(valid_files, 1):
             test_case = TestCase(
                 name=f"valid_{i:02d}_{file_path.stem}",
@@ -451,7 +487,7 @@ class TestRunner:
             self.test_cases.append(test_case)
 
         # Invalid test cases - should fail gracefully
-        invalid_files = sorted(self.invalid_dir.glob("*.def"))
+        invalid_files = sorted(self.invalid_dir.glob("*.params"))
         for i, file_path in enumerate(invalid_files, 1):
             test_case = TestCase(
                 name=f"invalid_{i:02d}_{file_path.stem}",
@@ -729,7 +765,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='Parser robustness test runner')
     parser.add_argument('--save-expected', action='store_true',
-                        help='Save current results as expected results (saves .def.json files alongside test files)')
+                        help='Save current results as expected results (saves .params.json files alongside test files)')
     parser.add_argument('--validate', action='store_true',
                         help='Validate results against expected results')
 

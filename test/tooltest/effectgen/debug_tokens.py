@@ -11,7 +11,7 @@ script_dir = Path(__file__).parent
 root_dir = script_dir.parent
 sys.path.insert(0, str(root_dir))
 
-from tools.generate_reflection_metadata_v2 import (
+from tool.effectgen.generate_reflection_metadata_v2 import (
     CppTokenizer,
     CppParser,
     AttributeParser,
@@ -82,9 +82,9 @@ def main():
     else:
         # Debug complex types case to see the parsing issue
         debug_files = [
-            "valid/06_complex_types.def",
-            "valid/11_cpp11_brace_init.def",
-            "invalid/01_missing_semicolon.def",
+            "valid/06_complex_types.params",
+            "valid/11_cpp11_brace_init.params",
+            "invalid/01_missing_semicolon.params",
         ]
 
     for file_name in debug_files:

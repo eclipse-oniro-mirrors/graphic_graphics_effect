@@ -1,0 +1,31 @@
+{
+  "name": "17_convert_attribute_invalid",
+  "should_parse": false,
+  "expected_error_count": 2,
+  "expected_errors": [
+    "invalid/17_convert_attribute_invalid.def:line 2, column 5: Empty convert attribute",
+    "invalid/17_convert_attribute_invalid.def:line 5, column 5: convert attribute: cast_from and custom parameters are mutually exclusive"
+  ],
+  "structs": [
+    {
+      "name": "TestConvertInvalidParams",
+      "enum_type": "TEST_CONVERT_INVALID",
+      "filter_name": "TestConvertInvalid",
+      "fields": [
+        {
+          "type": "int32_t",
+          "name": "field1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int32_t",
+          "name": "field2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}
