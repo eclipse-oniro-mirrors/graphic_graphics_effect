@@ -42,7 +42,6 @@ class GEFilterParams;
 #define FOR_EACH_PARAM_TYPE(X) \
     X(ESCAPE(Drawing::Matrix)) \
     X(ESCAPE(Drawing::Point)) \
-    X(ESCAPE(GEShaderShape)) \
     X(ESCAPE(GEV2::GEBezierWarpShaderFilterControlPointArray)) \
     X(ESCAPE(GEV2::GERRect)) \
     X(ESCAPE(GEV2::GESDFBorderParams)) \
@@ -738,7 +737,7 @@ GE_PARAMS_CONSTRAINT_RANGE(FROSTED_GLASS_EFFECT_DARK_SCALE, float, 0.0f, 1.0f)
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BLUR_PARAMS, float, 2, ESCAPE({0.0f, 0.0f}), ESCAPE({200.0f, 200.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_WEIGHTS_EMBOSS, float, 2, ESCAPE({-5.0f, -5.0f}), ESCAPE({5.0f, 5.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_WEIGHTS_EDL, float, 2, ESCAPE({-5.0f, -5.0f}), ESCAPE({5.0f, 5.0f}))
-GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(FROSTED_GLASS_SDF_SHAPE, ESCAPE(GEShaderShape))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(FROSTED_GLASS_SDF_SHAPE, ESCAPE(std::shared_ptr<GEShaderShape>))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_RATES, float, 2, ESCAPE({-20.0f, -20.0f}), ESCAPE({20.0f, 20.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_K_B_S, float, 3, ESCAPE({-20.0f, -20.0f, 0.0f}), ESCAPE({20.0f, 20.0f, 20.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_POS, float, 3, ESCAPE({-20.0f, -20.0f, -20.0f}), ESCAPE({20.0f, 20.0f, 20.0f}))
@@ -785,8 +784,8 @@ GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_CLIP_SHAPE, ESCAPE(std::shared_ptr<Dr
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_COLOR_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
 GE_PARAMS_CONSTRAINT_RANGE(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float, 0.0, 4096.0)
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_SHADOW_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
-GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_LEFT, ESCAPE(GEShaderShape))
-GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_RIGHT, ESCAPE(GEShaderShape))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_LEFT, ESCAPE(std::shared_ptr<GEShaderShape>))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_RIGHT, ESCAPE(std::shared_ptr<GEShaderShape>))
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SDF_UNION_OP_OP, ESCAPE(uint32_t), SDFUnionOpTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SOUND_WAVE_COLOR_A, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SOUND_WAVE_COLOR_B, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
@@ -1469,8 +1468,6 @@ public:
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEShaderShape& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,

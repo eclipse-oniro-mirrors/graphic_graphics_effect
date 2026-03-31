@@ -2003,7 +2003,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEShaderShape& value)
+                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
 {
     if (!params) {
         return;
@@ -2016,6 +2016,10 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         default:
@@ -2092,28 +2096,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
         GE_VALIDATE_AND_SET(SDF_UNION_OP_OP)
         GE_VALIDATE_AND_SET(WATER_RIPPLE_WAVE_COUNT)
         GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_MODE)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
-{
-    if (!params) {
-        return;
-    }
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params->GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
         default:
             break;
     }

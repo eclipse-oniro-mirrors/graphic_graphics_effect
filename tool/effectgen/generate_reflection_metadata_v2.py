@@ -640,36 +640,7 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     output.append("    // These are non-template functions, reducing binary bloat")
 
     # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
-    unique_types = set()
-    for struct in structs:
-        for field in struct.fields:
-            for tag_name, _, is_array_elem, array_idx in iterate_field_tags(struct, field):
-                cast_from_type = None
-                if field.prop_attributes:
-                    # Use first prop attribute's cast_from if available
-                    cast_from_type = field.prop_attributes[0].cast_from
-
-                if cast_from_type:
-                    effective_type = cast_from_type
-                elif is_array_elem and field.prop_attributes:
-                    # For array elements, find is prop attribute with array_accessor_length
-                    for prop_attr in field.prop_attributes:
-                        if prop_attr.array_accessor_length is not None:
-                            if prop_attr.array_accessor_type:
-                                # Use specified array_accessor_type
-                                effective_type = prop_attr.array_accessor_type
-                            else:
-                                # Fallback to field type (array type)
-                                effective_type = field.type
-                            break
-                else:
-                    # Regular field
-                    effective_type = field.type
-
-                # Normalize type using type aliases
-                normalized_type = normalize_type(effective_type, type_aliases)
-                unique_types.add(normalized_type)
-
+    unique_types = collect_effective_types(structs, type_aliases)
     sorted_types = sorted(unique_types)
 
     for field_type in sorted_types:
@@ -871,11 +842,8 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
-    """Generate X-Macro listing all unique member variable types."""
-    output = []
-
-    # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
+def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str]) -> set:
+    """Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)."""
     unique_types = set()
     for struct in structs:
         for field in struct.fields:
@@ -906,6 +874,15 @@ def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]
                 normalized_type = normalize_type(effective_type, type_aliases)
                 unique_types.add(normalized_type)
 
+    return unique_types
+
+
+def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+    """Generate X-Macro listing all unique member variable types."""
+    output = []
+
+    # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
+    unique_types = collect_effective_types(structs, type_aliases)
     sorted_types = sorted(unique_types)
 
     output.append("// X-Macro listing all unique parameter member types")
@@ -1482,35 +1459,9 @@ Examples:
     print(f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
 
     # Validate type list consistency between SetParamsMemberByTag and FOR_EACH_PARAM_TYPE
-    set_params_types = set()
-    for struct in structs:
-        for field in struct.fields:
-            if field.prop_attributes:
-                for prop_attr in field.prop_attributes:
-                    if prop_attr.array_accessor_length is not None:
-                        if prop_attr.array_accessor_type:
-                            set_params_types.add(normalize_type(prop_attr.array_accessor_type, type_aliases))
-                        else:
-                            set_params_types.add(normalize_type(field.type, type_aliases))
-                    else:
-                        set_params_types.add(normalize_type(field.type, type_aliases))
-            else:
-                set_params_types.add(normalize_type(field.type, type_aliases))
-
-    for_each_param_types = set()
-    for struct in structs:
-        for field in struct.fields:
-            if field.prop_attributes:
-                for prop_attr in field.prop_attributes:
-                    if prop_attr.array_accessor_length is not None:
-                        if prop_attr.array_accessor_type:
-                            for_each_param_types.add(normalize_type(prop_attr.array_accessor_type, type_aliases))
-                        else:
-                            for_each_param_types.add(normalize_type(field.type, type_aliases))
-                    else:
-                        for_each_param_types.add(normalize_type(field.type, type_aliases))
-            else:
-                for_each_param_types.add(normalize_type(field.type, type_aliases))
+    # Use the same logic as generate_set_params_member_overloads_decl and generate_type_xmacro
+    set_params_types = collect_effective_types(structs, type_aliases)
+    for_each_param_types = collect_effective_types(structs, type_aliases)
 
     if set_params_types != for_each_param_types:
         print("ERROR: Type list mismatch detected!", file=sys.stderr)
