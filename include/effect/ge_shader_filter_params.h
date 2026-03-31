@@ -965,6 +965,7 @@ constexpr char GE_FILTER_FROSTED_GLASS[] = "FrostedGlass";
 constexpr char GE_FILTER_FROSTED_GLASS_BLURPARAMS[] = "FrostedGlass_BlurParams";
 constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEMBOSS[] = "FrostedGlass_WeightsEmboss"; // envLight, sd
 constexpr char GE_FILTER_FROSTED_GLASS_WEIGHTSEDL[] = "FrostedGlass_WeightsEdl";
+constexpr char GE_FILTER_FROSTED_GLASS_MAXCOLOR[] = "FrostedGlass_MaxColor";
 // BG darken parameters
 constexpr char GE_FILTER_FROSTED_GLASS_BGRATES[] = "FrostedGlass_BgRates";
 constexpr char GE_FILTER_FROSTED_GLASS_BGKBS[] = "FrostedGlass_BgKBS";
@@ -1016,6 +1017,7 @@ struct GEFrostedGlassShaderFilterParams {
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     std::shared_ptr<GESDFShaderShape> sdfShape;
     std::shared_ptr<GEShaderMask> waveDisturbance;
+    float maxColor = 10.0f;
     // Background darken parameters
     Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
@@ -1070,6 +1072,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGKBS[] = "FrostedGlassEffect_BgKB
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGPOS[] = "FrostedGlassEffect_BgPos";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGNEG[] = "FrostedGlassEffect_BgNeg";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA[] = "FrostedGlassEffect_BgAlpha";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_MAXCOLOR[] = "FrostedGlassEffect_MaxColor";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ANTIALIAS[] = "FrostedGlassEffect_AntiAlias";
 // Refraction parameters
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTPARAMS[] = "FrostedGlassEffect_RefractParams";
 // Inner shadow parameters
@@ -1117,6 +1121,8 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE[] = "FrostedGlassEffect
 struct GEFrostedGlassEffectParams {
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    Vector2f antiAlias = Vector2f(-1.0f, 1.0f); // unit: px
+    float maxColor = 10.0f;
     // Background darken parameters
     Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
