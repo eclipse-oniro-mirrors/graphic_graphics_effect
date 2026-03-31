@@ -241,21 +241,36 @@ static constexpr char GRAVITY_PULL_PROG[] = R"(
             return p;
         }
 
-        float centerGate = smoothstep(0.0, 3600.0, centerDistSq);
+        float centerDist = sqrt(centerDistSq);
+        float centerGate = smoothstep(
+            0.25 * spacing,
+            0.25 * spacing + 0.35 * spacing,
+            centerDist
+        );
         if (centerGate <= 1e-5) {
             return p;
         }
 
         vec2 fromSmallCenter = p - centerPos;
         float localDistSq = dot(fromSmallCenter, fromSmallCenter);
+
         float warpRadius = max(spacing, 1e-6);
         float warpRadiusSq = warpRadius * warpRadius;
+
         if (localDistSq >= warpRadiusSq) {
             return p;
         }
 
         float falloff = 1.0 - smoothstep(0.0, warpRadiusSq, localDistSq);
-        float warpAmount = warpStrength * falloff * centerGate;
+
+        float hotValue = shapeShader.eval(centerPos).a;
+        float hotGate = 1.0 - smoothstep(
+            5.0,
+            5.0 + 0.3 * spacing,
+            hotValue
+        );
+
+        float warpAmount = warpStrength * falloff * hotGate * centerGate;
         if (warpAmount <= 1e-3) {
             return p;
         }
@@ -343,57 +358,69 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
 }
 
 static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
-        uniform float spacing;
-        uniform float warpStrength;
-        uniform vec2 shapeCenterPos;
-        uniform vec2 centerPos;
-        uniform shader shapeShader;
+    uniform float spacing;
+    uniform float warpStrength;
+    uniform vec2 shapeCenterPos;
+    uniform vec2 centerPos;
+    uniform shader shapeShader;
 
-        vec2 normalizeWithLenSq(vec2 v, float lenSq)
-        {
-            return (lenSq > 1e-8) ? v * inversesqrt(lenSq) : vec2(0.0, 0.0);
+    vec2 normalizeWithLenSq(vec2 v, float lenSq)
+    {
+        return (lenSq > 1e-8) ? v * inversesqrt(lenSq) : vec2(0.0, 0.0);
+    }
+
+    vec2 warpedSamplePos(vec2 p)
+    {
+        vec2 delta = centerPos - shapeCenterPos;
+        float centerDistSq = dot(delta, delta);
+        if (centerDistSq <= 1e-8) {
+            return p;
         }
 
-        vec2 warpedSamplePos(vec2 p)
-        {
-            vec2 delta = centerPos - shapeCenterPos;
-            float centerDistSq = dot(delta, delta);
-            if (centerDistSq <= 1e-8) {
-                return p;
-            }
-
-            float centerGate = smoothstep(0.0, 3600.0, centerDistSq);
-            if (centerGate <= 1e-5) {
-                return p;
-            }
-
-            vec2 fromSmallCenter = p - centerPos;
-            float localDistSq = dot(fromSmallCenter, fromSmallCenter);
-
-            float warpRadius = max(spacing, 1e-6);
-            float warpRadiusSq = warpRadius * warpRadius;
-
-            if (localDistSq >= warpRadiusSq) {
-                return p;
-            }
-
-            float falloff = 1.0 - smoothstep(0.0, warpRadiusSq, localDistSq);
-            float warpAmount = warpStrength * falloff * centerGate;
-
-            if (warpAmount <= 1e-3) {
-                return p;
-            }
-
-            vec2 dir = normalizeWithLenSq(delta, centerDistSq);
-            return p - dir * warpAmount;
+        float centerDist = sqrt(centerDistSq);
+        float centerGate = smoothstep(
+            0.25 * spacing,
+            0.25 * spacing + 0.35 * spacing,
+            centerDist
+        );
+        if (centerGate <= 1e-5) {
+            return p;
         }
 
-        half4 main(vec2 p)
-        {
-            vec4 leftShape = shapeShader.eval(warpedSamplePos(p));
-            return half4(leftShape.x, leftShape.y, 0.0, leftShape.a);
+        vec2 fromSmallCenter = p - centerPos;
+        float localDistSq = dot(fromSmallCenter, fromSmallCenter);
+
+        float warpRadius = max(spacing, 1e-6);
+        float warpRadiusSq = warpRadius * warpRadius;
+
+        if (localDistSq >= warpRadiusSq) {
+            return p;
         }
-    )";
+
+        float falloff = 1.0 - smoothstep(0.0, warpRadiusSq, localDistSq);
+
+        float hotValue = shapeShader.eval(centerPos).a;
+        float hotGate = 1.0 - smoothstep(
+            5.0,
+            5.0 + 0.3 * spacing,
+            hotValue
+        );
+
+        float warpAmount = warpStrength * falloff * hotGate * centerGate;
+        if (warpAmount <= 1e-3) {
+            return p;
+        }
+
+        vec2 dir = normalizeWithLenSq(delta, centerDistSq);
+        return p - dir * warpAmount;
+    }
+
+    half4 main(vec2 p)
+    {
+        vec4 shape = shapeShader.eval(warpedSamplePos(p));
+        return half4(shape.x, shape.y, 0.0, shape.a);
+    }
+)";
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder() const
 {
