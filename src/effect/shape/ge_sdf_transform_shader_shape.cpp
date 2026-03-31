@@ -221,6 +221,60 @@ bool GESDFTransformShaderShape::TryGetCenter(float& outX, float& outY) const
     return true;
 }
 
+static constexpr char GRAVITY_PULL_PROG[] = R"(
+    uniform float spacing;
+    uniform float warpStrength;
+    uniform vec2 shapeCenterPos;
+    uniform vec2 centerPos;
+    uniform shader shapeShader;
+
+    vec2 normalizeWithLenSq(vec2 v, float lenSq)
+    {
+        return (lenSq > 1e-8) ? v * inversesqrt(lenSq) : vec2(0.0, 0.0);
+    }
+
+    vec2 warpedSamplePos(vec2 p)
+    {
+        vec2 delta = centerPos - shapeCenterPos;
+        float centerDistSq = dot(delta, delta);
+        if (centerDistSq <= 1e-8) {
+            return p;
+        }
+
+        float centerGate = smoothstep(0.0, 3600.0, centerDistSq);
+        if (centerGate <= 1e-5) {
+            return p;
+        }
+
+        vec2 fromSmallCenter = p - centerPos;
+        float localDistSq = dot(fromSmallCenter, fromSmallCenter);
+        float warpRadius = max(spacing, 1e-6);
+        float warpRadiusSq = warpRadius * warpRadius;
+        if (localDistSq >= warpRadiusSq) {
+            return p;
+        }
+
+        float falloff = 1.0 - smoothstep(0.0, warpRadiusSq, localDistSq);
+        float warpAmount = warpStrength * falloff * centerGate;
+        if (warpAmount <= 1e-3) {
+            return p;
+        }
+
+        vec2 dir = normalizeWithLenSq(delta, centerDistSq);
+        return p - dir * warpAmount;
+    }
+
+    float mergedSdfAt(vec2 p)
+    {
+        return shapeShader.eval(warpedSamplePos(p)).a;
+    }
+
+    half4 main(vec2 p)
+    {
+        return half4(0.0, 0.0, 0.0, mergedSdfAt(p));
+    }
+)";
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGravityPullDrawingShaderBuilder() const
 {
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> gravityPullShaderBuilder = nullptr;
@@ -228,65 +282,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGra
         return gravityPullShaderBuilder;
     }
 
-    static constexpr char prog[] = R"(
-        uniform float spacing;
-        uniform float warpStrength;
-        uniform vec2 shapeCenterPos;
-        uniform vec2 centerPos;
-        uniform shader shapeShader;
-
-
-        vec2 normalizeWithLenSq(vec2 v, float lenSq)
-        {
-            return (lenSq > 1e-8) ? v * inversesqrt(lenSq) : vec2(0.0, 0.0);
-        }
-
-        vec2 warpedSamplePos(vec2 p)
-        {
-            vec2 delta = centerPos - shapeCenterPos;
-            float centerDistSq = dot(delta, delta);
-            if (centerDistSq <= 1e-8) {
-                return p;
-            }
-
-            float centerGate = smoothstep(0.0, 3600.0, centerDistSq);
-            if (centerGate <= 1e-5) {
-                return p;
-            }
-
-            vec2 fromSmallCenter = p - centerPos;
-            float localDistSq = dot(fromSmallCenter, fromSmallCenter);
-
-            float warpRadius = max(spacing, 1e-6);
-            float warpRadiusSq = warpRadius * warpRadius;
-
-            if (localDistSq >= warpRadiusSq) {
-                return p;
-            }
-
-            float falloff = 1.0 - smoothstep(0.0, warpRadiusSq, localDistSq);
-            float warpAmount = warpStrength * falloff * centerGate;
-
-            if (warpAmount <= 1e-3) {
-                return p;
-            }
-
-            vec2 dir = normalizeWithLenSq(delta, centerDistSq);
-            return p - dir * warpAmount;
-        }
-
-        float mergedSdfAt(vec2 p)
-        {
-            return shapeShader.eval(warpedSamplePos(p)).a;
-        }
-
-        half4 main(vec2 p)
-        {
-            return half4(0.0, 0.0, 0.0, mergedSdfAt(p));
-        }
-    )";
-
-    auto gravityPullShaderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto gravityPullShaderEffect = Drawing::RuntimeEffect::CreateForShader(GRAVITY_PULL_PROG);
     if (!gravityPullShaderEffect) {
         LOGE("GESDFTransformShaderShape::GetGravityPullDrawingShaderBuilder effect error");
         return nullptr;
@@ -328,7 +324,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     float shapeCenterX = 0.f;
     float shapeCenterY = 0.f;
     if (!TryGetCenter(shapeCenterX, shapeCenterY)) {
-        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader has gravity pull shader get transformed shape center error");
+        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
     }
 
     gravityPullShaderBuilder->SetUniform("spacing", std::max(params_.spacing, 0.0001f));
@@ -346,14 +342,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     return gravityPullShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder() const
-{
-    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> gravityPullShaderHasNormalBuilder = nullptr;
-    if (gravityPullShaderHasNormalBuilder) {
-        return gravityPullShaderHasNormalBuilder;
-    }
-
-    static constexpr char prog[] = R"(
+static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
         uniform float spacing;
         uniform float warpStrength;
         uniform vec2 shapeCenterPos;
@@ -406,14 +395,21 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGra
         }
     )";
 
-    auto gravityPullShaderHasNormalEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder() const
+{
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> gravityPullShaderHasNormalBuilder = nullptr;
+    if (gravityPullShaderHasNormalBuilder) {
+        return gravityPullShaderHasNormalBuilder;
+    }
+
+    auto gravityPullShaderHasNormalEffect = Drawing::RuntimeEffect::CreateForShader(GRAVITY_PULL_NORMAL_PROG);
     if (!gravityPullShaderHasNormalEffect) {
         LOGE("GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder effect error");
         return nullptr;
     }
 
-    gravityPullShaderHasNormalBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(gravityPullShaderHasNormalEffect);
-    return gravityPullShaderHasNormalBuilder;
+    gravPullShaderHasNormalBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(gravityPullShaderHasNormalEffect);
+    return gravPullShaderHasNormalBuilder;
 }
 
 std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal(
@@ -448,7 +444,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     float shapeCenterX = 0.f;
     float shapeCenterY = 0.f;
     if (!TryGetCenter(shapeCenterX, shapeCenterY)) {
-        LOGE("GESDFTransformShaderShape::GenerateGravPullDrawingShader has gravity pull shader get transformed shape center error");
+        LOGE("GESDFTransformShaderShape::GenerateGravPullDrawingShader get transformed shape center error");
     }
 
     gravityPullShaderBuilder->SetUniform("spacing", std::max(params_.spacing, 0.0001f));
