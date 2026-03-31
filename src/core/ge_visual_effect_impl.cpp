@@ -2939,6 +2939,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, float par
     if (tag == GE_FILTER_FROSTED_GLASS_BGALPHA) {
         frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
     }
+
+    constexpr float MAX_COLOR = 10.0f;
+    if (tag == GE_FILTER_FROSTED_GLASS_MAXCOLOR) {
+        frostedGlassParams_->maxColor = std::clamp(param, 0.0f, MAX_COLOR);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -3220,6 +3225,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA) {
         frostedGlassEffectParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid range is between 0.0f and 1.0f
     }
+
+    constexpr float MAX_COLOR = 15.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MAXCOLOR) {
+        frostedGlassEffectParams_->maxColor = std::clamp(param, 0.0f, MAX_COLOR);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag,
@@ -3339,6 +3349,12 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL) {
         frostedGlassEffectParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
+    }
+
+    constexpr float MAX_V = 20.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ANTIALIAS) {
+        frostedGlassEffectParams_->antiAlias = Vector2f(std::clamp(param.first, -MAX_V, MAX_V),
+            std::clamp(param.second, -MAX_V, MAX_V));
     }
 }
 
