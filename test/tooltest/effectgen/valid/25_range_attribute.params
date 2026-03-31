@@ -1,51 +1,31 @@
 struct [[ge::params(type=TEST_RANGE, name="TestRange")]] TestRangeParams {
-    // Scalar range [min, max]
-    [[ge::prop("PROGRESSX")]]
-    [[ge::range(min=0.0, max=1.0)]]
+    [[ge::prop(name="PROGRESSX", min=0.0, max=1.0)]]
     float progress = 0.0f;
 
-    // Minimum-only constraint [min, ∞)
-    [[ge::prop("RADIUSX")]]
-    [[ge::range(min=0.0)]]
+    [[ge::prop(name="RADIUSX", min=0.0)]]
     float radius = 1.0f;
 
-    // Maximum-only constraint (-∞, max]
-    [[ge::prop("INTENSITYX")]]
-    [[ge::range(max=10.0)]]
+    [[ge::prop(name="INTENSITYX", max=10.0)]]
     float intensity = 5.0f;
 
-    // Vector2f - uniform range for both components
-    [[ge::prop("NORMALIZED_COORDX")]]
-    [[ge::range(min=0.0, max=1.0)]]
+    [[ge::prop(name="NORMALIZED_COORDX", min=0.0, max=1.0)]]
     Vector2f coord = {0.5f, 0.5f};
 
-    // Vector3f - uniform range for all components
-    [[ge::prop("POSITIONX")]]
-    [[ge::range(min=0.0, max=10.0)]]
+    [[ge::prop(name="POSITIONX", min=0.0, max=10.0)]]
     Vector3f position = {1.0f, 1.0f, 1.0f};
 
-    // Vector4f - RGBA clamped to [0.0, 1.0]
-    [[ge::prop("COLORX")]]
-    [[ge::range(min=0.0, max=1.0)]]
+    [[ge::prop(name="COLORX", min=0.0, max=1.0)]]
     Vector4f color = {1.0f, 1.0f, 1.0f, 1.0f};
 
-    // Component-wise ranges (different per component)
-    [[ge::prop("KBSX")]]
-    [[ge::range(min={0.0, 0.0, -1.0}, max={10.0, 10.0, 1.0})]]
+    [[ge::prop(name="KBSX", min={0.0, 0.0, -1.0}, max={10.0, 10.0, 1.0})]]
     Vector3f kbs = {1.0f, 1.0f, 0.0f};
 
-    // Mixed constraints (uniform min, component-wise max)
-    [[ge::prop("ASYMMETRICX")]]
-    [[ge::range(min={0.0, 0.0}, max={1.0, 2.0})]]
+    [[ge::prop(name="ASYMMETRICX", min={0.0, 0.0}, max={1.0, 2.0})]]
     Vector2f asymmetric = {0.5f, 1.0f};
 
-    // Integer range
-    [[ge::prop("COUNTX")]]
-    [[ge::range(min=0, max=100)]]
+    [[ge::prop(name="COUNTX", min=0, max=100)]]
     int count = 50;
 
-    // Negative range
-    [[ge::prop("OFFSETX")]]
-    [[ge::range(min=-50.0, max=50.0)]]
+    [[ge::prop(name="OFFSETX", min=-50.0, max=50.0)]]
     float offset = 0.0f;
 };

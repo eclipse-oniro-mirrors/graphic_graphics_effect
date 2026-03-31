@@ -1,0 +1,33 @@
+{
+  "name": "16_invalid_prop_params",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestPropInvalidParams",
+      "enum_type": "TEST_PROP_INVALID",
+      "filter_name": "TestPropInvalid",
+      "fields": [
+        {
+          "type": "float",
+          "name": "field1",
+          "default_value": "0.0f",
+          "prop_name": "FIELD1X",
+          "prop_attributes": [
+            {
+              "name": "FIELD1X",
+              "array_accessor_length": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": "Invalid parameter 'cast_from_range' is ignored by parser, but field still parses successfully"
+}

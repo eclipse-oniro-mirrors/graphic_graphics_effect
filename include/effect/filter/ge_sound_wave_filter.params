@@ -15,11 +15,11 @@
 
 struct [[ge::params(type=SOUND_WAVE, name="SoundWave")]] GESoundWaveFilterParams {
     // sound wave
-    [[ge::prop("SoundWave_ColorA")]]
+    [[ge::prop(name="SoundWave_ColorA", cast_from="Vector4f", custom="Vector4fToColor4fTransformer")]]
     Drawing::Color4f colorA = {1.0f, 1.0f, 1.0f, 1.0f};
-    [[ge::prop("SoundWave_ColorB")]]
+    [[ge::prop(name="SoundWave_ColorB", cast_from="Vector4f", custom="Vector4fToColor4fTransformer")]]
     Drawing::Color4f colorB = {1.0f, 1.0f, 1.0f, 1.0f};
-    [[ge::prop("SoundWave_ColorC")]]
+    [[ge::prop(name="SoundWave_ColorC", cast_from="Vector4f", custom="Vector4fToColor4fTransformer")]]
     Drawing::Color4f colorC = {1.0f, 1.0f, 1.0f, 1.0f};
     [[ge::prop("SoundWave_ColorProgress")]]
     float colorProgress = 0.0f;

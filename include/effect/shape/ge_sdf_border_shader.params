@@ -19,6 +19,7 @@ struct GESDFBorderParams final {
 };
 
 struct [[ge::params(type=SDF_BORDER, name="SDFBorder")]] GESDFBorderShaderParams final {
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     GESDFBorderParams border;
 };

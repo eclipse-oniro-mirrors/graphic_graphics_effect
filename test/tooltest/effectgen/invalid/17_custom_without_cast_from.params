@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-
-struct [[ge::params(type=SDF_COLOR, name="SDFColor")]] GESDFColorShaderParams final {
-    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
-    std::shared_ptr<GESDFShaderShape> shape = nullptr;
-    Vector4f color;
+struct [[ge::params(type=TEST_PROP_INVALID_CUSTOM, name="TestPropInvalidCustom")]] TestPropInvalidCustomParams {
+    // Invalid: custom without cast_from
+    [[ge::prop(name="FIELD1X", custom="MyTransformer")]]
+    float field1 = 0.0f;
 };

@@ -18,7 +18,9 @@ struct [[ge::params(type=LIGHT_CAVE, name="LightCave")]] GEXLightCaveShaderParam
     Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f colorC = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f position = Vector2f(0.0f, 0.0f);
+    [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f radiusXY = Vector2f(0.0f, 0.0f);
     float progress = 0.0f;
 };

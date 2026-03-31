@@ -1,0 +1,33 @@
+{
+  "name": "17_custom_without_cast_from",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestPropInvalidCustomParams",
+      "enum_type": "TEST_PROP_INVALID_CUSTOM",
+      "filter_name": "TestPropInvalidCustom",
+      "fields": [
+        {
+          "type": "float",
+          "name": "field1",
+          "default_value": "0.0f",
+          "prop_name": "FIELD1X",
+          "prop_attributes": [
+            {
+              "name": "FIELD1X",
+              "array_accessor_length": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": "MyTransformer",
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": "custom without cast_from is allowed by parser but may cause issues in code generation"
+}

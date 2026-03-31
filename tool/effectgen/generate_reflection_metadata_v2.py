@@ -166,7 +166,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
 
 
 def parse_def_file(file_path: Path, report_errors: bool = True) -> Optional[StructInfo]:
-    """Parse a .def file and extract struct information."""
+    """Parse a .params file and extract struct information."""
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -332,7 +332,11 @@ def iterate_field_tags(struct: StructInfo, field: FieldInfo):
             else:
                 # Single tag for whole-field accessor
                 tag_name = to_member_tag_name(enum_type, field.name)
-                prop_name = prop_attr.name
+                # If prop_attr.name is empty, auto-generate from field name
+                if prop_attr.name:
+                    prop_name = prop_attr.name
+                else:
+                    prop_name = get_effective_prop_name(field, struct.filter_name)
                 yield (tag_name, prop_name, False, None)
     else:
         # No prop_attributes: single tag for field
@@ -434,25 +438,35 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     output.append("#define GE_VALIDATE_AND_SET(Tag) \\")
     output.append("    case GEParamsMemberTag::Tag: { \\")
     output.append("        using ParamsType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \\")
+    output.append("        using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \\")
     output.append("        using SetterType = std::remove_cv_t<std::remove_reference_t<decltype(value)>>; \\")
     output.append("        auto unboxed = GEFilterParams::Unbox<std::shared_ptr<ParamsType>>(params); \\")
     output.append("        if (unboxed == nullptr) { \\")
     output.append("            return; \\")
     output.append("        } \\")
     output.append("        auto& actualParams = *unboxed; \\")
-    output.append("        auto transformed = GEParamsValueTransformer<GEParamsMemberTag::Tag, SetterType>::Transform(value); \\")
-    output.append("        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \\")
+    output.append("        FieldType transformed; \\")
+    output.append("        if (GEParamsValueTransformer<GEParamsMemberTag::Tag, SetterType, FieldType>::Transform(value, transformed)) { \\")
+    output.append("            GEParamsFieldAccessor<GEParamsMemberTag::Tag>::Set(actualParams, transformed); \\")
+    output.append("        } \\")
     output.append("        break; \\")
     output.append("    }")
     output.append("")
 
-    # Group tags by their effective type (considering array_accessor_type)
+    # Group tags by their effective type (considering prop attributes and array_accessor_type)
     type_to_tags = {}
     for struct in structs:
         for field in struct.fields:
             for tag_name, _, is_array_elem, array_idx in iterate_field_tags(struct, field):
-                if is_array_elem and field.prop_attributes:
-                    # For array elements, find the prop attribute with array_accessor_length
+                cast_from_type = None
+                if field.prop_attributes:
+                    # Use first prop attribute's cast_from if available
+                    cast_from_type = field.prop_attributes[0].cast_from
+
+                if cast_from_type:
+                    effective_type = cast_from_type
+                elif is_array_elem and field.prop_attributes:
+                    # For array elements, find is prop attribute with array_accessor_length
                     for prop_attr in field.prop_attributes:
                         if prop_attr.array_accessor_length is not None:
                             if prop_attr.array_accessor_type:
@@ -625,34 +639,38 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     output.append("    // Overloaded SetParamsMemberByTag for each unique parameter type")
     output.append("    // These are non-template functions, reducing binary bloat")
 
-    # Collect unique field types from all structs
-    # For array elements, use array_accessor_type if specified
+    # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
     unique_types = set()
     for struct in structs:
         for field in struct.fields:
-            if field.prop_attributes:
-                for prop_attr in field.prop_attributes:
-                    if prop_attr.array_accessor_length is not None:
-                        # This is an array accessor field
-                        if prop_attr.array_accessor_type:
-                            # Use the specified array_accessor_type
-                            unique_types.add(prop_attr.array_accessor_type)
-                        else:
-                            # Fallback to the field type (array type)
-                            unique_types.add(field.type)
-                    else:
-                        # Regular field
-                        unique_types.add(field.type)
-            else:
-                # No prop_attributes: regular field
-                unique_types.add(field.type)
+            for tag_name, _, is_array_elem, array_idx in iterate_field_tags(struct, field):
+                cast_from_type = None
+                if field.prop_attributes:
+                    # Use first prop attribute's cast_from if available
+                    cast_from_type = field.prop_attributes[0].cast_from
 
-    # Normalize types using type aliases
-    normalized_types = set()
-    for type_str in unique_types:
-        normalized_types.add(normalize_type(type_str, type_aliases))
+                if cast_from_type:
+                    effective_type = cast_from_type
+                elif is_array_elem and field.prop_attributes:
+                    # For array elements, find is prop attribute with array_accessor_length
+                    for prop_attr in field.prop_attributes:
+                        if prop_attr.array_accessor_length is not None:
+                            if prop_attr.array_accessor_type:
+                                # Use specified array_accessor_type
+                                effective_type = prop_attr.array_accessor_type
+                            else:
+                                # Fallback to field type (array type)
+                                effective_type = field.type
+                            break
+                else:
+                    # Regular field
+                    effective_type = field.type
 
-    sorted_types = sorted(normalized_types)
+                # Normalize type using type aliases
+                normalized_type = normalize_type(effective_type, type_aliases)
+                unique_types.add(normalized_type)
+
+    sorted_types = sorted(unique_types)
 
     for field_type in sorted_types:
         output.append(f"    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
@@ -857,26 +875,38 @@ def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]
     """Generate X-Macro listing all unique member variable types."""
     output = []
 
+    # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
     unique_types = set()
     for struct in structs:
         for field in struct.fields:
-            if field.prop_attributes:
-                for prop_attr in field.prop_attributes:
-                    if prop_attr.array_accessor_length is not None:
-                        if prop_attr.array_accessor_type:
-                            unique_types.add(prop_attr.array_accessor_type)
-                        else:
-                            unique_types.add(field.type)
-                    else:
-                        unique_types.add(field.type)
-            else:
-                unique_types.add(field.type)
+            for tag_name, _, is_array_elem, array_idx in iterate_field_tags(struct, field):
+                cast_from_type = None
+                if field.prop_attributes:
+                    # Use first prop attribute's cast_from if available
+                    cast_from_type = field.prop_attributes[0].cast_from
 
-    normalized_types = set()
-    for type_str in unique_types:
-        normalized_types.add(normalize_type(type_str, type_aliases))
+                if cast_from_type:
+                    effective_type = cast_from_type
+                elif is_array_elem and field.prop_attributes:
+                    # For array elements, find is prop attribute with array_accessor_length
+                    for prop_attr in field.prop_attributes:
+                        if prop_attr.array_accessor_length is not None:
+                            if prop_attr.array_accessor_type:
+                                # Use specified array_accessor_type
+                                effective_type = prop_attr.array_accessor_type
+                            else:
+                                # Fallback to field type (array type)
+                                effective_type = field.type
+                            break
+                else:
+                    # Regular field
+                    effective_type = field.type
 
-    sorted_types = sorted(normalized_types)
+                # Normalize type using type aliases
+                normalized_type = normalize_type(effective_type, type_aliases)
+                unique_types.add(normalized_type)
+
+    sorted_types = sorted(unique_types)
 
     output.append("// X-Macro listing all unique parameter member types")
     output.append("// Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X")
@@ -1006,7 +1036,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
 def _infer_numeric_type(value_str: str) -> str:
     """Infer numeric type from a string value.
 
-    Returns 'float' if the value contains a decimal point or 'f' suffix, otherwise 'int'.
+    Returns 'float' if is value contains a decimal point or 'f' suffix, otherwise 'int'.
     """
     value = value_str.strip()
     if "." in value or value.endswith("f") or value.endswith("F"):
@@ -1014,71 +1044,78 @@ def _infer_numeric_type(value_str: str) -> str:
     return "int"
 
 
-def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
-    """Generate constraint metadata for a field with range attribute."""
-    range_attr = field_info.range_attr
+def _parse_component_values(value_str: str) -> List[str]:
+    """Parse component values from a brace-enclosed string.
 
-    if not range_attr:
+    Example: "{1.0f, 2.0f, 3.0f}" -> ["1.0f", "2.0f", "3.0f"]
+    """
+    import re
+    value_str = value_str.strip()
+    if not value_str.startswith("{") or not value_str.endswith("}"):
+        return []
+
+    inner = value_str[1:-1].strip()
+    if not inner:
+        return []
+
+    components = [c.strip() for c in inner.split(",")]
+    return [c for c in components if c]
+
+
+def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
+    """Generate constraint metadata for a field with prop attributes."""
+    if not field_info.prop_attributes:
         return ""
 
     field_type = field_info.type
     output = []
 
-    if range_attr.min_value is not None and range_attr.max_value is not None:
-        output.append(f"GE_PARAMS_CONSTRAINT_RANGE({tag}, {field_type}, {range_attr.min_value}, {range_attr.max_value})")
+    # Use the first prop attribute for constraint metadata
+    # (if multiple prop attributes exist, only the first one defines constraints)
+    prop_attr = field_info.prop_attributes[0]
 
-    elif range_attr.min_components is not None and range_attr.max_components is not None:
-        mins = range_attr.min_components
-        maxs = range_attr.max_components
-        component_type = _infer_numeric_type(mins[0])
-        mins_str = ", ".join(mins)
-        maxs_str = ", ".join(maxs)
-        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))")
+    # Handle range constraints (min/max)
+    if prop_attr.min_value is not None and prop_attr.max_value is not None:
+        # Check if values are arrays (component-wise)
+        if "{" in str(prop_attr.min_value) and "{" in str(prop_attr.max_value):
+            # Component-wise range
+            mins = _parse_component_values(prop_attr.min_value)
+            maxs = _parse_component_values(prop_attr.max_value)
+            if mins and maxs:
+                component_type = _infer_numeric_type(mins[0])
+                mins_str = ", ".join(mins)
+                maxs_str = ", ".join(maxs)
+                output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))")
+        else:
+            # Simple range
+            output.append(f"GE_PARAMS_CONSTRAINT_RANGE({tag}, {field_type}, {prop_attr.min_value}, {prop_attr.max_value})")
 
-    elif range_attr.min_components is not None:
-        mins = range_attr.min_components
-        component_type = _infer_numeric_type(mins[0])
-        mins_str = ", ".join(mins)
-        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))")
+    elif prop_attr.min_value is not None:
+        if "{" in str(prop_attr.min_value):
+            mins = _parse_component_values(prop_attr.min_value)
+            if mins:
+                component_type = _infer_numeric_type(mins[0])
+                mins_str = ", ".join(mins)
+                output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))")
+        else:
+            output.append(f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {prop_attr.min_value})")
 
-    elif range_attr.max_components is not None:
-        maxs = range_attr.max_components
-        component_type = _infer_numeric_type(maxs[0])
-        maxs_str = ", ".join(maxs)
-        output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))")
+    elif prop_attr.max_value is not None:
+        if "{" in str(prop_attr.max_value):
+            maxs = _parse_component_values(prop_attr.max_value)
+            if maxs:
+                component_type = _infer_numeric_type(maxs[0])
+                maxs_str = ", ".join(maxs)
+                output.append(f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))")
+        else:
+            output.append(f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {prop_attr.max_value})")
 
-    elif range_attr.min_value is not None:
-        output.append(f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {range_attr.min_value})")
-
-    elif range_attr.max_value is not None:
-        output.append(f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {range_attr.max_value})")
-
-    return "\n".join(output)
-
-
-def generate_transform_helper(structs: List[StructInfo]) -> str:
-    """Generate dispatch helper for runtime tag resolution."""
-    output = []
-
-    output.append("// Dispatch helper for runtime tag resolution")
-    output.append("template<typename T>")
-    output.append("struct GEParamsTransformHelper {")
-    output.append("    static T Transform(GEParamsMemberTag tag, T value) {")
-    output.append("        switch (tag) {")
-
-    for struct in structs:
-        for field in struct.fields:
-            if field.range_attr:
-                for tag_name, _, _, _ in iterate_field_tags(struct, field):
-                    output.append(f"            case GEParamsMemberTag::{tag_name}:")
-                    output.append(f"                return GEParamsValueTransformer<GEParamsMemberTag::{tag_name}, T>::Transform(value);")
-
-    output.append("            default:")
-    output.append("                return value;")
-    output.append("        }")
-    output.append("    }")
-    output.append("};")
-    output.append("")
+    # Handle convert constraints (cast_from/custom)
+    if prop_attr.cast_from is not None:
+        if prop_attr.custom:
+            output.append(f"GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM({tag}, ESCAPE({prop_attr.cast_from}), {prop_attr.custom})")
+        else:
+            output.append(f"GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM({tag}, ESCAPE({prop_attr.cast_from}))")
 
     return "\n".join(output)
 
@@ -1130,6 +1167,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_MAX = true; \\")
     output.append("        static constexpr Type MIN = Min; \\")
     output.append("        static constexpr Type MAX = Max; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS(Tag, Type, Count, Mins, Maxs) \\")
@@ -1142,6 +1184,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MIN(Tag, Type, Count, Mins) \\")
@@ -1153,6 +1200,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_MAX = false; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MAX(Tag, Type, Count, Maxs) \\")
@@ -1164,6 +1216,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_MAX = true; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MIN(Tag, Type, Min) \\")
@@ -1174,6 +1231,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_MIN = true; \\")
     output.append("        static constexpr bool HAS_MAX = false; \\")
     output.append("        static constexpr Type MIN = Min; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MAX(Tag, Type, Max) \\")
@@ -1184,6 +1246,39 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("        static constexpr bool HAS_MIN = false; \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
     output.append("        static constexpr Type MAX = Max; \\")
+    output.append("        static constexpr bool HAS_CONVERT = false; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
+    output.append("        using CastFromType = void; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
+    output.append("    };")
+    output.append("")
+    output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(Tag, _CastFromType) \\")
+    output.append("    template<> \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("        static constexpr bool HAS_RANGE = false; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("        static constexpr bool HAS_MIN = false; \\")
+    output.append("        static constexpr bool HAS_MAX = false; \\")
+    output.append("        static constexpr bool HAS_CONVERT = true; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = true; \\")
+    output.append("        using CastFromType = _CastFromType; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
+    output.append("        using CustomTransformer = void; \\")
+    output.append("    };")
+    output.append("")
+    output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(Tag, _CastFromType, _CustomTransformer) \\")
+    output.append("    template<> \\")
+    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("        static constexpr bool HAS_RANGE = false; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("        static constexpr bool HAS_MIN = false; \\")
+    output.append("        static constexpr bool HAS_MAX = false; \\")
+    output.append("        static constexpr bool HAS_CONVERT = true; \\")
+    output.append("        static constexpr bool HAS_CAST_FROM = true; \\")
+    output.append("        using CastFromType = _CastFromType; \\")
+    output.append("        static constexpr bool HAS_CUSTOM = true; \\")
+    output.append("        using CustomTransformer = _CustomTransformer; \\")
     output.append("    };")
     output.append("")
 
@@ -1202,6 +1297,8 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("#undef GE_PARAMS_CONSTRAINT_COMPONENTS_MAX")
     output.append("#undef GE_PARAMS_CONSTRAINT_MIN")
     output.append("#undef GE_PARAMS_CONSTRAINT_MAX")
+    output.append("#undef GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM")
+    output.append("#undef GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM")
     output.append("")
 
     # Generate GEFilterParamsTypeInfoV2 specializations
@@ -1367,7 +1464,7 @@ Examples:
         print(f"No .params files found in {params_dirs}", file=sys.stderr)
         return 1
 
-    print(f"Found {len(params_files)} .params files in {[str(x.relative_to(root_dir)) for x in params_dirs]}")
+    print(f"Found {len(params_files)} .params files in {params_dirs}")
 
     structs = []
     for params_file in params_files:

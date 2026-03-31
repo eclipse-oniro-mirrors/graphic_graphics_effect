@@ -13,9 +13,16 @@
  * limitations under the License.
  */
 
+struct [[ge::params(type=PROP_CAST_FROM_ONLY, name="PropCastFromOnly")]] PropCastFromOnlyParams {
+    // cast_from only (default conversion)
+    [[ge::prop(name="TestIntValue", cast_from="int32_t")]]
+    float floatValue = 50.0f;
 
-struct [[ge::params(type=SDF_COLOR, name="SDFColor")]] GESDFColorShaderParams final {
-    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
+    // cast_from with complex type
+    [[ge::prop(name="TestColor", cast_from="Vector4f")]]
+    Drawing::Color4f color = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    // cast_from with pointer type
+    [[ge::prop(name="TestShape", cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
-    Vector4f color;
 };

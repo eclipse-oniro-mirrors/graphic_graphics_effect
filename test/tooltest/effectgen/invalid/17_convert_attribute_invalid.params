@@ -1,7 +1,0 @@
-struct [[ge::params(type=TEST_CONVERT_INVALID, name="TestConvertInvalid")]] TestConvertInvalidParams {
-    [[ge::convert()]]
-    int32_t field1;
-
-    [[ge::convert(cast_from="int32_t", custom="SomeTransformer")]]
-    int32_t field2;
-};

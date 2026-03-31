@@ -8,6 +8,7 @@ Supports C#/Rust style key=value attributes.
 
 import re
 from typing import Dict, List, Tuple, Any, Optional
+from dataclasses import dataclass
 
 # Import Token from cpp_tokenizer module
 from tool.effectgen.cpp_tokenizer import Token

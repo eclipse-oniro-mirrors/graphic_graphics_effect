@@ -16,9 +16,9 @@
 constexpr int COLOR_GRADIENT_ARRAY_SIZE = 12;
 
 struct [[ge::params(type=COLOR_GRADIENT_EFFECT, name="ColorGradientEffect")]] GEXColorGradientEffectParams {
-    [[ge::prop(name="ColorGradientEffect_Color", array_accessor_length=12, array_accessor_type="Drawing::Color4f")]]
+    [[ge::prop(name="ColorGradientEffect_Color", array_accessor_length=12, array_accessor_type="Drawing::Color4f", cast_from="Vector4f", custom="Vector4fToColor4fTransformer")]]
     std::array<Drawing::Color4f, COLOR_GRADIENT_ARRAY_SIZE> colors_;
-    [[ge::prop(name="ColorGradientEffect_Position", array_accessor_length=12, array_accessor_type="Drawing::Point")]]
+    [[ge::prop(name="ColorGradientEffect_Position", array_accessor_length=12, array_accessor_type="Drawing::Point", cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     std::array<Drawing::Point, COLOR_GRADIENT_ARRAY_SIZE> positions_;
     [[ge::prop(name="ColorGradientEffect_Strength", array_accessor_length=12, array_accessor_type="float")]]
     std::array<float, COLOR_GRADIENT_ARRAY_SIZE> strengths_;

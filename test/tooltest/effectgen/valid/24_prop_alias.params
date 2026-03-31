@@ -14,7 +14,6 @@
  */
 
 struct [[ge::params(type=PROP_ALIAS, name="PropAlias")]] PropAliasTestParams {
-    [[ge::prop("PropAlias_PrimaryName")]]
-    [[ge::prop_alias("PropAlias_AliasName")]]
+    [[ge::prop(name="PropAlias_PrimaryName", alias="PropAlias_AliasName")]]
     float value = 0.f;
 };

@@ -23,6 +23,7 @@ struct GESDFShadowParams final {
 };
 
 struct [[ge::params(type=SDF_SHADOW, name="SDFShadow")]] GESDFShadowShaderParams final {
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     GESDFShadowParams shadow;
 };

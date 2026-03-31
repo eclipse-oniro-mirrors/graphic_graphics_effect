@@ -14,134 +14,150 @@
           "name": "progress",
           "default_value": "0.0f",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
         },
         {
           "type": "float",
           "name": "radius",
           "default_value": "1.0f",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": null,
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": null
+            }
+          ]
         },
         {
           "type": "float",
           "name": "intensity",
           "default_value": "5.0f",
           "prop_name": "",
-          "range_attr": {
-            "min_value": null,
-            "min_components": null,
-            "max_value": "10.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": null,
+              "max_value": "10.0"
+            }
+          ]
         },
         {
           "type": "Vector2f",
           "name": "coord",
           "default_value": "{0.5f,0.5f}",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
         },
         {
           "type": "Vector3f",
           "name": "position",
           "default_value": "{1.0f,1.0f,1.0f}",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "10.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "10.0"
+            }
+          ]
         },
         {
           "type": "Vector4f",
           "name": "color",
           "default_value": "{1.0f,1.0f,1.0f,1.0f}",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
         },
         {
           "type": "Vector3f",
           "name": "kbs",
           "default_value": "{1.0f,1.0f,0.0f}",
           "prop_name": "",
-          "range_attr": {
-            "min_value": null,
-            "min_components": [
-              "0.0",
-              "0.0",
-              "-1.0"
-            ],
-            "max_value": null,
-            "max_components": [
-              "10.0",
-              "10.0",
-              "1.0"
-            ]
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "{0.0, 0.0, -1.0}",
+              "max_value": "{10.0, 10.0, 1.0}"
+            }
+          ]
         },
         {
           "type": "Vector2f",
           "name": "asymmetric",
           "default_value": "{0.5f,1.0f}",
           "prop_name": "",
-          "range_attr": {
-            "min_value": null,
-            "min_components": [
-              "0.0",
-              "0.0"
-            ],
-            "max_value": null,
-            "max_components": [
-              "1.0",
-              "2.0"
-            ]
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "{0.0, 0.0}",
+              "max_value": "{1.0, 2.0}"
+            }
+          ]
         },
         {
           "type": "int",
           "name": "count",
           "default_value": "50",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "0",
-            "min_components": null,
-            "max_value": "100",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "0",
+              "max_value": "100"
+            }
+          ]
         },
         {
           "type": "float",
           "name": "offset",
           "default_value": "0.0f",
           "prop_name": "",
-          "range_attr": {
-            "min_value": "-50.0",
-            "min_components": null,
-            "max_value": "50.0",
-            "max_components": null
-          }
+          "prop_attributes": [
+            {
+              "name": "",
+              "array_accessor_length": null,
+              "alias": null,
+              "min_value": "-50.0",
+              "max_value": "50.0"
+            }
+          ]
         }
       ]
     }

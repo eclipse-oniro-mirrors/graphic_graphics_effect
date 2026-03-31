@@ -18,15 +18,11 @@
             {
               "name": "PROGRESSX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
             }
-          ],
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "float",
@@ -37,15 +33,11 @@
             {
               "name": "RADIUSX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": null
             }
-          ],
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": null,
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "float",
@@ -56,15 +48,11 @@
             {
               "name": "INTENSITYX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": null,
+              "max_value": "10.0"
             }
-          ],
-          "range_attr": {
-            "min_value": null,
-            "min_components": null,
-            "max_value": "10.0",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "Vector2f",
@@ -75,15 +63,11 @@
             {
               "name": "NORMALIZED_COORDX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
             }
-          ],
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "Vector3f",
@@ -94,15 +78,11 @@
             {
               "name": "POSITIONX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "10.0"
             }
-          ],
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "10.0",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "Vector4f",
@@ -113,15 +93,11 @@
             {
               "name": "COLORX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
             }
-          ],
-          "range_attr": {
-            "min_value": "0.0",
-            "min_components": null,
-            "max_value": "1.0",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "Vector3f",
@@ -132,23 +108,11 @@
             {
               "name": "KBSX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "{0.0, 0.0, -1.0}",
+              "max_value": "{10.0, 10.0, 1.0}"
             }
-          ],
-          "range_attr": {
-            "min_value": null,
-            "min_components": [
-              "0.0",
-              "0.0",
-              "-1.0"
-            ],
-            "max_value": null,
-            "max_components": [
-              "10.0",
-              "10.0",
-              "1.0"
-            ]
-          }
+          ]
         },
         {
           "type": "Vector2f",
@@ -159,21 +123,11 @@
             {
               "name": "ASYMMETRICX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "{0.0, 0.0}",
+              "max_value": "{1.0, 2.0}"
             }
-          ],
-          "range_attr": {
-            "min_value": null,
-            "min_components": [
-              "0.0",
-              "0.0"
-            ],
-            "max_value": null,
-            "max_components": [
-              "1.0",
-              "2.0"
-            ]
-          }
+          ]
         },
         {
           "type": "int",
@@ -184,15 +138,11 @@
             {
               "name": "COUNTX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "0",
+              "max_value": "100"
             }
-          ],
-          "range_attr": {
-            "min_value": "0",
-            "min_components": null,
-            "max_value": "100",
-            "max_components": null
-          }
+          ]
         },
         {
           "type": "float",
@@ -203,15 +153,11 @@
             {
               "name": "OFFSETX",
               "array_accessor_length": null,
-              "alias": null
+              "alias": null,
+              "min_value": "-50.0",
+              "max_value": "50.0"
             }
-          ],
-          "range_attr": {
-            "min_value": "-50.0",
-            "min_components": null,
-            "max_value": "50.0",
-            "max_components": null
-          }
+          ]
         }
       ]
     }

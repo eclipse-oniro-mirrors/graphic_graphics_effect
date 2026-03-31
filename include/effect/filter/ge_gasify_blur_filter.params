@@ -18,6 +18,6 @@ struct [[ge::params(type=GASIFY_BLUR, name="GasifyBlur")]] GEGasifyBlurFilterPar
     std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
     [[ge::prop("GasifyBlur_Mask")]]
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
-    [[ge::range(min=0.0, max=1.0)]]
+    [[ge::prop(min=0.0, max=1.0)]]
     float progress_ = 0.f;
 };

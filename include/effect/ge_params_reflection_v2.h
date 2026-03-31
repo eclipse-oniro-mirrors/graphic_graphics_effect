@@ -40,16 +40,13 @@ class GEFilterParams;
 // X-Macro listing all unique parameter member types
 // Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X
 #define FOR_EACH_PARAM_TYPE(X) \
-    X(ESCAPE(Drawing::Color4f)) \
     X(ESCAPE(Drawing::Matrix)) \
     X(ESCAPE(Drawing::Point)) \
-    X(ESCAPE(GEV2::DotMatrixDirection)) \
-    X(ESCAPE(GEV2::DotMatrixEffectType)) \
+    X(ESCAPE(GEShaderShape)) \
     X(ESCAPE(GEV2::GEBezierWarpShaderFilterControlPointArray)) \
     X(ESCAPE(GEV2::GERRect)) \
     X(ESCAPE(GEV2::GESDFBorderParams)) \
     X(ESCAPE(GEV2::GESDFShadowParams)) \
-    X(ESCAPE(GEV2::GESDFUnionOp)) \
     X(ESCAPE(RectF)) \
     X(ESCAPE(Vector2f)) \
     X(ESCAPE(Vector3f)) \
@@ -59,6 +56,7 @@ class GEFilterParams;
     X(ESCAPE(int32_t)) \
     X(ESCAPE(std::pair<float, float>)) \
     X(ESCAPE(std::shared_ptr<Drawing::GESDFShaderShape>)) \
+    X(ESCAPE(std::shared_ptr<Drawing::GEShaderShape>)) \
     X(ESCAPE(std::shared_ptr<Drawing::Image>)) \
     X(ESCAPE(std::shared_ptr<GEShaderMask>)) \
     X(ESCAPE(std::vector<Vector2f>)) \
@@ -580,6 +578,11 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_MAX = true; \
         static constexpr Type MIN = Min; \
         static constexpr Type MAX = Max; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
 #define GE_PARAMS_CONSTRAINT_COMPONENTS(Tag, Type, Count, Mins, Maxs) \
@@ -592,6 +595,11 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MIN_COMPONENTS[] = Mins; \
         static constexpr Type MAX_COMPONENTS[] = Maxs; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
 #define GE_PARAMS_CONSTRAINT_COMPONENTS_MIN(Tag, Type, Count, Mins) \
@@ -603,6 +611,11 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_MAX = false; \
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MIN_COMPONENTS[] = Mins; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
 #define GE_PARAMS_CONSTRAINT_COMPONENTS_MAX(Tag, Type, Count, Maxs) \
@@ -614,6 +627,11 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_MAX = true; \
         static constexpr size_t COMPONENT_COUNT = Count; \
         static constexpr Type MAX_COMPONENTS[] = Maxs; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
 #define GE_PARAMS_CONSTRAINT_MIN(Tag, Type, Min) \
@@ -624,6 +642,11 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_MIN = true; \
         static constexpr bool HAS_MAX = false; \
         static constexpr Type MIN = Min; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
 #define GE_PARAMS_CONSTRAINT_MAX(Tag, Type, Max) \
@@ -634,10 +657,46 @@ enum class GEParamsMemberTag : uint32_t {
         static constexpr bool HAS_MIN = false; \
         static constexpr bool HAS_MAX = true; \
         static constexpr Type MAX = Max; \
+        static constexpr bool HAS_CONVERT = false; \
+        static constexpr bool HAS_CAST_FROM = false; \
+        using CastFromType = void; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
     };
 
-GE_PARAMS_CONSTRAINT_RANGE(AURORA_NOISE_FREQ_X, float, 0.1, 5.0)
-GE_PARAMS_CONSTRAINT_RANGE(AURORA_NOISE_FREQ_Y, float, 0.1, 5.0)
+#define GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(Tag, _CastFromType) \
+    template<> \
+    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
+        static constexpr bool HAS_RANGE = false; \
+        static constexpr bool COMPONENT_WISE = false; \
+        static constexpr bool HAS_MIN = false; \
+        static constexpr bool HAS_MAX = false; \
+        static constexpr bool HAS_CONVERT = true; \
+        static constexpr bool HAS_CAST_FROM = true; \
+        using CastFromType = _CastFromType; \
+        static constexpr bool HAS_CUSTOM = false; \
+        using CustomTransformer = void; \
+    };
+
+#define GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(Tag, _CastFromType, _CustomTransformer) \
+    template<> \
+    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \
+        static constexpr bool HAS_RANGE = false; \
+        static constexpr bool COMPONENT_WISE = false; \
+        static constexpr bool HAS_MIN = false; \
+        static constexpr bool HAS_MAX = false; \
+        static constexpr bool HAS_CONVERT = true; \
+        static constexpr bool HAS_CAST_FROM = true; \
+        using CastFromType = _CastFromType; \
+        static constexpr bool HAS_CUSTOM = true; \
+        using CustomTransformer = _CustomTransformer; \
+    };
+
+GE_PARAMS_CONSTRAINT_RANGE(AURORA_NOISE_FREQ_X, float, 0.1f, 5.0f)
+GE_PARAMS_CONSTRAINT_RANGE(AURORA_NOISE_FREQ_Y, float, 0.1f, 5.0f)
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(DOT_MATRIX_PATH_DIRECTION, ESCAPE(int32_t))
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DOT_MATRIX_COLOR_FRACTIONS, ESCAPE(std::pair<float, float>), PairToVector2fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DOT_MATRIX_EFFECT_TYPE, ESCAPE(int32_t), DotMatrixEffectTypeTransformer)
 GE_PARAMS_CONSTRAINT_RANGE(FROSTED_GLASS_BLUR_RADIUS, float, 0.0, 200.0)
 GE_PARAMS_CONSTRAINT_RANGE(FROSTED_GLASS_BLUR_RADIUS_SCALE, float, 0.0, 200.0)
 GE_PARAMS_CONSTRAINT_RANGE(FROSTED_GLASS_BLUR_REFRACT_OUT_PX, float, -500.0, 500.0)
@@ -679,6 +738,7 @@ GE_PARAMS_CONSTRAINT_RANGE(FROSTED_GLASS_EFFECT_DARK_SCALE, float, 0.0f, 1.0f)
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BLUR_PARAMS, float, 2, ESCAPE({0.0f, 0.0f}), ESCAPE({200.0f, 200.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_WEIGHTS_EMBOSS, float, 2, ESCAPE({-5.0f, -5.0f}), ESCAPE({5.0f, 5.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_WEIGHTS_EDL, float, 2, ESCAPE({-5.0f, -5.0f}), ESCAPE({5.0f, 5.0f}))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(FROSTED_GLASS_SDF_SHAPE, ESCAPE(GEShaderShape))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_RATES, float, 2, ESCAPE({-20.0f, -20.0f}), ESCAPE({20.0f, 20.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_K_B_S, float, 3, ESCAPE({-20.0f, -20.0f, 0.0f}), ESCAPE({20.0f, 20.0f, 20.0f}))
 GE_PARAMS_CONSTRAINT_COMPONENTS(FROSTED_GLASS_BG_POS, float, 3, ESCAPE({-20.0f, -20.0f, -20.0f}), ESCAPE({20.0f, 20.0f, 20.0f}))
@@ -718,13 +778,55 @@ GE_PARAMS_CONSTRAINT_RANGE(GASIFY_SCALE_TWIST_PROGRESS, float, 0.0, 1.0)
 GE_PARAMS_CONSTRAINT_COMPONENTS(PARTICLE_CIRCULAR_HALO_CENTER, float, 2, ESCAPE({0.0, 0.0}), ESCAPE({1.0, 1.0}))
 GE_PARAMS_CONSTRAINT_RANGE(PARTICLE_CIRCULAR_HALO_RADIUS, float, 0.001, 10.0)
 GE_PARAMS_CONSTRAINT_MIN(PARTICLE_CIRCULAR_HALO_NOISE, float, 0.0)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(PIXEL_MAP_MASK_SRC, ESCAPE(Vector4f), Vector4fToRectFTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(PIXEL_MAP_MASK_DST, ESCAPE(Vector4f), Vector4fToRectFTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_BORDER_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_CLIP_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_COLOR_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
 GE_PARAMS_CONSTRAINT_RANGE(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float, 0.0, 4096.0)
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_SHADOW_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_LEFT, ESCAPE(GEShaderShape))
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_UNION_OP_RIGHT, ESCAPE(GEShaderShape))
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SDF_UNION_OP_OP, ESCAPE(uint32_t), SDFUnionOpTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SOUND_WAVE_COLOR_A, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SOUND_WAVE_COLOR_B, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SOUND_WAVE_COLOR_C, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(WAVE_DISTURBANCE_MASK_CLICK_POS, ESCAPE(std::pair<float, float>), WaveDisturbanceTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(WAVE_DISTURBANCE_MASK_WAVE_R_D, ESCAPE(std::pair<float, float>), WaveDisturbanceTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS0, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS1, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS2, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS3, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS4, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS5, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS6, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS7, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS8, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS9, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS10, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_COLORS11, ESCAPE(Vector4f), Vector4fToColor4fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS0, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS1, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS2, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS3, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS4, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS5, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS6, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS7, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS8, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS9, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS10, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(COLOR_GRADIENT_EFFECT_POSITIONS11, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(LIGHT_CAVE_POSITION, ESCAPE(std::pair<float, float>), PairToVector2fTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(LIGHT_CAVE_RADIUS_X_Y, ESCAPE(std::pair<float, float>), PairToVector2fTransformer)
 #undef GE_PARAMS_CONSTRAINT_RANGE
 #undef GE_PARAMS_CONSTRAINT_COMPONENTS
 #undef GE_PARAMS_CONSTRAINT_COMPONENTS_MIN
 #undef GE_PARAMS_CONSTRAINT_COMPONENTS_MAX
 #undef GE_PARAMS_CONSTRAINT_MIN
 #undef GE_PARAMS_CONSTRAINT_MAX
+#undef GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM
+#undef GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM
 
 // GEFilterParamsTypeInfoV2 template specializations
 // Provides FilterType ID and FilterName for each params type
@@ -1364,15 +1466,11 @@ public:
     // Overloaded SetParamsMemberByTag for each unique parameter type
     // These are non-template functions, reducing binary bloat
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const Drawing::Color4f& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value);
+                                     GEParamsMemberTag tag, const GEShaderShape& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1381,8 +1479,6 @@ public:
                                      GEParamsMemberTag tag, const GEV2::GESDFBorderParams& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GESDFShadowParams& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const RectF& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1401,6 +1497,8 @@ public:
                                      GEParamsMemberTag tag, const std::pair<float, float>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,

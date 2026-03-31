@@ -15,10 +15,10 @@
 
 
 struct [[ge::params(type=PARTICLE_CIRCULAR_HALO, name="ParticleCircularHalo")]] GEParticleCircularHaloShaderParams {
-    [[ge::range(min={0.0, 0.0}, max={1.0, 1.0})]]
+    [[ge::prop(min={0.0, 0.0}, max={1.0, 1.0})]]
     std::pair<float, float> center_ = {0.f, 0.f};
-    [[ge::range(min=0.001, max=10.0)]]
+    [[ge::prop(min=0.001, max=10.0)]]
     float radius_ = 0.f;
-    [[ge::range(min=0.0)]]
+    [[ge::prop(min=0.0)]]
     float noise_ = 0.f;
 };

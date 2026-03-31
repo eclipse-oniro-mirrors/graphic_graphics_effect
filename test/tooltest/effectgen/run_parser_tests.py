@@ -29,23 +29,12 @@ class PropAttributeExpected:
     """Expected result for a single prop attribute."""
     name: str
     array_accessor_length: Optional[int] = None
+    array_accessor_type: Optional[str] = None
     alias: Optional[str] = None
-
-
-@dataclass
-class RangeAttributeExpected:
-    """Expected result for a range attribute."""
-    min_value: Optional[str] = None
-    min_components: Optional[List[str]] = None
-    max_value: Optional[str] = None
-    max_components: Optional[List[str]] = None
-
-
-@dataclass
-class ConvertAttributeExpected:
-    """Expected result for a convert attribute."""
     cast_from: Optional[str] = None
     custom: Optional[str] = None
+    min_value: Optional[str] = None
+    max_value: Optional[str] = None
 
 
 @dataclass
@@ -57,8 +46,6 @@ class FieldExpectedResult:
     prop_name: str = ""
     array_accessor_length: Optional[int] = None
     prop_attributes: List[PropAttributeExpected] = None
-    range_attr: Optional[RangeAttributeExpected] = None
-    convert_attr: Optional[ConvertAttributeExpected] = None
 
     def __post_init__(self):
         if self.prop_attributes is None:
@@ -153,18 +140,13 @@ class TestRunner:
                         prop_attributes=[PropAttributeExpected(
                             name=pa.get('name', ''),
                             array_accessor_length=pa.get('array_accessor_length'),
-                            alias=pa.get('alias')
-                        ) for pa in f.get('prop_attributes', [])],
-                        range_attr=RangeAttributeExpected(
-                            min_value=f.get('range_attr', {}).get('min_value'),
-                            min_components=f.get('range_attr', {}).get('min_components'),
-                            max_value=f.get('range_attr', {}).get('max_value'),
-                            max_components=f.get('range_attr', {}).get('max_components')
-                        ) if 'range_attr' in f else None,
-                        convert_attr=ConvertAttributeExpected(
-                            cast_from=f.get('convert_attr', {}).get('cast_from'),
-                            custom=f.get('convert_attr', {}).get('custom')
-                        ) if 'convert_attr' in f else None
+                            array_accessor_type=pa.get('array_accessor_type'),
+                            alias=pa.get('alias'),
+                            cast_from=pa.get('cast_from'),
+                            custom=pa.get('custom'),
+                            min_value=pa.get('min_value'),
+                            max_value=pa.get('max_value')
+                        ) for pa in f.get('prop_attributes', [])]
                     ) for f in s.get('fields', [])]
                 ) for s in result_data.get('structs', [])]
 
@@ -204,27 +186,19 @@ class TestRunner:
                         "default_value": field.default_value or "",
                         "prop_name": field.prop_name or ""
                     }
-                    # Include prop_attributes if there are any
                     if field.prop_attributes:
                         field_dict["prop_attributes"] = [
                             {
                                 "name": pa.name,
                                 "array_accessor_length": pa.array_accessor_length,
-                                "alias": pa.alias
+                                "array_accessor_type": pa.array_accessor_type,
+                                "alias": pa.alias,
+                                "cast_from": pa.cast_from,
+                                "custom": pa.custom,
+                                "min_value": pa.min_value,
+                                "max_value": pa.max_value
                             } for pa in field.prop_attributes
                         ]
-                    if field.range_attr:
-                        field_dict["range_attr"] = {
-                            "min_value": field.range_attr.min_value,
-                            "min_components": field.range_attr.min_components,
-                            "max_value": field.range_attr.max_value,
-                            "max_components": field.range_attr.max_components
-                        }
-                    if field.convert_attr:
-                        field_dict["convert_attr"] = {
-                            "cast_from": field.convert_attr.cast_from,
-                            "custom": field.convert_attr.custom
-                        }
                     fields_data.append(field_dict)
 
                 struct_data = StructExpectedResult(
@@ -404,66 +378,41 @@ class TestRunner:
                             if exp_prop.array_accessor_length != act_prop.array_accessor_length:
                                 validation['passed'] = False
                                 validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1}, prop_attribute {k+1} array_accessor_length mismatch: expected {exp_prop.array_accessor_length}, got {act_prop.array_accessor_length}"
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} array_accessor_length mismatch: expected {exp_prop.array_accessor_length}, got {act_prop.array_accessor_length}"
+                                )
+                            if exp_prop.array_accessor_type != act_prop.array_accessor_type:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} array_accessor_type mismatch: expected {exp_prop.array_accessor_type}, got {act_prop.array_accessor_type}"
                                 )
                             if exp_prop.alias != act_prop.alias:
                                 validation['passed'] = False
                                 validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1}, prop_attribute {k+1} alias mismatch: expected '{exp_prop.alias}', got '{act_prop.alias}'"
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} alias mismatch: expected '{exp_prop.alias}', got '{act_prop.alias}'"
                                 )
-                            if exp_prop.array_accessor_length != act_prop.array_accessor_length:
+                            if exp_prop.cast_from != act_prop.cast_from:
                                 validation['passed'] = False
                                 validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} array_accessor_length mismatch: expected {exp_prop.array_accessor_length}, got {act_prop.array_accessor_length}"
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} cast_from mismatch: expected {exp_prop.cast_from}, got {act_prop.cast_from}'"
+                                )
+                            if exp_prop.custom != act_prop.custom:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} custom mismatch: expected {exp_prop.custom}, got {act_prop.custom}'"
+                                )
+                            if exp_prop.min_value != act_prop.min_value:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} min_value mismatch: expected {exp_prop.min_value}, got {act_prop.min_value}'"
+                                )
+                            if exp_prop.max_value != act_prop.max_value:
+                                validation['passed'] = False
+                                validation['differences'].append(
+                                    f"Struct {i+1}, field {j+1} prop_attribute {k+1} max_value mismatch: expected {exp_prop.max_value}, got {act_prop.max_value}'"
                                 )
 
-                        exp_range = exp_field.range_attr
-                        act_range = act_field.range_attr
-                        if (exp_range is None) != (act_range is None):
-                            validation['passed'] = False
-                            validation['differences'].append(
-                                f"Struct {i+1}, field {j+1} range_attr presence mismatch: expected {exp_range is not None}, got {act_range is not None}"
-                            )
-                        elif exp_range is not None and act_range is not None:
-                            if exp_range.min_value != act_range.min_value:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} range_attr min_value mismatch: expected '{exp_range.min_value}', got '{act_range.min_value}'"
-                                )
-                            if exp_range.min_components != act_range.min_components:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} range_attr min_components mismatch: expected {exp_range.min_components}, got {act_range.min_components}"
-                                )
-                            if exp_range.max_value != act_range.max_value:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} range_attr max_value mismatch: expected '{exp_range.max_value}', got '{act_range.max_value}'"
-                                )
-                            if exp_range.max_components != act_range.max_components:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} range_attr max_components mismatch: expected {exp_range.max_components}, got {act_range.max_components}"
-                                )
 
-                        exp_convert = exp_field.convert_attr
-                        act_convert = act_field.convert_attr
-                        if (exp_convert is None) != (act_convert is None):
-                            validation['passed'] = False
-                            validation['differences'].append(
-                                f"Struct {i+1}, field {j+1} convert_attr presence mismatch: expected {exp_convert is not None}, got {act_convert is not None}"
-                            )
-                        elif exp_convert is not None and act_convert is not None:
-                            if exp_convert.cast_from != act_convert.cast_from:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} convert_attr cast_from mismatch: expected '{exp_convert.cast_from}', got '{act_convert.cast_from}'"
-                                )
-                            if exp_convert.custom != act_convert.custom:
-                                validation['passed'] = False
-                                validation['differences'].append(
-                                    f"Struct {i+1}, field {j+1} convert_attr custom mismatch: expected '{exp_convert.custom}', got '{act_convert.custom}'"
-                                )
+
 
             validation_results.append(validation)
 
@@ -585,11 +534,11 @@ class TestRunner:
         print("TEST RESULTS")
         print("=" * 80)
 
-        # Print summary
-        print(f"\nTotal: {total} | OK: {ok} | FAILED: {failed} | ERROR: {errors}")
-
         # Check if validation was run
         has_validation = any(t.validation_passed is not None for t in self.test_cases)
+        ok_str = "PARSED" if has_validation else "PARSED (NOT VALIDATED)"
+        # Print summary
+        print(f"\nTotal: {total} | {ok_str} : {ok} | FAILED: {failed} | ERROR: {errors}")
 
         # Print validation summary if validation was run
         if has_validation:

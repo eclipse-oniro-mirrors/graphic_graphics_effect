@@ -1,0 +1,67 @@
+{
+  "name": "29_prop_cast_from_only",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "PropCastFromOnlyParams",
+      "enum_type": "PROP_CAST_FROM_ONLY",
+      "filter_name": "PropCastFromOnly",
+      "fields": [
+        {
+          "type": "float",
+          "name": "floatValue",
+          "default_value": "50.0f",
+          "prop_name": "TestIntValue",
+          "prop_attributes": [
+            {
+              "name": "TestIntValue",
+              "array_accessor_length": null,
+              "alias": null,
+              "cast_from": "int32_t",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "Drawing::Color4f",
+          "name": "color",
+          "default_value": "{1.0f,1.0f,1.0f,1.0f}",
+          "prop_name": "TestColor",
+          "prop_attributes": [
+            {
+              "name": "TestColor",
+              "array_accessor_length": null,
+              "alias": null,
+              "cast_from": "Vector4f",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "std::shared_ptr<GESDFShaderShape>",
+          "name": "shape",
+          "default_value": "nullptr",
+          "prop_name": "TestShape",
+          "prop_attributes": [
+            {
+              "name": "TestShape",
+              "array_accessor_length": null,
+              "alias": null,
+              "cast_from": "std::shared_ptr<Drawing::GEShaderShape>",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "notes": ""
+}

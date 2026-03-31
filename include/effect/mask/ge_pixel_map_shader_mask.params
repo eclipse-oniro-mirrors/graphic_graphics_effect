@@ -16,7 +16,9 @@
 
 struct [[ge::params(type=PIXEL_MAP_MASK, name="PixelMapMask")]] GEPixelMapMaskParams {
     std::shared_ptr<Drawing::Image> image = nullptr;
+    [[ge::prop(cast_from="Vector4f", custom="Vector4fToRectFTransformer")]]
     RectF src;
+    [[ge::prop(cast_from="Vector4f", custom="Vector4fToRectFTransformer")]]
     RectF dst;
     Vector4f fillColor;
 };

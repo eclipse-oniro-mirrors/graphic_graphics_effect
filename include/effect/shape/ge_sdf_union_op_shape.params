@@ -22,12 +22,10 @@ enum class GESDFUnionOp : uint8_t {
 struct [[ge::params(type=SDF_UNION_OP, name="SDFUnionOpShape")]] GESDFUnionOpShapeParams {
     [[ge::prop("SDFSmoothUnionOpShape_Spacing")]]
     float spacing = 0.f;
-    [[ge::prop("SDFUnionOpShape_ShapeX")]]
-    [[ge::prop_alias("SDFSmoothUnionOpShape_ShapeX")]]
+    [[ge::prop(name="SDFUnionOpShape_ShapeX", alias="SDFSmoothUnionOpShape_ShapeX", cast_from="GEShaderShape")]]
     std::shared_ptr<GESDFShaderShape> left;
-    [[ge::prop("SDFUnionOpShape_ShapeY")]]
-    [[ge::prop_alias("SDFSmoothUnionOpShape_ShapeY")]]
+    [[ge::prop(name="SDFUnionOpShape_ShapeY", alias="SDFSmoothUnionOpShape_ShapeY", cast_from="GEShaderShape")]]
     std::shared_ptr<GESDFShaderShape> right;
-    [[ge::prop("SDFUnionOpShape_Type")]]
+    [[ge::prop(name="SDFUnionOpShape_Type", cast_from="uint32_t", custom="SDFUnionOpTransformer")]]
     GESDFUnionOp op = GESDFUnionOp::SMOOTH_UNION;
 };
