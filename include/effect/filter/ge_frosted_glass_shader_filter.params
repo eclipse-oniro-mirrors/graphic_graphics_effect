@@ -20,7 +20,7 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
     [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
-    [[ge::prop(name="FrostedGlass_Shape", cast_from="GEShaderShape")]]
+    [[ge::prop(name="FrostedGlass_Shape", cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> sdfShape;
     [[ge::prop("FrostedGlass_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;
