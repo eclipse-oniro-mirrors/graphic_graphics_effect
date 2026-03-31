@@ -397,9 +397,9 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder() const
 {
-    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> gravityPullShaderHasNormalBuilder = nullptr;
-    if (gravityPullShaderHasNormalBuilder) {
-        return gravityPullShaderHasNormalBuilder;
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> gravPullShaderHasNormalBuilder = nullptr;
+    if (gravPullShaderHasNormalBuilder) {
+        return gravPullShaderHasNormalBuilder;
     }
 
     auto gravityPullShaderHasNormalEffect = Drawing::RuntimeEffect::CreateForShader(GRAVITY_PULL_NORMAL_PROG);
