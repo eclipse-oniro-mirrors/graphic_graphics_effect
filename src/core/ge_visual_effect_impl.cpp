@@ -2940,7 +2940,7 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, float par
         frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
     }
 
-    constexpr float MAX_COLOR = 10.0f;
+    constexpr float MAX_COLOR = 15.0f;
     if (tag == GE_FILTER_FROSTED_GLASS_MAXCOLOR) {
         frostedGlassParams_->maxColor = std::clamp(param, 0.0f, MAX_COLOR);
     }
