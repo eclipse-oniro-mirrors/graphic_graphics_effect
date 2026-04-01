@@ -241,11 +241,10 @@ static constexpr char GRAVITY_PULL_PROG[] = R"(
             return p;
         }
 
-        float centerDist = sqrt(centerDistSq);
         float centerGate = smoothstep(
             0.25 * spacing,
             0.25 * spacing + 0.35 * spacing,
-            centerDist
+            centerDistSq
         );
         if (centerGate <= 1e-5) {
             return p;
@@ -377,11 +376,10 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
             return p;
         }
 
-        float centerDist = sqrt(centerDistSq);
         float centerGate = smoothstep(
             0.25 * spacing,
             0.25 * spacing + 0.35 * spacing,
-            centerDist
+            centerDistSq
         );
         if (centerGate <= 1e-5) {
             return p;
