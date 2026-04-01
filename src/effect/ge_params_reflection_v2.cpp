@@ -1933,8 +1933,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
         default:
             break;
     }
@@ -2019,7 +2017,9 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
         GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
         GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
         GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
         GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         default:

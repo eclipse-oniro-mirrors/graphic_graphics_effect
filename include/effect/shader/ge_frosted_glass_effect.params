@@ -15,9 +15,9 @@
 
 
 struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFrostedGlassEffectParams {
-    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f})]]
+    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
-    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f})]]
+    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     // Background darken parameters
     [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
@@ -84,7 +84,7 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     // Dark mode parameters and scale
-    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f})]]
+    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
     Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
     [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
     Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);

@@ -36,6 +36,6 @@ struct [[ge::params(type=SDF_EDGE_LIGHT, name="SDFEdgeLight")]] GESDFEdgeLightFi
     std::shared_ptr<Drawing::Image> sdfImage;
     [[ge::prop("SDFEdgeLight_LightMask")]]
     std::shared_ptr<GEShaderMask> lightMask;
-    [[ge::prop("SDFEdgeLight_SDFShape")]]
+    [[ge::prop(name="SDFEdgeLight_SDFShape", cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
 };
