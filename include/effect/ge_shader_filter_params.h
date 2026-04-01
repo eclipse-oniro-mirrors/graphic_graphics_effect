@@ -739,6 +739,21 @@ struct GEBorderLightShaderParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(BORDER_LIGHT, GEBorderLightShaderParams, GE_SHADER_BORDER_LIGHT);
 
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT[] = "SpatialPointLight";
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_INTENSITY[] = "SpatialPointLight_LightIntensity";
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_POSITION[] = "SpatialPointLight_LightPosition";
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT_ATTENUATION[] = "SpatialPointLight_Attenuation";
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_COLOR[] = "SpatialPointLight_LightColor";
+constexpr char GE_SHADER_SPATIAL_POINT_LIGHT_MASK[] = "SpatialPointLight_Mask";
+struct GESpatialPointLightShaderParams {
+    float lightIntensity = 1.0f;
+    Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    float attenuation = 0.5f;
+    Vector4f lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    std::shared_ptr<GEShaderMask> mask = nullptr;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(SPATIAL_POINT_LIGHT, GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT);
+
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS[] = "MapColorByBrightness";
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS_COLORS[] = "MapColorByBrightness_Colors";
 constexpr char GE_FILTER_MAP_COLOR_BY_BRIGHTNESS_POSITIONS[] = "MapColorByBrightness_Positions";

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,6 +165,15 @@ TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
     ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_DISTORT_STRENGTH, distortStrength, float),
     ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_BLEND_GRADIENT, blendGradient, float),
     ADD_TAG_HANDLER(GECircleFlowlightEffectParams, GE_SHADER_CIRCLE_FLOWLIGHT_MASK, mask,
+        std::shared_ptr<Drawing::GEShaderMask>),
+};
+
+TagMap<GESpatialPointLightShaderParams> spatialPointLightTagMap_{
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, lightIntensity, float),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_ATTENUATION, attenuation, float),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_POSITION, lightPosition, Vector3f),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_COLOR, lightColor, Vector4f),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_MASK, mask,
         std::shared_ptr<Drawing::GEShaderMask>),
 };
 
@@ -609,6 +618,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::NOISY_FRAME_GRADIENT_MASK);
             impl->MakeNoisyFrameGradientMaskParams();
         }
+    },
+    { GE_SHADER_SPATIAL_POINT_LIGHT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT);
+            impl->MakeSpatialPointLightParams();
+        }
     }
 };
 
@@ -868,6 +883,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
+            break;
+        }
+        case FilterType::SPATIAL_POINT_LIGHT: {
+            ApplyTagParams(tag, param, spatialPointLightParams_, spatialPointLightTagMap_);
             break;
         }
         case FilterType::GASIFY_SCALE_TWIST: {
@@ -1502,6 +1521,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
             break;
         }
+        case FilterType::SPATIAL_POINT_LIGHT: {
+            ApplyTagParams(tag, param, spatialPointLightParams_, spatialPointLightTagMap_);
+            break;
+        }
         case FilterType::SDF_EDGE_LIGHT: {
             if (sdfEdgeLightParams_ == nullptr) {
                 return;
@@ -1652,6 +1675,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
             SetBorderLightParams(tag, param);
             break;
         }
+        case FilterType::SPATIAL_POINT_LIGHT: {
+            ApplyTagParams(tag, param, spatialPointLightParams_, spatialPointLightTagMap_);
+            break;
+        }
         case FilterType::WAVE_DISTURBANCE_MASK: {
             SetWaveDisturbanceMaskParams(tag, param);
             break;
@@ -1744,6 +1771,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         }
         case FilterType::BORDER_LIGHT: {
             SetBorderLightParams(tag, param);
+            break;
+        }
+        case FilterType::SPATIAL_POINT_LIGHT: {
+            ApplyTagParams(tag, param, spatialPointLightParams_, spatialPointLightTagMap_);
             break;
         }
         case FilterType::COLOR_GRADIENT_EFFECT: {
@@ -3575,6 +3606,3 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImpl::GetGEShaderSha
     return nullptr;
 }
 
-} // namespace Drawing
-} // namespace Rosen
-} // namespace OHOS

@@ -1,4 +1,4 @@
- /*
+﻿ /*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -718,6 +718,17 @@ public:
         return noisyFrameGradientMaskParams_;
     }
 
+
+    void MakeSpatialPointLightParams()
+    {
+        spatialPointLightParams_ = std::make_shared<GESpatialPointLightShaderParams>();
+    }
+
+    const std::shared_ptr<GESpatialPointLightShaderParams>& GetSpatialPointLightParams() const
+    {
+        return spatialPointLightParams_;
+    }
+
     void SetSDFEdgeLightParams(const std::string& tag, float param);
 
 private:
@@ -874,6 +885,7 @@ private:
     std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
 
     std::shared_ptr<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskParams_ = nullptr;
+    std::shared_ptr<GESpatialPointLightShaderParams> spatialPointLightParams_ = nullptr;
 };
 
 } // namespace Drawing
