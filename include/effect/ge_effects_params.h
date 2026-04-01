@@ -35,6 +35,7 @@
 #include "ge_filter_type.h"
 #include "ge_shader_mask.h"
 #include "ge_sdf_shader_shape.h"
+#include "ge_params_associate_types.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -84,7 +85,6 @@ namespace GEV2 {
 #include "effect/filter/ge_sdf_edge_light_filter.params"
 #include "effect/filter/ge_sdf_from_image_filter.params"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.params"
-#include "effect/shape/ge_sdf_rrect.params"
 #include "effect/shape/ge_sdf_rrect_shader_shape.params"
 #include "effect/shape/ge_sdf_shadow_shader.params"
 #include "effect/shape/ge_sdf_transform_shader_shape.params"

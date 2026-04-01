@@ -62,6 +62,7 @@ def generate_header() -> str:
     output.append('#include "ge_filter_type.h"')
     output.append('#include "ge_shader_mask.h"')
     output.append('#include "ge_sdf_shader_shape.h"')
+    output.append('#include "ge_params_associate_types.h"')
     output.append("")
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
