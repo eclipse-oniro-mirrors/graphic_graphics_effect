@@ -3353,8 +3353,8 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
 
     constexpr float MAX_V = 20.0f;
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ANTIALIAS) {
-        frostedGlassEffectParams_->antiAlias = Vector2f(std::clamp(param.first, -MAX_V, MAX_V),
-            std::clamp(param.second, -MAX_V, MAX_V));
+        frostedGlassEffectParams_->antiAlias = Vector2f(std::clamp(param.first, -MAX_V, -1.0f),
+            std::clamp(param.second, 1.0f, MAX_V));
     }
 }
 
