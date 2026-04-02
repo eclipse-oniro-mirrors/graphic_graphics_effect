@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing comma after raw string value
+ */
+
+struct [[ge::params(type=TEST_NO_COMMA_RAW_STR name="TestNoCommaRawStr" pattern=R"(\w+)")]] TestNoCommaRawStrParams {
+    float value1;
+    int value2;
+};

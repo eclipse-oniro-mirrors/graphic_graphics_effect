@@ -33,7 +33,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_COMMENTS",
+        "name": "TestComments"
+      }
     }
   ],
   "notes": ""

@@ -20,6 +20,14 @@
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
+// Additional includes for complex filters:
+// #include <memory>
+// #include <vector>
+// #include "draw/canvas.h"
+// #include "effect/color_filter.h"
+// #include "image/image.h"
+// #include "utils/matrix.h"
+
 namespace OHOS {
 namespace Rosen {
 
@@ -36,7 +44,13 @@ public:
     GE_EXPORT std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
+    // Optional: Override for preprocessing before effect application
+    // void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+
 private:
+    // Helper method to get/create shader effect
+    static std::shared_ptr<Drawing::RuntimeEffect> GetEffect();
+
 $MEMBER_DECLARATIONS
 };
 

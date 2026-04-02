@@ -18,7 +18,12 @@
             {
               "name": "Value1",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -31,7 +36,12 @@
             {
               "name": "Value2",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -44,7 +54,12 @@
             {
               "name": "Value3",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -63,11 +78,20 @@
             {
               "name": "Value4",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_MIXED_ATTR",
+        "name": "TestMixedAttr"
+      }
     }
   ],
   "notes": ""

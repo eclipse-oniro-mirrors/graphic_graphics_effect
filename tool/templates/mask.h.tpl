@@ -20,6 +20,12 @@
 #include "ge_shader_mask.h"
 #include "ge_shader_filter_params.h"
 
+// Additional includes for complex masks:
+// #include "draw/canvas.h"
+// #include "effect/runtime_effect.h"
+// #include "effect/runtime_shader_builder.h"
+// #include "image/image.h"
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
@@ -37,7 +43,20 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
+    // Optional: Override for nine-patch layout optimization
+    // virtual Drawing::Rect GetSubtractedRect(float width, float height) const override;
+
+    // Optional: Return associated image (for image-based masks)
+    // virtual std::weak_ptr<Drawing::Image> GetImage() const override;
+
+    // Optional: Return whether effect is used (for use-effect masks)
+    // virtual bool GetUseEffect() const override;
+
 private:
+    // Helper method to get/create shader builder
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder() const;
+    // static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder() const;
+
 $MEMBER_DECLARATIONS
 };
 

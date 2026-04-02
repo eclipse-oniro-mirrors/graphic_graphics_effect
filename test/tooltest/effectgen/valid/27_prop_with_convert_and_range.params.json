@@ -91,7 +91,11 @@
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "PROP_CONVERT_RANGE",
+        "name": "PropConvertRange"
+      }
     }
   ],
   "notes": ""

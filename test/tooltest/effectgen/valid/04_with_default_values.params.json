@@ -75,7 +75,11 @@
           "default_value": "-123.456",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_DEFAULTS",
+        "name": "TestDefaults"
+      }
     }
   ],
   "notes": ""

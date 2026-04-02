@@ -27,7 +27,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_BASIC",
+        "name": "TestBasic"
+      }
     }
   ],
   "notes": ""

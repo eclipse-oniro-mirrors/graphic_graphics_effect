@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unmatched opening brace in attribute
+ */
+
+struct [[ge::params(type=TEST_UNMATCHED_BRACE, name="TestUnmatchedBrace", data={a: 1, b: 2) ]] TestUnmatchedBraceParams {
+    float value1;
+    int value2;
+};

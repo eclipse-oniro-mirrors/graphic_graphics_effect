@@ -21,7 +21,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_UNRELATED",
+        "name": "TestUnrelated"
+      }
     }
   ],
   "notes": ""

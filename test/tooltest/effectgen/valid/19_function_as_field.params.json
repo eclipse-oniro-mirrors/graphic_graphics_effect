@@ -8,7 +8,11 @@
       "name": "TestFuncFieldParams",
       "enum_type": "TEST_FUNC_FIELD",
       "filter_name": "TestFuncField",
-      "fields": []
+      "fields": [],
+      "params": {
+        "type": "TEST_FUNC_FIELD",
+        "name": "TestFuncField"
+      }
     }
   ],
   "notes": ""

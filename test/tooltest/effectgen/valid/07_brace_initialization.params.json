@@ -39,7 +39,11 @@
           "default_value": "{1,2,3,4}",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_BRACE_INIT",
+        "name": "TestBraceInit"
+      }
     }
   ],
   "notes": ""

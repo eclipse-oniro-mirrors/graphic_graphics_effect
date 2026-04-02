@@ -75,7 +75,11 @@
           "default_value": "<div class=\"container\">Content</div>",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_RAW_STRINGS",
+        "name": "TestRawStrings"
+      }
     }
   ],
   "notes": ""

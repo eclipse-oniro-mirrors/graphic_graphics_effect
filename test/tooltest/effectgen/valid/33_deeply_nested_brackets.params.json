@@ -1,0 +1,33 @@
+{
+  "name": "33_deeply_nested_brackets",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestDeepNestedBracketsParams",
+      "enum_type": "TEST_DEEP_NESTED_BRACKETS",
+      "filter_name": "TestDeepNestedBrackets",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ],
+      "params": {
+        "type": "TEST_DEEP_NESTED_BRACKETS",
+        "name": "TestDeepNestedBrackets",
+        "data": "{{{{{1, 2}, {3, 4}}}, {{{5, 6}, {7, 8}}}}}"
+      }
+    }
+  ],
+  "notes": ""
+}

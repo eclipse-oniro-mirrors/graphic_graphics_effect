@@ -1,0 +1,8 @@
+/*
+ * Valid: Raw string with nested parentheses R"(...(...)...)"
+ */
+
+struct [[ge::params(type=TEST_RAW_STRING_NESTED_PAREN, name="TestRawStringNestedParen", pattern=R"(\w+(\d+)+)")]] TestRawStringNestedParenParams {
+    float value1;
+    int value2;
+};

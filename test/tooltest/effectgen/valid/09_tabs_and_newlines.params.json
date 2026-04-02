@@ -33,7 +33,11 @@
           "default_value": "1.23",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_TABS",
+        "name": "TestTabs"
+      }
     }
   ],
   "notes": ""

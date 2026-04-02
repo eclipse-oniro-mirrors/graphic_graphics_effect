@@ -18,12 +18,22 @@
             {
               "name": "BEZIER_WARP_DESTINATION_PATCH",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             },
             {
               "name": "BezierWarp_ControlPoint",
               "array_accessor_length": 12,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -36,16 +46,30 @@
             {
               "name": "COLOR_PALETTE",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             },
             {
               "name": "PaletteColor",
               "array_accessor_length": 5,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "BEZIER_WARP",
+        "name": "BezierWarp"
+      }
     }
   ],
   "notes": ""

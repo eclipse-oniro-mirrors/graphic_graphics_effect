@@ -18,7 +18,12 @@
             {
               "name": "MY_ARR",
               "array_accessor_length": 10,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -31,7 +36,12 @@
             {
               "name": "MY_OTHER_ARR",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -44,7 +54,12 @@
             {
               "name": "MY_THIRD_ARR",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -57,11 +72,20 @@
             {
               "name": "REGULAR_PROP",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_ARRAY",
+        "name": "TestArray"
+      }
     }
   ],
   "notes": ""

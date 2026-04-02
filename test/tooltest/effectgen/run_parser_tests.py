@@ -59,6 +59,11 @@ class StructExpectedResult:
     enum_type: str
     filter_name: str
     fields: List[FieldExpectedResult]
+    params: Dict[str, Any] = None  # All parsed params (as-is)
+
+    def __post_init__(self):
+        if self.params is None:
+            self.params = {}
 
 
 @dataclass
@@ -147,7 +152,8 @@ class TestRunner:
                             min_value=pa.get('min_value'),
                             max_value=pa.get('max_value')
                         ) for pa in f.get('prop_attributes', [])]
-                    ) for f in s.get('fields', [])]
+                    ) for f in s.get('fields', [])],
+                    params=s.get('params', {})
                 ) for s in result_data.get('structs', [])]
 
                 self.expected_results[test_case.file_path.stem] = TestCaseExpectedResult(
@@ -205,7 +211,8 @@ class TestRunner:
                     name=struct.name,
                     enum_type=struct.enum_type,
                     filter_name=struct.filter_name,
-                    fields=fields_data
+                    fields=fields_data,
+                    params=struct.params
                 )
                 structs_data.append(asdict(struct_data))
 
@@ -315,6 +322,29 @@ class TestRunner:
                         validation['differences'].append(
                             f"Struct {i+1} filter_name mismatch: expected '{exp_struct.filter_name}', got '{act_struct.filter_name}'"
                         )
+
+                    # Check params (all parsed params as-is)
+                    exp_params = exp_struct.params or {}
+                    act_params = act_struct.params or {}
+                    if exp_params != act_params:
+                        validation['passed'] = False
+                        # Find differences
+                        missing_keys = set(exp_params.keys()) - set(act_params.keys())
+                        extra_keys = set(act_params.keys()) - set(exp_params.keys())
+                        diff_keys = set(k for k in exp_params.keys() & act_params.keys() if exp_params[k] != act_params[k])
+
+                        if missing_keys:
+                            validation['differences'].append(
+                                f"Struct {i+1} params missing keys: {sorted(missing_keys)}"
+                            )
+                        if extra_keys:
+                            validation['differences'].append(
+                                f"Struct {i+1} params extra keys: {sorted(extra_keys)}"
+                            )
+                        for key in sorted(diff_keys):
+                            validation['differences'].append(
+                                f"Struct {i+1} params['{key}'] mismatch: expected '{exp_params[key]}', got '{act_params[key]}'"
+                            )
 
                     # Check fields
                     exp_fields = exp_struct.fields
@@ -429,7 +459,7 @@ class TestRunner:
         valid_files = sorted(self.valid_dir.glob("*.params"))
         for i, file_path in enumerate(valid_files, 1):
             test_case = TestCase(
-                name=f"valid_{i:02d}_{file_path.stem}",
+                name=f"[valid] {file_path.stem}",
                 file_path=file_path,
                 should_parse=True
             )
@@ -439,7 +469,7 @@ class TestRunner:
         invalid_files = sorted(self.invalid_dir.glob("*.params"))
         for i, file_path in enumerate(invalid_files, 1):
             test_case = TestCase(
-                name=f"invalid_{i:02d}_{file_path.stem}",
+                name=f"[invalid] {file_path.stem}",
                 file_path=file_path,
                 should_parse=False
             )
@@ -652,6 +682,10 @@ class TestRunner:
                     print(f"  Struct: {struct.name}")
                     print(f"  Enum Type: {struct.enum_type}")
                     print(f"  Filter Name: {struct.filter_name}")
+                    if struct.params:
+                        print(f"  Params ({len(struct.params)}):")
+                        for key, value in sorted(struct.params.items()):
+                            print(f"    - {key}: {value}")
                     print(f"  Fields ({len(struct.fields)}):")
                     for field in struct.fields:
                         default = f" = {field.default_value}" if field.default_value else ""

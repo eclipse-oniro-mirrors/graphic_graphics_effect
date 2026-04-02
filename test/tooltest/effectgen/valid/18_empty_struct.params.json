@@ -8,7 +8,11 @@
       "name": "TestEmptyParams",
       "enum_type": "TEST_EMPTY",
       "filter_name": "TestEmpty",
-      "fields": []
+      "fields": [],
+      "params": {
+        "type": "TEST_EMPTY",
+        "name": "TestEmpty"
+      }
     }
   ],
   "notes": ""

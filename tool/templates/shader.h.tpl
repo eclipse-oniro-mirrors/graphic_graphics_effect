@@ -21,6 +21,11 @@
 #include "ge_shader_filter_params.h"
 #include "effect/runtime_shader_builder.h"
 
+// Additional includes for complex shaders:
+// #include "common/rs_vector3.h"
+// #include "common/rs_vector4.h"
+// #include "utils/matrix.h"
+
 namespace OHOS {
 namespace Rosen {
 
@@ -35,9 +40,16 @@ public:
     DECLARE_GEFILTER_TYPEFUNC($CLASS_NAME, Drawing::$PARAMS_CLASS);
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
-    const std::string GetDescription() const { return "$CLASS_NAME"; }
+
+    // Optional: Override for preprocessing before shader generation
+    // void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
+    // Optional: Override for custom drawing behavior
+    // void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
+    static std::shared_ptr<Drawing::RuntimeEffect> GetEffect();
+
 $MEMBER_DECLARATIONS
 };
 

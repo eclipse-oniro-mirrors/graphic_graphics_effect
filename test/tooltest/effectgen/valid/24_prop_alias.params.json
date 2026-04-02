@@ -18,11 +18,20 @@
             {
               "name": "PropAlias_PrimaryName",
               "array_accessor_length": null,
-              "alias": "PropAlias_AliasName"
+              "array_accessor_type": null,
+              "alias": "PropAlias_AliasName",
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "PROP_ALIAS",
+        "name": "PropAlias"
+      }
     }
   ],
   "notes": ""

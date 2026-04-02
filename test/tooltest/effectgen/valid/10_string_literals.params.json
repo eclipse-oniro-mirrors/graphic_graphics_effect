@@ -45,7 +45,11 @@
           "default_value": "C-style string",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_STRINGS",
+        "name": "TestStrings"
+      }
     }
   ],
   "notes": ""

@@ -18,7 +18,12 @@
             {
               "name": "Custom_Property_Name",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -31,7 +36,12 @@
             {
               "name": "Another_Property",
               "array_accessor_length": null,
-              "alias": null
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
             }
           ]
         },
@@ -41,7 +51,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_ATTRS",
+        "name": "TestAttrs"
+      }
     }
   ],
   "notes": ""

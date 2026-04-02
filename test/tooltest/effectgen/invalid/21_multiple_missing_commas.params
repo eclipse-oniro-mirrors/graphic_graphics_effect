@@ -1,0 +1,8 @@
+/*
+ * Invalid: Multiple missing commas in sequence
+ */
+
+struct [[ge::params(type=TEST_MULTI_NO_COMMA name="TestMultiNoComma" count=1 flag=true)]] TestMultiNoCommaParams {
+    float value1;
+    int value2;
+};

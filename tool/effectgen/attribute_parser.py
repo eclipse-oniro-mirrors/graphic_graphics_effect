@@ -13,46 +13,31 @@ from dataclasses import dataclass
 from tool.effectgen.cpp_tokenizer import Token
 
 
+@dataclass
+class SplitResult:
+    """Result of splitting parameters by commas."""
+    parts: List[str]
+    errors: List[str]
+    in_string: bool
+    in_raw_string: bool
+    bracket_counts: Dict[str, int]
+    reported_raw_string_error: bool
+
+
 class AttributeParser:
     """Parse C++ attributes like [[ge::params(type=AIBAR, name="AIBAR")]]."""
 
     @staticmethod
-    def parse_attribute(attr_token: Token) -> Dict[str, Any]:
-        """Parse an attribute token and return a dict of key-value pairs."""
-        content = attr_token.value[2:-2]  # Remove [[ and ]]
-        content = content.strip()
-
-        # Find the function call pattern: ge::params(type=AIBAR, name="AIBAR")
-        match = re.match(r"(\w+)\s*::\s*(\w+)\s*\((.*)\)\s*", content, re.DOTALL)
-        if not match:
-            return {}
-
-        namespace = match.group(1)
-        function = match.group(2)
-        params_str = match.group(3).strip()
-
-        # Parse C#/Rust style: type=AIBAR, name="AIBAR"
-        params, errors = AttributeParser._parse_params(params_str, attr_token.line, attr_token.column)
-
-        return {"namespace": namespace, "function": function, "params": params, "errors": errors}
-
-    @staticmethod
-    def _parse_params(s: str, line: int, column: int) -> Tuple[Dict[str, Any], List[str]]:
-        """Parse C#/Rust style key=value attributes."""
-        result = {}
-        errors = []
-        s = s.strip()
-
-        # Split by commas (not inside quotes, parentheses, brackets, or braces)
+    def _split_params_by_commas(s: str) -> SplitResult:
+        """Split parameters by commas, respecting quotes, brackets, and raw strings."""
         parts = []
-        depth = 0  # Tracks combined depth of all brackets
+        errors = []
+        depth = 0
         in_string = False
         in_raw_string = False
-        reported_raw_string_error = False  # Track if we already reported a specific raw string error
+        reported_raw_string_error = False
         escape = False
         current = []
-
-        # Track individual bracket types for detailed validation
         bracket_counts = {"(": 0, "[": 0, "{": 0}
 
         i = 0
@@ -61,43 +46,34 @@ class AttributeParser:
 
             # Handle raw string literals: R"delimiter(...)delimiter"
             if not in_string and not in_raw_string and ch == "R" and i + 1 < len(s) and s[i + 1] == '"':
-                # Start of raw string literal
-                # Add the R" to current
                 current.append(ch)
                 current.append(s[i + 1])
-                i += 2  # Skip R"
+                i += 2
 
-                # Extract the delimiter (everything between R" and ()
                 delimiter = []
                 while i < len(s) and s[i] != "(":
                     delimiter.append(s[i])
                     current.append(s[i])
                     i += 1
 
-                # Check for opening parenthesis
                 if i >= len(s) or s[i] != "(":
-                    errors.append(f"line {line}, column {column}: Invalid raw string literal (missing opening '(' after R\"delimiter)")
-                    # Try to recover
+                    errors.append(f"Invalid raw string literal (missing opening '(' after R\"delimiter)")
                     in_raw_string = True
                 else:
                     delimiter_str = "".join(delimiter)
-                    current.append(s[i])  # Add '('
+                    current.append(s[i])
                     i += 1
 
-                    # Find the closing sequence: )delimiter"
                     closing_seq = ")" + delimiter_str + '"'
                     closing_pos = s.find(closing_seq, i)
 
                     if closing_pos == -1:
-                        # Unterminated raw string
-                        errors.append(f"line {line}, column {column}: Unterminated raw string literal (missing closing ')delimiter\"')")
+                        errors.append(f"Unterminated raw string literal (missing closing ')delimiter\"')")
                         reported_raw_string_error = True
-                        # Add rest of string to current and exit
                         current.extend(s[i:])
                         in_raw_string = True
                         break
                     else:
-                        # Add everything up to (and including) the closing sequence
                         current.extend(s[i : closing_pos + len(closing_seq)])
                         i = closing_pos + len(closing_seq)
                 continue
@@ -112,8 +88,6 @@ class AttributeParser:
                 i += 1
             elif ch == '"' and not escape:
                 if in_raw_string:
-                    # This should be the closing " of a raw string, but we already handled it above
-                    # If we get here, something went wrong
                     in_raw_string = False
                 in_string = not in_string
                 current.append(ch)
@@ -141,7 +115,6 @@ class AttributeParser:
                         bracket_counts["{"] -= 1
                         depth -= 1
                 elif ch == "," and depth == 0:
-                    # Only split on commas at depth 0 (outside all brackets)
                     parts.append("".join(current))
                     current = []
                     i += 1
@@ -149,95 +122,133 @@ class AttributeParser:
                 current.append(ch)
                 i += 1
             else:
-                # Inside a string or raw string - just append
                 current.append(ch)
                 i += 1
 
         if current:
             parts.append("".join(current))
 
-        # Validate: all strings must be closed
-        if (in_string or in_raw_string) and not reported_raw_string_error:
-            string_type = "raw string" if in_raw_string else "string"
-            errors.append(f"line {line}, column {column}: Unterminated {string_type} literal in attribute")
+        return SplitResult(
+            parts=parts,
+            errors=errors,
+            in_string=in_string,
+            in_raw_string=in_raw_string,
+            bracket_counts=bracket_counts,
+            reported_raw_string_error=reported_raw_string_error
+        )
 
-        # Validate: all brackets must be balanced
-        for bracket, count in bracket_counts.items():
+    @staticmethod
+    def _validate_split_result(split_result: SplitResult) -> List[str]:
+        """Validate the split result for unterminated strings and unbalanced brackets."""
+        errors = []
+        
+        if (split_result.in_string or split_result.in_raw_string) and not split_result.reported_raw_string_error:
+            string_type = "raw string" if split_result.in_raw_string else "string"
+            errors.append(f"Unterminated {string_type} literal in attribute")
+
+        for bracket, count in split_result.bracket_counts.items():
             if count > 0:
-                errors.append(f"line {line}, column {column}: Unmatched '{bracket}' in attribute (missing {count} closing '{bracket}')")
+                errors.append(f"Unmatched '{bracket}' in attribute (missing {count} closing '{bracket}')")
 
-        # Parse each part: key=value or key="string"
-        for i, part in enumerate(parts):
+        return errors
+
+    @staticmethod
+    def _check_missing_comma(part: str, key: str) -> Optional[str]:
+        """Check if there's a missing comma after a parameter value."""
+        eq_idx = part.index("=")
+        value_with_rest = part[eq_idx + 1 :].strip()
+        
+        if value_with_rest.startswith('"'):
+            if value_with_rest.startswith('R"'):
+                paren_pos = value_with_rest.find("(")
+                if paren_pos > 0:
+                    delimiter = value_with_rest[3:paren_pos]
+                    closing_seq = ")" + delimiter + '"'
+                    end_raw = value_with_rest.find(closing_seq, paren_pos)
+                    if end_raw > 0:
+                        after_value = value_with_rest[end_raw + len(closing_seq) :].strip()
+                    else:
+                        after_value = ""
+                else:
+                    after_value = ""
+            else:
+                end_quote = value_with_rest.find('"', 1)
+                if end_quote > 0:
+                    after_value = value_with_rest[end_quote + 1 :].strip()
+                else:
+                    after_value = ""
+            if after_value and "=" in after_value:
+                return f"Missing comma in attribute parameters (after '{key}')"
+        else:
+            remaining = value_with_rest
+            if re.search(r"\s+[a-zA-Z_]\w*=", remaining):
+                return f"Missing comma in attribute parameters (after '{key}')"
+        
+        return None
+
+    @staticmethod
+    def parse_attribute(attr_token: Token) -> Dict[str, Any]:
+        """Parse an attribute token and return a dict of key-value pairs."""
+        content = attr_token.value[2:-2]  # Remove [[ and ]]
+        content = content.strip()
+
+        # Find the function call pattern: ge::params(type=AIBAR, name="AIBAR")
+        match = re.match(r"(\w+)\s*::\s*(\w+)\s*\((.*)\)\s*", content, re.DOTALL)
+        if not match:
+            if content.startswith("ge::"):
+                return {"errors": [f"Malformed attribute: could not parse '{content}'"]}
+            return {}
+
+        namespace = match.group(1)
+        function = match.group(2)
+        params_str = match.group(3).strip()
+
+        # Parse C#/Rust style: type=AIBAR, name="AIBAR"
+        params, errors = AttributeParser._parse_params(params_str)
+
+        return {"namespace": namespace, "function": function, "params": params, "errors": errors}
+
+    @staticmethod
+    def _parse_params(s: str) -> Tuple[Dict[str, Any], List[str]]:
+        """Parse C#/Rust style key=value attributes."""
+        result = {}
+        errors = []
+        s = s.strip()
+
+        split_result = AttributeParser._split_params_by_commas(s)
+        parts = split_result.parts
+        errors.extend(split_result.errors)
+        
+        validation_errors = AttributeParser._validate_split_result(split_result)
+        errors.extend(validation_errors)
+
+        for part in parts:
             part = part.strip()
             if not part:
                 continue
 
             if "=" in part:
-                # Split only on the first '=' to handle values that contain '='
                 eq_idx = part.index("=")
                 key = part[:eq_idx].strip()
                 value = part[eq_idx + 1 :].strip()
-                # Remove quotes from string values (but not from raw strings)
+                
                 if value.startswith('"') and value.endswith('"'):
-                    # Check if it's a raw string (starts with R")
                     if not value.startswith('R"'):
                         value = value[1:-1]
                 result[key] = value
 
-                # Check for missing comma: look for unquoted identifier followed by '=' after the value
-                # For example: type=TEST_NO_COMMA name="TestNoComma" - the "name=" part indicates missing comma
-                value_with_rest = part[eq_idx + 1 :].strip()
-                if value_with_rest.startswith('"'):
-                    # Quoted string - find closing quote and check if there's content after it
-                    # For raw strings, we need to find the closing )delimiter"
-                    if value_with_rest.startswith('R"'):
-                        # Raw string - find the closing sequence
-                        paren_pos = value_with_rest.find("(")
-                        if paren_pos > 0:
-                            delimiter = value_with_rest[3:paren_pos]  # Between R" and (
-                            closing_seq = ")" + delimiter + '"'
-                            end_raw = value_with_rest.find(closing_seq, paren_pos)
-                            if end_raw > 0:
-                                after_value = value_with_rest[end_raw + len(closing_seq) :].strip()
-                            else:
-                                after_value = ""
-                        else:
-                            after_value = ""
-                    else:
-                        # Regular string - find closing quote
-                        end_quote = value_with_rest.find('"', 1)
-                        if end_quote > 0:
-                            after_value = value_with_rest[end_quote + 1 :].strip()
-                        else:
-                            after_value = ""
-                    if after_value and "=" in after_value:
-                        errors.append(f"line {line}, column {column}: Missing comma in attribute parameters (after '{key}')")
-                else:
-                    # Unquoted value - check if there's space followed by identifier=
-                    # Look for pattern like: value name="..." or value name=...
-                    remaining = value_with_rest
-                    import re as re_internal
-
-                    # Match: whitespace followed by identifier followed by =
-                    if re_internal.search(r"\s+[a-zA-Z_]\w*=", remaining):
-                        errors.append(f"line {line}, column {column}: Missing comma in attribute parameters (after '{key}')")
+                missing_comma_error = AttributeParser._check_missing_comma(part, key)
+                if missing_comma_error:
+                    errors.append(missing_comma_error)
             else:
-                # Single value without a key (e.g., ge::prop("value"))
-                # If we have exactly one part and it's a valid value, store it as _value
-                # If we have multiple parts without equals, this might be a missing comma error
                 if len(parts) == 1:
-                    # This is a single value like "Custom_Property_Name"
                     value = part.strip()
-                    # Remove quotes from string values
                     if value.startswith('"') and value.endswith('"') and not value.startswith('R"'):
                         value = value[1:-1]
                     result["_value"] = value
                 else:
-                    # Multiple parts without equals - likely a missing comma error
-                    # e.g., "type=TEST name=VALUE" instead of "type=TEST, name=VALUE"
-                    errors.append(f"line {line}, column {column}: Missing comma or equals in attribute parameters (near '{part}')")
+                    errors.append(f"Missing comma or equals in attribute parameters (near '{part}')")
 
-        # Backward compatibility: if there's a single _value and no 'name' key, treat it as 'name'
         if "_value" in result and "name" not in result and "NAME" not in result:
             result["name"] = result["_value"]
 

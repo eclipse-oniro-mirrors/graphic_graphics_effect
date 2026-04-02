@@ -1,0 +1,8 @@
+/*
+ * Valid: Raw string with multi-character delimiter R"delim(...)delim"
+ */
+
+struct [[ge::params(type=TEST_RAW_STRING_MULTI_DELIM, name="TestRawStringMultiDelim", pattern=R"DELIM(\w+\d+)DELIM")]] TestRawStringMultiDelimParams {
+    float value1;
+    int value2;
+};

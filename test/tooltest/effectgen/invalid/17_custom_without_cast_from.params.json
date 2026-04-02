@@ -1,6 +1,6 @@
 {
   "name": "17_custom_without_cast_from",
-  "should_parse": true,
+  "should_parse": false,
   "expected_error_count": 0,
   "expected_errors": [],
   "structs": [
@@ -18,6 +18,7 @@
             {
               "name": "FIELD1X",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
               "cast_from": null,
               "custom": "MyTransformer",
@@ -26,8 +27,12 @@
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_PROP_INVALID_CUSTOM",
+        "name": "TestPropInvalidCustom"
+      }
     }
   ],
-  "notes": "custom without cast_from is allowed by parser but may cause issues in code generation"
+  "notes": ""
 }

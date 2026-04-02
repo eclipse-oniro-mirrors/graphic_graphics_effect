@@ -1,0 +1,36 @@
+{
+  "name": "10_invalid_raw_string_format",
+  "should_parse": false,
+  "expected_error_count": 2,
+  "expected_errors": [
+    "invalid/10_invalid_raw_string_format.params:line 5, column 8: Invalid raw string literal (missing opening '(' after R\"delimiter)",
+    "invalid/10_invalid_raw_string_format.params:line 5, column 8: Unterminated raw string literal in attribute"
+  ],
+  "structs": [
+    {
+      "name": "TestInvalidRawStrParams",
+      "enum_type": "TEST_INVALID_RAW_STR",
+      "filter_name": "TestInvalidRawStr",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ],
+      "params": {
+        "type": "TEST_INVALID_RAW_STR",
+        "name": "TestInvalidRawStr",
+        "pattern": "R\"DELIM\\w+"
+      }
+    }
+  ],
+  "notes": ""
+}

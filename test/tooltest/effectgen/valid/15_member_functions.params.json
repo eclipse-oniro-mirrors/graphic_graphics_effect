@@ -27,7 +27,11 @@
           "default_value": "3.14",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_MEMBER_FUNCS",
+        "name": "TestMemberFuncs"
+      }
     }
   ],
   "notes": ""

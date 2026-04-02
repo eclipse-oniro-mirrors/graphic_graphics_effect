@@ -69,6 +69,7 @@ class StructInfo:
     filter_name: str
     fields: List[FieldInfo] = field(default_factory=list)
     errors: List[ParseError] = field(default_factory=list)
+    params: Dict[str, Any] = field(default_factory=dict)  # All parsed params (as-is)
 
 
 class CppParser:
@@ -187,10 +188,12 @@ class CppParser:
         # Parse attributes to extract params info
         enum_type = None
         filter_name = None
+        all_params = {}  # Store all params as-is
         for attr in attributes:
             parsed = AttributeParser.parse_attribute(attr)
             if parsed.get("namespace") == "ge" and parsed.get("function") == "params":
                 params = parsed.get("params", {})
+                all_params = params.copy()  # Store all params
                 enum_type = params.get("type")
                 filter_name = params.get("name")
 
@@ -236,7 +239,7 @@ class CppParser:
         else:
             self._consume()  # Consume }
 
-        return StructInfo(name=struct_name, enum_type=enum_type, filter_name=filter_name, fields=fields, errors=struct_errors)
+        return StructInfo(name=struct_name, enum_type=enum_type, filter_name=filter_name, fields=fields, errors=struct_errors, params=all_params)
 
     def _add_error(self, message: str, line: int, column: int):
         """Add a parsing error."""

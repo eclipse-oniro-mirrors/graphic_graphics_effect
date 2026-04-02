@@ -1,0 +1,8 @@
+/*
+ * Valid: Mixed bracket types in attribute value
+ */
+
+struct [[ge::params(type=TEST_MIXED_BRACKETS, name="TestMixedBrackets", data={[({1, 2}, {3, 4}), ({5, 6}, {7, 8})]})]] TestMixedBracketsParams {
+    float value1;
+    int value2;
+};

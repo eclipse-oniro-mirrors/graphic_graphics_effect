@@ -21,7 +21,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_MULTI_1",
+        "name": "TestMulti1"
+      }
     },
     {
       "name": "TestMulti2Params",
@@ -40,7 +44,11 @@
           "default_value": "3.14",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_MULTI_2",
+        "name": "TestMulti2"
+      }
     },
     {
       "name": "TestMulti3Params",
@@ -65,7 +73,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_MULTI_3",
+        "name": "TestMulti3"
+      }
     }
   ],
   "notes": ""

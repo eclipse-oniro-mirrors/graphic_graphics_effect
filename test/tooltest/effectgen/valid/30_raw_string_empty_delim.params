@@ -1,0 +1,8 @@
+/*
+ * Valid: Raw string with empty delimiter R"(...)"
+ */
+
+struct [[ge::params(type=TEST_RAW_STRING_EMPTY_DELIM, name="TestRawStringEmptyDelim", pattern=R"(\w+)")]] TestRawStringEmptyDelimParams {
+    float value1;
+    int value2;
+};

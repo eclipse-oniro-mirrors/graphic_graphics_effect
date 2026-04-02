@@ -1,0 +1,8 @@
+/*
+ * Invalid: Invalid raw string format (missing opening paren after delimiter)
+ */
+
+struct [[ge::params(type=TEST_INVALID_RAW_STR, name="TestInvalidRawStr", pattern=R"DELIM\w+) ]] TestInvalidRawStrParams {
+    float value1;
+    int value2;
+};

@@ -1,0 +1,8 @@
+/*
+ * Valid: Empty string value in attribute
+ */
+
+struct [[ge::params(type=TEST_EMPTY_STRING, name="TestEmptyString", pattern="")]] TestEmptyStringParams {
+    float value1;
+    int value2;
+};

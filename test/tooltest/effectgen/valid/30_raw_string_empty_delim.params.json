@@ -1,0 +1,33 @@
+{
+  "name": "30_raw_string_empty_delim",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestRawStringEmptyDelimParams",
+      "enum_type": "TEST_RAW_STRING_EMPTY_DELIM",
+      "filter_name": "TestRawStringEmptyDelim",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ],
+      "params": {
+        "type": "TEST_RAW_STRING_EMPTY_DELIM",
+        "name": "TestRawStringEmptyDelim",
+        "pattern": "R\"(\\w+)\""
+      }
+    }
+  ],
+  "notes": ""
+}

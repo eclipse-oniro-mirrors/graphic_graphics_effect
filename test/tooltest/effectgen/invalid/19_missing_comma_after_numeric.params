@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing comma after numeric value
+ */
+
+struct [[ge::params(type=TEST_NO_COMMA_NUMERIC name="TestNoCommaNumeric" count=123)]] TestNoCommaNumericParams {
+    float value1;
+    int value2;
+};

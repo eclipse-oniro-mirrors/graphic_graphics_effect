@@ -105,7 +105,11 @@
           "default_value": "{{1,1.0f},{2,2.0f}}",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_CPP11_BRACE",
+        "name": "TestCpp11Brace"
+      }
     }
   ],
   "notes": ""

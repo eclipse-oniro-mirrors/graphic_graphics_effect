@@ -1,0 +1,8 @@
+/*
+ * Invalid: Missing comma after identifier value
+ */
+
+struct [[ge::params(type=TEST_NO_COMMA_IDENT name="TestNoCommaIdent" mode=enabled)]] TestNoCommaIdentParams {
+    float value1;
+    int value2;
+};

@@ -1,0 +1,8 @@
+/*
+ * Valid: Multiple parameters with various value types
+ */
+
+struct [[ge::params(type=TEST_MULTI_VALUE_TYPES, name="TestMultiValueTypes", str_val="hello", num_val=42, float_val=3.14, bool_val=true)]] TestMultiValueTypesParams {
+    float value1;
+    int value2;
+};

@@ -1,0 +1,33 @@
+{
+  "name": "32_raw_string_nested_paren",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestRawStringNestedParenParams",
+      "enum_type": "TEST_RAW_STRING_NESTED_PAREN",
+      "filter_name": "TestRawStringNestedParen",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": ""
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": ""
+        }
+      ],
+      "params": {
+        "type": "TEST_RAW_STRING_NESTED_PAREN",
+        "name": "TestRawStringNestedParen",
+        "pattern": "R\"(\\w+(\\d+)+)\""
+      }
+    }
+  ],
+  "notes": ""
+}

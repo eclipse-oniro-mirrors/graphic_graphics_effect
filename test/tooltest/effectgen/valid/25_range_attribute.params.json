@@ -18,7 +18,10 @@
             {
               "name": "PROGRESSX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0.0",
               "max_value": "1.0"
             }
@@ -33,7 +36,10 @@
             {
               "name": "RADIUSX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0.0",
               "max_value": null
             }
@@ -48,7 +54,10 @@
             {
               "name": "INTENSITYX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": null,
               "max_value": "10.0"
             }
@@ -63,7 +72,10 @@
             {
               "name": "NORMALIZED_COORDX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0.0",
               "max_value": "1.0"
             }
@@ -78,7 +90,10 @@
             {
               "name": "POSITIONX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0.0",
               "max_value": "10.0"
             }
@@ -93,7 +108,10 @@
             {
               "name": "COLORX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0.0",
               "max_value": "1.0"
             }
@@ -108,7 +126,10 @@
             {
               "name": "KBSX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "{0.0, 0.0, -1.0}",
               "max_value": "{10.0, 10.0, 1.0}"
             }
@@ -123,7 +144,10 @@
             {
               "name": "ASYMMETRICX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "{0.0, 0.0}",
               "max_value": "{1.0, 2.0}"
             }
@@ -138,7 +162,10 @@
             {
               "name": "COUNTX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "0",
               "max_value": "100"
             }
@@ -153,13 +180,20 @@
             {
               "name": "OFFSETX",
               "array_accessor_length": null,
+              "array_accessor_type": null,
               "alias": null,
+              "cast_from": null,
+              "custom": null,
               "min_value": "-50.0",
               "max_value": "50.0"
             }
           ]
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_RANGE",
+        "name": "TestRange"
+      }
     }
   ],
   "notes": ""

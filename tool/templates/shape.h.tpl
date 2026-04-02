@@ -19,6 +19,11 @@
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
+// Additional includes for complex shapes:
+// #include "effect/runtime_shader_builder.h"
+// #include "ge_shader.h"
+// #include "ge_visual_effect_impl.h"
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
@@ -37,6 +42,13 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
 private:
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder() const;
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder() const;
+
+    // Optional: Common implementation for both shader types
+    static std::shared_ptr<ShaderEffect> GenerateShaderEffect(
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
+
 $MEMBER_DECLARATIONS
 };
 

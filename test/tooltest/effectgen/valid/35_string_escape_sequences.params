@@ -1,0 +1,8 @@
+/*
+ * Valid: String with escape sequences
+ */
+
+struct [[ge::params(type=TEST_STRING_ESCAPES, name="TestStringEscapes", pattern="\\w+\\d+\\s*")]] TestStringEscapesParams {
+    float value1;
+    int value2;
+};

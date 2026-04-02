@@ -1,0 +1,8 @@
+/*
+ * Invalid: Unmatched opening parenthesis in attribute
+ */
+
+struct [[ge::params(type=TEST_UNMATCHED_PAREN, name="TestUnmatchedParen", values=(1, 2, 3] ]] TestUnmatchedParenParams {
+    float value1;
+    int value2;
+};

@@ -57,7 +57,11 @@
           "default_value": "",
           "prop_name": ""
         }
-      ]
+      ],
+      "params": {
+        "type": "TEST_COMPLEX",
+        "name": "TestComplex"
+      }
     }
   ],
   "notes": ""
