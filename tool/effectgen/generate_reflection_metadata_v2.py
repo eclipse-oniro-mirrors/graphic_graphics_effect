@@ -24,6 +24,12 @@ from tool.effectgen.cpp_parser import CppParser, StructInfo, FieldInfo
 from tool.effectgen.cpp_tokenizer import CppTokenizer
 from tool.effectgen.value_parser import infer_numeric_type, parse_component_values
 
+# Import CLI utilities
+from tool.effectgen.cli_utils import Console
+
+# Global console instance
+console = Console()
+
 
 @dataclass
 class FilterTypeMacroInfo:
@@ -63,9 +69,9 @@ def load_config(config_path: Path) -> Dict[str, str]:
             config = json.load(f)
             type_aliases = config.get("type_aliases", {})
     except FileNotFoundError:
-        print(f"Warning: Config file not found at {config_path}", file=sys.stderr)
+        console.warning(f"Config file not found at {config_path}")
     except json.JSONDecodeError as e:
-        print(f"Warning: Failed to parse config file: {e}", file=sys.stderr)
+        console.warning(f"Failed to parse config file: {e}")
     return type_aliases
 
 
@@ -180,7 +186,7 @@ def parse_def_file(file_path: Path, report_errors: bool = True) -> Optional[Stru
     # Report errors if requested
     if report_errors and parser.errors:
         for error in parser.errors:
-            print(f"  {error}", file=sys.stderr)
+            console.error(f"  {error}")
 
     # Return the first (and typically only) struct
     if structs:
@@ -222,7 +228,7 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
 
                     macro_infos.append(FilterTypeMacroInfo(filter_class=filter_class, params_type=params_type, header_file=header_include))
             except Exception as e:
-                print(f"  Warning: Failed to scan {header_file}: {e}", file=sys.stderr)
+                console.warning(f"Failed to scan {header_file}: {e}")
 
     return macro_infos
 
@@ -698,6 +704,7 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
             error_lines.append(f"\n  String '{prop_name}' is used by multiple fields:")
             for struct_name, tag_name in tags:
                 error_lines.append(f"    - {struct_name}::{tag_name}")
+        console.error("\n".join(error_lines))
         raise RuntimeError("\n".join(error_lines))
 
     output.append("GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)")
@@ -1369,91 +1376,86 @@ Examples:
             root_dir / "include" / "effect" / "shape",
         ]
     filter_type_info_file = (
-        Path(args.filter_type_info_file) if args.filter_type_info_file 
-                                         else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
+        Path(args.filter_type_info_file) if args.filter_type_info_file
+                                          else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
     )
 
-    # Load type aliases from config
+    console.header("Loading configuration")
     type_aliases = load_config(config_file)
-    print(f"Loaded {len(type_aliases)} type aliases from {config_file}")
+    console.info(f"Loaded {len(type_aliases)} type aliases from {config_file}")
 
+    console.header("Scanning for .params files")
     params_files = []
     for params_dir in params_dirs:
         params_files.extend(list(params_dir.glob("*.params")))
     params_files.sort(key=lambda p: p.name)
 
     if not params_files:
-        print(f"No .params files found in {params_dirs}", file=sys.stderr)
+        console.error(f"No .params files found in {params_dirs}")
+        console.summary()
         return 1
 
-    print(f"Found {len(params_files)} .params files in {params_dirs}")
+    console.info(f"Found {len(params_files)} .params files in:")
+    for params_dir in params_dirs:
+        console.step(f"{params_dir}")
 
+    console.header("Parsing params definition files")
     structs = []
     for params_file in params_files:
         struct_info = parse_def_file(params_file)
         if struct_info:
             structs.append(struct_info)
-            print(f"  Parsed: {struct_info.name}")
+            console.step(f"Parsed: {struct_info.name}")
         else:
-            print(f"  Warning: Failed to parse {params_file.name}", file=sys.stderr)
+            console.warning(f"Failed to parse {params_file.name}")
 
     if not structs:
-        print("No valid structs found!", file=sys.stderr)
+        console.error("No valid structs found!")
+        console.summary()
         return 1
 
-    print(f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
+    console.info(f"Parsed {len(structs)} structs with {sum(len(s.fields) for s in structs)} total fields")
 
-    # Scan for DECLARE_GEFILTER_TYPEFUNC macros
-    print(f"Scanning for DECLARE_GEFILTER_TYPEFUNC macros...")
+    console.header("Scanning for DECLARE_GEFILTER_TYPEFUNC macros")
     macro_infos = scan_declare_gefilter_typefunc(effect_dirs)
-    print(f"Found {len(macro_infos)} DECLARE_GEFILTER_TYPEFUNC macros")
+    console.info(f"Found {len(macro_infos)} DECLARE_GEFILTER_TYPEFUNC macros")
 
     for info in macro_infos:
-        print(f"  {info.filter_class} -> {info.params_type}")
+        console.step(f"{info.filter_class} -> {info.params_type}")
 
-    # Generate header file
-    print(f"Generating {output_file.name}...")
+    console.header("Generating reflection metadata")
+    console.step(f"Generating {output_file.name}...")
     header_content = generate_header(structs, type_aliases)
 
-    # Ensure output directory exists
     output_file.parent.mkdir(parents=True, exist_ok=True)
-
-    # Write to file
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(header_content)
 
-    print(f"Generated {output_file}")
-    print(f"  - {len(structs)} parameter types")
-    print(f"  - {sum(len(s.fields) for s in structs)} total fields")
+    console.file(f"Generated {output_file}")
+    console.info(f"  - {len(structs)} parameter types")
+    console.info(f"  - {sum(len(s.fields) for s in structs)} total fields")
 
-    # Generate cpp file
-    print(f"Generating {output_cpp_file.name}...")
+    console.step(f"Generating {output_cpp_file.name}...")
     cpp_content = generate_cpp(structs, type_aliases)
 
-    # Ensure output directory exists
     output_cpp_file.parent.mkdir(parents=True, exist_ok=True)
-
-    # Write to file
     with open(output_cpp_file, "w", encoding="utf-8") as f:
         f.write(cpp_content)
 
-    print(f"Generated {output_cpp_file}")
+    console.file(f"Generated {output_cpp_file}")
 
-    # Generate GEFilterTypeInfoV2 header file
-    print(f"Generating {filter_type_info_file.name}...")
+    console.step(f"Generating {filter_type_info_file.name}...")
     filter_type_info_content = generate_filter_type_info_v2_header(macro_infos, structs)
 
-    # Ensure output directory exists
     filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
-
-    # Write to file
     with open(filter_type_info_file, "w", encoding="utf-8") as f:
         f.write(filter_type_info_content)
 
-    print(f"Generated {filter_type_info_file}")
-    print(f"  - {len(macro_infos)} filter type info specializations")
+    console.file(f"Generated {filter_type_info_file}")
+    console.info(f"  - {len(macro_infos)} filter type info specializations")
 
-    return 0
+    console.summary()
+    return 0 if console.error_count == 0 else 1
 
 
 if __name__ == "__main__":

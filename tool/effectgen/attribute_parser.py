@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Attribute Parser for C++ attributes.
 

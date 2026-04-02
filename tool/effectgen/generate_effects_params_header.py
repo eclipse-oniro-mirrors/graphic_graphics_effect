@@ -6,9 +6,18 @@ This script generates a header file that includes all .params files from effect 
 The file is designed to be manually editable if needed.
 """
 
+import sys
 import re
 from pathlib import Path
 from typing import List
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
+# Import CLI utilities
+from tool.effectgen.cli_utils import Console
+
+# Global console instance
+console = Console()
 
 # Copyright header
 COPYRIGHT_HEADER = """/*
@@ -108,19 +117,26 @@ def main():
         root_dir / "include" / "effect" / "shape",
     ]
 
+    console.header("Scanning for .params files")
+
     existing_dirs = [d for d in params_dirs if d.exists()]
     if not existing_dirs:
-        print(f"Error: No params directories found in {params_dirs}")
+        console.error(f"No params directories found in {params_dirs}")
+        console.summary()
         return 1
 
     params_files = get_params_files(params_dirs)
     if not params_files:
-        print(f"No .params files found in {params_dirs}")
+        console.error(f"No .params files found in {params_dirs}")
+        console.summary()
         return 1
 
-    print(f"Found {len(params_files)} .params files")
+    console.info(f"Found {len(params_files)} .params files")
+    for params_file in params_files:
+        console.file(f"  {params_file.name}")
 
-    print(f"Generating {output_file.name}...")
+    console.header("Generating ge_effects_params.h")
+    console.step(f"Generating {output_file.name}...")
     header_content = generate_header()
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -128,8 +144,10 @@ def main():
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(header_content)
 
-    print(f"Generated {output_file}")
-    print(f"  - {len(params_files)} parameter definition files included")
+    console.file(f"Generated {output_file}")
+    console.info(f"  - {len(params_files)} parameter definition files included")
+
+    console.summary()
     return 0
 
 
