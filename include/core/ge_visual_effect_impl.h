@@ -227,6 +227,16 @@ public:
         return sdfEdgeLightParams_;
     }
 
+    void MakeSdfEdgeLightEffectParams()
+    {
+        sdfEdgeLightEffectParams_ = std::make_shared<GESDFEdgeLightEffectParams>();
+    }
+
+    const std::shared_ptr<GESDFEdgeLightEffectParams>& GetSDFEdgeLightEffectParams() const
+    {
+        return sdfEdgeLightEffectParams_;
+    }
+
     void MakeSdfFromImageParams()
     {
         sdfFromImageParams_ = std::make_shared<GESDFFromImageFilterParams>();
@@ -271,7 +281,7 @@ public:
     {
         dotMatrixShaderParams_ = std::make_shared<GEDotMatrixShaderParams>();
     }
- 
+
     const std::shared_ptr<GEDotMatrixShaderParams>& GetDotMatrixShaderParams() const
     {
         return dotMatrixShaderParams_;
@@ -824,6 +834,8 @@ private:
     void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
     void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetFrostedGlassBlurParams(const std::string& tag, const float param);
+    void SetSDFEdgeLightEffectParams(const std::string& tag, float param);
+    void SetSDFEdgeLightEffectParams(const std::string& tag, const Vector3f& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -861,6 +873,7 @@ private:
     std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
     std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
     std::shared_ptr<GESDFEdgeLightFilterParams> sdfEdgeLightParams_ = nullptr;
+    std::shared_ptr<GESDFEdgeLightEffectParams> sdfEdgeLightEffectParams_ = nullptr;
     std::shared_ptr<GESDFFromImageFilterParams> sdfFromImageParams_ = nullptr;
     std::shared_ptr<GEDistortionCollapseFilterParams> distortionCollapseParams_ = nullptr;
 

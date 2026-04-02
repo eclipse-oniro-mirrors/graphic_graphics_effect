@@ -36,6 +36,8 @@ public:
     
     DECLARE_GEFILTER_TYPEFUNC(GEWaveDisturbanceShaderMask, GEWaveDisturbanceShaderMaskParams);
 
+    Vector2f GetClickPos() { return params_.clickPos; }
+    void SetClickPos(const Vector2f& clickPos) { params_.clickPos = clickPos; }
     // for this class no difference here
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
