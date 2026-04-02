@@ -26,6 +26,6 @@ struct [[ge::params(type=AIBAR_GLOW, name="AIBarGlow")]] GEXAIBarGlowEffectParam
     std::array<std::pair<float, float>, 4> positions;
     [[ge::prop("AIBarGlow_Strength")]]
     Vector4f strengths;
-    float brightness;
-    float progress;
+    float brightness = 1.0f;
+    float progress = 0.0f;
 };
