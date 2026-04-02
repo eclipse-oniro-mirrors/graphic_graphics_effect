@@ -174,6 +174,14 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
     }
     return sdfRRectShapeShader;
 }
+
+bool GESDFRRectShaderShape::TryGetCenter(float& outX, float& outY) const
+{
+    const GERRect& rect = GetRRect();
+    outX = rect.left_ + rect.width_ * 0.5f;
+    outY = rect.top_ + rect.height_ * 0.5f;
+    return true;
+}
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
