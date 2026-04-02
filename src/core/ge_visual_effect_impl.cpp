@@ -689,9 +689,17 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             if (sdfFromImageParams_ == nullptr) {
                 return;
             }
-
             if (tag == GE_FILTER_SDF_FROM_IMAGE_SPREAD_FACTOR) {
                 sdfFromImageParams_->spreadFactor = param;
+            }
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE) {
+                sdfTransformShapeParams_->unionMode = param;
             }
             break;
         }
@@ -965,6 +973,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::SDF_EDGE_LIGHT_EFFECT: {
             SetSDFEdgeLightEffectParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH) {
+                sdfTransformShapeParams_->warpStrength = param;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING) {
+                sdfTransformShapeParams_->spacing = param;
+            }
             break;
         }
         case FilterType::SDF_TRIANGLE_SHAPE: {
@@ -1247,6 +1267,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER) {
+                sdfTransformShapeParams_->centerPosition = Vector2f(param.first, param.second);
+            }
             break;
         }
         case FilterType::SDF_TRIANGLE_SHAPE: {
@@ -2986,6 +3015,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, float par
     if (tag == GE_FILTER_FROSTED_GLASS_BGALPHA) {
         frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
     }
+
+    constexpr float maxColorLitmit = 15.0f;
+    if (tag == GE_FILTER_FROSTED_GLASS_MAXCOLOR) {
+        frostedGlassParams_->maxColor = std::clamp(param, 0.0f, maxColorLitmit);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -3267,6 +3301,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA) {
         frostedGlassEffectParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid range is between 0.0f and 1.0f
     }
+
+    constexpr float maxColorLitmit = 15.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MAXCOLOR) {
+        frostedGlassEffectParams_->maxColor = std::clamp(param, 0.0f, maxColorLitmit);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag,
@@ -3386,6 +3425,12 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL) {
         frostedGlassEffectParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
+    }
+
+    constexpr float maxValue = 20.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ANTIALIAS) {
+        frostedGlassEffectParams_->antiAlias = Vector2f(std::clamp(param.first, -maxValue, -1.0f),
+            std::clamp(param.second, 1.0f, maxValue));
     }
 }
 

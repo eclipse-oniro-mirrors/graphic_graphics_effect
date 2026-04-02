@@ -59,6 +59,13 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         thisPixelmap->CopyState(*pixelmapShape);
     }
 }
+
+bool GESDFShaderShape::TryGetCenter(float& outX, float& outY) const
+{
+    outX = 0.f;
+    outY = 0.f;
+    return false;
+}
 } // Drawing
 } // namespace Rosen
 } // namespace OHOS
