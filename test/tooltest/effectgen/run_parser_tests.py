@@ -652,7 +652,6 @@ class TestRunner:
     def run_all_tests(self):
         """Run all test cases."""
         print(f"Running {len(self.test_cases)} test cases...")
-        print("=" * 80)
 
         for test_case in self.test_cases:
             self.run_test(test_case)
