@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -169,9 +169,11 @@ TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
 };
 
 TagMap<GESpatialPointLightShaderParams> spatialPointLightTagMap_{
-    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, lightIntensity, float),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, lightIntensity,
+        float),
     ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_ATTENUATION, attenuation, float),
-    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_POSITION, lightPosition, Vector3f),
+    ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_POSITION, lightPosition,
+        Vector3f),
     ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_LIGHT_COLOR, lightColor, Vector4f),
     ADD_TAG_HANDLER(GESpatialPointLightShaderParams, GE_SHADER_SPATIAL_POINT_LIGHT_MASK, mask,
         std::shared_ptr<Drawing::GEShaderMask>),
