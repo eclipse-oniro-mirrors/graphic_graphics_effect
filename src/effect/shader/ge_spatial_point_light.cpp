@@ -95,7 +95,6 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
         GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader builder_ is nullptr.");
         return nullptr;
     }
-    
     builder_->SetUniform("iResolution", width, height);
     builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.x,
         pointLightParams_.lightPosition.y, pointLightParams_.lightPosition.z);
@@ -103,13 +102,10 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
         pointLightParams_.lightColor.y, pointLightParams_.lightColor.z, pointLightParams_.lightColor.w);
     builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     builder_->SetUniform("attenuation", pointLightParams_.attenuation);
-    
     if (pointLightParams_.mask != nullptr) {
         builder_->SetChild("maskSampler", pointLightParams_.mask->GetDrawingShader(rect, 0.0f));
     }
-    
     auto spatialPointLightShader = builder_->MakeShader(nullptr, false);
-
     if (spatialPointLightShader == nullptr) {
         GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader spatialPointLightShader is nullptr.");
         return nullptr;
