@@ -13,19 +13,25 @@
           "type": "float",
           "name": "value1",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "int",
           "name": "value2",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "double",
           "name": "value3",
           "default_value": "3.14",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         }
       ],
       "params": {

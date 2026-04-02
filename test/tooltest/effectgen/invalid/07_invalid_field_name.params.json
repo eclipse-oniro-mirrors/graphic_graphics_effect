@@ -15,7 +15,9 @@
           "type": "int",
           "name": "value2",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         }
       ],
       "params": {

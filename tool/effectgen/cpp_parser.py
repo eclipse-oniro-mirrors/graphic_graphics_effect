@@ -38,7 +38,7 @@ class ParseError:
 class PropAttribute:
     """Information about a single [[ge::prop]] attribute."""
 
-    name: str
+    name: Optional[str]
     array_accessor_length: Optional[int] = None
     array_accessor_type: Optional[str] = None
     alias: Optional[str] = None
@@ -706,7 +706,7 @@ class CppParser:
                 if current_prop_name or has_any_param:
                     prop_attributes.append(
                         PropAttribute(
-                            name=current_prop_name or "",
+                            name=current_prop_name,
                             array_accessor_length=current_array_length,
                             array_accessor_type=current_array_type,
                             cast_from=current_cast_from,

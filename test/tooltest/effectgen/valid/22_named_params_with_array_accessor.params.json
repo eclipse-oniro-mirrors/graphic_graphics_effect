@@ -14,6 +14,7 @@
           "name": "myArr",
           "default_value": "",
           "prop_name": "MY_ARR",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "MY_ARR",
@@ -32,6 +33,7 @@
           "name": "myOtherArr",
           "default_value": "",
           "prop_name": "MY_OTHER_ARR",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "MY_OTHER_ARR",
@@ -50,6 +52,7 @@
           "name": "myThirdArr",
           "default_value": "",
           "prop_name": "MY_THIRD_ARR",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "MY_THIRD_ARR",
@@ -68,6 +71,7 @@
           "name": "regularField",
           "default_value": "",
           "prop_name": "REGULAR_PROP",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "REGULAR_PROP",

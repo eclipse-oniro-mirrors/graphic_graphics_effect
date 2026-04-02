@@ -14,9 +14,10 @@
           "name": "progress",
           "default_value": "0.0f",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -32,9 +33,10 @@
           "name": "radius",
           "default_value": "1.0f",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -50,9 +52,10 @@
           "name": "intensity",
           "default_value": "5.0f",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -68,9 +71,10 @@
           "name": "coord",
           "default_value": "{0.5f,0.5f}",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -86,9 +90,10 @@
           "name": "position",
           "default_value": "{1.0f,1.0f,1.0f}",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -104,9 +109,10 @@
           "name": "color",
           "default_value": "{1.0f,1.0f,1.0f,1.0f}",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -122,9 +128,10 @@
           "name": "kbs",
           "default_value": "{1.0f,1.0f,0.0f}",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -140,9 +147,10 @@
           "name": "asymmetric",
           "default_value": "{0.5f,1.0f}",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -158,9 +166,10 @@
           "name": "count",
           "default_value": "50",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,
@@ -176,9 +185,10 @@
           "name": "offset",
           "default_value": "0.0f",
           "prop_name": "",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
-              "name": "",
+              "name": null,
               "array_accessor_length": null,
               "array_accessor_type": null,
               "alias": null,

@@ -13,25 +13,33 @@
           "type": "float",
           "name": "value1",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "int",
           "name": "value2",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "bool",
           "name": "flag",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "double",
           "name": "complex",
           "default_value": "1.23",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         }
       ],
       "params": {

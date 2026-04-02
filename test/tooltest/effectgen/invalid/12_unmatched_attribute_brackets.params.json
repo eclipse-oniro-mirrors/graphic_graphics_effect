@@ -16,6 +16,7 @@
           "name": "value1",
           "default_value": "1.0f",
           "prop_name": "value",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "value",

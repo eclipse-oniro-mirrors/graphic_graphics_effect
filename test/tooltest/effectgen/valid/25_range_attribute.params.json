@@ -14,6 +14,7 @@
           "name": "progress",
           "default_value": "0.0f",
           "prop_name": "PROGRESSX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "PROGRESSX",
@@ -32,6 +33,7 @@
           "name": "radius",
           "default_value": "1.0f",
           "prop_name": "RADIUSX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "RADIUSX",
@@ -50,6 +52,7 @@
           "name": "intensity",
           "default_value": "5.0f",
           "prop_name": "INTENSITYX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "INTENSITYX",
@@ -68,6 +71,7 @@
           "name": "coord",
           "default_value": "{0.5f,0.5f}",
           "prop_name": "NORMALIZED_COORDX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "NORMALIZED_COORDX",
@@ -86,6 +90,7 @@
           "name": "position",
           "default_value": "{1.0f,1.0f,1.0f}",
           "prop_name": "POSITIONX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "POSITIONX",
@@ -104,6 +109,7 @@
           "name": "color",
           "default_value": "{1.0f,1.0f,1.0f,1.0f}",
           "prop_name": "COLORX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "COLORX",
@@ -122,6 +128,7 @@
           "name": "kbs",
           "default_value": "{1.0f,1.0f,0.0f}",
           "prop_name": "KBSX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "KBSX",
@@ -140,6 +147,7 @@
           "name": "asymmetric",
           "default_value": "{0.5f,1.0f}",
           "prop_name": "ASYMMETRICX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "ASYMMETRICX",
@@ -158,6 +166,7 @@
           "name": "count",
           "default_value": "50",
           "prop_name": "COUNTX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "COUNTX",
@@ -176,6 +185,7 @@
           "name": "offset",
           "default_value": "0.0f",
           "prop_name": "OFFSETX",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "OFFSETX",

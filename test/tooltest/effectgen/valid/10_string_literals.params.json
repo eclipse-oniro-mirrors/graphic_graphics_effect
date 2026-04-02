@@ -13,37 +13,49 @@
           "type": "std::string",
           "name": "emptyString",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "helloString",
           "default_value": "Hello, World!",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "escapedString",
           "default_value": "Line1\\nLine2\\tTabbed",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "quotedString",
           "default_value": "He said \\\"Hello\\\"",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "pathString",
           "default_value": "C:\\\\Users\\\\Test\\\\file.txt",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "const char*",
           "name": "cString",
           "default_value": "C-style string",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         }
       ],
       "params": {

@@ -14,6 +14,7 @@
           "name": "destinationPatch",
           "default_value": "",
           "prop_name": "BEZIER_WARP_DESTINATION_PATCH",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "BEZIER_WARP_DESTINATION_PATCH",
@@ -42,6 +43,7 @@
           "name": "colorPalette",
           "default_value": "",
           "prop_name": "COLOR_PALETTE",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "COLOR_PALETTE",

@@ -13,97 +13,129 @@
           "type": "int",
           "name": "emptyInt",
           "default_value": "{}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "float",
           "name": "emptyFloat",
           "default_value": "{}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "double",
           "name": "emptyDouble",
           "default_value": "{}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "bool",
           "name": "emptyBool",
           "default_value": "{}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "int",
           "name": "singleInt",
           "default_value": "{42}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "float",
           "name": "singleFloat",
           "default_value": "{3.14f}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "double",
           "name": "singleDouble",
           "default_value": "{2.718}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "bool",
           "name": "singleBool",
           "default_value": "{true}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "int",
           "name": "tradInit",
           "default_value": "0",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "int",
           "name": "braceInit",
           "default_value": "{0}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "emptyStr",
           "default_value": "{}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::string",
           "name": "helloStr",
           "default_value": "{Hello, World!}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::shared_ptr<GEShaderMask>",
           "name": "mask",
           "default_value": "{nullptr}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::array<int,3>",
           "name": "arr",
           "default_value": "{1,2,3}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "Vector2f",
           "name": "vec2",
           "default_value": "{1.0f,2.0f}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "std::vector<std::pair<int,float>>",
           "name": "pairs",
           "default_value": "{{1,1.0f},{2,2.0f}}",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         }
       ],
       "params": {

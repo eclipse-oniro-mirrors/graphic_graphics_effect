@@ -14,6 +14,7 @@
           "name": "value1",
           "default_value": "1.0f",
           "prop_name": "Value1",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "Value1",
@@ -32,6 +33,7 @@
           "name": "value2",
           "default_value": "",
           "prop_name": "Value2",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "Value2",
@@ -50,6 +52,7 @@
           "name": "value3",
           "default_value": "3.14",
           "prop_name": "Value3",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "Value3",
@@ -67,13 +70,16 @@
           "type": "bool",
           "name": "flag",
           "default_value": "",
-          "prop_name": ""
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
         },
         {
           "type": "char",
           "name": "ch",
           "default_value": "x",
           "prop_name": "Value4",
+          "array_accessor_length": null,
           "prop_attributes": [
             {
               "name": "Value4",
