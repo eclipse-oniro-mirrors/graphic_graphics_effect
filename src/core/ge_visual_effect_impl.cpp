@@ -3606,3 +3606,6 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImpl::GetGEShaderSha
     return nullptr;
 }
 
+} // namespace Drawing
+} // namespace Rosen
+} // namespace OHOS
