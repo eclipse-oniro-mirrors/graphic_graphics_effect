@@ -148,6 +148,7 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/shape/ge_sdf_shadow_shader.cpp",
     "src/util/ge_system_properties.cpp",
     "src/util/ge_tone_mapping_helper.cpp",
+    "src/util/ge_transform_helper.cpp",
     "src/ext/ge_external_dynamic_loader.cpp",
     "src/ext/gex_marshalling_helper.cpp",
   ]
