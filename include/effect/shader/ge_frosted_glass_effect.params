@@ -15,12 +15,15 @@
 
 
 struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFrostedGlassEffectParams {
-    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
+    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f},
+               cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f weightsEmboss = Vector2f(1.0f, 1.0f); // (envLight, sd)
-    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
+    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f},
+               cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
     // Background darken parameters
-    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f},
+               cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f bgRates = Vector2f(-0.00003f, 1.2f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
@@ -36,7 +39,7 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     // Inner shadow parameters
     [[ge::prop(min={-500.0f, 0.0f, 1.0f}, max={500.0f, 250.0f, 250.0f})]]
     Vector3f sdParams = Vector3f(0.0f, 2.0f, 2.0f);
-    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f sdRates = Vector2f(0.0f, 0.0f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f sdKBS = Vector3f(-0.02f, 2.0f, 4.62f);
@@ -45,9 +48,9 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f sdNeg = Vector3f(1.7f, 3.0f, 1.0f);
     // Env refraction parameters
-    [[ge::prop(min={0.0f, 1.0f}, max={250.0f, 250.0f})]]
+    [[ge::prop(min={0.0f, 1.0f}, max={250.0f, 250.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f envLightParams = Vector2f(0.2745f, 2.0f);
-    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f envLightRates = Vector2f(0.0f, 0.0f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f envLightKBS = Vector3f(0.8f, 0.2745f, 2.0f);
@@ -56,13 +59,13 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f envLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     // Edge highlights parameters
-    [[ge::prop(min={0.0f, 0.0f}, max={500.0f, 500.0f})]]
+    [[ge::prop(min={0.0f, 0.0f}, max={500.0f, 500.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f edLightParams = Vector2f(2.0f, -1.0f);
-    [[ge::prop(min={0.0f, 0.0f}, max={360.0f, 360.0f})]]
+    [[ge::prop(min={0.0f, 0.0f}, max={360.0f, 360.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f edLightAngles = Vector2f(30.0f, 30.0f);
-    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f})]]
+    [[ge::prop(cast_from="std::pair<float,float>", custom="ClampFallbackTransformer")]]
     Vector2f edLightDir = Vector2f(-1.0f, 1.0f);
-    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f edLightRates = Vector2f(0.0f, 0.0f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
@@ -84,9 +87,9 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     // Dark mode parameters and scale
-    [[ge::prop(min={-5.0f, -5.0f}, max={5.0f, 5.0f})]]
+    [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f darkModeWeightsEmboss = Vector2f(1.0f, 1.0f);
-    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f darkModeBgRates = Vector2f(-0.00003f, 1.2f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f darkModeBgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
@@ -96,7 +99,7 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     Vector3f darkModeBgNeg = Vector3f(0.5f, 0.5f, 1.0f);
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f darkModeEdLightKBS = Vector3f(0.6027f, 0.64f, 2.0f);
-    [[ge::prop(min={0.0f, 0.0f}, max={360.0f, 360.0f})]]
+    [[ge::prop(min={0.0f, 0.0f}, max={360.0f, 360.0f}, cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
     [[ge::prop(min=0.0f, max=1.0f)]]
     float darkScale = 0.0f;

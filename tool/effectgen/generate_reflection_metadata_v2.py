@@ -970,20 +970,6 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     return "\n".join(output)
 
 
-def generate_range_constraint(tag: str, field_type: str, min_val: str, max_val: str) -> str:
-    """Generate constraint metadata for range (min + max)."""
-    if "{" in str(min_val) and "{" in str(max_val):
-        mins = parse_component_values(min_val)
-        maxs = parse_component_values(max_val)
-        if mins and maxs:
-            component_type = infer_numeric_type(mins[0])
-            mins_str = ", ".join(mins)
-            maxs_str = ", ".join(maxs)
-            return f"GE_PARAMS_CONSTRAINT_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}), ESCAPE({{{maxs_str}}}))"
-    else:
-        return f"GE_PARAMS_CONSTRAINT_RANGE({tag}, {field_type}, {min_val}, {max_val})"
-
-
 def generate_min_constraint(tag: str, field_type: str, min_val: str) -> str:
     """Generate constraint metadata for min only."""
     if "{" in str(min_val):
@@ -991,7 +977,7 @@ def generate_min_constraint(tag: str, field_type: str, min_val: str) -> str:
         if mins:
             component_type = infer_numeric_type(mins[0])
             mins_str = ", ".join(mins)
-            return f"GE_PARAMS_CONSTRAINT_COMPONENTS_MIN({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))"
+            return f"GE_PARAMS_CONSTRAINT_MIN_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))"
     else:
         return f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {min_val})"
 
@@ -1003,7 +989,7 @@ def generate_max_constraint(tag: str, field_type: str, max_val: str) -> str:
         if maxs:
             component_type = infer_numeric_type(maxs[0])
             maxs_str = ", ".join(maxs)
-            return f"GE_PARAMS_CONSTRAINT_COMPONENTS_MAX({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))"
+            return f"GE_PARAMS_CONSTRAINT_MAX_COMPONENTS({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))"
     else:
         return f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {max_val})"
 
@@ -1027,12 +1013,12 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
     # (if multiple prop attributes exist, only the first one defines constraints)
     prop_attr = field_info.prop_attributes[0]
 
-    # Handle range constraints (min/max)
-    if prop_attr.min_value is not None and prop_attr.max_value is not None:
-        output.append(generate_range_constraint(tag, field_type, prop_attr.min_value, prop_attr.max_value))
-    elif prop_attr.min_value is not None:
+    # Handle min constraint
+    if prop_attr.min_value is not None:
         output.append(generate_min_constraint(tag, field_type, prop_attr.min_value))
-    elif prop_attr.max_value is not None:
+
+    # Handle max constraint
+    if prop_attr.max_value is not None:
         output.append(generate_max_constraint(tag, field_type, prop_attr.max_value))
 
     # Handle convert constraints (cast_from/custom)
@@ -1044,111 +1030,50 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str) -> str:
 def generate_constraints(structs: List[StructInfo]):
     """Generate constraint macros and metadata"""
     output = []
-    # Generate constraint metadata macros
+    # Generate base constraint templates
     output.append("")
-    output.append("// Constraint Metadata Macros")
-    output.append("#define GE_PARAMS_CONSTRAINT_RANGE(Tag, Type, Min, Max) \\")
-    output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
-    output.append("        static constexpr bool HAS_MIN = true; \\")
-    output.append("        static constexpr bool HAS_MAX = true; \\")
-    output.append("        static constexpr Type MIN = Min; \\")
-    output.append("        static constexpr Type MAX = Max; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
-    output.append("    };")
-    output.append("")
-    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS(Tag, Type, Count, Mins, Maxs) \\")
-    output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
-    output.append("        static constexpr bool HAS_MIN = true; \\")
-    output.append("        static constexpr bool HAS_MAX = true; \\")
-    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
-    output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
-    output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
-    output.append("    };")
-    output.append("")
-    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MIN(Tag, Type, Count, Mins) \\")
-    output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
-    output.append("        static constexpr bool HAS_MIN = true; \\")
-    output.append("        static constexpr bool HAS_MAX = false; \\")
-    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
-    output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
-    output.append("    };")
-    output.append("")
-    output.append("#define GE_PARAMS_CONSTRAINT_COMPONENTS_MAX(Tag, Type, Count, Maxs) \\")
-    output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
-    output.append("        static constexpr bool HAS_MIN = false; \\")
-    output.append("        static constexpr bool HAS_MAX = true; \\")
-    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
-    output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
-    output.append("    };")
-    output.append("")
+    output.append("// Constraint Metadata Macros for Min Component")
     output.append("#define GE_PARAMS_CONSTRAINT_MIN(Tag, Type, Min) \\")
     output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("    struct GEParamsConstraintMinInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_MIN = true; \\")
-    output.append("        static constexpr bool HAS_MAX = false; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = 0; \\")
     output.append("        static constexpr Type MIN = Min; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
+    output.append("#define GE_PARAMS_CONSTRAINT_MIN_COMPONENTS(Tag, Type, Count, Mins) \\")
+    output.append("    template<> \\")
+    output.append("    struct GEParamsConstraintMinInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("        static constexpr bool HAS_MIN = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
+    output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
+    output.append("    };")
+    output.append("")
+    output.append("// Constraint Metadata Macros for Max Component")
     output.append("#define GE_PARAMS_CONSTRAINT_MAX(Tag, Type, Max) \\")
     output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = true; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
-    output.append("        static constexpr bool HAS_MIN = false; \\")
+    output.append("    struct GEParamsConstraintMaxInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_MAX = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = 0; \\")
     output.append("        static constexpr Type MAX = Max; \\")
-    output.append("        static constexpr bool HAS_CONVERT = false; \\")
-    output.append("        static constexpr bool HAS_CAST_FROM = false; \\")
-    output.append("        using CastFromType = void; \\")
-    output.append("        static constexpr bool HAS_CUSTOM = false; \\")
-    output.append("        using CustomTransformer = void; \\")
     output.append("    };")
     output.append("")
+    output.append("#define GE_PARAMS_CONSTRAINT_MAX_COMPONENTS(Tag, Type, Count, Maxs) \\")
+    output.append("    template<> \\")
+    output.append("    struct GEParamsConstraintMaxInfo<GEParamsMemberTag::Tag> { \\")
+    output.append("        static constexpr bool HAS_MAX = true; \\")
+    output.append("        static constexpr bool COMPONENT_WISE = true; \\")
+    output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
+    output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
+    output.append("    };")
+    output.append("")
+    output.append("// Constraint Metadata Macros for Convert Component")
     output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(Tag, _CastFromType) \\")
     output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = false; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
-    output.append("        static constexpr bool HAS_MIN = false; \\")
-    output.append("        static constexpr bool HAS_MAX = false; \\")
+    output.append("    struct GEParamsConstraintConvertInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_CONVERT = true; \\")
     output.append("        static constexpr bool HAS_CAST_FROM = true; \\")
     output.append("        using CastFromType = _CastFromType; \\")
@@ -1158,11 +1083,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(Tag, _CastFromType, _CustomTransformer) \\")
     output.append("    template<> \\")
-    output.append("    struct GEParamsConstraintInfo<GEParamsMemberTag::Tag> { \\")
-    output.append("        static constexpr bool HAS_RANGE = false; \\")
-    output.append("        static constexpr bool COMPONENT_WISE = false; \\")
-    output.append("        static constexpr bool HAS_MIN = false; \\")
-    output.append("        static constexpr bool HAS_MAX = false; \\")
+    output.append("    struct GEParamsConstraintConvertInfo<GEParamsMemberTag::Tag> { \\")
     output.append("        static constexpr bool HAS_CONVERT = true; \\")
     output.append("        static constexpr bool HAS_CAST_FROM = true; \\")
     output.append("        using CastFromType = _CastFromType; \\")
@@ -1180,12 +1101,10 @@ def generate_constraints(structs: List[StructInfo]):
                     output.append(metadata)
 
     # Undefine constraint metadata macros
-    output.append("#undef GE_PARAMS_CONSTRAINT_RANGE")
-    output.append("#undef GE_PARAMS_CONSTRAINT_COMPONENTS")
-    output.append("#undef GE_PARAMS_CONSTRAINT_COMPONENTS_MIN")
-    output.append("#undef GE_PARAMS_CONSTRAINT_COMPONENTS_MAX")
     output.append("#undef GE_PARAMS_CONSTRAINT_MIN")
+    output.append("#undef GE_PARAMS_CONSTRAINT_MIN_COMPONENTS")
     output.append("#undef GE_PARAMS_CONSTRAINT_MAX")
+    output.append("#undef GE_PARAMS_CONSTRAINT_MAX_COMPONENTS")
     output.append("#undef GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM")
     output.append("#undef GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM")
     output.append("")

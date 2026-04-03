@@ -23,7 +23,9 @@ struct [[ge::params(type=DISTORT_CHROMA, name="DistortChroma")]] GEXDistortChrom
     float dispersion = 0.0f;
     float saturation = 0.0f;
     float verticalMoveDistance = 0.0f;
+    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f granularity =  Vector2f(0.0f, 0.0f);
+    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f distortFactor = Vector2f(0.0f, 0.0f);
     Vector3f colorStrength = Vector3f(0.0f, 0.0f, 0.0f);
     std::shared_ptr<GEShaderMask> mask;

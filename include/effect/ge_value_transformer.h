@@ -30,17 +30,51 @@ namespace GEV2 {
 // Forward declarations
 enum class GEParamsMemberTag : uint32_t;
 
-template<GEParamsMemberTag Tag>
-struct GEParamsConstraintInfo {
-    static constexpr bool HAS_RANGE = false;
-    static constexpr bool COMPONENT_WISE = false;
+// Base constraint templates for Min, Max, and Convert components
+// Base template for Min constraint
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintMinInfo {
     static constexpr bool HAS_MIN = false;
+    static constexpr bool COMPONENT_WISE = false;
+    static constexpr size_t COMPONENT_COUNT = 0;
+};
+
+// Base template for Max constraint
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintMaxInfo {
     static constexpr bool HAS_MAX = false;
+    static constexpr bool COMPONENT_WISE = false;
+    static constexpr size_t COMPONENT_COUNT = 0;
+};
+
+// Base template for Convert constraint
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintConvertInfo {
     static constexpr bool HAS_CONVERT = false;
     static constexpr bool HAS_CAST_FROM = false;
     using CastFromType = void;
     static constexpr bool HAS_CUSTOM = false;
     using CustomTransformer = void;
+};
+
+// Main constraint info template that combines Min, Max, and Convert info
+// Members (MIN, MAX, MIN_COMPONENTS, MAX_COMPONENTS) are inherited from specialized templates
+// Access to these members should be guarded by if constexpr checks on HAS_* flags
+template<GEParamsMemberTag Tag>
+struct GEParamsConstraintInfo :
+    GEParamsConstraintMinInfo<Tag>,
+    GEParamsConstraintMaxInfo<Tag>,
+    GEParamsConstraintConvertInfo<Tag> {
+    using CastFromType = typename GEParamsConstraintConvertInfo<Tag>::CastFromType;
+    using CustomTransformer = typename GEParamsConstraintConvertInfo<Tag>::CustomTransformer;
+
+    // Range flag derived from Min and Max
+    static constexpr bool HAS_RANGE = GEParamsConstraintMinInfo<Tag>::HAS_MIN || GEParamsConstraintMaxInfo<Tag>::HAS_MAX;
+    static constexpr bool COMPONENT_WISE = GEParamsConstraintMinInfo<Tag>::COMPONENT_WISE 
+                                        || GEParamsConstraintMaxInfo<Tag>::COMPONENT_WISE;
+
+    // Other members are inherited from specialized templates and should be accessed
+    // only after checking the corresponding HAS_* flag with if constexpr
 };
 
 // Helper trait: detect std::shared_ptr
@@ -59,55 +93,49 @@ struct GEParamsValueTransformer {
     static bool Transform(const FromType& value, ToType& out) {
         using Constraint = GEParamsConstraintInfo<Tag>;
 
-        // Step 1: Apply range constraints (only when FromType == ToType)
+        // Apply conversion (custom or default)
+        if constexpr (Constraint::HAS_CONVERT) {
+            if constexpr (Constraint::HAS_CUSTOM) {
+                using Transformer = typename Constraint::CustomTransformer;
+                if (!Transformer::Transform(value, out)) {
+                    return false;
+                }
+            } else if constexpr (is_shared_ptr_v<ToType>) {
+                // Pointer type: use std::static_pointer_cast
+                out = std::static_pointer_cast<typename ToType::element_type>(value);
+            } else {
+                // Value type: use static_cast
+                out = static_cast<ToType>(value);
+            }
+        }
+        else if constexpr (std::is_same_v<FromType, ToType>) {
+            out = value;
+        } else {
+            static_assert(sizeof(FromType) == 0, "Unsupported conversion from FromType to ToType");
+            return false;
+        }
+
+        // Apply range constraints (only when FromType == ToType)
         if constexpr (std::is_same_v<FromType, ToType> && Constraint::HAS_RANGE) {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
-                    out = ApplyComponentWiseClamp(value, Constraint::MIN_COMPONENTS, Constraint::MAX_COMPONENTS);
+                    out = ApplyComponentWiseClamp(out, Constraint::MIN_COMPONENTS, Constraint::MAX_COMPONENTS);
                 } else if constexpr (Constraint::HAS_MIN) {
-                    out = ApplyComponentWiseMin(value, Constraint::MIN_COMPONENTS);
+                    out = ApplyComponentWiseMin(out, Constraint::MIN_COMPONENTS);
                 } else if constexpr (Constraint::HAS_MAX) {
-                    out = ApplyComponentWiseMax(value, Constraint::MAX_COMPONENTS);
+                    out = ApplyComponentWiseMax(out, Constraint::MAX_COMPONENTS);
                 }
             } else {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
-                    out = std::clamp(value, Constraint::MIN, Constraint::MAX);
+                    out = std::clamp(out, Constraint::MIN, Constraint::MAX);
                 } else if constexpr (Constraint::HAS_MIN) {
-                    out = std::max(value, Constraint::MIN);
+                    out = std::max(out, Constraint::MIN);
                 } else if constexpr (Constraint::HAS_MAX) {
-                    out = std::min(value, Constraint::MAX);
+                    out = std::min(out, Constraint::MAX);
                 }
             }
-            return true;
         }
-
-        // Step 2: Apply conversion (custom or default)
-        else if constexpr (Constraint::HAS_CONVERT) {
-            if constexpr (Constraint::HAS_CUSTOM) {
-                // Use custom transformer
-                using Transformer = typename Constraint::CustomTransformer;
-                return Transformer::Transform(value, out);
-            } else {
-                // Use default conversion (static_cast or static_pointer_cast)
-                if constexpr (is_shared_ptr_v<ToType>) {
-                    // Pointer type: use std::static_pointer_cast
-                    out = std::static_pointer_cast<typename ToType::element_type>(value);
-                } else {
-                    // Value type: use static_cast
-                    out = static_cast<ToType>(value);
-                }
-                return true;
-            }
-        }
-
-        // Step 3: No conversion (identity)
-        else if constexpr (std::is_same_v<FromType, ToType>) {
-            out = value;
-            return true;
-        } else {
-            static_assert(sizeof(FromType) == 0, "Unsupported conversion");
-            return false;
-        }
+        return true;
     }
 
 private:

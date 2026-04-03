@@ -39,6 +39,6 @@ struct [[ge::params(type=WATER_DROPLET_TRANSITION, name="WaterDropletTransition"
     float noiseStrengthX = 0.0f;
     [[ge::prop("WaterDropletTransition_NoiseStrengthY")]]
     float noiseStrengthY = 0.0f;
-    [[ge::prop("WaterDropletTransition_Position")]]
+    [[ge::prop(name="WaterDropletTransition_Position", cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f position = Vector2f(0.5f, 0.5f);
 };
