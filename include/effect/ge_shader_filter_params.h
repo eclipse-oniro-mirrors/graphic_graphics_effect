@@ -1374,13 +1374,15 @@ struct GERRect {
     float top_ = 0.f;
     float width_ = 0.f;
     float height_ = 0.f;
-    Vector2f radius_[4] = { { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f } };
+    enum Corner : uint32_t {
+        TOP_LEFT = 0,
+        TOP_RIGHT,
+        BOTTOM_RIGHT,
+        BOTTOM_LEFT,
+        CORNER_COUNT,
+    };
 
-    static constexpr uint32_t TOP_LEFT = 0;
-    static constexpr uint32_t TOP_RIGHT = 1;
-    static constexpr uint32_t BOTTOM_RIGHT = 2;
-    static constexpr uint32_t BOTTOM_LEFT = 3;
-    static constexpr uint32_t CORNER_COUNT = 4;
+    Vector2f radius_[CORNER_COUNT] = { { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f }, { 0.f, 0.f } };
 
     void SetCornerRadius(float radiusX, float radiusY)
     {
