@@ -1,5 +1,7 @@
 # SDF RRect Notes
 
+Implementation at [src/effect/shape/ge_sdf_rrect_shader_shape.cpp](../../src/effect/shape/ge_sdf_rrect_shader_shape.cpp)
+
 ## Variant Selection
 
 There are four shader variants:
