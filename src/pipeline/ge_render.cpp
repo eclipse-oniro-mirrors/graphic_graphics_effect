@@ -27,6 +27,7 @@
 #include "ge_direction_light_shader_filter.h"
 #include "ge_dispersion_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
+#include "ge_distortion_collapse_filter.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
@@ -960,6 +961,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT: {
             const auto& params = ve->GetSDFEdgeLightParams();
             shaderFilter = std::make_shared<GESDFEdgeLight>(*params);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::DISTORTION_COLLAPSE: {
+            const auto& params = ve->GetDistortionCollapseParams();
+            shaderFilter = std::make_shared<GEDistortionCollapseFilter>(*params);
             break;
         }
         default:

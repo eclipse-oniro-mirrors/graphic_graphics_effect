@@ -319,6 +319,21 @@ struct GESDFEdgeLightEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(SDF_EDGE_LIGHT_EFFECT, GESDFEdgeLightEffectParams, GE_SHADER_SDF_EDGE_LIGHT_EFFECT);
 
+constexpr char GE_FILTER_DISTORTION_COLLAPSE[] = "DistortionCollapse";
+constexpr char GE_FILTER_DISTORTION_COLLAPSE_LU_CORNER[] = "DistortionCollapse_LUCorner";
+constexpr char GE_FILTER_DISTORTION_COLLAPSE_RU_CORNER[] = "DistortionCollapse_RUCorner";
+constexpr char GE_FILTER_DISTORTION_COLLAPSE_RB_CORNER[] = "DistortionCollapse_RBCorner";
+constexpr char GE_FILTER_DISTORTION_COLLAPSE_LB_CORNER[] = "DistortionCollapse_LBCorner";
+constexpr char GE_FILTER_DISTORTION_COLLAPSE_BARREL_DISTORTION[] = "DistortionCollapse_BarrelDistortion";
+struct GEDistortionCollapseFilterParams {
+    Drawing::Point LUCorner_;
+    Drawing::Point RUCorner_;
+    Drawing::Point RBCorner_;
+    Drawing::Point LBCorner_;
+    Vector4f barrelDistortion_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(DISTORTION_COLLAPSE, GEDistortionCollapseFilterParams, GE_FILTER_DISTORTION_COLLAPSE);
+
 constexpr char GE_MASK_RIPPLE[] = "RippleMask";
 constexpr char GE_MASK_RIPPLE_CENTER[] = "RippleMask_Center";
 constexpr char GE_MASK_RIPPLE_RADIUS[] = "RippleMask_Radius";
@@ -1379,6 +1394,22 @@ struct GESDFUnionOpShapeParams {
     std::shared_ptr<GESDFShaderShape> left;
     std::shared_ptr<GESDFShaderShape> right;
     GESDFUnionOp op = GESDFUnionOp::SMOOTH_UNION;
+};
+
+constexpr char GE_SHAPE_SDF_DISTORT_OP[] = "SDFDistortOpShape";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_SHAPE[] = "SDFDistortOpShape_Shape";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_LU_CORNER[] = "SDFDistortOpShape_LUCorner";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_RU_CORNER[] = "SDFDistortOpShape_RUCorner";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_RB_CORNER[] = "SDFDistortOpShape_RBCorner";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_LB_CORNER[] = "SDFDistortOpShape_LBCorner";
+constexpr char GE_SHAPE_SDF_DISTORT_OP_BARREL_DISTORTION[] = "SDFDistortOpShape_BarrelDistortion";
+struct GESDFDistortOpShapeParams {
+    std::shared_ptr<GESDFShaderShape> shape;
+    Drawing::Point LUCorner;
+    Drawing::Point RUCorner;
+    Drawing::Point RBCorner;
+    Drawing::Point LBCorner;
+    Vector4f barrelDistortion = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
 
 constexpr char GE_SHAPE_SDF_RRECT_SHAPE[] = "SDFRRectShape";
