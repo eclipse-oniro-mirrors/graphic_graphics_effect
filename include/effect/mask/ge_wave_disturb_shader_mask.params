@@ -14,10 +14,10 @@
  */
 
 struct [[ge::params(type=WAVE_DISTURBANCE_MASK, name="WaveDisturbanceMask")]] GEWaveDisturbanceShaderMaskParams {
-    [[ge::prop(cast_from="std::pair<float, float>", custom="WaveDisturbanceTransformer")]]
+    [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f clickPos = Vector2f(50.f, 50.f);
     float progress = 0.5f;
-    [[ge::prop(cast_from="std::pair<float, float>", custom="WaveDisturbanceTransformer")]]
+    [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f waveRD = Vector2f(2.5f, 0.7f);
     Vector3f waveLWH = Vector3f(150.f, 0.f, 20.f);
 };

@@ -20,6 +20,6 @@ using GEBezierWarpShaderFilterControlPointArray = std::array<Drawing::Point, GE_
 struct [[ge::params(type=BEZIER_WARP, name="BezierWarp")]] GEBezierWarpShaderFilterParams {
     [[ge::prop("BEZIER_WARP_DESTINATION_PATCH")]]
     [[ge::prop(name="BezierWarp_ControlPoint", array_accessor_length=12, array_accessor_type="Drawing::Point",
-               cast_from="std::pair<float, float>", custom="BezierWarpTransformer")]]
+               cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     GEBezierWarpShaderFilterControlPointArray destinationPatch;
 };

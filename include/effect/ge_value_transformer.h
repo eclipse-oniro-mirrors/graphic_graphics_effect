@@ -334,23 +334,6 @@ struct SDFUnionOpTransformer {
     }
 };
 
-// Custom Transformer: WaveDisturbance (uses operator[] to access Vector2f elements)
-struct WaveDisturbanceTransformer {
-    static bool Transform(const std::pair<float, float>& value, Vector2f& out) {
-        out[0] = value.first;  // Map to x_
-        out[1] = value.second; // Map to y_
-        return true;
-    }
-};
-
-// Custom Transformer: std::pair<float, float> to Drawing::Point (for BezierWarp)
-struct BezierWarpTransformer {
-    static bool Transform(const std::pair<float, float>& value, Drawing::Point& out) {
-        out = Drawing::Point(value.first, value.second);
-        return true;
-    }
-};
-
 } // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
