@@ -300,7 +300,7 @@ def get_effective_type_for_tag(field: FieldInfo, is_array_elem: bool, array_idx:
     Args:
         field: The field info
         is_array_elem: Whether this is an array element tag
-        array_idx: The array index (if is_array_elemari is True)
+        array_idx: The array index (if is_array_element is True)
         prop_attr_index: The index of the prop attribute to use for cast_from
         type_aliases: Type alias mapping
 
