@@ -559,14 +559,14 @@ public:
     }
 
     void MakeParticleAblationFilterParams()
- 	{
- 	    particleAblationFilterParams_ = std::make_shared<GEParticleAblationFilterParams>();
- 	}
+    {
+        particleAblationFilterParams_ = std::make_shared<GEParticleAblationFilterParams>();
+    }
 
- 	const std::shared_ptr<GEParticleAblationFilterParams> &GetParticleAblationFilterParams() const
- 	{
- 	    return particleAblationFilterParams_;
- 	}
+    const std::shared_ptr<GEParticleAblationFilterParams> &GetParticleAblationFilterParams() const
+    {
+        return particleAblationFilterParams_;
+    }
 
     void MakeGasifyScaleTwistFilterParams()
     {
@@ -776,8 +776,8 @@ private:
     void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
     void SetParticleAblationParams(const std::string& tag, float param);
- 	void SetParticleAblationParams(const std::string& tag, const std::pair<float, float>& param);
- 	void SetParticleAblationParams(const std::string& tag, int32_t param);
+    void SetParticleAblationParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetParticleAblationParams(const std::string& tag, int32_t param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveDisturbanceMaskParams(const std::string& tag, float param);
     void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);

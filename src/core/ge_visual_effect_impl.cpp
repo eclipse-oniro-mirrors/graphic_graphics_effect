@@ -515,10 +515,10 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         }
     },
     { GE_FILTER_PARTICLE_ABLATION,
- 	    [](GEVisualEffectImpl* impl) {
- 	        impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
- 	        impl->MakeParticleAblationFilterParams();
- 	    }
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
+            impl->MakeParticleAblationFilterParams();
+        }
  	},
     { GE_FILTER_GASIFY_BLUR,
         [](GEVisualEffectImpl* impl) {
@@ -1252,9 +1252,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             break;
         }
         case FilterType::PARTICLE_ABLATION: {
- 	        SetParticleAblationParams(tag, param);
- 	        break;
- 	    }
+            SetParticleAblationParams(tag, param);
+            break;
+        }
         case FilterType::BEZIER_WARP: {
             SetBezierWarpParams(tag, param);
             break;

@@ -87,7 +87,8 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
     EXPECT_EQ(geVisualEffectImplLightCave.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::LIGHT_CAVE);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplParticleAblation(Drawing::GE_FILTER_PARTICLE_ABLATION);
- 	EXPECT_EQ(geVisualEffectImplParticleAblation.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
+    EXPECT_EQ(geVisualEffectImplParticleAblation.GetFilterType(),
+        Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplGasifyScaleTwist(Drawing::GE_FILTER_GASIFY_SCALE_TWIST);
     EXPECT_EQ(geVisualEffectImplGasifyScaleTwist.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
