@@ -722,9 +722,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             break;
         }
         case FilterType::PARTICLE_ABLATION: {
- 	        SetParticleAblationParams(tag, param);
- 	        break;
- 	    }
+            SetParticleAblationParams(tag, param);
+            break;
+        }
         default:
             break;
     }
