@@ -558,6 +558,16 @@ public:
         return borderLightParams_;
     }
 
+    void MakeParticleAblationFilterParams()
+ 	{
+ 	    particleAblationFilterParams_ = std::make_shared<GEParticleAblationFilterParams>();
+ 	}
+
+ 	const std::shared_ptr<GEParticleAblationFilterParams> &GetParticleAblationFilterParams() const
+ 	{
+ 	    return particleAblationFilterParams_;
+ 	}
+
     void MakeGasifyScaleTwistFilterParams()
     {
         gasifyScaleTwistFilterParams_ = std::make_shared<GEGasifyScaleTwistFilterParams>();
@@ -765,6 +775,9 @@ private:
     void SetRippleMaskParamsFloat(const std::string& tag, float param);
     void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
     void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
+    void SetParticleAblationParams(const std::string& tag, float param);
+ 	void SetParticleAblationParams(const std::string& tag, const std::pair<float, float>& param);
+ 	void SetParticleAblationParams(const std::string& tag, int32_t param);
     void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
     void SetWaveDisturbanceMaskParams(const std::string& tag, float param);
     void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);
@@ -862,6 +875,7 @@ private:
     std::shared_ptr<GEGasifyScaleTwistFilterParams> gasifyScaleTwistFilterParams_ = nullptr;
     std::shared_ptr<GEGasifyBlurFilterParams> gasifyBlurFilterParams_ = nullptr;
     std::shared_ptr<GEGasifyFilterParams> gasifyFilterParams_ = nullptr;
+    std::shared_ptr<GEParticleAblationFilterParams> particleAblationFilterParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;

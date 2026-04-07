@@ -851,6 +851,39 @@ struct GEXColorGradientEffectParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams, GEX_SHADER_COLOR_GRADIENT_EFFECT);
 
+constexpr char GE_FILTER_PARTICLE_ABLATION[] = "ParticleAblation";
+constexpr char GE_FILTER_PARTICLE_ABLATION_PROGRESS[] = "ParticleAblation_Progress";
+constexpr char GE_FILTER_PARTICLE_ABLATION_ABLATION_RATE[] = "ParticleAblation_AblationRate";
+constexpr char GE_FILTER_PARTICLE_ABLATION_CENTERS0[] = "ParticleAblation_Centers0";
+constexpr char GE_FILTER_PARTICLE_ABLATION_CENTERS1[] = "ParticleAblation_Centers1";
+constexpr char GE_FILTER_PARTICLE_ABLATION_CENTERS2[] = "ParticleAblation_Centers2";
+constexpr char GE_FILTER_PARTICLE_ABLATION_CENTERS3[] = "ParticleAblation_Centers3";
+constexpr char GE_FILTER_PARTICLE_ABLATION_GLOW_LEVEL[] = "ParticleAblation_GlowLevel";
+constexpr char GE_FILTER_PARTICLE_ABLATION_GLOW_BRIGHTNESS[] = "ParticleAblation_GlowBrightness";
+constexpr char GE_FILTER_PARTICLE_ABLATION_MAX_PARTICLE_COUNT[] = "ParticleAblation_MaxParticleCount";
+constexpr char GE_FILTER_PARTICLE_ABLATION_WIND[] = "ParticleAblation_Wind";
+constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_SCALE[] = "ParticleAblation_TurbScale";
+constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_EVO[] = "ParticleAblation_TurbEvo";
+constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_AMP[] = "ParticleAblation_TurbAmp";
+constexpr char GE_FILTER_PARTICLE_ABLATION_SCALE_SIZE[] = "ParticleAblation_ScaleSize";
+struct GEParticleAblationFilterParams {
+    float progress_ = 0.f;
+    float ablationRate_ = 0.f;
+    std::pair<float, float> centers0_ = {0.f, 0.f};
+    std::pair<float, float> centers1_ = {0.f, 0.f};
+    std::pair<float, float> centers2_ = {0.f, 0.f};
+    std::pair<float, float> centers3_ = {0.f, 0.f};
+    float glowLevel_ = 0.f;
+    float glowBrightness_ = 0.f;
+    int32_t maxParticleCount_ = 0;
+    std::pair<float, float> wind_ = {0.f, 0.f};
+    int32_t turbScale_ = 0;
+    int32_t turbEvo_ = 0;
+    int32_t turbAmp_ = 0;
+    std::pair<float, float> scaleSize_ = {1.0f, 1.0f};
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(PARTICLE_ABLATION, GEParticleAblationFilterParams, GE_FILTER_PARTICLE_ABLATION);
+
 constexpr char GE_FILTER_GASIFY_SCALE_TWIST[] = "GasifyScaleTwist";
 constexpr char GE_FILTER_GASIFY_SCALE_TWIST_PROGRESS[] = "GasifyScaleTwist_Progress";
 constexpr char GE_FILTER_GASIFY_SCALE_TWIST_SOURCEIMAGE[] = "GasifyScaleTwist_SourceImage";
