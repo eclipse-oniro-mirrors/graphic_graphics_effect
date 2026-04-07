@@ -36,8 +36,6 @@ public:
         return GESDFShapeType::TRANSFORM;
     }
 
-    bool TryGetCenter(float& outX, float& outY) const override;
-
     const Drawing::Matrix& GetMatrix() const
     {
         return params_.matrix;
@@ -50,10 +48,6 @@ public:
 
     bool HasType(const GESDFShapeType type) const override;
 private:
-    std::shared_ptr<ShaderEffect> GenerateGravityPullDrawingShader(float width, float height) const;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetGravityPullDrawingShaderBuilder() const;
-    std::shared_ptr<ShaderEffect> GenerateGravityPullDrawingShaderHasNormal(float width, float height) const;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetGravPullDrawingShaderHasNormBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFTransformShaderShapeBuilder() const;
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFTransformShaderHasNormalShapeBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateShaderEffect(float width, float height,

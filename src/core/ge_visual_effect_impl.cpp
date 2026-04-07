@@ -701,17 +701,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             if (sdfFromImageParams_ == nullptr) {
                 return;
             }
+
             if (tag == GE_FILTER_SDF_FROM_IMAGE_SPREAD_FACTOR) {
                 sdfFromImageParams_->spreadFactor = param;
-            }
-            break;
-        }
-        case FilterType::SDF_TRANSFORM_SHAPE: {
-            if (sdfTransformShapeParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE) {
-                sdfTransformShapeParams_->unionMode = param;
             }
             break;
         }
@@ -1279,15 +1271,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::FRAME_GRADIENT_MASK: {
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
-            break;
-        }
-        case FilterType::SDF_TRANSFORM_SHAPE: {
-            if (sdfTransformShapeParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER) {
-                sdfTransformShapeParams_->centerPosition = Vector2f(param.first, param.second);
-            }
             break;
         }
         case FilterType::SDF_TRIANGLE_SHAPE: {
