@@ -331,11 +331,14 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
 std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateExtShaderRRect(
     const std::shared_ptr<GESDFRRectShapeParams>& params) const
 {
+    if (!CanBeContinuous(params)) {
+        return std::make_shared<GESDFRRectShaderShape>(*params);
+    }
     auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
         static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE),
         sizeof(Drawing::GESDFRRectShapeParams),
         static_cast<void *>(params.get()));
-    if (!CanBeContinuous(params) || !object) {
+    if (!object) {
         return std::make_shared<GESDFRRectShaderShape>(*params);
     }
     std::shared_ptr<Drawing::GEShaderShape> rrectShape(static_cast<Drawing::GEShaderShape*>(object));
