@@ -1439,17 +1439,9 @@ struct GESDFPixelmapShapeParams {
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE[] = "SDFTransformShape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_SHAPE[] = "SDFTransformShape_Shape";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_MATRIX[] = "SDFTransformShape_Matrix";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE[] = "SDFTransformShape_UnionMode";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER[] = "SDFTransformShape_GravityCenter";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH[] = "SDFTransformShape_GravityStrength";
-constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING[] = "SDFTransformShape_GravitySpacing";
 struct GESDFTransformShapeParams {
     std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix = Drawing::Matrix();
-    float warpStrength = 0.0f;
-    int unionMode = 0;
-    float spacing = 0.0f;
-    Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };
 
 constexpr char GE_SHAPE_SDF_EMPTY_SHAPE[] = "SDFEmptyShape";

@@ -36,8 +36,6 @@ public:
         return GESDFShapeType::RRECT;
     }
 
-    bool TryGetCenter(float& outX, float& outY) const override;
-    
     const GERRect& GetRRect() const
     {
         return params_.rrect;
