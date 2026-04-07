@@ -913,9 +913,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             break;
         }
         case FilterType::PARTICLE_ABLATION: {
- 	        SetParticleAblationParams(tag, param);
- 	        break;
- 	    }
+            SetParticleAblationParams(tag, param);
+            break;
+        }
         case FilterType::GASIFY_SCALE_TWIST: {
             SetGasifyScaleTwistParams(tag, param);
             break;
