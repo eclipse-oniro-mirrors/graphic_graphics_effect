@@ -979,18 +979,6 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetSDFEdgeLightEffectParams(tag, param);
             break;
         }
-        case FilterType::SDF_TRANSFORM_SHAPE: {
-            if (sdfTransformShapeParams_ == nullptr) {
-                return;
-            }
-            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH) {
-                sdfTransformShapeParams_->warpStrength = param;
-            }
-            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING) {
-                sdfTransformShapeParams_->spacing = param;
-            }
-            break;
-        }
         case FilterType::SDF_TRIANGLE_SHAPE: {
             if (sdfTriangleShapeParams_ == nullptr) {
                 return;
