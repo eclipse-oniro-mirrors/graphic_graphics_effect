@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """
-Generate C++ static reflection metadata from .params files (Improved Version).
+Generate C++ static reflection metadata from .params files.
 
-This script provides a best-in-effort C++ parser with:
-- Proper tokenization (handling comments, strings, char literals, etc.)
-- Flexible struct parsing
-- C#/Rust-style attribute parsing (e.g., [[ge::params(type=AIBAR, name="AIBAR")]])
-- Extensible design for future enhancements
+This script provides a best-in-effort C++ attribute parser to generate metadata for GE Effect Params
 """
 
 import sys
