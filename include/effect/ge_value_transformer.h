@@ -17,9 +17,10 @@
 #define GRAPHICS_EFFECT_GE_VALUE_TRANSFORMER_H
 
 #include <algorithm>
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <utility>
+
 #include "ge_effects_params.h"
 
 namespace OHOS {
@@ -61,17 +62,17 @@ struct GEParamsConstraintConvertInfo {
 // Members (MIN, MAX, MIN_COMPONENTS, MAX_COMPONENTS) are inherited from specialized templates
 // Access to these members should be guarded by if constexpr checks on HAS_* flags
 template<GEParamsMemberTag Tag>
-struct GEParamsConstraintInfo :
-    GEParamsConstraintMinInfo<Tag>,
-    GEParamsConstraintMaxInfo<Tag>,
-    GEParamsConstraintConvertInfo<Tag> {
+struct GEParamsConstraintInfo : GEParamsConstraintMinInfo<Tag>,
+                                GEParamsConstraintMaxInfo<Tag>,
+                                GEParamsConstraintConvertInfo<Tag> {
     using CastFromType = typename GEParamsConstraintConvertInfo<Tag>::CastFromType;
     using CustomTransformer = typename GEParamsConstraintConvertInfo<Tag>::CustomTransformer;
 
     // Range flag derived from Min and Max
-    static constexpr bool HAS_RANGE = GEParamsConstraintMinInfo<Tag>::HAS_MIN || GEParamsConstraintMaxInfo<Tag>::HAS_MAX;
-    static constexpr bool COMPONENT_WISE = GEParamsConstraintMinInfo<Tag>::COMPONENT_WISE 
-                                        || GEParamsConstraintMaxInfo<Tag>::COMPONENT_WISE;
+    static constexpr bool HAS_RANGE =
+        GEParamsConstraintMinInfo<Tag>::HAS_MIN || GEParamsConstraintMaxInfo<Tag>::HAS_MAX;
+    static constexpr bool COMPONENT_WISE =
+        GEParamsConstraintMinInfo<Tag>::COMPONENT_WISE || GEParamsConstraintMaxInfo<Tag>::COMPONENT_WISE;
 
     // Other members are inherited from specialized templates and should be accessed
     // only after checking the corresponding HAS_* flag with if constexpr
@@ -90,7 +91,8 @@ inline constexpr bool is_shared_ptr_v = is_shared_ptr<T>::value;
 // Base ValueTransformer template with new prototype
 template<GEParamsMemberTag Tag, typename FromType, typename ToType>
 struct GEParamsValueTransformer {
-    static bool Transform(const FromType& value, ToType& out) {
+    static bool Transform(const FromType& value, ToType& out)
+    {
         using Constraint = GEParamsConstraintInfo<Tag>;
 
         // Apply conversion (custom or default)
@@ -107,8 +109,7 @@ struct GEParamsValueTransformer {
                 // Value type: use static_cast
                 out = static_cast<ToType>(value);
             }
-        }
-        else if constexpr (std::is_same_v<FromType, ToType>) {
+        } else if constexpr (std::is_same_v<FromType, ToType>) {
             out = value;
         } else {
             static_assert(sizeof(FromType) == 0, "Unsupported conversion from FromType to ToType");
@@ -140,112 +141,82 @@ struct GEParamsValueTransformer {
 
 private:
     // Helper function: component-wise clamp for std::pair<float, float>
-    static std::pair<float, float> ApplyComponentWiseClamp(const std::pair<float, float>& value, const float (&min)[2], const float (&max)[2]) {
+    static std::pair<float, float> ApplyComponentWiseClamp(
+        const std::pair<float, float>& value, const float (&min)[2], const float (&max)[2])
+    {
         return std::pair<float, float>(
-            std::clamp(value.first, min[0], max[0]),
-            std::clamp(value.second, min[1], max[1])
-        );
+            std::clamp(value.first, min[0], max[0]), std::clamp(value.second, min[1], max[1]));
     }
 
     // Helper function: component-wise clamp for Vector2f
-    static Vector2f ApplyComponentWiseClamp(const Vector2f& value, const float (&min)[2], const float (&max)[2]) {
-        return Vector2f(
-            std::clamp(value.x_, min[0], max[0]),
-            std::clamp(value.y_, min[1], max[1])
-        );
+    static Vector2f ApplyComponentWiseClamp(const Vector2f& value, const float (&min)[2], const float (&max)[2])
+    {
+        return Vector2f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]));
     }
 
     // Helper function: component-wise clamp for Vector3f
-    static Vector3f ApplyComponentWiseClamp(const Vector3f& value, const float (&min)[3], const float (&max)[3]) {
-        return Vector3f(
-            std::clamp(value.x_, min[0], max[0]),
-            std::clamp(value.y_, min[1], max[1]),
-            std::clamp(value.z_, min[2], max[2])
-        );
+    static Vector3f ApplyComponentWiseClamp(const Vector3f& value, const float (&min)[3], const float (&max)[3])
+    {
+        return Vector3f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]),
+            std::clamp(value.z_, min[2], max[2]));
     }
 
     // Helper function: component-wise clamp for Vector4f
-    static Vector4f ApplyComponentWiseClamp(const Vector4f& value, const float (&min)[4], const float (&max)[4]) {
-        return Vector4f(
-            std::clamp(value.x_, min[0], max[0]),
-            std::clamp(value.y_, min[1], max[1]),
-            std::clamp(value.z_, min[2], max[2]),
-            std::clamp(value.w_, min[3], max[3])
-        );
+    static Vector4f ApplyComponentWiseClamp(const Vector4f& value, const float (&min)[4], const float (&max)[4])
+    {
+        return Vector4f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]),
+            std::clamp(value.z_, min[2], max[2]), std::clamp(value.w_, min[3], max[3]));
     }
 
     // Helper function: component-wise min
     template<typename T>
-    static T ApplyComponentWiseMin(const T& value, const float (&min)[4]) {
+    static T ApplyComponentWiseMin(const T& value, const float (&min)[4])
+    {
         if constexpr (std::is_same_v<T, Vector2f>) {
-            return Vector2f(
-                std::max(value.x_, min[0]),
-                std::max(value.y_, min[1])
-            );
+            return Vector2f(std::max(value.x_, min[0]), std::max(value.y_, min[1]));
         } else if constexpr (std::is_same_v<T, Vector3f>) {
-            return Vector3f(
-                std::max(value.x_, min[0]),
-                std::max(value.y_, min[1]),
-                std::max(value.z_, min[2])
-            );
+            return Vector3f(std::max(value.x_, min[0]), std::max(value.y_, min[1]), std::max(value.z_, min[2]));
         } else if constexpr (std::is_same_v<T, Vector4f>) {
-            return Vector4f(
-                std::max(value.x_, min[0]),
-                std::max(value.y_, min[1]),
-                std::max(value.z_, min[2]),
-                std::max(value.w_, min[3])
-            );
+            return Vector4f(std::max(value.x_, min[0]), std::max(value.y_, min[1]), std::max(value.z_, min[2]),
+                std::max(value.w_, min[3]));
         } else {
             return value;
         }
     }
 
     // Helper function: component-wise min for std::pair<float, float>
-    static std::pair<float, float> ApplyComponentWiseMin(const std::pair<float, float>& value, const float (&min)[2]) {
-        return std::make_pair(
-            std::max(value.first, min[0]),
-            std::max(value.second, min[1])
-        );
+    static std::pair<float, float> ApplyComponentWiseMin(const std::pair<float, float>& value, const float (&min)[2])
+    {
+        return std::make_pair(std::max(value.first, min[0]), std::max(value.second, min[1]));
     }
 
     // Helper function: component-wise max
     template<typename T>
-    static T ApplyComponentWiseMax(const T& value, const float (&max)[4]) {
+    static T ApplyComponentWiseMax(const T& value, const float (&max)[4])
+    {
         if constexpr (std::is_same_v<T, Vector2f>) {
-            return Vector2f(
-                std::min(value.x_, max[0]),
-                std::min(value.y_, max[1])
-            );
+            return Vector2f(std::min(value.x_, max[0]), std::min(value.y_, max[1]));
         } else if constexpr (std::is_same_v<T, Vector3f>) {
-            return Vector3f(
-                std::min(value.x_, max[0]),
-                std::min(value.y_, max[1]),
-                std::min(value.z_, max[2])
-            );
+            return Vector3f(std::min(value.x_, max[0]), std::min(value.y_, max[1]), std::min(value.z_, max[2]));
         } else if constexpr (std::is_same_v<T, Vector4f>) {
-            return Vector4f(
-                std::min(value.x_, max[0]),
-                std::min(value.y_, max[1]),
-                std::min(value.z_, max[2]),
-                std::min(value.w_, max[3])
-            );
+            return Vector4f(std::min(value.x_, max[0]), std::min(value.y_, max[1]), std::min(value.z_, max[2]),
+                std::min(value.w_, max[3]));
         } else {
             return value;
         }
     }
 
     // Helper function: component-wise max for std::pair<float, float>
-    static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>&& value, const float (&max)[2]) {
-        return std::make_pair(
-            std::min(value.first, max[0]),
-            std::min(value.second, max[1])
-        );
+    static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>&& value, const float (&max)[2])
+    {
+        return std::make_pair(std::min(value.first, max[0]), std::min(value.second, max[1]));
     }
 };
 
 // Custom Transformer: Vector4f to Color4f
 struct Vector4fToColor4fTransformer {
-    static bool Transform(const Vector4f& value, Color4f& out) {
+    static bool Transform(const Vector4f& value, Color4f& out)
+    {
         out.redF_ = value.x_;
         out.greenF_ = value.y_;
         out.blueF_ = value.z_;
@@ -256,7 +227,8 @@ struct Vector4fToColor4fTransformer {
 
 // Custom Transformer: Vector4f to RectF
 struct Vector4fToRectFTransformer {
-    static bool Transform(const Vector4f& value, RectF& out) {
+    static bool Transform(const Vector4f& value, RectF& out)
+    {
         out = RectF(value.x_, value.y_, value.z_, value.w_);
         return true;
     }
@@ -264,7 +236,8 @@ struct Vector4fToRectFTransformer {
 
 // Custom Transformer: Pair to Vector2f
 struct PairToVector2fTransformer {
-    static bool Transform(const std::pair<float, float>& value, Vector2f& out) {
+    static bool Transform(const std::pair<float, float>& value, Vector2f& out)
+    {
         out = Vector2f(value.first, value.second);
         return true;
     }
@@ -272,7 +245,8 @@ struct PairToVector2fTransformer {
 
 // Custom Transformer: std::pair<float, float> to Drawing::Point
 struct PairToPointTransformer {
-    static bool Transform(const std::pair<float, float>& value, Drawing::Point& out) {
+    static bool Transform(const std::pair<float, float>& value, Drawing::Point& out)
+    {
         out = Drawing::Point(value.first, value.second);
         return true;
     }
@@ -280,7 +254,8 @@ struct PairToPointTransformer {
 
 // Custom Transformer: Clamp with fallback for FrostedGlass edLightDir
 struct ClampFallbackTransformer {
-    static bool Transform(const std::pair<float, float>& value, Vector2f& out) {
+    static bool Transform(const std::pair<float, float>& value, Vector2f& out)
+    {
         constexpr float MIN_V = -1.0f;
         constexpr float MAX_V = 1.0f;
         constexpr float EPS = 1e-6f;
@@ -298,12 +273,9 @@ struct ClampFallbackTransformer {
 
 // Custom Transformer: DotMatrixEffectType with switch-case fallback
 struct DotMatrixEffectTypeTransformer {
-    static bool Transform(int32_t value, DotMatrixEffectType& out) {
-        enum class EffectTypeParam {
-            NONE = 0,
-            ROTATE,
-            RIPPLE
-        };
+    static bool Transform(int32_t value, DotMatrixEffectType& out)
+    {
+        enum class EffectTypeParam { NONE = 0, ROTATE, RIPPLE };
         EffectTypeParam effectTypeParam = static_cast<EffectTypeParam>(value);
         switch (effectTypeParam) {
             case EffectTypeParam::NONE:
@@ -324,7 +296,8 @@ struct DotMatrixEffectTypeTransformer {
 
 // Custom Transformer: SDFUnionOp with boundary check
 struct SDFUnionOpTransformer {
-    static bool Transform(uint32_t value, GESDFUnionOp& out) {
+    static bool Transform(uint32_t value, GESDFUnionOp& out)
+    {
         if (value >= static_cast<uint32_t>(GESDFUnionOp::MAX)) {
             // Invalid value, return false (don't set)
             return false;

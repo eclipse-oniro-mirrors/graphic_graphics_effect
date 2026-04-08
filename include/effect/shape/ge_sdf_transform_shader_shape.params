@@ -18,4 +18,13 @@ struct [[ge::params(type=SDF_TRANSFORM_SHAPE, name="SDFTransformShape")]] GESDFT
     [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix = Drawing::Matrix();
+    [[ge::prop("SDFTransformShape_GravityStrength")]]
+    float warpStrength = 0.0f;
+    [[ge::prop("SDFTransformShape_UnionMode")]]
+    int unionMode = 0;
+    [[ge::prop("SDFTransformShape_GravitySpacing")]]
+    float spacing = 0.0f;
+    [[ge::prop(name="SDFTransformShape_GravityCenter",
+               cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
+    Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };

@@ -13,14 +13,12 @@
  * limitations under the License.
  */
 
-struct GESDFBorderParams final {
-    Color color;
-    float width = 0.0f;
-    bool isOutline = false;
-};
-
-struct [[ge::params(type=SDF_BORDER, name="SDFBorder")]] GESDFBorderShaderParams final {
-    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
-    std::shared_ptr<GESDFShaderShape> shape = nullptr;
-    GESDFBorderParams border;
+struct [[ge::params(type=SDF_TRIANGLE_SHAPE, name="SDFTriangleShape")]] GESDFTriangleShapeParams {
+    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
+    Vector2f vertex0 = Vector2f(0.0f, 0.0f);
+    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
+    Vector2f vertex1 = Vector2f(0.0f, 0.0f);
+    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
+    Vector2f vertex2 = Vector2f(0.0f, 0.0f);
+    float radius = 0.0f;
 };

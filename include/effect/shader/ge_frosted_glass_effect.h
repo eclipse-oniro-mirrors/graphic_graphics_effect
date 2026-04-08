@@ -22,6 +22,7 @@
 #include "ge_common.h"
 #include "ge_shader.h"
 #include "ge_visual_effect.h"
+#include "ge_filter_type_info.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -37,6 +38,7 @@ public:
     GEFrostedGlassEffect(const GEFrostedGlassEffect&&) = delete;
     GEFrostedGlassEffect& operator=(const GEFrostedGlassEffect&) = delete;
     GEFrostedGlassEffect& operator=(const GEFrostedGlassEffect&&) = delete;
+    DECLARE_GEFILTER_TYPEFUNC(GEFrostedGlassEffect, Drawing::GEFrostedGlassEffectParams);
 
     const std::string GetDescription() const { return "GEFrostedGlassEffect"; }
 

@@ -27,6 +27,8 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     std::shared_ptr<GESDFShaderShape> sdfShape;
     [[ge::prop("FrostedGlass_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;
+    [[ge::prop(min=0.0f, max=15.0f)]]
+    float maxColor = 10.0f;
     // Background darken parameters
     [[ge::prop(min={-20.0f, -20.0f}, max={20.0f, 20.0f},
                cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]

@@ -21,4 +21,14 @@ struct [[ge::params(type=FRAME_GRADIENT_MASK, name="FrameGradientMask")]] GEFram
     float outerFrameWidth = 0.0f;
     std::pair<float, float> rectWH;
     std::pair<float, float> rectPos;
+    [[ge::prop(name="FrameGradientMask_AxialFeatherStrength", min=0.0)]]
+    float axialFeatherStrength = 0.0f;
+    [[ge::prop(name="FrameGradientMask_AxialCenter", min=0.0, max=1.0)]]
+    float axialCenter = 0.5f;
+    [[ge::prop(name="FrameGradientMask_AxialCoreWidth", min=0.0)]]
+    float axialCoreWidth = 1.0f;
+    [[ge::prop(name="FrameGradientMask_AxialDirection")]]
+    std::pair<float, float> axialDirection;
+    [[ge::prop(name="FrameGradientMask_BoxAngleDeg")]]
+    float boxAngleDeg = 0.0f;
 };

@@ -13,14 +13,13 @@
  * limitations under the License.
  */
 
-struct GESDFBorderParams final {
-    Color color;
-    float width = 0.0f;
-    bool isOutline = false;
-};
 
-struct [[ge::params(type=SDF_BORDER, name="SDFBorder")]] GESDFBorderShaderParams final {
-    [[ge::prop(cast_from="std::shared_ptr<Drawing::GEShaderShape>")]]
-    std::shared_ptr<GESDFShaderShape> shape = nullptr;
-    GESDFBorderParams border;
+struct [[ge::params(type=SDF_DISTORT_OP_SHAPE, name="SDFDistortOpShape")]] GESDFDistortOpShapeParams {
+    [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
+    std::shared_ptr<GESDFShaderShape> shape;
+    Drawing::Point LUCorner;
+    Drawing::Point RUCorner;
+    Drawing::Point RBCorner;
+    Drawing::Point LBCorner;
+    Vector4f barrelDistortion = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };

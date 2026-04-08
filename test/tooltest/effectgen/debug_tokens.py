@@ -8,15 +8,12 @@ from pathlib import Path
 
 # Add parent directory to path
 script_dir = Path(__file__).parent
-root_dir = script_dir.parent
+root_dir = script_dir.parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
-from tool.effectgen.generate_reflection_metadata_v2 import (
-    CppTokenizer,
-    CppParser,
-    AttributeParser,
-    Token
-)
+from tool.effectgen.cpp_parser import CppParser
+from tool.effectgen.cpp_tokenizer import CppTokenizer
+
 
 def debug_file(file_path: Path):
     """Debug a specific file."""

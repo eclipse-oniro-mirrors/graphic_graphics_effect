@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-GE Effect Generator CLI
+Create GE Effect CLI
 
-A create-react-app style CLI for generating new Graphics Effect templates.
+Generating new Graphics Effect by templates.
 Supports creating filter, mask, shader, and shape effect types with params files.
 """
 
@@ -271,24 +271,24 @@ def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: P
 
 def main():
     parser = argparse.ArgumentParser(
-        description="GE Effect Generator - Create new Graphics Effect templates",
+        description="Create GE Effects - Create new Graphics Effect by templates",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   # Create a filter effect
-  python ge_effect_generator.py my_blur filter
+  python create-ge-effect.py my_blur filter
 
   # Create a filter effect with parameters from JSON file
-  python ge_effect_generator.py my_blur filter --params my_params.json
+  python create-ge-effect.py my_blur filter --params my_params.json
 
   # Create a mask effect
-  python ge_effect_generator.py my_gradient mask
+  python create-ge-effect.py my_gradient mask
 
   # Create a shader effect
-  python ge_effect_generator.py my_light shader
+  python create-ge-effect.py my_light shader
 
   # Create a shape effect
-  python ge_effect_generator.py my_shape shape
+  python create-ge-effect.py my_shape shape
 
 Available effect types:
   filter  - Shader-based image processing filters (GEShaderFilter)
@@ -336,7 +336,7 @@ Parameter JSON format:
     parser.add_argument(
         "--root",
         type=Path,
-        default=Path(__file__).parent.parent,
+        default=Path(__file__).parent.parent.parent,
         help="Root directory of the graphics_effect project (default: parent of tool directory)"
     )
 

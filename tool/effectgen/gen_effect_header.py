@@ -7,7 +7,6 @@ The file is designed to be manually editable if needed.
 """
 
 import sys
-import re
 from pathlib import Path
 from typing import List
 

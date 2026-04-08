@@ -31,6 +31,7 @@
 #include "effect/filter/ge_direction_light_shader_filter.h"
 #include "effect/filter/ge_dispersion_shader_filter.h"
 #include "effect/filter/ge_displacement_distort_shader_filter.h"
+#include "effect/filter/ge_distortion_collapse_filter.h"
 #include "effect/filter/ge_edge_light_shader_filter.h"
 #include "effect/filter/ge_frosted_glass_blur_shader_filter.h"
 #include "effect/filter/ge_frosted_glass_shader_filter.h"
@@ -61,7 +62,9 @@
 #include "effect/shader/ge_circle_flowlight_effect.h"
 #include "effect/shader/ge_color_gradient_effect.h"
 #include "effect/shader/ge_contour_diagonal_flow_light_shader.h"
+#include "effect/shader/ge_frosted_glass_effect.h"
 #include "effect/shader/ge_particle_circular_halo_shader.h"
+#include "effect/shader/ge_sdf_edge_light_shader.h"
 #include "effect/shader/ge_wavy_ripple_light_shader.h"
 #include "effect/shape/ge_sdf_border_shader.h"
 #include "effect/shape/ge_sdf_clip_shader.h"
@@ -101,6 +104,7 @@ GE_FILTER_TYPE_INFO(GEAIBarShaderFilter, GEAIBarShaderFilterParams)
 GE_FILTER_TYPE_INFO(GEMESABlurShaderFilter, GEMESABlurShaderFilterParams)
 GE_FILTER_TYPE_INFO(GEMaskTransitionShaderFilter, GEMaskTransitionShaderFilterParams)
 GE_FILTER_TYPE_INFO(GEDisplacementDistortFilter, GEDisplacementDistortFilterParams)
+GE_FILTER_TYPE_INFO(GEDistortionCollapseFilter, GEDistortionCollapseFilterParams)
 GE_FILTER_TYPE_INFO(GEKawaseBlurShaderFilter, GEKawaseBlurShaderFilterParams)
 GE_FILTER_TYPE_INFO(GEEdgeLightShaderFilter, GEEdgeLightShaderFilterParams)
 GE_FILTER_TYPE_INFO(GESDFEdgeLight, GESDFEdgeLightFilterParams)
@@ -131,6 +135,8 @@ GE_FILTER_TYPE_INFO(GEFrameGradientShaderMask, GEFrameGradientMaskParams)
 GE_FILTER_TYPE_INFO(GEPixelMapShaderMask, GEPixelMapMaskParams)
 GE_FILTER_TYPE_INFO(GEWavyRippleLightShader, GEWavyRippleLightShaderParams)
 GE_FILTER_TYPE_INFO(GEAuroraNoiseShader, GEAuroraNoiseShaderParams)
+GE_FILTER_TYPE_INFO(GESDFEdgeLightShader, GESDFEdgeLightEffectParams)
+GE_FILTER_TYPE_INFO(GEFrostedGlassEffect, GEFrostedGlassEffectParams)
 GE_FILTER_TYPE_INFO(GEParticleCircularHaloShader, GEParticleCircularHaloShaderParams)
 GE_FILTER_TYPE_INFO(GEContourDiagonalFlowLightShader, GEContentDiagonalFlowLightShaderParams)
 GE_FILTER_TYPE_INFO(GECircleFlowlightEffect, GECircleFlowlightEffectParams)
