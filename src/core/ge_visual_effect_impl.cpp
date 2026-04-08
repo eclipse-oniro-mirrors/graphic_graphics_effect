@@ -994,6 +994,9 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH) {
                 sdfTransformShapeParams_->warpStrength = param;
             }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_HOTZONE) {
+                sdfTransformShapeParams_->hotZone = param;
+            }
             if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING) {
                 sdfTransformShapeParams_->spacing = param;
             }

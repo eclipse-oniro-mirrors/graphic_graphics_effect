@@ -1490,12 +1490,14 @@ constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE[] = "SDFTransformShape_Un
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER[] = "SDFTransformShape_GravityCenter";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH[] = "SDFTransformShape_GravityStrength";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING[] = "SDFTransformShape_GravitySpacing";
+constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_HOTZONE[] = "SDFTransformShape_GravityHotZone";
 struct GESDFTransformShapeParams {
     std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix = Drawing::Matrix();
     float warpStrength = 0.0f;
     int unionMode = 0;
     float spacing = 0.0f;
+    float hotZone = 0.0f;
     Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };
 
