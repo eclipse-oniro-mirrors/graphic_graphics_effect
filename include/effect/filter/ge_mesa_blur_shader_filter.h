@@ -52,6 +52,11 @@ public:
 
     GE_EXPORT static std::pair<float, float> AngleToDirection(float angle);
 
+    GE_EXPORT void SetIsFrostedGlassBlur(bool isFrostedGlassBlur)
+    {
+        isFrostedGlassBlur_ = isFrostedGlassBlur;
+    }
+
 protected:
     struct NewBlurParams {
         int numberOfPasses = 1;     // 1: initial number of passes
@@ -124,6 +129,7 @@ protected:
     bool isDirection_ = false;
     float angle_ = 0.0f;
     static GE_EXPORT int g_isSimpleX;
+    bool isFrostedGlassBlur_ = false;
 
 private:
     bool InitBlurEffect();

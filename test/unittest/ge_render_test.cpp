@@ -819,9 +819,10 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_DirectDrawOnCanvas, TestSize.Level1
     ASSERT_NE(image, nullptr);
 
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_FROSTED_GLASS);
-    auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(Drawing::GESDFRRectShapeParams {
-        Drawing::GERRect { 0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f } // from GESDFRRectShaderShapeTest
-    });
+    Drawing::GESDFRRectShapeParams shapeParam;
+    shapeParam.rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    shapeParam.rrect.SetCornerRadius(10.0f, 10.0f); // from GESDFRRectShaderShapeTest
+    auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(shapeParam);
     visualEffect->SetParam(
         Drawing::GE_FILTER_FROSTED_GLASS_SHAPE, std::static_pointer_cast<Drawing::GESDFShaderShape>(shape));
 

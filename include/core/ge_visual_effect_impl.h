@@ -227,6 +227,16 @@ public:
         return sdfEdgeLightParams_;
     }
 
+    void MakeSdfEdgeLightEffectParams()
+    {
+        sdfEdgeLightEffectParams_ = std::make_shared<GESDFEdgeLightEffectParams>();
+    }
+
+    const std::shared_ptr<GESDFEdgeLightEffectParams>& GetSDFEdgeLightEffectParams() const
+    {
+        return sdfEdgeLightEffectParams_;
+    }
+
     void MakeSdfFromImageParams()
     {
         sdfFromImageParams_ = std::make_shared<GESDFFromImageFilterParams>();
@@ -271,7 +281,7 @@ public:
     {
         dotMatrixShaderParams_ = std::make_shared<GEDotMatrixShaderParams>();
     }
- 
+
     const std::shared_ptr<GEDotMatrixShaderParams>& GetDotMatrixShaderParams() const
     {
         return dotMatrixShaderParams_;
@@ -466,6 +476,16 @@ public:
     void MakeSDFTransformShapeParams()
     {
         sdfTransformShapeParams_ = std::make_shared<GESDFTransformShapeParams>();
+    }
+
+    const std::shared_ptr<GESDFDistortOpShapeParams>& GetSDFDistortOpShapeParams() const
+    {
+        return sdfDistortOpShapeParams_;
+    }
+
+    void MakeSDFDistortOpShapeParams()
+    {
+        sdfDistortOpShapeParams_ = std::make_shared<GESDFDistortOpShapeParams>();
     }
 
     const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
@@ -731,6 +751,16 @@ public:
 
     void SetSDFEdgeLightParams(const std::string& tag, float param);
 
+    void MakeDistortionCollapseParams()
+    {
+        distortionCollapseParams_ = std::make_shared<GEDistortionCollapseFilterParams>();
+    }
+
+    const std::shared_ptr<GEDistortionCollapseFilterParams>& GetDistortionCollapseParams() const
+    {
+        return distortionCollapseParams_;
+    }
+
 private:
     static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr; // cacheData
@@ -766,6 +796,8 @@ private:
     void SetWavyRippleLightParams(const std::string& tag, float param);
     void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
     void SetAuroraNoiseParams(const std::string& tag, float param);
+    void SetDistortionCollapseParams(const std::string& tag, const std::pair<float, float>& param);
+    void SetSDFDistortOpShapeParams(const std::string& tag, const std::pair<float, float>& param);
     void SetPixelMapMaskParams(const std::string& tag, const RectF& param);
     void SetPixelMapMaskParams(const std::string& tag, const Vector4f& param);
     void SetParticleCircularHaloParams(const std::string& tag, float param);
@@ -813,6 +845,8 @@ private:
     void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
     void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
     void SetFrostedGlassBlurParams(const std::string& tag, const float param);
+    void SetSDFEdgeLightEffectParams(const std::string& tag, float param);
+    void SetSDFEdgeLightEffectParams(const std::string& tag, const Vector3f& param);
 
     FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
@@ -850,7 +884,9 @@ private:
     std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
     std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
     std::shared_ptr<GESDFEdgeLightFilterParams> sdfEdgeLightParams_ = nullptr;
+    std::shared_ptr<GESDFEdgeLightEffectParams> sdfEdgeLightEffectParams_ = nullptr;
     std::shared_ptr<GESDFFromImageFilterParams> sdfFromImageParams_ = nullptr;
+    std::shared_ptr<GEDistortionCollapseFilterParams> distortionCollapseParams_ = nullptr;
 
     std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
     std::shared_ptr<GEDotMatrixShaderParams> dotMatrixShaderParams_ = nullptr;
@@ -875,6 +911,7 @@ private:
     std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
     std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
     std::shared_ptr<GESDFPixelmapShapeParams> sdfPixelmapShapeParams_ = nullptr;
+    std::shared_ptr<GESDFDistortOpShapeParams> sdfDistortOpShapeParams_ = nullptr;
     std::shared_ptr<GEHarmoniumEffectShaderParams> harmoniumEffectParams_ = nullptr;
     std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
     std::shared_ptr<GEXAIBarRectHaloEffectParams> AIBarRectHaloEffectParams_ = nullptr;

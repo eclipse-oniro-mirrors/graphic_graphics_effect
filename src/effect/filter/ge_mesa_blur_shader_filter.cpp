@@ -493,6 +493,15 @@ Drawing::ImageInfo GEMESABlurShaderFilter::ComputeImageInfo(const Drawing::Image
     int& width, int& height) const
 {
     LOGD("GEMESABlurShaderFilter:: sigma = %{public}f. ", blurRadius_);
+    if (isFrostedGlassBlur_) {
+        if (blurScale_ > BASE_BLUR_SCALE - 1e-4) {
+            width = width + width % 2; // 2: To determine whether it is an even number
+            height = height + height % 2;
+        } else if (blurScale_ > BLUR_SCALE_1 - 1e-4) {
+            width = width % 4 ? width - width % 4 + 4 : width; // 4: To determine whether it is a multiple of 4
+            height = height % 4 ? height - height % 4 + 4 : height;
+        }
+    }
     return Drawing::ImageInfo(std::ceil(width * blurScale_), std::ceil(height * blurScale_),
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
 }
@@ -624,10 +633,19 @@ Drawing::Matrix GEMESABlurShaderFilter::BuildMatrix(
     blurMatrix.Translate(-src.GetLeft(), -src.GetTop());
     int scaleWidth = scaledInfo.GetWidth();
     int width = input->GetWidth();
+    int height = input->GetHeight();
+    if (isFrostedGlassBlur_) {
+        if (blurScale_ > BASE_BLUR_SCALE - 1e-4) {
+            width = width + width % 2; // 2: To determine whether it is an even number
+            height = height + height % 2;
+        } else if (blurScale_ > BLUR_SCALE_1 - 1e-4) {
+            width = width % 4 ? width - width % 4 + 4 : width; // 4: To determine whether it is a multiple of 4
+            height = height % 4 ? height - height % 4 + 4 : height;
+        }
+    }
     float scaleW = static_cast<float>(scaleWidth) / (width > 0 ? width : 1);
 
     int scaleHeight = scaledInfo.GetHeight();
-    int height = input->GetHeight();
     float scaleH = static_cast<float>(scaleHeight) / (height > 0 ? height : 1);
     blurMatrix.PostScale(scaleW, scaleH);
     return blurMatrix;

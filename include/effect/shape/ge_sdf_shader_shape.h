@@ -29,7 +29,8 @@ enum class GESDFShapeType : uint8_t {
     TRIANGLE,
     TRANSFORM,
     UNION_OP,
-    MAX = UNION_OP,
+    DISTORT_OP,
+    MAX = DISTORT_OP,
 };
 
 class GE_EXPORT GESDFShaderShape : public GEShaderShape {
@@ -41,6 +42,7 @@ public:
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
+    virtual bool TryGetCenter(float& outX, float& outY) const;
     virtual GESDFShapeType GetSDFShapeType() const = 0;
     virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);

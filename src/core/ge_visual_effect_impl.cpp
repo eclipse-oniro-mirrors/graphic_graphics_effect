@@ -146,6 +146,12 @@ TagMap<GEFrameGradientMaskParams> frameGradientMaskTagMap_{
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_OUTER_FRAME_WIDTH, outerFrameWidth, float),
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_RECT_WH, rectWH, PairFloat),
     ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_RECT_POS, rectPos, PairFloat),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_AXIAL_FEATHER_STRENGTH,
+        axialFeatherStrength, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_AXIAL_CENTER, axialCenter, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_AXIAL_CORE_WIDTH, axialCoreWidth, float),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_AXIAL_DIRECTION, axialDirection, PairFloat),
+    ADD_TAG_HANDLER(GEFrameGradientMaskParams, GE_MASK_FRAME_GRADIENT_BOX_ANGLE_DEG, boxAngleDeg, float)
 };
 
 TagMap<GECircleFlowlightEffectParams> circleFlowlightEffectTagMap_{
@@ -340,6 +346,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSdfEdgeLightPrams();
         }
     },
+    { GE_SHADER_SDF_EDGE_LIGHT_EFFECT,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT_EFFECT);
+            impl->MakeSdfEdgeLightEffectParams();
+        }
+    },
     { GE_FILTER_SDF_FROM_IMAGE,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_FROM_IMAGE);
@@ -470,6 +482,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_TRANSFORM_SHAPE);
             impl->MakeSDFTransformShapeParams();
+        }
+    },
+    { GE_SHAPE_SDF_DISTORT_OP,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::SDF_DISTORT_OP_SHAPE);
+            impl->MakeSDFDistortOpShapeParams();
         }
     },
     { GE_SHAPE_SDF_EMPTY_SHAPE,
@@ -626,6 +644,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT);
             impl->MakeSpatialPointLightParams();
         }
+    },
+    { GE_FILTER_DISTORTION_COLLAPSE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::DISTORTION_COLLAPSE);
+            impl->MakeDistortionCollapseParams();
+        }
     }
 };
 
@@ -694,9 +718,17 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             if (sdfFromImageParams_ == nullptr) {
                 return;
             }
-
             if (tag == GE_FILTER_SDF_FROM_IMAGE_SPREAD_FACTOR) {
                 sdfFromImageParams_->spreadFactor = param;
+            }
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE) {
+                sdfTransformShapeParams_->unionMode = param;
             }
             break;
         }
@@ -972,6 +1004,22 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetSDFEdgeLightParams(tag, param);
             break;
         }
+        case FilterType::SDF_EDGE_LIGHT_EFFECT: {
+            SetSDFEdgeLightEffectParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH) {
+                sdfTransformShapeParams_->warpStrength = param;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING) {
+                sdfTransformShapeParams_->spacing = param;
+            }
+            break;
+        }
         case FilterType::SDF_TRIANGLE_SHAPE: {
             if (sdfTriangleShapeParams_ == nullptr) {
                 return;
@@ -1042,6 +1090,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_FILTER_SDF_EDGE_LIGHT_SDF_IMAGE) {
                 sdfEdgeLightParams_->sdfImage = param;
+            }
+            break;
+        }
+        case FilterType::SDF_EDGE_LIGHT_EFFECT: {
+            if (sdfEdgeLightEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_IMAGE) {
+                sdfEdgeLightEffectParams_->sdfImage = param;
             }
             break;
         }
@@ -1245,6 +1302,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             ApplyTagParams(tag, param, frameGradientMaskParams_, frameGradientMaskTagMap_);
             break;
         }
+        case FilterType::SDF_TRANSFORM_SHAPE: {
+            if (sdfTransformShapeParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER) {
+                sdfTransformShapeParams_->centerPosition = Vector2f(param.first, param.second);
+            }
+            break;
+        }
         case FilterType::SDF_TRIANGLE_SHAPE: {
             if (sdfTriangleShapeParams_ == nullptr) {
                 return;
@@ -1256,6 +1322,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
             } else if (tag == GE_SHAPE_SDF_TRIANGLE_SHAPE_VERTEX2) {
                 sdfTriangleShapeParams_->vertex2 = Vector2f(param.first, param.second);
             }
+            break;
+        }
+        case FilterType::DISTORTION_COLLAPSE: {
+            SetDistortionCollapseParams(tag, param);
+            break;
+        }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            SetSDFDistortOpShapeParams(tag, param);
             break;
         }
         default:
@@ -1536,6 +1610,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_EDGE_LIGHT_EFFECT: {
+            if (sdfEdgeLightEffectParams_ == nullptr) {
+                return;
+            }
+            if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_LIGHT_MASK) {
+                sdfEdgeLightEffectParams_->lightMask = param;
+            }
+            break;
+        }
         case FilterType::FROSTED_GLASS_EFFECT: {
             if (frostedGlassEffectParams_ == nullptr || !param) {
                 return;
@@ -1630,6 +1713,24 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::SDF_EDGE_LIGHT_EFFECT: {
+            if (sdfEdgeLightEffectParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE) {
+                sdfEdgeLightEffectParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            if (sdfDistortOpShapeParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_SHAPE_SDF_DISTORT_OP_SHAPE) {
+                sdfDistortOpShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1707,6 +1808,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector3f& param)
         }
         case FilterType::DISTORT_CHROMA: {
             ApplyTagParams(tag, param, distortChromaParams_, distortChromaTagMap_);
+            break;
+        }
+        case FilterType::SDF_EDGE_LIGHT_EFFECT: {
+            SetSDFEdgeLightEffectParams(tag, param);
             break;
         }
         default:
@@ -1822,6 +1927,18 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const Vector4f& param)
         case FilterType::SDF_COLOR: {
             if (sdfColorShaderParams_ && tag == GE_SHADER_SDF_COLOR_COLOR) {
                 sdfColorShaderParams_->color = param;
+            }
+            break;
+        }
+        case FilterType::DISTORTION_COLLAPSE: {
+            if (distortionCollapseParams_ && tag == GE_FILTER_DISTORTION_COLLAPSE_BARREL_DISTORTION) {
+                distortionCollapseParams_->barrelDistortion_ = param;
+            }
+            break;
+        }
+        case FilterType::SDF_DISTORT_OP_SHAPE: {
+            if (sdfDistortOpShapeParams_ && tag == GE_SHAPE_SDF_DISTORT_OP_BARREL_DISTORTION) {
+                sdfDistortOpShapeParams_->barrelDistortion = param;
             }
             break;
         }
@@ -2516,6 +2633,47 @@ void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, float 
     }
 }
 
+void GEVisualEffectImpl::SetDistortionCollapseParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (distortionCollapseParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_LU_CORNER) {
+        distortionCollapseParams_->LUCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_RU_CORNER) {
+        distortionCollapseParams_->RUCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_RB_CORNER) {
+        distortionCollapseParams_->RBCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_LB_CORNER) {
+        distortionCollapseParams_->LBCorner_ = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_FILTER_DISTORTION_COLLAPSE_BARREL_DISTORTION) {
+        distortionCollapseParams_->barrelDistortion_ = Vector4f(param.first, param.first, param.second, param.second);
+    }
+}
+
+void GEVisualEffectImpl::SetSDFDistortOpShapeParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (sdfDistortOpShapeParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_LU_CORNER) {
+        sdfDistortOpShapeParams_->LUCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_RU_CORNER) {
+        sdfDistortOpShapeParams_->RUCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_RB_CORNER) {
+        sdfDistortOpShapeParams_->RBCorner = Drawing::Point(param.first, param.second);
+    }
+    if (tag == GE_SHAPE_SDF_DISTORT_OP_LB_CORNER) {
+        sdfDistortOpShapeParams_->LBCorner = Drawing::Point(param.first, param.second);
+    }
+}
+
 void GEVisualEffectImpl::SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param)
 {
     if (wavyRippleLightParams_ == nullptr) {
@@ -2972,6 +3130,11 @@ void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, float par
     if (tag == GE_FILTER_FROSTED_GLASS_BGALPHA) {
         frostedGlassParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid alpha range is between 0.0f and 1.0f
     }
+
+    constexpr float maxColorLitmit = 15.0f;
+    if (tag == GE_FILTER_FROSTED_GLASS_MAXCOLOR) {
+        frostedGlassParams_->maxColor = std::clamp(param, 0.0f, maxColorLitmit);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassParams(const std::string& tag, const bool& param)
@@ -3253,6 +3416,11 @@ void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag, con
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_BGALPHA) {
         frostedGlassEffectParams_->bgAlpha = std::clamp(param, 0.0f, 1.0f); // valid range is between 0.0f and 1.0f
     }
+
+    constexpr float maxColorLitmit = 15.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_MAXCOLOR) {
+        frostedGlassEffectParams_->maxColor = std::clamp(param, 0.0f, maxColorLitmit);
+    }
 }
 
 void GEVisualEffectImpl::SetFrostedGlassEffectParams(const std::string& tag,
@@ -3372,6 +3540,12 @@ void GEVisualEffectImpl::HandleSetFrostedGlassEffectWeights(
     if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_WEIGHTSEDL) {
         frostedGlassEffectParams_->weightsEdl = Vector2f(std::clamp(param.first, MIN_W, MAX_W),
             std::clamp(param.second, MIN_W, MAX_W));
+    }
+
+    constexpr float maxValue = 20.0f;
+    if (tag == GE_SHADER_FROSTED_GLASS_EFFECT_ANTIALIAS) {
+        frostedGlassEffectParams_->antiAlias = Vector2f(std::clamp(param.first, -maxValue, -1.0f),
+            std::clamp(param.second, 1.0f, maxValue));
     }
 }
 
@@ -3578,6 +3752,61 @@ void GEVisualEffectImpl::SetSDFEdgeLightParams(const std::string& tag, float par
     }
     if (tag == GE_FILTER_SDF_EDGE_LIGHT_OUTER_BORDER_BLOOM_WIDTH) {
         sdfEdgeLightParams_->outerBorderBloomWidth = param;
+    }
+}
+
+void GEVisualEffectImpl::SetSDFEdgeLightEffectParams(const std::string& tag, const Vector3f& param)
+{
+    constexpr float MIN_COLOR = 0.0f;
+    constexpr float MAX_COLOR = 1.0f;
+    if (sdfEdgeLightEffectParams_ == nullptr) {
+        GE_LOGE("GEVisualEffectImpl::SetSDFEdgeLightEffectParams sdfEdgeLightEffectParams_ Vector3f is nullptr");
+        return;
+    }
+
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_COLOR) {
+        sdfEdgeLightEffectParams_->color = Vector3f(std::clamp(param[NUM_0], MIN_COLOR, MAX_COLOR),
+            std::clamp(param[NUM_1], MIN_COLOR, MAX_COLOR), std::clamp(param[NUM_2], MIN_COLOR, MAX_COLOR));
+    }
+}
+
+void GEVisualEffectImpl::SetSDFEdgeLightEffectParams(const std::string& tag, float param)
+{
+    constexpr float MIN_VALUE = 0.0f;
+    constexpr float MAX_VALUE = 4096.0f;
+    constexpr float MAX_CUTOFF = 1.0f;
+
+    if (sdfEdgeLightEffectParams_ == nullptr) {
+        GE_LOGE("GEVisualEffectImpl::SetSDFEdgeLightEffectParams sdfEdgeLightEffectParams_ is nullptr");
+        return;
+    }
+
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_SDF_SPREAD_FACTOR) {
+        sdfEdgeLightEffectParams_->sdfSpreadFactor = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_BLOOM_INTENSITY_CUTOFF) {
+        sdfEdgeLightEffectParams_->bloomIntensityCutoff = std::clamp(param, MIN_VALUE, MAX_CUTOFF);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_INTENSITY) {
+        sdfEdgeLightEffectParams_->maxIntensity = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_BLOOM_INTENSITY) {
+        sdfEdgeLightEffectParams_->maxBloomIntensity = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_BLOOM_FALLOFF_POW) {
+        sdfEdgeLightEffectParams_->bloomFalloffPow = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MIN_BORDER_WIDTH) {
+        sdfEdgeLightEffectParams_->minBorderWidth = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_MAX_BORDER_WIDTH) {
+        sdfEdgeLightEffectParams_->maxBorderWidth = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_INNER_BORDER_BLOOM_WIDTH) {
+        sdfEdgeLightEffectParams_->innerBorderBloomWidth = std::clamp(param, MIN_VALUE, MAX_VALUE);
+    }
+    if (tag == GE_SHADER_SDF_EDGE_LIGHT_EFFECT_OUTER_BORDER_BLOOM_WIDTH) {
+        sdfEdgeLightEffectParams_->outerBorderBloomWidth = std::clamp(param, MIN_VALUE, MAX_VALUE);
     }
 }
 

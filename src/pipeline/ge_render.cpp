@@ -27,6 +27,7 @@
 #include "ge_direction_light_shader_filter.h"
 #include "ge_dispersion_shader_filter.h"
 #include "ge_displacement_distort_shader_filter.h"
+#include "ge_distortion_collapse_filter.h"
 #include "ge_edge_light_shader_filter.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
@@ -57,6 +58,7 @@
 #include "ge_sdf_color_shader.h"
 #include "ge_sdf_shadow_shader.h"
 #include "ge_sdf_edge_light.h"
+#include "ge_sdf_edge_light_shader.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -159,6 +161,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
             }
             const auto& params = ve->GetBorderLightParams();
             out = std::make_shared<GEBorderLightShader>(*params);
+            return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetSDFEdgeLightEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSDFEdgeLightEffectParams();
+            out = std::make_shared<GESDFEdgeLightShader>(*params);
             return out;
         }
     },
@@ -948,6 +961,11 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::SDF_EDGE_LIGHT: {
             const auto& params = ve->GetSDFEdgeLightParams();
             shaderFilter = std::make_shared<GESDFEdgeLight>(*params);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::DISTORTION_COLLAPSE: {
+            const auto& params = ve->GetDistortionCollapseParams();
+            shaderFilter = std::make_shared<GEDistortionCollapseFilter>(*params);
             break;
         }
         default:

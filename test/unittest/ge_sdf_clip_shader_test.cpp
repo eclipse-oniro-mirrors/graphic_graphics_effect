@@ -50,7 +50,8 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
     auto shader = clipShader.MakeSDFClipShader(rect);
     EXPECT_EQ(shader, nullptr);
 
-    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f, 10.0f, 10.0f}};
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    rectShapeParams.rrect.SetCornerRadius(10.0f, 10.0f);
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     params.shape = sdfShape;
     clipShader.SetSDFClipParams(params);

@@ -36,6 +36,13 @@ inline static const std::string maskString = R"(
     uniform half cornerRadius;
     uniform half2 rectWH;
     uniform half2 rectPos;
+    uniform half axialFeatherStrength;
+    uniform half axialCenter;
+    uniform half axialCoreWidth;
+    uniform half2 axialDirection;
+    uniform half boxAngleDeg;
+
+    const half PI = 3.1415926;
 
     half sdRoundedBox(half2 p, half2 b, half r)
     {
@@ -50,13 +57,35 @@ inline static const std::string maskString = R"(
         return (((1.0 + XY.x - XY.y) * t - XY.x - XY.x + XY.y) * t + XY.x) * t;
     }
 
+    half AxialEnvelope(half t, half axialCenter, half axialCoreWidth)
+    {
+        half halfWidth = 0.5 * axialCoreWidth;
+        half riseEnd = axialCenter - halfWidth;
+        half fallStart = axialCenter + halfWidth;
+
+        half rise = smoothstep(0.0, riseEnd, t);
+        half fall = 1.0 - smoothstep(fallStart, 1.0, t);
+        return rise * fall;
+    }
+
+    half2 Rotate2D(half2 p, half a)
+    {
+        half s = sin(a);
+        half c = cos(a);
+        return half2(c * p.x - s * p.y,
+            s * p.x + c * p.y);
+    }
+
     half4 main(float2 fragCoord) {
         half2 uv = fragCoord / iResolution.xy;
         half2 centeredUvs = (uv - 0.5) * 2.0 - rectPos;
         half screenRatio = iResolution.x / iResolution.y;
         centeredUvs.x *= screenRatio;
 
-        half sdfrect = sdRoundedBox(centeredUvs.xy, half2(screenRatio * rectWH.x, rectWH.y),
+        half angle = boxAngleDeg * PI / 180.0;
+        half2 localPos = Rotate2D(centeredUvs, -angle);
+
+        half sdfrect = sdRoundedBox(localPos.xy, half2(screenRatio * rectWH.x, rectWH.y),
                         clamp(cornerRadius, 0.0, min(screenRatio * rectWH.x, rectWH.y)));
 
         half2 sdfInOut = half2(sdfrect, -sdfrect) + half2(innerFrameWidth, outerFrameWidth);
@@ -69,7 +98,17 @@ inline static const std::string maskString = R"(
             return half4(0.0);
         }
         gradient = cubicBezierInterpolation(sdfrect > 0.0 ? outerBezier : innerBezier, gradient);
-        return half4(gradient);
+
+        // new optional axial modulation
+        half dirLen2 = dot(axialDirection, axialDirection);
+        half enable = step(1e-5, dirLen2) * step(1e-5, axialFeatherStrength);
+        half2 dir = (dirLen2 > 1e-5) ? axialDirection * inversesqrt(dirLen2) : half2(0.0, 0.0);
+        half halfExtent = abs(dir.x) * rectWH.x + abs(dir.y) * rectWH.y;
+        half axisCoord = dot(half2(localPos.x / screenRatio, localPos.y), dir);
+        half t = clamp(axisCoord / (2.0 * max(halfExtent, 1e-5)) + 0.5, 0.0, 1.0);
+        half envelope = AxialEnvelope(t, axialCenter, axialCoreWidth);
+        half axialMask = mix(1.0, mix(1.0, envelope, axialFeatherStrength), enable);
+        return half4(gradient * axialMask);
     }
 )";
 
@@ -82,7 +121,8 @@ GEFrameGradientShaderMask::GEFrameGradientShaderMask(const GEFrameGradientMaskPa
       innerFrameWidth_(std::max(param.innerFrameWidth, 0.0f)),
       outerFrameWidth_(std::max(param.outerFrameWidth, 0.0f)),
       rectWH_(std::make_pair(std::max(param.rectWH.first, 0.0f), std::max(param.rectWH.second, 0.0f))),
-      rectPos_(param.rectPos)
+      rectPos_(param.rectPos), axialFeatherStrength_(param.axialFeatherStrength), axialCenter_(param.axialCenter),
+      axialCoreWidth_(param.axialCoreWidth), axialDirection_(param.axialDirection), boxAngleDeg_(param.boxAngleDeg)
 {}
 
 bool GEFrameGradientShaderMask::ValidateParams(float width, float height) const
@@ -143,6 +183,11 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::CreateFrameGradientMask
     maskBuilder->SetUniform("outerFrameWidth", outerFrameWidth_ * NORMALIZATION_FACTOR / height);
     maskBuilder->SetUniform("rectWH", rectWH_.first, rectWH_.second);
     maskBuilder->SetUniform("rectPos", rectPos_.first, rectPos_.second);
+    maskBuilder->SetUniform("axialFeatherStrength", axialFeatherStrength_);
+    maskBuilder->SetUniform("axialCenter", axialCenter_);
+    maskBuilder->SetUniform("axialCoreWidth", axialCoreWidth_);
+    maskBuilder->SetUniform("axialDirection", axialDirection_.first, axialDirection_.second);
+    maskBuilder->SetUniform("boxAngleDeg", boxAngleDeg_);
     auto maskShader = maskBuilder->MakeShader(nullptr, false);
     if (!maskShader) {
         GE_LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader fail");

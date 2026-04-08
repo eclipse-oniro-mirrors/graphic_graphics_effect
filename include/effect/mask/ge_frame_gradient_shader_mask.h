@@ -52,6 +52,11 @@ private:
     float outerFrameWidth_ = 0.0f;
     std::pair<float, float> rectWH_;
     std::pair<float, float> rectPos_;
+    float axialFeatherStrength_ = 0.0f;
+    float axialCenter_ = 0.5f;
+    float axialCoreWidth_ = 1.0f;
+    std::pair<float, float> axialDirection_;
+    float boxAngleDeg_ = 0.0f;
 };
 } // Drawing
 } // namespace Rosen

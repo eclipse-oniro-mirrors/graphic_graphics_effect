@@ -560,7 +560,6 @@ GEEdgeLightShaderFilter::GEEdgeLightShaderFilter(const Drawing::GEEdgeLightShade
     mask_ = params.mask;
     useRawColor_ = params.useRawColor;
 
-    LOGD("GEEdgeLightShaderFilter::GEEdgeLightShaderFilter constructor.");
     if (!InitConvertFragShaderEffect() || !InitDetectFragShaderEffect() || !InitGaussShaderEffect() ||
         !InitCompositeShaderEffect() || !InitMaskShaderEffect() || !InitMergeImageShaderEffect()) {
         LOGE("GEEdgeLightShaderFilter::GEEdgeLightShaderFilter failed when initializing Effect.");

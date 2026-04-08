@@ -1315,7 +1315,8 @@ HWTEST_F(GEVisualEffectImplTest, SetSDFRRectShapeParamsTest, TestSize.Level1)
     float radiusX = 15.0f;
     float radiusY = 15.0f;
 
-    Drawing::GERRect rrect{left, top, width, height, radiusX, radiusY};
+    Drawing::GERRect rrect{left, top, width, height};
+    rrect.SetCornerRadius(radiusX, radiusY);
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_RRECT_SHAPE_RRECT, rrect);
     EXPECT_EQ(geVisualEffectImpl.GetSDFRRectShapeParams(), nullptr);
 
@@ -1331,8 +1332,8 @@ HWTEST_F(GEVisualEffectImplTest, SetSDFRRectShapeParamsTest, TestSize.Level1)
     EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.top_, top);
     EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.width_, width);
     EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.height_, height);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusX_, radiusX);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radiusY_, radiusY);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radius_[Drawing::GERRect::TOP_LEFT].x_, radiusX);
+    EXPECT_FLOAT_EQ(geVisualEffectImpl.sdfRRectShapeParams_->rrect.radius_[Drawing::GERRect::TOP_LEFT].y_, radiusY);
 }
 
 /**
@@ -1353,11 +1354,13 @@ HWTEST_F(GEVisualEffectImplTest, SetUnionOpShapeParamsTest, TestSize.Level1)
 
     // Create test sub-shapes
     Drawing::GESDFRRectShapeParams leftRectParams;
-    leftRectParams.rrect = {10.0f, 10.0f, 50.0f, 50.0f, 5.0f, 5.0f};
+    leftRectParams.rrect = {10.0f, 10.0f, 50.0f, 50.0f};
+    leftRectParams.rrect.SetCornerRadius(5.0f, 5.0f);
     auto leftShape = std::make_shared<Drawing::GESDFRRectShaderShape>(leftRectParams);
 
     Drawing::GESDFRRectShapeParams rightRectParams;
-    rightRectParams.rrect = {60.0f, 60.0f, 50.0f, 50.0f, 5.0f, 5.0f};
+    rightRectParams.rrect = {60.0f, 60.0f, 50.0f, 50.0f};
+    rightRectParams.rrect.SetCornerRadius(5.0f, 5.0f);
     auto rightShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rightRectParams);
 
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SPACING, spacing);
