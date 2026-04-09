@@ -42,37 +42,21 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
             uniform half4 lightColor;
             uniform half lightIntensity;
             uniform half attenuation;
-            uniform sampler2D maskSampler;
+            uniform shader mask;
 
             half4 main(vec2 fragCoord)
             {
-                vec2 uv = fragCoord / iResolution.xy;
-                
-                vec3 fragPos = vec3(uv, 0.0);
-                vec3 lightPos = vec3(lightPosition.x, lightPosition.y, lightPosition.z);
-                
-                float distance = length(fragPos - lightPos);
-                float attenuationFactor = 1.0 / (1.0 + attenuation * distance * distance);
-                
-                vec3 lightDir = normalize(lightPos - fragPos);
-                vec3 normal = vec3(0.0, 0.0, 1.0);
-                vec3 viewDir = vec3(0.0, 0.0, 1.0);
+                vec2 textureUVs = fragCoord.xy / iResolution.xy;
+                vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
+                vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
+                vec4 NormalMap = mask.eval(fragCoord);
+
+                vec3 viewDir = lightDir;
                 vec3 halfwayDir = normalize(lightDir + viewDir);
-                
-                float ndotl = max(dot(normal, lightDir), 0.0);
-                float ndoth = max(dot(normal, halfwayDir), 0.0);
-                
-                vec3 diffuse = lightColor.rgb * ndotl;
-                vec3 specular = lightColor.rgb * pow(ndoth, 32.0);
-                
-                vec3 result = (diffuse + specular) * lightIntensity * attenuationFactor;
-                
-                float maskValue = 1.0;
-                if (attenuation > 0.0) {
-                    maskValue = texture2D(maskSampler, uv).a;
-                }
-                
-                return half4(result * maskValue, lightColor.a * maskValue);
+                float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
+
+                vec4 fragColor = spec * lightIntensity * lightColor * NormalMap.r;
+                return fragColor;
             }
         )";
         spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
@@ -96,14 +80,12 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
         return nullptr;
     }
     builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.x,
-        pointLightParams_.lightPosition.y, pointLightParams_.lightPosition.z);
-    builder_->SetUniform("lightColor", pointLightParams_.lightColor.x,
-        pointLightParams_.lightColor.y, pointLightParams_.lightColor.z, pointLightParams_.lightColor.w);
+    builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), 3);
+    builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), 4);
     builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     builder_->SetUniform("attenuation", pointLightParams_.attenuation);
     if (pointLightParams_.mask != nullptr) {
-        builder_->SetChild("maskSampler", pointLightParams_.mask->GetDrawingShader(rect, 0.0f));
+        builder_->SetChild("mask", pointLightParams_.mask->GenerateDrawingShader(width, height));
     }
     auto spatialPointLightShader = builder_->MakeShader(nullptr, false);
     if (spatialPointLightShader == nullptr) {
