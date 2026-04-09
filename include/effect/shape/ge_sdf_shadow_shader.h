@@ -135,15 +135,17 @@ private:
             return (x >= 0.0) ? result : 2.0 - result;
         }
 
-        float gaussianShadow(float d, float blurRadius) {
+        // Outer Gaussian falloff for ambient/spot shadow
+        // erfc(0) = 1.0, seamless with interior fill
+        float outerGaussian(float d, float blurRadius) {
             if (blurRadius < 0.001) return 0.0;
             float sigma = blurRadius * 0.5;
             float x = d / (sigma * 1.41421356237);
 
             if (USE_NATIVE_ERF > 0.5) {
-                return 0.5 * (1.0 - erf(x));
+                return 1.0 - erf(x);
             } else {
-                return 0.5 * erfc_approx(x);
+                return erfc_approx(x);
             }
         }
 
@@ -153,12 +155,15 @@ private:
                 alphaFilled = smoothstep(-1.0, 0.0, d);
             }
 
-            vec4 ambient = vec4(ambientColor.rgb,
-                                ambientColor.a * gaussianShadow(d, ambientBlurRadius));
+            // Ambient: filled interior + outer Gaussian falloff (matches Skia tessellation model)
+            float ambientCoverage = (d <= 0.0) ? 1.0 : outerGaussian(d, ambientBlurRadius);
+            vec4 ambient = vec4(ambientColor.rgb, ambientColor.a * ambientCoverage);
 
-            vec4 spot = vec4(spotColor.rgb,
-                             spotColor.a * gaussianShadow(d, spotBlurRadius));
+            // Spot: same filled interior + outer falloff model
+            float spotCoverage = (d <= 0.0) ? 1.0 : outerGaussian(d, spotBlurRadius);
+            vec4 spot = vec4(spotColor.rgb, spotColor.a * spotCoverage);
 
+            // SrcOver blend
             vec3 color = ambient.rgb + spot.rgb * (1.0 - ambient.a);
             float alpha = ambient.a + spot.a * (1.0 - ambient.a);
 

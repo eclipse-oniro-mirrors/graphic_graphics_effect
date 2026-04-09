@@ -144,12 +144,15 @@ void GESDFShadowShader::ComputeElevationParams()
 {
     float elevation = params_.shadow.elevation;
 
-    // Ambient shadow params (aligned with Skia AmbientBlurRadius)
-    ambientBlurRadius_ = std::min(elevation * AMBIENT_HEIGHT_FACTOR * AMBIENT_GEOM_FACTOR,
-                                  MAX_AMBIENT_RADIUS);
-
-    // Ambient alpha = originalAlpha / AmbientRecipAlpha
+    // Ambient shadow params (aligned with Skia)
+    // outset = AmbientBlurRadius = min(elevation/2, 150)
+    // recipAlpha = AmbientRecipAlpha = 1 + elevation/128
+    // effective blur = outset * recipAlpha (matches Skia's actual blur width)
+    float outset = std::min(elevation * AMBIENT_HEIGHT_FACTOR * AMBIENT_GEOM_FACTOR, MAX_AMBIENT_RADIUS);
     float recipAlpha = 1.0f + std::max(elevation * AMBIENT_HEIGHT_FACTOR, 0.0f);
+    ambientBlurRadius_ = outset * recipAlpha;
+
+    // Ambient alpha = originalAlpha / recipAlpha
     float ambientAlpha = (static_cast<float>(DEFAULT_AMBIENT_ALPHA) / 255.0f) / recipAlpha;
     ambientColor_ = Drawing::Color::ColorQuadSetARGB(
         static_cast<uint8_t>(std::clamp(ambientAlpha * 255.0f, 0.0f, 255.0f)), 0, 0, 0);
@@ -202,8 +205,7 @@ void GESDFShadowShader::UpdateRectForElevationShadow(Drawing::Rect& rect)
     rect.SetBottom(rect.GetBottom() + maxBlur);
 }
 
-std::shared_ptr<Drawing::ShaderEffect>
-GESDFShadowShader::MakeElevationShadowShader(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowShader(const Drawing::Rect& rect)
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
