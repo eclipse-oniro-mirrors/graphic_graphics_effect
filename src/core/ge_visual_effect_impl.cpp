@@ -519,7 +519,7 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
             impl->MakeParticleAblationFilterParams();
         }
- 	},
+    },
     { GE_FILTER_GASIFY_BLUR,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_BLUR);
@@ -3068,16 +3068,16 @@ void GEVisualEffectImpl::SetParticleAblationParams(const std::string& tag, int32
         return;
     }
     if (tag == GE_FILTER_PARTICLE_ABLATION_MAX_PARTICLE_COUNT) {
-        particleAblationFilterParams_->maxParticleCount_ = param;
+        particleAblationFilterParams_->maxParticleCount_ = std::max(param, 0);
     }
     if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_SCALE) {
-        particleAblationFilterParams_->turbScale_ = param;
+        particleAblationFilterParams_->turbScale_ = std::max(param, 0);
     }
     if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_EVO) {
-        particleAblationFilterParams_->turbEvo_ = param;
+        particleAblationFilterParams_->turbEvo_ = std::max(param, 0);
     }
     if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_AMP) {
-        particleAblationFilterParams_->turbAmp_ = param;
+        particleAblationFilterParams_->turbAmp_ = std::max(param, 0);
     }
 }
 
