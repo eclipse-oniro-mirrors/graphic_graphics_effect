@@ -46,9 +46,25 @@ public:
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
+    bool IsElevationMode() const { return params_.shadow.elevation > 0.0f; }
+
+    // Original SDF shadow methods
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFShadowEffect();
     void UpdateRectForShadow(Drawing::Rect& rect);
+
+    // Elevation shadow methods
+    void ComputeElevationParams();
+    std::shared_ptr<Drawing::RuntimeEffect> GetElevationShadowEffect();
+    void UpdateRectForElevationShadow(Drawing::Rect& rect);
+    std::shared_ptr<Drawing::ShaderEffect> MakeElevationShadowShader(const Drawing::Rect& rect);
+
     Drawing::GESDFShadowShaderParams params_;
+
+    // Elevation computed params
+    float ambientBlurRadius_ = 0.0f;
+    float spotBlurRadius_ = 0.0f;
+    Drawing::Color ambientColor_;
+    Drawing::Color spotColor_;
 
     inline static const std::string shaderCode_ = R"(
         uniform shader sdfShape;
@@ -95,6 +111,63 @@ private:
             vec2 coord = fragCoord;
             float d = sdfShape.eval(coord).a;
             vec4 color = shadowEffect(coord, shadowOffset, d, shadowColor, shadowRadius, isFilled > 0.5);
+            return half4(color);
+        }
+    )";
+
+    inline static const std::string elevationShaderCode_ = R"(
+        uniform shader sdfShape;
+        uniform vec2 iResolution;
+        uniform vec4 ambientColor;
+        uniform float ambientBlurRadius;
+        uniform vec4 spotColor;
+        uniform float spotBlurRadius;
+        uniform float isFilled;
+
+        const float USE_NATIVE_ERF = 1.0;
+
+        float erfc_approx(float x) {
+            float ax = abs(x);
+            float t = 1.0 / (1.0 + 0.3275911 * ax);
+            float result = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741
+                           + t * (-1.453152027 + t * 1.061405429))));
+            result *= exp(-ax * ax);
+            return (x >= 0.0) ? result : 2.0 - result;
+        }
+
+        float gaussianShadow(float d, float blurRadius) {
+            if (blurRadius < 0.001) return 0.0;
+            float sigma = blurRadius * 0.5;
+            float x = d / (sigma * 1.41421356237);
+
+            if (USE_NATIVE_ERF > 0.5) {
+                return 0.5 * (1.0 - erf(x));
+            } else {
+                return 0.5 * erfc_approx(x);
+            }
+        }
+
+        vec4 elevationShadowEffect(float d) {
+            float alphaFilled = 1.0;
+            if (isFilled < 0.5 && d < 0.0) {
+                alphaFilled = smoothstep(-1.0, 0.0, d);
+            }
+
+            vec4 ambient = vec4(ambientColor.rgb,
+                                ambientColor.a * gaussianShadow(d, ambientBlurRadius));
+
+            vec4 spot = vec4(spotColor.rgb,
+                             spotColor.a * gaussianShadow(d, spotBlurRadius));
+
+            vec3 color = ambient.rgb + spot.rgb * (1.0 - ambient.a);
+            float alpha = ambient.a + spot.a * (1.0 - ambient.a);
+
+            return vec4(color * alphaFilled, alpha * alphaFilled);
+        }
+
+        half4 main(float2 fragCoord) {
+            float d = sdfShape.eval(fragCoord).a;
+            vec4 color = elevationShadowEffect(d);
             return half4(color);
         }
     )";
