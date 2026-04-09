@@ -15,14 +15,19 @@
 
 
 struct [[ge::params(type=DISTORTION_COLLAPSE, name="DistortionCollapse")]] GEDistortionCollapseFilterParams {
-    [[ge::prop(name="DistortionCollapse_LUCorner", cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
+    [[ge::prop(name="DistortionCollapse_LUCorner",
+               cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     Drawing::Point LUCorner_;
-    [[ge::prop(name="DistortionCollapse_RUCorner", cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
+    [[ge::prop(name="DistortionCollapse_RUCorner",
+               cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     Drawing::Point RUCorner_;
-    [[ge::prop(name="DistortionCollapse_RBCorner", cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
+    [[ge::prop(name="DistortionCollapse_RBCorner",
+               cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     Drawing::Point RBCorner_;
-    [[ge::prop(name="DistortionCollapse_LBCorner", cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
+    [[ge::prop(name="DistortionCollapse_LBCorner",
+               cast_from="std::pair<float, float>", custom="PairToPointTransformer")]]
     Drawing::Point LBCorner_;
-    [[ge::prop("DistortionCollapse_BarrelDistortion")]]
+    [[ge::prop(name="DistortionCollapse_BarrelDistortion",
+               cast_from="std::pair<float, float>", custom="DistortionCollapsePairToVector4fTransformer")]]
     Vector4f barrelDistortion_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };

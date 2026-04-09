@@ -323,6 +323,41 @@ def get_effective_type_for_tag(field: FieldInfo, is_array_elem: bool, array_idx:
     return normalize_type(effective_type, type_aliases)
 
 
+def get_original_field_type(field: FieldInfo, is_array_elem: bool) -> str:
+    """Get the original field type (before cast_from consideration).
+
+    Args:
+        field: The field info
+        is_array_elem: Whether this is an array element tag
+
+    Returns:
+        The original field type string
+    """
+    if is_array_elem and field.prop_attributes:
+        for prop_attr in field.prop_attributes:
+            if prop_attr.array_accessor_length is not None:
+                if prop_attr.array_accessor_type:
+                    return prop_attr.array_accessor_type
+                else:
+                    return field.type
+    return field.type
+
+
+def has_cast_from(field: FieldInfo, prop_attr_index: int) -> bool:
+    """Check if field has cast_from_from specified.
+
+    Args:
+        field: The field info
+        prop_attr_index: The index of the prop attribute to check
+
+    Returns:
+        True if cast_from is specified, False otherwise
+    """
+    if field.prop_attributes and prop_attr_index < len(field.prop_attributes):
+        return field.prop_attributes[prop_attr_index].cast_from is not None
+    return False
+
+
 def to_member_tag_name(enum_type: str, field_name: str, index: Optional[int] = None) -> str:
     """Generate GEParamsMemberTag enum name.
 
@@ -501,15 +536,26 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     output.append("")
 
     # Group tags by their effective type (considering prop attributes and array_accessor_type)
+    # When cast_from is specified, tags are added to BOTH cast_from type AND original field type
     type_to_tags = {}
     for struct in structs:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
+                # Get effective type (cast_from or field type)
                 normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
-
+                
                 if normalized_type not in type_to_tags:
                     type_to_tags[normalized_type] = []
                 type_to_tags[normalized_type].append((tag_info.tag_name, struct.name, field.name))
+                
+                # If cast_from is specified, also add to original field type group
+                if has_cast_from(field, tag_info.prop_attr_index):
+                    original_type = get_original_field_type(field, tag_info.is_array_element)
+                    normalized_original = normalize_type(original_type, type_aliases)
+                    
+                    if normalized_original not in type_to_tags:
+                        type_to_tags[normalized_original] = []
+                    type_to_tags[normalized_original].append((tag_info.tag_name, struct.name, field.name))
 
     # Generate implementations for each type
     for field_type, tags in type_to_tags.items():
@@ -661,7 +707,6 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     output = []
 
     output.append("    // Overloaded SetParamsMemberByTag for each unique parameter type")
-    output.append("    // These are non-template functions, reducing binary bloat")
 
     # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
     unique_types = collect_effective_types(structs, type_aliases)
@@ -833,13 +878,25 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
 
 
 def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str]) -> set:
-    """Collect unique effective types from all tags."""
+    """Collect unique effective types from all tags.
+    
+    When cast_from is specified, both cast_from type AND original field type
+    are included to generate overloads for both types.
+    """
     unique_types = set()
     for struct in structs:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
+                # Get effective type (cast_from or field type)
                 normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
                 unique_types.add(normalized_type)
+                
+                # If cast_from is specified, also add original field type
+                # This ensures we generate overloads for both types
+                if has_cast_from(field, tag_info.prop_attr_index):
+                    original_type = get_original_field_type(field, tag_info.is_array_element)
+                    normalized_original = normalize_type(original_type, type_aliases)
+                    unique_types.add(normalized_original)
 
     return unique_types
 

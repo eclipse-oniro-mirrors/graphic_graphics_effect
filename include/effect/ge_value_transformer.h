@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 
 #include "ge_effects_params.h"
@@ -78,6 +79,7 @@ struct GEParamsConstraintInfo : GEParamsConstraintMinInfo<Tag>,
     // only after checking the corresponding HAS_* flag with if constexpr
 };
 
+namespace ValueTransformerTypeTraits {
 // Helper trait: detect std::shared_ptr
 template<typename T>
 struct is_shared_ptr : std::false_type {};
@@ -88,20 +90,76 @@ struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
 template<typename T>
 inline constexpr bool is_shared_ptr_v = is_shared_ptr<T>::value;
 
+// Helper trait: detect if Transform(const FromType&, ToType&) method exists
+template<typename, typename, typename, typename = void>
+struct has_transform_method_const_ref : std::false_type {};
+
+template<typename Transformer, typename FromType, typename ToType>
+struct has_transform_method_const_ref<Transformer, FromType, ToType,
+    std::void_t<decltype(std::declval<Transformer>().Transform(
+        std::declval<const FromType&>(), std::declval<ToType&>()))>> : std::true_type {};
+
+// Helper trait: detect if Transform(FromType, ToType&) method exists
+template<typename, typename, typename, typename = void>
+struct has_transform_method_value : std::false_type {};
+
+template<typename Transformer, typename FromType, typename ToType>
+struct has_transform_method_value<Transformer, FromType, ToType,
+    std::void_t<decltype(std::declval<Transformer>().Transform(std::declval<FromType>(), std::declval<ToType&>()))>>
+    : std::true_type {};
+
+// Helper trait: detect if Transform method exists with either signature
+template<typename Transformer, typename FromType, typename ToType>
+struct has_transform_method : std::bool_constant<has_transform_method_const_ref<Transformer, FromType, ToType>::value ||
+                                                 has_transform_method_value<Transformer, FromType, ToType>::value> {};
+
+template<typename Transformer, typename FromType, typename ToType>
+inline constexpr bool has_transform_method_v = has_transform_method<Transformer, FromType, ToType>::value;
+} // namespace ValueTransformerTypeTraits
+
 // Base ValueTransformer template with new prototype
 template<GEParamsMemberTag Tag, typename FromType, typename ToType>
 struct GEParamsValueTransformer {
+    static bool TransformCustomConvert(const FromType& value, ToType& out)
+    {
+        using namespace ValueTransformerTypeTraits;
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        using Transformer = typename Constraint::CustomTransformer;
+        // When FromType == ToType, check if Transform is implemented
+        // If not implemented or types match, fallback to direct assignment
+        // Required for mapping multiple SetParams entries to single member
+        if constexpr (std::is_same_v<FromType, ToType>) {
+            if constexpr (has_transform_method_v<Transformer, FromType, ToType>) {
+                if (!Transformer::Transform(value, out)) {
+                    return false;
+                }
+            } else {
+                // Fallback: direct assignment when Transform not implemented
+                out = value;
+            }
+        } else {
+            // FromType != ToType: always call Transform
+            if (!Transformer::Transform(value, out)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     static bool Transform(const FromType& value, ToType& out)
     {
+        using namespace ValueTransformerTypeTraits;
         using Constraint = GEParamsConstraintInfo<Tag>;
 
         // Apply conversion (custom or default)
         if constexpr (Constraint::HAS_CONVERT) {
             if constexpr (Constraint::HAS_CUSTOM) {
-                using Transformer = typename Constraint::CustomTransformer;
-                if (!Transformer::Transform(value, out)) {
+                if (!TransformCustomConvert(value, out)) {
                     return false;
                 }
+            } else if constexpr (std::is_same_v<FromType, ToType>) {
+                // No custom transformer and types match: direct assignment
+                out = value;
             } else if constexpr (is_shared_ptr_v<ToType>) {
                 // Pointer type: use std::static_pointer_cast
                 out = std::static_pointer_cast<typename ToType::element_type>(value);
@@ -303,6 +361,15 @@ struct SDFUnionOpTransformer {
             return false;
         }
         out = static_cast<GESDFUnionOp>(value);
+        return true;
+    }
+};
+
+// Custom Transformer: DistortionCollapse has a special pair -> Vector4f convert
+struct DistortionCollapsePairToVector4fTransformer {
+    static bool Transform(const std::pair<float, float>& value, Vector4f& out)
+    {
+        out = Vector4f(value.first, value.first, value.second, value.second);
         return true;
     }
 };

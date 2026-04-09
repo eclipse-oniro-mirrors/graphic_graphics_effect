@@ -1594,6 +1594,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
         GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_U_CORNER)
         GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_B_CORNER)
         GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_BARREL_DISTORTION)
         GE_VALIDATE_AND_SET(DOT_MATRIX_COLOR_FRACTIONS)
         GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_CENTER1)
         GE_VALIDATE_AND_SET(DOUBLE_RIPPLE_MASK_CENTER2)
@@ -1689,6 +1690,58 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
         GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_R_RECT_W_H)
         GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_R_RECT_POS)
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_START_END_POSITION)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Drawing::Point& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH0)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH1)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH2)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH3)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH4)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH5)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH6)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH7)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH8)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH9)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH10)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH11)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_U_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_U_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_B_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_START_POSITION)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_END_POSITION)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_U_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_U_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_B_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS0)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS1)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS2)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS3)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS4)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS5)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS6)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS7)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS8)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS9)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS10)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS11)
         default:
             break;
     }
@@ -1953,6 +2006,25 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                                 GEParamsMemberTag tag, const std::vector<Vector4f>& value)
 {
     if (!params) {
@@ -1967,6 +2039,64 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
     switch (tag) {
         GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_COLORS)
         GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_COLORS)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Vector2f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_COLOR_FRACTIONS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EDL)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ANTI_ALIAS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_DIR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EDL)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_DIR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BLUR_PARAM)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_CENTER_POSITION)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX0)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX2)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_POSITION)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_CLICK_POS)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_R_D)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_GRANULARITY)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_DISTORT_FACTOR)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_POSITION)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_RADIUS_X_Y)
         default:
             break;
     }
@@ -2003,6 +2133,25 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                                 GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value)
 {
     if (!params) {
@@ -2016,6 +2165,17 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         default:
             break;
     }
@@ -2056,6 +2216,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_RECT)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
         default:
             break;
     }
@@ -2163,30 +2325,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const Drawing::Point& value)
-{
-    if (!params) {
-        return;
-    }
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params->GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_START_POSITION)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_END_POSITION)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_U_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_U_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_B_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_B_CORNER)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                                 GEParamsMemberTag tag, const uint32_t& value)
 {
     if (!params) {
@@ -2263,6 +2401,58 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_SHADOW_SHADOW)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_OP)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                                GEParamsMemberTag tag, const Drawing::Color4f& value)
+{
+    if (!params) {
+        return;
+    }
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params->GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
         default:
             break;
     }

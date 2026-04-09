@@ -14,11 +14,9 @@
  */
 
 
-constexpr int ARRAY_SIZE_NINE = 9;
-
 struct [[ge::params(type=GRID_WARP, name="GridWarp")]] GEGridWarpShaderFilterParams {
     [[ge::prop(name="GridWarp_GridPoint", array_accessor_length=9, array_accessor_type="std::pair<float, float>")]]
-    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> gridPoints;
+    std::array<std::pair<float, float>, 9> gridPoints;
     [[ge::prop(name="GridWarp_RotationAngle", array_accessor_length=9, array_accessor_type="std::pair<float, float>")]]
-    std::array<std::pair<float, float>, ARRAY_SIZE_NINE> rotationAngles;
+    std::array<std::pair<float, float>, 9> rotationAngles;
 };

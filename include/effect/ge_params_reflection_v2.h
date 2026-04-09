@@ -40,13 +40,18 @@ class GEFilterParams;
 // X-Macro listing all unique parameter member types
 // Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X
 #define FOR_EACH_PARAM_TYPE(X) \
+    X(ESCAPE(Drawing::Color4f)) \
     X(ESCAPE(Drawing::Matrix)) \
     X(ESCAPE(Drawing::Point)) \
+    X(ESCAPE(GEV2::DotMatrixDirection)) \
+    X(ESCAPE(GEV2::DotMatrixEffectType)) \
     X(ESCAPE(GEV2::GEBezierWarpShaderFilterControlPointArray)) \
     X(ESCAPE(GEV2::GERRect)) \
     X(ESCAPE(GEV2::GESDFBorderParams)) \
     X(ESCAPE(GEV2::GESDFShadowParams)) \
+    X(ESCAPE(GEV2::GESDFUnionOp)) \
     X(ESCAPE(RectF)) \
+    X(ESCAPE(Vector2f)) \
     X(ESCAPE(Vector3f)) \
     X(ESCAPE(Vector4f)) \
     X(ESCAPE(bool)) \
@@ -685,13 +690,10 @@ GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DISTORTION_COLLAPSE_L_U_CORNER, ESCAPE(std::
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DISTORTION_COLLAPSE_R_U_CORNER, ESCAPE(std::pair<float, float>), PairToPointTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DISTORTION_COLLAPSE_R_B_CORNER, ESCAPE(std::pair<float, float>), PairToPointTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DISTORTION_COLLAPSE_L_B_CORNER, ESCAPE(std::pair<float, float>), PairToPointTransformer)
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DISTORTION_COLLAPSE_BARREL_DISTORTION, ESCAPE(std::pair<float, float>), DistortionCollapsePairToVector4fTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(DOT_MATRIX_PATH_DIRECTION, ESCAPE(int32_t))
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DOT_MATRIX_COLOR_FRACTIONS, ESCAPE(std::pair<float, float>), PairToVector2fTransformer)
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(DOT_MATRIX_EFFECT_TYPE, ESCAPE(int32_t), DotMatrixEffectTypeTransformer)
-GE_PARAMS_CONSTRAINT_MIN(FRAME_GRADIENT_MASK_AXIAL_FEATHER_STRENGTH, float, 0.0)
-GE_PARAMS_CONSTRAINT_MIN(FRAME_GRADIENT_MASK_AXIAL_CENTER, float, 0.0)
-GE_PARAMS_CONSTRAINT_MAX(FRAME_GRADIENT_MASK_AXIAL_CENTER, float, 1.0)
-GE_PARAMS_CONSTRAINT_MIN(FRAME_GRADIENT_MASK_AXIAL_CORE_WIDTH, float, 0.0)
 GE_PARAMS_CONSTRAINT_MIN(FROSTED_GLASS_BLUR_RADIUS, float, 0.0)
 GE_PARAMS_CONSTRAINT_MAX(FROSTED_GLASS_BLUR_RADIUS, float, 200.0)
 GE_PARAMS_CONSTRAINT_MIN(FROSTED_GLASS_BLUR_RADIUS_SCALE, float, 0.0)
@@ -1641,11 +1643,16 @@ public:
     // Set params member by tag using overloaded functions (reduces binary bloat)
     // All implementations are in the .cpp file
     // Overloaded SetParamsMemberByTag for each unique parameter type
-    // These are non-template functions, reducing binary bloat
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const Drawing::Color4f& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1655,7 +1662,11 @@ public:
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const GEV2::GESDFShadowParams& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const RectF& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const Vector2f& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Vector3f& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
