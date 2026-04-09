@@ -48,10 +48,24 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImplV2::GetGEShaderS
         return nullptr;
     }
 
-    // TODO: According to GEVisualEffectImpl::GetGEShaderShape, this migration should be delegated to those two tags' 
-    // getter, check the type and convert back
-    // FROSTED_GLASS_SDF_SHAPE
-    // FROSTED_GLASS_EFFECT_SDF_SHAPE
+    switch (shaderShapeTag) {
+        case GEV2::GEParamsMemberTag::FROSTED_GLASS_SDF_SHAPE: {
+            auto frostedGlassParams = GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassShaderFilterParams>(params_);
+            if (frostedGlassParams.has_value()) {
+                return frostedGlassParams.value().sdfShape;
+            }
+            break;
+        }
+        case GEV2::GEParamsMemberTag::FROSTED_GLASS_EFFECT_SDF_SHAPE: {
+            auto frostedGlassEffectParams = GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassEffectParams>(params_);
+            if (frostedGlassEffectParams.has_value()) {
+                return frostedGlassEffectParams.value().sdfShape;
+            }
+            break;
+        }
+        default:
+            break;
+    }
 
     return nullptr;
 }
@@ -71,6 +85,13 @@ FOR_EACH_PARAM_TYPE(IMPLEMENT_SET_PARAM_INTERNAL)
 void GEVisualEffectImplV2::SetSDFEdgeLightParams(const std::string& tag, float param)
 {
     SetParam(tag, param);
+}
+
+void GEVisualEffectImplV2::MakeSDFUnionOpShapeParams(const GEV2::GESDFUnionOp& op)
+{
+    auto params = std::make_shared<GEV2::GESDFUnionOpShapeParams>();
+    params->op = op;
+    params_ = GEV2::GEFilterParams::Box(params);
 }
 
 } // namespace Drawing

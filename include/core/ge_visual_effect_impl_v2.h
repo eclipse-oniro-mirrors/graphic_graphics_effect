@@ -192,7 +192,8 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(GridWarpFilterParams, GEV2::GEGridWarpShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(NoisyFrameGradientMaskParams, GEV2::GEXNoisyFrameGradientMaskParams)
 
-    // TODO: void MakeSDFUnionOpShapeParams(const GESDFUnionOp& op)
+    // Special overload: MakeSDFUnionOpShapeParams with op parameter
+    void MakeSDFUnionOpShapeParams(const GEV2::GESDFUnionOp& op);
 #undef GE_DECLARE_MAKE_GET_PARAMS
 
     void SetCanvasInfo(Drawing::CanvasInfo info)
