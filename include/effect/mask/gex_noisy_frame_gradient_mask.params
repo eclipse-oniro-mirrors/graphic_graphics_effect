@@ -22,6 +22,6 @@ struct [[ge::params(type=NOISY_FRAME_GRADIENT_MASK, name="NoisyFrameGradientMask
     std::pair<float, float> outsideFrameWidth;
     std::pair<float, float> RRectWH;
     std::pair<float, float> RRectPos;
-    float slope;
-    float progress;
+    float slope = 0.0f;
+    float progress = 0.0f;
 };

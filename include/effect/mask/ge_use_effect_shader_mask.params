@@ -13,9 +13,6 @@
  * limitations under the License.
  */
 
-// WARNING: This struct is not registered with REGISTER_GEFILTERPARAM_TYPEINFO
-// The type name is guessed from the enum name USE_EFFECT_MASK
-
 struct [[ge::params(type=USE_EFFECT_MASK, name="UseEffectMask")]] GEUseEffectMaskParams {
     std::weak_ptr<Drawing::Image> image;
     bool useEffect = false;
