@@ -1306,7 +1306,7 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
         using ParamsType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::ParamsType; \
         using FieldType = GEParamsFieldAccessor<GEParamsMemberTag::Tag>::FieldType; \
         using SetterType = std::remove_cv_t<std::remove_reference_t<decltype(value)>>; \
-        auto unboxed = GEFilterParams::Unbox<std::shared_ptr<ParamsType>>(params); \
+        auto unboxed = GEFilterParams::Unbox<ParamsType>(params); \
         if (unboxed == nullptr) { \
             return; \
         } \

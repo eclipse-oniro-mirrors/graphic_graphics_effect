@@ -46,7 +46,7 @@ public:
     static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfoV2<T>::ID != GEFilterType::NONE;
 
     template<typename T>
-    static OptionalType<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
+    static std::shared_ptr<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
     template<typename T>
     static std::shared_ptr<GEFilterParams> Box(T&& params);
 
@@ -90,15 +90,15 @@ public:
 
 // Checked downcast from GEFilterParams to specific params type
 template<typename T>
-GEFilterParams::OptionalType<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
+std::shared_ptr<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
 {
     static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
-    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
+    using ParamType = typename GEFilterParamsWrapper<std::shared_ptr<T>>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
     if (GEFilterParamsTypeInfoV2<ParamType>::ID == params->id) {
-        return std::static_pointer_cast<GEFilterParamsWrapper<T>>(params)->data;
+        return std::static_pointer_cast<GEFilterParamsWrapper<std::shared_ptr<T>>>(params)->data;
     }
-    return GEFilterParamsWrapper<T>::Null;
+    return GEFilterParamsWrapper<std::shared_ptr<T>>::Null;
 }
 
 // Upcast from specific params type to type-erased GEFilterParams

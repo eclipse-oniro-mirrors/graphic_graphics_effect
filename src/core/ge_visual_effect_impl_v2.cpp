@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 #include "core/ge_visual_effect_impl_v2.h"
+
 #include "effect/ge_params_reflection_v2.h"
-#include "ge_log.h"
 #include "ge_external_dynamic_loader.h"
+#include "ge_log.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -23,18 +24,16 @@ namespace Drawing {
 
 GEVisualEffectImplV2::GEVisualEffectImplV2(
     const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
-    : canvasInfo_(canvasInfo ? *canvasInfo : Drawing::CanvasInfo{})
+    : canvasInfo_(canvasInfo ? *canvasInfo : Drawing::CanvasInfo {})
 {
     // Initialize filter type from name using generated helper
     filterType_ = GEV2::GEParamsBuilder::GetFilterTypeFromString(name);
-    
+
     // Build params of appropriate type using generated helper
     params_ = GEV2::GEParamsBuilder::Build(filterType_);
 }
 
-GEVisualEffectImplV2::~GEVisualEffectImplV2()
-{
-}
+GEVisualEffectImplV2::~GEVisualEffectImplV2() {}
 
 const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImplV2::GetGEShaderShape(const std::string& tag) const
 {
@@ -50,16 +49,18 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImplV2::GetGEShaderS
 
     switch (shaderShapeTag) {
         case GEV2::GEParamsMemberTag::FROSTED_GLASS_SDF_SHAPE: {
-            auto frostedGlassParams = GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassShaderFilterParams>(params_);
-            if (frostedGlassParams.has_value()) {
-                return frostedGlassParams.value().sdfShape;
+            auto frostedGlassParams =
+                GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassShaderFilterParams>(params_);
+            if (frostedGlassParams != nullptr) {
+                return frostedGlassParams->sdfShape;
             }
             break;
         }
         case GEV2::GEParamsMemberTag::FROSTED_GLASS_EFFECT_SDF_SHAPE: {
-            auto frostedGlassEffectParams = GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassEffectParams>(params_);
-            if (frostedGlassEffectParams.has_value()) {
-                return frostedGlassEffectParams.value().sdfShape;
+            auto frostedGlassEffectParams =
+                GEV2::GEFilterParams::Unbox<GEV2::GEFrostedGlassEffectParams>(params_);
+            if (frostedGlassEffectParams != nullptr) {
+                return frostedGlassEffectParams->sdfShape;
             }
             break;
         }
@@ -70,13 +71,13 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImplV2::GetGEShaderS
     return nullptr;
 }
 
-#define IMPLEMENT_SET_PARAM_INTERNAL(Type) \
+#define IMPLEMENT_SET_PARAM_INTERNAL(Type)                                                      \
     void GEVisualEffectImplV2::SetParamInternal(GEV2::GEParamsMemberTag tag, const Type& value) \
-    { \
-        if (!params_) { \
-            return; \
-        } \
-        GEV2::GEParamsMemberHelper::SetParamsMemberByTag(params_, tag, value); \
+    {                                                                                           \
+        if (!params_) {                                                                         \
+            return;                                                                             \
+        }                                                                                       \
+        GEV2::GEParamsMemberHelper::SetParamsMemberByTag(params_, tag, value);                  \
     }
 
 FOR_EACH_PARAM_TYPE(IMPLEMENT_SET_PARAM_INTERNAL)

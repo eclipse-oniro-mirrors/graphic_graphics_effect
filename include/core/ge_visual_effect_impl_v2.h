@@ -15,27 +15,27 @@
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_V2_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_V2_H
 
-#include <string>
-#include <map>
-#include <functional>
-#include <memory>
-#include <array>
-#include <optional>
-#include <vector>
 #include <any>
-
-#include "core/ge_filter_type.h"
-#include "ge_shader.h"
-#include "ge_shader_filter.h"
-#include "ge_visual_effect.h"
-#include "effect/ge_filter_params.h"
-#include "effect/ge_params_reflection_v2.h"
+#include <array>
+#include <functional>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <vector>
 
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
+#include "core/ge_filter_type.h"
 #include "effect/color_filter.h"
+#include "effect/ge_filter_params.h"
+#include "effect/ge_params_reflection_v2.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_shader.h"
+#include "ge_shader_filter.h"
+#include "ge_visual_effect.h"
+
 #include "utils/rect.h"
 
 namespace OHOS {
@@ -52,10 +52,10 @@ namespace Drawing {
  */
 class GE_EXPORT GEVisualEffectImplV2 {
 public:
+    // Type alias for compatiblilty. Many old call sites use GEVisualEffectImpl::FilterType
     using FilterType = GEFilterType;
 
     GEVisualEffectImplV2(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
-
     ~GEVisualEffectImplV2();
 
     // ========================================================================
@@ -73,7 +73,8 @@ public:
 
         // Check if tag is valid for current params type
         if (!IsTagValidForCurrentType(tag)) {
-            LOGE("GEVisualEffectImplV2::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
+            LOGE(
+                "GEVisualEffectImplV2::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
             return;
         }
 
@@ -115,22 +116,57 @@ public:
     template<typename ParamsType>
     void MakeParams()
     {
-        params_ = GEV2::GEFilterParams::Box(ParamsType{});
+        params_ = GEV2::GEFilterParams::Box(ParamsType {});
     }
 
     template<typename ParamsType>
-    auto GetParams() const
+    std::shared_ptr<ParamsType> GetParams() const
     {
         return GEV2::GEFilterParams::Unbox<ParamsType>(params_);
     }
 
     // ========================================================================
+    // CanvasInfo management - Screen canvas geometry info
+    // ========================================================================
+
+    void SetCanvasInfo(Drawing::CanvasInfo info)
+    {
+        canvasInfo_ = info;
+    }
+
+    const Drawing::CanvasInfo& GetCanvasInfo() const
+    {
+        return canvasInfo_;
+    }
+
+    // ========================================================================
+    // Per-effect cache management
+    // ========================================================================
+
+    void SetCache(std::shared_ptr<std::any> cacheData)
+    {
+        cacheAnyPtr_ = cacheData;
+    }
+
+    std::shared_ptr<std::any> GetCache() const
+    {
+        return cacheAnyPtr_;
+    }
+
+    // ========================================================================
     // Backward-compatible convenience methods
+    // Warning: New types should use MakeParams<T> / GetParams<T> directly
     // ========================================================================
 
 #define GE_DECLARE_MAKE_GET_PARAMS(MethodName, ParamsType) \
-    void Make##MethodName() { MakeParams<ParamsType>(); } \
-    auto Get##MethodName() const { return GetParams<ParamsType>(); }
+    void Make##MethodName()                                \
+    {                                                      \
+        MakeParams<ParamsType>();                          \
+    }                                                      \
+    auto Get##MethodName() const                           \
+    {                                                      \
+        return GetParams<ParamsType>();                    \
+    }
 
     GE_DECLARE_MAKE_GET_PARAMS(MESAParams, GEV2::GEMESABlurShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(KawaseParams, GEV2::GEKawaseBlurShaderFilterParams)
@@ -147,14 +183,15 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(DispersionParams, GEV2::GEDispersionShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(DirectionLightParams, GEV2::GEDirectionLightShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(ContentLightParams, GEV2::GEContentLightFilterParams)
+    // intentional typo `Conten` instead of `Content` due to compatiblity
     GE_DECLARE_MAKE_GET_PARAMS(ContenDiagonalParams, GEV2::GEContentDiagonalFlowLightShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(DotMatrixShaderParams, GEV2::GEDotMatrixShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(WavyRippleLightParams, GEV2::GEWavyRippleLightShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(AuroraNoiseParams, GEV2::GEAuroraNoiseShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(ParticleCircularHaloParams, GEV2::GEParticleCircularHaloShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(VariableRadiusBlurParams, GEV2::GEVariableRadiusBlurShaderFilterParams)
-    GE_DECLARE_MAKE_GET_PARAMS(SdfEdgeLightParams, GEV2::GESDFEdgeLightFilterParams)
-    GE_DECLARE_MAKE_GET_PARAMS(SdfFromImageParams, GEV2::GESDFFromImageFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightParams, GEV2::GESDFEdgeLightFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SdfFromImageParams, GEV2::GESDFFromImageFilterParams) // because original decl use 'Sdf'
     GE_DECLARE_MAKE_GET_PARAMS(SDFBorderShaderParams, GEV2::GESDFBorderShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFShadowShaderParams, GEV2::GESDFShadowShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(RippleMaskParams, GEV2::GERippleShaderMaskParams)
@@ -191,34 +228,30 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassParams, GEV2::GEFrostedGlassBlurShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(GridWarpFilterParams, GEV2::GEGridWarpShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(NoisyFrameGradientMaskParams, GEV2::GEXNoisyFrameGradientMaskParams)
-
-    // Special overload: MakeSDFUnionOpShapeParams with op parameter
-    void MakeSDFUnionOpShapeParams(const GEV2::GESDFUnionOp& op);
+    GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightEffectParams, GEV2::GESDFEdgeLightEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFTriangleShapeParams, GEV2::GESDFTriangleShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFDistortOpShapeParams, GEV2::GESDFDistortOpShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DistortionCollapseParams, GEV2::GEDistortionCollapseFilterParams)
 #undef GE_DECLARE_MAKE_GET_PARAMS
 
-    void SetCanvasInfo(Drawing::CanvasInfo info)
-    {
-        canvasInfo_ = info;
-    }
+    // ========================================================================
+    // Backward-compatible dirty methods
+    // Warning: DO NOT ADD NEW METHODS or MODIFY EXISTING METHODS unless you have to
+    //          These methods should be removed in the future
+    // ========================================================================
 
-    const Drawing::CanvasInfo& GetCanvasInfo() const
-    {
-        return canvasInfo_;
-    }
-
-    void SetCache(std::shared_ptr<std::any> cacheData)
-    {
-        cacheAnyPtr_ = cacheData;
-    }
-
-    std::shared_ptr<std::any> GetCache() const
-    {
-        return cacheAnyPtr_;
-    }
-
+    // Introduced by SDF Union Op
+    void MakeSDFUnionOpShapeParams(const GEV2::GESDFUnionOp& op);
+    // Introduced by Frosted Glass
     const std::shared_ptr<Drawing::GEShaderShape> GetGEShaderShape(const std::string& tag) const;
-
+    // Introduced by SDF Edge Light
     void SetSDFEdgeLightParams(const std::string& tag, float param);
+
+    // 'Prams' Typo compatible: remove this method after fix all call sites including 2d dependencies
+    void MakeSdfEdgeLightPrams()
+    {
+        MakeSDFEdgeLightParams();
+    }
 
 private:
     /// Check if tag belongs to current params type's tag range
@@ -235,17 +268,15 @@ private:
     /// Internal set param implementation - uses reflection metadata to set field value
     /// Non-template overloads for each type, generated from FOR_EACH_PARAM_TYPE
     /// Implementations in ge_visual_effect_impl_v2.cpp
-#define DECLARE_SET_PARAM_INTERNAL(Type) \
-    void SetParamInternal(GEV2::GEParamsMemberTag tag, const Type& value);
+#define DECLARE_SET_PARAM_INTERNAL(Type) void SetParamInternal(GEV2::GEParamsMemberTag tag, const Type& value);
 
     FOR_EACH_PARAM_TYPE(DECLARE_SET_PARAM_INTERNAL)
 #undef DECLARE_SET_PARAM_INTERNAL
 
-    FilterType filterType_ = GEVisualEffectImplV2::FilterType::NONE;
+private:
+    FilterType filterType_ = FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
-
-    // Single type-erased params member replacing 60+ individual params_ members
     std::shared_ptr<GEV2::GEFilterParams> params_ = nullptr;
 };
 
