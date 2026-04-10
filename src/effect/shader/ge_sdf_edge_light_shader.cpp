@@ -23,8 +23,6 @@ namespace OHOS::Rosen {
 namespace {
 
 constexpr char SHADER[] = R"(
-    uniform vec2 iResolution;
-
     uniform shader sdfShader;
     uniform shader lightMaskShader;
 
@@ -42,20 +40,22 @@ constexpr char SHADER[] = R"(
     uniform float innerBorderBloomWidth;
     uniform float outerBorderBloomWidth;
 
-    float bloomMultiplierFromDist(float d) {
+    float BloomMultiplierFromDist(float d)
+    {
         float dNorm = abs(d) / (d > 0 ? outerBorderBloomWidth : innerBorderBloomWidth);
         float falloff = max((1 - dNorm) / pow(1 + dNorm, bloomFalloffPow), 0);
         return maxBloomIntensity * falloff;
     }
 
-    float edgeLightFakeBloom(float intensity, float d, float smoothD) {
+    float EdgeLightFakeBloom(float intensity, float d, float smoothD)
+    {
         float bloomBorder = 1 - step(outerBorderBloomWidth, d);
         bloomBorder *= step(-innerBorderBloomWidth, d);
         float edgeThickness = smoothstep(0, 1, intensity) *
                               (maxBorderWidth - minBorderWidth) + minBorderWidth;
         float thinBorder = (1 - smoothstep(0, edgeThickness, d)) * smoothstep(-edgeThickness, 0, d);
         float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) *
-                  bloomBorder * bloomMultiplierFromDist(smoothD));
+                  bloomBorder * BloomMultiplierFromDist(smoothD));
         return b;
     }
 
@@ -63,8 +63,8 @@ constexpr char SHADER[] = R"(
     {
         float lightMaskValue = lightMaskShader.eval(fragCoord).r;
         vec4 sdfSample = sdfShader.eval(fragCoord);
-        half3 rgb = lightColor * edgeLightFakeBloom(lightMaskValue, sdfSample.a, sdfSample.a);
-        return half4(rgb, rgb.r);
+        half3 rgb = lightColor * EdgeLightFakeBloom(lightMaskValue, sdfSample.a, sdfSample.a);
+        return half4(rgb, 1.0);
     }
 )";
 } // namespace
@@ -72,24 +72,6 @@ constexpr char SHADER[] = R"(
 GESDFEdgeLightShader::GESDFEdgeLightShader(const Drawing::GESDFEdgeLightEffectParams& params)
     : params_(params)
 {}
-
-void GESDFEdgeLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
-{
-    canvas.Save();
-    canvas.ResetClip();
-    MakeDrawingShader(rect, -1.f); // not use progress
-    auto shader = GetDrawingShader();
-    if (!shader) {
-        LOGE("GESDFEdgeLightShader::OnDrawShader: no shader generated, draw nothing");
-        return;
-    }
-    Drawing::Brush brush;
-    brush.SetShaderEffect(shader);
-    canvas.AttachBrush(brush);
-    canvas.DrawRect(rect);
-    canvas.DetachBrush();
-    canvas.Restore();
-}
 
 void GESDFEdgeLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
@@ -135,8 +117,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
     const Drawing::SamplingOptions sampling(Drawing::FilterMode::LINEAR);
     auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader_);
 
-    auto width = rect.GetWidth();
-    auto height = rect.GetHeight();
+    auto width = canvasInfo_.geoWidth;
+    auto height = canvasInfo_.geoHeight;
 
     auto sdfShader = params_.sdfShape->GenerateDrawingShader(width, height);
     if (sdfShader == nullptr) {
@@ -158,13 +140,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
     builder->SetUniform("maxBloomIntensity", params_.maxBloomIntensity);
     builder->SetUniform("bloomFalloffPow", params_.bloomFalloffPow);
 
-    params_.minBorderWidth = std::max(params_.minBorderWidth, std::numeric_limits<float>::epsilon());
-    params_.maxBorderWidth = std::max(params_.maxBorderWidth, std::numeric_limits<float>::epsilon());
     builder->SetUniform("minBorderWidth", params_.minBorderWidth);
     builder->SetUniform("maxBorderWidth", params_.maxBorderWidth);
 
-    builder->SetUniform("innerBorderBloomWidth", params_.innerBorderBloomWidth);
-    builder->SetUniform("outerBorderBloomWidth", params_.outerBorderBloomWidth);
+    builder->SetUniform("innerBorderBloomWidth",
+        std::max(params_.innerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
+    builder->SetUniform("outerBorderBloomWidth",
+        std::max(params_.outerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
 
     return builder;
 }
