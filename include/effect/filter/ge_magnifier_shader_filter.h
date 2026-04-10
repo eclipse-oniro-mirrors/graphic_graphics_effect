@@ -70,21 +70,15 @@ public:
 
     const GE_EXPORT std::string GetDescription() const;
 
-    void SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo) override;
-
 private:
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMagnifierShader(
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeMagnifierShaderWithSDFShape(
         std::shared_ptr<Drawing::ShaderEffect> imageShader, float imageWidth, float imageHeight);
-    bool InitMagnifierEffect();
+    bool ValidateMagnifierParams(float imageWidth, float imageHeight) const;
     void ConvertToRgba(uint32_t rgba, float* color, int tupleSize);
-    void SetMagnifierOffset(Drawing::Matrix& mat);
-
-    float scaleX_ = 1.f;
-    float scaleY_ = 1.f;
-    int32_t rotateDegree_ = 0;
 
     std::shared_ptr<GEMagnifierParams> magnifierPara_ = nullptr;
-    static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffect;
+    std::shared_ptr<Drawing::GEShaderShape> sdfShape_ = nullptr;
+    static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffectWithSDF;
 };
 
 } // namespace Rosen

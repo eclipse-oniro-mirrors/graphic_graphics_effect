@@ -1706,6 +1706,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             break;
         }
+        case FilterType::MAGNIFIER: {
+            if (magnifierParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_FILTER_MAGNIFIER_SDF_SHAPE) {
+                magnifierParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
         default:
             break;
     }

@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_magnifier_shader_filter.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 #include "draw/color.h"
 #include "image/bitmap.h"
@@ -140,7 +141,6 @@ HWTEST_F(GEMagnifierShaderFilterTest, OnProcessImage_004, TestSize.Level0)
 
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
-    EXPECT_TRUE(filter->InitMagnifierEffect());
 }
 
 /**
@@ -179,28 +179,6 @@ HWTEST_F(GEMagnifierShaderFilterTest, ConvertToRgba_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: MakeMagnifierShader_001
- * @tc.desc: Verify function MakeMagnifierShader
- * @tc.type:FUNC
- */
-HWTEST_F(GEMagnifierShaderFilterTest, MakeMagnifierShader_001, TestSize.Level1)
-{
-    Drawing::GEMagnifierShaderFilterParams params{
-        1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
-    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
-    ASSERT_TRUE(filter != nullptr);
-    filter->magnifierPara_ = nullptr;
-    Drawing::Matrix matrix;
-    EXPECT_NE(image_, nullptr);
-    auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image_, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
-    float imageWidth = image_->GetWidth();
-    float imageHeight = image_->GetHeight();
-    auto builder = filter->MakeMagnifierShader(imageShader, imageWidth, imageHeight);
-    EXPECT_EQ(builder, nullptr);
-}
-
-/**
  * @tc.name: Type_001
  * @tc.desc: Verify function Type
  * @tc.type:FUNC
@@ -215,67 +193,104 @@ HWTEST_F(GEMagnifierShaderFilterTest, Type_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetMagnifierOffset_001
- * @tc.desc: Verify function SetMagnifierOffsetTest
- * @tc.type: FUNC
+ * @tc.name: ValidateMagnifierParams_001
+ * @tc.desc: Verify function ValidateMagnifierParams with valid params
+ * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, SetMagnifierOffset_001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_001, TestSize.Level1)
 {
     Drawing::GEMagnifierShaderFilterParams params{
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
-    Drawing::Matrix matrix1;
-    matrix1.PostRotate(90); // 90 degree
-    filter->SetMagnifierOffset(matrix1);
-    EXPECT_EQ(filter->rotateDegree_, 270);
-
-    Drawing::Matrix matrix2;
-    matrix2.PostRotate(180); // 180 degree
-    filter->SetMagnifierOffset(matrix2);
-    EXPECT_EQ(filter->rotateDegree_, 180);
-
-    Drawing::Matrix matrix3;
-    matrix3.PostRotate(270); // 270 degree
-    filter->SetMagnifierOffset(matrix3);
-    EXPECT_EQ(filter->rotateDegree_, 90);
-
-    Drawing::Matrix matrix4; // 0 degree
-    filter->SetMagnifierOffset(matrix4);
-    EXPECT_EQ(filter->rotateDegree_, 0);
+    ASSERT_TRUE(filter != nullptr);
+    
+    Drawing::GERRect rrect1 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+    Drawing::GESDFRRectShapeParams sdfParams1 = {rrect1};
+    auto sdfShape1 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams1);
+    filter->sdfShape_ = sdfShape1;
+    
+    EXPECT_TRUE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 
 /**
- * @tc.name: SetShaderFilterCanvasinfo_001
- * @tc.desc: Verify function SetShaderFilterCanvasinfo
+ * @tc.name: ValidateMagnifierParams_002
+ * @tc.desc: Verify function ValidateMagnifierParams with invalid image size
  * @tc.type:FUNC
  */
-HWTEST_F(GEMagnifierShaderFilterTest, SetShaderFilterCanvasinfo_001, TestSize.Level1)
+HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_002, TestSize.Level1)
 {
     Drawing::GEMagnifierShaderFilterParams params{
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
-    Drawing::Matrix matrix1;
-    matrix1.PostRotate(90); // 90 degree
-    Drawing::CanvasInfo canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix1};
-    filter->SetShaderFilterCanvasinfo(canvasInfo);
-    EXPECT_EQ(filter->rotateDegree_, 270);
+    ASSERT_TRUE(filter != nullptr);
+    
+    Drawing::GERRect rrect2 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+    Drawing::GESDFRRectShapeParams sdfParams2 = {rrect2};
+    auto sdfShape2 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams2);
+    filter->sdfShape_ = sdfShape2;
+    
+    EXPECT_FALSE(filter->ValidateMagnifierParams(0.0f, 100.0f));
+    EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 0.0f));
+    EXPECT_FALSE(filter->ValidateMagnifierParams(-1.0f, 100.0f));
+    EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, -1.0f));
+}
 
-    Drawing::Matrix matrix2;
-    matrix2.PostRotate(180); // 180 degree
-    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix2};
-    filter->SetShaderFilterCanvasinfo(canvasInfo);
-    EXPECT_EQ(filter->rotateDegree_, 180);
+/**
+ * @tc.name: ValidateMagnifierParams_003
+ * @tc.desc: Verify function ValidateMagnifierParams with null magnifierPara
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_003, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+    
+    Drawing::GERRect rrect3 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+    Drawing::GESDFRRectShapeParams sdfParams3 = {rrect3};
+    auto sdfShape3 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams3);
+    filter->sdfShape_ = sdfShape3;
+    filter->magnifierPara_ = nullptr;
+    
+    EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
+}
 
-    Drawing::Matrix matrix3;
-    matrix3.PostRotate(270); // 270 degree
-    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix3};
-    filter->SetShaderFilterCanvasinfo(canvasInfo);
-    EXPECT_EQ(filter->rotateDegree_, 90);
+/**
+ * @tc.name: ValidateMagnifierParams_004
+ * @tc.desc: Verify function ValidateMagnifierParams with invalid factor
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_004, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{
+        0.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+    
+    Drawing::GERRect rrect4 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+    Drawing::GESDFRRectShapeParams sdfParams4 = {rrect4};
+    auto sdfShape4 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams4);
+    filter->sdfShape_ = sdfShape4;
+    
+    EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
+}
 
-    Drawing::Matrix matrix4; // 0 degree
-    canvasInfo = {100.0f, 100.0f, 1.0f, -1.0f, matrix4};
-    filter->SetShaderFilterCanvasinfo(canvasInfo);
-    EXPECT_EQ(filter->rotateDegree_, 0);
+/**
+ * @tc.name: ValidateMagnifierParams_005
+ * @tc.desc: Verify function ValidateMagnifierParams with null sdfShape
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_005, TestSize.Level1)
+{
+    Drawing::GEMagnifierShaderFilterParams params{
+        1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
+    auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+    
+    filter->sdfShape_ = nullptr;
+    
+    EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 
 } // namespace GraphicsEffectEngine

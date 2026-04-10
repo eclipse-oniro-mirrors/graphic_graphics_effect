@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "ge_magnifier_shader_filter.h"
+#include "ge_system_properties.h"
 
 #include "ge_log.h"
 
@@ -21,9 +22,127 @@ namespace Rosen {
 
 namespace {
 constexpr static uint8_t COLOR_CHANNEL = 4; // 4 len of rgba
+static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
+    uniform shader imageShader;
+    uniform shader sdfShader;
+    uniform half2 iResolution;
+
+    uniform half factor;
+    uniform half2 zoomOffset;
+    uniform half borderSize;
+    uniform half4 borderColor;
+    uniform half shadowSize;
+    uniform half shadowStrength;
+
+    const half2 boxPos = half2(0.5, 0.5);
+    const half3 incident = half3(0.0, 0.0, -1.0);
+    const half aa = 1.0;
+    const half dispScale = 0.5;
+    const half dispersion = 0.15;
+    const half index = 1.5;
+    const half thickness = 8.0;
+    const half baseHeight = 64.0;
+
+    // 常量预计算（编译期计算，无运行时开销）
+    const half thicknessSq = thickness * thickness;
+    const half invIndex = 1.0 / index;
+    const half invIndexSubDisp = 1.0 / (index - dispersion);
+    const half invIndexAddDisp = 1.0 / (index + dispersion);
+    const half minNdotV = 0.05;
+
+    half height(half sd)
+    {
+        if (sd >= 0.0) return 0.0;
+        if (sd < -thickness) return thickness;
+        half x = thickness + sd;
+        return sqrt(thicknessSq - x * x); // 用预计算平方
+    }
+
+    half4 bg(half2 uv)
+    {
+        return imageShader.eval(uv * iResolution);
+    }
+
+    half4 getRefractColor(half2 fragCoord, half3 normal, half h)
+    {
+        half2 res = iResolution.xy;
+        half3 refr = refract(incident, normal, invIndex); // 预计算除法
+        half ndotv = max(dot(incident, refr), minNdotV);
+        half refractLen = (h + baseHeight) / ndotv;
+
+        half2 uv = (fragCoord + refr.xy * refractLen) / res;
+        uv = (uv - boxPos + zoomOffset) / factor + boxPos;
+        return bg(uv);
+    }
+
+    half4 getDispColor(half2 fragCoord, half3 normal, half refractLen)
+    {
+        half2 res = iResolution.xy;
+
+        half3 refrR = refract(incident, normal, invIndexSubDisp);
+        half3 refrB = refract(incident, normal, invIndexAddDisp);
+
+        half2 uvR = (fragCoord + refrR.xy*refractLen)/res;
+        half2 uvB = (fragCoord + refrB.xy*refractLen)/res;
+
+        uvR = (uvR - boxPos + zoomOffset)/factor + boxPos;
+        uvB = (uvB - boxPos + zoomOffset)/factor + boxPos;
+
+        return half4(bg(uvR).r, 0.0, bg(uvB).b, 1.0);
+    }
+
+    half4 main(float2 fragCoord)
+    {
+        half4 sdfResult = sdfShader.eval(fragCoord);
+        half rawDist = sdfResult.w;
+        half sd = rawDist * dispScale;
+
+        // 1. 阴影
+        half shadow = 1.0 - smoothstep(0.0, shadowSize, rawDist);
+        half4 fragColor = half4(0.0, 0.0, 0.0, shadow * shadowStrength);
+
+        // 2. 只在内部计算
+        if (sd < 0.0)
+        {
+            if (sd < -thickness)
+            {
+                half2 uv = fragCoord / iResolution.xy;
+                half zoomUV = (uv - boxPos + zoomOffset) / factor + boxPos;
+                return bg(zoomUV);
+            }
+            half shapeMask = 1.0 - smoothstep(-aa, aa, sd);
+            half2 preNormal = normalize(sdfResult.xy);
+            half nc = clamp((thickness + sd) / thickness, 0.0, 1.0);
+            half3 normal = normalize(half3(preNormal * nc, sqrt(1.0 - nc * nc)));
+
+            half h = height(sd);
+            fragColor = getRefractColor(fragCoord, normal, h);
+
+            // 色散只在边缘计算
+            half edgeFactor = smoothstep(-15.0, 0.0, sd);
+            if (edgeFactor > 0.001)
+            {
+                half3 refr = refract(incident, normal, invIndex);
+                half ndotv = max(dot(incident, refr), minNdotV);
+                half refractLen = (h + baseHeight) / ndotv;
+                half4 dispColor = getDispColor(fragCoord, normal, refractLen);
+                dispColor.g = fragColor.g;
+                fragColor = mix(fragColor, dispColor, edgeFactor);
+            }
+
+            fragColor *= shapeMask;
+        }
+
+        // 3. 边框
+        half border = smoothstep(-borderSize, -borderSize + aa, rawDist) * smoothstep(aa, 0.0, rawDist);
+        fragColor = mix(fragColor, half4(borderColor.rgb, 1.0), border * borderColor.a);
+
+        return fragColor;
+    }
+)";
 } // namespace
 
-std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffect = nullptr;
+std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffectWithSDF = nullptr;
 
 GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params)
 {
@@ -47,37 +166,59 @@ GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShade
     magnifierPara_->outerContourColor1_ = params.outerContourColor1;
     magnifierPara_->outerContourColor2_ = params.outerContourColor2;
     magnifierPara_->rotateDegree_ = params.rotateDegree;
+    sdfShape_ = params.sdfShape;
+    LOGD("GEMagnifierShaderFilter::GEMagnifierShaderFilter - "
+     "factor: %{public}f, width: %{public}f, height: %{public}f, "
+     "cornerRadius: %{public}f, borderWidth: %{public}f, "
+     "zoomOffsetX: %{public}f, zoomOffsetY: %{public}f, "
+     "shadowOffsetX: %{public}f, shadowOffsetY: %{public}f, "
+     "shadowSize: %{public}f, shadowStrength: %{public}f, "
+     "rotateDegree: %{public}d",
+     params.factor, params.width, params.height,
+     params.cornerRadius, params.borderWidth,
+     params.zoomOffsetX, params.zoomOffsetY,
+     params.shadowOffsetX,
+     params.shadowOffsetY,
+     params.shadowSize,
+     params.shadowStrength,
+     params.rotateDegree);
 }
 
 std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (image == nullptr || magnifierPara_ == nullptr) {
+    if (image == nullptr || magnifierPara_ == nullptr || sdfShape_ == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage image or para is null");
         return image;
     }
 
-    Drawing::Matrix matrix;
-    matrix.Rotate(rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
-        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
+    Drawing::Matrix matrix = canvasInfo_.mat;
+    matrix.PostTranslate(-canvasInfo_.materialDst.GetLeft(), -canvasInfo_.materialDst.GetTop());
+    Drawing::Matrix invertMatrix;
+
+    if (!matrix.Invert(invertMatrix)) {
+        LOGE("GEColorGradientShaderFilter::ProcessImage Invert matrix failed");
+        return image;
+    }
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
-        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
     float imageWidth = image->GetWidth();
     float imageHeight = image->GetHeight();
-    auto builder = MakeMagnifierShader(imageShader, imageWidth, imageHeight);
+
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
+
+    builder = MakeMagnifierShaderWithSDFShape(imageShader, imageWidth, imageHeight);
+
     if (builder == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage builder is null");
         return image;
     }
 
-    Drawing::Matrix invMatrix;
-    invMatrix.Rotate(-rotateDegree_, src.GetLeft() + src.GetWidth() / 2.0f,
-        src.GetTop() + src.GetHeight() / 2.0f); // 2.0 center of rect
 #ifdef RS_ENABLE_GPU
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &invMatrix, image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &matrix, image->GetImageInfo(), false);
 #else
-    auto resultImage = builder->MakeImage(nullptr, &invMatrix, image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(nullptr, &matrix, image->GetImageInfo(), false);
 #endif
     if (resultImage == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage resultImage is null");
@@ -87,157 +228,75 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing:
     return resultImage;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagnifierShader(
+bool GEMagnifierShaderFilter::ValidateMagnifierParams(float imageWidth, float imageHeight) const
+{
+    if (GE_LE(imageHeight, 0.0f) || GE_LE(imageWidth, 0.0f)) {
+        LOGE("GEMagnifierShaderFilter::ValidateMagnifierParams invalid image size: width=%{public}f, height=%{public}f",
+            imageWidth, imageHeight);
+        return false;
+    }
+    if (magnifierPara_ == nullptr) {
+        LOGE("GEMagnifierShaderFilter::ValidateMagnifierParams magnifierPara is null");
+        return false;
+    }
+    if (GE_LE(magnifierPara_->factor_, 0.0f)) {
+        LOGE("GEMagnifierShaderFilter::ValidateMagnifierParams invalid factor: %{public}f", magnifierPara_->factor_);
+        return false;
+    }
+    if (sdfShape_ == nullptr) {
+        LOGE("GEMagnifierShaderFilter::ValidateMagnifierParams sdfShape is null");
+        return false;
+    }
+    return true;
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagnifierShaderWithSDFShape(
     std::shared_ptr<Drawing::ShaderEffect> imageShader, float imageWidth, float imageHeight)
 {
-    if (g_magnifierShaderEffect == nullptr) {
-        if (!InitMagnifierEffect()) {
-            LOGE("GEMagnifierShaderFilter::failed when initializing MagnifierEffect.");
+    if (imageShader == nullptr) {
+        LOGE("GEMagnifierShaderFilter::MakeMagnifierShaderWithSDFShape imageShader is null");
+        return nullptr;
+    }
+
+    if (!ValidateMagnifierParams(imageWidth, imageHeight)) {
+        return nullptr;
+    }
+
+    if (g_magnifierShaderEffectWithSDF == nullptr) {
+        g_magnifierShaderEffectWithSDF = Drawing::RuntimeEffect::CreateForShader(MAGNIFIER_SHADER_WITH_SDF_PROG);
+        if (g_magnifierShaderEffectWithSDF == nullptr) {
+            LOGE("GEMagnifierShaderFilter::MakeMagnifierShaderWithSDFShape failed to create RuntimeEffect");
             return nullptr;
         }
     }
-    if (GE_LE(imageHeight, 0.0f) || GE_LE(imageWidth, 0.0f)) {
-        LOGE("GEMagnifierShaderFilter::MakeMagnifierShader imageinfo is invalid");
-        return nullptr;
-    }
-    if (magnifierPara_ == nullptr || GE_LE(magnifierPara_->factor_, 0.0f)) {
-        LOGE("GEMagnifierShaderFilter::MakeMagnifierShader magnifierPara is invalid");
+
+    auto sdfShader = sdfShape_->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
+    if (sdfShader == nullptr) {
+        LOGE("GEMagnifierShaderFilter::MakeMagnifierShaderWithSDFShape failed to generate SDF shader, "
+            "imageWidth=%{public}f, imageHeight=%{public}f", imageWidth, imageHeight);
         return nullptr;
     }
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder =
-        std::make_shared<Drawing::RuntimeShaderBuilder>(g_magnifierShaderEffect);
+        std::make_shared<Drawing::RuntimeShaderBuilder>(g_magnifierShaderEffectWithSDF);
+
     builder->SetChild("imageShader", imageShader);
-    builder->SetUniform("iResolution", imageWidth, imageHeight);
+    builder->SetChild("sdfShader", sdfShader);
+    builder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
 
     builder->SetUniform("factor", magnifierPara_->factor_);
-    builder->SetUniform("size", magnifierPara_->width_ * scaleX_, magnifierPara_->height_ * scaleY_);
-    builder->SetUniform("cornerRadius", magnifierPara_->cornerRadius_ * scaleY_);
-    builder->SetUniform("borderWidth", magnifierPara_->borderWidth_ * scaleY_);
     builder->SetUniform("zoomOffset", magnifierPara_->zoomOffsetX_ / imageWidth,
-        magnifierPara_->zoomOffsetY_ / imageWidth);
+        magnifierPara_->zoomOffsetY_ / imageHeight);
+    builder->SetUniform("borderSize", magnifierPara_->borderWidth_);
 
-    builder->SetUniform("shadowOffset", magnifierPara_->shadowOffsetX_ * scaleX_,
-        magnifierPara_->shadowOffsetY_ * scaleY_);
-    builder->SetUniform("shadowSize", magnifierPara_->shadowSize_ * scaleY_);
+    float borderColor[COLOR_CHANNEL] = {0.0f};
+    ConvertToRgba(magnifierPara_->outerContourColor1_, borderColor, COLOR_CHANNEL);
+    builder->SetUniform("borderColor", borderColor, COLOR_CHANNEL);
+
+    builder->SetUniform("shadowSize", magnifierPara_->shadowSize_);
     builder->SetUniform("shadowStrength", magnifierPara_->shadowStrength_);
 
-    float maskColor1[COLOR_CHANNEL] = { 0.0f };
-    float maskColor2[COLOR_CHANNEL] = { 0.0f };
-    float outColor1[COLOR_CHANNEL] = { 0.0f };
-    float outColor2[COLOR_CHANNEL] = { 0.0f };
-    ConvertToRgba(magnifierPara_->gradientMaskColor1_, maskColor1, COLOR_CHANNEL);
-    ConvertToRgba(magnifierPara_->gradientMaskColor2_, maskColor2, COLOR_CHANNEL);
-    ConvertToRgba(magnifierPara_->outerContourColor1_, outColor1, COLOR_CHANNEL);
-    ConvertToRgba(magnifierPara_->outerContourColor2_, outColor2, COLOR_CHANNEL);
-    builder->SetUniform("gradientMaskColor1", maskColor1, COLOR_CHANNEL);
-    builder->SetUniform("gradientMaskColor2", maskColor2, COLOR_CHANNEL);
-    builder->SetUniform("outerContourColor1", outColor1, COLOR_CHANNEL);
-    builder->SetUniform("outerContourColor2", outColor2, COLOR_CHANNEL);
-
     return builder;
-}
-
-bool GEMagnifierShaderFilter::InitMagnifierEffect()
-{
-    if (g_magnifierShaderEffect == nullptr) {
-        static constexpr char prog[] = R"(
-            uniform shader imageShader;
-            uniform float2 iResolution;
-
-            uniform float factor;
-            uniform float borderWidth;
-            uniform float cornerRadius;
-            uniform float2 size;
-            uniform float2 zoomOffset;
-
-            uniform float2 shadowOffset;
-            uniform float shadowSize;
-            uniform float shadowStrength;
-
-            uniform vec4 gradientMaskColor1;
-            uniform vec4 gradientMaskColor2;
-            uniform vec4 outerContourColor1;
-            uniform vec4 outerContourColor2;
-
-            // refraction
-            const float refractionStrength = 0.02;           // 0.02 refraction strength
-            const float epsilon = 1e-4;
-
-            vec4 sdfRect(vec2 position, vec2 R1, float R2, float curvature, out float isInBorder)
-            {
-                // calculate normal
-                vec2 d = max(abs(position) - R1, 0.0);
-                float dist = length(d) / R2;
-                vec2 dir = normalize(sign(position) * d);
-                float borderHeightRatio = min(size.x, size.y) / (borderWidth * 2.8); // 2.8 borderWidth
-                float posInBorder = mix(1.0 - borderHeightRatio, 1.0, dist);
-                float weight = max(posInBorder, 0.0);
-                vec3 normal = normalize(mix(vec3(0.0, 0.0, 1.0), vec3(dir, 0.0), weight));
-                isInBorder = smoothstep(0.0, 0.3, posInBorder); // 0.3 alpha threshold
-
-                // calculate shadow
-                position -= shadowOffset / iResolution.x;
-                float R2Shadow = R2 + 0.5 * shadowSize / iResolution.x; // 0.5 half of shader size
-                float distShadow = length(max(abs(position) - R1, 0.)) / R2Shadow;
-                float shadowSizeHeightRatio = min(size.x, size.y) / (shadowSize / (curvature + epsilon) * 2.0);
-                float weightShadow = max(mix(1.0 - shadowSizeHeightRatio, 1.0, distShadow), 0.0);
-                float shadow = mix(1.0 - shadowStrength, 1.0, min(abs(weightShadow - 0.5) * 2.0, 1.0)); // 0.5 2.0 num
-
-                return vec4(normal, shadow);
-            }
-
-            vec4 main(float2 fragCoord)
-            {
-                vec2 uv = fragCoord.xy / iResolution.x;
-                vec2 boxPosition = iResolution / 2.0 / iResolution.x; // 2.0 center of rect
-                vec2 halfBoxSize = size / iResolution.x / 2.0; // 2.0 half of resolution
-                float curvature = cornerRadius / min(size.x, size.y) * 2.0; // 2.0 double of radius
-                float mn = min(halfBoxSize.x, halfBoxSize.y) * (curvature + epsilon);
-
-                float isInBorder = 0;
-                vec4 magnifyingGlass = sdfRect(uv - boxPosition, halfBoxSize - vec2(mn), mn, curvature, isInBorder);
-                vec4 finalColor = vec4(outerContourColor1.xyz, 1.0);
-
-                // add refraction
-                float red = magnifyingGlass.x;
-                float green = magnifyingGlass.y;
-                float offsetX = refractionStrength * sign(red) * red * red;
-                float offsetY = -refractionStrength * sign(green) * green * green;
-                vec2 sampleUV = (uv - boxPosition + zoomOffset) / factor + boxPosition;
-                vec4 refraction = imageShader.eval((sampleUV + vec2(offsetX, offsetY)) * iResolution.x);
-
-                // add gradient mask
-                float yDistToCenter = (uv.y - boxPosition.y) / halfBoxSize.y;
-                float yValue = (yDistToCenter + 1.0) / 2.0; // 2.0 half of height
-                vec4 gradientMask = mix(gradientMaskColor1, gradientMaskColor2, yValue);
-                refraction.xyz = mix(refraction.xyz, gradientMask.xyz, gradientMask.w);
-
-                // only apply refraction if z-value is not zero
-                float mask = smoothstep(0.0, 0.3, magnifyingGlass.z); // 0.3 alpha threshold
-                finalColor = mix(finalColor, refraction, mask);
-
-                // add outer_contour color
-                float xValue = (uv.x - boxPosition.x) / halfBoxSize.x;
-                vec4 gradientContour = mix(outerContourColor1, outerContourColor2, abs(xValue));
-                finalColor.xyz = mix(finalColor.xyz, gradientContour.xyz, gradientContour.w * isInBorder * mask);
-
-                // add shadow
-                finalColor.xyz *= magnifyingGlass.w;
-                vec4 shadowColor = vec4(0.0, 0.0, 0.0, 1.0) * (1.0 - magnifyingGlass.w);
-                finalColor = mix(shadowColor, finalColor, mask);
-
-                return finalColor;
-            }
-        )";
-
-        g_magnifierShaderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
-        if (g_magnifierShaderEffect == nullptr) {
-            LOGE("MakeMagnifierShader::RuntimeShader effect error\n");
-            return false;
-        }
-    }
-    return true;
 }
 
 void GEMagnifierShaderFilter::ConvertToRgba(uint32_t rgba, float* color, int tupleSize)
@@ -256,44 +315,10 @@ void GEMagnifierShaderFilter::ConvertToRgba(uint32_t rgba, float* color, int tup
     color[3] = alpha * 1.0f / 255.0f;   // 255.0f is the max value, 3 alpha
 }
 
-void GEMagnifierShaderFilter::SetShaderFilterCanvasinfo(const Drawing::CanvasInfo& canvasInfo)
-{
-    canvasInfo_ = canvasInfo;
-    SetMagnifierOffset(canvasInfo_.mat);
-}
-
 const std::string GEMagnifierShaderFilter::GetDescription() const
 {
     return "GEMagnifierShaderFilter";
 }
 
-void GEMagnifierShaderFilter::SetMagnifierOffset(Drawing::Matrix& mat)
-{
-    if (!magnifierPara_) {
-        LOGD("GEMagnifierShaderFilter::SetMagnifierOffset magnifierPara_ is nullptr!");
-        return;
-    }
-
-    // 1 and 3 represents index
-    if ((mat.Get(1) > 1e-6) && (mat.Get(3) < -1e-6)) {
-        rotateDegree_ = 90; // 90 represents rotate degree
-        scaleX_ = mat.Get(1);
-        scaleY_ = -mat.Get(3); // 3 represents index
-    // 0 and 4 represents index
-    } else if ((mat.Get(0) < -1e-6) && (mat.Get(4) < -1e-6)) {
-        rotateDegree_ = 180; // 180 represents rotate degree
-        scaleX_ = -mat.Get(0);
-        scaleY_ = -mat.Get(4); // 4 represents index
-    // 1 and 3 represents index
-    } else if ((mat.Get(1) < -1e-6) && (mat.Get(3) > 1e-6)) {
-        rotateDegree_ = 270; // 270 represents rotate degree
-        scaleX_ = -mat.Get(1);
-        scaleY_ = mat.Get(3); // 3 represents index
-    } else {
-        rotateDegree_ = 0;
-        scaleX_ = mat.Get(0);
-        scaleY_ = mat.Get(4); // 4 represents index
-    }
-}
 } // namespace Rosen
 } // namespace OHOS

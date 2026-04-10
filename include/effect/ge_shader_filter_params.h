@@ -235,6 +235,7 @@ constexpr char GE_FILTER_MAGNIFIER_GRADIENT_MASK_COLOR_2[] = "Magnifier_Gradient
 constexpr char GE_FILTER_MAGNIFIER_OUTER_CONTOUR_COLOR_1[] = "Magnifier_OuterContourColor1";
 constexpr char GE_FILTER_MAGNIFIER_OUTER_CONTOUR_COLOR_2[] = "Magnifier_OuterContourColor2";
 constexpr char GE_FILTER_MAGNIFIER_ROTATE_DEGREE[] = "Magnifier_RotateDegree";
+constexpr char GE_FILTER_MAGNIFIER_SDF_SHAPE[] = "Magnifier_SDFShape";
 struct GEMagnifierShaderFilterParams {
     float factor = 0.f;
     float width = 0.f;
@@ -256,6 +257,7 @@ struct GEMagnifierShaderFilterParams {
     uint32_t outerContourColor2 = 0x00000000;
 
     int32_t rotateDegree = 0;
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(MAGNIFIER, GEMagnifierShaderFilterParams, GE_FILTER_MAGNIFIER);
 
