@@ -203,12 +203,12 @@ HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_001, TestSize.Leve
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
-    
-    Drawing::GERRect rrect1 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+
+    Drawing::GERRect rrect1 = {0.0f, 0.0f, 100.0f, 100.0f};
     Drawing::GESDFRRectShapeParams sdfParams1 = {rrect1};
     auto sdfShape1 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams1);
     filter->sdfShape_ = sdfShape1;
-    
+
     EXPECT_TRUE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 
@@ -223,12 +223,12 @@ HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_002, TestSize.Leve
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
-    
-    Drawing::GERRect rrect2 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+
+    Drawing::GERRect rrect2 = {0.0f, 0.0f, 100.0f, 100.0f};
     Drawing::GESDFRRectShapeParams sdfParams2 = {rrect2};
     auto sdfShape2 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams2);
     filter->sdfShape_ = sdfShape2;
-    
+
     EXPECT_FALSE(filter->ValidateMagnifierParams(0.0f, 100.0f));
     EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 0.0f));
     EXPECT_FALSE(filter->ValidateMagnifierParams(-1.0f, 100.0f));
@@ -246,13 +246,13 @@ HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_003, TestSize.Leve
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
-    
-    Drawing::GERRect rrect3 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+
+    Drawing::GERRect rrect3 = {0.0f, 0.0f, 100.0f, 100.0f};
     Drawing::GESDFRRectShapeParams sdfParams3 = {rrect3};
     auto sdfShape3 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams3);
     filter->sdfShape_ = sdfShape3;
     filter->magnifierPara_ = nullptr;
-    
+
     EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 
@@ -267,12 +267,12 @@ HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_004, TestSize.Leve
         0.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
-    
-    Drawing::GERRect rrect4 = {0.0f, 0.0f, 100.0f, 100.0f, 10.0f, 10.0f};
+
+    Drawing::GERRect rrect4 = {0.0f, 0.0f, 100.0f, 100.0f};
     Drawing::GESDFRRectShapeParams sdfParams4 = {rrect4};
     auto sdfShape4 = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParams4);
     filter->sdfShape_ = sdfShape4;
-    
+
     EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 
@@ -287,9 +287,9 @@ HWTEST_F(GEMagnifierShaderFilterTest, ValidateMagnifierParams_005, TestSize.Leve
         1.f, 1.f, 1.f, 1.f, 1.f, 0.0f, 0.0f, 1.f, 1.f, 1.f, 1.f, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
     auto filter = std::make_shared<GEMagnifierShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
-    
+
     filter->sdfShape_ = nullptr;
-    
+
     EXPECT_FALSE(filter->ValidateMagnifierParams(100.0f, 100.0f));
 }
 

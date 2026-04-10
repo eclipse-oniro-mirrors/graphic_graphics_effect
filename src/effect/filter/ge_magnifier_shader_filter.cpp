@@ -107,7 +107,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
             if (sd < -thickness)
             {
                 half2 uv = fragCoord / iResolution.xy;
-                half zoomUV = (uv - boxPos + zoomOffset) / factor + boxPos;
+                half2 zoomUV = (uv - boxPos + zoomOffset) / factor + boxPos;
                 return bg(zoomUV);
             }
             half shapeMask = 1.0 - smoothstep(-aa, aa, sd);
@@ -167,28 +167,20 @@ GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShade
     magnifierPara_->outerContourColor2_ = params.outerContourColor2;
     magnifierPara_->rotateDegree_ = params.rotateDegree;
     sdfShape_ = params.sdfShape;
-    LOGD("GEMagnifierShaderFilter::GEMagnifierShaderFilter - "
-     "factor: %{public}f, width: %{public}f, height: %{public}f, "
-     "cornerRadius: %{public}f, borderWidth: %{public}f, "
-     "zoomOffsetX: %{public}f, zoomOffsetY: %{public}f, "
-     "shadowOffsetX: %{public}f, shadowOffsetY: %{public}f, "
-     "shadowSize: %{public}f, shadowStrength: %{public}f, "
-     "rotateDegree: %{public}d",
-     params.factor, params.width, params.height,
-     params.cornerRadius, params.borderWidth,
-     params.zoomOffsetX, params.zoomOffsetY,
-     params.shadowOffsetX,
-     params.shadowOffsetY,
-     params.shadowSize,
-     params.shadowStrength,
-     params.rotateDegree);
 }
 
 std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (image == nullptr || magnifierPara_ == nullptr || sdfShape_ == nullptr) {
-        LOGE("GEMagnifierShaderFilter::OnProcessImage image or para is null");
+    if (image == nullptr) {
+        LOGE("GEMagnifierShaderFilter::OnProcessImage image is null");
+        return image;
+    }
+
+    float imageWidth = image->GetWidth();
+    float imageHeight = image->GetHeight();
+    if (!ValidateMagnifierParams(imageWidth, imageHeight)) {
+        LOGE("GEMagnifierShaderFilter::OnProcessImage validate params failed");
         return image;
     }
 
@@ -197,19 +189,15 @@ std::shared_ptr<Drawing::Image> GEMagnifierShaderFilter::OnProcessImage(Drawing:
     Drawing::Matrix invertMatrix;
 
     if (!matrix.Invert(invertMatrix)) {
-        LOGE("GEColorGradientShaderFilter::ProcessImage Invert matrix failed");
+        LOGE("GEColorGradientShaderFilter::OnProcessImage Invert matrix failed");
         return image;
     }
 
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), invertMatrix);
-    float imageWidth = image->GetWidth();
-    float imageHeight = image->GetHeight();
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
-
     builder = MakeMagnifierShaderWithSDFShape(imageShader, imageWidth, imageHeight);
-
     if (builder == nullptr) {
         LOGE("GEMagnifierShaderFilter::OnProcessImage builder is null");
         return image;
@@ -258,10 +246,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
         return nullptr;
     }
 
-    if (!ValidateMagnifierParams(imageWidth, imageHeight)) {
-        return nullptr;
-    }
-
     if (g_magnifierShaderEffectWithSDF == nullptr) {
         g_magnifierShaderEffectWithSDF = Drawing::RuntimeEffect::CreateForShader(MAGNIFIER_SHADER_WITH_SDF_PROG);
         if (g_magnifierShaderEffectWithSDF == nullptr) {
@@ -285,8 +269,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     builder->SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
 
     builder->SetUniform("factor", magnifierPara_->factor_);
-    builder->SetUniform("zoomOffset", magnifierPara_->zoomOffsetX_ / imageWidth,
-        magnifierPara_->zoomOffsetY_ / imageHeight);
+    builder->SetUniform("zoomOffset", magnifierPara_->zoomOffsetX_ / (imageWidth > 0.0f ? imageWidth : 1.0f),
+        magnifierPara_->zoomOffsetY_ / (imageHeight > 0.0f ? imageHeight : 1.0f));
     builder->SetUniform("borderSize", magnifierPara_->borderWidth_);
 
     float borderColor[COLOR_CHANNEL] = {0.0f};
