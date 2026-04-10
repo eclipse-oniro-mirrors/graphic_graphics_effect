@@ -15,6 +15,10 @@
 
 #ifndef GRAPHICS_EFFECT_GE_EFFECTS_COMMON_PARAMS_TYPES_H
 #define GRAPHICS_EFFECT_GE_EFFECTS_COMMON_PARAMS_TYPES_H
+#include <cstdint>
+
+#include "common/rs_vector2.h"
+#include "common/rs_vector4.h"
 #include "utils/matrix.h"
 #include "utils/rect.h"
 /* 
