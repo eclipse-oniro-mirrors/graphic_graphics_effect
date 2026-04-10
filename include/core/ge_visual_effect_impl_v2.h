@@ -44,9 +44,9 @@ namespace Rosen {
 namespace Drawing {
 
 /**
- * GEVisualEffectImpl - Refactored implementation using GEFilterParams variant.
+ * GEVisualEffectImpl v2 - Refactored implementation using GEFilterParams variant.
  *
- * Key differences from GEVisualEffectImpl:
+ * Key differences from v1:
  * 1. Uses single `params_` member (type-erased GEFilterParams) instead of 60+ individual params
  * 2. SetParam uses reflection metadata (GEParamsMemberTag) for type-safe field access
  * 3. String-based SetParam uses generated GEParamsMemberTagFromString mapping
