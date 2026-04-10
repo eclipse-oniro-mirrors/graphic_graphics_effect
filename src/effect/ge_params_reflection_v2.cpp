@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-namespace GEV2 {
 
 std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 {
@@ -111,7 +110,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
 #define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
-    { std::string(GEFilterParamsTypeInfoV2<Struct>::FilterName), GEFilterParamsTypeInfoV2<Struct>::ID }
+    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
 
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAIBarShaderFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAuroraNoiseShaderParams),
@@ -1543,7 +1542,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value)
+                                                GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value)
 {
     if (!params) {
         return;
@@ -2006,7 +2005,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value)
+                                                GEParamsMemberTag tag, const DotMatrixDirection& value)
 {
     if (!params) {
         return;
@@ -2133,7 +2132,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value)
+                                                GEParamsMemberTag tag, const DotMatrixEffectType& value)
 {
     if (!params) {
         return;
@@ -2350,7 +2349,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::GESDFBorderParams& value)
+                                                GEParamsMemberTag tag, const GESDFBorderParams& value)
 {
     if (!params) {
         return;
@@ -2369,7 +2368,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::GERRect& value)
+                                                GEParamsMemberTag tag, const GERRect& value)
 {
     if (!params) {
         return;
@@ -2388,7 +2387,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::GESDFShadowParams& value)
+                                                GEParamsMemberTag tag, const GESDFShadowParams& value)
 {
     if (!params) {
         return;
@@ -2407,7 +2406,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value)
+                                                GEParamsMemberTag tag, const GESDFUnionOp& value)
 {
     if (!params) {
         return;
@@ -2460,7 +2459,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 
 #undef GE_VALIDATE_AND_SET
 
-} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

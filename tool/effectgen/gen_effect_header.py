@@ -75,7 +75,6 @@ def generate_header() -> str:
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
-    output.append("namespace GEV2 {")
     output.append("")
     output.append("// Parameter structure definitions")
 
@@ -94,7 +93,6 @@ def generate_header() -> str:
         output.append(f'#include "{rel_path}"')
 
     output.append("")
-    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")

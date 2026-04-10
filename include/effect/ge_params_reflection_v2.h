@@ -30,7 +30,6 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-namespace GEV2 {
 
 class GEFilterParams;
 
@@ -40,16 +39,16 @@ class GEFilterParams;
 // X-Macro listing all unique parameter member types
 // Usage: #define X(Type) <your code>; FOR_EACH_PARAM_TYPE(X); #undef X
 #define FOR_EACH_PARAM_TYPE(X) \
+    X(ESCAPE(DotMatrixDirection)) \
+    X(ESCAPE(DotMatrixEffectType)) \
     X(ESCAPE(Drawing::Color4f)) \
     X(ESCAPE(Drawing::Matrix)) \
     X(ESCAPE(Drawing::Point)) \
-    X(ESCAPE(GEV2::DotMatrixDirection)) \
-    X(ESCAPE(GEV2::DotMatrixEffectType)) \
-    X(ESCAPE(GEV2::GEBezierWarpShaderFilterControlPointArray)) \
-    X(ESCAPE(GEV2::GERRect)) \
-    X(ESCAPE(GEV2::GESDFBorderParams)) \
-    X(ESCAPE(GEV2::GESDFShadowParams)) \
-    X(ESCAPE(GEV2::GESDFUnionOp)) \
+    X(ESCAPE(GEBezierWarpShaderFilterControlPointArray)) \
+    X(ESCAPE(GERRect)) \
+    X(ESCAPE(GESDFBorderParams)) \
+    X(ESCAPE(GESDFShadowParams)) \
+    X(ESCAPE(GESDFUnionOp)) \
     X(ESCAPE(RectF)) \
     X(ESCAPE(Vector2f)) \
     X(ESCAPE(Vector3f)) \
@@ -963,10 +962,10 @@ GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(LIGHT_CAVE_RADIUS_X_Y, ESCAPE(std::pair<floa
 #undef GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM
 #undef GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM
 
-// GEFilterParamsTypeInfoV2 template specializations
+// GEFilterParamsTypeInfo template specializations
 // Provides FilterType ID and FilterName for each params type
 template<typename T>
-struct GEFilterParamsTypeInfoV2 {
+struct GEFilterParamsTypeInfo {
     using Self = T;
     static constexpr GEFilterType ID = GEFilterType::NONE;
     static constexpr std::string_view FilterName = "";
@@ -975,7 +974,7 @@ struct GEFilterParamsTypeInfoV2 {
 // Helper macro for GEParamsTypeInfo specializations
 #define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \
     template<> \
-    struct GEFilterParamsTypeInfoV2<Struct> { \
+    struct GEFilterParamsTypeInfo<Struct> { \
         using Self = Struct; \
         static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \
         static constexpr std::string_view FilterName = #FilterNameStr; \
@@ -1056,7 +1055,7 @@ public:
     static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);
 
     // Convert filter name string to GEFilterType
-    // Note: Strings are sourced from GEFilterParamsTypeInfoV2<Struct>::FilterName
+    // Note: Strings are sourced from GEFilterParamsTypeInfo<Struct>::FilterName
     static GEFilterType GetFilterTypeFromString(const std::string& str);
 };
 
@@ -1644,25 +1643,25 @@ public:
     // All implementations are in the .cpp file
     // Overloaded SetParamsMemberByTag for each unique parameter type
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const DotMatrixDirection& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+                                     GEParamsMemberTag tag, const DotMatrixEffectType& value);
+    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Color4f& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::DotMatrixDirection& value);
+                                     GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::DotMatrixEffectType& value);
+                                     GEParamsMemberTag tag, const GERRect& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GEBezierWarpShaderFilterControlPointArray& value);
+                                     GEParamsMemberTag tag, const GESDFBorderParams& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GERRect& value);
+                                     GEParamsMemberTag tag, const GESDFShadowParams& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GESDFBorderParams& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GESDFShadowParams& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const GEV2::GESDFUnionOp& value);
+                                     GEParamsMemberTag tag, const GESDFUnionOp& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const RectF& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
@@ -1702,7 +1701,6 @@ public:
 
 };
 
-} // namespace GEV2
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

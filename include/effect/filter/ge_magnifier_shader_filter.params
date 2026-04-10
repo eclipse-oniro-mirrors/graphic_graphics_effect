@@ -47,4 +47,6 @@ struct [[ge::params(type=MAGNIFIER, name="Magnifier")]] GEMagnifierShaderFilterP
     uint32_t outerContourColor2 = 0x00000000;
     [[ge::prop("Magnifier_RotateDegree")]]
     int32_t rotateDegree = 0;
+    [[ge::prop(name="Magnifier_SDFShape", cast_from="std::shared_ptr<GEShaderShape>")]]
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
 };

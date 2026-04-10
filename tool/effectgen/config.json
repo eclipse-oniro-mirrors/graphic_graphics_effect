@@ -3,13 +3,6 @@
     "int": "int32_t",
     "GESDFShaderShape": "Drawing::GESDFShaderShape",
     "std::shared_ptr<GEShaderShape>": "std::shared_ptr<Drawing::GEShaderShape>",
-    "std::shared_ptr<GESDFShaderShape>" : "std::shared_ptr<Drawing::GESDFShaderShape>",
-    "DotMatrixDirection": "GEV2::DotMatrixDirection",
-    "DotMatrixEffectType": "GEV2::DotMatrixEffectType",
-    "GERRect": "GEV2::GERRect",
-    "GESDFBorderParams": "GEV2::GESDFBorderParams",
-    "GESDFShadowParams": "GEV2::GESDFShadowParams",
-    "GESDFUnionOp": "GEV2::GESDFUnionOp",
-    "GEBezierWarpShaderFilterControlPointArray": "GEV2::GEBezierWarpShaderFilterControlPointArray"
+    "std::shared_ptr<GESDFShaderShape>" : "std::shared_ptr<Drawing::GESDFShaderShape>"
   }
 }

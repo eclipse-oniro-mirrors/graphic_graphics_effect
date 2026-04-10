@@ -589,13 +589,13 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
 
 
 def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
-    """Generate GEFilterParamsTypeInfoV2 template specializations."""
+    """Generate GEFilterParamsTypeInfo template specializations."""
     output = []
 
-    output.append("// GEFilterParamsTypeInfoV2 template specializations")
+    output.append("// GEFilterParamsTypeInfo template specializations")
     output.append("// Provides FilterType ID and FilterName for each params type")
     output.append("template<typename T>")
-    output.append("struct GEFilterParamsTypeInfoV2 {")
+    output.append("struct GEFilterParamsTypeInfo {")
     output.append("    using Self = T;")
     output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
     output.append('    static constexpr std::string_view FilterName = "";')
@@ -605,7 +605,7 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("// Helper macro for GEParamsTypeInfo specializations")
     output.append("#define GE_PARAMS_TYPE_INFO(Struct, FilterTypeEnum, FilterNameStr) \\")
     output.append("    template<> \\")
-    output.append("    struct GEFilterParamsTypeInfoV2<Struct> { \\")
+    output.append("    struct GEFilterParamsTypeInfo<Struct> { \\")
     output.append("        using Self = Struct; \\")
     output.append("        static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \\")
     output.append("        static constexpr std::string_view FilterName = #FilterNameStr; \\")
@@ -809,7 +809,7 @@ def generate_params_builder_decl() -> str:
     output.append("    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);")
     output.append("")
     output.append("    // Convert filter name string to GEFilterType")
-    output.append("    // Note: Strings are sourced from GEFilterParamsTypeInfoV2<Struct>::FilterName")
+    output.append("    // Note: Strings are sourced from GEFilterParamsTypeInfo<Struct>::FilterName")
     output.append("    static GEFilterType GetFilterTypeFromString(const std::string& str);")
     output.append("};")
     output.append("")
@@ -853,9 +853,9 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEFilterType> map = {")
 
-    # Helper macro for reducing repetition - uses GEFilterParamsTypeInfoV2::FilterName
+    # Helper macro for reducing repetition - uses GEFilterParamsTypeInfo::FilterName
     output.append("#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \\")
-    output.append("    { std::string(GEFilterParamsTypeInfoV2<Struct>::FilterName), GEFilterParamsTypeInfoV2<Struct>::ID }")
+    output.append("    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }")
     output.append("")
 
     for struct in structs:
@@ -985,7 +985,6 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
-    output.append("namespace GEV2 {")
     output.append("")
 
     # Base template
@@ -1005,8 +1004,8 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("    struct GEFilterTypeInfoV2<_FilterClass> { \\")
     output.append("        using FilterClass = _FilterClass; \\")
     output.append("        using ParamType = _ParamType; \\")
-    output.append("        static constexpr GEFilterType ID = GEFilterParamsTypeInfoV2<_ParamType>::ID; \\")
-    output.append("        static constexpr std::string_view Name = GEFilterParamsTypeInfoV2<_ParamType>::FilterName; \\")
+    output.append("        static constexpr GEFilterType ID = GEFilterParamsTypeInfo<_ParamType>::ID; \\")
+    output.append("        static constexpr std::string_view Name = GEFilterParamsTypeInfo<_ParamType>::FilterName; \\")
     output.append("    };")
     output.append("")
 
@@ -1024,7 +1023,6 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("#undef GE_FILTER_TYPE_INFO")
     output.append("")
 
-    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
@@ -1195,7 +1193,6 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
-    output.append("namespace GEV2 {")
     output.append("")
     output.append("class GEFilterParams;")
     output.append("")
@@ -1213,7 +1210,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     # Generate constraints
     output.append(generate_constraints(structs))
 
-    # Generate GEFilterParamsTypeInfoV2 specializations
+    # Generate GEFilterParamsTypeInfo specializations
     output.append(generate_filter_params_type_info(structs))
     output.append(generate_params_builder_decl())
 
@@ -1223,7 +1220,6 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     # Generate GEParamsMemberHelper declaration (includes SetParamsMemberByTag template)
     output.append(generate_struct_tag_ranges_decl(structs, type_aliases))
 
-    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
@@ -1311,7 +1307,6 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
-    output.append("namespace GEV2 {")
     output.append("")
 
     # Generate compile-time branch verification static asserts
@@ -1332,7 +1327,6 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     # Generate overloaded SetParamsMemberByTag implementations
     output.append(generate_set_params_member_overloads_impl(structs, type_aliases))
 
-    output.append("} // namespace GEV2")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
     output.append("} // namespace OHOS")
@@ -1494,12 +1488,12 @@ Examples:
 
     console.file(f"Generated {output_cpp_file}")
 
-    console.step(f"Generating {filter_type_info_file.name}...")
-    filter_type_info_content = generate_filter_type_info_v2_header(macro_infos, structs)
+    # console.step(f"Generating {filter_type_info_file.name}...")
+    # filter_type_info_content = generate_filter_type_info_v2_header(macro_infos, structs)
 
-    filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(filter_type_info_file, "w", encoding="utf-8") as f:
-        f.write(filter_type_info_content)
+    # filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
+    # with open(filter_type_info_file, "w", encoding="utf-8") as f:
+    #     f.write(filter_type_info_content)
 
     console.file(f"Generated {filter_type_info_file}")
     console.info(f"  - {len(macro_infos)} filter type info specializations")
