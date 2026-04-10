@@ -123,6 +123,7 @@ private:
         uniform vec4 spotColor;
         uniform float spotBlurRadius;
         uniform float isFilled;
+        uniform vec2 shadowOffset;
 
         const float USE_NATIVE_ERF = 1.0;
 
@@ -171,7 +172,8 @@ private:
         }
 
         half4 main(float2 fragCoord) {
-            float d = sdfShape.eval(fragCoord).a;
+            vec2 coord = fragCoord - shadowOffset;
+            float d = sdfShape.eval(coord).a;
             vec4 color = elevationShadowEffect(d);
             return half4(color);
         }

@@ -199,10 +199,10 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetElevationShadowEff
 void GESDFShadowShader::UpdateRectForElevationShadow(Drawing::Rect& rect)
 {
     float maxBlur = std::max({ambientBlurRadius_, spotBlurRadius_, SDF_SHADOW_MIN_THRESHOLD});
-    rect.SetLeft(rect.GetLeft() - maxBlur);
-    rect.SetTop(rect.GetTop() - maxBlur);
-    rect.SetRight(rect.GetRight() + maxBlur);
-    rect.SetBottom(rect.GetBottom() + maxBlur);
+    rect.SetLeft(rect.GetLeft() + params_.shadow.offsetX - maxBlur);
+    rect.SetTop(rect.GetTop() + params_.shadow.offsetY - maxBlur);
+    rect.SetRight(rect.GetRight() + params_.shadow.offsetX + maxBlur);
+    rect.SetBottom(rect.GetBottom() + params_.shadow.offsetY + maxBlur);
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowShader(const Drawing::Rect& rect)
@@ -240,6 +240,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowSha
         spotColor_.GetGreenF(), spotColor_.GetBlueF(), spotColor_.GetAlphaF());
     builder->SetUniform("spotBlurRadius", spotBlurRadius_);
     builder->SetUniform("isFilled", static_cast<float>(params_.shadow.isFilled));
+    builder->SetUniform("shadowOffset", params_.shadow.offsetX, params_.shadow.offsetY);
 
     auto outShader = builder->MakeShader(nullptr, false);
     if (outShader == nullptr) {
