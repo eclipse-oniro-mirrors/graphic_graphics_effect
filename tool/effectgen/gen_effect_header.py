@@ -75,6 +75,10 @@ def generate_header() -> str:
     output.append("namespace OHOS {")
     output.append("namespace Rosen {")
     output.append("namespace Drawing {")
+    output.append("#if defined(__clang__)")
+    output.append("#pragma clang diagnostic push")
+    output.append('#pragma clang diagnostic ignored "-Wunknown-attributes"')
+    output.append("#endif")
     output.append("")
     output.append("// Parameter structure definitions")
 
@@ -92,6 +96,9 @@ def generate_header() -> str:
         rel_path = params_file.relative_to(root_dir / "include")
         output.append(f'#include "{rel_path}"')
 
+    output.append("#if defined(__clang__)")
+    output.append("#pragma clang diagnostic pop")
+    output.append("#endif")
     output.append("")
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")

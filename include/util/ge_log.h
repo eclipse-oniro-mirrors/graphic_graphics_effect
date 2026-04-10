@@ -30,11 +30,13 @@ namespace Rosen {
 #undef LOG_TAG
 #define LOG_TAG "OHOS::GE"
 
+#ifndef RS_GRAPHIC_LOG_H // This header has same macro, prevent from redefinition
 #define LOGI(format, ...) HILOG_INFO(LOG_CORE, format, ##__VA_ARGS__)
 #define LOGD(format, ...) HILOG_DEBUG(LOG_CORE, format, ##__VA_ARGS__)
 #define LOGE(format, ...) HILOG_ERROR(LOG_CORE, format, ##__VA_ARGS__)
 #define LOGW(format, ...) HILOG_WARN(LOG_CORE, format, ##__VA_ARGS__)
 #define LOGF(format, ...) HILOG_FATAL(LOG_CORE, format, ##__VA_ARGS__)
+#endif
 
 #define GE_LOGI(format, ...) HILOG_INFO(LOG_CORE, format, ##__VA_ARGS__)
 #define GE_LOGD(format, ...) HILOG_DEBUG(LOG_CORE, format, ##__VA_ARGS__)

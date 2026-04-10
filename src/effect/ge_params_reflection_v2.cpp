@@ -2151,36 +2151,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterPa
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value)
-{
-    if (!params) {
-        return;
-    }
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params->GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                                 GEParamsMemberTag tag, const std::weak_ptr<Drawing::Image>& value)
 {
     if (!params) {

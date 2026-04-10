@@ -57,7 +57,6 @@ class GEFilterParams;
     X(ESCAPE(float)) \
     X(ESCAPE(int32_t)) \
     X(ESCAPE(std::pair<float, float>)) \
-    X(ESCAPE(std::shared_ptr<Drawing::GESDFShaderShape>)) \
     X(ESCAPE(std::shared_ptr<Drawing::GEShaderShape>)) \
     X(ESCAPE(std::shared_ptr<Drawing::Image>)) \
     X(ESCAPE(std::shared_ptr<GEShaderMask>)) \
@@ -1678,8 +1677,6 @@ public:
                                      GEParamsMemberTag tag, const int32_t& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::pair<float, float>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
-                                     GEParamsMemberTag tag, const std::shared_ptr<Drawing::GESDFShaderShape>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value);
     static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,

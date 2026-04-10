@@ -40,6 +40,10 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunknown-attributes"
+#endif
 
 // Parameter structure definitions
 #include "effect/filter/ge_aibar_shader_filter.params"
@@ -109,6 +113,9 @@ namespace Drawing {
 #include "effect/shader/gex_light_cave_shader.params"
 #include "effect/mask/gex_noisy_frame_gradient_mask.params"
 #include "effect/shader/gex_rounded_rect_flowlight_effect.params"
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 
 } // namespace Drawing
 } // namespace Rosen

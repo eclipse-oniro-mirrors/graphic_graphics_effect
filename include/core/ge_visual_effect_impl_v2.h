@@ -26,17 +26,17 @@
 #include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
-#include "core/ge_filter_type.h"
 #include "effect/color_filter.h"
-#include "effect/ge_filter_params.h"
-#include "effect/ge_params_reflection_v2.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_filter_type.h"
+#include "ge_filter_params.h"
 #include "ge_log.h"
+#include "ge_params_reflection_v2.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
-
 #include "utils/rect.h"
 
 namespace OHOS {
@@ -68,14 +68,13 @@ public:
     void SetParam(GEParamsMemberTag tag, T value)
     {
         if (!params_) {
-            LOGE("GEVisualEffectImpl::SetParam: params_ is null");
+            GE_LOGE("GEVisualEffectImpl::SetParam: params_ is null");
             return;
         }
 
         // Check if tag is valid for current params type
         if (!IsTagValidForCurrentType(tag)) {
-            LOGE(
-                "GEVisualEffectImpl::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
+            GE_LOGE("GEVisualEffectImpl::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
             return;
         }
 
@@ -91,7 +90,7 @@ public:
         if (tag != GEParamsMemberTag::INVALID) {
             SetParam(tag, value);
         } else {
-            LOGE("GEVisualEffectImpl::SetParam: unknown tag '%s'", tagStr.c_str());
+            GE_LOGE("GEVisualEffectImpl::SetParam: unknown tag '%s'", tagStr.c_str());
         }
     }
 
@@ -279,9 +278,10 @@ private:
     FOR_EACH_PARAM_TYPE(DECLARE_SET_PARAM_INTERNAL)
 #undef DECLARE_SET_PARAM_INTERNAL
 
-    // Current placeholders, remove these two placeholders if future effects use long long or double params
+    // Compatibility placeholders, remove these two placeholders if future effects use them
     void SetParamInternal(GEParamsMemberTag tag, const long long& value);
     void SetParamInternal(GEParamsMemberTag tag, const double& value);
+    void SetParamInternal(GEParamsMemberTag tag, const std::shared_ptr<Drawing::ColorFilter> param);
 
 private:
     FilterType filterType_ = FilterType::NONE;

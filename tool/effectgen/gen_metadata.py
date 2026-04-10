@@ -68,18 +68,23 @@ COPYRIGHT_HEADER = """/*
 """
 
 
-def load_config(config_path: Path) -> Dict[str, str]:
-    """Load type aliases from config.json."""
+def load_config(config_path: Path) -> Tuple[Dict[str, str], Dict[str, str]]:
+    """Load type aliases and blocked types from config.json."""
     type_aliases = {}
+    blocked_types = {}
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
             type_aliases = config.get("type_aliases", {})
+            blocked_types_list = config.get("member_setter_blocked_types", [])
+            for item in blocked_types_list:
+                if "type" in item:
+                    blocked_types[item["type"]] = item.get("reason", "")
     except FileNotFoundError:
         console.warning(f"Config file not found at {config_path}")
     except json.JSONDecodeError as e:
         console.warning(f"Failed to parse config file: {e}")
-    return type_aliases
+    return type_aliases, blocked_types
 
 
 def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
@@ -454,8 +459,11 @@ def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tup
     return "\n".join(output), struct_tag_ranges
 
 
-def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate GEParamsMemberHelper class declaration."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     output.append("")
@@ -474,7 +482,7 @@ def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dic
     output.append("")
     output.append("    // Set params member by tag using overloaded functions (reduces binary bloat)")
     output.append("    // All implementations are in the .cpp file")
-    output.append(generate_set_params_member_overloads_decl(structs, type_aliases))
+    output.append(generate_set_params_member_overloads_decl(structs, type_aliases, blocked_types))
 
     output.append("};")
     output.append("")
@@ -512,8 +520,11 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate overloaded SetParamsMemberByTag function implementations."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     output.append("// Helper macro to validate and set parameter")
@@ -543,19 +554,21 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
             for tag_info in iterate_field_tags(struct, field):
                 # Get effective type (cast_from or field type)
                 normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
-                
-                if normalized_type not in type_to_tags:
-                    type_to_tags[normalized_type] = []
-                type_to_tags[normalized_type].append((tag_info.tag_name, struct.name, field.name))
-                
+
+                if normalized_type not in blocked_types:
+                    if normalized_type not in type_to_tags:
+                        type_to_tags[normalized_type] = []
+                    type_to_tags[normalized_type].append((tag_info.tag_name, struct.name, field.name))
+
                 # If cast_from is specified, also add to original field type group
                 if has_cast_from(field, tag_info.prop_attr_index):
                     original_type = get_original_field_type(field, tag_info.is_array_element)
                     normalized_original = normalize_type(original_type, type_aliases)
-                    
-                    if normalized_original not in type_to_tags:
-                        type_to_tags[normalized_original] = []
-                    type_to_tags[normalized_original].append((tag_info.tag_name, struct.name, field.name))
+
+                    if normalized_original not in blocked_types:
+                        if normalized_original not in type_to_tags:
+                            type_to_tags[normalized_original] = []
+                        type_to_tags[normalized_original].append((tag_info.tag_name, struct.name, field.name))
 
     # Generate implementations for each type
     for field_type, tags in type_to_tags.items():
@@ -701,15 +714,17 @@ def generate_set_member_cases(structs: List[StructInfo]) -> str:
 
     return "\n".join(output)
 
-
-def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate overloaded SetParamsMemberByTag function declarations."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     output.append("    // Overloaded SetParamsMemberByTag for each unique parameter type")
 
     # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
-    unique_types = collect_effective_types(structs, type_aliases)
+    unique_types = collect_effective_types(structs, type_aliases, blocked_types)
     sorted_types = sorted(unique_types)
 
     for field_type in sorted_types:
@@ -877,36 +892,52 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str]) -> set:
+def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> set:
     """Collect unique effective types from all tags.
-    
+
     When cast_from is specified, both cast_from type AND original field type
     are included to generate overloads for both types.
+
+    Args:
+        structs: List of struct information
+        type_aliases: Type alias mapping
+        blocked_types: Dictionary of types to exclude (type -> reason mapping)
+
+    Returns:
+        Set of unique effective types, excluding any blocked types
     """
+    if blocked_types is None:
+        blocked_types = {}
+
     unique_types = set()
     for struct in structs:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
                 # Get effective type (cast_from or field type)
                 normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
-                unique_types.add(normalized_type)
-                
+                if normalized_type not in blocked_types:
+                    unique_types.add(normalized_type)
+
                 # If cast_from is specified, also add original field type
                 # This ensures we generate overloads for both types
                 if has_cast_from(field, tag_info.prop_attr_index):
                     original_type = get_original_field_type(field, tag_info.is_array_element)
                     normalized_original = normalize_type(original_type, type_aliases)
-                    unique_types.add(normalized_original)
+                    if normalized_original not in blocked_types:
+                        unique_types.add(normalized_original)
 
     return unique_types
 
 
-def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate X-Macro listing all unique member variable types."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     # Collect unique effective types from all tags (same logic as generate_set_params_member_overloads_impl)
-    unique_types = collect_effective_types(structs, type_aliases)
+    unique_types = collect_effective_types(structs, type_aliases, blocked_types)
     sorted_types = sorted(unique_types)
 
     output.append("// X-Macro listing all unique parameter member types")
@@ -1173,8 +1204,11 @@ def generate_constraints(structs: List[StructInfo]):
     return "\n".join(output)
 
 
-def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate the complete header file."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     output.append(COPYRIGHT_HEADER)
@@ -1201,7 +1235,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append("#define ESCAPE(...) __VA_ARGS__")
     output.append("")
 
-    output.append(generate_type_xmacro(structs, type_aliases))
+    output.append(generate_type_xmacro(structs, type_aliases, blocked_types))
 
     # Generate member enums and tag ranges
     enum_code, struct_tag_ranges = generate_member_enums(structs)
@@ -1218,7 +1252,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     output.append(generate_type_traits(structs))
 
     # Generate GEParamsMemberHelper declaration (includes SetParamsMemberByTag template)
-    output.append(generate_struct_tag_ranges_decl(structs, type_aliases))
+    output.append(generate_struct_tag_ranges_decl(structs, type_aliases, blocked_types))
 
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
@@ -1229,8 +1263,11 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str]) -> 
     return "\n".join(output)
 
 
-def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str:
+def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate complete cpp file."""
+    if blocked_types is None:
+        blocked_types = {}
+
     output = []
 
     output.append(COPYRIGHT_HEADER)
@@ -1261,7 +1298,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str]) -> str
     output.append(generate_string_to_enum_mapping_impl(structs))
 
     # Generate overloaded SetParamsMemberByTag implementations
-    output.append(generate_set_params_member_overloads_impl(structs, type_aliases))
+    output.append(generate_set_params_member_overloads_impl(structs, type_aliases, blocked_types))
 
     output.append("} // namespace Drawing")
     output.append("} // namespace Rosen")
@@ -1361,8 +1398,12 @@ Examples:
     )
 
     console.header("Loading configuration")
-    type_aliases = load_config(config_file)
+    type_aliases, blocked_types = load_config(config_file)
     console.info(f"Loaded {len(type_aliases)} type aliases from {config_file}")
+    if blocked_types:
+        console.info(f"Loaded {len(blocked_types)} blocked types from {config_file}")
+        for blocked_type, reason in blocked_types.items():
+            console.step(f"  Blocked: {blocked_type} - {reason}")
 
     console.header("Scanning for .params files")
     params_files = []
@@ -1405,7 +1446,7 @@ Examples:
 
     console.header("Generating reflection metadata")
     console.step(f"Generating {output_file.name}...")
-    header_content = generate_header(structs, type_aliases)
+    header_content = generate_header(structs, type_aliases, blocked_types)
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, "w", encoding="utf-8") as f:
@@ -1416,7 +1457,7 @@ Examples:
     console.info(f"  - {sum(len(s.fields) for s in structs)} total fields")
 
     console.step(f"Generating {output_cpp_file.name}...")
-    cpp_content = generate_cpp(structs, type_aliases)
+    cpp_content = generate_cpp(structs, type_aliases, blocked_types)
 
     output_cpp_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_cpp_file, "w", encoding="utf-8") as f:
