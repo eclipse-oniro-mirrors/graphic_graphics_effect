@@ -465,7 +465,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
 
     gravityPullShaderBuilder->SetUniform("spacing", std::max(params_.spacing, 0.0001f));
     gravityPullShaderBuilder->SetUniform("warpStrength", params_.warpStrength);
-    gravityPullShaderBuilder->SetUniform("hotZone", params_.hotZone);
+    gravityPullShaderBuilder->SetUniform("hotZone", std::max(params_.hotZone, 0.0001f));
     gravityPullShaderBuilder->SetUniform("shapeCenterPos", shapeCenterX, shapeCenterY);
     gravityPullShaderBuilder->SetUniform("centerPos", params_.centerPosition[0], params_.centerPosition[1]);
     gravityPullShaderBuilder->SetChild("shapeShader", transformedShapeShader);
