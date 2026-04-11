@@ -140,6 +140,32 @@ struct GESoundWaveFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(SOUND_WAVE, GESoundWaveFilterParams, GE_FILTER_SOUND_WAVE);
 
+constexpr char GE_FILTER_HEAT_DISTORTION[] = "HeatDistortion";
+constexpr char GE_FILTER_HEAT_DISTORTION_INTENSITY[] = "HeatDistortion_Intensity";
+constexpr char GE_FILTER_HEAT_DISTORTION_NOISE_SCALE[] = "HeatDistortion_NoiseScale";
+constexpr char GE_FILTER_HEAT_DISTORTION_RISE_WEIGHT[] = "HeatDistortion_RiseWeight";
+constexpr char GE_FILTER_HEAT_DISTORTION_PROGRESS[] = "HeatDistortion_Progress";
+struct GEHeatDistortionFilterParams {
+    float intensity = 1.0f;
+    float noiseScale = 1.0f;
+    float riseWeight = 0.2f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(HEAT_DISTORTION, GEHeatDistortionFilterParams, GE_FILTER_HEAT_DISTORTION);
+
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE[] = "BlurBubblesRise";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_BLUR_INTENSITY[] = "BlurBubblesRise_BlurIntensity";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_MIX_STRENGTH[] = "BlurBubblesRise_MixStrength";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_PROGRESS[] = "BlurBubblesRise_Progress";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_MASK_IMAGE[] = "BlurBubblesRise_MaskImage";
+struct GEBlurBubblesRiseFilterParams {
+    float blurIntensity = 0.3f;
+    float mixStrength = 1.0f;
+    float progress = 0.0f;
+    std::shared_ptr<Drawing::Image> maskImage = nullptr;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(BLUR_BUBBLES_RISE, GEBlurBubblesRiseFilterParams, GE_FILTER_BLUR_BUBBLES_RISE);
+
 constexpr char GE_FILTER_GREY[] = "GREY";
 constexpr char GE_FILTER_GREY_COEF_1[] = "GREY_COEF_1";
 constexpr char GE_FILTER_GREY_COEF_2[] = "GREY_COEF_2";

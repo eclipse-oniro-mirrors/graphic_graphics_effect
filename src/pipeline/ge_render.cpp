@@ -17,6 +17,7 @@
 #include "ge_aibar_shader_filter.h"
 #include "ge_aurora_noise_shader.h"
 #include "ge_bezier_warp_shader_filter.h"
+#include "ge_blur_bubbles_rise_filter.h"
 #include "ge_border_light_shader.h"
 #include "ge_circle_flowlight_effect.h"
 #include "ge_color_gradient_effect.h"
@@ -36,6 +37,7 @@
 #include "ge_frosted_glass_shader_filter.h"
 #include "ge_grey_shader_filter.h"
 #include "ge_grid_warp_shader_filter.h"
+#include "ge_heat_distortion_filter.h"
 #include "ge_hps_build_pass.h"
 #include "ge_hps_effect_filter.h"
 #include "ge_hps_upscale_pass.h"
@@ -899,6 +901,16 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::SOUND_WAVE: {
             const auto& soundWaveParams = ve->GetSoundWaveParams();
             shaderFilter = std::make_shared<GESoundWaveFilter>(*soundWaveParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::HEAT_DISTORTION: {
+            const auto& heatDistortionParams = ve->GetHeatDistortionParams();
+            shaderFilter = std::make_shared<GEHeatDistortionFilter>(*heatDistortionParams);
+            break;
+        }
+        case Drawing::GEVisualEffectImpl::FilterType::BLUR_BUBBLES_RISE: {
+            const auto& blurBubblesRiseParams = ve->GetBlurBubblesRiseParams();
+            shaderFilter = std::make_shared<GEBlurBubblesRiseFilter>(*blurBubblesRiseParams);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
