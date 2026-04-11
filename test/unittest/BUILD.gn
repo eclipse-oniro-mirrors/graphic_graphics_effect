@@ -254,12 +254,15 @@ ohos_unittest("GraphicsEffectTest") {
     "-Dprotected=public",
   ]
 
-  deps = [ ":graphics_effect_test_src" ]
+  public_deps = [ ":graphics_effect_test_src" ]
 
   external_deps = [
     "c_utils:utils",
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
+    "graphic_surface:surface",
+    "egl:libEGL",
+    "opengles:libGLES",
     "graphic_2d:librender_service_base",
   ]
 
