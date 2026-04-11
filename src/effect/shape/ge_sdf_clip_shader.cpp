@@ -65,7 +65,9 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const 
         return nullptr;
     }
     GE_TRACE_NAME_FMT("GESDFClipShader::GetSDFClipEffect, normal type");
-    auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
+    auto sdfShader = params_.shape->GenerateDrawingShader(
+        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : rect.GetWidth(),
+        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFClipShader: failed generate GESDFClipShader.");
         return nullptr;
