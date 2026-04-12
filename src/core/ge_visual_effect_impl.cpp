@@ -299,6 +299,18 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeSoundWaveParams();
         }
     },
+    { GE_FILTER_HEAT_DISTORTION,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::HEAT_DISTORTION);
+            impl->MakeHeatDistortionParams();
+        }
+    },
+    { GE_FILTER_BLUR_BUBBLES_RISE,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::BLUR_BUBBLES_RISE);
+            impl->MakeBlurBubblesRiseParams();
+        }
+    },
     { GE_FILTER_EDGE_LIGHT,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::EDGE_LIGHT);
@@ -850,6 +862,14 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
             SetSoundWaveParams(tag, param);
             break;
         }
+        case FilterType::HEAT_DISTORTION: {
+            SetHeatDistortionParams(tag, param);
+            break;
+        }
+        case FilterType::BLUR_BUBBLES_RISE: {
+            SetBlurBubblesRiseParams(tag, param);
+            break;
+        }
         case FilterType::EDGE_LIGHT: {
             SetEdgeLightParams(tag, param);
             break;
@@ -1091,6 +1111,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             if (tag == GE_SHAPE_SDF_PIXELMAP_SHAPE_IMAGE) {
                 sdfPixelmapShapeParams_->image = param;
             }
+            break;
+        }
+        case FilterType::BLUR_BUBBLES_RISE: {
+            SetBlurBubblesRiseParams(tag, param);
             break;
         }
         default:
@@ -2361,6 +2385,61 @@ void GEVisualEffectImpl::SetSoundWaveParams(const std::string& tag, const Drawin
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetHeatDistortionParams(const std::string& tag, float param)
+{
+    if (heatDistortionParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_HEAT_DISTORTION_INTENSITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->heatDistortionParams_->intensity = p; } },
+        { GE_FILTER_HEAT_DISTORTION_NOISE_SCALE,
+            [](GEVisualEffectImpl* obj, float p) { obj->heatDistortionParams_->noiseScale = p; } },
+        { GE_FILTER_HEAT_DISTORTION_RISE_WEIGHT,
+            [](GEVisualEffectImpl* obj, float p) { obj->heatDistortionParams_->riseWeight = p; } },
+        { GE_FILTER_HEAT_DISTORTION_PROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->heatDistortionParams_->progress = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetBlurBubblesRiseParams(const std::string& tag, float param)
+{
+    if (blurBubblesRiseParams_ == nullptr) {
+        return;
+    }
+
+    static std::unordered_map<std::string, std::function<void(GEVisualEffectImpl*, float)>> actions = {
+        { GE_FILTER_BLUR_BUBBLES_RISE_BLUR_INTENSITY,
+            [](GEVisualEffectImpl* obj, float p) { obj->blurBubblesRiseParams_->blurIntensity = p; } },
+        { GE_FILTER_BLUR_BUBBLES_RISE_MIX_STRENGTH,
+            [](GEVisualEffectImpl* obj, float p) { obj->blurBubblesRiseParams_->mixStrength = p; } },
+        { GE_FILTER_BLUR_BUBBLES_RISE_PROGRESS,
+            [](GEVisualEffectImpl* obj, float p) { obj->blurBubblesRiseParams_->progress = p; } },
+    };
+
+    auto it = actions.find(tag);
+    if (it != actions.end()) {
+        it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetBlurBubblesRiseParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param)
+{
+    if (blurBubblesRiseParams_ == nullptr) {
+        return;
+    }
+
+    if (tag == GE_FILTER_BLUR_BUBBLES_RISE_MASK_IMAGE) {
+        blurBubblesRiseParams_->maskImage = param;
     }
 }
 

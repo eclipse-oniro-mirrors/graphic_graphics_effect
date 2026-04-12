@@ -99,7 +99,9 @@ enum class GEFilterType : int32_t {
     SDF_COLOR,
     SDF_EDGE_LIGHT_EFFECT,
     DISTORTION_COLLAPSE,
-    MAX
+    HEAT_DISTORTION,
+    BLUR_BUBBLES_RISE,
+    MAX,
 };
 
 // Virtual interface for runtime type identification of registered GEFilter types and type-erasured class GEFilterParams
