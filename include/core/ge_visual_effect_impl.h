@@ -187,6 +187,26 @@ public:
         return soundWaveParams_;
     }
 
+    void MakeHeatDistortionParams()
+    {
+        heatDistortionParams_ = std::make_shared<GEHeatDistortionFilterParams>();
+    }
+
+    const std::shared_ptr<GEHeatDistortionFilterParams>& GetHeatDistortionParams() const
+    {
+        return heatDistortionParams_;
+    }
+
+    void MakeBlurBubblesRiseParams()
+    {
+        blurBubblesRiseParams_ = std::make_shared<GEBlurBubblesRiseFilterParams>();
+    }
+
+    const std::shared_ptr<GEBlurBubblesRiseFilterParams>& GetBlurBubblesRiseParams() const
+    {
+        return blurBubblesRiseParams_;
+    }
+
     void MakeEdgeLightParams()
     {
         edgeLightParams_ = std::make_shared<GEEdgeLightShaderFilterParams>();
@@ -782,6 +802,9 @@ private:
     void SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param);
     void SetSoundWaveParams(const std::string& tag, float param);
     void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
+    void SetHeatDistortionParams(const std::string& tag, float param);
+    void SetBlurBubblesRiseParams(const std::string& tag, float param);
+    void SetBlurBubblesRiseParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
     void SetDirectionLightParamsFloat(const std::string& tag, float param);
     void SetEdgeLightParams(const std::string& tag, float param);
     void SetDispersionParams(const std::string& tag, float param);
@@ -874,6 +897,8 @@ private:
     std::shared_ptr<GEGasifyBlurFilterParams> gasifyBlurFilterParams_ = nullptr;
     std::shared_ptr<GEGasifyFilterParams> gasifyFilterParams_ = nullptr;
     std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
+    std::shared_ptr<GEHeatDistortionFilterParams> heatDistortionParams_ = nullptr;
+    std::shared_ptr<GEBlurBubblesRiseFilterParams> blurBubblesRiseParams_ = nullptr;
     std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
     std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
     std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;

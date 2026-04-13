@@ -140,6 +140,32 @@ struct GESoundWaveFilterParams {
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(SOUND_WAVE, GESoundWaveFilterParams, GE_FILTER_SOUND_WAVE);
 
+constexpr char GE_FILTER_HEAT_DISTORTION[] = "HeatDistortion";
+constexpr char GE_FILTER_HEAT_DISTORTION_INTENSITY[] = "HeatDistortion_Intensity";
+constexpr char GE_FILTER_HEAT_DISTORTION_NOISE_SCALE[] = "HeatDistortion_NoiseScale";
+constexpr char GE_FILTER_HEAT_DISTORTION_RISE_WEIGHT[] = "HeatDistortion_RiseWeight";
+constexpr char GE_FILTER_HEAT_DISTORTION_PROGRESS[] = "HeatDistortion_Progress";
+struct GEHeatDistortionFilterParams {
+    float intensity = 1.0f;
+    float noiseScale = 1.0f;
+    float riseWeight = 0.2f;
+    float progress = 0.0f;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(HEAT_DISTORTION, GEHeatDistortionFilterParams, GE_FILTER_HEAT_DISTORTION);
+
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE[] = "BlurBubblesRise";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_BLUR_INTENSITY[] = "BlurBubblesRise_BlurIntensity";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_MIX_STRENGTH[] = "BlurBubblesRise_MixStrength";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_PROGRESS[] = "BlurBubblesRise_Progress";
+constexpr char GE_FILTER_BLUR_BUBBLES_RISE_MASK_IMAGE[] = "BlurBubblesRise_MaskImage";
+struct GEBlurBubblesRiseFilterParams {
+    float blurIntensity = 0.3f;
+    float mixStrength = 1.0f;
+    float progress = 0.0f;
+    std::shared_ptr<Drawing::Image> maskImage = nullptr;
+};
+REGISTER_GEFILTERPARAM_TYPEINFO(BLUR_BUBBLES_RISE, GEBlurBubblesRiseFilterParams, GE_FILTER_BLUR_BUBBLES_RISE);
+
 constexpr char GE_FILTER_GREY[] = "GREY";
 constexpr char GE_FILTER_GREY_COEF_1[] = "GREY_COEF_1";
 constexpr char GE_FILTER_GREY_COEF_2[] = "GREY_COEF_2";
@@ -1505,12 +1531,14 @@ constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_UNION_MODE[] = "SDFTransformShape_Un
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_CENTER[] = "SDFTransformShape_GravityCenter";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_STRENGTH[] = "SDFTransformShape_GravityStrength";
 constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_SPACING[] = "SDFTransformShape_GravitySpacing";
+constexpr char GE_SHAPE_SDF_TRANSFORM_SHAPE_GRAVITY_HOTZONE[] = "SDFTransformShape_GravityHotZone";
 struct GESDFTransformShapeParams {
     std::shared_ptr<GESDFShaderShape> shape;
     Drawing::Matrix matrix = Drawing::Matrix();
     float warpStrength = 0.0f;
     int unionMode = 0;
     float spacing = 0.0f;
+    float hotZone = 0.0f;
     Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };
 
@@ -1559,54 +1587,6 @@ constexpr char GE_SHADER_SDF_COLOR_COLOR[] = "SDFColor_Color";
 struct GESDFColorShaderParams final {
     std::shared_ptr<GESDFShaderShape> shape = nullptr;
     Vector4f color;
-};
-
-struct GEWaterGlassDataParams final {
-    float speed = 0.38f;
-    float distortSpeed = 0.2f;
-    Drawing::Point refractionSpeed = {1.18f, 0.47f};
-    float progress = 0.0f;
-    Drawing::Point shakingDirection1 = {0.0f, 0.0f};
-    Drawing::Point shakingDirection2 = {0.0f, 0.0f};
-    Drawing::Point waveDensityXY = {4.8f, 14.6f};
-    float waveStrength = 5.8f;
-    float waveRefraction = 0.2f;
-    float waveSpecular = 0.32f;
-    float waveFrequency = 6.15f;
-    float waveShapeDistortion = 0.54f;
-    float waveDistortionAngle = 0.93f;
-    float rippleXWave = 0.01f;
-    float rippleYWave = 0.04f;
-    float borderRadius = 0.1f;
-    float borderThickness = 0.1f;
-    Drawing::Point waveInnerMaskXY = {0.85f, 0.9f};
-    float waveInnerMaskRadius = 0.59f;
-    float waveInnerMaskSmoothness = 1.0f;
-    float waveOuterMaskPadding = 0.04f;
-    float waveSpecularPower = 50.0f;
-    float refractionDetailDark = 0.85f;
-    float refractionDetailWhite = 0.48f;
-    float detailStrength = 0.61f;
-};
-
-struct GEReededGlassDataParams final {
-    float refractionFactor = 0.3f;
-    uint8_t horizontalPatternNumber = 20;
-    float gridLightStrength = 0.1f;
-    float gridLightPositionStart = 0.97f;
-    float gridLightPositionEnd = 0.92f;
-    float gridShadowStrength = 0.02f;
-    float gridShadowPositionStart = 0.0f;
-    float gridShadowPositionEnd = 0.7f;
-    Drawing::Point portalLightSize = {0.2f, 0.01f};
-    Drawing::Point portalLightTilt = {0.526f, 0.46f};
-    Drawing::Point portalLightPosition = {0.55f, 0.7f};
-    float portalLightDisperseAttenuation = 2.4f;
-    float portalLightDisperse = 0.01f;
-    float portalLightSmoothBorder = 0.03f;
-    float portalLightShadowBorder = 0.06f;
-    float portalLightShadowPositionShift = 0.0f;
-    float portalLightStrength = 1.21f;
 };
 } // namespace Drawing
 } // namespace Rosen
