@@ -605,6 +605,10 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
             output.append(f"        GE_VALIDATE_AND_SET({tag_name})")
 
         output.append("        default:")
+        output.append('            GE_LOGE("SetParamsMemberByTag: No matching case for tag %u (filter type %u, params type %u)",')
+        output.append("                static_cast<uint32_t>(tag),")
+        output.append("                static_cast<uint32_t>(expectedFilterType),")
+        output.append("                static_cast<uint32_t>(params.GetType()));")
         output.append("            break;")
         output.append("    }")
         output.append("}")
@@ -1303,6 +1307,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocke
     output.append("")
     output.append('#include "ge_params_reflection_v2.h"')
     output.append('#include "ge_filter_params.h"')
+    output.append('#include "ge_log.h"')
     output.append("#include <unordered_map>")
     output.append("")
 

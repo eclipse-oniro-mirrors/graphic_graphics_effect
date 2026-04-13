@@ -83,7 +83,9 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     [[ge::prop("FrostedGlassEffect_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;
     // Adapt effect component
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::Image>", custom="SharedPtrImageToWeakTransformer")]]
     std::weak_ptr<Drawing::Image> blurImage; // frosted glass blur by ec
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::Image>", custom="SharedPtrImageToWeakTransformer")]]
     std::weak_ptr<Drawing::Image> blurImageForEdge; // frosted glass blur downsampled by ec
     RectF snapshotRect; // effect component snapshot total rect
     Drawing::Matrix snapshotMatrix; // effect component total matrix

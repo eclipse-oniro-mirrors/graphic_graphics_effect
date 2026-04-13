@@ -14,6 +14,7 @@
  */
 
 struct [[ge::params(type=USE_EFFECT_MASK, name="UseEffectMask")]] GEUseEffectMaskParams {
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::Image>", custom="SharedPtrImageToWeakTransformer")]]
     std::weak_ptr<Drawing::Image> image;
     bool useEffect = false;
 };
