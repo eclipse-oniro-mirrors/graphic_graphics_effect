@@ -29,14 +29,15 @@
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
-#include "ge_filter_type.h"
 #include "ge_filter_params.h"
+#include "ge_filter_type.h"
 #include "ge_log.h"
 #include "ge_params_reflection_v2.h"
 #include "ge_shader.h"
 #include "ge_shader_filter.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect.h"
+
 #include "utils/rect.h"
 
 namespace OHOS {
@@ -73,13 +74,14 @@ public:
         }
 
         // Check if tag is valid for current params type
-        if (!IsTagValidForCurrentType(tag)) {
-            GE_LOGE("GEVisualEffectImpl::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
+        if (!IsTagValidForCurrentType(*params_, tag)) {
+            GE_LOGE(
+                "GEVisualEffectImpl::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
             return;
         }
 
         // Use generated helper to set parameter by tag
-        SetParamInternal(tag, value);
+        SetParamInternal(*params_, tag, value);
     }
 
     /// Set parameter by string tag (runtime lookup to enum, then dispatch)
@@ -116,13 +118,16 @@ public:
     template<typename ParamsType>
     void MakeParams()
     {
-        params_ = GEFilterParams::Box(ParamsType {});
+        params_ = GEFilterParams::Box(std::make_shared<ParamsType>());
     }
 
     template<typename ParamsType>
     std::shared_ptr<ParamsType> GetParams() const
     {
-        return GEFilterParams::Unbox<ParamsType>(params_);
+        if (!params_) {
+            return nullptr;
+        }
+        return GEFilterParams::Unbox<ParamsType>(*params_);
     }
 
     // ========================================================================
@@ -260,34 +265,31 @@ public:
 
 private:
     /// Check if tag belongs to current params type's tag range
-    bool IsTagValidForCurrentType(GEParamsMemberTag tag) const
+    static bool IsTagValidForCurrentType(const GEFilterParams& params, GEParamsMemberTag tag)
     {
-        if (!params_) {
-            return false;
-        }
-
         auto tagType = GEParamsMemberHelper::GetFilterTypeFromTag(tag);
-        return tagType == params_->GetType();
+        return tagType == params.GetType();
     }
 
     /// Internal set param implementation - uses reflection metadata to set field value
     /// Non-template overloads for each type, generated from FOR_EACH_PARAM_TYPE
     /// Implementations in ge_visual_effect_impl_v2.cpp
-#define DECLARE_SET_PARAM_INTERNAL(Type) void SetParamInternal(GEParamsMemberTag tag, const Type& value);
+#define DECLARE_SET_PARAM_INTERNAL(Type) \
+    void SetParamInternal(GEFilterParams& params, GEParamsMemberTag tag, const Type& value);
 
     FOR_EACH_PARAM_TYPE(DECLARE_SET_PARAM_INTERNAL)
 #undef DECLARE_SET_PARAM_INTERNAL
 
-    // Compatibility placeholders, remove these two placeholders if future effects use them
-    void SetParamInternal(GEParamsMemberTag tag, const long long& value);
-    void SetParamInternal(GEParamsMemberTag tag, const double& value);
-    void SetParamInternal(GEParamsMemberTag tag, const std::shared_ptr<Drawing::ColorFilter> param);
+    // Compatibility placeholders, remove these placeholders if future effects use them
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long long&);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const double&);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const std::shared_ptr<Drawing::ColorFilter>);
 
 private:
     FilterType filterType_ = FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
-    std::shared_ptr<GEFilterParams> params_ = nullptr;
+    std::unique_ptr<GEFilterParams> params_ = nullptr;
 };
 
 } // namespace Drawing

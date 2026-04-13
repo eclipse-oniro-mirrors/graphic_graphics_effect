@@ -44,37 +44,22 @@ public:
     static constexpr bool IsRegisteredParamTypeInfo = GEFilterParamsTypeInfo<T>::ID != GEFilterType::NONE;
 
     template<typename T>
-    static std::shared_ptr<T> Unbox(const std::shared_ptr<GEFilterParams>& params);
+    static std::shared_ptr<T> Unbox(const GEFilterParams& params);
     template<typename T>
-    static std::shared_ptr<GEFilterParams> Box(T&& params);
+    static std::unique_ptr<GEFilterParams> Box(const std::shared_ptr<T>& params);
 
     virtual ~GEFilterParams() = default;
 
-    GEFilterType GetType() { return id; }
+    GEFilterType GetType() const { return id; }
 
 protected:
     GEFilterParams(GEFilterType type) : id(type) {}
     GEFilterType id;
 };
 
-// Type-specific proxy wrapper of params
+// Type-specific proxy wrapper of params - stores std::shared_ptr<T> by default
 template<typename T>
 class GEFilterParamsWrapper : public GEFilterParams {
-public:
-    using ParamType = T;
-    static constexpr std::nullopt_t Null = std::nullopt;
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unregistered GEFilterParams type");
-    template<typename U>
-    GEFilterParamsWrapper(U&& params)
-        : GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(std::forward<U>(params))
-    {}
-
-    T data;
-};
-
-// Type-specific proxy wrapper of params, specialization of std::shared_ptr<T> for handy use
-template<typename T>
-class GEFilterParamsWrapper<std::shared_ptr<T>> : public GEFilterParams {
 public:
     using ParamType = T;
     static constexpr std::nullptr_t Null = nullptr;
@@ -88,27 +73,29 @@ public:
 
 // Checked downcast from GEFilterParams to specific params type
 template<typename T>
-std::shared_ptr<T> GEFilterParams::Unbox(const std::shared_ptr<GEFilterParams>& params)
+std::shared_ptr<T> GEFilterParams::Unbox(const GEFilterParams& params)
 {
     static_assert(!std::is_reference_v<T>, "Can't unbox as a reference");
-    using ParamType = typename GEFilterParamsWrapper<std::shared_ptr<T>>::ParamType;
+    using ParamType = typename GEFilterParamsWrapper<T>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    if (GEFilterParamsTypeInfo<ParamType>::ID == params->id) {
-        return std::static_pointer_cast<GEFilterParamsWrapper<std::shared_ptr<T>>>(params)->data;
+    if (GEFilterParamsTypeInfo<ParamType>::ID == params.id) {
+        return static_cast<const GEFilterParamsWrapper<T>&>(params).data;
     }
-    return GEFilterParamsWrapper<std::shared_ptr<T>>::Null;
+    return nullptr;
 }
 
 // Upcast from specific params type to type-erased GEFilterParams
 template<typename T>
-std::shared_ptr<GEFilterParams> GEFilterParams::Box(T&& params)
+std::unique_ptr<GEFilterParams> GEFilterParams::Box(const std::shared_ptr<T>& params)
 {
     // As the type parameter of an universal reference, T may be U&/const U&, so removing qualifiers is necessary
     using TValue = std::remove_cv_t<std::remove_reference_t<T>>;
     using ParamType = typename GEFilterParamsWrapper<TValue>::ParamType;
     static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
-    auto p = std::make_shared<GEFilterParamsWrapper<TValue>>(std::forward<T>(params));
-    return std::static_pointer_cast<GEFilterParams>(p);
+    if (!params) {
+        return nullptr;
+    }
+    return std::make_unique<GEFilterParamsWrapper<TValue>>(params);
 }
 } // namespace Drawing
 } // namespace Rosen

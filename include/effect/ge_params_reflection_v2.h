@@ -1062,7 +1062,7 @@ GE_PARAMS_TYPE_INFO(GEXRoundedRectFlowlightEffectParams, ROUNDED_RECT_FLOWLIGHT,
 
 class GEParamsBuilder {
 public:
-    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);
+    static std::unique_ptr<GEFilterParams> Build(GEFilterType filterType);
 
     // Convert filter name string to GEFilterType
     // Note: Strings are sourced from GEFilterParamsTypeInfo<Struct>::FilterName
@@ -1661,59 +1661,59 @@ public:
     // Set params member by tag using overloaded functions (reduces binary bloat)
     // All implementations are in the .cpp file
     // Overloaded SetParamsMemberByTag for each unique parameter type
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const DotMatrixDirection& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const DotMatrixEffectType& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Drawing::Color4f& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Drawing::Matrix& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Drawing::Point& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const GERRect& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const GESDFBorderParams& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const GESDFShadowParams& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const GESDFUnionOp& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const RectF& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Vector2f& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Vector3f& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const Vector4f& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const bool& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const float& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const int32_t& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::pair<float, float>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::shared_ptr<GEShaderMask>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::vector<Vector2f>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::vector<Vector4f>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::vector<float>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const std::weak_ptr<Drawing::Image>& value);
-    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,
+    static void SetParamsMemberByTag(GEFilterParams& params,
                                      GEParamsMemberTag tag, const uint32_t& value);
 
 };

@@ -1,4 +1,19 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Generate C++ static reflection metadata from .params files.
 
@@ -219,9 +234,6 @@ def scan_declare_gefilter_typefunc(effect_dirs: List[Path]) -> List[FilterTypeMa
                     content = f.read()
 
                 # Pattern to match DECLARE_GEFILTER_TYPEFUNC(Class, ParamsType)
-                # This pattern handles:
-                # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, Drawing::GEKawaseBlurShaderFilterParams)
-                # - DECLARE_GEFILTER_TYPEFUNC(GEKawaseBlurShaderFilter, GEKawaseBlurShaderFilterParams)
                 pattern = r"DECLARE_GEFILTER_TYPEFUNC\s*\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*,\s*([a-zA-Z_][a-zA-Z0-9_:<>:]*)\s*\)"
 
                 matches = re.finditer(pattern, content)
@@ -292,7 +304,9 @@ def to_pascal_case(name: str) -> str:
     return "".join(result)
 
 
-def get_effective_type_for_tag(field: FieldInfo, is_array_elem: bool, array_idx: Optional[int], prop_attr_index: int, type_aliases: Dict[str, str]) -> str:
+def get_effective_type_for_tag(
+    field: FieldInfo, is_array_elem: bool, array_idx: Optional[int], prop_attr_index: int, type_aliases: Dict[str, str]
+) -> str:
     """Get the effective type for a field tag.
 
     This function consolidates the logic for determining the effective type
@@ -402,7 +416,7 @@ def get_effective_prop_name(field: FieldInfo, filter_name: str, index: Optional[
 
 def iterate_field_tags(struct: StructInfo, field: FieldInfo):
     """Helper to iterate over all tags for a field.
-    
+
     Yields FieldTagInfo objects containing tag information.
     For array elements, array_index is the element index.
     For whole-field accessors, is_array_element is False and array_index is None.
@@ -431,6 +445,7 @@ def iterate_field_tags(struct: StructInfo, field: FieldInfo):
         tag_name = to_member_tag_name(enum_type, field.name)
         prop = get_effective_prop_name(field, struct.filter_name)
         yield FieldTagInfo(tag_name, prop, False, None, 0)
+
 
 def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tuple[int, int, str]]]:
     """Generate GEParamsMemberTag enum."""
@@ -499,8 +514,9 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
     output.append("    switch (tag) {")
 
     output.append("#define GE_GET_FILTER_TYPE_CASE(Tag, FilterTypeEnum) \\")
-    output.append("    case GEParamsMemberTag::Tag: \\")
-    output.append("        return GEFilterType::FilterTypeEnum;")
+    output.append("    case GEParamsMemberTag::Tag: {                   \\")
+    output.append("        return GEFilterType::FilterTypeEnum;         \\")
+    output.append("    }")
     output.append("")
 
     for struct in structs:
@@ -553,7 +569,9 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
                 # Get effective type (cast_from or field type)
-                normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
+                normalized_type = get_effective_type_for_tag(
+                    field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases
+                )
 
                 if normalized_type not in blocked_types:
                     if normalized_type not in type_to_tags:
@@ -572,15 +590,12 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
 
     # Generate implementations for each type
     for field_type, tags in type_to_tags.items():
-        output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
+        output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,")
         output.append(f"                                                GEParamsMemberTag tag, const {field_type}& value)")
         output.append("{")
-        output.append("    if (!params) {")
-        output.append("        return;")
-        output.append("    }")
         output.append("")
         output.append("    auto expectedFilterType = GetFilterTypeFromTag(tag);")
-        output.append("    if (params->GetType() != expectedFilterType) {")
+        output.append("    if (params.GetType() != expectedFilterType) {")
         output.append("        return;")
         output.append("    }")
         output.append("")
@@ -678,7 +693,9 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
                 if tag_info.is_array_element:
-                    output.append(f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {tag_info.array_index}, {tag_info.tag_name}, {tag_info.prop_name})")
+                    output.append(
+                        f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {tag_info.array_index}, {tag_info.tag_name}, {tag_info.prop_name})"
+                    )
                 else:
                     output.append(f"GE_PARAMS_FIELD_ACCESSOR({struct.name}, {field.name}, {tag_info.tag_name}, {tag_info.prop_name})")
 
@@ -714,6 +731,7 @@ def generate_set_member_cases(structs: List[StructInfo]) -> str:
 
     return "\n".join(output)
 
+
 def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
     """Generate overloaded SetParamsMemberByTag function declarations."""
     if blocked_types is None:
@@ -728,7 +746,7 @@ def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_al
     sorted_types = sorted(unique_types)
 
     for field_type in sorted_types:
-        output.append(f"    static void SetParamsMemberByTag(const std::shared_ptr<GEFilterParams>& params,")
+        output.append(f"    static void SetParamsMemberByTag(GEFilterParams& params,")
         output.append(f"                                     GEParamsMemberTag tag, const {field_type}& value);")
 
     output.append("")
@@ -821,7 +839,7 @@ def generate_params_builder_decl() -> str:
 
     output.append("class GEParamsBuilder {")
     output.append("public:")
-    output.append("    static std::shared_ptr<GEFilterParams> Build(GEFilterType filterType);")
+    output.append("    static std::unique_ptr<GEFilterParams> Build(GEFilterType filterType);")
     output.append("")
     output.append("    // Convert filter name string to GEFilterType")
     output.append("    // Note: Strings are sourced from GEFilterParamsTypeInfo<Struct>::FilterName")
@@ -836,12 +854,13 @@ def generate_params_builder_impl(structs: List[StructInfo]) -> str:
     """Generate GEParamsBuilder::Build() implementation."""
     output = []
 
-    output.append("std::shared_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)")
+    output.append("std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)")
     output.append("{")
     output.append("    switch (filterType) {")
     output.append("#define GE_BUILD_PARAMS_CASE(EnumType, Struct) \\")
-    output.append("    case GEFilterType::EnumType: \\")
-    output.append("        return GEFilterParams::Box(Struct{});")
+    output.append("    case GEFilterType::EnumType: {\\")
+    output.append("        return GEFilterParams::Box(std::make_shared<Struct>()); \\")
+    output.append("    }")
     output.append("")
 
     for struct in structs:
@@ -914,7 +933,9 @@ def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, s
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
                 # Get effective type (cast_from or field type)
-                normalized_type = get_effective_type_for_tag(field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases)
+                normalized_type = get_effective_type_for_tag(
+                    field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases
+                )
                 if normalized_type not in blocked_types:
                     unique_types.add(normalized_type)
 
@@ -1094,6 +1115,7 @@ def generate_convert_constraint(tag: str, cast_from: str, custom: Optional[str])
     else:
         return f"GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM({tag}, ESCAPE({cast_from}))"
 
+
 def generate_constraint_metadata(field_info: FieldInfo, tag: str, prop_attr_index: int = 0) -> str:
     """Generate constraint metadata for a field with prop attributes."""
     if not field_info.prop_attributes:
@@ -1119,6 +1141,7 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str, prop_attr_inde
         output.append(generate_convert_constraint(tag, prop_attr.cast_from, prop_attr.custom))
 
     return "\n".join(output)
+
 
 def generate_constraints(structs: List[StructInfo]):
     """Generate constraint macros and metadata"""
@@ -1328,26 +1351,11 @@ Examples:
         help="Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)",
     )
 
-    parser.add_argument(
-        '--output-file',
-        type=str,
-        default=None,
-        help='Output header file path (default: include/effect/ge_params_reflection_v2.h)'
-    )
+    parser.add_argument("--output-file", type=str, default=None, help="Output header file path (default: include/effect/ge_params_reflection_v2.h)")
 
-    parser.add_argument(
-        '--output-cpp-file',
-        type=str,
-        default=None,
-        help='Output cpp file path (default: src/effect/ge_params_reflection_v2.cpp)'
-    )
+    parser.add_argument("--output-cpp-file", type=str, default=None, help="Output cpp file path (default: src/effect/ge_params_reflection_v2.cpp)")
 
-    parser.add_argument(
-        '--config-file',
-        type=str,
-        default=None,
-        help='Config file path (default: tool/effectgen/config.json)'
-    )
+    parser.add_argument("--config-file", type=str, default=None, help="Config file path (default: tool/effectgen/config.json)")
 
     parser.add_argument(
         "--effect-dirs",
@@ -1377,10 +1385,8 @@ Examples:
             root_dir / "include" / "effect" / "shader",
             root_dir / "include" / "effect" / "shape",
         ]
-    output_file = Path(args.output_file) if args.output_file else root_dir / \
-        "include" / "effect" / "ge_params_reflection_v2.h"
-    output_cpp_file = Path(args.output_cpp_file) if args.output_cpp_file else root_dir / \
-        "src" / "effect" / "ge_params_reflection_v2.cpp"
+    output_file = Path(args.output_file) if args.output_file else root_dir / "include" / "effect" / "ge_params_reflection_v2.h"
+    output_cpp_file = Path(args.output_cpp_file) if args.output_cpp_file else root_dir / "src" / "effect" / "ge_params_reflection_v2.cpp"
     config_file = Path(args.config_file) if args.config_file else Path(__file__).parent / "config.json"
 
     if args.effect_dirs:
@@ -1393,8 +1399,7 @@ Examples:
             root_dir / "include" / "effect" / "shape",
         ]
     filter_type_info_file = (
-        Path(args.filter_type_info_file) if args.filter_type_info_file
-                                          else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
+        Path(args.filter_type_info_file) if args.filter_type_info_file else root_dir / "include" / "core" / "ge_filter_type_info_v2.h"
     )
 
     console.header("Loading configuration")
@@ -1464,13 +1469,6 @@ Examples:
         f.write(cpp_content)
 
     console.file(f"Generated {output_cpp_file}")
-
-    # console.step(f"Generating {filter_type_info_file.name}...")
-    # filter_type_info_content = generate_filter_type_info_v2_header(macro_infos, structs)
-
-    # filter_type_info_file.parent.mkdir(parents=True, exist_ok=True)
-    # with open(filter_type_info_file, "w", encoding="utf-8") as f:
-    #     f.write(filter_type_info_content)
 
     console.file(f"Generated {filter_type_info_file}")
     console.info(f"  - {len(macro_infos)} filter type info specializations")

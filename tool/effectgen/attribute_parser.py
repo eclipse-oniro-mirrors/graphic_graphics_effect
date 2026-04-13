@@ -1,3 +1,18 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 """
 Attribute Parser for C++ attributes.
 
@@ -16,6 +31,7 @@ from tool.effectgen.cpp_tokenizer import Token
 @dataclass
 class SplitResult:
     """Result of splitting parameters by commas."""
+
     parts: List[str]
     errors: List[str]
     in_string: bool
@@ -26,6 +42,28 @@ class SplitResult:
 
 class AttributeParser:
     """Parse C++ attributes like [[ge::params(type=AIBAR, name="AIBAR")]]."""
+
+    @staticmethod
+    def parse_attribute(attr_token: Token) -> Dict[str, Any]:
+        """Parse an attribute token and return a dict of key-value pairs."""
+        content = attr_token.value[2:-2]  # Remove [[ and ]]
+        content = content.strip()
+
+        # Find the function call pattern: ge::params(type=AIBAR, name="AIBAR")
+        match = re.match(r"(\w+)\s*::\s*(\w+)\s*\((.*)\)\s*", content, re.DOTALL)
+        if not match:
+            if content.startswith("ge::"):
+                return {"errors": [f"Malformed attribute: could not parse '{content}'"]}
+            return {}
+
+        namespace = match.group(1)
+        function = match.group(2)
+        params_str = match.group(3).strip()
+
+        # Parse C#/Rust style: type=AIBAR, name="AIBAR"
+        params, errors = AttributeParser._parse_params(params_str)
+
+        return {"namespace": namespace, "function": function, "params": params, "errors": errors}
 
     @staticmethod
     def _split_params_by_commas(s: str) -> SplitResult:
@@ -134,14 +172,14 @@ class AttributeParser:
             in_string=in_string,
             in_raw_string=in_raw_string,
             bracket_counts=bracket_counts,
-            reported_raw_string_error=reported_raw_string_error
+            reported_raw_string_error=reported_raw_string_error,
         )
 
     @staticmethod
     def _validate_split_result(split_result: SplitResult) -> List[str]:
         """Validate the split result for unterminated strings and unbalanced brackets."""
         errors = []
-        
+
         if (split_result.in_string or split_result.in_raw_string) and not split_result.reported_raw_string_error:
             string_type = "raw string" if split_result.in_raw_string else "string"
             errors.append(f"Unterminated {string_type} literal in attribute")
@@ -157,7 +195,7 @@ class AttributeParser:
         """Check if there's a missing comma after a parameter value."""
         eq_idx = part.index("=")
         value_with_rest = part[eq_idx + 1 :].strip()
-        
+
         if value_with_rest.startswith('"'):
             if value_with_rest.startswith('R"'):
                 paren_pos = value_with_rest.find("(")
@@ -183,30 +221,8 @@ class AttributeParser:
             remaining = value_with_rest
             if re.search(r"\s+[a-zA-Z_]\w*=", remaining):
                 return f"Missing comma in attribute parameters (after '{key}')"
-        
+
         return None
-
-    @staticmethod
-    def parse_attribute(attr_token: Token) -> Dict[str, Any]:
-        """Parse an attribute token and return a dict of key-value pairs."""
-        content = attr_token.value[2:-2]  # Remove [[ and ]]
-        content = content.strip()
-
-        # Find the function call pattern: ge::params(type=AIBAR, name="AIBAR")
-        match = re.match(r"(\w+)\s*::\s*(\w+)\s*\((.*)\)\s*", content, re.DOTALL)
-        if not match:
-            if content.startswith("ge::"):
-                return {"errors": [f"Malformed attribute: could not parse '{content}'"]}
-            return {}
-
-        namespace = match.group(1)
-        function = match.group(2)
-        params_str = match.group(3).strip()
-
-        # Parse C#/Rust style: type=AIBAR, name="AIBAR"
-        params, errors = AttributeParser._parse_params(params_str)
-
-        return {"namespace": namespace, "function": function, "params": params, "errors": errors}
 
     @staticmethod
     def _parse_params(s: str) -> Tuple[Dict[str, Any], List[str]]:
@@ -218,7 +234,7 @@ class AttributeParser:
         split_result = AttributeParser._split_params_by_commas(s)
         parts = split_result.parts
         errors.extend(split_result.errors)
-        
+
         validation_errors = AttributeParser._validate_split_result(split_result)
         errors.extend(validation_errors)
 
@@ -231,7 +247,7 @@ class AttributeParser:
                 eq_idx = part.index("=")
                 key = part[:eq_idx].strip()
                 value = part[eq_idx + 1 :].strip()
-                
+
                 if value.startswith('"') and value.endswith('"'):
                     if not value.startswith('R"'):
                         value = value[1:-1]
