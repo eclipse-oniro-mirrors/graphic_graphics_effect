@@ -125,22 +125,24 @@ private:
         uniform float isFilled;
         uniform vec2 shadowOffset;
 
-        float erfc_approx(float x) {
-            float ax = abs(x);
-            float t = 1.0 / (1.0 + 0.3275911 * ax);
-            float result = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741
-                           + t * (-1.453152027 + t * 1.061405429))));
-            result *= exp(-ax * ax);
-            return (x >= 0.0) ? result : 2.0 - result;
+        // Skia GaussianColorFilter quartic approximation (SkRasterPipeline_opts.h:4957)
+        // Input: x = 1.0 at boundary (d=0), 0.0 at blurRadius (d=blurRadius)
+        // Approximates: exp(-(1-x)^2 * 4) - 0.018
+        float skiaGaussian(float x) {
+            const float c4 = -2.26661229133605957031;
+            const float c3 =  2.89795351028442382812;
+            const float c2 =  0.21345567703247070312;
+            const float c1 =  0.15489584207534790039;
+            const float c0 =  0.00030726194381713867;
+            return c0 + x * (c1 + x * (c2 + x * (c3 + x * c4)));
         }
 
-        // Outer Gaussian falloff for ambient/spot shadow
-        // erfc(0) = 1.0, seamless with interior fill
+        // Outer falloff for ambient/spot shadow
+        // x = 1.0 at boundary, 0.0 at blurRadius
         float outerGaussian(float d, float blurRadius) {
-            if (blurRadius < 0.001) return 0.0;
-            float sigma = blurRadius * 0.5;
-            float x = d / (sigma * 1.41421356237);
-            return erfc_approx(x);
+            if (blurRadius < 0.001 || d >= blurRadius) return 0.0;
+            float x = 1.0 - d / blurRadius;
+            return max(skiaGaussian(x), 0.0);
         }
 
         vec4 elevationShadowEffect(float d, float d_original) {
