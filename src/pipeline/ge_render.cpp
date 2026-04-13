@@ -59,6 +59,7 @@
 #include "ge_sdf_shadow_shader.h"
 #include "ge_sdf_edge_light.h"
 #include "ge_sdf_edge_light_shader.h"
+#include "ge_spatial_point_light.cpp"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
@@ -394,6 +395,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetSpatialPointLightParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSpatialPointLightParams();
+            out = std::make_shared<GESpatialPointLightShader>(*params);
+            return out;
         }
     },
 };
