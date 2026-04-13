@@ -151,6 +151,7 @@ void GESDFShadowShader::ComputeElevationParams()
     float outset = std::min(elevation * AMBIENT_HEIGHT_FACTOR * AMBIENT_GEOM_FACTOR, MAX_AMBIENT_RADIUS);
     float recipAlpha = 1.0f + std::max(elevation * AMBIENT_HEIGHT_FACTOR, 0.0f);
     ambientBlurRadius_ = outset * recipAlpha;
+    ambientOutset_ = outset;
 
     // Ambient alpha (raw value, not divided by recipAlpha)
     float ambientAlpha = static_cast<float>(DEFAULT_AMBIENT_ALPHA) / 255.0f;
@@ -214,6 +215,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowSha
     builder->SetUniformVec4("ambientColor", ambientColor_.GetRedF(),
         ambientColor_.GetGreenF(), ambientColor_.GetBlueF(), ambientColor_.GetAlphaF());
     builder->SetUniform("ambientBlurRadius", ambientBlurRadius_);
+    builder->SetUniform("ambientOutset", ambientOutset_);
     builder->SetUniformVec4("spotColor", spotColor_.GetRedF(),
         spotColor_.GetGreenF(), spotColor_.GetBlueF(), spotColor_.GetAlphaF());
     builder->SetUniform("spotBlurRadius", spotBlurRadius_);

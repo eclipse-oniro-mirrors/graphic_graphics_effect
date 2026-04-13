@@ -62,6 +62,7 @@ private:
 
     // Elevation computed params
     float ambientBlurRadius_ = 0.0f;
+    float ambientOutset_ = 0.0f;
     float spotBlurRadius_ = 0.0f;
     Drawing::Color ambientColor_;
     Drawing::Color spotColor_;
@@ -120,6 +121,7 @@ private:
         uniform vec2 iResolution;
         uniform vec4 ambientColor;
         uniform float ambientBlurRadius;
+        uniform float ambientOutset;
         uniform vec4 spotColor;
         uniform float spotBlurRadius;
         uniform float isFilled;
@@ -137,12 +139,23 @@ private:
             return c0 + x * (c1 + x * (c2 + x * (c3 + x * c4)));
         }
 
-        // Outer falloff for ambient/spot shadow
-        // x = 1.0 at boundary, 0.0 at blurRadius
-        float outerGaussian(float d, float blurRadius) {
-            if (blurRadius < 0.001 || d >= blurRadius) return 0.0;
-            float x = 1.0 - d / blurRadius;
-            return max(skiaGaussian(x), 0.0);
+        // Spot shadow coverage: symmetric tessellation model (inset = outset)
+        // alpha = 0.5 - d / (2 * blurRadius), maps d in [-blurRadius, +blurRadius] -> alpha in [1, 0]
+        float computeSpotCoverage(float d, float blurRadius) {
+            if (blurRadius < 0.001) return 0.0;
+            float alpha = 0.5 - d / (2.0 * blurRadius);
+            alpha = clamp(alpha, 0.0, 1.0);
+            return max(skiaGaussian(alpha), 0.0);
+        }
+
+        // Ambient shadow coverage: asymmetric tessellation model (inset != outset)
+        // alpha = (outset - d) / ambientBlurRadius, maps d in [-inset, +outset] -> alpha in [1, 0]
+        // ambientBlurRadius = outset * recipAlpha = inset + outset
+        float computeAmbientCoverage(float d, float ambientBlurRadius, float ambientOutset) {
+            if (ambientBlurRadius < 0.001) return 0.0;
+            float alpha = (ambientOutset - d) / ambientBlurRadius;
+            alpha = clamp(alpha, 0.0, 1.0);
+            return max(skiaGaussian(alpha), 0.0);
         }
 
         vec4 elevationShadowEffect(float d, float d_original) {
@@ -151,12 +164,10 @@ private:
                 alphaFilled = smoothstep(-1.0, 0.0, d_original);
             }
 
-            // Ambient: filled interior + outer Gaussian falloff (matches Skia tessellation model)
-            float ambientCoverage = (d <= 0.0) ? 1.0 : outerGaussian(d, ambientBlurRadius);
+            float ambientCoverage = computeAmbientCoverage(d, ambientBlurRadius, ambientOutset);
             vec4 ambient = vec4(ambientColor.rgb, ambientColor.a * ambientCoverage);
 
-            // Spot: same filled interior + outer falloff model
-            float spotCoverage = (d <= 0.0) ? 1.0 : outerGaussian(d, spotBlurRadius);
+            float spotCoverage = computeSpotCoverage(d, spotBlurRadius);
             vec4 spot = vec4(spotColor.rgb, spotColor.a * spotCoverage);
 
             // SrcOver blend
