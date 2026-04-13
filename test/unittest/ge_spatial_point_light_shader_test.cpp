@@ -17,6 +17,7 @@
 #include "ge_spatial_point_light.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_spatial_point_light.h"
 
 using namespace testing;
 using namespace testing::ext;
