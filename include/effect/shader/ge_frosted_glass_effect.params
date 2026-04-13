@@ -78,7 +78,7 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
-    [[ge::prop("FrostedGlassEffect_Shape")]]
+    [[ge::prop(name="FrostedGlassEffect_Shape", cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> sdfShape;
     [[ge::prop("FrostedGlassEffect_WaveMask")]]
     std::shared_ptr<GEShaderMask> waveDisturbance;

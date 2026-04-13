@@ -21,7 +21,7 @@ Focuses on parsing struct definitions with [[ge::params(...)]] attributes.
 """
 
 from typing import List, Optional, Dict, Any
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field as dc_field
 
 # Import Token from cpp_tokenizer module
 from tool.effectgen.cpp_tokenizer import Token
@@ -70,9 +70,9 @@ class FieldInfo:
     name: str
     type: str
     prop_name: Optional[str] = None  # For backward compatibility - first prop name
-    prop_attributes: List[PropAttribute] = field(default_factory=list)  # All prop attributes
+    prop_attributes: List[PropAttribute] = dc_field(default_factory=list)  # All prop attributes
     default_value: Optional[str] = None
-    attributes: List[Token] = field(default_factory=list)
+    attributes: List[Token] = dc_field(default_factory=list)
 
 
 @dataclass
@@ -82,9 +82,9 @@ class StructInfo:
     name: str
     enum_type: str
     filter_name: str
-    fields: List[FieldInfo] = field(default_factory=list)
-    errors: List[ParseError] = field(default_factory=list)
-    params: Dict[str, Any] = field(default_factory=dict)  # All parsed params (as-is)
+    fields: List[FieldInfo] = dc_field(default_factory=list)
+    errors: List[ParseError] = dc_field(default_factory=list)
+    params: Dict[str, Any] = dc_field(default_factory=dict)  # All parsed params (as-is)
 
 
 class CppParser:

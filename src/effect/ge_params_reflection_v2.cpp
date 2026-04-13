@@ -1342,7 +1342,7 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
     }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const float& value)
+    GEParamsMemberTag tag, const float& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1571,7 +1571,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value)
+    GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1587,7 +1587,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::pair<float, float>& value)
+    GEParamsMemberTag tag, const std::pair<float, float>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1718,7 +1718,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Drawing::Point& value)
+    GEParamsMemberTag tag, const Drawing::Point& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1767,7 +1767,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value)
+    GEParamsMemberTag tag, const std::shared_ptr<Drawing::Image>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1795,7 +1795,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Vector3f& value)
+    GEParamsMemberTag tag, const Vector3f& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1857,7 +1857,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Vector4f& value)
+    GEParamsMemberTag tag, const Vector4f& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1939,7 +1939,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<GEShaderMask>& value)
+    GEParamsMemberTag tag, const std::shared_ptr<GEShaderMask>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1972,7 +1972,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::vector<float>& value)
+    GEParamsMemberTag tag, const std::vector<float>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1993,7 +1993,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::vector<Vector2f>& value)
+    GEParamsMemberTag tag, const std::vector<Vector2f>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2011,7 +2011,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const int32_t& value)
+    GEParamsMemberTag tag, const int32_t& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2035,7 +2035,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const DotMatrixDirection& value)
+    GEParamsMemberTag tag, const DotMatrixDirection& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2051,7 +2051,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::vector<Vector4f>& value)
+    GEParamsMemberTag tag, const std::vector<Vector4f>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2068,7 +2068,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Vector2f& value)
+    GEParamsMemberTag tag, const Vector2f& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2123,7 +2123,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const bool& value)
+    GEParamsMemberTag tag, const bool& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2150,7 +2150,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const DotMatrixEffectType& value)
+    GEParamsMemberTag tag, const DotMatrixEffectType& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2166,7 +2166,34 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::weak_ptr<Drawing::Image>& value)
+    GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
+{
+
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
+        default:
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
+    GEParamsMemberTag tag, const std::weak_ptr<Drawing::Image>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2184,7 +2211,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const RectF& value)
+    GEParamsMemberTag tag, const RectF& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2202,7 +2229,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Drawing::Matrix& value)
+    GEParamsMemberTag tag, const Drawing::Matrix& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2221,33 +2248,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
-{
-
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
-        default:
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value)
+    GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2264,7 +2265,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const uint32_t& value)
+    GEParamsMemberTag tag, const uint32_t& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2286,7 +2287,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const GESDFBorderParams& value)
+    GEParamsMemberTag tag, const GESDFBorderParams& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2302,7 +2303,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const GERRect& value)
+    GEParamsMemberTag tag, const GERRect& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2318,7 +2319,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const GESDFShadowParams& value)
+    GEParamsMemberTag tag, const GESDFShadowParams& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2334,7 +2335,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const GESDFUnionOp& value)
+    GEParamsMemberTag tag, const GESDFUnionOp& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2350,7 +2351,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,
-                                                GEParamsMemberTag tag, const Drawing::Color4f& value)
+    GEParamsMemberTag tag, const Drawing::Color4f& value)
 {
 
     auto expectedFilterType = GetFilterTypeFromTag(tag);

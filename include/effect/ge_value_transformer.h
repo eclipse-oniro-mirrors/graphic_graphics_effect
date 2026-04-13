@@ -174,7 +174,7 @@ struct GEParamsValueTransformer {
         }
 
         // Apply range constraints (only when FromType == ToType)
-        if constexpr (std::is_same_v<FromType, ToType> && Constraint::HAS_RANGE) {
+        if constexpr (Constraint::HAS_RANGE) {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
                     out = ApplyComponentWiseClamp(out, Constraint::MIN_COMPONENTS, Constraint::MAX_COMPONENTS);

@@ -591,7 +591,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
     # Generate implementations for each type
     for field_type, tags in type_to_tags.items():
         output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,")
-        output.append(f"                                                GEParamsMemberTag tag, const {field_type}& value)")
+        output.append(f"    GEParamsMemberTag tag, const {field_type}& value)")
         output.append("{")
         output.append("")
         output.append("    auto expectedFilterType = GetFilterTypeFromTag(tag);")
@@ -637,14 +637,14 @@ def generate_filter_params_type_info(structs: List[StructInfo]) -> str:
     output.append("        using Self = Struct; \\")
     output.append("        static constexpr GEFilterType ID = GEFilterType::FilterTypeEnum; \\")
     output.append("        static constexpr std::string_view FilterName = #FilterNameStr; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
 
     for struct in structs:
         enum_type = struct.enum_type
         struct_name = struct.name
         filter_name = struct.filter_name
-        output.append(f"GE_PARAMS_TYPE_INFO({struct_name}, {enum_type}, {filter_name})")
+        output.append(f"GE_PARAMS_TYPE_INFO({struct_name}, {enum_type}, {filter_name});")
 
     output.append("")
     output.append("#undef GE_PARAMS_TYPE_INFO")
@@ -672,7 +672,7 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
     output.append("        static FieldType& Get(ParamsType& params) { return params.Field; } \\")
     output.append("        static const FieldType& Get(const ParamsType& params) { return params.Field; } \\")
     output.append("        static void Set(ParamsType& params, const FieldType& value) { params.Field = value; } \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
 
     # Helper macro for array element accessors
@@ -686,7 +686,7 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
     output.append("        static FieldType& Get(ParamsType& params) { return params.Field[Index]; } \\")
     output.append("        static const FieldType& Get(const ParamsType& params) { return params.Field[Index]; } \\")
     output.append("        static void Set(ParamsType& params, const FieldType& value) { params.Field[Index] = value; } \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
 
     for struct in structs:
@@ -694,10 +694,10 @@ def generate_type_traits(structs: List[StructInfo]) -> str:
             for tag_info in iterate_field_tags(struct, field):
                 if tag_info.is_array_element:
                     output.append(
-                        f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {tag_info.array_index}, {tag_info.tag_name}, {tag_info.prop_name})"
+                        f"GE_PARAMS_ARRAY_ELEMENT_ACCESSOR({struct.name}, {field.name}, {tag_info.array_index}, {tag_info.tag_name}, {tag_info.prop_name});"
                     )
                 else:
-                    output.append(f"GE_PARAMS_FIELD_ACCESSOR({struct.name}, {field.name}, {tag_info.tag_name}, {tag_info.prop_name})")
+                    output.append(f"GE_PARAMS_FIELD_ACCESSOR({struct.name}, {field.name}, {tag_info.tag_name}, {tag_info.prop_name});")
 
     output.append("")
     output.append("#undef GE_PARAMS_FIELD_ACCESSOR")
@@ -1058,7 +1058,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     output.append("        using ParamType = _ParamType; \\")
     output.append("        static constexpr GEFilterType ID = GEFilterParamsTypeInfo<_ParamType>::ID; \\")
     output.append("        static constexpr std::string_view Name = GEFilterParamsTypeInfo<_ParamType>::FilterName; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
 
     # Specializations for each filter class
@@ -1069,7 +1069,7 @@ def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], 
     for info in macro_infos:
         # Simplify params type if it matches a known params type
         simplified_params_type = simplify_params_type(info.params_type, known_params_types)
-        output.append(f"GE_FILTER_TYPE_INFO({info.filter_class}, {simplified_params_type})")
+        output.append(f"GE_FILTER_TYPE_INFO({info.filter_class}, {simplified_params_type});")
 
     output.append("")
     output.append("#undef GE_FILTER_TYPE_INFO")
@@ -1091,9 +1091,12 @@ def generate_min_constraint(tag: str, field_type: str, min_val: str) -> str:
         if mins:
             component_type = infer_numeric_type(mins[0])
             mins_str = ", ".join(mins)
-            return f"GE_PARAMS_CONSTRAINT_MIN_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}))"
+            return f"GE_PARAMS_CONSTRAINT_MIN_COMPONENTS({tag}, {component_type}, {len(mins)}, ESCAPE({{{mins_str}}}));"
+        else:
+            console.error(f"Failed to parse min components for tag {tag} with value {min_val}")
+            return ""
     else:
-        return f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {min_val})"
+        return f"GE_PARAMS_CONSTRAINT_MIN({tag}, {field_type}, {min_val});"
 
 
 def generate_max_constraint(tag: str, field_type: str, max_val: str) -> str:
@@ -1103,17 +1106,20 @@ def generate_max_constraint(tag: str, field_type: str, max_val: str) -> str:
         if maxs:
             component_type = infer_numeric_type(maxs[0])
             maxs_str = ", ".join(maxs)
-            return f"GE_PARAMS_CONSTRAINT_MAX_COMPONENTS({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}))"
+            return f"GE_PARAMS_CONSTRAINT_MAX_COMPONENTS({tag}, {component_type}, {len(maxs)}, ESCAPE({{{maxs_str}}}));"
+        else:
+            console.error(f"Failed to parse max components for tag {tag} with value {max_val}")
+            return ""
     else:
-        return f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {max_val})"
+        return f"GE_PARAMS_CONSTRAINT_MAX({tag}, {field_type}, {max_val});"
 
 
 def generate_convert_constraint(tag: str, cast_from: str, custom: Optional[str]) -> str:
     """Generate constraint metadata for type conversion."""
     if custom:
-        return f"GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM({tag}, ESCAPE({cast_from}), {custom})"
+        return f"GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM({tag}, ESCAPE({cast_from}), {custom});"
     else:
-        return f"GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM({tag}, ESCAPE({cast_from}))"
+        return f"GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM({tag}, ESCAPE({cast_from}));"
 
 
 def generate_constraint_metadata(field_info: FieldInfo, tag: str, prop_attr_index: int = 0) -> str:
@@ -1156,7 +1162,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = 0; \\")
     output.append("        static constexpr Type MIN = Min; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MIN_COMPONENTS(Tag, Type, Count, Mins) \\")
     output.append("    template<> \\")
@@ -1165,7 +1171,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MIN_COMPONENTS[] = Mins; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
     output.append("// Constraint Metadata Macros for Max Component")
     output.append("#define GE_PARAMS_CONSTRAINT_MAX(Tag, Type, Max) \\")
@@ -1175,7 +1181,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        static constexpr bool COMPONENT_WISE = false; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = 0; \\")
     output.append("        static constexpr Type MAX = Max; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_MAX_COMPONENTS(Tag, Type, Count, Maxs) \\")
     output.append("    template<> \\")
@@ -1184,7 +1190,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        static constexpr bool COMPONENT_WISE = true; \\")
     output.append("        static constexpr size_t COMPONENT_COUNT = Count; \\")
     output.append("        static constexpr Type MAX_COMPONENTS[] = Maxs; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
     output.append("// Constraint Metadata Macros for Convert Component")
     output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(Tag, _CastFromType) \\")
@@ -1195,7 +1201,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        using CastFromType = _CastFromType; \\")
     output.append("        static constexpr bool HAS_CUSTOM = false; \\")
     output.append("        using CustomTransformer = void; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
     output.append("#define GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(Tag, _CastFromType, _CustomTransformer) \\")
     output.append("    template<> \\")
@@ -1205,7 +1211,7 @@ def generate_constraints(structs: List[StructInfo]):
     output.append("        using CastFromType = _CastFromType; \\")
     output.append("        static constexpr bool HAS_CUSTOM = true; \\")
     output.append("        using CustomTransformer = _CustomTransformer; \\")
-    output.append("    };")
+    output.append("    }")
     output.append("")
 
     # Generate constraint metadata for constrained fields
@@ -1305,9 +1311,6 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocke
     output.append("namespace Drawing {")
     output.append("")
 
-    # Generate compile-time branch verification static asserts
-    # output.append(generate_transform_branch_static_asserts(structs, type_aliases))
-
     # Generate GEParamsBuilder::Build() implementation
     output.append(generate_params_builder_impl(structs))
 
@@ -1329,6 +1332,57 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocke
     output.append("")
 
     return "\n".join(output)
+
+
+def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> None:
+    """Check for enum values that are not referenced in any SetParamsMemberByTag implementation.
+
+    This can happen when a type is in member_setter_blocked_types, which prevents
+    SetParamsMemberByTag overloads from being generated for that type.
+
+    Args:
+        structs: List of struct information
+        type_aliases: Type alias mapping
+        blocked_types: Dictionary of types to exclude
+    """
+    if blocked_types is None:
+        blocked_types = {}
+
+    all_tags = set()
+    referenced_tags = set()
+    tag_to_info = {}
+
+    for struct in structs:
+        for field in struct.fields:
+            for tag_info in iterate_field_tags(struct, field):
+                all_tags.add(tag_info.tag_name)
+                tag_to_info[tag_info.tag_name] = (struct, field, tag_info)
+
+                normalized_type = get_effective_type_for_tag(
+                    field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases
+                )
+
+                if normalized_type not in blocked_types:
+                    referenced_tags.add(tag_info.tag_name)
+
+                if has_cast_from(field, tag_info.prop_attr_index):
+                    original_type = get_original_field_type(field, tag_info.is_array_element)
+                    normalized_original = normalize_type(original_type, type_aliases)
+
+                    if normalized_original not in blocked_types:
+                        referenced_tags.add(tag_info.tag_name)
+
+    unused_tags = all_tags - referenced_tags
+
+    if unused_tags:
+        console.warning("Found enum values not referenced in any SetParamsMemberByTag implementation:")
+        for tag in sorted(unused_tags):
+            struct, field, tag_info = tag_to_info[tag]
+            normalized_type = get_effective_type_for_tag(
+                field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases
+            )
+            reason = blocked_types.get(normalized_type, "unknown reason")
+            console.step(f"  {tag} ({struct.name}::{field.name}) - type '{normalized_type}' is blocked: {reason}")
 
 
 def main():
@@ -1470,8 +1524,9 @@ Examples:
 
     console.file(f"Generated {output_cpp_file}")
 
-    console.file(f"Generated {filter_type_info_file}")
-    console.info(f"  - {len(macro_infos)} filter type info specializations")
+    console.step(f"Found {len(macro_infos)} filter type info specializations")
+
+    check_unused_enum_values(structs, type_aliases, blocked_types)
 
     console.summary()
     return 0 if console.error_count == 0 else 1

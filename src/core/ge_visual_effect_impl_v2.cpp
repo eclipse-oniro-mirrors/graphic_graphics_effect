@@ -22,11 +22,28 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+static GEFilterType GetParamlessFilterType(const std::string& name)
+{
+    // Handle special cases for compatibility
+    // Not recommended to add more types here
+    if (name == GE_SHAPE_SDF_EMPTY_SHAPE) {
+        return GEFilterType::SDF_EMPTY_SHAPE;
+    }
+    return GEFilterType::NONE;
+}
+
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
     : canvasInfo_(canvasInfo ? *canvasInfo : Drawing::CanvasInfo {})
 {
     // Initialize filter type from name using generated helper
     filterType_ = GEParamsBuilder::GetFilterTypeFromString(name);
+
+    if (filterType_ == FilterType::NONE) {
+        filterType_ = GetParamlessFilterType(name);
+        if (filterType_ == FilterType::NONE) {
+            GE_LOGE("GEVisualEffectImpl: unknown filter type for name '%s'", name.c_str());
+        }
+    }
 
     // Build params of appropriate type using generated helper
     params_ = GEParamsBuilder::Build(filterType_);
