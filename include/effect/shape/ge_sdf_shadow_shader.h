@@ -125,8 +125,6 @@ private:
         uniform float isFilled;
         uniform vec2 shadowOffset;
 
-        const float USE_NATIVE_ERF = 1.0;
-
         float erfc_approx(float x) {
             float ax = abs(x);
             float t = 1.0 / (1.0 + 0.3275911 * ax);
@@ -142,18 +140,13 @@ private:
             if (blurRadius < 0.001) return 0.0;
             float sigma = blurRadius * 0.5;
             float x = d / (sigma * 1.41421356237);
-
-            if (USE_NATIVE_ERF > 0.5) {
-                return 1.0 - erf(x);
-            } else {
-                return erfc_approx(x);
-            }
+            return erfc_approx(x);
         }
 
-        vec4 elevationShadowEffect(float d) {
+        vec4 elevationShadowEffect(float d, float d_original) {
             float alphaFilled = 1.0;
-            if (isFilled < 0.5 && d < 0.0) {
-                alphaFilled = smoothstep(-1.0, 0.0, d);
+            if (isFilled < 0.5 && d_original < 0.0) {
+                alphaFilled = smoothstep(-1.0, 0.0, d_original);
             }
 
             // Ambient: filled interior + outer Gaussian falloff (matches Skia tessellation model)
@@ -172,9 +165,16 @@ private:
         }
 
         half4 main(float2 fragCoord) {
-            vec2 coord = fragCoord - shadowOffset;
-            float d = sdfShape.eval(coord).a;
-            vec4 color = elevationShadowEffect(d);
+            // isFilled clipping: check original shape position
+            float d_original = sdfShape.eval(fragCoord).a;
+
+            // Shadow rendering: use offset position (matches shaderCode_ pattern)
+            float d = d_original;
+            if (any(notEqual(shadowOffset, vec2(0.0)))) {
+                d = sdfShape.eval(fragCoord - shadowOffset).a;
+            }
+
+            vec4 color = elevationShadowEffect(d, d_original);
             return half4(color);
         }
     )";

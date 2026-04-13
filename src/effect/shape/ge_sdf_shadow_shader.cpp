@@ -152,8 +152,8 @@ void GESDFShadowShader::ComputeElevationParams()
     float recipAlpha = 1.0f + std::max(elevation * AMBIENT_HEIGHT_FACTOR, 0.0f);
     ambientBlurRadius_ = outset * recipAlpha;
 
-    // Ambient alpha = originalAlpha / recipAlpha
-    float ambientAlpha = (static_cast<float>(DEFAULT_AMBIENT_ALPHA) / 255.0f) / recipAlpha;
+    // Ambient alpha (raw value, not divided by recipAlpha)
+    float ambientAlpha = static_cast<float>(DEFAULT_AMBIENT_ALPHA) / 255.0f;
     ambientColor_ = Drawing::Color::ColorQuadSetARGB(
         static_cast<uint8_t>(std::clamp(ambientAlpha * 255.0f, 0.0f, 255.0f)), 0, 0, 0);
 
@@ -161,30 +161,8 @@ void GESDFShadowShader::ComputeElevationParams()
     float zRatio = std::clamp(elevation / (DEFAULT_LIGHT_HEIGHT - elevation), 0.0f, 0.95f);
     spotBlurRadius_ = DEFAULT_LIGHT_RADIUS * zRatio;
 
-    // Tonal color computation (aligned with Skia ComputeTonalColors)
-    auto& spotIn = params_.shadow.color;
-    float spotR = static_cast<float>(spotIn.GetRed());
-    float spotG = static_cast<float>(spotIn.GetGreen());
-    float spotB = static_cast<float>(spotIn.GetBlue());
-    float maxC = std::max({spotR, spotG, spotB});
-    float minC = std::min({spotR, spotG, spotB});
-    float luminance = 0.5f * (maxC + minC) / 255.0f;
-    float origA = static_cast<float>(spotIn.GetAlpha()) / 255.0f;
-
-    float alphaAdjust = (2.6f + (-2.66667f + 1.06667f * origA) * origA) * origA;
-    float colorAlpha = (3.544762f + (-4.891428f + 2.3466f * luminance) * luminance) * luminance;
-    colorAlpha = std::clamp(alphaAdjust * colorAlpha, 0.0f, 1.0f);
-
-    float greyscaleAlpha = std::clamp(origA * (1.0f - 0.4f * luminance), 0.0f, 1.0f);
-    float colorScale = colorAlpha * (1.0f - greyscaleAlpha);
-    float tonalAlpha = colorScale + greyscaleAlpha;
-    float unPremulScale = (tonalAlpha > 0.001f) ? colorScale / tonalAlpha : 0.0f;
-
-    spotColor_ = Drawing::Color::ColorQuadSetARGB(
-        static_cast<uint8_t>(std::clamp(tonalAlpha * 255.999f, 0.0f, 255.0f)),
-        static_cast<uint8_t>(std::clamp(unPremulScale * spotR, 0.0f, 255.0f)),
-        static_cast<uint8_t>(std::clamp(unPremulScale * spotG, 0.0f, 255.0f)),
-        static_cast<uint8_t>(std::clamp(unPremulScale * spotB, 0.0f, 255.0f)));
+    // Spot color: use raw shadow color (no Tonal Color transform)
+    spotColor_ = params_.shadow.color;
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetElevationShadowEffect()
