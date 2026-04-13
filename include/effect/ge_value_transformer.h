@@ -173,7 +173,7 @@ struct GEParamsValueTransformer {
             return false;
         }
 
-        // Apply range constraints (only when FromType == ToType)
+        // Apply range constraints
         if constexpr (Constraint::HAS_RANGE) {
             if constexpr (Constraint::COMPONENT_WISE) {
                 if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
@@ -369,6 +369,15 @@ struct DistortionCollapsePairToVector4fTransformer {
     static bool Transform(const std::pair<float, float>& value, Vector4f& out)
     {
         out = Vector4f(value.first, value.first, value.second, value.second);
+        return true;
+    }
+};
+
+// Custom Transformer: std::shared_ptr<Drawing::Image> to std::weak_ptr<Drawing::Image>
+struct SharedPtrImageToWeakTransformer {
+    static bool Transform(const std::shared_ptr<Drawing::Image>& value, std::weak_ptr<Drawing::Image>& out)
+    {
+        out = value;
         return true;
     }
 };
