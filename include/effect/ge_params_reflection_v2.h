@@ -91,6 +91,10 @@ enum class GEParamsMemberTag : uint32_t {
     BEZIER_WARP_DESTINATION_PATCH9,
     BEZIER_WARP_DESTINATION_PATCH10,
     BEZIER_WARP_DESTINATION_PATCH11,
+    BLUR_BUBBLES_RISE_BLUR_INTENSITY,
+    BLUR_BUBBLES_RISE_MIX_STRENGTH,
+    BLUR_BUBBLES_RISE_PROGRESS,
+    BLUR_BUBBLES_RISE_MASK_IMAGE,
     BORDER_LIGHT_POSITION,
     BORDER_LIGHT_COLOR,
     BORDER_LIGHT_INTENSITY,
@@ -323,6 +327,10 @@ enum class GEParamsMemberTag : uint32_t {
     HARMONIUM_EFFECT_NEG_R_G_B,
     HARMONIUM_EFFECT_FRACTION,
     HARMONIUM_EFFECT_TOTAL_MATRIX,
+    HEAT_DISTORTION_INTENSITY,
+    HEAT_DISTORTION_NOISE_SCALE,
+    HEAT_DISTORTION_RISE_WEIGHT,
+    HEAT_DISTORTION_PROGRESS,
     IMAGE_MASK_IMAGE,
     KAWASE_BLUR_RADIUS,
     LINEAR_GRADIENT_BLUR_BLUR_RADIUS,
@@ -983,6 +991,7 @@ struct GEFilterParamsTypeInfo {
 GE_PARAMS_TYPE_INFO(GEAIBarShaderFilterParams, AIBAR, AIBAR)
 GE_PARAMS_TYPE_INFO(GEAuroraNoiseShaderParams, AURORA_NOISE, AuroraNoise)
 GE_PARAMS_TYPE_INFO(GEBezierWarpShaderFilterParams, BEZIER_WARP, BezierWarp)
+GE_PARAMS_TYPE_INFO(GEBlurBubblesRiseFilterParams, BLUR_BUBBLES_RISE, BlurBubblesRise)
 GE_PARAMS_TYPE_INFO(GEBorderLightShaderParams, BORDER_LIGHT, BorderLight)
 GE_PARAMS_TYPE_INFO(GECircleFlowlightEffectParams, CIRCLE_FLOWLIGHT, CircleFlowlight)
 GE_PARAMS_TYPE_INFO(GEColorGradientShaderFilterParams, COLOR_GRADIENT, ColorGradient)
@@ -1005,6 +1014,7 @@ GE_PARAMS_TYPE_INFO(GEGasifyScaleTwistFilterParams, GASIFY_SCALE_TWIST, GasifySc
 GE_PARAMS_TYPE_INFO(GEGreyShaderFilterParams, GREY, GREY)
 GE_PARAMS_TYPE_INFO(GEGridWarpShaderFilterParams, GRID_WARP, GridWarp)
 GE_PARAMS_TYPE_INFO(GEHarmoniumEffectShaderParams, HARMONIUM_EFFECT, HarmoniumEffect)
+GE_PARAMS_TYPE_INFO(GEHeatDistortionFilterParams, HEAT_DISTORTION, HeatDistortion)
 GE_PARAMS_TYPE_INFO(GEImageMaskParams, IMAGE_MASK, ImageMask)
 GE_PARAMS_TYPE_INFO(GEKawaseBlurShaderFilterParams, KAWASE_BLUR, KAWASE_BLUR)
 GE_PARAMS_TYPE_INFO(GELinearGradientBlurShaderFilterParams, LINEAR_GRADIENT_BLUR, LINEAR_GRADIENT_BLUR)
@@ -1108,6 +1118,10 @@ GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(GEBezierWarpShaderFilterParams, destinationPatc
 GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(GEBezierWarpShaderFilterParams, destinationPatch, 9, BEZIER_WARP_DESTINATION_PATCH9, BezierWarp_ControlPoint9)
 GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(GEBezierWarpShaderFilterParams, destinationPatch, 10, BEZIER_WARP_DESTINATION_PATCH10, BezierWarp_ControlPoint10)
 GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(GEBezierWarpShaderFilterParams, destinationPatch, 11, BEZIER_WARP_DESTINATION_PATCH11, BezierWarp_ControlPoint11)
+GE_PARAMS_FIELD_ACCESSOR(GEBlurBubblesRiseFilterParams, blurIntensity, BLUR_BUBBLES_RISE_BLUR_INTENSITY, BlurBubblesRise_BlurIntensity)
+GE_PARAMS_FIELD_ACCESSOR(GEBlurBubblesRiseFilterParams, mixStrength, BLUR_BUBBLES_RISE_MIX_STRENGTH, BlurBubblesRise_MixStrength)
+GE_PARAMS_FIELD_ACCESSOR(GEBlurBubblesRiseFilterParams, progress, BLUR_BUBBLES_RISE_PROGRESS, BlurBubblesRise_Progress)
+GE_PARAMS_FIELD_ACCESSOR(GEBlurBubblesRiseFilterParams, maskImage, BLUR_BUBBLES_RISE_MASK_IMAGE, BlurBubblesRise_MaskImage)
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, position, BORDER_LIGHT_POSITION, BorderLight_Position)
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, color, BORDER_LIGHT_COLOR, BorderLight_Color)
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, intensity, BORDER_LIGHT_INTENSITY, BorderLight_Intensity)
@@ -1340,6 +1354,10 @@ GE_PARAMS_FIELD_ACCESSOR(GEHarmoniumEffectShaderParams, posRGB, HARMONIUM_EFFECT
 GE_PARAMS_FIELD_ACCESSOR(GEHarmoniumEffectShaderParams, negRGB, HARMONIUM_EFFECT_NEG_R_G_B, HarmoniumEffect_NegRGB)
 GE_PARAMS_FIELD_ACCESSOR(GEHarmoniumEffectShaderParams, fraction, HARMONIUM_EFFECT_FRACTION, HarmoniumEffect_Fraction)
 GE_PARAMS_FIELD_ACCESSOR(GEHarmoniumEffectShaderParams, totalMatrix, HARMONIUM_EFFECT_TOTAL_MATRIX, HarmoniumEffect_TotalMatrix)
+GE_PARAMS_FIELD_ACCESSOR(GEHeatDistortionFilterParams, intensity, HEAT_DISTORTION_INTENSITY, HeatDistortion_Intensity)
+GE_PARAMS_FIELD_ACCESSOR(GEHeatDistortionFilterParams, noiseScale, HEAT_DISTORTION_NOISE_SCALE, HeatDistortion_NoiseScale)
+GE_PARAMS_FIELD_ACCESSOR(GEHeatDistortionFilterParams, riseWeight, HEAT_DISTORTION_RISE_WEIGHT, HeatDistortion_RiseWeight)
+GE_PARAMS_FIELD_ACCESSOR(GEHeatDistortionFilterParams, progress, HEAT_DISTORTION_PROGRESS, HeatDistortion_Progress)
 GE_PARAMS_FIELD_ACCESSOR(GEImageMaskParams, image, IMAGE_MASK_IMAGE, ImageMask_Image)
 GE_PARAMS_FIELD_ACCESSOR(GEKawaseBlurShaderFilterParams, radius, KAWASE_BLUR_RADIUS, KAWASE_BLUR_RADIUS)
 GE_PARAMS_FIELD_ACCESSOR(GELinearGradientBlurShaderFilterParams, blurRadius, LINEAR_GRADIENT_BLUR_BLUR_RADIUS, BLURRADIUS)

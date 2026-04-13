@@ -40,15 +40,16 @@
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-attributes"
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-attributes"
 #endif
 
 // Parameter structure definitions
 #include "effect/filter/ge_aibar_shader_filter.params"
 #include "effect/shader/ge_aurora_noise_shader.params"
 #include "effect/filter/ge_bezier_warp_shader_filter.params"
+#include "effect/filter/ge_blur_bubbles_rise_filter.params"
 #include "effect/shader/ge_border_light_shader.params"
 #include "effect/shader/ge_circle_flowlight_effect.params"
 #include "effect/filter/ge_color_gradient_shader_filter.params"
@@ -71,6 +72,7 @@ namespace Drawing {
 #include "effect/filter/ge_grey_shader_filter.params"
 #include "effect/filter/ge_grid_warp_shader_filter.params"
 #include "effect/shader/ge_harmonium_effect_shader.params"
+#include "effect/filter/ge_heat_distortion_filter.params"
 #include "effect/mask/ge_image_shader_mask.params"
 #include "effect/filter/ge_kawase_blur_shader_filter.params"
 #include "effect/filter/ge_linear_gradient_blur_shader_filter.params"
@@ -113,8 +115,8 @@ namespace Drawing {
 #include "effect/shader/gex_light_cave_shader.params"
 #include "effect/mask/gex_noisy_frame_gradient_mask.params"
 #include "effect/shader/gex_rounded_rect_flowlight_effect.params"
-#if defined(__GNUC__) || defined(__clang__)
-#pragma GCC diagnostic pop
+#if defined(__clang__)
+#pragma clang diagnostic pop
 #endif
 
 } // namespace Drawing
