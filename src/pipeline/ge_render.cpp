@@ -61,7 +61,7 @@
 #include "ge_sdf_shadow_shader.h"
 #include "ge_sdf_edge_light.h"
 #include "ge_sdf_edge_light_shader.h"
-#include "ge_spatial_point_light.cpp"
+#include "ge_spatial_point_light.h"
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
