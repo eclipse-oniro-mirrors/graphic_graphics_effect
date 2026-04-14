@@ -34,6 +34,9 @@ namespace Drawing {
 class GEFilterParams;
 
 // Helper macro to escape commas in macro arguments
+// e.g. CALL(std::pair<int, int>), the comma would separate into two macro arguments
+//      CALL(ESCAPE(std::pair<int, int>)) treats it as one argument
+// Used to pass types as-is without extra parentheses which can cause issues in some contexts
 #define ESCAPE(...) __VA_ARGS__
 
 // X-Macro listing all unique parameter member types
@@ -67,6 +70,7 @@ class GEFilterParams;
     X(ESCAPE(std::weak_ptr<Drawing::Image>))             \
     X(ESCAPE(uint32_t))
 
+// Enum for all parameter member tags
 enum class GEParamsMemberTag : uint32_t {
     INVALID = 0,
     AIBAR_AI_BAR_LOW,

@@ -1001,8 +1001,10 @@ def simplify_params_type(full_qualified_type: str, known_params_types: List[str]
         if full_qualified_type.endswith(known_type):
             if len(full_qualified_type) == len(known_type):
                 return known_type
-            elif full_qualified_type[-len(known_type) - 2 : -len(known_type)] == "::":
-                return known_type
+            # Check bounds before slicing to avoid index out of range
+            elif len(known_type) + 2 <= len(full_qualified_type):
+                if full_qualified_type[-len(known_type) - 2 : -len(known_type)] == "::":
+                    return known_type
 
     return full_qualified_type
 
@@ -1262,6 +1264,8 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blo
     output.append("")
 
     output.append("// Helper macro to escape commas in macro arguments")
+    output.append("// e.g. CALL(std::pair<int, int>), the comma would break the parameter parsing without escaping")
+    output.append("// Used to pass types as-is without extra curly braces which can cause issues in some contexts")
     output.append("#define ESCAPE(...) __VA_ARGS__")
     output.append("")
 
