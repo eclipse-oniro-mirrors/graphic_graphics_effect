@@ -275,7 +275,7 @@ private:
 
     /// Internal set param implementation - uses reflection metadata to set field value
     /// Non-template overloads for each type, generated from FOR_EACH_PARAM_TYPE
-    /// Implementations in ge_visual_effect_impl_v2.cpp
+    /// Implementations in ge_visual_effect_impl.cpp
 #define DECLARE_SET_PARAM_INTERNAL(Type) \
     void SetParamInternal(GEFilterParams& params, GEParamsMemberTag tag, const Type& value);
 

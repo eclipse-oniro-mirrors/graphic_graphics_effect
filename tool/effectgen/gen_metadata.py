@@ -1385,6 +1385,8 @@ def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, 
     if unused_tags:
         console.warning("Found enum values not referenced in any SetParamsMemberByTag implementation:")
         for tag in sorted(unused_tags):
+            if tag not in tag_to_info: # should never happen since all_tags is built with tag_to_info
+                continue
             struct, field, tag_info = tag_to_info[tag]
             normalized_type = get_effective_type_for_tag(
                 field, tag_info.is_array_element, tag_info.array_index, tag_info.prop_attr_index, type_aliases

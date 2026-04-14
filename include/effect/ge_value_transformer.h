@@ -145,7 +145,7 @@ struct GEParamsValueTransformer {
         return true;
     }
 
-    static bool Transform(const FromType& value, ToType& out)
+    static bool ApplyConversion(const FromType& value, ToType& out)
     {
         using namespace ValueTransformerTypeTraits;
         using Constraint = GEParamsConstraintInfo<Tag>;
@@ -173,6 +173,13 @@ struct GEParamsValueTransformer {
             return false;
         }
 
+        return true;
+    }
+
+    static void ApplyRangeConstraints(ToType& value)
+    {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+
         // Apply range constraints
         if constexpr (Constraint::HAS_RANGE) {
             if constexpr (Constraint::COMPONENT_WISE) {
@@ -193,6 +200,18 @@ struct GEParamsValueTransformer {
                 }
             }
         }
+    }
+
+    static bool Transform(const FromType& value, ToType& out)
+    {
+        using namespace ValueTransformerTypeTraits;
+        using Constraint = GEParamsConstraintInfo<Tag>;
+
+        if (!ApplyConversion(value, out)) {
+            return false;
+        }
+
+        ApplyRangeConstraints(out);
         return true;
     }
 
