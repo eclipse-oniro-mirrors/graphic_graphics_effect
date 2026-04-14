@@ -21,12 +21,11 @@ Supports creating filter, mask, shader, and shape effect types with params files
 """
 
 import argparse
-import json
 import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from string import Template
 
 
@@ -129,7 +128,7 @@ def generate_params_file(name: str, effect_type: str, params: List[Dict], output
 
     content = template.substitute(
         YEAR=datetime.now().year,
-        TYPE_ENUM=pascal_name.upper(),
+        TYPE_ENUM=snake_name.upper(),
         DISPLAY_NAME=pascal_name,
         PARAMS_CLASS=params_class,
         PARAM_DECLARATIONS='\n'.join(param_declarations) if param_declarations else ""
@@ -207,25 +206,6 @@ def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_di
     return cpp_file
 
 
-def parse_params_file(params_file: Path) -> Tuple[List[str], List[Dict]]:
-    """Parse a JSON file containing parameter definitions."""
-    if not params_file.exists():
-        return [], []
-
-    with open(params_file, 'r') as f:
-        data = json.load(f)
-
-    params = []
-    for param in data.get('params', []):
-        params.append({
-            'name': param['name'],
-            'type': param['type'],
-            'default': param.get('default', ''),
-        })
-
-    return data.get('includes', []), params
-
-
 def get_output_dir(effect_type: str, target: str, root_dir: Path) -> Path:
     """Get the output directory for a given effect type."""
     if effect_type == EffectType.FILTER:
@@ -279,9 +259,6 @@ Examples:
   # Create a filter effect
   python create_ge_effect.py my_blur filter
 
-  # Create a filter effect with parameters from JSON file
-  python create_ge_effect.py my_blur filter --params my_params.json
-
   # Create a mask effect
   python create_ge_effect.py my_gradient mask
 
@@ -296,22 +273,6 @@ Available effect types:
   mask    - Masking operations (GEShaderMask)
   shader  - Direct shader effects (GEShader)
   shape   - Shape-based effects (GESDFShaderShape)
-
-Parameter JSON format:
-{
-  "params": [
-    {
-      "name": "radius",
-      "type": "float",
-      "default": "10.0f"
-    },
-    {
-      "name": "intensity",
-      "type": "float",
-      "default": "0.5f"
-    }
-  ]
-}
         """
     )
 
@@ -326,12 +287,6 @@ Parameter JSON format:
         nargs="?",
         choices=EffectType.ALL,
         help="Type of effect to create"
-    )
-
-    parser.add_argument(
-        "--params",
-        type=Path,
-        help="JSON file containing parameter definitions"
     )
 
     parser.add_argument(
@@ -355,11 +310,6 @@ Parameter JSON format:
         return 1
 
     params = []
-    if args.params:
-        _, params = parse_params_file(args.params)
-        if not params:
-            print(f"Warning: No parameters found in {args.params}", file=sys.stderr)
-
     return 0 if generate_effect(args.name, args.type, params, args.root, args.templates) else 1
 
 
