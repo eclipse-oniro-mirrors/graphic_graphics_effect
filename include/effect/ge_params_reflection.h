@@ -19,13 +19,18 @@
 #ifndef GRAPHICS_EFFECT_GE_PARAMS_REFLECTION_H
 #define GRAPHICS_EFFECT_GE_PARAMS_REFLECTION_H
 
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 
 #include "ge_effects_params.h"
 #include "ge_value_transformer.h"
+#include "ge_value_transformer_traits.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -620,6 +625,199 @@ enum class GEParamsMemberTag : uint32_t {
     ROUNDED_RECT_FLOWLIGHT_PROGRESS,
 };
 
+// Base constraint templates for Min, Max, and Convert components
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintMinInfo {
+    static constexpr bool HAS_MIN = false;
+    static constexpr bool COMPONENT_WISE = false;
+    static constexpr size_t COMPONENT_COUNT = 0;
+};
+
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintMaxInfo {
+    static constexpr bool HAS_MAX = false;
+    static constexpr bool COMPONENT_WISE = false;
+    static constexpr size_t COMPONENT_COUNT = 0;
+};
+
+template<GEParamsMemberTag, typename = void>
+struct GEParamsConstraintConvertInfo {
+    static constexpr bool HAS_CONVERT = false;
+    static constexpr bool HAS_CAST_FROM = false;
+    using CastFromType = void;
+    static constexpr bool HAS_CUSTOM = false;
+    using CustomTransformer = void;
+};
+
+template<GEParamsMemberTag Tag>
+struct GEParamsConstraintInfo : GEParamsConstraintMinInfo<Tag>,
+                                GEParamsConstraintMaxInfo<Tag>,
+                                GEParamsConstraintConvertInfo<Tag> {
+    using CastFromType = typename GEParamsConstraintConvertInfo<Tag>::CastFromType;
+    using CustomTransformer = typename GEParamsConstraintConvertInfo<Tag>::CustomTransformer;
+
+    static constexpr bool HAS_RANGE =
+        GEParamsConstraintMinInfo<Tag>::HAS_MIN || GEParamsConstraintMaxInfo<Tag>::HAS_MAX;
+    static constexpr bool COMPONENT_WISE =
+        GEParamsConstraintMinInfo<Tag>::COMPONENT_WISE || GEParamsConstraintMaxInfo<Tag>::COMPONENT_WISE;
+};
+
+template<GEParamsMemberTag Tag, typename FromType, typename ToType>
+struct GEParamsValueTransformer {
+    static bool TransformCustomConvert(const FromType& value, ToType& out)
+    {
+        using namespace ValueTransformerTypeTraits;
+        using Constraint = GEParamsConstraintInfo<Tag>;
+        using Transformer = typename Constraint::CustomTransformer;
+        if constexpr (std::is_same_v<FromType, ToType>) {
+            if constexpr (has_transform_method_v<Transformer, FromType, ToType>) {
+                if (!Transformer::Transform(value, out)) {
+                    return false;
+                }
+            } else {
+                out = value;
+            }
+        } else {
+            if (!Transformer::Transform(value, out)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static bool ApplyConversion(const FromType& value, ToType& out)
+    {
+        using namespace ValueTransformerTypeTraits;
+        using Constraint = GEParamsConstraintInfo<Tag>;
+
+        if constexpr (Constraint::HAS_CONVERT) {
+            if constexpr (Constraint::HAS_CUSTOM) {
+                if (!TransformCustomConvert(value, out)) {
+                    return false;
+                }
+            } else if constexpr (std::is_same_v<FromType, ToType>) {
+                out = value;
+            } else if constexpr (is_shared_ptr_v<FromType> && is_shared_ptr_v<ToType>) {
+                out = std::static_pointer_cast<typename ToType::element_type>(value);
+            } else {
+                out = static_cast<ToType>(value);
+            }
+        } else if constexpr (std::is_same_v<FromType, ToType>) {
+            out = value;
+        } else {
+            static_assert(sizeof(FromType) == 0, "Unsupported conversion from FromType to ToType");
+            return false;
+        }
+        return true;
+    }
+
+    static void ApplyRangeConstraints(ToType& out)
+    {
+        using Constraint = GEParamsConstraintInfo<Tag>;
+
+        if constexpr (Constraint::HAS_RANGE) {
+            if constexpr (Constraint::COMPONENT_WISE) {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    out = ApplyComponentWiseClamp(out, Constraint::MIN_COMPONENTS, Constraint::MAX_COMPONENTS);
+                } else if constexpr (Constraint::HAS_MIN) {
+                    out = ApplyComponentWiseMin(out, Constraint::MIN_COMPONENTS);
+                } else if constexpr (Constraint::HAS_MAX) {
+                    out = ApplyComponentWiseMax(out, Constraint::MAX_COMPONENTS);
+                }
+            } else {
+                if constexpr (Constraint::HAS_MIN && Constraint::HAS_MAX) {
+                    out = std::clamp(out, Constraint::MIN, Constraint::MAX);
+                } else if constexpr (Constraint::HAS_MIN) {
+                    out = std::max(out, Constraint::MIN);
+                } else if constexpr (Constraint::HAS_MAX) {
+                    out = std::min(out, Constraint::MAX);
+                }
+            }
+        }
+    }
+
+    static bool Transform(const FromType& value, ToType& out)
+    {
+        if (!ApplyConversion(value, out)) {
+            return false;
+        }
+        ApplyRangeConstraints(out);
+        return true;
+    }
+
+private:
+    static constexpr size_t AXIS_X = 0;
+    static constexpr size_t AXIS_Y = 1;
+    static constexpr size_t AXIS_Z = 2;
+    static constexpr size_t AXIS_W = 3;
+
+    static std::pair<float, float> ApplyComponentWiseClamp(
+        const std::pair<float, float>& value, const float (&min)[2], const float (&max)[2])
+    {
+        return std::pair<float, float>(
+            std::clamp(value.first, min[AXIS_X], max[AXIS_X]), std::clamp(value.second, min[AXIS_Y], max[AXIS_Y]));
+    }
+
+    static Vector2f ApplyComponentWiseClamp(const Vector2f& value, const float (&min)[2], const float (&max)[2])
+    {
+        return Vector2f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]));
+    }
+
+    static Vector3f ApplyComponentWiseClamp(const Vector3f& value, const float (&min)[3], const float (&max)[3])
+    {
+        return Vector3f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]),
+            std::clamp(value.z_, min[AXIS_Z], max[AXIS_Z]));
+    }
+
+    static Vector4f ApplyComponentWiseClamp(const Vector4f& value, const float (&min)[4], const float (&max)[4])
+    {
+        return Vector4f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]),
+            std::clamp(value.z_, min[AXIS_Z], max[AXIS_Z]), std::clamp(value.w_, min[AXIS_W], max[AXIS_W]));
+    }
+
+    template<typename T>
+    static T ApplyComponentWiseMin(const T& value, const float (&min)[4])
+    {
+        if constexpr (std::is_same_v<T, Vector2f>) {
+            return Vector2f(std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]));
+        } else if constexpr (std::is_same_v<T, Vector3f>) {
+            return Vector3f(
+                std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]), std::max(value.z_, min[AXIS_Z]));
+        } else if constexpr (std::is_same_v<T, Vector4f>) {
+            return Vector4f(std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]),
+                std::max(value.z_, min[AXIS_Z]), std::max(value.w_, min[AXIS_W]));
+        } else {
+            return value;
+        }
+    }
+
+    static std::pair<float, float> ApplyComponentWiseMin(const std::pair<float, float>& value, const float (&min)[2])
+    {
+        return std::make_pair(std::max(value.first, min[AXIS_X]), std::max(value.second, min[AXIS_Y]));
+    }
+
+    template<typename T>
+    static T ApplyComponentWiseMax(const T& value, const float (&max)[4])
+    {
+        if constexpr (std::is_same_v<T, Vector2f>) {
+            return Vector2f(std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]));
+        } else if constexpr (std::is_same_v<T, Vector3f>) {
+            return Vector3f(
+                std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]), std::min(value.z_, max[AXIS_Z]));
+        } else if constexpr (std::is_same_v<T, Vector4f>) {
+            return Vector4f(std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]),
+                std::min(value.z_, max[AXIS_Z]), std::min(value.w_, max[AXIS_W]));
+        } else {
+            return value;
+        }
+    }
+
+    static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>& value, const float (&max)[2])
+    {
+        return std::make_pair(std::min(value.first, max[AXIS_X]), std::min(value.second, max[AXIS_Y]));
+    }
+};
+
 // Constraint Metadata Macros for Min Component
 #define GE_PARAMS_CONSTRAINT_MIN(Tag, Type, Min)               \
     template<>                                                 \
@@ -1043,6 +1241,7 @@ GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(
     DISTORT_CHROMA_DISTORT_FACTOR, ESCAPE(std::pair<float, float>), PairToVector2fTransformer);
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(LIGHT_CAVE_POSITION, ESCAPE(std::pair<float, float>), PairToVector2fTransformer);
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(LIGHT_CAVE_RADIUS_X_Y, ESCAPE(std::pair<float, float>), PairToVector2fTransformer);
+
 #undef GE_PARAMS_CONSTRAINT_MIN
 #undef GE_PARAMS_CONSTRAINT_MIN_COMPONENTS
 #undef GE_PARAMS_CONSTRAINT_MAX
