@@ -15,11 +15,11 @@
 
 
 struct [[ge::params(type=GASIFY_SCALE_TWIST, name="GasifyScaleTwist")]] GEGasifyScaleTwistFilterParams {
-    [[ge::prop(min={0.0, 0.0})]]
+    [[ge::prop(min={0.0f, 0.0f})]]
     std::pair<float, float> scale_ = {1.0f, 1.0f};
     std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
     [[ge::prop(name="GasifyScaleTwist_Mask")]]
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
-    [[ge::prop(min=0.0, max=1.0)]]
+    [[ge::prop(min=0.0f, max=1.0f)]]
     float progress_ = 0.f;
 };

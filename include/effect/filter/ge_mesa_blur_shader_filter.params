@@ -38,5 +38,5 @@ struct [[ge::params(type=MESA_BLUR, name="MESA_BLUR")]] GEMESABlurShaderFilterPa
     [[ge::prop("MESA_BLUR_IS_DIRECTION")]]
     bool isDirection = false;
     [[ge::prop("MESA_BLUR_ANGLE")]]
-    float angle = 0.0;
+    float angle = 0.0f;
 };
