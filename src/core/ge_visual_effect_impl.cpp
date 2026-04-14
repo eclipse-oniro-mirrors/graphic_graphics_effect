@@ -49,6 +49,7 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
     if (!params_) {
         GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
             static_cast<int>(filterType_), name.c_str());
+        filterType_ = FilterType::NONE; // Reset to NONE if build failed
     }
 
     canvasInfo_ = canvasInfo ? *canvasInfo : Drawing::CanvasInfo{};
@@ -138,6 +139,7 @@ void GEVisualEffectImpl::MakeSDFUnionOpShapeParams(const GESDFUnionOp& op)
 {
     auto params = std::make_shared<GESDFUnionOpShapeParams>();
     params->op = op;
+    filterType_ = FilterType::SDF_UNION_OP;
     params_ = GEFilterParams::Box(params);
 }
 
