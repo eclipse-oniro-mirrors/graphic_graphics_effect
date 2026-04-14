@@ -47,12 +47,21 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
 
     // Build params of appropriate type using generated helper
     params_ = GEParamsBuilder::Build(filterType_);
+    if (!params_) {
+        GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
+            static_cast<int>(filterType_), name.c_str());
+    }
 }
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}
 
 const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImpl::GetGEShaderShape(const std::string& tag) const
 {
+    if (!params_) {
+        GE_LOGE("GEVisualEffectImpl::GetGEShaderShape: params not initialized");
+        return nullptr;
+    }
+
     auto shaderShapeTag = GEParamsMemberHelper::GEParamsMemberTagFromString(tag);
     if (shaderShapeTag == GEParamsMemberTag::INVALID) {
         return nullptr;

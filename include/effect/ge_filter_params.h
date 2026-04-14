@@ -91,7 +91,7 @@ std::unique_ptr<GEFilterParams> GEFilterParams::Box(const std::shared_ptr<T>& pa
     // As the type parameter of an universal reference, T may be U&/const U&, so removing qualifiers is necessary
     using TValue = std::remove_cv_t<std::remove_reference_t<T>>;
     using ParamType = typename GEFilterParamsWrapper<TValue>::ParamType;
-    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Unbox an unregistered GEFilterParam type");
+    static_assert(GEFilterParams::IsRegisteredParamTypeInfo<ParamType>, "Box an unregistered GEFilterParam type");
     if (!params) {
         return nullptr;
     }

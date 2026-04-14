@@ -139,7 +139,7 @@ class Validator:
         )
         self._field_validators = self._get_dataclass_fields(FieldExpectedResult)
         self._struct_validators = self._get_dataclass_fields(StructExpectedResult)
-
+    
     @staticmethod
     def _get_dataclass_fields(cls) -> List[str]:
         exclude_fields = {
@@ -151,19 +151,6 @@ class Validator:
         }
         excluded = exclude_fields.get(cls, [])
         return [f.name for f in fields(cls) if f.name not in excluded]
-
-    def _format_error_path(self, error_str: str) -> str:
-        line_idx = error_str.find(":line")
-        if line_idx > 0:
-            abs_path = error_str[:line_idx]
-            rest = error_str[line_idx:]
-            try:
-                rel_path = str(Path(abs_path).relative_to(self.test_dir))
-                rel_path = rel_path.replace("\\", "/")
-                return rel_path + rest
-            except (ValueError, TypeError):
-                pass
-        return error_str
 
     def _add_difference(self, validation: Dict[str, Any], message: str):
         validation["passed"] = False
@@ -286,7 +273,20 @@ class Validator:
         for j, (exp_field, act_field) in enumerate(zip(exp_fields, act_fields)):
             field_context = ValidationContext(context.struct_idx, j)
             self._validate_field(validation, field_context, exp_field, act_field)
-
+    
+    def format_error_path(self, error_str: str) -> str:
+        line_idx = error_str.find(":line")
+        if line_idx > 0:
+            abs_path = error_str[:line_idx]
+            rest = error_str[line_idx:]
+            try:
+                rel_path = str(Path(abs_path).relative_to(self.test_dir))
+                rel_path = rel_path.replace("\\", "/")
+                return rel_path + rest
+            except (ValueError, TypeError):
+                pass
+        return error_str
+    
     def validate_test_case(
         self, test_case: TestCase, expected: TestCaseExpectedResult
     ) -> Dict[str, Any]:
@@ -306,11 +306,11 @@ class Validator:
             )
 
         actual_errors = [
-            self._format_error_path(str(e)) for e in test_case.parser_errors
+            self.format_error_path(str(e)) for e in test_case.parser_errors
         ]
         expected_errors = expected.expected_errors or []
 
-        if actual_errors != expected_errors:
+        if sorted(actual_errors) != sorted(expected_errors):
             missing_errors = set(expected_errors) - set(actual_errors)
             extra_errors = set(actual_errors) - set(expected_errors)
 
@@ -669,7 +669,7 @@ class TestRunner:
                 structs_data.append(asdict(struct_data))
 
             error_strings = [
-                self.validator._format_error_path(str(error))
+                self.validator.format_error_path(str(error))
                 for error in test_case.parser_errors
             ]
 

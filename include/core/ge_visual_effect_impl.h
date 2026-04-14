@@ -283,7 +283,7 @@ private:
 #undef DECLARE_SET_PARAM_INTERNAL
 
     // Compatibility placeholders, remove these placeholders if future effects use them
-    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long &);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long&);
     void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long long&);
     void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const double&);
     void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const std::shared_ptr<Drawing::ColorFilter>);
