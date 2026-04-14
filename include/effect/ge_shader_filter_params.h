@@ -865,7 +865,7 @@ constexpr char GE_FILTER_PARTICLE_ABLATION_WIND[] = "ParticleAblation_Wind";
 constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_SCALE[] = "ParticleAblation_TurbScale";
 constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_EVO[] = "ParticleAblation_TurbEvo";
 constexpr char GE_FILTER_PARTICLE_ABLATION_TURB_AMP[] = "ParticleAblation_TurbAmp";
-constexpr char GE_FILTER_PARTICLE_ABLATION_SCALE_SIZE[] = "ParticleAblation_ScaleSize";
+constexpr char GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE[] = "ParticleAblation_ExpansionSize";
 struct GEParticleAblationFilterParams {
     float progress_ = 0.f;
     float ablationRate_ = 0.f;
@@ -880,7 +880,7 @@ struct GEParticleAblationFilterParams {
     int32_t turbScale_ = 0;
     int32_t turbEvo_ = 0;
     int32_t turbAmp_ = 0;
-    std::pair<float, float> scaleSize_ = {1.0f, 1.0f};
+    std::pair<float, float> expansionSize_ = {1.0f, 1.0f};
 };
 REGISTER_GEFILTERPARAM_TYPEINFO(PARTICLE_ABLATION, GEParticleAblationFilterParams, GE_FILTER_PARTICLE_ABLATION);
 

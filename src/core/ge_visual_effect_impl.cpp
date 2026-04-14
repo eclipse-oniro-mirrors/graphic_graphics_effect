@@ -3057,8 +3057,8 @@ void GEVisualEffectImpl::SetParticleAblationParams(const std::string& tag, const
     if (tag == GE_FILTER_PARTICLE_ABLATION_WIND) {
         particleAblationFilterParams_->wind_ = param;
     }
-    if (tag == GE_FILTER_PARTICLE_ABLATION_SCALE_SIZE) {
-        particleAblationFilterParams_->scaleSize_ = param;
+    if (tag == GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE) {
+        particleAblationFilterParams_->expansionSize_ = param;
     }
 }
 
