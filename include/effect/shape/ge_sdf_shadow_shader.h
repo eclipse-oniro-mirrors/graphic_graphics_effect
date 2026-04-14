@@ -165,16 +165,19 @@ private:
             }
 
             float ambientCoverage = computeAmbientCoverage(d, ambientBlurRadius, ambientOutset);
-            vec4 ambient = vec4(ambientColor.rgb, ambientColor.a * ambientCoverage);
-
             float spotCoverage = computeSpotCoverage(d, spotBlurRadius);
-            vec4 spot = vec4(spotColor.rgb, spotColor.a * spotCoverage);
 
-            // SrcOver blend
-            vec3 color = ambient.rgb + spot.rgb * (1.0 - ambient.a);
-            float alpha = ambient.a + spot.a * (1.0 - ambient.a);
+            // Premultiplied alpha colors
+            vec3 ambientPM = ambientColor.rgb * ambientColor.a * ambientCoverage;
+            vec3 spotPM = spotColor.rgb * spotColor.a * spotCoverage;
+            float ambientA = ambientColor.a * ambientCoverage;
+            float spotA = spotColor.a * spotCoverage;
 
-            return vec4(color * alphaFilled, alpha * alphaFilled);
+            // SrcOver: spot over ambient (matching Skia draw order)
+            vec3 colorPM = spotPM + ambientPM * (1.0 - spotA);
+            float alpha = spotA + ambientA * (1.0 - spotA);
+
+            return vec4(colorPM * alphaFilled, alpha * alphaFilled);
         }
 
         half4 main(float2 fragCoord) {
