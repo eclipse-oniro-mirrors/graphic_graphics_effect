@@ -21,6 +21,10 @@ for command-line tools.
 """
 
 import sys
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Optional
 
 
 # ANSI Color codes for modern CLI output
@@ -111,3 +115,45 @@ class Console:
         if self.use_colors:
             return f"{color}{text}{Colors.RESET}"
         return text
+
+
+def find_clang_format() -> Optional[str]:
+    """Find clang-format executable in the system.
+
+    Returns:
+        Path to clang-format if found, None otherwise
+    """
+    # Try common names in order of preference
+    for name in ["clang-format", "clang-format-18", "clang-format-17", "clang-format-16", "clang-format-15"]:
+        path = shutil.which(name)
+        if path:
+            return path
+    return None
+
+
+def format_file_with_clang_format(file_path: Path, clang_format_path: str, console: Console) -> bool:
+    """Format a file using clang-format.
+
+    Args:
+        file_path: Path to the file to format
+        clang_format_path: Path to clang-format executable
+        console: Console instance for output
+
+    Returns:
+        True if formatting succeeded, False otherwise
+    """
+    try:
+        result = subprocess.run(
+            [clang_format_path, "-i", str(file_path)],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            console.success(f"Formatted {file_path.name} with clang-format")
+            return True
+        else:
+            console.warning(f"clang-format failed for {file_path}: {result.stderr}")
+            return False
+    except Exception as e:
+        console.warning(f"Failed to run clang-format: {e}")
+        return False

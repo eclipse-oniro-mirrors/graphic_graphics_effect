@@ -28,7 +28,7 @@ from typing import List
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import CLI utilities
-from tool.effectgen.cli_utils import Console
+from tool.effectgen.cli_utils import Console, find_clang_format, format_file_with_clang_format
 
 # Global console instance
 console = Console()
@@ -156,6 +156,15 @@ def main():
 
     console.file(f"Generated {output_file}")
     console.info(f"  - {len(params_files)} parameter definition files included")
+
+    # Format generated file with clang-format if available
+    clang_format_path = find_clang_format()
+    if clang_format_path:
+        console.header("Formatting generated file")
+        format_file_with_clang_format(output_file, clang_format_path, console)
+    else:
+        console.warning("clang-format not found. Generated file will not be formatted.")
+        console.step("Install clang-format to enable automatic formatting.")
 
     console.summary()
     return 0

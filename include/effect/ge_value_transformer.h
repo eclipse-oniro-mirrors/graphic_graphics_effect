@@ -197,32 +197,37 @@ struct GEParamsValueTransformer {
     }
 
 private:
+    static constexpr size_t AXIS_X = 0;
+    static constexpr size_t AXIS_Y = 1;
+    static constexpr size_t AXIS_Z = 2;
+    static constexpr size_t AXIS_W = 3;
+
     // Helper function: component-wise clamp for std::pair<float, float>
     static std::pair<float, float> ApplyComponentWiseClamp(
         const std::pair<float, float>& value, const float (&min)[2], const float (&max)[2])
     {
         return std::pair<float, float>(
-            std::clamp(value.first, min[0], max[0]), std::clamp(value.second, min[1], max[1]));
+            std::clamp(value.first, min[AXIS_X], max[AXIS_X]), std::clamp(value.second, min[AXIS_Y], max[AXIS_Y]));
     }
 
     // Helper function: component-wise clamp for Vector2f
     static Vector2f ApplyComponentWiseClamp(const Vector2f& value, const float (&min)[2], const float (&max)[2])
     {
-        return Vector2f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]));
+        return Vector2f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]));
     }
 
     // Helper function: component-wise clamp for Vector3f
     static Vector3f ApplyComponentWiseClamp(const Vector3f& value, const float (&min)[3], const float (&max)[3])
     {
-        return Vector3f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]),
-            std::clamp(value.z_, min[2], max[2]));
+        return Vector3f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]),
+            std::clamp(value.z_, min[AXIS_Z], max[AXIS_Z]));
     }
 
     // Helper function: component-wise clamp for Vector4f
     static Vector4f ApplyComponentWiseClamp(const Vector4f& value, const float (&min)[4], const float (&max)[4])
     {
-        return Vector4f(std::clamp(value.x_, min[0], max[0]), std::clamp(value.y_, min[1], max[1]),
-            std::clamp(value.z_, min[2], max[2]), std::clamp(value.w_, min[3], max[3]));
+        return Vector4f(std::clamp(value.x_, min[AXIS_X], max[AXIS_X]), std::clamp(value.y_, min[AXIS_Y], max[AXIS_Y]),
+            std::clamp(value.z_, min[AXIS_Z], max[AXIS_Z]), std::clamp(value.w_, min[AXIS_W], max[AXIS_W]));
     }
 
     // Helper function: component-wise min
@@ -230,12 +235,13 @@ private:
     static T ApplyComponentWiseMin(const T& value, const float (&min)[4])
     {
         if constexpr (std::is_same_v<T, Vector2f>) {
-            return Vector2f(std::max(value.x_, min[0]), std::max(value.y_, min[1]));
+            return Vector2f(std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]));
         } else if constexpr (std::is_same_v<T, Vector3f>) {
-            return Vector3f(std::max(value.x_, min[0]), std::max(value.y_, min[1]), std::max(value.z_, min[2]));
+            return Vector3f(
+                std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]), std::max(value.z_, min[AXIS_Z]));
         } else if constexpr (std::is_same_v<T, Vector4f>) {
-            return Vector4f(std::max(value.x_, min[0]), std::max(value.y_, min[1]), std::max(value.z_, min[2]),
-                std::max(value.w_, min[3]));
+            return Vector4f(std::max(value.x_, min[AXIS_X]), std::max(value.y_, min[AXIS_Y]),
+                std::max(value.z_, min[AXIS_Z]), std::max(value.w_, min[AXIS_W]));
         } else {
             return value;
         }
@@ -244,7 +250,7 @@ private:
     // Helper function: component-wise min for std::pair<float, float>
     static std::pair<float, float> ApplyComponentWiseMin(const std::pair<float, float>& value, const float (&min)[2])
     {
-        return std::make_pair(std::max(value.first, min[0]), std::max(value.second, min[1]));
+        return std::make_pair(std::max(value.first, min[AXIS_X]), std::max(value.second, min[AXIS_Y]));
     }
 
     // Helper function: component-wise max
@@ -252,12 +258,13 @@ private:
     static T ApplyComponentWiseMax(const T& value, const float (&max)[4])
     {
         if constexpr (std::is_same_v<T, Vector2f>) {
-            return Vector2f(std::min(value.x_, max[0]), std::min(value.y_, max[1]));
+            return Vector2f(std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]));
         } else if constexpr (std::is_same_v<T, Vector3f>) {
-            return Vector3f(std::min(value.x_, max[0]), std::min(value.y_, max[1]), std::min(value.z_, max[2]));
+            return Vector3f(
+                std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]), std::min(value.z_, max[AXIS_Z]));
         } else if constexpr (std::is_same_v<T, Vector4f>) {
-            return Vector4f(std::min(value.x_, max[0]), std::min(value.y_, max[1]), std::min(value.z_, max[2]),
-                std::min(value.w_, max[3]));
+            return Vector4f(std::min(value.x_, max[AXIS_X]), std::min(value.y_, max[AXIS_Y]),
+                std::min(value.z_, max[AXIS_Z]), std::min(value.w_, max[AXIS_W]));
         } else {
             return value;
         }
@@ -266,7 +273,7 @@ private:
     // Helper function: component-wise max for std::pair<float, float>
     static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>& value, const float (&max)[2])
     {
-        return std::make_pair(std::min(value.first, max[0]), std::min(value.second, max[1]));
+        return std::make_pair(std::min(value.first, max[AXIS_X]), std::min(value.second, max[AXIS_Y]));
     }
 };
 

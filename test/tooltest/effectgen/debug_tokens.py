@@ -5,9 +5,9 @@
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-# 
+#
 #     http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,19 +31,19 @@ from tool.effectgen.cpp_tokenizer import CppTokenizer
 
 def debug_file(file_path: Path):
     """Debug a specific file."""
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
     print(f"DEBUGGING: {file_path.name}")
-    print(f"{'='*80}")
+    print(f"{'=' * 80}")
 
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     print(f"\nFILE CONTENT:")
     print(content)
 
-    print(f"\n{'-'*80}")
+    print(f"\n{'-' * 80}")
     print("TOKENS:")
-    print(f"{'-'*80}")
+    print(f"{'-' * 80}")
 
     # Tokenize
     tokenizer = CppTokenizer(content)
@@ -55,9 +55,9 @@ def debug_file(file_path: Path):
     if len(tokens) > 50:
         print(f"... ({len(tokens) - 50} more tokens)")
 
-    print(f"\n{'-'*80}")
+    print(f"\n{'-' * 80}")
     print("PARSE RESULT:")
-    print(f"{'-'*80}")
+    print(f"{'-' * 80}")
 
     # Parse
     parser = CppParser(tokens, str(file_path))
@@ -105,5 +105,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

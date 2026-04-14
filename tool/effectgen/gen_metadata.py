@@ -36,7 +36,7 @@ from tool.effectgen.cpp_tokenizer import CppTokenizer
 from tool.effectgen.value_parser import infer_numeric_type, parse_component_values
 
 # Import CLI utilities
-from tool.effectgen.cli_utils import Console
+from tool.effectgen.cli_utils import Console, find_clang_format, format_file_with_clang_format
 
 # Global console instance
 console = Console()
@@ -1515,6 +1515,16 @@ Examples:
         f.write(cpp_content)
 
     console.file(f"Generated {output_cpp_file}")
+
+    # Format generated files with clang-format if available
+    clang_format_path = find_clang_format()
+    if clang_format_path:
+        console.header("Formatting generated files")
+        format_file_with_clang_format(output_file, clang_format_path, console)
+        format_file_with_clang_format(output_cpp_file, clang_format_path, console)
+    else:
+        console.warning("clang-format not found. Generated files will not be formatted.")
+        console.step("Install clang-format to enable automatic formatting.")
 
     console.step(f"Found {len(macro_infos)} filter type info specializations")
 
