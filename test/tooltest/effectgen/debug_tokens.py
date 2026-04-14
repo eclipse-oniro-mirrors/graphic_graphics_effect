@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -93,9 +93,9 @@ def main():
     else:
         # Debug complex types case to see the parsing issue
         debug_files = [
-            "valid/06_complex_types.params",
-            "valid/11_cpp11_brace_init.params",
-            "invalid/01_missing_semicolon.params",
+            "syntax_valid_tests/complex_types.params",
+            "syntax_valid_tests/cpp11_brace_init.params",
+            "syntax_invalid_tests/missing_semicolon.params",
         ]
 
     for file_name in debug_files:

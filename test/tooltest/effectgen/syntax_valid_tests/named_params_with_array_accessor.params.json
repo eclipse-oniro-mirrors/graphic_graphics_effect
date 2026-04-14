@@ -1,0 +1,96 @@
+{
+  "name": "named_params_with_array_accessor",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestArrayParams",
+      "enum_type": "TEST_ARRAY",
+      "filter_name": "TestArray",
+      "fields": [
+        {
+          "type": "std::array<int,10>",
+          "name": "myArr",
+          "default_value": "",
+          "prop_name": "MY_ARR",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "MY_ARR",
+              "array_accessor_length": 10,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "std::array<float,5>",
+          "name": "myOtherArr",
+          "default_value": "",
+          "prop_name": "MY_OTHER_ARR",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "MY_OTHER_ARR",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "std::array<bool,3>",
+          "name": "myThirdArr",
+          "default_value": "",
+          "prop_name": "MY_THIRD_ARR",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "MY_THIRD_ARR",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "int",
+          "name": "regularField",
+          "default_value": "",
+          "prop_name": "REGULAR_PROP",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "REGULAR_PROP",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "TEST_ARRAY",
+        "name": "TestArray"
+      }
+    }
+  ],
+  "notes": ""
+}

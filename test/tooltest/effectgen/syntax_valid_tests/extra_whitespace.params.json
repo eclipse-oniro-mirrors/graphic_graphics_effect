@@ -1,0 +1,52 @@
+{
+  "name": "extra_whitespace",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestWhitespaceParams",
+      "enum_type": "TEST_WHITESPACE",
+      "filter_name": "TestWhitespace",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "bool",
+          "name": "flag",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "double",
+          "name": "extra",
+          "default_value": "3.14",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_WHITESPACE",
+        "name": "TestWhitespace"
+      }
+    }
+  ],
+  "notes": ""
+}

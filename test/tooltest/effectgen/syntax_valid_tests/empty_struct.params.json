@@ -1,0 +1,19 @@
+{
+  "name": "empty_struct",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestEmptyParams",
+      "enum_type": "TEST_EMPTY",
+      "filter_name": "TestEmpty",
+      "fields": [],
+      "params": {
+        "type": "TEST_EMPTY",
+        "name": "TestEmpty"
+      }
+    }
+  ],
+  "notes": ""
+}

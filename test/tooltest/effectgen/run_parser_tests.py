@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -473,8 +473,8 @@ class TestRunner:
 
     def __init__(self, test_dir: Path):
         self.test_dir = test_dir
-        self.valid_dir = test_dir / "valid"
-        self.invalid_dir = test_dir / "invalid"
+        self.valid_dir = test_dir / "syntax_valid_tests"
+        self.invalid_dir = test_dir / "syntax_invalid_tests"
         self.test_cases: List[TestCase] = []
         self.expected_results: Dict[str, TestCaseExpectedResult] = {}
         self.validator = Validator(test_dir)
@@ -603,7 +603,7 @@ class TestRunner:
         valid_files = sorted(self.valid_dir.glob("*.params"))
         for file_path in valid_files:
             test_case = TestCase(
-                name=f"[valid] {file_path.stem}",
+                name=f"[syntax valid test] {file_path.stem}",
                 file_path=file_path,
                 should_parse=True
             )
@@ -612,7 +612,7 @@ class TestRunner:
         invalid_files = sorted(self.invalid_dir.glob("*.params"))
         for file_path in invalid_files:
             test_case = TestCase(
-                name=f"[invalid] {file_path.stem}",
+                name=f"[syntax invalid test] {file_path.stem}",
                 file_path=file_path,
                 should_parse=False
             )

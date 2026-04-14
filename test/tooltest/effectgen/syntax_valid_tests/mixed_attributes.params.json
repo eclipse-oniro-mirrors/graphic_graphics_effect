@@ -1,0 +1,104 @@
+{
+  "name": "mixed_attributes",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestMixedAttrParams",
+      "enum_type": "TEST_MIXED_ATTR",
+      "filter_name": "TestMixedAttr",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "1.0f",
+          "prop_name": "Value1",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Value1",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "Value2",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Value2",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "double",
+          "name": "value3",
+          "default_value": "3.14",
+          "prop_name": "Value3",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Value3",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "bool",
+          "name": "flag",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "char",
+          "name": "ch",
+          "default_value": "x",
+          "prop_name": "Value4",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Value4",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "TEST_MIXED_ATTR",
+        "name": "TestMixedAttr"
+      }
+    }
+  ],
+  "notes": ""
+}

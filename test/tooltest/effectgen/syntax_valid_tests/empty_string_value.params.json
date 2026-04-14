@@ -1,0 +1,37 @@
+{
+  "name": "empty_string_value",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestEmptyStringParams",
+      "enum_type": "TEST_EMPTY_STRING",
+      "filter_name": "TestEmptyString",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_EMPTY_STRING",
+        "name": "TestEmptyString",
+        "pattern": ""
+      }
+    }
+  ],
+  "notes": ""
+}
