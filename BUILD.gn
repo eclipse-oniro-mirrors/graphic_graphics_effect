@@ -80,7 +80,7 @@ ohos_source_set("graphics_effect_src") {
   sources = [
     "src/core/ge_visual_effect.cpp",
     "src/core/ge_visual_effect_container.cpp",
-    "src/core/ge_visual_effect_impl_v2.cpp",
+    "src/core/ge_visual_effect_impl.cpp",
     "src/pipeline/ge_render.cpp",
     "src/pipeline/ge_filter_composer.cpp",
     "src/pipeline/ge_direct_draw_on_canvas_pass.cpp",
@@ -88,7 +88,7 @@ ohos_source_set("graphics_effect_src") {
     "src/pipeline/ge_hps_build_pass.cpp",
     "src/pipeline/ge_hps_upscale_pass.cpp",
     "src/hps/ge_hps_effect_filter.cpp",
-    "src/effect/ge_params_reflection_v2.cpp",
+    "src/effect/ge_params_reflection.cpp",
     "src/effect/filter/ge_shader_filter.cpp",
     "src/effect/filter/ge_aibar_shader_filter.cpp",
     "src/effect/filter/ge_bezier_warp_shader_filter.cpp",

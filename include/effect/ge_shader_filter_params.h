@@ -17,7 +17,7 @@
 
 #include "ge_params_associate_types.h"
 #include "ge_effects_params.h"
-#include "ge_params_reflection_v2.h"
+#include "ge_params_reflection.h"
 #include "ge_shader_filter_params_namesonly.h"
 
 #endif // GRAPHICS_EFFECT_GE_SHADER_FILTER_PARAMS_H

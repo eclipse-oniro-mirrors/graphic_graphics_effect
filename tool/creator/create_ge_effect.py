@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -226,30 +226,16 @@ def parse_params_file(params_file: Path) -> Tuple[List[str], List[Dict]]:
     return data.get('includes', []), params
 
 
-def get_output_dir(effect_type: str, root_dir: Path) -> Path:
+def get_output_dir(effect_type: str, target: str, root_dir: Path) -> Path:
     """Get the output directory for a given effect type."""
     if effect_type == EffectType.FILTER:
-        return root_dir / "include" / "effect" / "filter"
+        return root_dir / target / "effect" / "filter"
     elif effect_type == EffectType.MASK:
-        return root_dir / "include" / "effect" / "mask"
+        return root_dir / target / "effect" / "mask"
     elif effect_type == EffectType.SHADER:
-        return root_dir / "include" / "effect" / "shader"
+        return root_dir / target / "effect" / "shader"
     elif effect_type == EffectType.SHAPE:
-        return root_dir / "include" / "effect" / "shape"
-    else:
-        raise ValueError(f"Unknown effect type: {effect_type}")
-
-
-def get_src_output_dir(effect_type: str, root_dir: Path) -> Path:
-    """Get the source output directory for a given effect type."""
-    if effect_type == EffectType.FILTER:
-        return root_dir / "src" / "effect" / "filter"
-    elif effect_type == EffectType.MASK:
-        return root_dir / "src" / "effect" / "mask"
-    elif effect_type == EffectType.SHADER:
-        return root_dir / "src" / "effect" / "shader"
-    elif effect_type == EffectType.SHAPE:
-        return root_dir / "src" / "effect" / "shape"
+        return root_dir / target / "effect" / "shape"
     else:
         raise ValueError(f"Unknown effect type: {effect_type}")
 
@@ -257,14 +243,14 @@ def get_src_output_dir(effect_type: str, root_dir: Path) -> Path:
 def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: Path, templates_dir: Path) -> bool:
     """Generate all files for a new effect."""
     try:
-        output_dir = get_output_dir(effect_type, root_dir)
-        src_output_dir = get_src_output_dir(effect_type, root_dir)
+        output_dir = get_output_dir(effect_type, "include", root_dir)
+        src_output_dir = get_output_dir(effect_type, "src", root_dir)
 
         output_dir.mkdir(parents=True, exist_ok=True)
         src_output_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"Generating {effect_type} effect: {name}")
-        print(f"  Output directory: {output_dir}")
+        print(f"- Header Output directory: {output_dir}")
 
         params_file = generate_params_file(name, effect_type, params, output_dir, templates_dir)
         print(f"  Generated: {params_file.name}")
@@ -272,8 +258,9 @@ def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: P
         header_file = generate_header_file(name, effect_type, params, output_dir, templates_dir)
         print(f"  Generated: {header_file.name}")
 
+        print(f"- Source Output directory: {src_output_dir}")
         cpp_file = generate_cpp_file(name, effect_type, params, src_output_dir, templates_dir)
-        print(f"  Generated: {cpp_file.name} (in {src_output_dir})")
+        print(f"  Generated: {cpp_file.name}")
 
         print(f"\nSuccessfully generated {name} {effect_type} effect!")
         return True
@@ -290,19 +277,19 @@ def main():
         epilog="""
 Examples:
   # Create a filter effect
-  python create-ge-effect.py my_blur filter
+  python create_ge_effect.py my_blur filter
 
   # Create a filter effect with parameters from JSON file
-  python create-ge-effect.py my_blur filter --params my_params.json
+  python create_ge_effect.py my_blur filter --params my_params.json
 
   # Create a mask effect
-  python create-ge-effect.py my_gradient mask
+  python create_ge_effect.py my_gradient mask
 
   # Create a shader effect
-  python create-ge-effect.py my_light shader
+  python create_ge_effect.py my_light shader
 
   # Create a shape effect
-  python create-ge-effect.py my_shape shape
+  python create_ge_effect.py my_shape shape
 
 Available effect types:
   filter  - Shader-based image processing filters (GEShaderFilter)

@@ -89,6 +89,10 @@ struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
 template<typename T>
 inline constexpr bool is_shared_ptr_v = is_shared_ptr<T>::value;
 
+template<typename FromType, typename ToType>
+inline constexpr bool is_shared_ptr_convertible_v = is_shared_ptr_v<FromType> && is_shared_ptr_v<ToType> &&
+    std::is_convertible_v<typename FromType::element_type*, typename ToType::element_type*>;
+
 // Helper trait: detect if Transform(const FromType&, ToType&) method exists
 template<typename, typename, typename, typename = void>
 struct has_transform_method_const_ref : std::false_type {};
@@ -159,7 +163,7 @@ struct GEParamsValueTransformer {
             } else if constexpr (std::is_same_v<FromType, ToType>) {
                 // No custom transformer and types match: direct assignment
                 out = value;
-            } else if constexpr (is_shared_ptr_v<ToType>) {
+            } else if constexpr (is_shared_ptr_convertible_v<FromType, ToType>) {
                 // Pointer type: use std::static_pointer_cast
                 out = std::static_pointer_cast<typename ToType::element_type>(value);
             } else {
@@ -264,7 +268,7 @@ private:
     }
 
     // Helper function: component-wise max for std::pair<float, float>
-    static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>&& value, const float (&max)[2])
+    static std::pair<float, float> ApplyComponentWiseMax(const std::pair<float, float>& value, const float (&max)[2])
     {
         return std::make_pair(std::min(value.first, max[0]), std::min(value.second, max[1]));
     }

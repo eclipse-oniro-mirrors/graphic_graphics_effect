@@ -58,7 +58,7 @@ def get_params_files(params_dirs: List[Path]) -> List[Path]:
     return sorted(params_files, key=lambda p: p.name)
 
 
-def generate_header() -> str:
+def generate_header(root_dir: Path, params_dirs: List[Path]) -> str:
     """Generate the complete ge_effects_params.h header file."""
     output = []
 
@@ -96,15 +96,6 @@ def generate_header() -> str:
     output.append("#endif")
     output.append("")
     output.append("// Parameter structure definitions")
-
-    script_dir = Path(__file__).parent
-    root_dir = script_dir.parent.parent
-    params_dirs = [
-        root_dir / "include" / "effect" / "filter",
-        root_dir / "include" / "effect" / "mask",
-        root_dir / "include" / "effect" / "shader",
-        root_dir / "include" / "effect" / "shape",
-    ]
 
     params_files = get_params_files(params_dirs)
     for params_file in params_files:
@@ -156,7 +147,7 @@ def main():
 
     console.header("Generating ge_effects_params.h")
     console.step(f"Generating {output_file.name}...")
-    header_content = generate_header()
+    header_content = generate_header(root_dir, params_dirs)
 
     output_file.parent.mkdir(parents=True, exist_ok=True)
 
