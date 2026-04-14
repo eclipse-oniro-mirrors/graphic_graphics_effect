@@ -18,6 +18,10 @@
 
 namespace OHOS {
 namespace Rosen {
+namespace {
+    const int COLOR_CHANNEL = 4;
+    const int POSITION_DIMENSION = 3;
+}
 
 GESpatialPointLightShader::GESpatialPointLightShader() {}
 
@@ -80,8 +84,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
         return nullptr;
     }
     builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), 3);
-    builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), 4);
+    builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), POSITION_DIMENSION);
+    builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), COLOR_CHANNEL);
     builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     builder_->SetUniform("attenuation", pointLightParams_.attenuation);
     if (pointLightParams_.mask != nullptr) {
