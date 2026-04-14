@@ -176,7 +176,7 @@ struct GEParamsValueTransformer {
         return true;
     }
 
-    static void ApplyRangeConstraints(ToType& value)
+    static void ApplyRangeConstraints(ToType& out)
     {
         using Constraint = GEParamsConstraintInfo<Tag>;
 
@@ -204,9 +204,6 @@ struct GEParamsValueTransformer {
 
     static bool Transform(const FromType& value, ToType& out)
     {
-        using namespace ValueTransformerTypeTraits;
-        using Constraint = GEParamsConstraintInfo<Tag>;
-
         if (!ApplyConversion(value, out)) {
             return false;
         }
