@@ -91,7 +91,8 @@ HWTEST_F(GEVisualEffectImplTest, GetFilterType_001, TestSize.Level2)
         Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplGasifyScaleTwist(Drawing::GE_FILTER_GASIFY_SCALE_TWIST);
-    EXPECT_EQ(geVisualEffectImplGasifyScaleTwist.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
+    EXPECT_EQ(geVisualEffectImplGasifyScaleTwist.GetFilterType(),
+        Drawing::GEVisualEffectImpl::FilterType::GASIFY_SCALE_TWIST);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplGasifyBlur(Drawing::GE_FILTER_GASIFY_BLUR);
     EXPECT_EQ(geVisualEffectImplGasifyBlur.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::GASIFY_BLUR);
@@ -383,7 +384,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_013, TestSize.Level1)
 
     float centerOffset = 0.7f;
     geVisualEffectImplRippleMask.SetParam("RippleMask_Offset", centerOffset);
-    EXPECT_EQ(geVisualEffectImplRippleMask.GetParams<Drawing::GERippleShaderMaskParams>()->widthCenterOffset_, centerOffset);
+    EXPECT_EQ(
+        geVisualEffectImplRippleMask.GetParams<Drawing::GERippleShaderMaskParams>()->widthCenterOffset_, centerOffset);
 }
 
 /**
@@ -408,7 +410,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Factor", factor);
-    EXPECT_EQ(geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->factor_, factor);
+    EXPECT_EQ(
+        geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->factor_, factor);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplRadialGradientMask(Drawing::GE_MASK_RADIAL_GRADIENT);
     geVisualEffectImplRadialGradientMask.filterType_ =
@@ -417,7 +420,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
 
     std::pair<float, float> radial_gradient_center = {0.5f, 0.5f};
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_Center", radial_gradient_center);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->center_, radial_gradient_center);
+    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->center_,
+        radial_gradient_center);
 }
 
 /**
@@ -435,7 +439,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
-    EXPECT_EQ(geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
+    EXPECT_EQ(
+        geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
 }
 
 /**
@@ -749,23 +754,28 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_018, TestSize.Level1)
     // test invalid params setting
     float rippleRadiusX = 0.5f;
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_RadiusX", rippleRadiusX);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->radiusX_, rippleRadiusX);
+    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->radiusX_,
+        rippleRadiusX);
 
     float rippleRadiusY = 0.5f;
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_RadiusY", rippleRadiusY);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->radiusY_, rippleRadiusY);
+    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->radiusY_,
+        rippleRadiusY);
 
-    std::pair<float, float> center = {-2.5f, -2.5f};
+    std::pair<float, float> center = { -2.5f, -2.5f };
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_Center", center);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->center_, center);
+    EXPECT_EQ(
+        geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->center_, center);
 
     std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f }; // 1.0, 0.0, 0.0, 1.0 is the color rgba params
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_Colors", colors);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->colors_, colors);
+    EXPECT_EQ(
+        geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->colors_, colors);
 
     std::vector<float> positions = { 1.0f, 1.0f }; // 1.0, 1.0 is poition xy params
     geVisualEffectImplRadialGradientMask.SetParam("RadialGradientMask_Positions", positions);
-    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->positions_, positions);
+    EXPECT_EQ(geVisualEffectImplRadialGradientMask.GetParams<Drawing::GERadialGradientShaderMaskParams>()->positions_,
+        positions);
 }
 
 /**
@@ -784,7 +794,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_19, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
-    EXPECT_EQ(geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
+    EXPECT_EQ(
+        geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
 }
 
 /**
@@ -863,15 +874,20 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_022, TestSize.Level1)
 
     float turbulenceStrength = 0.5f;
     geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_TurbulenceStrength", turbulenceStrength);
-    EXPECT_EQ(geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->turbulenceStrength_, turbulenceStrength);
+    EXPECT_EQ(
+        geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->turbulenceStrength_,
+        turbulenceStrength);
 
     float blurRadius = 0.5f;
     geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_BlurRadius", blurRadius);
-    EXPECT_EQ(geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->blurRadius_, blurRadius);
+    EXPECT_EQ(geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->blurRadius_,
+        blurRadius);
 
     float propagationRadius = 0.5f;
     geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_PropagationRadius", propagationRadius);
-    EXPECT_EQ(geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->propagationRadius_, propagationRadius);
+    EXPECT_EQ(
+        geVisualEffectImplWaveGradientMask.GetParams<Drawing::GEWaveGradientShaderMaskParams>()->propagationRadius_,
+        propagationRadius);
 
     std::pair<float, float> center = {-2.5f, -2.5f};
     geVisualEffectImplWaveGradientMask.SetParam("WaveGradientMask_WaveCenter", center);
@@ -894,7 +910,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_023, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
-    EXPECT_EQ(geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
+    EXPECT_EQ(
+        geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
 }
 
 /**
@@ -911,11 +928,13 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_024, TestSize.Level1)
     // test invalid params setting
     std::pair<float, float> center1 = {-2.5f, -2.5f};
     geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Center1", center1);
-    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->center1_, center1);
+    EXPECT_EQ(
+        geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->center1_, center1);
 
     std::pair<float, float> center2 = {2.5f, 2.5f};
     geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Center2", center2);
-    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->center2_, center2);
+    EXPECT_EQ(
+        geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->center2_, center2);
 
     float radius = 0.5f;
     geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Radius", radius);
@@ -927,7 +946,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_024, TestSize.Level1)
 
     float turbulence = 0.5f;
     geVisualEffectImplDoubleRippleMask.SetParam("DoubleRippleMask_Turbulence", turbulence);
-    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->turbulence_, turbulence);
+    EXPECT_EQ(geVisualEffectImplDoubleRippleMask.GetParams<Drawing::GEDoubleRippleShaderMaskParams>()->turbulence_,
+        turbulence);
 }
 
 /**
@@ -946,7 +966,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_025, TestSize.Level1)
         Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
-    EXPECT_EQ(geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
+    EXPECT_EQ(
+        geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->mask_, shaderMask);
 }
 
 /**
@@ -1175,13 +1196,16 @@ HWTEST_F(GEVisualEffectImplTest, SetLightCaveParamsTest, TestSize.Level1)
     EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->colorC, color);
 
     geVisualEffectImpl.SetParam("", position);
-    EXPECT_NE(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->position, Vector2f(position.first, position.second));
+    EXPECT_NE(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->position,
+        Vector2f(position.first, position.second));
 
     geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_POSITION, position);
-    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->position, Vector2f(position.first, position.second));
+    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->position,
+        Vector2f(position.first, position.second));
 
     geVisualEffectImpl.SetParam(Drawing::GEX_SHADER_LIGHT_CAVE_RADIUSXY, randerXY);
-    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->radiusXY, Vector2f(randerXY.first, randerXY.second));
+    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->radiusXY,
+        Vector2f(randerXY.first, randerXY.second));
 
     geVisualEffectImpl.SetParam("", progress);
     EXPECT_NE(geVisualEffectImpl.GetParams<Drawing::GEXLightCaveShaderParams>()->progress, progress);
@@ -1316,8 +1340,12 @@ HWTEST_F(GEVisualEffectImplTest, SetSDFRRectShapeParamsTest, TestSize.Level1)
     EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.top_, top);
     EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.width_, width);
     EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.height_, height);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.radius_[Drawing::GERRect::TOP_LEFT].x_, radiusX);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.radius_[Drawing::GERRect::TOP_LEFT].y_, radiusY);
+    EXPECT_FLOAT_EQ(
+        geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.radius_[Drawing::GERRect::TOP_LEFT].x_,
+        radiusX);
+    EXPECT_FLOAT_EQ(
+        geVisualEffectImpl.GetParams<Drawing::GESDFRRectShapeParams>()->rrect.radius_[Drawing::GERRect::TOP_LEFT].y_,
+        radiusY);
 }
 
 /**
@@ -1338,12 +1366,12 @@ HWTEST_F(GEVisualEffectImplTest, SetUnionOpShapeParamsTest, TestSize.Level1)
 
     // Create test sub-shapes
     Drawing::GESDFRRectShapeParams leftRectParams;
-    leftRectParams.rrect = {10.0f, 10.0f, 50.0f, 50.0f};
+    leftRectParams.rrect = { 10.0f, 10.0f, 50.0f, 50.0f };
     leftRectParams.rrect.SetCornerRadius(5.0f, 5.0f);
     auto leftShape = std::make_shared<Drawing::GESDFRRectShaderShape>(leftRectParams);
 
     Drawing::GESDFRRectShapeParams rightRectParams;
-    rightRectParams.rrect = {60.0f, 60.0f, 50.0f, 50.0f};
+    rightRectParams.rrect = { 60.0f, 60.0f, 50.0f, 50.0f };
     rightRectParams.rrect.SetCornerRadius(5.0f, 5.0f);
     auto rightShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rightRectParams);
 

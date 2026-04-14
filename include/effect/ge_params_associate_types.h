@@ -19,9 +19,10 @@
 
 #include "common/rs_vector2.h"
 #include "common/rs_vector4.h"
+
 #include "utils/matrix.h"
 #include "utils/rect.h"
-/* 
+/*
  * Common associate types for params definition
  * DO NOT PUT THESE TYPES IN THIS FILE:
  * 1. ACTUAL params definition

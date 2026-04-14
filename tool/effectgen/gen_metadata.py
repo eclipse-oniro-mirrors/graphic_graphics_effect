@@ -452,6 +452,7 @@ def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tup
     output = []
 
     # Generate member tag enum
+    output.append("// Enum for all parameter member tags")
     output.append("enum class GEParamsMemberTag : uint32_t {")
     output.append("    INVALID = 0,")
 
@@ -1264,8 +1265,9 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blo
     output.append("")
 
     output.append("// Helper macro to escape commas in macro arguments")
-    output.append("// e.g. CALL(std::pair<int, int>), the comma would break the parameter parsing without escaping")
-    output.append("// Used to pass types as-is without extra curly braces which can cause issues in some contexts")
+    output.append("// e.g. CALL(std::pair<int, int>), the comma would separate into two macro arguments")
+    output.append("//      CALL(ESCAPE(std::pair<int, int>)) treats it as one argument")
+    output.append("// Used to pass types as-is without extra parentheses which can cause issues in some contexts")
     output.append("#define ESCAPE(...) __VA_ARGS__")
     output.append("")
 

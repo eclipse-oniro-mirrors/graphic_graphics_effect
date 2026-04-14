@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #ifndef GRAPHICS_EFFECT_GE_SHADER_FILTER_PARAMS_NAMESONLY_H
 #define GRAPHICS_EFFECT_GE_SHADER_FILTER_PARAMS_NAMESONLY_H
 
@@ -464,13 +464,13 @@ constexpr char GE_FILTER_FROSTED_GLASS_SDKBS[] = "FrostedGlass_SdKBS";
 constexpr char GE_FILTER_FROSTED_GLASS_SDPOS[] = "FrostedGlass_SdPos";
 constexpr char GE_FILTER_FROSTED_GLASS_SDNEG[] = "FrostedGlass_SdNeg";
 constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPARAMS[] = "FrostedGlass_EnvLightParams"; // OutPx, width. featherPx
-constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates"; // cubic, quad
+constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTRATES[] = "FrostedGlass_EnvLightRates";   // cubic, quad
 constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTKBS[] = "FrostedGlass_EnvLightKBS";
 constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTPOS[] = "FrostedGlass_EnvLightPos";
 constexpr char GE_FILTER_FROSTED_GLASS_ENVLIGHTNEG[] = "FrostedGlass_EnvLightNeg";
 constexpr char GE_FILTER_FROSTED_GLASS_EDLPARAMS[] = "FrostedGlass_EdLightParams"; // width. featherPx
 constexpr char GE_FILTER_FROSTED_GLASS_EDLANGLES[] = "FrostedGlass_EdLightAngles"; // AngleDeg, featherDeg
-constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir"; // x, y
+constexpr char GE_FILTER_FROSTED_GLASS_EDLDIR[] = "FrostedGlass_EdLightDir";       // x, y
 constexpr char GE_FILTER_FROSTED_GLASS_EDLRATES[] = "FrostedGlass_EdLightRates";
 constexpr char GE_FILTER_FROSTED_GLASS_EDLKBS[] = "FrostedGlass_EdLightKBS";
 constexpr char GE_FILTER_FROSTED_GLASS_EDLPOS[] = "FrostedGlass_EdLightPos";
@@ -511,7 +511,7 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTPOS[] = "FrostedGlassEffec
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENVLIGHTNEG[] = "FrostedGlassEffect_EnvLightNeg";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPARAMS[] = "FrostedGlassEffect_EdLightParams"; // width. featherPx
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLANGLES[] = "FrostedGlassEffect_EdLightAngles"; // AngleDeg, featherDeg
-constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR[] = "FrostedGlassEffect_EdLightDir"; // x, y
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLDIR[] = "FrostedGlassEffect_EdLightDir";       // x, y
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLRATES[] = "FrostedGlassEffect_EdLightRates";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLKBS[] = "FrostedGlassEffect_EdLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_EDLPOS[] = "FrostedGlassEffect_EdLightPos";
