@@ -33,7 +33,6 @@ static GEFilterType GetParamlessFilterType(const std::string& name)
 }
 
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
-    : canvasInfo_(canvasInfo ? *canvasInfo : Drawing::CanvasInfo {})
 {
     // Initialize filter type from name using generated helper
     filterType_ = GEParamsBuilder::GetFilterTypeFromString(name);
@@ -51,6 +50,8 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
         GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
             static_cast<int>(filterType_), name.c_str());
     }
+
+    canvasInfo_ = canvasInfo ? *canvasInfo : Drawing::CanvasInfo{};
 }
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}
