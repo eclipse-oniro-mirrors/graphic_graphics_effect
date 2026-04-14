@@ -85,7 +85,6 @@ def debug_file(file_path: Path):
 def main():
     """Main entry point."""
     test_dir = Path(__file__).parent
-    import sys
 
     # Get file from command line or use defaults
     if len(sys.argv) > 1:
@@ -93,9 +92,7 @@ def main():
     else:
         # Debug complex types case to see the parsing issue
         debug_files = [
-            "syntax_valid_tests/complex_types.params",
-            "syntax_valid_tests/cpp11_brace_init.params",
-            "syntax_invalid_tests/missing_semicolon.params",
+            "syntax_valid_tests/multiple_attrs_for_struct.params",
         ]
 
     for file_name in debug_files:

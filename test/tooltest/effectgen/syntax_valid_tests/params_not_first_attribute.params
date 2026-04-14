@@ -1,0 +1,8 @@
+/*
+ * Valid: ge::params is NOT the first attribute
+ */
+
+struct [[clang::annotate("random")]] [[ge::params(type=TEST_PARAMS_NOT_FIRST, name="TestParamsNotFirst")]] [[maybe_unused]] TestParamsNotFirstParams {
+    float value1;
+    int value2;
+};

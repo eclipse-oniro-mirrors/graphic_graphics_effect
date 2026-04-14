@@ -1,0 +1,8 @@
+/*
+ * Valid: Multiple attrs for struct
+ */
+
+struct [[ge::params(type=TEST_MULTIPLE_ATTRS_FOR_STRUCT, name="TestMultipleAttrsForStruct")]] [[clang::annotate("random")]] [[maybe_unused]] TestMultipleAttrsForStructParams {
+    float value1;
+    int value2;
+};

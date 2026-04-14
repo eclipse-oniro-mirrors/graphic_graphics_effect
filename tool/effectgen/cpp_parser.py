@@ -110,42 +110,53 @@ class CppParser:
                 saved_pos = self.pos
                 self._consume()  # Consume 'struct'
 
-                # Check if next token is an attribute [[ge::params(...)]]
-                if self._peek() and self._peek().type == "attribute":
-                    attr_token = self._consume()
-                    parsed = AttributeParser.parse_attribute(attr_token)
+                # Collect all consecutive attributes
+                attributes = []
+                while self._peek() and self._peek().type == "attribute":
+                    attributes.append(self._consume())
 
+                # Check if any attribute is ge::params
+                ge_params_attr = None
+                ge_params_index = -1
+                for i, attr_token in enumerate(attributes):
+                    parsed = AttributeParser.parse_attribute(attr_token)
                     # Add any attribute parsing errors
                     for error in parsed.get("errors", []):
                         self._add_error(error, attr_token.line, attr_token.column)
 
                     if parsed.get("namespace") == "ge" and parsed.get("function") == "params":
-                        # This is a params struct with attribute after struct keyword
-                        struct = self._parse_struct([attr_token])
-                        if struct:
-                            structs.append(struct)
-                        else:
-                            # _parse_struct returned None - check if it's because struct name is missing
-                            # Peek at the next token after consuming 'struct' and the attribute
-                            if self._peek() and self._peek().type not in ("identifier", "keyword"):
-                                self._add_warning(
-                                    "Struct has [[ge::params(...)]] attribute but is missing a struct name",
-                                    attr_token.line,
-                                    attr_token.column,
-                                )
-                        continue
+                        ge_params_attr = attr_token
+                        ge_params_index = i
+                        break
+
+                if ge_params_attr:
+                    # This is a params struct with ge::params attribute
+                    struct = self._parse_struct(attributes)
+                    if struct:
+                        structs.append(struct)
                     else:
-                        # Not a params attribute - add warning if it has a valid namespace
-                        if parsed.get("namespace") and parsed.get("function"):
+                        # _parse_struct returned None - check if it's because struct name is missing
+                        if self._peek() and self._peek().type not in ("identifier", "keyword"):
                             self._add_warning(
-                                f"Skipping struct with attribute '{parsed.get('namespace')}::{parsed.get('function')}' (only 'ge::params' is parsed)",
-                                attr_token.line,
-                                attr_token.column,
+                                "Struct has [[ge::params(...)]] attribute but is missing a struct name",
+                                ge_params_attr.line,
+                                ge_params_attr.column,
                             )
-                        # Restore position
-                        self.pos = saved_pos
+                    continue
+                elif attributes:
+                    # Has attributes but no ge::params - warn and skip this struct
+                    # Check if the first attribute has a valid namespace::function format
+                    parsed = AttributeParser.parse_attribute(attributes[0])
+                    if parsed.get("namespace") and parsed.get("function"):
+                        self._add_warning(
+                            f"Skipping struct with attribute '{parsed.get('namespace')}::{parsed.get('function')}' (only 'ge::params' is parsed)",
+                            attributes[0].line,
+                            attributes[0].column,
+                        )
+                    # Skip this struct by not restoring position
                 else:
-                    # Not an attribute after struct, restore position
+                    # No attributes after struct - this is likely a helper type, ignore it
+                    # Restore position to continue normal parsing
                     self.pos = saved_pos
 
             self.pos += 1
