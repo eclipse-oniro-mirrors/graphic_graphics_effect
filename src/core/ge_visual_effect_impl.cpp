@@ -36,7 +36,6 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
 {
     // Initialize filter type from name using generated helper
     filterType_ = GEParamsBuilder::GetFilterTypeFromString(name);
-
     if (filterType_ == FilterType::NONE) {
         filterType_ = GetParamlessFilterType(name);
         if (filterType_ == FilterType::NONE) {

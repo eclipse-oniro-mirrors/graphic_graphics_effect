@@ -1072,7 +1072,6 @@ HWTEST_F(GEVisualEffectImplTest, SetAllParam_001, TestSize.Level1)
 
     geVisualEffectImpl.SetParam("", paramFloat);
     geVisualEffectImpl.SetParam("", paramUint32);
-
 }
 
 /**
