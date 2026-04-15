@@ -13,7 +13,7 @@ python tool/generate_metadata/gen_metadata.py
 python tool/generate_metadata/gen_effect_header.py
 ```
 
-For creating new effects, use `tool/create_effect/create_effect.py` to scaffold code first.
+For creating new effects, you can use `tool/create_effect/create_effect.py` to scaffold code first.
 
 ---
 
@@ -51,6 +51,8 @@ struct [[ge::params(type=MY_FILTER, name="MY_FILTER")]] GEMyFilterParams {
     float radius;
 };
 ```
+
+For creating new effects, you can use `tool/create_effect/create_effect.py` to scaffold code boilerplate.
 
 ### Step 2: Add Enum Value
 
