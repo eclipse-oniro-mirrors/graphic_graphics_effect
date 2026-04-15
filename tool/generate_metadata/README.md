@@ -3,21 +3,18 @@
 EffectGen is a code generation tool for the OpenHarmony Graphics Effect (GE) library. It automatically generates C++ reflection metadata from parameter definition files (`.params`), enabling runtime introspection and type-safe parameter access for visual effects.
 
 ## TL;DR
-**Create new effect params file:**
-```bash
-# Use the creator tool to scaffold a new effect
-python tool/creator/create_ge_effect.py my_effect filter 
-```
+
+After creating a .params file or modifying existing .params file, run the following two script 
 
 **Generate metadata from .params files:**
 ```bash
 # Default: scan standard effect directories
-python tool/effectgen/gen_metadata.py
+python tool/generate_metadata/gen_metadata.py
 ```
 
 **Generate effect params unified include header:**
 ```bash
-python tool/effectgen/gen_effect_header.py
+python tool/generate_metadata/gen_effect_header.py
 ```
 ---
 
@@ -55,7 +52,7 @@ The easiest way to create a new effect is to use the `create_ge_effect.py` tool:
 
 ```bash
 # Create a filter effect with parameters
-python tool/creator/create_ge_effect.py my_blur filter
+python tool/create_effect/create_ge_effect.py my_blur filter
 ```
 
 This generates:
@@ -65,7 +62,7 @@ This generates:
 
 **Note**: After creating the effect, you need to:
 1. Add the enum value to `include/core/ge_filter_type.h`
-2. Run `python tool/effectgen/gen_metadata.py` to generate reflection metadata
+2. Run `python tool/generate_metadata/gen_metadata.py` to generate reflection metadata
 
 ### Basic Parameter Definition
 
@@ -112,7 +109,7 @@ Generates C++ reflection metadata from `.params` files.
 - `--params-dirs`: Directories containing `.params` files (default: include/effect/{filter,mask,shader,shape})
 - `--output-file`: Output header path (default: include/effect/ge_params_reflection.h)
 - `--output-cpp-file`: Output cpp path (default: src/effect/ge_params_reflection.cpp)
-- `--config-file`: Config file path (default: tool/effectgen/config.json)
+- `--config-file`: Config file path (default: tool/generate_metadata/config.json)
 - `--effect-dirs`: Directories containing effect headers (for DECLARE_GEFILTER_TYPEFUNC scanning)
 
 ### gen_effect_header.py
@@ -362,7 +359,7 @@ auto filterType = GEParamsMemberHelper::GetFilterTypeFromTag(
 ### Directory Structure
 
 ```
-tool/effectgen/
+tool/generate_metadata/
 ├── gen_metadata.py          # Main metadata generator
 ├── gen_effect_header.py      # Header aggregator
 ├── cpp_parser.py            # C++ struct parser
@@ -563,10 +560,10 @@ EffectGen is typically run during the build process:
 
 ```bash
 # Generate metadata
-python tool/effectgen/gen_metadata.py
+python tool/generate_metadata/gen_metadata.py
 
 # Generate unified header
-python tool/effectgen/gen_effect_header.py
+python tool/generate_metadata/gen_effect_header.py
 
 # Format with clang-format (automatic if available)
 ```
@@ -605,7 +602,7 @@ Generated files are then compiled as part of the graphics_effect library.
 
 3. **Run generator**:
    ```bash
-   python tool/effectgen/gen_metadata.py
+   python tool/generate_metadata/gen_metadata.py
    ```
 
 4. **Use generated metadata** in C++:

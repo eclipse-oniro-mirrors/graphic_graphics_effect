@@ -1661,7 +1661,7 @@ Examples:
 
     parser.add_argument("--output-cpp-file", type=str, default=None, help="Output cpp file path (default: src/effect/ge_params_reflection.cpp)")
 
-    parser.add_argument("--config-file", type=str, default=None, help="Config file path (default: tool/effectgen/config.json)")
+    parser.add_argument("--config-file", type=str, default=None, help="Config file path (default: tool/generate_metadata/config.json)")
 
     parser.add_argument(
         "--effect-dirs",

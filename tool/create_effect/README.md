@@ -18,7 +18,7 @@ The Graphics Effect Creator is a code generation tool that automates the creatio
 ## Directory Structure
 
 ```
-tool/creator/
+tool/create_effect/
 ├── create_ge_effect.py      # Main script for generating effects
 └── templates/                # Template files for code generation
     ├── filter.h.tpl         # Filter effect header template

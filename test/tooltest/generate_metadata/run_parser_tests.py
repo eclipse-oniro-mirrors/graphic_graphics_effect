@@ -32,8 +32,8 @@ script_dir = Path(__file__).parent
 root_dir = script_dir.parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
-from tool.effectgen.cpp_tokenizer import CppTokenizer
-from tool.effectgen.cpp_parser import CppParser, FieldInfo, StructInfo
+from tool.generate_metadata.cpp_tokenizer import CppTokenizer
+from tool.generate_metadata.cpp_parser import CppParser, FieldInfo, StructInfo
 
 
 class TestStatus(Enum):

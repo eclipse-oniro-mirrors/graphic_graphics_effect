@@ -25,8 +25,8 @@ script_dir = Path(__file__).parent
 root_dir = script_dir.parent.parent.parent
 sys.path.insert(0, str(root_dir))
 
-from tool.effectgen.cpp_parser import CppParser
-from tool.effectgen.cpp_tokenizer import CppTokenizer
+from tool.generate_metadata.cpp_parser import CppParser
+from tool.generate_metadata.cpp_tokenizer import CppTokenizer
 
 
 def debug_file(file_path: Path):
