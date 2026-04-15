@@ -81,7 +81,7 @@ std::shared_ptr<T> GEFilterParams::Unbox(const GEFilterParams& params)
     if (GEFilterParamsTypeInfo<ParamType>::ID == params.id) {
         return static_cast<const GEFilterParamsWrapper<T>&>(params).data;
     }
-    return nullptr;
+    return GEFilterParamsWrapper<T>::Null;
 }
 
 // Upcast from specific params type to type-erased GEFilterParams
