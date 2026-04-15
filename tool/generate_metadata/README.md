@@ -48,11 +48,11 @@ This enables:
 
 ### Creating a New Effect
 
-The easiest way to create a new effect is to use the `create_ge_effect.py` tool:
+The easiest way to create a new effect is to use the `create_effect.py` tool:
 
 ```bash
 # Create a filter effect with parameters
-python tool/create_effect/create_ge_effect.py my_blur filter
+python tool/create_effect/create_effect.py my_blur filter
 ```
 
 This generates:

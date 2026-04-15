@@ -19,7 +19,7 @@ The Graphics Effect Creator is a code generation tool that automates the creatio
 
 ```
 tool/create_effect/
-├── create_ge_effect.py      # Main script for generating effects
+├── create_effect.py      # Main script for generating effects
 └── templates/                # Template files for code generation
     ├── filter.h.tpl         # Filter effect header template
     ├── filter.cpp.tpl       # Filter effect implementation template
@@ -43,26 +43,26 @@ Create a new effect without parameters:
 
 ```bash
 # Create a filter effect
-python create_ge_effect.py my_blur filter
+python create_effect.py my_blur filter
 
 # Create a mask effect
-python create_ge_effect.py my_gradient mask
+python create_effect.py my_gradient mask
 
 # Create a shader effect
-python create_ge_effect.py my_light shader
+python create_effect.py my_light shader
 
 # Create a shape effect
-python create_ge_effect.py my_shape shape
+python create_effect.py my_shape shape
 ```
 
 ### Advanced Options
 
 ```bash
 # Specify custom root directory
-python create_ge_effect.py my_effect filter --root /path/to/project
+python create_effect.py my_effect filter --root /path/to/project
 
 # Specify custom templates directory
-python create_ge_effect.py my_effect filter --templates /path/to/templates
+python create_effect.py my_effect filter --templates /path/to/templates
 ```
 
 ### Command-Line Arguments

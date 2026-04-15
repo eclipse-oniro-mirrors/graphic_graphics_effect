@@ -24,10 +24,10 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field as dc_field
 
 # Import Token from cpp_tokenizer module
-from tool.effectgen.cpp_tokenizer import Token
+from tool.generate_metadata.cpp_tokenizer import Token
 
 # Import AttributeParser from attribute_parser module
-from tool.effectgen.attribute_parser import AttributeParser
+from tool.generate_metadata.attribute_parser import AttributeParser
 
 
 @dataclass

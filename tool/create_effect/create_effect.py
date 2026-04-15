@@ -257,16 +257,16 @@ def main():
         epilog="""
 Examples:
   # Create a filter effect
-  python create_ge_effect.py my_blur filter
+  python create_effect.py my_blur filter
 
   # Create a mask effect
-  python create_ge_effect.py my_gradient mask
+  python create_effect.py my_gradient mask
 
   # Create a shader effect
-  python create_ge_effect.py my_light shader
+  python create_effect.py my_light shader
 
   # Create a shape effect
-  python create_ge_effect.py my_shape shape
+  python create_effect.py my_shape shape
 
 Available effect types:
   filter  - Shader-based image processing filters (GEShaderFilter)

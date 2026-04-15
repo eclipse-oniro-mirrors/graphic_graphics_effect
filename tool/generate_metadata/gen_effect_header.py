@@ -27,7 +27,7 @@ from typing import List
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import CLI utilities
-from tool.effectgen.cli_utils import Console, find_clang_format, format_file_with_clang_format
+from tool.generate_metadata.cli_utils import Console, find_clang_format, format_file_with_clang_format
 
 # Global console instance
 console = Console()

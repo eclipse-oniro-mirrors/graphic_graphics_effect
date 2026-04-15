@@ -31,12 +31,12 @@ from dataclasses import dataclass
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import parser modules
-from tool.effectgen.cpp_parser import CppParser, StructInfo, FieldInfo
-from tool.effectgen.cpp_tokenizer import CppTokenizer
-from tool.effectgen.value_parser import infer_numeric_type, parse_component_values
+from tool.generate_metadata.cpp_parser import CppParser, StructInfo, FieldInfo
+from tool.generate_metadata.cpp_tokenizer import CppTokenizer
+from tool.generate_metadata.value_parser import infer_numeric_type, parse_component_values
 
 # Import CLI utilities
-from tool.effectgen.cli_utils import Console, find_clang_format, format_file_with_clang_format
+from tool.generate_metadata.cli_utils import Console, find_clang_format, format_file_with_clang_format
 
 # Global console instance
 console = Console()
