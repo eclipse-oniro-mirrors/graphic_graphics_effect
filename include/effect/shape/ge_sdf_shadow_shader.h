@@ -160,7 +160,7 @@ private:
 
         vec4 elevationShadowEffect(float d, float d_original) {
             float alphaFilled = 1.0;
-            if (isFilled < 0.5 && d_original < 0.0) {
+            if (isFilled < 0.5) {
                 alphaFilled = smoothstep(-1.0, 0.0, d_original);
             }
 
