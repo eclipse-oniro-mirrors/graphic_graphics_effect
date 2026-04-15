@@ -606,7 +606,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
             output.append(f"        GE_VALIDATE_AND_SET({tag_name})")
 
         output.append("        default:")
-        output.append('            GE_LOGE("SetParamsMemberByTag: No matching case for tag %u (filter type %u, params type %u)",')
+        output.append(f'            GE_LOGE("SetParamsMemberByTag<{field_type}>: No matching case for tag %u (filter type %u, params type %u)",')
         output.append("                static_cast<uint32_t>(tag),")
         output.append("                static_cast<uint32_t>(expectedFilterType),")
         output.append("                static_cast<uint32_t>(params.GetType()));")
