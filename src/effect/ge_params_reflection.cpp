@@ -1352,6 +1352,492 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
         break;                                                                                                        \
     }
 
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const DotMatrixDirection& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
+        default:
+            GE_LOGE("SetParamsMemberByTag<DotMatrixDirection>: No matching case for tag %u (filter type %u, params "
+                    "type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const DotMatrixEffectType& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
+        default:
+            GE_LOGE("SetParamsMemberByTag<DotMatrixEffectType>: No matching case for tag %u (filter type %u, params "
+                    "type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Color4f& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
+        default:
+            GE_LOGE(
+                "SetParamsMemberByTag<Drawing::Color4f>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Matrix& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_MATRIX)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TOTAL_MATRIX)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_MAT)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_MATRIX)
+        default:
+            GE_LOGE(
+                "SetParamsMemberByTag<Drawing::Matrix>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Point& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH0)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH1)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH2)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH3)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH4)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH5)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH6)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH7)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH8)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH9)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH10)
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH11)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_U_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_U_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_B_CORNER)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_START_POSITION)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_END_POSITION)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_U_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_U_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_B_CORNER)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS0)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS1)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS2)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS3)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS4)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS5)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS6)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS7)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS8)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS9)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS10)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS11)
+        default:
+            GE_LOGE(
+                "SetParamsMemberByTag<Drawing::Point>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH)
+        default:
+            GE_LOGE("SetParamsMemberByTag<GEBezierWarpShaderFilterControlPointArray>: No matching case for tag %u "
+                    "(filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const GERRect& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_RRECT_SHAPE_RRECT)
+        default:
+            GE_LOGE("SetParamsMemberByTag<GERRect>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const GESDFBorderParams& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_BORDER_BORDER)
+        default:
+            GE_LOGE(
+                "SetParamsMemberByTag<GESDFBorderParams>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const GESDFShadowParams& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHADOW)
+        default:
+            GE_LOGE(
+                "SetParamsMemberByTag<GESDFShadowParams>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const GESDFUnionOp& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_OP)
+        default:
+            GE_LOGE("SetParamsMemberByTag<GESDFUnionOp>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const RectF& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_RECT)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
+        default:
+            GE_LOGE("SetParamsMemberByTag<RectF>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector2f& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_COLOR_FRACTIONS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EDL)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ANTI_ALIAS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_DIR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EDL)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_DIR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BLUR_PARAM)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_WEIGHTS_EMBOSS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_RATES)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_CENTER_POSITION)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX0)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)
+        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX2)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_POSITION)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_CLICK_POS)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_R_D)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_GRANULARITY)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_DISTORT_FACTOR)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_POSITION)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_RADIUS_X_Y)
+        default:
+            GE_LOGE("SetParamsMemberByTag<Vector2f>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector3f& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_POSITION)
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_ROTATION_ANGLE)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_POSITION)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_ROTATION_ANGLE)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_DIRECTION)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_REFRACT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_REFRACT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_PARAMS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_K_B_S)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_POS)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_NEG)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_K_B_S)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_POS_R_G_B)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_NEG_R_G_B)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_COLOR)
+        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_L_W_H)
+        GE_VALIDATE_AND_SET(DISTORT_CHROMA_COLOR_STRENGTH)
+        default:
+            GE_LOGE("SetParamsMemberByTag<Vector3f>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector4f& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(BORDER_LIGHT_COLOR)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS0)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS1)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS2)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS3)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_SEED)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_X)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_Y)
+        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_STRENGTH)
+        GE_VALIDATE_AND_SET(CONTENT_LIGHT_COLOR)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR)
+        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR)
+        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_COLOR)
+        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_BARREL_DISTORTION)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_DOT_COLOR)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_BG_COLOR)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_COLOR)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_INNER_BEZIER)
+        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_OUTER_BEZIER)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_MATERIAL_COLOR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_MATERIAL_COLOR)
+        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TINT_COLOR)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
+        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_FILL_COLOR)
+        GE_VALIDATE_AND_SET(SDF_COLOR_COLOR)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_BARREL_DISTORTION)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B)
+        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_L_T_W_H)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS0)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS1)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS2)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS3)
+        GE_VALIDATE_AND_SET(AIBAR_GLOW_STRENGTHS)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_L_T_W_H)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS0)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS1)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS2)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS3)
+        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_STRENGTHS)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS0)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS1)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS2)
+        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS3)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_A)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_B)
+        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_C)
+        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_GRADIENT_BEZIER_CONTROL_POINTS)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS)
+        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_COLOR)
+        default:
+            GE_LOGE("SetParamsMemberByTag<Vector4f>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const bool& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(DOT_MATRIX_INVERSE_EFFECT)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_BLOOM)
+        GE_VALIDATE_AND_SET(EDGE_LIGHT_USE_RAW_COLOR)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_BASE_VIBRANCY_ENABLED)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_OFFSCREEN_CANVAS)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_RADIUS_GRADIENT)
+        GE_VALIDATE_AND_SET(MASK_TRANSITION_INVERSE)
+        GE_VALIDATE_AND_SET(MESA_BLUR_IS_DIRECTION)
+        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_GENERATE_DERIVS)
+        GE_VALIDATE_AND_SET(USE_EFFECT_MASK_USE_EFFECT)
+        GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_APPLY_INSIDE_MASK)
+        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_INVERSE)
+        default:
+            GE_LOGE("SetParamsMemberByTag<bool>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const float& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1582,8 +2068,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
     }
 }
 
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value)
+void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const int32_t& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
     if (params.GetType() != expectedFilterType) {
@@ -1591,10 +2076,17 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 
     switch (tag) {
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
+        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
+        GE_VALIDATE_AND_SET(KAWASE_BLUR_RADIUS)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_DIRECTION)
+        GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE)
+        GE_VALIDATE_AND_SET(MESA_BLUR_RADIUS)
+        GE_VALIDATE_AND_SET(MESA_BLUR_TILE_MODE)
+        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_UNION_MODE)
         default:
-            GE_LOGE("SetParamsMemberByTag<GEBezierWarpShaderFilterControlPointArray>: No matching case for tag %u "
-                    "(filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<int32_t>: No matching case for tag %u (filter type %u, params type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1736,7 +2228,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Point& value)
+    GEFilterParams& params, GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
     if (params.GetType() != expectedFilterType) {
@@ -1744,43 +2236,22 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 
     switch (tag) {
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH0)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH1)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH2)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH3)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH4)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH5)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH6)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH7)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH8)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH9)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH10)
-        GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH11)
-        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_U_CORNER)
-        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_U_CORNER)
-        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_R_B_CORNER)
-        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_L_B_CORNER)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_START_POSITION)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_END_POSITION)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_U_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_U_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_B_CORNER)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_B_CORNER)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS0)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS1)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS2)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS3)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS4)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS5)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS6)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS7)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS8)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS9)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS10)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS11)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(MAGNIFIER_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
+        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Point>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::GEShaderShape>>: No matching case for tag %u "
+                    "(filter type %u, params type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1815,152 +2286,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         default:
             GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::Image>>: No matching case for tag %u (filter type "
                     "%u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector3f& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(BORDER_LIGHT_POSITION)
-        GE_VALIDATE_AND_SET(BORDER_LIGHT_ROTATION_ANGLE)
-        GE_VALIDATE_AND_SET(CONTENT_LIGHT_POSITION)
-        GE_VALIDATE_AND_SET(CONTENT_LIGHT_ROTATION_ANGLE)
-        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_DIRECTION)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_REFRACT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_REFRACT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_K_B_S)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_POS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_NEG)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_K_B_S)
-        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_POS_R_G_B)
-        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_NEG_R_G_B)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_COLOR)
-        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_L_W_H)
-        GE_VALIDATE_AND_SET(DISTORT_CHROMA_COLOR_STRENGTH)
-        default:
-            GE_LOGE("SetParamsMemberByTag<Vector3f>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector4f& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(BORDER_LIGHT_COLOR)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS0)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS1)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS2)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_COLORS3)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_FREQUENCY)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_AMPLITUDE)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_ROTATION_SEED)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_X)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_GRADIENT_Y)
-        GE_VALIDATE_AND_SET(CIRCLE_FLOWLIGHT_STRENGTH)
-        GE_VALIDATE_AND_SET(CONTENT_LIGHT_COLOR)
-        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE1_COLOR)
-        GE_VALIDATE_AND_SET(CONTOUR_DIAGONAL_FLOW_LIGHT_LINE2_COLOR)
-        GE_VALIDATE_AND_SET(DIRECTION_LIGHT_LIGHT_COLOR)
-        GE_VALIDATE_AND_SET(DISTORTION_COLLAPSE_BARREL_DISTORTION)
-        GE_VALIDATE_AND_SET(DOT_MATRIX_DOT_COLOR)
-        GE_VALIDATE_AND_SET(DOT_MATRIX_BG_COLOR)
-        GE_VALIDATE_AND_SET(EDGE_LIGHT_COLOR)
-        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_INNER_BEZIER)
-        GE_VALIDATE_AND_SET(FRAME_GRADIENT_MASK_OUTER_BEZIER)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_MATERIAL_COLOR)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_MATERIAL_COLOR)
-        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TINT_COLOR)
-        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC)
-        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
-        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_FILL_COLOR)
-        GE_VALIDATE_AND_SET(SDF_COLOR_COLOR)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_BARREL_DISTORTION)
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A)
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B)
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_L_T_W_H)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS0)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS1)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS2)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_COLORS3)
-        GE_VALIDATE_AND_SET(AIBAR_GLOW_STRENGTHS)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_L_T_W_H)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS0)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS1)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS2)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_COLORS3)
-        GE_VALIDATE_AND_SET(AIBAR_RECT_HALO_STRENGTHS)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
-        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS0)
-        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS1)
-        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS2)
-        GE_VALIDATE_AND_SET(GRADIENT_FLOW_COLORS_COLORS3)
-        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_A)
-        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_B)
-        GE_VALIDATE_AND_SET(LIGHT_CAVE_COLOR_C)
-        GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_GRADIENT_BEZIER_CONTROL_POINTS)
-        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_FEATHERING_BEZIER_CONTROL_POINTS)
-        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS)
-        GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_COLOR)
-        default:
-            GE_LOGE("SetParamsMemberByTag<Vector4f>: No matching case for tag %u (filter type %u, params type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2004,30 +2329,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const std::vector<float>& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_COLORS)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_POSITIONS)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_STRENGTHS)
-        GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_POSITIONS)
-        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_COLORS)
-        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_POSITIONS)
-        default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<float>>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
     GEFilterParams& params, GEParamsMemberTag tag, const std::vector<Vector2f>& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2041,50 +2342,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_RIPPLE_POSITION)
         default:
             GE_LOGE("SetParamsMemberByTag<std::vector<Vector2f>>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const int32_t& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
-        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
-        GE_VALIDATE_AND_SET(KAWASE_BLUR_RADIUS)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_DIRECTION)
-        GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE)
-        GE_VALIDATE_AND_SET(MESA_BLUR_RADIUS)
-        GE_VALIDATE_AND_SET(MESA_BLUR_TILE_MODE)
-        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_UNION_MODE)
-        default:
-            GE_LOGE("SetParamsMemberByTag<int32_t>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const DotMatrixDirection& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
-        default:
-            GE_LOGE("SetParamsMemberByTag<DotMatrixDirection>: No matching case for tag %u (filter type %u, params "
                     "type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
@@ -2112,92 +2369,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 }
 
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Vector2f& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(DOT_MATRIX_COLOR_FRACTIONS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EMBOSS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_WEIGHTS_EDL)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ANTI_ALIAS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SD_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ENV_LIGHT_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_ANGLES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_DIR)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_ED_LIGHT_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_WEIGHTS_EMBOSS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_BG_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BLUR_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EMBOSS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_WEIGHTS_EDL)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SD_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ENV_LIGHT_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_PARAMS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_ANGLES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_DIR)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_ED_LIGHT_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BLUR_PARAM)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_WEIGHTS_EMBOSS)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_RATES)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_CENTER_POSITION)
-        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX0)
-        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)
-        GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX2)
-        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_POSITION)
-        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_CLICK_POS)
-        GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_R_D)
-        GE_VALIDATE_AND_SET(DISTORT_CHROMA_GRANULARITY)
-        GE_VALIDATE_AND_SET(DISTORT_CHROMA_DISTORT_FACTOR)
-        GE_VALIDATE_AND_SET(LIGHT_CAVE_POSITION)
-        GE_VALIDATE_AND_SET(LIGHT_CAVE_RADIUS_X_Y)
-        default:
-            GE_LOGE("SetParamsMemberByTag<Vector2f>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const bool& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(DOT_MATRIX_INVERSE_EFFECT)
-        GE_VALIDATE_AND_SET(EDGE_LIGHT_BLOOM)
-        GE_VALIDATE_AND_SET(EDGE_LIGHT_USE_RAW_COLOR)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_BASE_VIBRANCY_ENABLED)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_OFFSCREEN_CANVAS)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_IS_RADIUS_GRADIENT)
-        GE_VALIDATE_AND_SET(MASK_TRANSITION_INVERSE)
-        GE_VALIDATE_AND_SET(MESA_BLUR_IS_DIRECTION)
-        GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_GENERATE_DERIVS)
-        GE_VALIDATE_AND_SET(USE_EFFECT_MASK_USE_EFFECT)
-        GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_APPLY_INSIDE_MASK)
-        GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_INVERSE)
-        default:
-            GE_LOGE("SetParamsMemberByTag<bool>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
 void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const DotMatrixEffectType& value)
+    GEFilterParams& params, GEParamsMemberTag tag, const std::vector<float>& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
     if (params.GetType() != expectedFilterType) {
@@ -2205,9 +2378,14 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 
     switch (tag) {
-        GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_COLORS)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_POSITIONS)
+        GE_VALIDATE_AND_SET(COLOR_GRADIENT_STRENGTHS)
+        GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_POSITIONS)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_COLORS)
+        GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_POSITIONS)
         default:
-            GE_LOGE("SetParamsMemberByTag<DotMatrixEffectType>: No matching case for tag %u (filter type %u, params "
+            GE_LOGE("SetParamsMemberByTag<std::vector<float>>: No matching case for tag %u (filter type %u, params "
                     "type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
@@ -2216,7 +2394,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const std::shared_ptr<Drawing::GEShaderShape>& value)
+    GEFilterParams& params, GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
     if (params.GetType() != expectedFilterType) {
@@ -2224,22 +2402,11 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 
     switch (tag) {
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(MAGNIFIER_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_BORDER_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_CLIP_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_COLOR_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_EDGE_LIGHT_SDF_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_SHADOW_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_FRACTION_STOPS)
+        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_FRACTION_STOPS)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::GEShaderShape>>: No matching case for tag %u "
-                    "(filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::vector<std::pair<float, float>>>: No matching case for tag %u (filter "
+                    "type %u, params type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2267,67 +2434,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     }
 }
 
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const RectF& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_RECT)
-        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_SRC)
-        GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
-        default:
-            GE_LOGE("SetParamsMemberByTag<RectF>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Matrix& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_SNAPSHOT_MATRIX)
-        GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_TOTAL_MATRIX)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_MAT)
-        GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_MATRIX)
-        default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Matrix>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const std::vector<std::pair<float, float>>& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_FRACTION_STOPS)
-        GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_FRACTION_STOPS)
-        default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<std::pair<float, float>>>: No matching case for tag %u (filter "
-                    "type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
 void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const uint32_t& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -2345,112 +2451,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_MODE)
         default:
             GE_LOGE("SetParamsMemberByTag<uint32_t>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const GESDFBorderParams& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_BORDER_BORDER)
-        default:
-            GE_LOGE(
-                "SetParamsMemberByTag<GESDFBorderParams>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const GERRect& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_RRECT_SHAPE_RRECT)
-        default:
-            GE_LOGE("SetParamsMemberByTag<GERRect>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const GESDFShadowParams& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_SHADOW_SHADOW)
-        default:
-            GE_LOGE(
-                "SetParamsMemberByTag<GESDFShadowParams>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const GESDFUnionOp& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SDF_UNION_OP_OP)
-        default:
-            GE_LOGE("SetParamsMemberByTag<GESDFUnionOp>: No matching case for tag %u (filter type %u, params type %u)",
-                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
-                static_cast<uint32_t>(params.GetType()));
-            break;
-    }
-}
-
-void GEParamsMemberHelper::SetParamsMemberByTag(
-    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Color4f& value)
-{
-    auto expectedFilterType = GetFilterTypeFromTag(tag);
-    if (params.GetType() != expectedFilterType) {
-        return;
-    }
-
-    switch (tag) {
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_A)
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_B)
-        GE_VALIDATE_AND_SET(SOUND_WAVE_COLOR_C)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS0)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS1)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS2)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS3)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS4)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS5)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS6)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS7)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS8)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS9)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
-        GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
-        default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Color4f>: No matching case for tag %u (filter type %u, params type %u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
