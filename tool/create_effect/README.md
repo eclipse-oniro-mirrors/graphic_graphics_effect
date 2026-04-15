@@ -1,234 +1,199 @@
-# Graphics Effect Creator
+# create_effect
+
+Scaffold CLI for creating new visual effects in Graphics Effect (GE) library. Generates boilerplate: `.params`, `.h`, `.cpp` files with proper naming and inheritance.
+
+**Note**: Generates scaffold code only. You must implement shader logic and `OnProcessImage()` manually.
+
+---
+
+## TL;DR
+
+```bash
+python tool/create_effect/create_effect.py <name> <type>
+```
+
+**Types**: `filter` | `mask` | `shader` | `shape`
+
+**Post-scaffold steps**:
+1. Add enum to `include/core/ge_filter_type.h`
+2. Implement render logic
+3. Run `python tool/generate_metadata/gen_metadata.py` and `python tool/generate_metadata/gen_effect_header.py`
+
+---
 
 ## Overview
 
-The Graphics Effect Creator is a code generation tool that automates the creation of new Graphics Effect components in the OpenHarmony graphics subsystem. It uses template-based generation to create consistent, well-structured code for different effect types.
+This tool creates initial file structure for new effects:
 
-## Features
+| Generated | Purpose |
+|-----------|---------|
+| `.params` | Parameter struct with default fields |
+| `.h` | Class declaration with proper inheritance |
+| `.cpp` | Skeleton implementation with TODO placeholders |
 
-- **Automated Code Generation**: Generates header files, implementation files, and parameter definitions
-- **Multiple Effect Types**: Supports four types of graphics effects:
-  - **Filter**: Shader-based image processing filters (inherits from `GEShaderFilter`)
-  - **Mask**: Masking operations (inherits from `GEShaderMask`)
-  - **Shader**: Direct shader effects (inherits from `GEShader`)
-  - **Shape**: Shape-based effects using SDF (inherits from `GESDFShaderShape`)
-- **Template-Based**: Uses customizable templates for consistent code structure
-- **Naming Conventions**: Automatically handles CamelCase/snake_case conversions
+Generated code follows GE conventions but requires:
+- Manual shader code (GLSL/SkSL)
+- Implementation of `OnProcessImage()` or equivalent methods
+- RuntimeEffect creation with custom shader source
 
-## Directory Structure
+---
 
-```
-tool/create_effect/
-├── create_effect.py      # Main script for generating effects
-└── templates/                # Template files for code generation
-    ├── filter.h.tpl         # Filter effect header template
-    ├── filter.cpp.tpl       # Filter effect implementation template
-    ├── filter.params.tpl    # Filter parameter definition template
-    ├── mask.h.tpl           # Mask effect header template
-    ├── mask.cpp.tpl         # Mask effect implementation template
-    ├── mask.params.tpl      # Mask parameter definition template
-    ├── shader.h.tpl         # Shader effect header template
-    ├── shader.cpp.tpl       # Shader effect implementation template
-    ├── shader.params.tpl    # Shader parameter definition template
-    ├── shape.h.tpl          # Shape effect header template
-    ├── shape.cpp.tpl        # Shape effect implementation template
-    └── shape.params.tpl     # Shape parameter definition template
-```
-
-## Usage
-
-### Basic Usage
-
-Create a new effect without parameters:
+## Quick Start
 
 ```bash
-# Create a filter effect
-python create_effect.py my_blur filter
-
-# Create a mask effect
-python create_effect.py my_gradient mask
-
-# Create a shader effect
-python create_effect.py my_light shader
-
-# Create a shape effect
-python create_effect.py my_shape shape
+# Scaffold a filter effect
+python tool/create_effect/create_effect.py my_blur filter
 ```
 
-### Advanced Options
+**Generated files**:
 
-```bash
-# Specify custom root directory
-python create_effect.py my_effect filter --root /path/to/project
+| File | Path |
+|------|------|
+| `.params` | `include/effect/filter/ge_my_blur_shader_filter.params` |
+| `.h` | `include/effect/filter/ge_my_blur_shader_filter.h` |
+| `.cpp` | `src/effect/filter/ge_my_blur_shader_filter.cpp` |
 
-# Specify custom templates directory
-python create_effect.py my_effect filter --templates /path/to/templates
-```
-
-### Command-Line Arguments
-
-- `name` (required): Name of the effect (e.g., 'my_blur', 'my_gradient')
-- `type` (required): Type of effect to create (filter, mask, shader, shape)
-- `--root`: Root directory of the graphics_effect project (default: parent of tool directory)
-- `--templates`: Directory containing template files (default: tool/templates)
-
-## Generated Files
-
-For each effect, the tool generates three files:
-
-### 1. Parameter Definition File (.params)
-
-Location: `include/effect/{type}/ge_{name}_{type}_shader_filter.params`
-
-Defines the parameter structure and type information:
+**Generated `.params`**:
 
 ```cpp
 // TODO: Add type to GEFilterType in include/core/ge_filter_type.h and remove this line
-struct [[ge::params(type=MY_EFFECT, name="MyEffect")]] GEMyEffectShaderFilterParams {
+struct [[ge::params(type=MY_BLUR, name="MyBlur")]] GEMyBlurShaderFilterParams {
     float radius = 10.0f;
     float intensity = 0.5f;
     Vector4f color = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 };
 ```
 
-**Notice**: You need to add a new item of type enum GEFilterType to include/core/ge_filter_type.h manually.
+**Complete workflow**:
 
-### 2. Header File (.h)
+```bash
+# 1. Scaffold
+python tool/create_effect/create_effect.py my_blur filter
 
-Location: `include/effect/{type}/ge_{name}_{type}_shader_filter.h`
+# 2. Add enum (manual)
+# Edit include/core/ge_filter_type.h → add MY_BLUR
 
-Defines the effect class with proper inheritance and interface:
+# 3. Implement shader logic (manual)
+# Edit src/effect/filter/ge_my_blur_shader_filter.cpp
 
-```cpp
-class GE_EXPORT GEMyEffectShaderFilter : public GEShaderFilter {
-public:
-    GEMyEffectShaderFilter(const Drawing::GEMyEffectShaderFilterParams& params);
-    ~GEMyEffectShaderFilter() override = default;
-    DECLARE_GEFILTER_TYPEFUNC(GEMyEffectShaderFilter, Drawing::GEMyEffectShaderFilterParams);
-
-    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
-
-private:
-    static std::shared_ptr<Drawing::RuntimeEffect> GetEffect();
-
-    float radius_;
-    float intensity_;
-    Vector4f color_;
-};
+# 4. Generate metadata
+python tool/generate_metadata/gen_metadata.py
 ```
 
-### 3. Implementation File (.cpp)
-
-Location: `src/effect/{type}/ge_{name}_{type}_shader_filter.cpp`
-
-Provides the implementation skeleton:
-
-```cpp
-GEMyEffectShaderFilter::GEMyEffectShaderFilter(
-    const Drawing::GEMyEffectShaderFilterParams& params)
-    : radius_(params.radius),
-      intensity_(params.intensity),
-      color_(params.color)
-{
-}
-
-// Implementation of OnProcessImage and GetEffect methods
-// ...
-```
+---
 
 ## Effect Types
 
-### Filter (GEShaderFilter)
+| Type | Base Class | Namespace | Generated Class | Typical Use |
+|------|------------|-----------|-----------------|-------------|
+| `filter` | `GEShaderFilter` | `Rosen` | `GE{Name}ShaderFilter` | Blur, color, distortion |
+| `mask` | `GEShaderMask` | `Drawing` | `GE{Name}ShaderMask` | Gradient/image masks |
+| `shader` | `GEShader` | `Rosen` | `GE{Name}Shader` | Lighting, material effects |
+| `shape` | `GESDFShaderShape` | `Drawing` | `GE{Name}SDFShaderShape` | SDF borders/shadows/clips |
 
-**Base Class**: `GEShaderFilter`
-**Namespace**: `Rosen`
-**Purpose**: Shader-based image processing filters
+---
 
-**Use Cases**:
-- Blur effects
-- Color adjustments
-- Image transformations
-- Distortion effects
+## Command-Line Options
 
-**Generated Class**: `GE{Name}ShaderFilter`
+```bash
+python tool/create_effect/create_effect.py <name> <type> [--root DIR] [--templates DIR]
+```
 
-### Mask (GEShaderMask)
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `name` | Yes | Effect name in snake_case (e.g., `my_blur`) |
+| `type` | Yes | One of: `filter`, `mask`, `shader`, `shape` |
 
-**Base Class**: `GEShaderMask`
-**Namespace**: `Drawing`
-****Purpose**: Masking operations
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--root` | Parent of `tool/` | Project root directory |
+| `--templates` | `tool/templates/` | Template files directory |
 
-**Use Cases**:
-- Gradient masks
-- Image-based masks
-- Animated masks
+---
 
-**Generated Class**: `GE{Name}ShaderMask`
+## Generated Files
 
-### Shader (GEShader)
+### File Locations
 
-**Base Class**: `GEShader`
-**Namespace**: `Rosen`
-**Purpose**: Direct shader effects
+```
+include/effect/{type}/ge_{name}_{suffix}.{ext}
+src/effect/{type}/ge_{name}_{suffix}.{ext}
+```
 
-**Use Cases**:
-- Lighting effects
-- Material effects
-- Custom visual effects
+**Suffix by type**:
 
-**Generated Class**: `GE{Name}Shader`
+| Type | Suffix |
+|------|--------|
+| `filter` | `shader_filter` |
+| `mask` | `shader_mask` |
+| `shader` | `shader` |
+| `shape` | `sdf_shader_shape` |
 
-### Shape (GESDFShaderShape)
+### File Contents
 
-**Base Class**: `GESDFShaderShape`
-**Namespace**: `Drawing`
-**Purpose**: Shape-based effects using Signed Distance Fields
+| File | Contains |
+|------|----------|
+| `.params` | Struct with `[[ge::params]]` attribute, default fields (radius, intensity, color) |
+| `.h` | Class declaration, inheritance, `DECLARE_GEFILTER_TYPEFUNC`, virtual methods |
+| `.cpp` | Constructor, TODO placeholders, `GetEffect()` stub |
 
-**Use Cases**:
-- SDF-based borders
-- SDF-based shadows
-- SDF-based clipping
-- SDF-based coloring
-
-**Generated Class**: `GE{Name}SDFShaderShape`
+---
 
 ## Naming Conventions
 
-The tool automatically handles naming conversions:
+| Input `my_blur` | Output |
+|-----------------|--------|
+| Class | `GEMyBlurShaderFilter` (PascalCase + GE prefix) |
+| File | `ge_my_blur_shader_filter.h` (snake_case + ge prefix) |
+| Params | `GEMyBlurShaderFilterParams` (class + Params suffix) |
 
-- **Input Name**: `my_blur` (snake_case)
-- **Class Name**: `GEMyBlurShaderFilter` (PascalCase with GE prefix)
-- **File Name**: `ge_my_blur_shader_filter.h` (snake_case with ge prefix)
-- **Params Class**: `GEMyBlurShaderFilterParams`
+---
 
 ## Template Customization
 
-Templates are located in the `templates/` directory and use Python's `string.Template`:
+Templates in `tool/templates/` use Python `string.Template`:
 
-### Template Variables
+| Variable | Injected Value |
+|----------|----------------|
+| `$YEAR` | Current year |
+| `$HEADER_GUARD` | Header guard macro |
+| `$CLASS_NAME` | Generated class name |
+| `$PARAMS_CLASS` | Parameter class name |
+| `$MEMBER_DECLARATIONS` | Member variable declarations |
+| `$INITIALIZATION_LIST` | Constructor init list |
 
-Common template variables:
-- `$YEAR`: Current year
-- `$HEADER_GUARD`: Header guard macro
-- `$CLASS_NAME`: Generated class name
-- `$PARAMS_CLASS`: Parameter class name
-- `$MEMBER_DECLARATIONS`: Member variable declarations
-- `$INITIALIZATION_LIST`: Constructor initialization list
+To modify scaffolds, edit template files:
+- `*.h.tpl` - Class declarations
+- `*.cpp.tpl` - Method implementations
+- `*.params.tpl` - Parameter structures
 
-### Customizing Templates
+---
 
-To customize the generated code, modify the template files:
+## Implementation Details
 
-1. **Header Templates** (`*.h.tpl`): Modify class declarations, includes, and method signatures
-2. **Implementation Templates** (`*.cpp.tpl`): Modify method implementations
-3. **Parameter Templates** (`*.params.tpl`): Modify parameter structure definitions
+### Directory Structure
 
-## Requirements
+```
+tool/create_effect/
+├── create_effect.py
+└── templates/
+    ├── filter.{h,cpp,params}.tpl
+    ├── mask.{h,cpp,params}.tpl
+    ├── shader.{h,cpp,params}.tpl
+    └── shape.{h,cpp,params}.tpl
+```
 
-- Python 3.6+
-- Access to the graphics_effect project directory
+### Requirements
 
-## License
+- Python 3.8+
+- Access to graphics_effect project directory
 
-Apache License, Version 2.0
+### Related Tool
+
+After scaffolding, generate reflection metadata:
+
+```bash
+python tool/generate_metadata/gen_metadata.py
+```
+
+See `tool/generate_metadata/README.md` for details.
