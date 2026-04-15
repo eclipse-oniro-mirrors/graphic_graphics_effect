@@ -2,7 +2,7 @@
 
 EffectGen is a code generation tool for the OpenHarmony Graphics Effect (GE) library. It automatically generates C++ reflection metadata from parameter definition files (`.params`), enabling runtime introspection and type-safe parameter access for visual effects.
 
-## TL;DR - Quick Start
+## TL;DR
 **Create new effect params file:**
 ```bash
 # Use the creator tool to scaffold a new effect

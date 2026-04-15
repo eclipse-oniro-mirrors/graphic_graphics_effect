@@ -18,7 +18,6 @@
 Generate ge_effects_params.h header file.
 
 This script generates a header file that includes all .params files from effect subdirectories.
-The file is designed to be manually editable if needed.
 """
 
 import sys
