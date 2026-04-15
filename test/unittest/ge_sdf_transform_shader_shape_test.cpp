@@ -1276,9 +1276,12 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_004, TestSize.Level1)
     bool result = shape.TryGetCenter(outX, outY);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) scaled by (2.0, 1.5) should be (100, 75)
-    EXPECT_FLOAT_EQ(outX, 100.0f);
-    EXPECT_FLOAT_EQ(outY, 75.0f);
+    // Center (50, 50) scaled by (2.0, 1.5) with pivot (1.0, 1.0)
+    // Formula: (center - pivot) * scale + pivot
+    // X: (50 - 1.0) * 2.0 + 1.0 = 99.0
+    // Y: (50 - 1.0) * 1.5 + 1.0 = 74.5
+    EXPECT_NEAR(outX, 99.0f, 0.1f);
+    EXPECT_NEAR(outY, 74.5f, 0.1f);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_004 end";
 }
 
@@ -1321,10 +1324,12 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_006, TestSize.Level1)
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create combined transformation: translate then scale
+    // Create combined transformation using Pre/Post methods for concatenation
+    // Note: Simple Scale() and Translate() replace the matrix, not concatenate
+    // Use PostTranslate to add translation after existing transformation
     Drawing::Matrix matrix;
-    matrix.Translate(10.0f, 20.0f);
     matrix.Scale(2.0f, 1.5f, 1.0f, 1.0f);
+    matrix.PostTranslate(10.0f, 20.0f);
     param.matrix = matrix;
 
     GESDFTransformShaderShape shape(param);
@@ -1333,9 +1338,12 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_006, TestSize.Level1)
     bool result = shape.TryGetCenter(outX, outY);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) -> translate (10, 20) -> (60, 70) -> scale (2.0, 1.5) -> (120, 105)
-    EXPECT_FLOAT_EQ(outX, 120.0f);
-    EXPECT_FLOAT_EQ(outY, 105.0f);
+    // Center (50, 50) -> scale by (2.0, 1.5) with pivot (1.0, 1.0)
+    // X: (50 - 1.0) * 2.0 + 1.0 = 99.0
+    // Y: (50 - 1.0) * 1.5 + 1.0 = 74.5
+    // Then PostTranslate (10, 20): 99 + 10 = 109, 74.5 + 20 = 94.5
+    EXPECT_NEAR(outX, 109.0f, 0.1f);
+    EXPECT_NEAR(outY, 94.5f, 0.1f);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_006 end";
 }
 
@@ -1409,9 +1417,12 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_008, TestSize.Level1)
     bool result = shape.TryGetCenter(outX, outY);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) scaled by (0.0, 0.0) should be (0, 0)
-    EXPECT_FLOAT_EQ(outX, 0.0f);
-    EXPECT_FLOAT_EQ(outY, 0.0f);
+    // Center (50, 50) scaled by (0.0, 0.0) with pivot (1.0, 1.0)
+    // Formula: (center - pivot) * scale + pivot
+    // X: (50 - 1.0) * 0.0 + 1.0 = 1.0
+    // Y: (50 - 1.0) * 0.0 + 1.0 = 1.0
+    EXPECT_NEAR(outX, 1.0f, 0.1f);
+    EXPECT_NEAR(outY, 1.0f, 0.1f);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_008 end";
 }
 
