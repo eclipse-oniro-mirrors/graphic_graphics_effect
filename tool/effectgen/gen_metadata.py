@@ -890,18 +890,29 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEFilterType> map = {")
 
-    # Helper macro for reducing repetition - uses GEFilterParamsTypeInfo::FilterName
+    # Helper macro for primary filter name - uses GEFilterParamsTypeInfo::FilterName
     output.append("#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \\")
     output.append("    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }")
+    output.append("")
+
+    # Helper macro for alias entries (struct-level alias from [[ge::params(..., alias="...")]])
+    output.append("#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) \\")
+    output.append("    { #Alias, GEFilterParamsTypeInfo<Struct>::ID }")
     output.append("")
 
     for struct in structs:
         struct_name = struct.name
         output.append(f"        GE_FILTER_NAME_TO_TYPE_ENTRY({struct_name}),")
 
+        # Add alias entry if struct has alias attribute
+        struct_alias = struct.params.get("alias") if struct.params else None
+        if struct_alias:
+            output.append(f"        GE_FILTER_NAME_TO_TYPE_ALIAS({struct_name}, {struct_alias}),")
+
     output.append("    };")
     output.append("")
     output.append("#undef GE_FILTER_NAME_TO_TYPE_ENTRY")
+    output.append("#undef GE_FILTER_NAME_TO_TYPE_ALIAS")
     output.append("")
     output.append("    auto it = map.find(str);")
     output.append("    if (it != map.end()) {")

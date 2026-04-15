@@ -101,7 +101,7 @@ public:
     // ========================================================================
     // Filter type management
     // ========================================================================
-
+    // Not recommended to use
     void SetFilterType(FilterType type)
     {
         filterType_ = type;

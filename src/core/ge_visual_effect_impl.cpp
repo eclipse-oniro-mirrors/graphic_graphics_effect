@@ -32,6 +32,27 @@ static GEFilterType GetParamlessFilterType(const std::string& name)
     return GEFilterType::NONE;
 }
 
+// Compatibility Hook: GESDFUnionOpShapeParams is a weird case which maps two type strings to one GEFilterType
+// CRITICAL: **DO NOT** write new params like GESDFUnionOpShapeParams, it's anti-pattern
+static void SDFUnionOpSharedNameBuildCompatibilityHook(
+    GEVisualEffectImpl& self, GEFilterType filterType, const std::string& name)
+{
+    if (filterType == GEFilterType::SDF_UNION_OP) {
+        if (name == GE_SHAPE_SDF_UNION_OP) {
+            self.SetParam(GEParamsMemberTag::SDF_UNION_OP_OP, GESDFUnionOp::UNION);
+        } else if (name == GE_SHAPE_SDF_SMOOTH_UNION_OP) {
+            self.SetParam(GEParamsMemberTag::SDF_UNION_OP_OP, GESDFUnionOp::SMOOTH_UNION);
+        }
+    }
+}
+
+static void AfterBuildHook(GEVisualEffectImpl& self, GEFilterType filterType, const std::string& name)
+{
+    // Handle special cases for compatibility
+    // Not recommended to add more cases here
+    SDFUnionOpSharedNameBuildCompatibilityHook(self, filterType, name);
+}
+
 GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo)
 {
     // Initialize filter type from name using generated helper
@@ -45,13 +66,14 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
 
     // Build params of appropriate type using generated helper
     params_ = GEParamsBuilder::Build(filterType_);
+    AfterBuildHook(*this, filterType_, name);
     if (!params_) {
         GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
             static_cast<int>(filterType_), name.c_str());
         filterType_ = FilterType::NONE; // Reset to NONE if build failed
     }
 
-    canvasInfo_ = canvasInfo ? *canvasInfo : Drawing::CanvasInfo{};
+    canvasInfo_ = canvasInfo ? *canvasInfo : Drawing::CanvasInfo {};
 }
 
 GEVisualEffectImpl::~GEVisualEffectImpl() {}

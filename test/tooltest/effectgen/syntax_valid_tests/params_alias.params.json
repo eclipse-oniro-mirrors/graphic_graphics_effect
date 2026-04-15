@@ -1,0 +1,40 @@
+{
+  "name": "params_alias",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "ParamsAliasTestParams",
+      "enum_type": "PARAMS_ALIAS_TEST",
+      "filter_name": "ParamsAliasTest",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value",
+          "default_value": "0.f",
+          "prop_name": "ParamsAliasTest_Value",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "ParamsAliasTest_Value",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "PARAMS_ALIAS_TEST",
+        "name": "ParamsAliasTest",
+        "alias": "ParamsAliasTestAlias"
+      }
+    }
+  ],
+  "notes": "Test struct-level alias attribute in [[ge::params(...)]]"
+}

@@ -114,8 +114,12 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
-#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
-    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
+#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \
+    {                                                                                               \
+        std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \
+    }
+
+#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
 
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAIBarShaderFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAuroraNoiseShaderParams),
@@ -169,6 +173,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFTransformShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFTriangleShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFUnionOpShapeParams),
+        GE_FILTER_NAME_TO_TYPE_ALIAS(GESDFUnionOpShapeParams, SDFSmoothUnionOpShape),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESoundWaveFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEUseEffectMaskParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEVariableRadiusBlurShaderFilterParams),
@@ -189,6 +194,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
     };
 
 #undef GE_FILTER_NAME_TO_TYPE_ENTRY
+#undef GE_FILTER_NAME_TO_TYPE_ALIAS
 
     auto it = map.find(str);
     if (it != map.end()) {
