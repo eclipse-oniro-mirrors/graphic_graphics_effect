@@ -589,11 +589,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
                             type_to_tags[normalized_original] = []
                         type_to_tags[normalized_original].append((tag_info.tag_name, struct.name, field.name))
 
-    # Generate implementations for each type
-    # Sort types alphabetically to ensure stable ordering (same as declaration generation)
-    sorted_types = sorted(type_to_tags.keys())
-    for field_type in sorted_types:
-        tags = type_to_tags[field_type]
+    for field_type, tags in sorted(type_to_tags.items()):
         output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,")
         output.append(f"    GEParamsMemberTag tag, const {field_type}& value)")
         output.append("{")
