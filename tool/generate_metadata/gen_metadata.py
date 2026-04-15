@@ -492,7 +492,7 @@ def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dic
     output.append("")
     output.append("    // Convert string to GEParamsMemberTag")
     output.append("    // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth")
-    output.append("    //       Aliases from [[ge::prop_alias]] are also included")
+    output.append("    //       Aliases from [[ge::prop(alias=...)]] are also included")
     output.append("    static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);")
 
     output.append("")

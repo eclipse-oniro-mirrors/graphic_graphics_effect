@@ -62,15 +62,15 @@ GEVisualEffectImpl::GEVisualEffectImpl(const std::string& name, const std::optio
         if (filterType_ == FilterType::NONE) {
             GE_LOGE("GEVisualEffectImpl: unknown filter type for name '%s'", name.c_str());
         }
-    }
-
-    // Build params of appropriate type using generated helper
-    params_ = GEParamsBuilder::Build(filterType_);
-    AfterBuildHook(*this, filterType_, name);
-    if (!params_) {
-        GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
-            static_cast<int>(filterType_), name.c_str());
-        filterType_ = FilterType::NONE; // Reset to NONE if build failed
+    } else {
+        // Build params of appropriate type using generated helper
+        params_ = GEParamsBuilder::Build(filterType_);
+        AfterBuildHook(*this, filterType_, name);
+        if (!params_) {
+            GE_LOGE("GEVisualEffectImpl: failed to build params for filter type '%d' with name '%s'",
+                static_cast<int>(filterType_), name.c_str());
+            filterType_ = FilterType::NONE; // Reset to NONE if build failed
+        }
     }
 
     canvasInfo_ = canvasInfo ? *canvasInfo : Drawing::CanvasInfo {};
