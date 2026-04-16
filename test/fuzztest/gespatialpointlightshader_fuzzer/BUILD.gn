@@ -6,8 +6,8 @@
 #     http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -24,19 +24,13 @@ ohos_fuzztest("GESpatialPointLightShaderFuzzTest") {
       "$graphics_effect_root/test/fuzztest/gespatialpointlightshader_fuzzer"
 
   include_dirs = [
-    "$graphics_effect_root/include",
-    "$graphics_effect_root/include/core",
-    "$graphics_effect_root/include/effect",
-    "$graphics_effect_root/include/effect/shader",
-    "$graphics_effect_root/include/util",
+    "$graphics_effect_root/src",
     "$graphics_effect_root/test/fuzztest/",
   ]
 
   sources = [
     "ge_spatial_point_light_shader_fuzzer.cpp",
     "get_object.h",
-    "$graphics_effect_root/src/effect/shader/ge_spatial_point_light.cpp",
-    "$graphics_effect_root/src/effect/shader/ge_shader.cpp",
   ]
 
   cflags = [
@@ -51,7 +45,7 @@ ohos_fuzztest("GESpatialPointLightShaderFuzzTest") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "graphic_2d:2d_graphics",
-    "hilog:libhilog",
+    "graphics_effect:graphics_effect_core",
   ]
 
   part_name = "graphics_effect"
