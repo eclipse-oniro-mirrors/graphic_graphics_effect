@@ -103,5 +103,74 @@ HWTEST_F(GESDFShadowShaderTest, UpdateRectForShadowTest, TestSize.Level1)
     EXPECT_EQ(newRect.GetTop(), -19.0f);
     EXPECT_EQ(newRect.GetBottom(), 12.0f);
 }
+
+/**
+ * @tc.name: MakeDrawingShaderElevationTest
+ * @tc.desc: test MakeDrawingShader by elevation params
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShadowShaderTest, MakeDrawingShaderElevationTest, TestSize.Level1)
+{
+    Drawing::GESDFShadowShaderParams shadowParams;
+    shadowParams.shadow.elevation = 20.0f; // 20.0f: set elevation > 0
+    GESDFShadowShader shadowShader(shadowParams);
+
+    Drawing::Rect rect0;
+    shadowShader.MakeDrawingShader(rect0, -1.f);
+    EXPECT_EQ(shadowShader.GetDrawingShader(), nullptr);
+
+    // 1.0f, 1.0f, 200.0f, 200.0f is left top right bottom
+    Drawing::Rect rect1 { 1.0f, 1.0f, 200.0f, 200.0f };
+    shadowShader.MakeDrawingShader(rect1, -1.f);
+    EXPECT_EQ(shadowShader.GetDrawingShader(), nullptr);
+
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
+    shadowParams.shape = sdfShape;
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.MakeDrawingShader(rect1, -1.f);
+    EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
+
+    shadowParams.shadow.color = Drawing::Color::COLOR_GRAY;
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.MakeDrawingShader(rect1, -1.f);
+    EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
+}
+
+/**
+ * @tc.name: UpdateRectForElevationShadowTest
+ * @tc.desc: test UpdateRectForElevationShadow by elevation params
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShadowShaderTest, UpdateRectForElevationShadowTest, TestSize.Level1)
+{
+    Drawing::GESDFShadowShaderParams shadowParams;
+    shadowParams.shadow.elevation = 300.0f; // 300.0f: set elevation > 0
+    GESDFShadowShader shadowShader(shadowParams);
+
+    // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
+    Drawing::Rect rect { 1.0f, 1.0f, 2.0f, 2.0f };
+    Drawing::Rect newRect = rect;
+    shadowShader.UpdateRectForElevationShadow(newRect);
+    EXPECT_NE(rect, newRect);
+    EXPECT_EQ(newRect.GetLeft(), -759.0f);
+    EXPECT_EQ(newRect.GetRight(), 762.0f);
+    EXPECT_EQ(newRect.GetTop(), -759.0f);
+    EXPECT_EQ(newRect.GetBottom(), 762.0f);
+
+    shadowParams.shadow.offsetX = 5.0f; // 5.0f: set offsetX > 0
+    shadowShader.SetSDFShadowParams(shadowParams);
+    newRect = rect;
+    shadowShader.UpdateRectForElevationShadow(newRect);
+    EXPECT_EQ(newRect.GetLeft(), -754.0f);
+    EXPECT_EQ(newRect.GetRight(), 767.0f);
+
+    shadowParams.shadow.offsetY = -5.0f; // -5.0f: set offsetY < 0
+    shadowShader.SetSDFShadowParams(shadowParams);
+    newRect = rect;
+    shadowShader.UpdateRectForElevationShadow(newRect);
+    EXPECT_EQ(newRect.GetTop(), -764.0f);
+    EXPECT_EQ(newRect.GetBottom(), 757.0f);
+}
 } // namespace Rosen
 } // namespace OHOS
