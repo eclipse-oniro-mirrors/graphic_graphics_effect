@@ -24,13 +24,19 @@ ohos_fuzztest("GESpatialPointLightShaderFuzzTest") {
       "$graphics_effect_root/test/fuzztest/gespatialpointlightshader_fuzzer"
 
   include_dirs = [
-    "$graphics_effect_root/src",
+    "$graphics_effect_root/include",
+    "$graphics_effect_root/include/core",
+    "$graphics_effect_root/include/effect",
+    "$graphics_effect_root/include/effect/shader",
+    "$graphics_effect_root/include/util",
     "$graphics_effect_root/test/fuzztest/",
   ]
 
   sources = [
     "ge_spatial_point_light_shader_fuzzer.cpp",
     "get_object.h",
+    "$graphics_effect_root/src/effect/shader/ge_spatial_point_light.cpp",
+    "$graphics_effect_root/src/effect/shader/ge_shader.cpp",
   ]
 
   cflags = [
@@ -38,12 +44,14 @@ ohos_fuzztest("GESpatialPointLightShaderFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-Dprivate=public",
+    "-Dprotected=public",
   ]
 
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "graphic_2d:2d_graphics",
-    "graphics_effect:graphics_effect_core",
+    "hilog:libhilog",
   ]
 
   part_name = "graphics_effect"
