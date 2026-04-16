@@ -374,7 +374,6 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest015, TestSi
     Drawing::Rect rect(0, 0, 100, 100);
 
     constexpr size_t ALPHA_SIZE = 6;
-    float alphas[ALPHA_SIZE] = {0.0f, 0.25f, 0.5f, 0.75f, 1.0f, 1.5f};
     for (size_t i = 0; i < ALPHA_SIZE; i++) {
         auto effect = shader.MakeSpatialPointLightShader(rect);
         EXPECT_NE(effect, nullptr);
