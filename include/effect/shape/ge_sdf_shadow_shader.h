@@ -130,7 +130,8 @@ private:
         // Skia GaussianColorFilter quartic approximation (SkRasterPipeline_opts.h:4957)
         // Input: x = 1.0 at boundary (d=0), 0.0 at blurRadius (d=blurRadius)
         // Approximates: exp(-(1-x)^2 * 4) - 0.018
-        float skiaGaussian(float x) {
+        float skiaGaussian(float x)
+        {
             const float c4 = -2.26661229133605957031;
             const float c3 =  2.89795351028442382812;
             const float c2 =  0.21345567703247070312;
@@ -141,8 +142,12 @@ private:
 
         // Spot shadow coverage: symmetric tessellation model (inset = outset)
         // alpha = 0.5 - d / (2 * blurRadius), maps d in [-blurRadius, +blurRadius] -> alpha in [1, 0]
-        float computeSpotCoverage(float d, float blurRadius) {
-            if (blurRadius < 0.001) return 0.0;
+        float computeSpotCoverage(float d, float blurRadius)
+        {
+            if (blurRadius < 0.001)
+            {
+                return 0.0;
+            }
             float alpha = 0.5 - d / (2.0 * blurRadius);
             alpha = clamp(alpha, 0.0, 1.0);
             return max(skiaGaussian(alpha), 0.0);
@@ -151,16 +156,22 @@ private:
         // Ambient shadow coverage: asymmetric tessellation model (inset != outset)
         // alpha = (outset - d) / ambientBlurRadius, maps d in [-inset, +outset] -> alpha in [1, 0]
         // ambientBlurRadius = outset * recipAlpha = inset + outset
-        float computeAmbientCoverage(float d, float ambientBlurRadius, float ambientOutset) {
-            if (ambientBlurRadius < 0.001) return 0.0;
+        float computeAmbientCoverage(float d, float ambientBlurRadius, float ambientOutset)
+        {
+            if (ambientBlurRadius < 0.001)
+            {
+                return 0.0;
+            }
             float alpha = (ambientOutset - d) / ambientBlurRadius;
             alpha = clamp(alpha, 0.0, 1.0);
             return max(skiaGaussian(alpha), 0.0);
         }
 
-        vec4 elevationShadowEffect(float d, float d_original) {
+        vec4 elevationShadowEffect(float d, float d_original)
+        {
             float alphaFilled = 1.0;
-            if (isFilled < 0.5) {
+            if (isFilled < 0.5)
+            {
                 alphaFilled = smoothstep(-1.0, 0.0, d_original);
             }
 
@@ -180,13 +191,15 @@ private:
             return vec4(colorPM * alphaFilled, alpha * alphaFilled);
         }
 
-        half4 main(float2 fragCoord) {
+        half4 main(float2 fragCoord)
+        {
             // isFilled clipping: check original shape position
             float d_original = sdfShape.eval(fragCoord).a;
 
             // Shadow rendering: use offset position (matches shaderCode_ pattern)
             float d = d_original;
-            if (any(notEqual(shadowOffset, vec2(0.0)))) {
+            if (any(notEqual(shadowOffset, vec2(0.0))))
+            {
                 d = sdfShape.eval(fragCoord - shadowOffset).a;
             }
 

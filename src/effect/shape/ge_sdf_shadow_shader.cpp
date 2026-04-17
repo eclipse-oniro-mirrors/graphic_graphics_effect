@@ -21,16 +21,17 @@
 
 namespace OHOS {
 namespace Rosen {
-static constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
-static constexpr float RADIUS_FACTOR = 1.5f;
+constexpr float SDF_SHADOW_MIN_THRESHOLD = 0.0001f;
+constexpr float RADIUS_FACTOR = 1.5f;
 
 // Elevation shadow constants (aligned with Skia SkDrawShadowInfo.h)
-static constexpr float DEFAULT_LIGHT_HEIGHT = 600.0f;
-static constexpr float DEFAULT_LIGHT_RADIUS = 800.0f;
-static constexpr float AMBIENT_HEIGHT_FACTOR = 1.0f / 128.0f;
-static constexpr float AMBIENT_GEOM_FACTOR = 64.0f;
-static constexpr float MAX_AMBIENT_RADIUS = 150.0f;
-static constexpr uint8_t DEFAULT_AMBIENT_ALPHA = 0x0A;
+constexpr float DEFAULT_LIGHT_HEIGHT = 600.0f;
+constexpr float DEFAULT_LIGHT_RADIUS = 800.0f;
+constexpr float AMBIENT_HEIGHT_FACTOR = 1.0f / 128.0f;
+constexpr float AMBIENT_GEOM_FACTOR = 64.0f;
+constexpr float MAX_AMBIENT_RADIUS = 150.0f;
+constexpr uint8_t DEFAULT_AMBIENT_ALPHA = 0x0A;
+constexpr float EPSILON = 1e-6f;
 
 GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& params) : params_(params)
 {
@@ -159,7 +160,7 @@ void GESDFShadowShader::ComputeElevationParams()
         static_cast<uint8_t>(std::clamp(ambientAlpha * 255.0f, 0.0f, 255.0f)), 0, 0, 0);
 
     // Spot shadow params (aligned with Skia GetSpotParams, isLimitElevation=true)
-    float zRatio = std::clamp(elevation / (DEFAULT_LIGHT_HEIGHT - elevation), 0.0f, 0.95f);
+    float zRatio = std::clamp(elevation / std::max(DEFAULT_LIGHT_HEIGHT - elevation, EPSILON), 0.0f, 0.95f);
     spotBlurRadius_ = DEFAULT_LIGHT_RADIUS * zRatio;
 
     // Spot color: use raw shadow color (no Tonal Color transform)
