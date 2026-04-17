@@ -59,7 +59,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
                 }
                 vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
                 vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
-                
 
                 vec3 viewDir = lightDir;
                 vec3 halfwayDir = normalize(lightDir + viewDir);
