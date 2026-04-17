@@ -53,10 +53,13 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
 
             half4 main(vec2 fragCoord)
             {
-                vec2 textureUVs = fragCoord.xy / iResolution.xy;
+                half4 NormalMap = mask.eval(fragCoord);
+                if (NormalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
+                    return vec4(0.0);
+                }
                 vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
                 vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
-                vec4 NormalMap = mask.eval(fragCoord);
+                
 
                 vec3 viewDir = lightDir;
                 vec3 halfwayDir = normalize(lightDir + viewDir);
