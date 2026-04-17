@@ -215,6 +215,7 @@ class Console:
             return f"{color}{text}{Colors.RESET}"
         return text
 
+
 def find_clang_format() -> Optional[str]:
     """Find clang-format executable in the system.
 
