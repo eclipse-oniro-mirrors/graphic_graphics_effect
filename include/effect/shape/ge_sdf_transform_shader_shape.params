@@ -26,6 +26,7 @@ struct [[ge::params(type=SDF_TRANSFORM_SHAPE, name="SDFTransformShape")]] GESDFT
     [[ge::prop("SDFTransformShape_GravityHotZone")]]
     float hotZone = 0.0f;
     [[ge::prop(name="SDFTransformShape_GravityCenter",
-               cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
     Vector2f centerPosition = Vector2f(0.0f, 0.0f);
 };

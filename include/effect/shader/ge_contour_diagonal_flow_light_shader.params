@@ -13,7 +13,8 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=CONTOUR_DIAGONAL_FLOW_LIGHT, name="ContourDiagonalFlowLight")]] GEContentDiagonalFlowLightShaderParams {
+struct [[ge::params(type=CONTOUR_DIAGONAL_FLOW_LIGHT,
+                    name="ContourDiagonalFlowLight")]] GEContentDiagonalFlowLightShaderParams {
     std::vector<Vector2f> contour_{};
     float line1Start_ = 0.f;
     float line1Length_ = 0.f;
