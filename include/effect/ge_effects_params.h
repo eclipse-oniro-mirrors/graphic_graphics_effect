@@ -72,6 +72,7 @@ namespace Drawing {
 #include "effect/filter/ge_map_color_by_brightness_filter.params"
 #include "effect/filter/ge_mask_transition_shader_filter.params"
 #include "effect/filter/ge_mesa_blur_shader_filter.params"
+#include "effect/filter/ge_particle_ablation_filter.params"
 #include "effect/filter/ge_sdf_edge_light_filter.params"
 #include "effect/filter/ge_sdf_from_image_filter.params"
 #include "effect/filter/ge_sound_wave_filter.params"

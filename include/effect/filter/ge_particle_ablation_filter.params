@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=PARTICLE_ABLATION, name="ParticleAblation")]] GEParticleAblationFilterParams {
+    [[ge::prop(name="ParticleAblation_Progress", min=0.0f, max=1.0f)]]
+    float progress_ = 0.f;
+    [[ge::prop(name="ParticleAblation_AblationRate", min=0.0f)]]
+    float ablationRate_ = 0.f;
+    [[ge::prop("ParticleAblation_Centers0")]]
+    std::pair<float, float> centers0_ = {0.f, 0.f};
+    [[ge::prop("ParticleAblation_Centers1")]]
+    std::pair<float, float> centers1_ = {0.f, 0.f};
+    [[ge::prop("ParticleAblation_Centers2")]]
+    std::pair<float, float> centers2_ = {0.f, 0.f};
+    [[ge::prop("ParticleAblation_Centers3")]]
+    std::pair<float, float> centers3_ = {0.f, 0.f};
+    [[ge::prop(name="ParticleAblation_GlowLevel", min=0.0f)]]
+    float glowLevel_ = 0.f;
+    [[ge::prop(name="ParticleAblation_GlowBrightness", min=0.0f)]]
+    float glowBrightness_ = 0.f;
+    [[ge::prop(name="ParticleAblation_MaxParticleCount", min=0)]]
+    int32_t maxParticleCount_ = 0;
+    [[ge::prop("ParticleAblation_Wind")]]
+    std::pair<float, float> wind_ = {0.f, 0.f};
+    [[ge::prop(name="ParticleAblation_TurbScale", min=0)]]
+    int32_t turbScale_ = 0;
+    [[ge::prop(name="ParticleAblation_TurbEvo", min=0)]]
+    int32_t turbEvo_ = 0;
+    [[ge::prop(name="ParticleAblation_TurbAmp", min=0)]]
+    int32_t turbAmp_ = 0;
+    [[ge::prop("ParticleAblation_ExpansionSize")]]
+    std::pair<float, float> expansionSize_ = {1.0f, 1.0f};
+};
