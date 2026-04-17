@@ -25,7 +25,6 @@ group("fuzztest") {
     "gemagnifiershaderfilter_fuzzer:fuzztest",
     "gemesablurshaderfilter_fuzzer:fuzztest",
     "gerender_fuzzer:fuzztest",
-    "gespatialpointlightshader_fuzzer:fuzztest",
     "gevisualeffect_fuzzer:fuzztest",
     "gevisualeffectcontainer_fuzzer:fuzztest",
     "gewaterrippleshaderfilter_fuzzer:fuzztest",
