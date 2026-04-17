@@ -262,8 +262,11 @@ static constexpr char GRAVITY_PULL_PROG[] = R"(
         }
 
         float hotGate = 1.0 - smoothstep(0.0, hotZone, insideValue);
-        float warpScale = warpStrength * insideGate * hotGate;
-        if (warpScale <= 1e-3) {
+        float rawWarpScale = warpStrength * insideGate * hotGate;
+        float centerDist = sqrt(centerDistSq);
+        float maxWarpScale = min(0.8 * warpRadius, 0.8 * centerDist);
+        float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
+        if (abs(warpScale) <= kEpsilon) {
             return p;
         }
 
@@ -393,8 +396,11 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
         }
 
         float hotGate = 1.0 - smoothstep(0.0, hotZone, insideValue);
-        float warpScale = warpStrength * insideGate * hotGate;
-        if (warpScale <= 1e-3) {
+        float rawWarpScale = warpStrength * insideGate * hotGate;
+        float centerDist = sqrt(centerDistSq);
+        float maxWarpScale = min(0.8 * warpRadius, 0.8 * centerDist);
+        float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
+        if (abs(warpScale) <= kEpsilon) {
             return p;
         }
 
