@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef GRAPHICS_EFFECT_GE_FILTER_PARAM_H
-#define GRAPHICS_EFFECT_GE_FILTER_PARAM_H
+#ifndef GRAPHICS_EFFECT_GE_FILTER_PARAMS_H
+#define GRAPHICS_EFFECT_GE_FILTER_PARAMS_H
 #include <memory>
 #include <optional>
 
@@ -50,7 +50,10 @@ public:
 
     virtual ~GEFilterParams() = default;
 
-    GEFilterType GetType() const { return id; }
+    GEFilterType GetType() const
+    {
+        return id;
+    }
 
 protected:
     GEFilterParams(GEFilterType type) : id(type) {}
@@ -101,4 +104,4 @@ std::unique_ptr<GEFilterParams> GEFilterParams::Box(const std::shared_ptr<T>& pa
 } // namespace Rosen
 } // namespace OHOS
 
-#endif
+#endif // GRAPHICS_EFFECT_GE_FILTER_PARAM_H

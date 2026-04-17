@@ -694,7 +694,7 @@ class CppParser:
             if namespace == "ge" and function == "params":
                 # ge::params should only be used on struct names, not on member variables
                 # Log a warning and ignore
-                self._add_error(
+                self._add_warning(
                     "Warning: [[ge::params]] should be used on struct name, not on member variables. Use [[ge::prop]] instead.",
                     attr.line,
                     attr.column,

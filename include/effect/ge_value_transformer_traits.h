@@ -59,6 +59,9 @@ struct has_transform_method : std::bool_constant<has_transform_method_const_ref<
 
 template<typename Transformer, typename FromType, typename ToType>
 inline constexpr bool has_transform_method_v = has_transform_method<Transformer, FromType, ToType>::value;
+
+template<typename... T>
+inline constexpr bool always_false_v = false;
 } // namespace ValueTransformerTypeTraits
 
 } // namespace Drawing

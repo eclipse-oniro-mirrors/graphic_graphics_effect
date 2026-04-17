@@ -192,7 +192,7 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(DispersionParams, GEDispersionShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(DirectionLightParams, GEDirectionLightShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(ContentLightParams, GEContentLightFilterParams)
-    // intentional typo `Conten` instead of `Content` due to compatiblity
+    // intentional typo `Conten` instead of `Content` due to compatibility
     GE_DECLARE_MAKE_GET_PARAMS(ContenDiagonalParams, GEContentDiagonalFlowLightShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(DotMatrixShaderParams, GEDotMatrixShaderParams)
     GE_DECLARE_MAKE_GET_PARAMS(WavyRippleLightParams, GEWavyRippleLightShaderParams)

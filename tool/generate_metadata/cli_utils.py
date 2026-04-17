@@ -20,9 +20,11 @@ This module provides color-coded output and error/warning tracking
 for command-line tools.
 """
 
+import os
 import sys
 import shutil
 import subprocess
+import locale
 from pathlib import Path
 from typing import Optional
 
@@ -64,10 +66,102 @@ class Colors:
 class Console:
     """Manages CLI output with colors and error/warning tracking."""
 
-    def __init__(self, use_colors: bool = True):
-        self.use_colors = use_colors and sys.stdout.isatty()
+    # Unicode symbols for modern terminals
+    UNICODE_SYMBOLS = {
+        'warning': '⚠',
+        'error': '✗',
+        'success': '✓',
+        'header': '▶',
+        'step': '•',
+        'file': '📄',
+    }
+
+    # ASCII fallback for terminals that don't support Unicode
+    ASCII_SYMBOLS = {
+        'warning': '[!]',
+        'error': '[x]',
+        'success': '[ok]',
+        'header': '>',
+        'step': '*',
+        'file': '[f]',
+    }
+
+    def __init__(self, use_colors: Optional[bool] = None):
+        # Determine color usage:
+        # 1. If explicitly set (True/False), use that value
+        # 2. If None, check NO_COLOR environment variable (https://no-color.org/)
+        # 3. If NO_COLOR is not set, default to TTY detection
+        if use_colors is None:
+            # NO_COLOR standard: if the environment variable exists (even if empty),
+            # colors should be disabled
+            self.use_colors = 'NO_COLOR' not in os.environ and sys.stdout.isatty()
+        else:
+            self.use_colors = use_colors and sys.stdout.isatty()
+
+        # Detect Unicode support in terminal
+        self.use_unicode = self._detect_unicode_support()
+
         self.warning_count = 0
         self.error_count = 0
+
+    def _detect_unicode_support(self) -> bool:
+        """Detect if the terminal supports Unicode output.
+
+        Returns:
+            True if Unicode is supported, False otherwise (use ASCII fallback)
+        """
+        # Check if stdout is a TTY (non-TTY may pipe to files/tools that expect ASCII)
+        if not sys.stdout.isatty():
+            return False
+
+        # Check environment variables that indicate ASCII-only terminals
+        # TERM=dumb indicates a terminal with no special capabilities
+        term = os.environ.get('TERM', '')
+        if term == 'dumb' or term == '':
+            return False
+
+        # Check if the terminal encoding supports Unicode
+        try:
+            # Get the encoding of stdout
+            encoding = sys.stdout.encoding
+            if encoding is None:
+                return False
+
+            # UTF-8 and UTF-16 variants support Unicode
+            if encoding.lower().startswith('utf'):
+                return True
+
+            # Check locale encoding
+            try:
+                loc = locale.getpreferredencoding(False)
+                if loc and loc.lower().startswith('utf'):
+                    return True
+            except Exception:
+                pass
+
+            # Check LANG environment variable for UTF-8 hint
+            lang = os.environ.get('LANG', '')
+            if 'utf' in lang.lower() or 'UTF' in lang:
+                return True
+
+            # Default to ASCII for other encodings (e.g., ASCII, ISO-8859-*, etc.)
+            return False
+        except Exception:
+            # If any encoding check fails, default to ASCII for safety
+            return False
+
+    def _get_symbol(self, symbol_name: str) -> str:
+        """Get appropriate symbol based on Unicode support.
+
+        Args:
+            symbol_name: Key from UNICODE_SYMBOLS/ASCII_SYMBOLS dict
+
+        Returns:
+            Unicode or ASCII symbol depending on terminal support
+        """
+        if self.use_unicode:
+            return self.UNICODE_SYMBOLS.get(symbol_name, '')
+        return self.ASCII_SYMBOLS.get(symbol_name, '')
 
 
     def info(self, message: str) -> None:
@@ -81,30 +175,36 @@ class Console:
     def warning(self, message: str) -> None:
         """Print warning message in yellow."""
         self.warning_count += 1
-        print(self._colorize(f"⚠ {message}", Colors.BRIGHT_YELLOW), file=sys.stderr)
+        symbol = self._get_symbol('warning')
+        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_YELLOW), file=sys.stderr)
 
     def error(self, message: str) -> None:
         """Print error message in red."""
         self.error_count += 1
-        print(self._colorize(f"✗ {message}", Colors.BRIGHT_RED), file=sys.stderr)
+        symbol = self._get_symbol('error')
+        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_RED), file=sys.stderr)
 
     def header(self, message: str) -> None:
         """Print section header in cyan with bold."""
-        print(f"\n{self._colorize('▶', Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
+        symbol = self._get_symbol('header')
+        print(f"\n{self._colorize(symbol, Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
 
     def step(self, message: str) -> None:
         """Print step message in blue."""
-        print(f"  {self._colorize('•', Colors.BRIGHT_BLUE)} {message}")
+        symbol = self._get_symbol('step')
+        print(f"  {self._colorize(symbol, Colors.BRIGHT_BLUE)} {message}")
 
     def file(self, message: str) -> None:
         """Print file-related message in dim."""
-        print(f"  {self._colorize('📄', Colors.DIM)} {message}")
+        symbol = self._get_symbol('file')
+        print(f"  {self._colorize(symbol, Colors.DIM)} {message}")
 
     def summary(self) -> None:
         """Print execution summary."""
         print()
+        success_symbol = self._get_symbol('success')
         if self.error_count == 0 and self.warning_count == 0:
-            self.success("✓ Generation completed successfully!")
+            self.success(f"{success_symbol} Generation completed successfully!")
         elif self.error_count == 0:
             self.warning(f"Generation completed with {self.warning_count} warning(s)")
         else:

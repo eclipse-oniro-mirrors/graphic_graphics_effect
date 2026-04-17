@@ -106,4 +106,4 @@ struct GERRect {
 } // namespace Rosen
 } // namespace OHOS
 
-#endif // GRAPHICS_EFFECT_GE_EFFECTS_RRECT_H
+#endif // GRAPHICS_EFFECT_GE_PARAMS_ASSOCIATE_TYPES_H
