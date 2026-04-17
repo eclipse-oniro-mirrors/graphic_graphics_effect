@@ -76,6 +76,19 @@ def load_template(template_path: Path) -> Template:
         return Template(f.read())
 
 
+def strip_template_copyright(template_content: str) -> str:
+    """Strip copyright header from template content.
+    
+    Tpl files have copyright header for linter compliance, but we generate
+    fresh copyright headers when creating actual source files.
+    """
+    COPYRIGHT_HEADER_LINES = 15
+    lines = template_content.split('\n')
+    if len(lines) > COPYRIGHT_HEADER_LINES:
+        return '\n'.join(lines[COPYRIGHT_HEADER_LINES:])
+    return template_content
+
+
 def get_effect_info(effect_type: str) -> Dict:
     """Get information about an effect type."""
     info = {
@@ -114,6 +127,7 @@ def generate_params_file(name: str, effect_type: str, params: List[Dict], output
     file_name = f"{to_snake_case(class_name)}.params"
 
     template = load_template(templates_dir / f"{effect_type}.params.tpl")
+    template_content = strip_template_copyright(template.template)
 
     param_declarations = []
     for param in params:
@@ -126,8 +140,7 @@ def generate_params_file(name: str, effect_type: str, params: List[Dict], output
         else:
             param_declarations.append(f"    {param_type} {param_name};")
 
-    content = template.substitute(
-        YEAR=datetime.now().year,
+    content = get_copyright_header() + Template(template_content).substitute(
         TYPE_ENUM=snake_name.upper(),
         DISPLAY_NAME=pascal_name,
         PARAMS_CLASS=params_class,
@@ -151,6 +164,7 @@ def generate_header_file(name: str, effect_type: str, params: List[Dict], output
     header_guard = f"GRAPHICS_EFFECT_{to_snake_case(class_name).upper()}_H"
 
     template = load_template(templates_dir / f"{effect_type}.h.tpl")
+    template_content = strip_template_copyright(template.template)
 
     member_declarations = []
     for param in params:
@@ -158,8 +172,7 @@ def generate_header_file(name: str, effect_type: str, params: List[Dict], output
         param_type = param['type']
         member_declarations.append(f"    {param_type} {param_name}_;")
 
-    content = template.substitute(
-        YEAR=datetime.now().year,
+    content = get_copyright_header() + Template(template_content).substitute(
         HEADER_GUARD=header_guard,
         CLASS_NAME=class_name,
         PARAMS_CLASS=params_class,
@@ -183,6 +196,7 @@ def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_di
     header_file_name = f"ge_{snake_name}{info['params_suffix']}.h"
 
     template = load_template(templates_dir / f"{effect_type}.cpp.tpl")
+    template_content = strip_template_copyright(template.template)
 
     init_list = []
     for param in params:
@@ -193,8 +207,7 @@ def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_di
     if init_list:
         initialization = ":\n" + ',\n'.join(init_list)
 
-    content = template.substitute(
-        YEAR=datetime.now().year,
+    content = get_copyright_header() + Template(template_content).substitute(
         HEADER_FILE=header_file_name,
         CLASS_NAME=class_name,
         PARAMS_CLASS=params_class,
@@ -242,7 +255,9 @@ def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: P
         cpp_file = generate_cpp_file(name, effect_type, params, src_output_dir, templates_dir)
         print(f"  Generated: {cpp_file.name}")
 
-        print(f"\nSuccessfully generated {name} {effect_type} effect!")
+        print(f"\nSuccessfully generated {name} {effect_type} effect!\n")
+        print(f"Hint: run `python tool/generate_metadata/gen_effect_header.py` to generate include for your params")
+        print(f"      run `python tool/generate_metadata/gen_metadata.py` to generate param setters for your params")
         return True
 
     except Exception as e:

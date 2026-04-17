@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=NOISY_FRAME_GRADIENT_MASK, name="NoisyFrameGradientMask")]] GEXNoisyFrameGradientMaskParams {
     Vector4f gradientBezierControlPoints;
     float cornerRadius = 0.0f;

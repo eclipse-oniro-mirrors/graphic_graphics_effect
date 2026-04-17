@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=LIGHT_CAVE, name="LightCave")]] GEXLightCaveShaderParams {
     Vector4f colorA = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
     Vector4f colorB = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);

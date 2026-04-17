@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=WAVY_RIPPLE_LIGHT, name="WavyRippleLight")]] GEWavyRippleLightShaderParams {
     std::pair<float, float> center_ = {0.f, 0.f};
     float radius_ = 0.f;

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=FROSTED_GLASS_BLUR, name="FrostedGlassBlur")]] GEFrostedGlassBlurShaderFilterParams {
     [[ge::prop(name="FrostedGlassBlur_Radius", min=0.0f, max=200.0f)]]
     float radius = 0.0f; // blurParam[0]: blur radius

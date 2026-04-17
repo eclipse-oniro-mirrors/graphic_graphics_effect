@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=WATER_RIPPLE, name="WATER_RIPPLE")]] GEWaterRippleFilterParams {
     [[ge::prop("PROGRESS")]]
     float progress = 0.0f;

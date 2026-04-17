@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=GRID_WARP, name="GridWarp")]] GEGridWarpShaderFilterParams {
     [[ge::prop(name="GridWarp_GridPoint", array_accessor_length=9, array_accessor_type="std::pair<float, float>")]]
     std::array<std::pair<float, float>, 9> gridPoints;

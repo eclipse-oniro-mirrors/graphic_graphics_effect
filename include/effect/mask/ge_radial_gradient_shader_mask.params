@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=RADIAL_GRADIENT_MASK, name="RadialGradientMask")]] GERadialGradientShaderMaskParams {
     std::pair<float, float> center_ = {0.f, 0.f};
     float radiusX_ = 0.f;

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=AIBAR_RECT_HALO, name="AIBarRectHalo")]] GEXAIBarRectHaloEffectParams {
     Vector4f LTWH;
     [[ge::prop(name="AIBarRectHalo_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]

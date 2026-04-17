@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=PARTICLE_CIRCULAR_HALO, name="ParticleCircularHalo")]] GEParticleCircularHaloShaderParams {
     [[ge::prop(min={0.0f, 0.0f}, max={1.0f, 1.0f})]]
     std::pair<float, float> center_ = {0.f, 0.f};

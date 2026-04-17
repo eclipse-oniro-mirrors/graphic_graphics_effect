@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=VARIABLE_RADIUS_BLUR, name="VariableRadiusBlur")]] GEVariableRadiusBlurShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     [[ge::prop("VariableRadiusBlur_Radius")]]

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=DOUBLE_RIPPLE_MASK, name="DoubleRippleMask")]] GEDoubleRippleShaderMaskParams {
     std::pair<float, float> center1_ = {0.f, 0.f};
     std::pair<float, float> center2_ = {0.f, 0.f};

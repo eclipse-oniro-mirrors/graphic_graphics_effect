@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=GASIFY_SCALE_TWIST, name="GasifyScaleTwist")]] GEGasifyScaleTwistFilterParams {
     [[ge::prop(min={0.0f, 0.0f})]]
     std::pair<float, float> scale_ = {1.0f, 1.0f};

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=SDF_DISTORT_OP_SHAPE, name="SDFDistortOpShape")]] GESDFDistortOpShapeParams {
     [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape;

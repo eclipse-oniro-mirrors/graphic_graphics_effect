@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=SDF_FROM_IMAGE, name="SDF_FROM_IMAGE")]] GESDFFromImageFilterParams {
     [[ge::prop("SDF_FROM_IMAGE_SPREAD_FACTOR")]]
     int spreadFactor;

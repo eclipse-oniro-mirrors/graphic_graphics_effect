@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=IMAGE_MASK, name="ImageMask")]] GEImageMaskParams {
     std::shared_ptr<Drawing::Image> image = nullptr;
 };

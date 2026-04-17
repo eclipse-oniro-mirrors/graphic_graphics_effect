@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFrostedGlassEffectParams {
     [[ge::prop(min={-1.0f, -1.0f}, max={1.0f, 1.0f},
                cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=DIRECTION_LIGHT, name="DirectionLight")]] GEDirectionLightShaderFilterParams {
     std::shared_ptr<GEShaderMask> mask;
     [[ge::prop("DirectionLight_Factor")]]

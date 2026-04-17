@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=DUPOLI_NOISE_MASK, name="DupoliNoiseMask")]] GEXDupoliNoiseMaskParams {
     float progress = 0.0f;
     float granularity = 0.0f;

@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=DISPLACEMENT_DISTORT_FILTER, name="DispDistort")]] GEDisplacementDistortFilterParams {
     std::pair<float, float> factor_ = {1.0f, 1.0f};
     std::shared_ptr<GEShaderMask> mask_;

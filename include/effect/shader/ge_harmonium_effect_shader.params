@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=HARMONIUM_EFFECT, name="HarmoniumEffect")]] GEHarmoniumEffectShaderParams {
     std::shared_ptr<GEShaderMask> mask = nullptr;
     std::shared_ptr<GEShaderMask> maskClock = nullptr;

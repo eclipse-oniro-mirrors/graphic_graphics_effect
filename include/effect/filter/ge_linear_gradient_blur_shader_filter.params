@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=LINEAR_GRADIENT_BLUR, name="LINEAR_GRADIENT_BLUR")]] GELinearGradientBlurShaderFilterParams {
     [[ge::prop("BLURRADIUS")]]
     float blurRadius;

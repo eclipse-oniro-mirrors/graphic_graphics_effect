@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-
 struct [[ge::params(type=GASIFY, name="Gasify")]] GEGasifyFilterParams {
     std::shared_ptr<Drawing::Image> sourceImage_ = nullptr;
     [[ge::prop("Gasify_Mask")]]
