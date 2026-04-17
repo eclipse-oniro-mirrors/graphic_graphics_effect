@@ -162,7 +162,12 @@ class Console:
         if self.use_unicode:
             return self.UNICODE_SYMBOLS.get(symbol_name, '')
         return self.ASCII_SYMBOLS.get(symbol_name, '')
-
+    
+    def _colorize(self, text: str, color: str) -> str:
+        """Apply color to text if colors are enabled."""
+        if self.use_colors:
+            return f"{color}{text}{Colors.RESET}"
+        return text
 
     def info(self, message: str) -> None:
         """Print informational message."""
@@ -209,12 +214,6 @@ class Console:
             self.warning(f"Generation completed with {self.warning_count} warning(s)")
         else:
             self.error(f"Generation failed with {self.error_count} error(s) and {self.warning_count} warning(s)")
-
-    def _colorize(self, text: str, color: str) -> str:
-        """Apply color to text if colors are enabled."""
-        if self.use_colors:
-            return f"{color}{text}{Colors.RESET}"
-        return text
 
 
 def find_clang_format() -> Optional[str]:
