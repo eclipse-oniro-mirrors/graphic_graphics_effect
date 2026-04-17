@@ -157,7 +157,6 @@ ohos_source_set("graphics_effect_src") {
   ]
 
   deps = [ ":utils" ]
-
   external_deps = []
   if (is_arkui_x) {
     deps += [
@@ -182,8 +181,14 @@ ohos_source_set("graphics_effect_src") {
   defines = []
   if (current_os == "ohos") {
     defines += [ "GE_OHOS" ]
-    external_deps += [ "init:libbegetutil" ]
+    external_deps += [
+      "init:libbegetutil",
+      "c_utils:utils",
+    ]
+  } else if (!(current_os == "android" || current_os == "ios")) {
+    deps += [ ":mock_utils" ]
   }
+
   if (is_arkui_x) {
     if (graphics_effect_feature_upgrade_skia) {
       defines += [ "USE_M133_SKIA" ]
@@ -241,15 +246,10 @@ if (is_arkui_x) {
 
 # utils {{{
 group("utils") {
-  if (current_os == "ohos") {
-    public_external_deps = [ "c_utils:utils" ]
-  } else if (current_os == "android" || current_os == "ios") {
+  if (current_os == "android" || current_os == "ios") {
     public_external_deps = [ "c_utils:utilsbase" ]
-  } else {
-    public_deps = [ ":mock_utils" ]
   }
 }
-
 config("utils_config") {
   include_dirs = [ "src/util/mock" ]
 }
@@ -260,7 +260,7 @@ ohos_source_set("mock_utils") {
     "src/util/mock/parcel.cpp",
     "src/util/mock/refbase.cpp",
   ]
-  public_external_deps = [ "bounds_checking_function:libsec_shared" ]
+  external_deps = [ "bounds_checking_function:libsec_shared" ]
   part_name = "graphics_effect"
   subsystem_name = "graphic"
 }

@@ -537,6 +537,12 @@ std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> GEVisualEf
             impl->MakeGasifyScaleTwistFilterParams();
         }
     },
+    { GE_FILTER_PARTICLE_ABLATION,
+        [](GEVisualEffectImpl* impl) {
+            impl->SetFilterType(GEVisualEffectImpl::FilterType::PARTICLE_ABLATION);
+            impl->MakeParticleAblationFilterParams();
+        }
+    },
     { GE_FILTER_GASIFY_BLUR,
         [](GEVisualEffectImpl* impl) {
             impl->SetFilterType(GEVisualEffectImpl::FilterType::GASIFY_BLUR);
@@ -744,6 +750,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, int32_t param)
             }
             break;
         }
+        case FilterType::PARTICLE_ABLATION: {
+            SetParticleAblationParams(tag, param);
+            break;
+        }
         default:
             break;
     }
@@ -941,6 +951,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, float param)
         }
         case FilterType::SPATIAL_POINT_LIGHT: {
             ApplyTagParams(tag, param, spatialPointLightParams_, spatialPointLightTagMap_);
+            break;
+        }
+        case FilterType::PARTICLE_ABLATION: {
+            SetParticleAblationParams(tag, param);
             break;
         }
         case FilterType::GASIFY_SCALE_TWIST: {
@@ -1283,6 +1297,10 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::pair<float,
         }
         case FilterType::GASIFY_SCALE_TWIST: {
             SetGasifyScaleTwistParams(tag, param);
+            break;
+        }
+        case FilterType::PARTICLE_ABLATION: {
+            SetParticleAblationParams(tag, param);
             break;
         }
         case FilterType::BEZIER_WARP: {
@@ -1755,6 +1773,15 @@ void GEVisualEffectImpl::SetParam(const std::string& tag, const std::shared_ptr<
             }
             if (tag == GE_SHAPE_SDF_DISTORT_OP_SHAPE) {
                 sdfDistortOpShapeParams_->shape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
+            }
+            break;
+        }
+        case FilterType::MAGNIFIER: {
+            if (magnifierParams_ == nullptr || !param) {
+                return;
+            }
+            if (tag == GE_FILTER_MAGNIFIER_SDF_SHAPE) {
+                magnifierParams_->sdfShape = std::static_pointer_cast<Drawing::GESDFShaderShape>(param);
             }
             break;
         }
@@ -3112,6 +3139,69 @@ void GEVisualEffectImpl::SetColorGradientEffectParams(const std::string& tag, co
     auto it = actions.find(tag);
     if (it != actions.end()) {
         it->second(this, param);
+    }
+}
+
+void GEVisualEffectImpl::SetParticleAblationParams(const std::string& tag, float param)
+{
+    if (particleAblationFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_PROGRESS) {
+        particleAblationFilterParams_->progress_ = std::clamp(param, 0.0f, 1.0f);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_ABLATION_RATE) {
+        particleAblationFilterParams_->ablationRate_ = std::max(param, 0.0f);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_GLOW_LEVEL) {
+        particleAblationFilterParams_->glowLevel_ = std::max(param, 0.0f);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_GLOW_BRIGHTNESS) {
+        particleAblationFilterParams_->glowBrightness_ = std::max(param, 0.0f);
+    }
+}
+
+void GEVisualEffectImpl::SetParticleAblationParams(const std::string& tag, const std::pair<float, float>& param)
+{
+    if (particleAblationFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_CENTERS0) {
+        particleAblationFilterParams_->centers0_ = param;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_CENTERS1) {
+        particleAblationFilterParams_->centers1_ = param;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_CENTERS2) {
+        particleAblationFilterParams_->centers2_ = param;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_CENTERS3) {
+        particleAblationFilterParams_->centers3_ = param;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_WIND) {
+        particleAblationFilterParams_->wind_ = param;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE) {
+        particleAblationFilterParams_->expansionSize_ = param;
+    }
+}
+
+void GEVisualEffectImpl::SetParticleAblationParams(const std::string& tag, int32_t param)
+{
+    if (particleAblationFilterParams_ == nullptr) {
+        return;
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_MAX_PARTICLE_COUNT) {
+        particleAblationFilterParams_->maxParticleCount_ = std::max(param, 0);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_SCALE) {
+        particleAblationFilterParams_->turbScale_ = std::max(param, 0);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_EVO) {
+        particleAblationFilterParams_->turbEvo_ = std::max(param, 0);
+    }
+    if (tag == GE_FILTER_PARTICLE_ABLATION_TURB_AMP) {
+        particleAblationFilterParams_->turbAmp_ = std::max(param, 0);
     }
 }
 
