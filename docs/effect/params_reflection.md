@@ -13,7 +13,6 @@ This document describes the architecture of GE's **declarative parameter system 
 |----------------|-----------|--------|
 | `ge_params_reflection.h/cpp` | `gen_metadata.py` | **Auto-generated** |
 | `ge_effects_params.h` | `gen_effect_header.py` | **Auto-generated** |
-| `ge_filter_type_info.h` | `gen_metadata.py` | **Auto-generated** |
 
 > For tool usage (commands, syntax, config), see [`tool/generate_metadata/README.md`](../../tool/generate_metadata/README.md).
 
