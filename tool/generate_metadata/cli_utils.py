@@ -104,6 +104,52 @@ class Console:
         self.warning_count = 0
         self.error_count = 0
 
+    def info(self, message: str) -> None:
+        """Print informational message."""
+        print(message)
+
+    def success(self, message: str) -> None:
+        """Print success message in green."""
+        print(self._colorize(message, Colors.BRIGHT_GREEN))
+
+    def warning(self, message: str) -> None:
+        """Print warning message in yellow."""
+        self.warning_count += 1
+        symbol = self._get_symbol('warning')
+        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_YELLOW), file=sys.stderr)
+
+    def error(self, message: str) -> None:
+        """Print error message in red."""
+        self.error_count += 1
+        symbol = self._get_symbol('error')
+        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_RED), file=sys.stderr)
+
+    def header(self, message: str) -> None:
+        """Print section header in cyan with bold."""
+        symbol = self._get_symbol('header')
+        print(f"\n{self._colorize(symbol, Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
+
+    def step(self, message: str) -> None:
+        """Print step message in blue."""
+        symbol = self._get_symbol('step')
+        print(f"  {self._colorize(symbol, Colors.BRIGHT_BLUE)} {message}")
+
+    def file(self, message: str) -> None:
+        """Print file-related message in dim."""
+        symbol = self._get_symbol('file')
+        print(f"  {self._colorize(symbol, Colors.DIM)} {message}")
+
+    def summary(self) -> None:
+        """Print execution summary."""
+        print()
+        success_symbol = self._get_symbol('success')
+        if self.error_count == 0 and self.warning_count == 0:
+            self.success(f"{success_symbol} Generation completed successfully!")
+        elif self.error_count == 0:
+            self.warning(f"Generation completed with {self.warning_count} warning(s)")
+        else:
+            self.error(f"Generation failed with {self.error_count} error(s) and {self.warning_count} warning(s)")
+    
     def _detect_unicode_support(self) -> bool:
         """Detect if the terminal supports Unicode output.
 
@@ -168,53 +214,6 @@ class Console:
         if self.use_colors:
             return f"{color}{text}{Colors.RESET}"
         return text
-
-    def info(self, message: str) -> None:
-        """Print informational message."""
-        print(message)
-
-    def success(self, message: str) -> None:
-        """Print success message in green."""
-        print(self._colorize(message, Colors.BRIGHT_GREEN))
-
-    def warning(self, message: str) -> None:
-        """Print warning message in yellow."""
-        self.warning_count += 1
-        symbol = self._get_symbol('warning')
-        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_YELLOW), file=sys.stderr)
-
-    def error(self, message: str) -> None:
-        """Print error message in red."""
-        self.error_count += 1
-        symbol = self._get_symbol('error')
-        print(self._colorize(f"{symbol} {message}", Colors.BRIGHT_RED), file=sys.stderr)
-
-    def header(self, message: str) -> None:
-        """Print section header in cyan with bold."""
-        symbol = self._get_symbol('header')
-        print(f"\n{self._colorize(symbol, Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
-
-    def step(self, message: str) -> None:
-        """Print step message in blue."""
-        symbol = self._get_symbol('step')
-        print(f"  {self._colorize(symbol, Colors.BRIGHT_BLUE)} {message}")
-
-    def file(self, message: str) -> None:
-        """Print file-related message in dim."""
-        symbol = self._get_symbol('file')
-        print(f"  {self._colorize(symbol, Colors.DIM)} {message}")
-
-    def summary(self) -> None:
-        """Print execution summary."""
-        print()
-        success_symbol = self._get_symbol('success')
-        if self.error_count == 0 and self.warning_count == 0:
-            self.success(f"{success_symbol} Generation completed successfully!")
-        elif self.error_count == 0:
-            self.warning(f"Generation completed with {self.warning_count} warning(s)")
-        else:
-            self.error(f"Generation failed with {self.error_count} error(s) and {self.warning_count} warning(s)")
-
 
 def find_clang_format() -> Optional[str]:
     """Find clang-format executable in the system.
