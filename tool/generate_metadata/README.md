@@ -25,7 +25,6 @@ The GE library uses attribute-based parameter definitions. This tool parses `.pa
 |--------|---------|
 | `ge_params_reflection.h/cpp` | Type-safe field accessors, constraint metadata, enum mappings |
 | `ge_effects_params.h` | Unified include aggregating all `.params` files |
-| `ge_filter_type_info.h` | Links filter classes to their parameter types |
 
 **Benefits**:
 - Runtime parameter setting via string names

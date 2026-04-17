@@ -2303,7 +2303,7 @@ public:
 
     // Convert string to GEParamsMemberTag
     // Note: Strings are sourced from GEParamsFieldAccessor<Tag>::name for single source of truth
-    //       Aliases from [[ge::prop_alias]] are also included
+    //       Aliases from [[ge::prop(alias=...)]] are also included
     static GEParamsMemberTag GEParamsMemberTagFromString(const std::string& str);
 
     // Set params member by tag using overloaded functions (reduces binary bloat)
