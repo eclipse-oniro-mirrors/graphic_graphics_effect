@@ -38,7 +38,7 @@ std::string GetDescriptionFuzzTest()
     params.attenuation = attenuation;
     params.lightColor = Vector4f(colorR, colorG, colorB, colorA);
 
-    auto shader = std::make_unique<Drawing::GESpatialPointLightShader>(params);
+    auto shader = std::make_unique<GESpatialPointLightShader>(params);
     std::string res = shader->GetDescription();
     return res;
 }
@@ -66,7 +66,7 @@ std::shared_ptr<Drawing::ShaderEffect> MakeSpatialPointLightShaderFuzzTest()
         GETest::GetPlainData<float>()
     );
 
-    auto shader = std::make_unique<Drawing::GESpatialPointLightShader>(params);
+    auto shader = std::make_unique<GESpatialPointLightShader>(params);
     auto res = shader->MakeSpatialPointLightShader(rect);
     return res;
 }
@@ -95,7 +95,7 @@ void MakeDrawingShaderFuzzTest()
         GETest::GetPlainData<float>()
     );
 
-    auto shader = std::make_unique<Drawing::GESpatialPointLightShader>(params);
+    auto shader = std::make_unique<GESpatialPointLightShader>(params);
     shader->MakeDrawingShader(rect, progress);
 }
 
