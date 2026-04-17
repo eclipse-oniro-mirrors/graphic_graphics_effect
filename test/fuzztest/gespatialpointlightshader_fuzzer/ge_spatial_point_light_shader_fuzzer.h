@@ -6,21 +6,22 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *     Unless required by applicable law or agreed to in writing, software
- *     distributed under the License is distributed on an "AS IS" BASIS,
- *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *     See the License for the specific language governing permissions and
- *     limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #ifndef TEST_FUZZTEST_GESPATIALPOINTLIGHTSHADER_FUZZER_H
 #define TEST_FUZZTEST_GESPATIALPOINTLIGHTSHADER_FUZZER_H
 
-#include <climits>
-#include <cstddef>
 #include <cstdint>
+#include <unistd.h>
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
+#include <fcntl.h>
 
 #define FUZZ_PROJECT_NAME "gespatialpointlightshader_fuzzer"
 

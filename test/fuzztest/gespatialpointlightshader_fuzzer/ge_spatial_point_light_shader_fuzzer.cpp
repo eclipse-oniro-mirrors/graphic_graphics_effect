@@ -6,31 +6,31 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *     Unless required by applicable law or agreed to in writing, software
- *     distributed under the License is distributed on an "AS IS" BASIS,
- *     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *     See the License for the specific language governing permissions and
- *     limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 #include "ge_spatial_point_light_shader_fuzzer.h"
+#include "fuzzed_data_provider.h"
 #include "ge_spatial_point_light.h"
-#include "get_object.h"
 
 namespace OHOS {
 namespace Rosen {
 
-std::string GetDescriptionFuzzTest()
+void DoGetDescription(FuzzedDataProvider& fdp)
 {
-    float lightIntensity = GETest::GetPlainData<float>();
-    float lightPosX = GETest::GetPlainData<float>();
-    float lightPosY = GETest::GetPlainData<float>();
-    float lightPosZ = GETest::GetPlainData<float>();
-    float attenuation = GETest::GetPlainData<float>();
-    float colorR = GETest::GetPlainData<float>();
-    float colorG = GETest::GetPlainData<float>();
-    float colorB = GETest::GetPlainData<float>();
-    float colorA = GETest::GetPlainData<float>();
+    float lightIntensity = fdp.ConsumeFloatingPoint<float>();
+    float lightPosX = fdp.ConsumeFloatingPoint<float>();
+    float lightPosY = fdp.ConsumeFloatingPoint<float>();
+    float lightPosZ = fdp.ConsumeFloatingPoint<float>();
+    float attenuation = fdp.ConsumeFloatingPoint<float>();
+    float colorR = fdp.ConsumeFloatingPoint<float>();
+    float colorG = fdp.ConsumeFloatingPoint<float>();
+    float colorB = fdp.ConsumeFloatingPoint<float>();
+    float colorA = fdp.ConsumeFloatingPoint<float>();
 
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = lightIntensity;
@@ -39,60 +39,58 @@ std::string GetDescriptionFuzzTest()
     params.lightColor = Vector4f(colorR, colorG, colorB, colorA);
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
-    std::string res = shader->GetDescription();
-    return res;
+    shader->GetDescription();
 }
 
-std::shared_ptr<Drawing::ShaderEffect> MakeSpatialPointLightShaderFuzzTest()
+void DoMakeSpatialPointLightShader(FuzzedDataProvider& fdp)
 {
-    float rectLeft = GETest::GetPlainData<float>();
-    float rectTop = GETest::GetPlainData<float>();
-    float rectRight = GETest::GetPlainData<float>();
-    float rectBottom = GETest::GetPlainData<float>();
+    float rectLeft = fdp.ConsumeFloatingPoint<float>();
+    float rectTop = fdp.ConsumeFloatingPoint<float>();
+    float rectRight = fdp.ConsumeFloatingPoint<float>();
+    float rectBottom = fdp.ConsumeFloatingPoint<float>();
     Drawing::Rect rect{rectLeft, rectTop, rectRight, rectBottom};
 
     Drawing::GESpatialPointLightShaderParams params;
-    params.lightIntensity = GETest::GetPlainData<float>();
+    params.lightIntensity = fdp.ConsumeFloatingPoint<float>();
     params.lightPosition = Vector3f(
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>()
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>()
     );
-    params.attenuation = GETest::GetPlainData<float>();
+    params.attenuation = fdp.ConsumeFloatingPoint<float>();
     params.lightColor = Vector4f(
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>()
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>()
     );
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
-    auto res = shader->MakeSpatialPointLightShader(rect);
-    return res;
+    shader->MakeSpatialPointLightShader(rect);
 }
 
-void MakeDrawingShaderFuzzTest()
+void DoMakeDrawingShader(FuzzedDataProvider& fdp)
 {
-    float rectLeft = GETest::GetPlainData<float>();
-    float rectTop = GETest::GetPlainData<float>();
-    float rectRight = GETest::GetPlainData<float>();
-    float rectBottom = GETest::GetPlainData<float>();
+    float rectLeft = fdp.ConsumeFloatingPoint<float>();
+    float rectTop = fdp.ConsumeFloatingPoint<float>();
+    float rectRight = fdp.ConsumeFloatingPoint<float>();
+    float rectBottom = fdp.ConsumeFloatingPoint<float>();
     Drawing::Rect rect{rectLeft, rectTop, rectRight, rectBottom};
-    float progress = GETest::GetPlainData<float>();
+    float progress = fdp.ConsumeFloatingPoint<float>();
 
     Drawing::GESpatialPointLightShaderParams params;
-    params.lightIntensity = GETest::GetPlainData<float>();
+    params.lightIntensity = fdp.ConsumeFloatingPoint<float>();
     params.lightPosition = Vector3f(
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>()
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>()
     );
-    params.attenuation = GETest::GetPlainData<float>();
+    params.attenuation = fdp.ConsumeFloatingPoint<float>();
     params.lightColor = Vector4f(
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>(),
-        GETest::GetPlainData<float>()
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>()
     );
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
@@ -108,13 +106,29 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
     if (data == nullptr) {
         return 0;
     }
-    // initialize
-    OHOS::Rosen::GETest::g_data = data;
-    OHOS::Rosen::GETest::g_size = size;
-    OHOS::Rosen::GETest::g_pos = 0;
-    /* Run your code on data */
-    OHOS::Rosen::GetDescriptionFuzzTest();
-    OHOS::Rosen::MakeSpatialPointLightShaderFuzzTest();
-    OHOS::Rosen::MakeDrawingShaderFuzzTest();
+    
+    FuzzedDataProvider fdp(data, size);
+    
+    const uint8_t DO_GET_DESCRIPTION = 0;
+    const uint8_t DO_MAKE_SPATIAL_POINT_LIGHT_SHADER = 1;
+    const uint8_t DO_MAKE_DRAWING_SHADER = 2;
+    const uint8_t TARGET_SIZE = 3;
+    
+    uint8_t choice = fdp.ConsumeIntegral<uint8_t>() % TARGET_SIZE;
+    
+    switch (choice) {
+        case DO_GET_DESCRIPTION:
+            OHOS::Rosen::DoGetDescription(fdp);
+            break;
+        case DO_MAKE_SPATIAL_POINT_LIGHT_SHADER:
+            OHOS::Rosen::DoMakeSpatialPointLightShader(fdp);
+            break;
+        case DO_MAKE_DRAWING_SHADER:
+            OHOS::Rosen::DoMakeDrawingShader(fdp);
+            break;
+        default:
+            break;
+    }
+    
     return 0;
 }
