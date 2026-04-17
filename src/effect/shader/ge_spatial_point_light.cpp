@@ -81,7 +81,6 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
-
     if (width < 1e-6 || height < 1e-6) {
         GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader invalid rect size: width=%f, height=%f",
             width, height);
