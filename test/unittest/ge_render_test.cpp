@@ -598,6 +598,55 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_013, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GenerateShaderFilters_014
+ * @tc.desc: Verify GenerateShaderFilters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GenerateShaderFilters_014, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_014 start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_PARTICLE_ABLATION);
+    float progress = 0.5f;
+    float ablationRate = 0.3f;
+    std::pair<float, float> centers0 = {0.25f, 0.25f};
+    std::pair<float, float> centers1 = {0.75f, 0.25f};
+    std::pair<float, float> centers2 = {0.25f, 0.75f};
+    std::pair<float, float> centers3 = {0.75f, 0.75f};
+    float glowLevel = 2.0f;
+    float glowBrightness = 1.5f;
+    int32_t maxParticleCount = 1000;
+    std::pair<float, float> wind = {0.1f, 0.05f};
+    int32_t turbScale = 4;
+    int32_t turbEvo = 2;
+    int32_t turbAmp = 1;
+    std::pair<float, float> expansionSize = {1.0f, 1.0f};
+    
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_PROGRESS, progress);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_ABLATION_RATE, ablationRate);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_CENTERS0, centers0);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_CENTERS1, centers1);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_CENTERS2, centers2);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_CENTERS3, centers3);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_GLOW_LEVEL, glowLevel);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_GLOW_BRIGHTNESS, glowBrightness);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_MAX_PARTICLE_COUNT, maxParticleCount);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_WIND, wind);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_SCALE, turbScale);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_EVO, turbEvo);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_AMP, turbAmp);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE, expansionSize);
+    
+    Drawing::GEVisualEffectContainer veContainer;
+    veContainer.AddToChainedFilter(visualEffect);
+    auto geRender = std::make_shared<GERender>();
+    auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
+    EXPECT_NE(shaderFilters[0], nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_014 end";
+}
+
+/**
  * @tc.name: GenerateShaderFiltersEdgelight_001
  * @tc.desc: Verify the GenerateShaderFilters
  * @tc.type: FUNC

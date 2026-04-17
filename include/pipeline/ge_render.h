@@ -157,12 +157,12 @@ public:
     ApplyHpsGEResult ApplyHpsGEImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const HpsGEImageEffectContext& context, std::shared_ptr<Drawing::Image>& outImage, Drawing::Brush& brush);
 
-    bool IsGasifyFilter();
+    bool IsNeedExpansionFilter();
     bool IsFrostedGlassFilter(Drawing::GEVisualEffectContainer& veContainer);
 
-    Drawing::Rect GetGasifyRect()
+    Drawing::Rect GetExpansionRect()
     {
-        return gasifyRect_;
+        return expansionRect_;
     }
 
     static void SetMesablurAllEnabledByCCM(bool flag);
@@ -242,6 +242,9 @@ private:
  
     std::shared_ptr<GEShaderFilter> GenerateExtShaderGasify(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
 
+    std::shared_ptr<GEShaderFilter> GenerateExtShaderParticleAblation(
+        const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
+
     std::shared_ptr<GEShaderFilter> GenerateExtShaderVariableRadiusBlur(
         const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
         
@@ -253,8 +256,8 @@ private:
         const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve);
     static bool isMesablurAllEnable_;
 
-    bool isGasifyFilter_ = false;
-    Drawing::Rect gasifyRect_ {};
+    bool isNeedExpansionFilter_ = false;
+    Drawing::Rect expansionRect_ {};
 };
 
 } // namespace GraphicsEffectEngine

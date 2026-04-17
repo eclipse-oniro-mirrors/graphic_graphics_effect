@@ -468,12 +468,13 @@ bool GERender::AfterApplyShaderFilter(Drawing::Canvas& canvas, const Drawing::GE
     // Update information after executing the shader filter
     auto ve = visualEffect.GetImpl();
     ve->SetCache(geShaderFilter.GetCache());
-    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY) {
-        isGasifyFilter_ = true;
-        gasifyRect_.SetLeft(context.src.GetLeft());
-        gasifyRect_.SetTop(context.src.GetTop());
-        gasifyRect_.SetRight(context.src.GetRight());
-        gasifyRect_.SetBottom(context.src.GetBottom());
+    if (ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::GASIFY ||
+        ve->GetFilterType() == Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION) {
+        isNeedExpansionFilter_ = true;
+        expansionRect_.SetLeft(context.src.GetLeft());
+        expansionRect_.SetTop(context.src.GetTop());
+        expansionRect_.SetRight(context.src.GetRight());
+        expansionRect_.SetBottom(context.src.GetBottom());
     }
     return true;
 }
@@ -654,6 +655,9 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderFilter(
         case Drawing::GEVisualEffectImpl::FilterType::GASIFY: {
             return GenerateExtShaderGasify(ve);
         }
+        case Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION: {
+            return GenerateExtShaderParticleAblation(ve);
+        }
         case Drawing::GEVisualEffectImpl::FilterType::VARIABLE_RADIUS_BLUR: {
             return GenerateExtShaderVariableRadiusBlur(ve);
         }
@@ -773,6 +777,21 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderGasify(
     auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
         static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::GASIFY),
         sizeof(Drawing::GEGasifyFilterParams),
+        static_cast<void *>(mesaParams.get()));
+    if (!object) {
+        return nullptr;
+    }
+    std::shared_ptr<GEShaderFilter> dmShader(static_cast<GEShaderFilter *>(object));
+    return dmShader;
+}
+
+std::shared_ptr<GEShaderFilter> GERender::GenerateExtShaderParticleAblation(
+    const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve)
+{
+    const auto &mesaParams = ve->GetParticleAblationFilterParams();
+    auto object = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+        static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION),
+        sizeof(Drawing::GEParticleAblationFilterParams),
         static_cast<void *>(mesaParams.get()));
     if (!object) {
         return nullptr;
@@ -957,6 +976,10 @@ std::shared_ptr<GEShaderFilter> GERender::GenerateShaderFilter(
             shaderFilter = GenerateExtShaderFilter(ve);
             break;
         }
+        case Drawing::GEVisualEffectImpl::FilterType::PARTICLE_ABLATION: {
+            shaderFilter = GenerateExtShaderFilter(ve);
+            break;
+        }
         case Drawing::GEVisualEffectImpl::FilterType::FROSTED_GLASS: {
             shaderFilter = GenerateExtShaderFilter(ve);
             break;
@@ -1035,10 +1058,10 @@ void GERender::SetMesablurAllEnabledByCCM(bool flag)
     isMesablurAllEnable_ = isMesablurAllEnable_ || flag;
 }
 
-bool GERender::IsGasifyFilter()
+bool GERender::IsNeedExpansionFilter()
 {
-    if (isGasifyFilter_) {
-        isGasifyFilter_ = false;
+    if (isNeedExpansionFilter_) {
+        isNeedExpansionFilter_ = false;
         return true;
     }
     return false;
