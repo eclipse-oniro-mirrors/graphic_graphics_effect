@@ -1,10 +1,10 @@
 # generate_metadata
 
-Auto-generates C++ reflection metadata from `.params` files for runtime parameter access in Graphics Effect (GE) library.
+Auto-generates C++ reflection metadata from `.params.in` files for runtime parameter access in Graphics Effect (GE) library.
 
 ## TL;DR
 
-Run the following scripts after modifying/adding .params files.
+Run the following scripts after modifying/adding .params.in files.
 ```bash
 # Generate reflection metadata
 python tool/generate_metadata/gen_metadata.py
@@ -19,12 +19,12 @@ For creating new effects, you can use `tool/create_effect/create_effect.py` to s
 
 ## Overview
 
-The GE library uses attribute-based parameter definitions. This tool parses `.params` files and generates:
+The GE library uses attribute-based parameter definitions. This tool parses `.params.in` files and generates:
 
 | Output | Purpose |
 |--------|---------|
 | `ge_params_reflection.h/cpp` | Type-safe field accessors, constraint metadata, enum mappings |
-| `ge_effects_params.h` | Unified include aggregating all `.params` files |
+| `ge_effects_params.h` | Unified include aggregating all `.params.in` files |
 
 **Benefits**:
 - Runtime parameter setting via string names
@@ -38,10 +38,10 @@ The GE library uses attribute-based parameter definitions. This tool parses `.pa
 
 ### Step 1: Define Parameters
 
-Create a `.params` file in `include/effect/filter/` (or `shader/`, `mask/`, `shape/`):
+Create a `.params.in` file in `include/effect/filter/` (or `shader/`, `mask/`, `shape/`):
 
 ```cpp
-// include/effect/filter/ge_my_filter.params
+// include/effect/filter/ge_my_filter.params.in
 struct [[ge::params(type=MY_FILTER, name="MY_FILTER")]] GEMyFilterParams {
     [[ge::prop("INTENSITY")]]
     float intensity;
@@ -166,7 +166,7 @@ enum class GEParamsMemberTag : uint32_t {
     INVALID = 0,
     KAWASE_BLUR_RADIUS,
     BEZIER_WARP_DESTINATIONPATCH0,
-    // ... all fields from all .params files
+    // ... all fields from all .params.in files
 };
 ```
 
@@ -302,11 +302,11 @@ Tests located in `test/tooltest/generate_metadata/`:
 
 ```
 test/tooltest/generate_metadata/
-├── syntax_valid_tests/     # Valid .params files
-└── syntax_invalid_tests/   # Invalid .params files (error handling)
+├── syntax_valid_tests/     # Valid .params.in files
+└── syntax_invalid_tests/   # Invalid .params.in files (error handling)
 ```
 
-Each test can have a `.params.json` specifying expected results.
+Each test can have a `.params.in.json` specifying expected results.
 
 ```bash
 # Run tests
@@ -336,7 +336,7 @@ python tool/generate_metadata/gen_metadata.py \
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--params-dirs` | `include/effect/{filter,mask,shader,shape}` | `.params` file directories |
+| `--params-dirs` | `include/effect/{filter,mask,shader,shape}` | `.params.in` file directories |
 | `--output-file` | `include/effect/ge_params_reflection.h` | Output header path |
 | `--output-cpp-file` | `src/effect/ge_params_reflection.cpp` | Output cpp path |
 | `--config-file` | `tool/generate_metadata/config.json` | Config file path |
@@ -348,7 +348,7 @@ python tool/generate_metadata/gen_metadata.py \
 python tool/generate_metadata/gen_effect_header.py
 ```
 
-Generates `include/effect/ge_effects_params.h` - a unified include aggregating all `.params` files.
+Generates `include/effect/ge_effects_params.h` - a unified include aggregating all `.params.in` files.
 
 ---
 

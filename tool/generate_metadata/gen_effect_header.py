@@ -17,7 +17,7 @@
 """
 Generate ge_effects_params.h header file.
 
-This script generates a header file that includes all .params files from effect subdirectories.
+This script generates a header file that includes all .params.in files from effect subdirectories.
 """
 
 import sys
@@ -56,7 +56,7 @@ COPYRIGHT_HEADER = """/*
 def get_params_files(params_dirs: List[Path]) -> List[Path]:
     params_files = []
     for params_dir in params_dirs:
-        params_files.extend(list(params_dir.glob("*.params")))
+        params_files.extend(list(params_dir.glob("*.params.in")))
     return sorted(params_files, key=lambda p: p.name)
 
 
@@ -101,7 +101,7 @@ def generate_header(root_dir: Path, params_dirs: List[Path]) -> str:
 
     params_files = get_params_files(params_dirs)
     for params_file in params_files:
-        rel_path = params_file.relative_to(root_dir / "include")
+        rel_path = params_file.relative_to(root_dir / "include").as_posix()
         output.append(f'#include "{rel_path}"')
 
     output.append("#if defined(__clang__)")
@@ -130,7 +130,7 @@ def main():
         root_dir / "include" / "effect" / "shape",
     ]
 
-    console.header("Scanning for .params files")
+    console.header("Scanning for .params.in files")
 
     existing_dirs = [d for d in params_dirs if d.exists()]
     if not existing_dirs:
@@ -140,11 +140,11 @@ def main():
 
     params_files = get_params_files(params_dirs)
     if not params_files:
-        console.error(f"No .params files found in {params_dirs}")
+        console.error(f"No .params.in files found in {params_dirs}")
         console.summary()
         return 1
 
-    console.info(f"Found {len(params_files)} .params files")
+    console.info(f"Found {len(params_files)} .params.in files")
     for params_file in params_files:
         console.file(f"  {params_file.name}")
 

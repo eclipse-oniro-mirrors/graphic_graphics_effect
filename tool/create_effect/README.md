@@ -1,6 +1,6 @@
 # create_effect
 
-Scaffold CLI for creating new visual effects in Graphics Effect (GE) library. Generates boilerplate: `.params`, `.h`, `.cpp` files with proper naming and inheritance.
+Scaffold CLI for creating new visual effects in Graphics Effect (GE) library. Generates boilerplate: `.params.in`, `.h`, `.cpp` files with proper naming and inheritance.
 
 **Note**: Generates scaffold code only. You must implement shader logic and `OnProcessImage()` manually.
 
@@ -27,7 +27,7 @@ This tool creates initial file structure for new effects:
 
 | Generated | Purpose |
 |-----------|---------|
-| `.params` | Parameter struct with default fields |
+| `.params.in` | Parameter struct with default fields |
 | `.h` | Class declaration with proper inheritance |
 | `.cpp` | Skeleton implementation with TODO placeholders |
 
@@ -49,11 +49,11 @@ python tool/create_effect/create_effect.py my_blur filter
 
 | File | Path |
 |------|------|
-| `.params` | `include/effect/filter/ge_my_blur_shader_filter.params` |
+| `.params.in` | `include/effect/filter/ge_my_blur_shader_filter.params.in` |
 | `.h` | `include/effect/filter/ge_my_blur_shader_filter.h` |
 | `.cpp` | `src/effect/filter/ge_my_blur_shader_filter.cpp` |
 
-**Generated `.params`**:
+**Generated `.params.in`**:
 
 ```cpp
 // TODO: Add type to GEFilterType in include/core/ge_filter_type.h and remove this line
@@ -133,7 +133,7 @@ src/effect/{type}/ge_{name}_{suffix}.{ext}
 
 | File | Contains |
 |------|----------|
-| `.params` | Struct with `[[ge::params]]` attribute, default fields (radius, intensity, color) |
+| `.params.in` | Struct with `[[ge::params]]` attribute, default fields (radius, intensity, color) |
 | `.h` | Class declaration, inheritance, `DECLARE_GEFILTER_TYPEFUNC`, virtual methods |
 | `.cpp` | Constructor, TODO placeholders, `GetEffect()` stub |
 
