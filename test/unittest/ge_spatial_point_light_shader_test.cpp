@@ -45,7 +45,7 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest001, TestSi
 {
     auto shader = std::make_unique<GESpatialPointLightShader>();
     EXPECT_EQ(shader->Type(), Drawing::GEFilterType::SPATIAL_POINT_LIGHT);
-    EXPECT_EQ(shader->TypeName(), Drawing::GE_SHADER_SPATIAL_POINT_LIGHT);
+    EXPECT_EQ(shader->TypeName(), "SpatialPointLight");
     EXPECT_EQ(shader->GetDescription(), "GESpatialPointLightShader");
 }
 
