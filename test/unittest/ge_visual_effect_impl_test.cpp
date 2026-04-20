@@ -1449,15 +1449,17 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_001, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
     float lightIntensity = 2.5f;
-    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, lightIntensity);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightIntensity, lightIntensity);
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
+        lightIntensity);
+    EXPECT_FLOAT_EQ(params->lightIntensity, lightIntensity);
 
     float attenuation = 0.8f;
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, attenuation);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->attenuation, attenuation);
+    EXPECT_FLOAT_EQ(params->attenuation, attenuation);
 }
 
 /**
@@ -1469,13 +1471,15 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_002, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
     Vector3f lightPosition = Vector3f(0.5f, 0.5f, 1.0f);
-    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_POSITION, lightPosition);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightPosition.x_, lightPosition.x_);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightPosition.y_, lightPosition.y_);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightPosition.z_, lightPosition.z_);
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_POSITION,
+        lightPosition);
+    EXPECT_FLOAT_EQ(params->lightPosition.x_, lightPosition.x_);
+    EXPECT_FLOAT_EQ(params->lightPosition.y_, lightPosition.y_);
+    EXPECT_FLOAT_EQ(params->lightPosition.z_, lightPosition.z_);
 }
 
 /**
@@ -1487,14 +1491,15 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_003, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
     Vector4f lightColor = Vector4f(1.0f, 0.8f, 0.6f, 1.0f);
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_COLOR, lightColor);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightColor.x_, lightColor.x_);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightColor.y_, lightColor.y_);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightColor.z_, lightColor.z_);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightColor.w_, lightColor.w_);
+    EXPECT_FLOAT_EQ(params->lightColor.x_, lightColor.x_);
+    EXPECT_FLOAT_EQ(params->lightColor.y_, lightColor.y_);
+    EXPECT_FLOAT_EQ(params->lightColor.z_, lightColor.z_);
+    EXPECT_FLOAT_EQ(params->lightColor.w_, lightColor.w_);
 }
 
 /**
@@ -1506,13 +1511,14 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_004, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
     Drawing::GERippleShaderMaskParams maskParam;
     auto geRippleShaderMask = std::make_shared<Drawing::GERippleShaderMask>(maskParam);
     auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRippleShaderMask);
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_MASK, shaderMask);
-    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->mask, shaderMask);
+    EXPECT_EQ(params->mask, shaderMask);
 }
 
 /**
@@ -1524,11 +1530,12 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_005, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
-    float defaultValue = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightIntensity;
+    float defaultValue = params->lightIntensity;
     geVisualEffectImpl.SetParam("", 5.0f);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightIntensity, defaultValue);
+    EXPECT_FLOAT_EQ(params->lightIntensity, defaultValue);
 }
 
 /**
@@ -1540,19 +1547,20 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_006, TestSize.Level1
 {
     Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
     geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
-    ASSERT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
 
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, 0.0f);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightIntensity, 0.0f);
+    EXPECT_FLOAT_EQ(params->lightIntensity, 0.0f);
 
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, -1.0f);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->lightIntensity, -1.0f);
+    EXPECT_FLOAT_EQ(params->lightIntensity, -1.0f);
 
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, 0.0f);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->attenuation, 0.0f);
+    EXPECT_FLOAT_EQ(params->attenuation, 0.0f);
 
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, 100.0f);
-    EXPECT_FLOAT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>()->attenuation, 100.0f);
+    EXPECT_FLOAT_EQ(params->attenuation, 100.0f);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
