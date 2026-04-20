@@ -112,6 +112,13 @@ constexpr char SHADER[] = R"(
         {
             vec2 lerpDistortion = vec2(mix(barrelDistortion.x, barrelDistortion.y, newUV.x),
                                        mix(barrelDistortion.z, barrelDistortion.w, newUV.y));
+            // Clip the repeating texture
+            if (lerpDistortion.x < 0.0 && (newUV.x < 0.0 || newUV.x > 1.0)) {
+                return half4(0.0);
+            }
+          	if (lerpDistortion.y < 0.0 && (newUV.y < 0.0 || newUV.y > 1.0)) {
+                return half4(0.0);
+            }
             vec2 centerNewUV = newUV - vec2(0.5);
             vec2 normFactor = 1.0 / (1.0 + lerpDistortion * 0.5); // makes the corners align with params
             float l = length(centerNewUV);
