@@ -113,6 +113,7 @@ def generate_header(root_dir: Path, params_dirs: List[Path]) -> str:
     output.append("} // namespace OHOS")
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_EFFECTS_PARAMS_H")
+    output.append("")
 
     return "\n".join(output)
 

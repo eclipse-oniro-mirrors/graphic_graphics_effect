@@ -1020,84 +1020,6 @@ def simplify_params_type(full_qualified_type: str, known_params_types: List[str]
     return full_qualified_type
 
 
-def generate_filter_type_info_v2_header(macro_infos: List[FilterTypeMacroInfo], structs: List[StructInfo]) -> str:
-    """Generate GEFilterTypeInfoV2 header file content."""
-    output = []
-
-    known_params_types = [struct.name for struct in structs]
-
-    output.append(COPYRIGHT_HEADER)
-    output.append("")
-    output.append("#ifndef GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_H")
-    output.append("#define GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_H")
-    output.append("")
-    output.append("#include <type_traits>")
-    output.append('#include "ge_filter_type.h"')
-    output.append('#include "ge_params_reflection.h"')
-    output.append("")
-
-    # Group by header file and add includes
-    header_to_macros = {}
-    for info in macro_infos:
-        if info.header_file not in header_to_macros:
-            header_to_macros[info.header_file] = []
-        header_to_macros[info.header_file].append(info)
-
-    # Add includes for each header file
-    for header_file in sorted(header_to_macros.keys()):
-        output.append(f'#include "{header_file}"')
-    output.append("")
-
-    output.append("namespace OHOS {")
-    output.append("namespace Rosen {")
-    output.append("namespace Drawing {")
-    output.append("")
-
-    # Base template
-    output.append("// GEFilterTypeInfoV2 - Type information for filter classes")
-    output.append("template<typename T, typename = void>")
-    output.append("struct GEFilterTypeInfoV2 {")
-    output.append("    using FilterClass = T;")
-    output.append("    using ParamType = void;")
-    output.append("    static constexpr GEFilterType ID = GEFilterType::NONE;")
-    output.append('    static constexpr std::string_view Name = "";')
-    output.append("};")
-    output.append("")
-
-    # Helper macro for GEFilterTypeInfoV2 specializations
-    output.append("#define GE_FILTER_TYPE_INFO(_FilterClass, _ParamType) \\")
-    output.append("    template<> \\")
-    output.append("    struct GEFilterTypeInfoV2<_FilterClass> { \\")
-    output.append("        using FilterClass = _FilterClass; \\")
-    output.append("        using ParamType = _ParamType; \\")
-    output.append("        static constexpr GEFilterType ID = GEFilterParamsTypeInfo<_ParamType>::ID; \\")
-    output.append("        static constexpr std::string_view Name = GEFilterParamsTypeInfo<_ParamType>::FilterName; \\")
-    output.append("    }")
-    output.append("")
-
-    # Specializations for each filter class
-    output.append("// Specializations for filter classes")
-    output.append("// Each filter class uses DECLARE_GEFILTER_TYPEFUNC(FilterClass, ParamType)")
-    output.append("")
-
-    for info in macro_infos:
-        # Simplify params type if it matches a known params type
-        simplified_params_type = simplify_params_type(info.params_type, known_params_types)
-        output.append(f"GE_FILTER_TYPE_INFO({info.filter_class}, {simplified_params_type});")
-
-    output.append("")
-    output.append("#undef GE_FILTER_TYPE_INFO")
-    output.append("")
-
-    output.append("} // namespace Drawing")
-    output.append("} // namespace Rosen")
-    output.append("} // namespace OHOS")
-    output.append("")
-    output.append("#endif // GRAPHICS_EFFECT_GE_FILTER_TYPE_INFO_H")
-
-    return "\n".join(output)
-
-
 def generate_min_constraint(tag: str, field_type: str, min_val: str) -> str:
     """Generate constraint metadata for min only."""
     if "{" in str(min_val):
@@ -1537,6 +1459,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blo
     output.append("} // namespace OHOS")
     output.append("")
     output.append("#endif // GRAPHICS_EFFECT_GE_PARAMS_REFLECTION_H")
+    output.append("")
 
     return "\n".join(output)
 
