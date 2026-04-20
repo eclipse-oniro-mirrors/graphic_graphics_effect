@@ -2,11 +2,11 @@
 
 ## TLDR
 
-This document describes the architecture of GE's **declarative parameter system with code generation** — how `.params` files define effect parameters, and how the generator produces reflection metadata for runtime access.
+This document describes the architecture of GE's **declarative parameter system with code generation** — how `.params.in` files define effect parameters, and how the generator produces reflection metadata for runtime access.
 
 **Key Points**:
 - **Generated files** (marked with `// AUTO GENERATED` header) must **NOT be edited manually** — they are overwritten on each generator run
-- To modify behavior: edit `.params` source files, not generated output
+- To modify behavior: edit `.params.in` source files, not generated output
 - The system replaces 60+ individual parameter members with a single type-erased container
 
 | Generated File | Generator | Status |
@@ -34,7 +34,7 @@ Before v2, `GEVisualEffectImpl` stored **60+ independent parameter member variab
 **Declarative parameter definition + code generation**:
 
 ```
-.params files (declarative definitions)
+.params.in files (declarative definitions)
         ↓
     Code generator
         ↓
@@ -56,7 +56,7 @@ Reflection metadata (ge_params_reflection.h/cpp)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                        .params files                                 │
+│                        .params.in files                                 │
 │   [[ge::params]] struct GEKawaseBlurShaderFilterParams { ... }      │
 └───────────────────────────────────┬─────────────────────────────────┘
                                     │ parse
@@ -209,7 +209,7 @@ All generated files contain the header:
 
 | Need | Location |
 |------|----------|
-| Add/modify parameters | Edit `.params` files |
+| Add/modify parameters | Edit `.params.in` files |
 | Add custom transformer | Edit `ge_value_transformer.h` |
 | Type alias config | Edit `tool/generate_metadata/config.json` |
 | Generator logic | Edit `gen_metadata.py` |
@@ -217,8 +217,8 @@ All generated files contain the header:
 ### Workflow for Adding New Effects
 
 ```bash
-# 1. Create .params file
-vim include/effect/filter/ge_new_filter.params
+# 1. Create .params.in file
+vim include/effect/filter/ge_new_filter.params.in
 
 # 2. Add GEFilterType enum value
 vim include/core/ge_filter_type.h
@@ -231,7 +231,7 @@ python tool/generate_metadata/gen_effect_header.py
 vim src/effect/filter/ge_new_filter.cpp
 ```
 
-**Critical order**: Define `.params` → Generate → Implement. Reverse order causes build failures.
+**Critical order**: Define `.params.in` → Generate → Implement. Reverse order causes build failures.
 
 ### String Tag Uniqueness
 
@@ -239,7 +239,7 @@ vim src/effect/filter/ge_new_filter.cpp
 
 Avoid conflicts:
 - Use effect name as prefix: `KAWASE_BLUR_RADIUS`, `MESA_BLUR_RADIUS`
-- Check existing `.params` files for naming patterns
+- Check existing `.params.in` files for naming patterns
 - Use `alias` attribute for backward compatibility, not duplicate tags
 
 ### Type Conversion Usage
@@ -273,7 +273,7 @@ struct MyTransformer {
 };
 ```
 
-Reference in `.params`:
+Reference in `.params.in`:
 
 ```cpp
 [[ge::prop(name="FIELD", cast_from="FromType", custom="MyTransformer")]]
@@ -337,7 +337,7 @@ void GEMyBlurShaderFilter::DoFilter(...) {
 
 ## Common Issues
 
-### Q: Build fails after modifying `.params`?
+### Q: Build fails after modifying `.params.in`?
 
 **Cause**: Generated `.h/.cpp` files not updated.
 
@@ -356,7 +356,7 @@ void GEMyBlurShaderFilter::DoFilter(...) {
 **Cause**: String not registered in `GEParamsMemberTagFromString` map.
 
 **Solution**:
-- Confirm `[[ge::prop("NAME")]]` definition in `.params`
+- Confirm `[[ge::prop("NAME")]]` definition in `.params.in`
 - Check spelling
 - Use `alias` attribute for backward compatibility
 
@@ -373,7 +373,7 @@ void GEMyBlurShaderFilter::DoFilter(...) {
 ## References
 
 - **Tool usage guide**: [`tool/generate_metadata/README.md`](../../tool/generate_metadata/README.md)
-- **Parameter definition examples**: `include/effect/filter/*.params`
+- **Parameter definition examples**: `include/effect/filter/*.params.in`
 - **Generated reflection code**: `include/effect/ge_params_reflection.h`
 - **Transformer definitions**: `include/effect/ge_value_transformer.h`
 - **Core implementation**: `include/core/ge_visual_effect_impl.h`
