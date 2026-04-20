@@ -485,6 +485,11 @@ enum class GEParamsMemberTag : uint32_t {
     SOUND_WAVE_SHOCK_WAVE_PROGRESS_A,
     SOUND_WAVE_SHOCK_WAVE_PROGRESS_B,
     SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA,
+    SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
+    SPATIAL_POINT_LIGHT_LIGHT_POSITION,
+    SPATIAL_POINT_LIGHT_ATTENUATION,
+    SPATIAL_POINT_LIGHT_LIGHT_COLOR,
+    SPATIAL_POINT_LIGHT_MASK,
     USE_EFFECT_MASK_IMAGE,
     USE_EFFECT_MASK_USE_EFFECT,
     VARIABLE_RADIUS_BLUR_MASK,
@@ -1346,6 +1351,7 @@ GE_PARAMS_TYPE_INFO(GESDFTransformShapeParams, SDF_TRANSFORM_SHAPE, SDFTransform
 GE_PARAMS_TYPE_INFO(GESDFTriangleShapeParams, SDF_TRIANGLE_SHAPE, SDFTriangleShape);
 GE_PARAMS_TYPE_INFO(GESDFUnionOpShapeParams, SDF_UNION_OP, SDFUnionOpShape);
 GE_PARAMS_TYPE_INFO(GESoundWaveFilterParams, SOUND_WAVE, SoundWave);
+GE_PARAMS_TYPE_INFO(GESpatialPointLightShaderParams, SPATIAL_POINT_LIGHT, SpatialPointLight);
 GE_PARAMS_TYPE_INFO(GEUseEffectMaskParams, USE_EFFECT_MASK, UseEffectMask);
 GE_PARAMS_TYPE_INFO(GEVariableRadiusBlurShaderFilterParams, VARIABLE_RADIUS_BLUR, VariableRadiusBlur);
 GE_PARAMS_TYPE_INFO(GEWaterDropletTransitionFilterParams, WATER_DROPLET_TRANSITION, WaterDropletTransition);
@@ -2079,6 +2085,15 @@ GE_PARAMS_FIELD_ACCESSOR(
     GESoundWaveFilterParams, shockWaveProgressB, SOUND_WAVE_SHOCK_WAVE_PROGRESS_B, SoundWave_ProgressB);
 GE_PARAMS_FIELD_ACCESSOR(
     GESoundWaveFilterParams, shockWaveTotalAlpha, SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA, SoundWave_TotalAlpha);
+GE_PARAMS_FIELD_ACCESSOR(GESpatialPointLightShaderParams, lightIntensity, SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
+    SpatialPointLight_LightIntensity);
+GE_PARAMS_FIELD_ACCESSOR(GESpatialPointLightShaderParams, lightPosition, SPATIAL_POINT_LIGHT_LIGHT_POSITION,
+    SpatialPointLight_LightPosition);
+GE_PARAMS_FIELD_ACCESSOR(
+    GESpatialPointLightShaderParams, attenuation, SPATIAL_POINT_LIGHT_ATTENUATION, SpatialPointLight_Attenuation);
+GE_PARAMS_FIELD_ACCESSOR(
+    GESpatialPointLightShaderParams, lightColor, SPATIAL_POINT_LIGHT_LIGHT_COLOR, SpatialPointLight_LightColor);
+GE_PARAMS_FIELD_ACCESSOR(GESpatialPointLightShaderParams, mask, SPATIAL_POINT_LIGHT_MASK, SpatialPointLight_Mask);
 GE_PARAMS_FIELD_ACCESSOR(GEUseEffectMaskParams, image, USE_EFFECT_MASK_IMAGE, UseEffectMask_Image);
 GE_PARAMS_FIELD_ACCESSOR(GEUseEffectMaskParams, useEffect, USE_EFFECT_MASK_USE_EFFECT, UseEffectMask_UseEffect);
 GE_PARAMS_FIELD_ACCESSOR(

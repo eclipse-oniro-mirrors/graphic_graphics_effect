@@ -100,6 +100,7 @@ namespace Drawing {
 #include "effect/shader/ge_harmonium_effect_shader.params"
 #include "effect/shader/ge_particle_circular_halo_shader.params"
 #include "effect/shader/ge_sdf_edge_light_effect.params"
+#include "effect/shader/ge_spatial_point_light.params"
 #include "effect/shader/ge_wavy_ripple_light_shader.params"
 #include "effect/shader/gex_aibar_glow_effect.params"
 #include "effect/shader/gex_aibar_rect_halo_effect.params"
