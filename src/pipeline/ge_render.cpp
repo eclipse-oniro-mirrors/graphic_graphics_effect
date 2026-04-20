@@ -402,10 +402,10 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
     {GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
         {
             std::shared_ptr<GEShader> out = nullptr;
-            if (ve == nullptr || ve->GetSpatialPointLightParams() == nullptr) {
+            if (ve == nullptr || ve->GetParmas<Drawing::GESpatialPointLightShaderParams>() == nullptr) {
                 return out;
             }
-            const auto& params = ve->GetSpatialPointLightParams();
+            const auto& params = ve->GetParmas<Drawing::GESpatialPointLightShaderParams>();
             out = std::make_shared<GESpatialPointLightShader>(*params);
             return out;
         }
