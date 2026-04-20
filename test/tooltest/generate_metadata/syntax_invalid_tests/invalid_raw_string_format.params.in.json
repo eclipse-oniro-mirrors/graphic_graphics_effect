@@ -3,8 +3,8 @@
   "should_parse": false,
   "expected_error_count": 2,
   "expected_errors": [
-    "syntax_invalid_tests/invalid_raw_string_format.params:line 20, column 8: Invalid raw string literal (missing opening '(' after R\"delimiter)",
-    "syntax_invalid_tests/invalid_raw_string_format.params:line 20, column 8: Unterminated raw string literal in attribute"
+    "syntax_invalid_tests/invalid_raw_string_format.params.in:line 20, column 8: Invalid raw string literal (missing opening '(' after R\"delimiter)",
+    "syntax_invalid_tests/invalid_raw_string_format.params.in:line 20, column 8: Unterminated raw string literal in attribute"
   ],
   "structs": [
     {

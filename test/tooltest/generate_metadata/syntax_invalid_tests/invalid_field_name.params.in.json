@@ -3,7 +3,7 @@
   "should_parse": false,
   "expected_error_count": 1,
   "expected_errors": [
-    "syntax_invalid_tests/invalid_field_name.params:line 21, column 5: Field 'float' in struct 'TestNoFieldNameParams' has empty type declaration"
+    "syntax_invalid_tests/invalid_field_name.params.in:line 21, column 5: Field 'float' in struct 'TestNoFieldNameParams' has empty type declaration"
   ],
   "structs": [
     {

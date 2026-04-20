@@ -117,14 +117,14 @@ def get_effect_info(effect_type: str) -> Dict:
 
 
 def generate_params_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
-    """Generate .params file."""
+    """Generate .params.in file."""
     info = get_effect_info(effect_type)
     snake_name = to_snake_case(name)
     pascal_name = to_pascal_case(name)
     class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
     params_class = f"{class_name}Params"
 
-    file_name = f"{to_snake_case(class_name)}.params"
+    file_name = f"{to_snake_case(class_name)}.params.in"
 
     template = load_template(templates_dir / f"{effect_type}.params.tpl")
     template_content = strip_template_copyright(template.template)

@@ -600,7 +600,7 @@ class TestRunner:
         """Load expected results from individual JSON files alongside test files."""
         loaded_count = 0
         for test_case in self.test_cases:
-            expected_file = test_case.file_path.with_suffix(".params.json")
+            expected_file = Path(str(test_case.file_path) + ".json")
 
             if not expected_file.exists():
                 continue
@@ -682,19 +682,19 @@ class TestRunner:
                 notes="",
             )
 
-            # Save to a .params.json file next to the test file
-            output_file = test_case.file_path.with_suffix(".params.json")
+            # Save to a .params.in.json file next to the test file
+            output_file = Path(str(test_case.file_path) + ".json")
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(asdict(expected_result), f, indent=2, ensure_ascii=False)
 
             saved_count += 1
 
         print(f"\nSaved {saved_count} expected results files alongside test files")
-        print(f"Pattern: <test_file>.params.json")
+        print(f"Pattern: <test_file>.json")
 
     def discover_tests(self):
         """Discover all test cases."""
-        valid_files = sorted(self.valid_dir.glob("*.params"))
+        valid_files = sorted(self.valid_dir.glob("*.params.in"))
         for file_path in valid_files:
             test_case = TestCase(
                 name=f"[syntax valid test] {file_path.stem}",
@@ -703,7 +703,7 @@ class TestRunner:
             )
             self.test_cases.append(test_case)
 
-        invalid_files = sorted(self.invalid_dir.glob("*.params"))
+        invalid_files = sorted(self.invalid_dir.glob("*.params.in"))
         for file_path in invalid_files:
             test_case = TestCase(
                 name=f"[syntax invalid test] {file_path.stem}",
@@ -797,7 +797,7 @@ def main():
     parser.add_argument(
         "--save-expected",
         action="store_true",
-        help="Save current results as expected results (saves .params.json files alongside test files)",
+        help="Save current results as expected results (saves .params.in.json files alongside test files)",
     )
     parser.add_argument(
         "--show-all-details",
@@ -814,11 +814,11 @@ def main():
 
     loaded = runner.load_expected_results()
     if not loaded:
-        print("Warning: No .params.json files found. Tests will be PARSED ONLY.")
+        print("Warning: No .params.in.json files found. Tests will be PARSED ONLY.")
         print("Run with --save-expected to generate expected results files.")
     else:
         print(
-            f"Loaded {len(runner.expected_results)} expected results from .params.json files"
+            f"Loaded {len(runner.expected_results)} expected results from .params.in.json files"
         )
 
     runner.run_all_tests()
