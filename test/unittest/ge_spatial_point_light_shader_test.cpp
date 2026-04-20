@@ -52,7 +52,7 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest001, TestSi
 /**
  * @tc.name: GESpatialPointLightShaderTest002
  * @tc.type: FUNC
- * @tc.desc: Test construction with params and GetSpatialPointLightBuilder
+ * @tc.desc: Test construction with params and GetSpatialPointLightBuilderNoMask
  */
 HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest002, TestSize.Level1)
 {
@@ -63,9 +63,9 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest002, TestSi
     params.lightColor = Vector4f(1.0f, 0.8f, 0.6f, 1.0f);
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
-    auto builder1 = shader->GetSpatialPointLightBuilder();
+    auto builder1 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder1, nullptr);
-    auto builder2 = shader->GetSpatialPointLightBuilder();
+    auto builder2 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder2, nullptr);
 }
 
@@ -457,13 +457,13 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest018, TestSi
     params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
-    auto builder1 = shader->GetSpatialPointLightBuilder();
+    auto builder1 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder1, nullptr);
 
-    auto builder2 = shader->GetSpatialPointLightBuilder();
+    auto builder2 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder2, nullptr);
 
-    auto builder3 = shader->GetSpatialPointLightBuilder();
+    auto builder3 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder3, nullptr);
 }
 
