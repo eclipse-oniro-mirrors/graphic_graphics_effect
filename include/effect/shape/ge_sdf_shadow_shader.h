@@ -93,11 +93,11 @@ private:
             }
 
             // Recalculate the distance if there is offset
-            if (any(notEqual(shadowOffset, vec2(0.0))))
-            {
-                d = sdfShape.eval(coord - shadowOffset).a;
-            }
-
+            if (any(notEqual(shadowOffset, vec2(0.0)))) 
+            {   
+                d = sdfShape.eval(coord - shadowOffset).a;  
+            }   
+    
             if (d <= shadowRadius)
             {
                 float alpha = 1.0 - smoothstep(-shadowRadius, shadowRadius, d);
