@@ -24,6 +24,58 @@ namespace Rosen {
 namespace {
     constexpr int COLOR_CHANNEL = 4;
     constexpr int POSITION_DIMENSION = 3;
+
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> spatialPointLightShaderEffect_ = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> spatialPointLightShaderEffectWithMask_ = nullptr;
+
+    // Shader without mask - full screen effect
+    static constexpr char PROG_NO_MASK[] = R"(
+        uniform vec2 iResolution;
+        uniform vec3 lightPosition;
+        uniform half4 lightColor;
+        uniform half lightIntensity;
+        uniform half attenuation;
+
+        half4 main(vec2 fragCoord)
+        {
+            vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
+            vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
+
+            vec3 viewDir = lightDir;
+            vec3 halfwayDir = normalize(lightDir + viewDir);
+            float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
+
+            vec4 fragColor = spec * lightIntensity * lightColor;
+            return fragColor;
+        }
+    )";
+
+    // Shader with mask - uses mask for lighting effect
+    static constexpr char PROG_WITH_MASK[] = R"(
+        uniform vec2 iResolution;
+        uniform vec3 lightPosition;
+        uniform half4 lightColor;
+        uniform half lightIntensity;
+        uniform half attenuation;
+        uniform shader mask;
+
+        half4 main(vec2 fragCoord)
+        {
+            half4 normalMap = mask.eval(fragCoord);
+            if (normalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
+                return vec4(0.0);
+            }
+            vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
+            vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
+
+            vec3 viewDir = lightDir;
+            vec3 halfwayDir = normalize(lightDir + viewDir);
+            float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
+
+            vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
+            return fragColor;
+        }
+    )";
 }
 
 GESpatialPointLightShader::GESpatialPointLightShader() {}
@@ -40,45 +92,32 @@ void GESpatialPointLightShader::MakeDrawingShader(const Drawing::Rect& rect, flo
     drShader_ = MakeSpatialPointLightShader(rect);
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilder()
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderNoMask()
 {
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> spatialPointLightShaderEffect_ = nullptr;
-
     if (spatialPointLightShaderEffect_ == nullptr) {
-        static constexpr char prog[] = R"(
-            uniform vec2 iResolution;
-            uniform vec3 lightPosition;
-            uniform half4 lightColor;
-            uniform half lightIntensity;
-            uniform half attenuation;
-            uniform shader mask;
-
-            half4 main(vec2 fragCoord)
-            {
-                half4 normalMap = mask.eval(fragCoord);
-                if (normalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
-                    return vec4(0.0);
-                }
-                vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
-                vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
-
-                vec3 viewDir = lightDir;
-                vec3 halfwayDir = normalize(lightDir + viewDir);
-                float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
-
-                vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
-                return fragColor;
-            }
-        )";
-        spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
-        GE_LOGD("RuntimeEffect created");
+        spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
+        GE_LOGD("RuntimeEffect (no mask) created");
     }
 
     if (spatialPointLightShaderEffect_ == nullptr) {
-        GE_LOGE("GetSpatialPointLightBuilder effect is nullptr.");
+        GE_LOGE("GetSpatialPointLightBuilderNoMask effect is nullptr.");
         return nullptr;
     }
     return std::make_shared<Drawing::RuntimeShaderBuilder>(spatialPointLightShaderEffect_);
+}
+
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderWithMask()
+{
+    if (spatialPointLightShaderEffectWithMask_ == nullptr) {
+        spatialPointLightShaderEffectWithMask_ = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
+        GE_LOGD("RuntimeEffect (with mask) created");
+    }
+
+    if (spatialPointLightShaderEffectWithMask_ == nullptr) {
+        GE_LOGE("GetSpatialPointLightBuilderWithMask effect is nullptr.");
+        return nullptr;
+    }
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(spatialPointLightShaderEffectWithMask_);
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPointLightShader(const Drawing::Rect& rect)
@@ -91,7 +130,13 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
         return nullptr;
     }
 
-    builder_ = GetSpatialPointLightBuilder();
+    // Choose builder based on whether mask exists
+    if (pointLightParams_.mask != nullptr) {
+        builder_ = GetSpatialPointLightBuilderWithMask();
+    } else {
+        builder_ = GetSpatialPointLightBuilderNoMask();
+    }
+
     if (builder_ == nullptr) {
         GE_LOGE("MakeSpatialPointLightShader builder is nullptr.");
         return nullptr;
@@ -101,9 +146,17 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), COLOR_CHANNEL);
     builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     builder_->SetUniform("attenuation", pointLightParams_.attenuation);
+
+    // Only set mask child when mask exists
     if (pointLightParams_.mask != nullptr) {
-        builder_->SetChild("mask", pointLightParams_.mask->GenerateDrawingShader(width, height));
+        auto maskShader = pointLightParams_.mask->GenerateDrawingShader(width, height);
+        if (maskShader == nullptr) {
+            GE_LOGE("MakeSpatialPointLightShader mask shader is nullptr.");
+            return nullptr;
+        }
+        builder_->SetChild("mask", maskShader);
     }
+
     auto spatialPointLightShader = builder_->MakeShader(nullptr, false);
     if (spatialPointLightShader == nullptr) {
         GE_LOGE("MakeSpatialPointLightShader shader is nullptr.");

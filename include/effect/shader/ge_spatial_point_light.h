@@ -44,7 +44,8 @@ public:
 
     std::shared_ptr<Drawing::ShaderEffect> MakeSpatialPointLightShader(const Drawing::Rect& rect);
 
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSpatialPointLightBuilder();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSpatialPointLightBuilderNoMask();
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSpatialPointLightBuilderWithMask();
 
 private:
     GESpatialPointLightShader(const GESpatialPointLightShader&) = delete;
