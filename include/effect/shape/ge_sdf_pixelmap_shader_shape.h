@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_SDF_PIXELMAP_SHAPE_H
 #define GRAPHICS_EFFECT_GE_SDF_PIXELMAP_SHAPE_H
 
+#include "ge_filter_type_info.h"
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
@@ -28,6 +29,8 @@ public:
     GESDFPixelmapShaderShape(const GESDFPixelmapShapeParams& param) : params_(param) {}
     GESDFPixelmapShaderShape(const GESDFPixelmapShaderShape&) = delete;
     virtual ~GESDFPixelmapShaderShape() = default;
+
+    DECLARE_GEFILTER_TYPEFUNC(GESDFPixelmapShaderShape, GESDFPixelmapShapeParams)
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

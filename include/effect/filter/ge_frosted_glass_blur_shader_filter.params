@@ -1,0 +1,23 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=FROSTED_GLASS_BLUR, name="FrostedGlassBlur")]] GEFrostedGlassBlurShaderFilterParams {
+    [[ge::prop(name="FrostedGlassBlur_Radius", min=0.0f, max=200.0f)]]
+    float radius = 0.0f; // blurParam[0]: blur radius
+    [[ge::prop(name="FrostedGlassBlur_RadiusScaleK", min=0.0f, max=200.0f)]]
+    float radiusScale = 4.0f; // blurParam[1]: scale ratio for blur radius of baseblur and edgeblur
+    [[ge::prop(name="FrostedGlassBlur_RefractOutPx", min=-500.0f, max=500.0f)]]
+    float refractOutPx = 0.8f; // envlightParam[0]: envlight refraction outward sampling degree
+};

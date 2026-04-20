@@ -1,0 +1,19 @@
+{
+  "name": "function_as_field",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestFuncFieldParams",
+      "enum_type": "TEST_FUNC_FIELD",
+      "filter_name": "TestFuncField",
+      "fields": [],
+      "params": {
+        "type": "TEST_FUNC_FIELD",
+        "name": "TestFuncField"
+      }
+    }
+  ],
+  "notes": ""
+}

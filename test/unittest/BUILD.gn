@@ -61,6 +61,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/core/ge_visual_effect.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_impl.cpp",
+    "${graphics_effect_root}/src/effect/ge_params_reflection.cpp",
     "${graphics_effect_root}/src/pipeline/ge_render.cpp",
     "${graphics_effect_root}/src/pipeline/ge_filter_composer.cpp",
     "${graphics_effect_root}/src/pipeline/ge_direct_draw_on_canvas_pass.cpp",

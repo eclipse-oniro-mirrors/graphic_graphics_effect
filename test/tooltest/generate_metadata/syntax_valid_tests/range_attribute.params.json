@@ -1,0 +1,210 @@
+{
+  "name": "range_attribute",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestRangeParams",
+      "enum_type": "TEST_RANGE",
+      "filter_name": "TestRange",
+      "fields": [
+        {
+          "type": "float",
+          "name": "progress",
+          "default_value": "0.0f",
+          "prop_name": "PROGRESSX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "PROGRESSX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
+        },
+        {
+          "type": "float",
+          "name": "radius",
+          "default_value": "1.0f",
+          "prop_name": "RADIUSX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "RADIUSX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0.0",
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "float",
+          "name": "intensity",
+          "default_value": "5.0f",
+          "prop_name": "INTENSITYX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "INTENSITYX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": "10.0"
+            }
+          ]
+        },
+        {
+          "type": "Vector2f",
+          "name": "coord",
+          "default_value": "{0.5f,0.5f}",
+          "prop_name": "NORMALIZED_COORDX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "NORMALIZED_COORDX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
+        },
+        {
+          "type": "Vector3f",
+          "name": "position",
+          "default_value": "{1.0f,1.0f,1.0f}",
+          "prop_name": "POSITIONX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "POSITIONX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0.0",
+              "max_value": "10.0"
+            }
+          ]
+        },
+        {
+          "type": "Vector4f",
+          "name": "color",
+          "default_value": "{1.0f,1.0f,1.0f,1.0f}",
+          "prop_name": "COLORX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "COLORX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
+        },
+        {
+          "type": "Vector3f",
+          "name": "kbs",
+          "default_value": "{1.0f,1.0f,0.0f}",
+          "prop_name": "KBSX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "KBSX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "{0.0, 0.0, -1.0}",
+              "max_value": "{10.0, 10.0, 1.0}"
+            }
+          ]
+        },
+        {
+          "type": "Vector2f",
+          "name": "asymmetric",
+          "default_value": "{0.5f,1.0f}",
+          "prop_name": "ASYMMETRICX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "ASYMMETRICX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "{0.0, 0.0}",
+              "max_value": "{1.0, 2.0}"
+            }
+          ]
+        },
+        {
+          "type": "int",
+          "name": "count",
+          "default_value": "50",
+          "prop_name": "COUNTX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "COUNTX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "0",
+              "max_value": "100"
+            }
+          ]
+        },
+        {
+          "type": "float",
+          "name": "offset",
+          "default_value": "0.0f",
+          "prop_name": "OFFSETX",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "OFFSETX",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": "-50.0",
+              "max_value": "50.0"
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "TEST_RANGE",
+        "name": "TestRange"
+      }
+    }
+  ],
+  "notes": ""
+}

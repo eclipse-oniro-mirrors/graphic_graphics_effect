@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=CIRCLE_FLOWLIGHT, name="CircleFlowlight")]] GECircleFlowlightEffectParams {
+    [[ge::prop(name="CircleFlowlight_Color", array_accessor_length=4, array_accessor_type="Vector4f")]]
+    std::array<Vector4f, 4> colors;
+    [[ge::prop("CircleFlowlight_RotationFrequency")]]
+    Vector4f rotationFrequency;
+    [[ge::prop("CircleFlowlight_RotationAmplitude")]]
+    Vector4f rotationAmplitude;
+    [[ge::prop("CircleFlowlight_RotationSeed")]]
+    Vector4f rotationSeed;
+    [[ge::prop("CircleFlowlight_GradientX")]]
+    Vector4f gradientX;
+    [[ge::prop("CircleFlowlight_GradientY")]]
+    Vector4f gradientY;
+    [[ge::prop("CircleFlowlight_Progress")]]
+    float progress = 0.0f;
+    [[ge::prop("CircleFlowlight_Strength")]]
+    Vector4f strength = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    [[ge::prop("CircleFlowlight_DistortStrength")]]
+    float distortStrength = 4.0f;
+    [[ge::prop("CircleFlowlight_BlendGradient")]]
+    float blendGradient = 1.0f;
+    std::shared_ptr<GEShaderMask> mask;
+};

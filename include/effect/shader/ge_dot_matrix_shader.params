@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+// Enum types
+enum class DotMatrixEffectType {
+    NONE,
+    ROTATE,
+    RIPPLE,
+};
+
+enum class DotMatrixDirection {
+    TOP,
+    TOP_RIGHT,
+    RIGHT,
+    BOTTOM_RIGHT,
+    BOTTOM,
+    BOTTOM_LEFT,
+    LEFT,
+    TOP_LEFT,
+    MAX = TOP_LEFT,
+};
+
+struct [[ge::params(type=DOT_MATRIX, name="DotMatrixShader")]] GEDotMatrixShaderParams {
+    [[ge::prop(cast_from="int32_t")]]
+    DotMatrixDirection pathDirection_ = DotMatrixDirection::TOP_LEFT;
+    std::vector<Vector4f> effectColors_{};
+    [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
+    Vector2f colorFractions_ = Vector2f(0.0f, 0.0f);
+    std::vector<Vector2f> startPoints_{};
+    float pathWidth_ = 0.0f;
+    bool inverseEffect_ = false;
+    Vector4f dotColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    float dotSpacing_ = 0.0f;
+    float dotRadius_ = 0.0f;
+    Vector4f bgColor_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    [[ge::prop(cast_from="int32_t", custom="DotMatrixEffectTypeTransformer")]]
+    DotMatrixEffectType effectType_ = DotMatrixEffectType::NONE;
+    float progress_ = 0.0f;
+};

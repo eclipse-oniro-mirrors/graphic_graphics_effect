@@ -274,7 +274,7 @@ HWTEST_F(GEHpsEffectFilterTest, HpsSupportEffectGE_001, TestSize.Level0)
     Drawing::GEVisualEffectContainer veContainer;
     std::pair<float, float> factor = {0.5f, 0.5f};
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_MASK_RIPPLE);
-    visualEffect->visualEffectImpl_->rippleMaskParams_ = std::make_shared<Drawing::GERippleShaderMaskParams>();
+    visualEffect->visualEffectImpl_->MakeRippleMaskParams();
     visualEffect->visualEffectImpl_->filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
     visualEffect->SetParam(Drawing::GE_MASK_RIPPLE_CENTER, factor);
     veContainer.AddToChainedFilter(visualEffect);
