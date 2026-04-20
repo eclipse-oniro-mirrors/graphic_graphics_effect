@@ -1,0 +1,108 @@
+{
+  "name": "with_default_values",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestDefaultsParams",
+      "enum_type": "TEST_DEFAULTS",
+      "filter_name": "TestDefaults",
+      "fields": [
+        {
+          "type": "float",
+          "name": "floatValue",
+          "default_value": "1.5f",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "double",
+          "name": "doubleValue",
+          "default_value": "3.14159",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "intValue",
+          "default_value": "42",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "bool",
+          "name": "boolValue",
+          "default_value": "true",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "bool",
+          "name": "boolValue2",
+          "default_value": "false",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "char",
+          "name": "charValue",
+          "default_value": "x",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "hexValue",
+          "default_value": "0xFF",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "binaryValue",
+          "default_value": "0b1010",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "octalValue",
+          "default_value": "0755",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "float",
+          "name": "scientificNotation",
+          "default_value": "1.5e10",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "double",
+          "name": "negativeValue",
+          "default_value": "-123.456",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_DEFAULTS",
+        "name": "TestDefaults"
+      }
+    }
+  ],
+  "notes": ""
+}

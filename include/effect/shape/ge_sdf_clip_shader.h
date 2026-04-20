@@ -32,6 +32,8 @@ public:
     GESDFClipShader operator=(const GESDFClipShader&) = delete;
     ~GESDFClipShader() override = default;
 
+    DECLARE_GEFILTER_TYPEFUNC(GESDFClipShader, Drawing::GESDFClipShaderParams);
+
     const std::string GetDescription() const { return "GESDFClipShader"; }
 
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;

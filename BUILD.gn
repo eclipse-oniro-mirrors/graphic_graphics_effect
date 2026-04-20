@@ -88,6 +88,7 @@ ohos_source_set("graphics_effect_src") {
     "src/pipeline/ge_hps_build_pass.cpp",
     "src/pipeline/ge_hps_upscale_pass.cpp",
     "src/hps/ge_hps_effect_filter.cpp",
+    "src/effect/ge_params_reflection.cpp",
     "src/effect/filter/ge_shader_filter.cpp",
     "src/effect/filter/ge_aibar_shader_filter.cpp",
     "src/effect/filter/ge_bezier_warp_shader_filter.cpp",

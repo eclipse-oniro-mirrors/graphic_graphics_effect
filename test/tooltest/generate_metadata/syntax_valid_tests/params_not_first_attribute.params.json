@@ -1,0 +1,36 @@
+{
+  "name": "params_not_first_attribute",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestParamsNotFirstParams",
+      "enum_type": "TEST_PARAMS_NOT_FIRST",
+      "filter_name": "TestParamsNotFirst",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_PARAMS_NOT_FIRST",
+        "name": "TestParamsNotFirst"
+      }
+    }
+  ],
+  "notes": ""
+}

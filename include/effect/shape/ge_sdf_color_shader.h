@@ -33,6 +33,8 @@ public:
     GESDFColorShader operator=(const GESDFColorShader&) = delete;
     ~GESDFColorShader() override = default;
 
+    DECLARE_GEFILTER_TYPEFUNC(GESDFColorShader, Drawing::GESDFColorShaderParams);
+
     const std::string GetDescription() const { return "GESDFColorShader"; }
 
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;

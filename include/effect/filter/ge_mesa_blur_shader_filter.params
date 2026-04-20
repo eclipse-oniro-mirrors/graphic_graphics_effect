@@ -1,0 +1,41 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=MESA_BLUR, name="MESA_BLUR")]] GEMESABlurShaderFilterParams {
+    [[ge::prop("MESA_BLUR_RADIUS")]]
+    int radius;
+    [[ge::prop("MESA_BLUR_GREY_COEF_1")]]
+    float greyCoef1;
+    [[ge::prop("MESA_BLUR_GREY_COEF_2")]]
+    float greyCoef2;
+    [[ge::prop("OFFSET_X")]]
+    float offsetX;
+    [[ge::prop("OFFSET_Y")]]
+    float offsetY;
+    [[ge::prop("OFFSET_Z")]]
+    float offsetZ;
+    [[ge::prop("OFFSET_W")]]
+    float offsetW;
+    [[ge::prop("TILE_MODE")]]
+    int tileMode;
+    [[ge::prop("WIDTH")]]
+    float width;
+    [[ge::prop("HEIGHT")]]
+    float height;
+    [[ge::prop("MESA_BLUR_IS_DIRECTION")]]
+    bool isDirection = false;
+    [[ge::prop("MESA_BLUR_ANGLE")]]
+    float angle = 0.0f;
+};

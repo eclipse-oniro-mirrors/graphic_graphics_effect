@@ -1,0 +1,76 @@
+{
+  "name": "standard_attributes",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestStdAttrParams",
+      "enum_type": "TEST_STD_ATTR",
+      "filter_name": "TestStdAttr",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "1.0f",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "bool",
+          "name": "old_flag",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "double",
+          "name": "value3",
+          "default_value": "3.14",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "char",
+          "name": "ch",
+          "default_value": "a",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "value4",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "void*",
+          "name": "ptr",
+          "default_value": "nullptr",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_STD_ATTR",
+        "name": "TestStdAttr"
+      }
+    }
+  ],
+  "notes": ""
+}

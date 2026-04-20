@@ -1,0 +1,60 @@
+{
+  "name": "brace_initialization",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestBraceInitParams",
+      "enum_type": "TEST_BRACE_INIT",
+      "filter_name": "TestBraceInit",
+      "fields": [
+        {
+          "type": "Vector2f",
+          "name": "vec2",
+          "default_value": "{1.0f,2.0f}",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "Vector3f",
+          "name": "vec3",
+          "default_value": "{1.0f,2.0f,3.0f}",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "Vector4f",
+          "name": "vec4",
+          "default_value": "{1.0f,0.0f,0.0f,1.0f}",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "std::array<int,3>",
+          "name": "arr",
+          "default_value": "{1,2,3}",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        },
+        {
+          "type": "int",
+          "name": "values",
+          "default_value": "{1,2,3,4}",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_BRACE_INIT",
+        "name": "TestBraceInit"
+      }
+    }
+  ],
+  "notes": ""
+}

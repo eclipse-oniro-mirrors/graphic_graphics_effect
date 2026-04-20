@@ -1,0 +1,14 @@
+{
+  "type_aliases": {
+    "int": "int32_t",
+    "GESDFShaderShape": "Drawing::GESDFShaderShape",
+    "std::shared_ptr<GEShaderShape>": "std::shared_ptr<Drawing::GEShaderShape>",
+    "std::shared_ptr<GESDFShaderShape>" : "std::shared_ptr<Drawing::GESDFShaderShape>"
+  },
+  "member_setter_blocked_types" : [
+    {
+      "type": "std::shared_ptr<Drawing::GESDFShaderShape>",
+      "reason": "ambiguous setter with std::shared_ptr<Drawing::GEShaderShape> due to subclassing relationship"
+    }
+  ]
+}

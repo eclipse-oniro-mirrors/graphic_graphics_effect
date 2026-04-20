@@ -1,0 +1,66 @@
+{
+  "name": "with_attributes",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestAttrsParams",
+      "enum_type": "TEST_ATTRS",
+      "filter_name": "TestAttrs",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value1",
+          "default_value": "1.0f",
+          "prop_name": "Custom_Property_Name",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Custom_Property_Name",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "int",
+          "name": "value2",
+          "default_value": "",
+          "prop_name": "Another_Property",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "Another_Property",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "bool",
+          "name": "flag",
+          "default_value": "",
+          "prop_name": "",
+          "array_accessor_length": null,
+          "prop_attributes": []
+        }
+      ],
+      "params": {
+        "type": "TEST_ATTRS",
+        "name": "TestAttrs"
+      }
+    }
+  ],
+  "notes": ""
+}

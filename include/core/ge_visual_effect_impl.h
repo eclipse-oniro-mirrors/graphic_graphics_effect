@@ -1,5 +1,5 @@
- /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,68 +15,93 @@
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H
 
-#include <string>
-#include <map>
-#include <functional>
-#include <memory>
 #include <array>
+#include <functional>
+#include <map>
+#include <memory>
 #include <optional>
+#include <string>
 #include <vector>
 
-#include "ge_filter_type.h"
-#include "ge_shader.h"
-#include "ge_shader_filter.h"
-#include "ge_shader_filter_params.h"
-#include "ge_visual_effect.h"
-
+#include "common/rs_vector2.h"
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 #include "effect/color_filter.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_filter_params.h"
+#include "ge_filter_type.h"
+#include "ge_log.h"
+#include "ge_params_reflection.h"
+#include "ge_shader.h"
+#include "ge_shader_filter.h"
+#include "ge_shader_filter_params.h"
+#include "ge_visual_effect.h"
+
 #include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+/**
+ * GEVisualEffectImpl v2 - Refactored implementation using GEFilterParams variant.
+ *
+ * Key differences from v1:
+ * 1. Uses single `params_` member (type-erased GEFilterParams) instead of 60+ individual params
+ * 2. SetParam uses reflection metadata (GEParamsMemberTag) for type-safe field access
+ * 3. String-based SetParam uses generated GEParamsMemberTagFromString mapping
+ */
 class GE_EXPORT GEVisualEffectImpl {
 public:
+    // Type alias for compatiblilty. Many old call sites use GEVisualEffectImpl::FilterType
     using FilterType = GEFilterType;
 
     GEVisualEffectImpl(const std::string& name, const std::optional<Drawing::CanvasInfo>& canvasInfo = std::nullopt);
-
     ~GEVisualEffectImpl();
 
-    void SetParam(const std::string& tag, int32_t param);
-    void SetParam(const std::string& tag, int64_t param);
-    void SetParam(const std::string& tag, float param);
-    void SetParam(const std::string& tag, double param);
-    void SetParam(const std::string& tag, const char* const param);
+    // ========================================================================
+    // Main SetParam overloads using reflection
+    // ========================================================================
 
-    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::ColorFilter> param);
-    void SetParam(const std::string& tag, const Drawing::Matrix param);
-    void SetParam(const std::string& tag, const std::pair<float, float>& param);
-    void SetParam(const std::string& tag, const std::vector<std::pair<float, float>>& param);
-    void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
-    void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
-    void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
-    void SetParam(const std::string& tag, bool param);
-    void SetParam(const std::string& tag, uint32_t param);
-    void SetParam(const std::string& tag, const std::vector<float>& param);
-    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderMask> param);
-    void SetParam(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
-    void SetParam(const std::string& tag, const Drawing::Color4f& param);
-    void SetParam(const std::string& tag, const Vector3f& param);
-    void SetParam(const std::string& tag, const Vector4f& param);
-    void SetParam(const std::string& tag, const RectF& param);
-    void SetParam(const std::string& tag, const GERRect& param);
-    void SetParam(const std::string& tag, const GESDFBorderParams& param);
-    void SetParam(const std::string& tag, const GESDFShadowParams& param);
+    /// Set parameter by tag enum (type-safe, recommended)
+    template<typename T>
+    void SetParam(GEParamsMemberTag tag, T value)
+    {
+        if (!params_) {
+            GE_LOGE("GEVisualEffectImpl::SetParam: params_ is null");
+            return;
+        }
 
-    const std::shared_ptr<Drawing::GEShaderShape> GetGEShaderShape(const std::string& tag) const;
+        // Check if tag is valid for current params type
+        if (!IsTagValidForCurrentType(*params_, tag)) {
+            GE_LOGE(
+                "GEVisualEffectImpl::SetParam: tag %u not valid for current params type", static_cast<uint32_t>(tag));
+            return;
+        }
 
+        // Use generated helper to set parameter by tag
+        SetParamInternal(*params_, tag, value);
+    }
+
+    /// Set parameter by string tag (runtime lookup to enum, then dispatch)
+    template<typename T>
+    void SetParam(const std::string& tagStr, T value)
+    {
+        auto tag = GEParamsMemberHelper::GEParamsMemberTagFromString(tagStr);
+        if (tag != GEParamsMemberTag::INVALID) {
+            SetParam(tag, value);
+        } else {
+            // 2D effects may use string-based tags that are not in the enum for their specific use only
+            // Log and ignore unknown tags
+            GE_LOGD("GEVisualEffectImpl::SetParam: unknown tag '%s'", tagStr.c_str());
+        }
+    }
+
+    // ========================================================================
+    // Filter type management
+    // ========================================================================
+    // Not recommended to use
     void SetFilterType(FilterType type)
     {
         filterType_ = type;
@@ -87,556 +112,29 @@ public:
         return filterType_;
     }
 
-    void MakeMESAParams()
-    {
-        mesaParams_ = std::make_shared<GEMESABlurShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEMESABlurShaderFilterParams>& GetMESAParams() const
-    {
-        return mesaParams_;
-    }
-
-    void MakeKawaseParams()
-    {
-        kawaseParams_ = std::make_shared<GEKawaseBlurShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEKawaseBlurShaderFilterParams>& GetKawaseParams() const
-    {
-        return kawaseParams_;
-    }
-
-    void MakeWaterRippleParams()
-    {
-        waterRippleParams_ = std::make_shared<GEWaterRippleFilterParams>();
-    }
-
-    const std::shared_ptr<GEWaterRippleFilterParams>& GetWaterRippleParams() const
-    {
-        return waterRippleParams_;
-    }
-
-    void MakeAIBarParams()
-    {
-        aiBarParams_ = std::make_shared<GEAIBarShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEAIBarShaderFilterParams>& GetAIBarParams() const
-    {
-        return aiBarParams_;
-    }
-
-    void MakeGreyParams()
-    {
-        greyParams_ = std::make_shared<GEGreyShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEGreyShaderFilterParams>& GetGreyParams() const
-    {
-        return greyParams_;
-    }
-
-    void MakeLinearGradientBlurParams()
-    {
-        linearGradientBlurParams_ = std::make_shared<GELinearGradientBlurShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GELinearGradientBlurShaderFilterParams>& GetLinearGradientBlurParams() const
-    {
-        return linearGradientBlurParams_;
-    }
-
-    void MakeMagnifierParams()
-    {
-        magnifierParams_ = std::make_shared<GEMagnifierShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEMagnifierShaderFilterParams>& GetMagnifierParams() const
-    {
-        return magnifierParams_;
-    }
-
-    void MakeColorGradientParams()
-    {
-        colorGradientParams_ = std::make_shared<GEColorGradientShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEColorGradientShaderFilterParams>& GetColorGradientParams() const
-    {
-        return colorGradientParams_;
-    }
-
-    void MakeDisplacementDistortParams()
-    {
-        displacementDistortParams_ = std::make_shared<GEDisplacementDistortFilterParams>();
-    }
-
-    const std::shared_ptr<GEDisplacementDistortFilterParams> &GetDisplacementDistortParams() const
-    {
-        return displacementDistortParams_;
-    }
-
-    void MakeSoundWaveParams()
-    {
-        soundWaveParams_ = std::make_shared<GESoundWaveFilterParams>();
-    }
-
-    const std::shared_ptr<GESoundWaveFilterParams>& GetSoundWaveParams() const
-    {
-        return soundWaveParams_;
-    }
-
-    void MakeHeatDistortionParams()
-    {
-        heatDistortionParams_ = std::make_shared<GEHeatDistortionFilterParams>();
-    }
-
-    const std::shared_ptr<GEHeatDistortionFilterParams>& GetHeatDistortionParams() const
-    {
-        return heatDistortionParams_;
-    }
-
-    void MakeBlurBubblesRiseParams()
-    {
-        blurBubblesRiseParams_ = std::make_shared<GEBlurBubblesRiseFilterParams>();
-    }
-
-    const std::shared_ptr<GEBlurBubblesRiseFilterParams>& GetBlurBubblesRiseParams() const
-    {
-        return blurBubblesRiseParams_;
-    }
-
-    void MakeEdgeLightParams()
-    {
-        edgeLightParams_ = std::make_shared<GEEdgeLightShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEEdgeLightShaderFilterParams>& GetEdgeLightParams() const
-    {
-        return edgeLightParams_;
-    }
-
-    void MakeBezierWarpParams()
-    {
-        bezierWarpParams_ = std::make_shared<GEBezierWarpShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEBezierWarpShaderFilterParams>& GetBezierWarpParams() const
-    {
-        return bezierWarpParams_;
-    }
-
-    void MakeDispersionParams()
-    {
-        dispersionParams_ = std::make_shared<GEDispersionShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEDispersionShaderFilterParams>& GetDispersionParams() const
-    {
-        return dispersionParams_;
-    }
-
-    void MakeSdfEdgeLightPrams()
-    {
-        sdfEdgeLightParams_ = std::make_shared<GESDFEdgeLightFilterParams>();
-    }
-
-    const std::shared_ptr<GESDFEdgeLightFilterParams>& GetSDFEdgeLightParams() const
-    {
-        return sdfEdgeLightParams_;
-    }
-
-    void MakeSdfEdgeLightEffectParams()
-    {
-        sdfEdgeLightEffectParams_ = std::make_shared<GESDFEdgeLightEffectParams>();
-    }
-
-    const std::shared_ptr<GESDFEdgeLightEffectParams>& GetSDFEdgeLightEffectParams() const
-    {
-        return sdfEdgeLightEffectParams_;
-    }
-
-    void MakeSdfFromImageParams()
-    {
-        sdfFromImageParams_ = std::make_shared<GESDFFromImageFilterParams>();
-    }
-
-    const std::shared_ptr<GESDFFromImageFilterParams>& GetSdfFromImageParams() const
-    {
-        return sdfFromImageParams_;
-    }
-
-    void MakeDirectionLightParams()
-    {
-        directionLightParams_ = std::make_shared<GEDirectionLightShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEDirectionLightShaderFilterParams>& GetDirectionLightParams() const
-    {
-        return directionLightParams_;
-    }
-
-    void MakeContentLightParams()
-    {
-        contentLightParams_ = std::make_shared<GEContentLightFilterParams>();
-    }
-
-    const std::shared_ptr<GEContentLightFilterParams>& GetContentLightParams() const
-    {
-        return contentLightParams_;
-    }
-
-    void MakeContentDiagonalParams()
-    {
-        contentDiagonalParams_ = std::make_shared<GEContentDiagonalFlowLightShaderParams>();
-    }
-
-    const std::shared_ptr<GEContentDiagonalFlowLightShaderParams>& GetContenDiagonalParams() const
-    {
-        return contentDiagonalParams_;
-    }
-
-    void MakeDotMatrixShaderParams()
-    {
-        dotMatrixShaderParams_ = std::make_shared<GEDotMatrixShaderParams>();
-    }
-
-    const std::shared_ptr<GEDotMatrixShaderParams>& GetDotMatrixShaderParams() const
-    {
-        return dotMatrixShaderParams_;
-    }
-
-    void MakeWavyRippleLightParams()
-    {
-        wavyRippleLightParams_ = std::make_shared<GEWavyRippleLightShaderParams>();
-    }
-
-    const std::shared_ptr<GEWavyRippleLightShaderParams>& GetWavyRippleLightParams() const
-    {
-        return wavyRippleLightParams_;
-    }
-
-    void MakeAuroraNoiseParams()
-    {
-        auroNoiseParams_ = std::make_shared<GEAuroraNoiseShaderParams>();
-    }
-
-    const std::shared_ptr<GEAuroraNoiseShaderParams>& GetAuroraNoiseParams() const
-    {
-        return auroNoiseParams_;
-    }
-
-    void MakeParticleCircularHaloParams()
-    {
-        particleCircularHaloParams_ = std::make_shared<GEParticleCircularHaloShaderParams>();
-    }
-
-    const std::shared_ptr<GEParticleCircularHaloShaderParams>& GetParticleCircularHaloParams() const
-    {
-        return particleCircularHaloParams_;
-    }
-
-    void SetCache(std::shared_ptr<std::any> cacheData)
-    {
-        cacheAnyPtr_ = cacheData;
-    }
-
-    std::shared_ptr<std::any> GetCache() const
-    {
-        return cacheAnyPtr_;
-    }
-
-    void MakeRippleMaskParams()
-    {
-        rippleMaskParams_ = std::make_shared<GERippleShaderMaskParams>();
-    }
-
-    const std::shared_ptr<GERippleShaderMaskParams>& GetRippleMaskParams() const
-    {
-        return rippleMaskParams_;
-    }
+    // ========================================================================
+    // Params management - using GEFilterParams variant
+    // ========================================================================
 
-    void MakeDoubleRippleMaskParams()
+    /// Create params of specific type and store in params_
+    template<typename ParamsType>
+    void MakeParams()
     {
-        doubleRippleMaskParams_ = std::make_shared<GEDoubleRippleShaderMaskParams>();
+        params_ = GEFilterParams::Box(std::make_shared<ParamsType>());
     }
 
-    const std::shared_ptr<GEDoubleRippleShaderMaskParams>& GetDoubleRippleMaskParams() const
+    template<typename ParamsType>
+    std::shared_ptr<ParamsType> GetParams() const
     {
-        return doubleRippleMaskParams_;
+        if (!params_) {
+            return nullptr;
+        }
+        return GEFilterParams::Unbox<ParamsType>(*params_);
     }
 
-    void MakeWaveDisturbanceMaskParams()
-    {
-        waveDisturbanceMaskParams_ = std::make_shared<GEWaveDisturbanceShaderMaskParams>();
-    }
-
-    const std::shared_ptr<GEWaveDisturbanceShaderMaskParams>& GetWaveDisturbanceMaskParams() const
-    {
-        return waveDisturbanceMaskParams_;
-    }
-
-    void MakeRadialGradientMaskParams()
-    {
-        radialGradientMaskParams_ = std::make_shared<GERadialGradientShaderMaskParams>();
-    }
-
-    const std::shared_ptr<GERadialGradientShaderMaskParams>& GetRadialGradientMaskParams() const
-    {
-        return radialGradientMaskParams_;
-    }
-
-    void MakePixelMapMaskParams()
-    {
-        pixelMapMaskParams_ = std::make_shared<GEPixelMapMaskParams>();
-    }
-
-    const std::shared_ptr<GEPixelMapMaskParams>& GetPixelMapMaskParams() const
-    {
-        return pixelMapMaskParams_;
-    }
-
-    void MakeImageMaskParams()
-    {
-        imageMaskParams_ = std::make_shared<GEImageMaskParams>();
-    }
-
-    const std::shared_ptr<GEImageMaskParams>& GetImageMaskParams() const
-    {
-        return imageMaskParams_;
-    }
-
-    void MakeUseEffectMaskParams()
-    {
-        useEffectMaskParams_ = std::make_shared<GEUseEffectMaskParams>();
-    }
-
-    const std::shared_ptr<GEUseEffectMaskParams>& GetUseEffectMaskParams() const
-    {
-        return useEffectMaskParams_;
-    }
-
-    void MakeWaveGradientMaskParams()
-    {
-        waveGradientMaskParams_ = std::make_shared<GEWaveGradientShaderMaskParams>();
-    }
-
-    const std::shared_ptr<GEWaveGradientShaderMaskParams>& GetWaveGradientMaskParams() const
-    {
-        return waveGradientMaskParams_;
-    }
-
-    void MakeMaskTransitionParams()
-    {
-        maskTransitionParams_ = std::make_shared<GEMaskTransitionShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEMaskTransitionShaderFilterParams>& GetMaskTransitionParams() const
-    {
-        return maskTransitionParams_;
-    }
-
-    void MakeVariableRadiusBlurParams()
-    {
-        variableRadiusBlurParams_ = std::make_shared<GEVariableRadiusBlurShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEVariableRadiusBlurShaderFilterParams>& GetVariableRadiusBlurParams() const
-    {
-        return variableRadiusBlurParams_;
-    }
-
-    const std::shared_ptr<GESDFUnionOpShapeParams>& GetSDFUnionOpShapeParams() const
-    {
-        return sdfUnionOpShapeParams_;
-    }
-
-    void MakeSDFUnionOpShapeParams(const GESDFUnionOp& op)
-    {
-        sdfUnionOpShapeParams_ = std::make_shared<GESDFUnionOpShapeParams>();
-        sdfUnionOpShapeParams_->op = op;
-    }
-
-    const std::shared_ptr<GESDFRRectShapeParams>& GetSDFRRectShapeParams() const
-    {
-        return sdfRRectShapeParams_;
-    }
-
-    void MakeSDFRRectShapeParams()
-    {
-        sdfRRectShapeParams_ = std::make_shared<GESDFRRectShapeParams>();
-    }
-
-    const std::shared_ptr<GESDFTriangleShapeParams>& GetSDFTriangleShapeParams() const
-    {
-        return sdfTriangleShapeParams_;
-    }
-
-    void MakeSDFTriangleShapeParams()
-    {
-        sdfTriangleShapeParams_ = std::make_shared<GESDFTriangleShapeParams>();
-    }
-
-    const std::shared_ptr<GESDFPixelmapShapeParams>& GetSDFPixelmapShapeParams() const
-    {
-        return sdfPixelmapShapeParams_;
-    }
-
-    void MakeSDFPixelmapShapeParams()
-    {
-        sdfPixelmapShapeParams_ = std::make_shared<GESDFPixelmapShapeParams>();
-    }
-
-    const std::shared_ptr<GESDFTransformShapeParams>& GetSDFTransformShapeParams() const
-    {
-        return sdfTransformShapeParams_;
-    }
-
-    void MakeSDFTransformShapeParams()
-    {
-        sdfTransformShapeParams_ = std::make_shared<GESDFTransformShapeParams>();
-    }
-
-    const std::shared_ptr<GESDFDistortOpShapeParams>& GetSDFDistortOpShapeParams() const
-    {
-        return sdfDistortOpShapeParams_;
-    }
-
-    void MakeSDFDistortOpShapeParams()
-    {
-        sdfDistortOpShapeParams_ = std::make_shared<GESDFDistortOpShapeParams>();
-    }
-
-    const std::shared_ptr<GESDFShadowShaderParams>& GetSDFShadowShaderParams() const
-    {
-        return sdfShadowShaderParams_;
-    }
-
-    void MakeSDFShadowParams()
-    {
-        sdfShadowShaderParams_ = std::make_shared<GESDFShadowShaderParams>();
-    }
-
-    const std::shared_ptr<GESDFClipShaderParams>& GetSDFClipShaderParams() const
-    {
-        return sdfClipShaderParams_;
-    }
-
-    void MakeSDFClipParams()
-    {
-        sdfClipShaderParams_ = std::make_shared<GESDFClipShaderParams>();
-    }
-
-    const std::shared_ptr<GESDFColorShaderParams>& GetSDFColorShaderParams() const
-    {
-        return sdfColorShaderParams_;
-    }
-
-    void MakeSDFColorParams()
-    {
-        sdfColorShaderParams_ = std::make_shared<GESDFColorShaderParams>();
-    }
-
-    void MakeLightCaveParams()
-    {
-        lightCaveShaderParams_ = std::make_shared<GEXLightCaveShaderParams>();
-    }
-
-    const std::shared_ptr<GEXLightCaveShaderParams>& GetLightCaveParams() const
-    {
-        return lightCaveShaderParams_;
-    }
-
-    void MakeDistortChromaParams()
-    {
-        distortChromaParams_ = std::make_shared<GEXDistortChromaEffectParams>();
-    }
-
-    const std::shared_ptr<GEXDistortChromaEffectParams>& GetDistortChromaParams() const
-    {
-        return distortChromaParams_;
-    }
-
-    void MakeDupoliNoiseMaskParams()
-    {
-        dupoliNoiseMaskParams_ = std::make_shared<GEXDupoliNoiseMaskParams>();
-    }
-
-    const std::shared_ptr<GEXDupoliNoiseMaskParams>& GetDupoliNoiseMaskParams() const
-    {
-        return dupoliNoiseMaskParams_;
-    }
-
-    void MakeBorderLightParams()
-    {
-        borderLightParams_ = std::make_shared<GEBorderLightShaderParams>();
-    }
-
-    const std::shared_ptr<GEBorderLightShaderParams>& GetBorderLightParams() const
-    {
-        return borderLightParams_;
-    }
-
-    void MakeParticleAblationFilterParams()
-    {
-        particleAblationFilterParams_ = std::make_shared<GEParticleAblationFilterParams>();
-    }
-
-    const std::shared_ptr<GEParticleAblationFilterParams> &GetParticleAblationFilterParams() const
-    {
-        return particleAblationFilterParams_;
-    }
-
-    void MakeGasifyScaleTwistFilterParams()
-    {
-        gasifyScaleTwistFilterParams_ = std::make_shared<GEGasifyScaleTwistFilterParams>();
-    }
-
-    const std::shared_ptr<GEGasifyScaleTwistFilterParams> &GetGasifyScaleTwistFilterParams() const
-    {
-        return gasifyScaleTwistFilterParams_;
-    }
-
-    void MakeGasifyBlurFilterParams()
-    {
-        gasifyBlurFilterParams_ = std::make_shared<GEGasifyBlurFilterParams>();
-    }
-
-    const std::shared_ptr<GEGasifyBlurFilterParams> &GetGasifyBlurFilterParams() const
-    {
-        return gasifyBlurFilterParams_;
-    }
-
-     void MakeGasifyFilterParams()
-    {
-        gasifyFilterParams_ = std::make_shared<GEGasifyFilterParams>();
-    }
-
-    const std::shared_ptr<GEGasifyFilterParams> &GetGasifyFilterParams() const
-    {
-        return gasifyFilterParams_;
-    }
-
-    void MakeColorGradientEffectParams()
-    {
-        colorGradientEffectParams_ = std::make_shared<GEXColorGradientEffectParams>();
-    }
-
-    const std::shared_ptr<GEXColorGradientEffectParams>& GetColorGradientEffectParams() const
-    {
-        return colorGradientEffectParams_;
-    }
-
-    void MakeHarmoniumEffectParams()
-    {
-        harmoniumEffectParams_ = std::make_shared<GEHarmoniumEffectShaderParams>();
-    }
-
-    const std::shared_ptr<GEHarmoniumEffectShaderParams>& GetHarmoniumEffectParams() const
-    {
-        return harmoniumEffectParams_;
-    }
+    // ========================================================================
+    // CanvasInfo management - Screen canvas geometry info
+    // ========================================================================
 
     void SetCanvasInfo(Drawing::CanvasInfo info)
     {
@@ -648,323 +146,158 @@ public:
         return canvasInfo_;
     }
 
-    void MakeAIBarGlowEffectParams()
+    // ========================================================================
+    // Per-effect cache management
+    // ========================================================================
+
+    void SetCache(std::shared_ptr<std::any> cacheData)
     {
-        AIBarGlowEffectParams_ = std::make_shared<GEXAIBarGlowEffectParams>();
+        cacheAnyPtr_ = cacheData;
     }
 
-    const std::shared_ptr<GEXAIBarGlowEffectParams>& GetAIBarGlowEffectParams() const
+    std::shared_ptr<std::any> GetCache() const
     {
-        return AIBarGlowEffectParams_;
+        return cacheAnyPtr_;
     }
 
-    void MakeAIBarRectHaloEffectParams()
-    {
-        AIBarRectHaloEffectParams_ = std::make_shared<GEXAIBarRectHaloEffectParams>();
+    // ========================================================================
+    // Backward-compatible convenience methods
+    // Warning: New types should use MakeParams<T> / GetParams<T> directly
+    // ========================================================================
+
+#define GE_DECLARE_MAKE_GET_PARAMS(MethodName, ParamsType) \
+    void Make##MethodName()                                \
+    {                                                      \
+        MakeParams<ParamsType>();                          \
+    }                                                      \
+    auto Get##MethodName() const                           \
+    {                                                      \
+        return GetParams<ParamsType>();                    \
     }
 
-    const std::shared_ptr<GEXAIBarRectHaloEffectParams>& GetAIBarRectHaloEffectParams() const
-    {
-        return AIBarRectHaloEffectParams_;
-    }
+    GE_DECLARE_MAKE_GET_PARAMS(MESAParams, GEMESABlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(KawaseParams, GEKawaseBlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(AIBarParams, GEAIBarShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GreyParams, GEGreyShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(WaterRippleParams, GEWaterRippleFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(LinearGradientBlurParams, GELinearGradientBlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(MagnifierParams, GEMagnifierShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ColorGradientParams, GEColorGradientShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DisplacementDistortParams, GEDisplacementDistortFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SoundWaveParams, GESoundWaveFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(HeatDistortionParams, GEHeatDistortionFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(BlurBubblesRiseParams, GEBlurBubblesRiseFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(EdgeLightParams, GEEdgeLightShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(BezierWarpParams, GEBezierWarpShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DispersionParams, GEDispersionShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DirectionLightParams, GEDirectionLightShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ContentLightParams, GEContentLightFilterParams)
+    // intentional typo `Conten` instead of `Content` due to compatibility
+    GE_DECLARE_MAKE_GET_PARAMS(ContenDiagonalParams, GEContentDiagonalFlowLightShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DotMatrixShaderParams, GEDotMatrixShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(WavyRippleLightParams, GEWavyRippleLightShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(AuroraNoiseParams, GEAuroraNoiseShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ParticleCircularHaloParams, GEParticleCircularHaloShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(VariableRadiusBlurParams, GEVariableRadiusBlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightParams, GESDFEdgeLightFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SdfFromImageParams, GESDFFromImageFilterParams) // because original decl use 'Sdf'
+    GE_DECLARE_MAKE_GET_PARAMS(SDFBorderShaderParams, GESDFBorderShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFShadowShaderParams, GESDFShadowShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(RippleMaskParams, GERippleShaderMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DoubleRippleMaskParams, GEDoubleRippleShaderMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(WaveDisturbanceMaskParams, GEWaveDisturbanceShaderMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(RadialGradientMaskParams, GERadialGradientShaderMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(PixelMapMaskParams, GEPixelMapMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ImageMaskParams, GEImageMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(UseEffectMaskParams, GEUseEffectMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(WaveGradientMaskParams, GEWaveGradientShaderMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(MaskTransitionParams, GEMaskTransitionShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFUnionOpShapeParams, GESDFUnionOpShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFRRectShapeParams, GESDFRRectShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFPixelmapShapeParams, GESDFPixelmapShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFTransformShapeParams, GESDFTransformShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFClipParams, GESDFClipShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFClipShaderParams, GESDFClipShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFColorParams, GESDFColorShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFColorShaderParams, GESDFColorShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(LightCaveParams, GEXLightCaveShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DistortChromaParams, GEXDistortChromaEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DupoliNoiseMaskParams, GEXDupoliNoiseMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(BorderLightParams, GEBorderLightShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GasifyScaleTwistFilterParams, GEGasifyScaleTwistFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GasifyBlurFilterParams, GEGasifyBlurFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GasifyFilterParams, GEGasifyFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ColorGradientEffectParams, GEXColorGradientEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(HarmoniumEffectParams, GEHarmoniumEffectShaderParams)
+    GE_DECLARE_MAKE_GET_PARAMS(AIBarGlowEffectParams, GEXAIBarGlowEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(AIBarRectHaloEffectParams, GEXAIBarRectHaloEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(RoundedRectFlowlightEffectParams, GEXRoundedRectFlowlightEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GradientFlowColorsEffectParams, GEXGradientFlowColorsEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(FrameGradientMaskParams, GEFrameGradientMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(CircleFlowlightEffectParams, GECircleFlowlightEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassEffectParams, GEFrostedGlassEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassBlurParams, GEFrostedGlassBlurShaderFilterParams);
+    GE_DECLARE_MAKE_GET_PARAMS(FrostedGlassParams, GEFrostedGlassShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(GridWarpFilterParams, GEGridWarpShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(NoisyFrameGradientMaskParams, GEXNoisyFrameGradientMaskParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightEffectParams, GESDFEdgeLightEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFTriangleShapeParams, GESDFTriangleShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFDistortOpShapeParams, GESDFDistortOpShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DistortionCollapseParams, GEDistortionCollapseFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(ParticleAblationFilterParams, GEParticleAblationFilterParams)
+#undef GE_DECLARE_MAKE_GET_PARAMS
 
-    void MakeRoundedRectFlowlightEffectParams()
-    {
-        roundedRectFlowlightEffectParams_ = std::make_shared<GEXRoundedRectFlowlightEffectParams>();
-    }
+    // ========================================================================
+    // Backward-compatible dirty methods
+    // Warning: DO NOT ADD NEW METHODS or MODIFY EXISTING METHODS unless you have to
+    //          These methods should be removed in the future
+    // ========================================================================
 
-    const std::shared_ptr<GEXRoundedRectFlowlightEffectParams>& GetRoundedRectFlowlightEffectParams() const
-    {
-        return roundedRectFlowlightEffectParams_;
-    }
-
-    void MakeGradientFlowColorsEffectParams()
-    {
-        gradientFlowColorsEffectParams_ = std::make_shared<GEXGradientFlowColorsEffectParams>();
-    }
-
-    const std::shared_ptr<GEXGradientFlowColorsEffectParams>& GetGradientFlowColorsEffectParams() const
-    {
-        return gradientFlowColorsEffectParams_;
-    }
-
-    void MakeFrameGradientMaskParams()
-    {
-        frameGradientMaskParams_ = std::make_shared<GEFrameGradientMaskParams>();
-    }
-
-    const std::shared_ptr<GEFrameGradientMaskParams>& GetFrameGradientMaskParams() const
-    {
-        return frameGradientMaskParams_;
-    }
-
-    const std::shared_ptr<GESDFBorderShaderParams>& GetSDFBorderShaderParams() const
-    {
-        return sdfBorderShaderParams_;
-    }
-
-    void MakeSDFBorderParams()
-    {
-        sdfBorderShaderParams_ = std::make_shared<GESDFBorderShaderParams>();
-    }
-
-    void MakeFrostedGlassParams()
-    {
-        frostedGlassParams_ = std::make_shared<GEFrostedGlassShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEFrostedGlassShaderFilterParams>& GetFrostedGlassParams() const
-    {
-        return frostedGlassParams_;
-    }
-
-    void MakeCircleFlowlightEffectParams()
-    {
-        circleFlowlightEffectParams_ = std::make_shared<GECircleFlowlightEffectParams>();
-    }
-
-    const std::shared_ptr<GECircleFlowlightEffectParams>& GetCircleFlowlightEffectParams() const
-    {
-        return circleFlowlightEffectParams_;
-    }
-
-    void MakeFrostedGlassEffectParams()
-    {
-        frostedGlassEffectParams_ = std::make_shared<GEFrostedGlassEffectParams>();
-    }
-
-    const std::shared_ptr<GEFrostedGlassEffectParams>& GetFrostedGlassEffectParams() const
-    {
-        return frostedGlassEffectParams_;
-    }
-
-    void MakeFrostedGlassBlurParams()
-    {
-        frostedGlassBlurParams_ = std::make_shared<GEFrostedGlassBlurShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEFrostedGlassBlurShaderFilterParams>& GetFrostedGlassBlurParams() const
-    {
-        return frostedGlassBlurParams_;
-    }
-
-    void MakeGridWarpFilterParams()
-    {
-        gridWarpFilterParams_ = std::make_shared<GEGridWarpShaderFilterParams>();
-    }
-
-    const std::shared_ptr<GEGridWarpShaderFilterParams>& GetGridWarpFilterParams() const
-    {
-        return gridWarpFilterParams_;
-    }
-
-    void MakeNoisyFrameGradientMaskParams()
-    {
-        noisyFrameGradientMaskParams_ = std::make_shared<GEXNoisyFrameGradientMaskParams>();
-    }
-
-    const std::shared_ptr<GEXNoisyFrameGradientMaskParams>& GetNoisyFrameGradientMaskParams() const
-    {
-        return noisyFrameGradientMaskParams_;
-    }
-
-
-    void MakeSpatialPointLightParams()
-    {
-        spatialPointLightParams_ = std::make_shared<GESpatialPointLightShaderParams>();
-    }
-
-    const std::shared_ptr<GESpatialPointLightShaderParams>& GetSpatialPointLightParams() const
-    {
-        return spatialPointLightParams_;
-    }
-
+    // Introduced by SDF Union Op
+    void MakeSDFUnionOpShapeParams(const GESDFUnionOp& op);
+    // Introduced by Frosted Glass
+    const std::shared_ptr<Drawing::GEShaderShape> GetGEShaderShape(const std::string& tag) const;
+    // Introduced by SDF Edge Light
     void SetSDFEdgeLightParams(const std::string& tag, float param);
 
-    void MakeDistortionCollapseParams()
+    // 'Prams' Typo compatible: remove this method after fix all call sites including 2d dependencies
+    void MakeSdfEdgeLightPrams()
     {
-        distortionCollapseParams_ = std::make_shared<GEDistortionCollapseFilterParams>();
-    }
-
-    const std::shared_ptr<GEDistortionCollapseFilterParams>& GetDistortionCollapseParams() const
-    {
-        return distortionCollapseParams_;
+        MakeSDFEdgeLightParams();
     }
 
 private:
-    static std::map<const std::string, std::function<void(GEVisualEffectImpl*)>> g_initialMap;
-    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr; // cacheData
-    void SetMESABlurParams(const std::string& tag, float param);
-    void SetAIBarParams(const std::string& tag, float param);
-    void SetGreyParams(const std::string& tag, float param);
-    void SetLinearGradientBlurParams(const std::string& tag, float param);
+    /// Check if tag belongs to current params type's tag range
+    static bool IsTagValidForCurrentType(const GEFilterParams& params, GEParamsMemberTag tag)
+    {
+        auto tagType = GEParamsMemberHelper::GetFilterTypeFromTag(tag);
+        return tagType == params.GetType();
+    }
 
-    void SetMagnifierParamsFloat(const std::string& tag, float param);
-    void SetMagnifierParamsUint32(const std::string& tag, uint32_t param);
+    /// Internal set param implementation - uses reflection metadata to set field value
+    /// Non-template overloads for each type, generated from FOR_EACH_PARAM_TYPE
+    /// Implementations in ge_visual_effect_impl.cpp
+#define DECLARE_SET_PARAM_INTERNAL(Type) \
+    void SetParamInternal(GEFilterParams& params, GEParamsMemberTag tag, const Type& value);
 
-    void SetWaterRippleParams(const std::string& tag, float param);
-    void SetRippleMaskParamsFloat(const std::string& tag, float param);
-    void SetDoubleRippleMaskParamsFloat(const std::string& tag, float param);
-    void SetRadialGradientMaskParamsFloat(const std::string& tag, float param);
-    void SetParticleAblationParams(const std::string& tag, float param);
-    void SetParticleAblationParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetParticleAblationParams(const std::string& tag, int32_t param);
-    void SetWaveGradientMaskParamsFloat(const std::string& tag, float param);
-    void SetWaveDisturbanceMaskParams(const std::string& tag, float param);
-    void SetWaveDisturbanceMaskParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetWaveDisturbanceMaskParams(const std::string& tag, const Vector3f& param);
-    void SetSoundWaveParams(const std::string& tag, float param);
-    void SetSoundWaveParams(const std::string& tag, const Drawing::Color4f& param);
-    void SetHeatDistortionParams(const std::string& tag, float param);
-    void SetBlurBubblesRiseParams(const std::string& tag, float param);
-    void SetBlurBubblesRiseParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void SetDirectionLightParamsFloat(const std::string& tag, float param);
-    void SetEdgeLightParams(const std::string& tag, float param);
-    void SetDispersionParams(const std::string& tag, float param);
-    void SetDispersionParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetContentLightParams(const std::string& tag, float param);
-    void SetContentDiagonalFlowParams(const std::string& tag, const Vector4f& param);
-    void SetContentDiagonalFlowParams(const std::string& tag, float param);
-    void SetDotMatrixShaderParamsInitData(const std::string& tag, int32_t param);
-    void SetDotMatrixShaderParamsEffectType(const std::string& tag, int32_t param);
-    void SetDotMatrixShaderParams(const std::string& tag, float param);
-    void SetDotMatrixShaderParams(const std::string& tag, const Vector4f& param);
-    void SetWavyRippleLightParams(const std::string& tag, float param);
-    void SetWavyRippleLightParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetAuroraNoiseParams(const std::string& tag, float param);
-    void SetDistortionCollapseParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetSDFDistortOpShapeParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetPixelMapMaskParams(const std::string& tag, const RectF& param);
-    void SetPixelMapMaskParams(const std::string& tag, const Vector4f& param);
-    void SetParticleCircularHaloParams(const std::string& tag, float param);
-    void SetParticleCircularHaloParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetDoubleRippleMaskParamsPair(const std::string& tag, const std::pair<float, float>& param);
-    void SetWaveGradientMaskParamsPair(const std::string& tag, const std::pair<float, float>& param);
-    void SetMaskTransitionParamsFloat(const std::string& tag, float param);
-    void SetVariableRadiusBlurParams(const std::string& tag, float param);
-    void SetLightCaveParams(const std::string& tag, const Vector4f& param);
-    void SetLightCaveParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetLightCaveParams(const std::string& tag, float param);
-    void SetBezierWarpParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetBorderLightParams(const std::string& tag, const Vector3f& param);
-    void SetBorderLightParams(const std::string& tag, const Vector4f& param);
-    void SetBorderLightParams(const std::string& tag, float param);
-    void SetGasifyScaleTwistParams(const std::string& tag, float param);
-    void SetGasifyScaleTwistParams(const std::string& tag, const std::pair<float, float>& param);
-    void SetGasifyScaleTwistParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void SetGasifyBlurParams(const std::string& tag, float param);
-    void SetGasifyBlurParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void SetGasifyParams(const std::string& tag, float param);
-    void SetGasifyParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void SetColorGradientEffectParams(const std::string& tag, float param);
-    void SetColorGradientEffectParams(const std::string& tag, const Vector4f& param);
-    void SetColorGradientEffectParams(const std::string& tag, const std::pair<float, float>&  param);
-    void SetHarmoniumEffectParams(const std::string& tag, float param);
-    void SetFrostedGlassParams(const std::string& tag, float param);
-    void SetFrostedGlassParams(const std::string& tag, const std::pair<float, float>& param);
-    void HandleSetFrostedGlassWeights(const std::string& tag, const std::pair<float, float>& param);
-    void HandleSetFrostedGlassRates(const std::string& tag, const std::pair<float, float>& param);
-    void SetFrostedGlassParams(const std::string& tag, const Vector3f& param);
-    void SetFrostedGlassParams(const std::string& tag, const bool& param);
-    void SetFrostedGlassParams(const std::string& tag, const Vector4f& param);
-    void HandleSetFrostedGlassKBS(const std::string& tag, const Vector3f& param);
-    void HandleSetFrostedGlassPosNegCoefs(const std::string& tag, const Vector3f& param);
-    void SetSDFClipParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
-    void SetSDFShadowParams(const std::string& tag, const std::shared_ptr<Drawing::GEShaderShape> param);
-    void SetFrostedGlassEffectParams(const std::string& tag, const std::pair<float, float>& param);
-    void HandleSetFrostedGlassEffectWeights(const std::string& tag, const std::pair<float, float>& param);
-    void HandleSetFrostedGlassEffectRates(const std::string& tag, const std::pair<float, float>& param);
-    void SetFrostedGlassEffectParams(const std::string& tag, const float param);
-    void SetFrostedGlassEffectParams(const std::string& tag, const Vector3f& param);
-    void SetFrostedGlassEffectParams(const std::string& tag, const Vector4f& param);
-    void SetFrostedGlassEffectParams(const std::string& tag, const std::shared_ptr<Drawing::Image> param);
-    void HandleSetFrostedGlassEffectKBS(const std::string& tag, const Vector3f& param);
-    void HandleSetFrostedGlassEffectPosNegCoefs(const std::string& tag, const Vector3f& param);
-    void SetFrostedGlassBlurParams(const std::string& tag, const float param);
-    void SetSDFEdgeLightEffectParams(const std::string& tag, float param);
-    void SetSDFEdgeLightEffectParams(const std::string& tag, const Vector3f& param);
+    FOR_EACH_PARAM_TYPE(DECLARE_SET_PARAM_INTERNAL)
+#undef DECLARE_SET_PARAM_INTERNAL
 
-    FilterType filterType_ = GEVisualEffectImpl::FilterType::NONE;
+    // Compatibility placeholders, remove these placeholders if future effects use them
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long&);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const long long&);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const double&);
+    void SetParamInternal(GEFilterParams&, GEParamsMemberTag, const std::shared_ptr<Drawing::ColorFilter>);
+
+private:
+    FilterType filterType_ = FilterType::NONE;
     Drawing::CanvasInfo canvasInfo_;
-
-    // ShaderFilter Params
-    std::shared_ptr<GEImageMaskParams> imageMaskParams_ = nullptr;
-    std::shared_ptr<GEUseEffectMaskParams> useEffectMaskParams_ = nullptr;
-    std::shared_ptr<GEKawaseBlurShaderFilterParams> kawaseParams_ = nullptr;
-    std::shared_ptr<GEMESABlurShaderFilterParams> mesaParams_ = nullptr;
-    std::shared_ptr<GEAIBarShaderFilterParams> aiBarParams_ = nullptr;
-    std::shared_ptr<GEColorGradientShaderFilterParams> colorGradientParams_ = nullptr;
-    std::shared_ptr<GEGreyShaderFilterParams> greyParams_ = nullptr;
-    std::shared_ptr<GELinearGradientBlurShaderFilterParams> linearGradientBlurParams_ = nullptr;
-
-    std::shared_ptr<GEMagnifierShaderFilterParams> magnifierParams_ = nullptr;
-    std::shared_ptr<GEWaterRippleFilterParams> waterRippleParams_ = nullptr;
-    std::shared_ptr<GERadialGradientShaderMaskParams> radialGradientMaskParams_ = nullptr;
-    std::shared_ptr<GEPixelMapMaskParams> pixelMapMaskParams_ = nullptr;
-    std::shared_ptr<GERippleShaderMaskParams> rippleMaskParams_ = nullptr;
-    std::shared_ptr<GEDoubleRippleShaderMaskParams> doubleRippleMaskParams_ = nullptr;
-    std::shared_ptr<GEWaveDisturbanceShaderMaskParams> waveDisturbanceMaskParams_ = nullptr;
-    std::shared_ptr<GEWaveGradientShaderMaskParams> waveGradientMaskParams_ = nullptr;
-    std::shared_ptr<GEDisplacementDistortFilterParams> displacementDistortParams_ = nullptr;
-    std::shared_ptr<GEGasifyScaleTwistFilterParams> gasifyScaleTwistFilterParams_ = nullptr;
-    std::shared_ptr<GEGasifyBlurFilterParams> gasifyBlurFilterParams_ = nullptr;
-    std::shared_ptr<GEGasifyFilterParams> gasifyFilterParams_ = nullptr;
-    std::shared_ptr<GEParticleAblationFilterParams> particleAblationFilterParams_ = nullptr;
-    std::shared_ptr<GESoundWaveFilterParams> soundWaveParams_ = nullptr;
-    std::shared_ptr<GEHeatDistortionFilterParams> heatDistortionParams_ = nullptr;
-    std::shared_ptr<GEBlurBubblesRiseFilterParams> blurBubblesRiseParams_ = nullptr;
-    std::shared_ptr<GEEdgeLightShaderFilterParams> edgeLightParams_ = nullptr;
-    std::shared_ptr<GEBezierWarpShaderFilterParams> bezierWarpParams_ = nullptr;
-    std::shared_ptr<GEDispersionShaderFilterParams> dispersionParams_ = nullptr;
-    std::shared_ptr<GEContentLightFilterParams> contentLightParams_ = nullptr;
-    std::shared_ptr<GEDirectionLightShaderFilterParams> directionLightParams_ = nullptr;
-    std::shared_ptr<GEMaskTransitionShaderFilterParams> maskTransitionParams_ = nullptr;
-    std::shared_ptr<GEFrostedGlassShaderFilterParams> frostedGlassParams_ = nullptr;
-    std::shared_ptr<GEFrostedGlassEffectParams> frostedGlassEffectParams_ = nullptr;
-    std::shared_ptr<GEFrostedGlassBlurShaderFilterParams> frostedGlassBlurParams_ = nullptr;
-    std::shared_ptr<GESDFEdgeLightFilterParams> sdfEdgeLightParams_ = nullptr;
-    std::shared_ptr<GESDFEdgeLightEffectParams> sdfEdgeLightEffectParams_ = nullptr;
-    std::shared_ptr<GESDFFromImageFilterParams> sdfFromImageParams_ = nullptr;
-    std::shared_ptr<GEDistortionCollapseFilterParams> distortionCollapseParams_ = nullptr;
-
-    std::shared_ptr<GEContentDiagonalFlowLightShaderParams> contentDiagonalParams_ = nullptr;
-    std::shared_ptr<GEDotMatrixShaderParams> dotMatrixShaderParams_ = nullptr;
-    std::shared_ptr<GEWavyRippleLightShaderParams> wavyRippleLightParams_ = nullptr;
-    std::shared_ptr<GEAuroraNoiseShaderParams> auroNoiseParams_ = nullptr;
-
-    std::shared_ptr<GEParticleCircularHaloShaderParams> particleCircularHaloParams_ = nullptr;
-    std::shared_ptr<GEVariableRadiusBlurShaderFilterParams> variableRadiusBlurParams_ = nullptr;
-    std::shared_ptr<GEXLightCaveShaderParams> lightCaveShaderParams_ = nullptr;
-    std::shared_ptr<GEXDistortChromaEffectParams> distortChromaParams_ = nullptr;
-    std::shared_ptr<GEXDupoliNoiseMaskParams> dupoliNoiseMaskParams_ = nullptr;
-    std::shared_ptr<GEBorderLightShaderParams> borderLightParams_ = nullptr;
-
-    std::shared_ptr<GEXColorGradientEffectParams> colorGradientEffectParams_ = nullptr;
-
-    std::shared_ptr<GESDFClipShaderParams> sdfClipShaderParams_ = nullptr;
-    std::shared_ptr<GESDFColorShaderParams> sdfColorShaderParams_ = nullptr;
-    std::shared_ptr<GESDFUnionOpShapeParams> sdfUnionOpShapeParams_ = nullptr;
-    std::shared_ptr<GESDFRRectShapeParams> sdfRRectShapeParams_ = nullptr;
-    std::shared_ptr<GESDFTriangleShapeParams> sdfTriangleShapeParams_ = nullptr;
-    std::shared_ptr<GESDFBorderShaderParams> sdfBorderShaderParams_ = nullptr;
-    std::shared_ptr<GESDFShadowShaderParams> sdfShadowShaderParams_ = nullptr;
-    std::shared_ptr<GESDFTransformShapeParams> sdfTransformShapeParams_ = nullptr;
-    std::shared_ptr<GESDFPixelmapShapeParams> sdfPixelmapShapeParams_ = nullptr;
-    std::shared_ptr<GESDFDistortOpShapeParams> sdfDistortOpShapeParams_ = nullptr;
-    std::shared_ptr<GEHarmoniumEffectShaderParams> harmoniumEffectParams_ = nullptr;
-    std::shared_ptr<GEXAIBarGlowEffectParams> AIBarGlowEffectParams_ = nullptr;
-    std::shared_ptr<GEXAIBarRectHaloEffectParams> AIBarRectHaloEffectParams_ = nullptr;
-    std::shared_ptr<GEXRoundedRectFlowlightEffectParams> roundedRectFlowlightEffectParams_ = nullptr;
-    std::shared_ptr<GEXGradientFlowColorsEffectParams> gradientFlowColorsEffectParams_ = nullptr;
-    std::shared_ptr<GEFrameGradientMaskParams> frameGradientMaskParams_ = nullptr;
-    std::shared_ptr<GECircleFlowlightEffectParams> circleFlowlightEffectParams_ = nullptr;
-    std::shared_ptr<GEGridWarpShaderFilterParams> gridWarpFilterParams_ = nullptr;
-
-    std::shared_ptr<GEXNoisyFrameGradientMaskParams> noisyFrameGradientMaskParams_ = nullptr;
-    std::shared_ptr<GESpatialPointLightShaderParams> spatialPointLightParams_ = nullptr;
+    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
+    std::unique_ptr<GEFilterParams> params_ = nullptr;
 };
 
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
+
 #endif // GRAPHICS_EFFECT_GE_VISUAL_EFFECT_IMPL_H

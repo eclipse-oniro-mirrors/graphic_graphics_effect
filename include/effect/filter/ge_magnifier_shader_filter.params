@@ -1,0 +1,52 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=MAGNIFIER, name="Magnifier")]] GEMagnifierShaderFilterParams {
+    [[ge::prop("Magnifier_Factor")]]
+    float factor = 0.f;
+    [[ge::prop("Magnifier_Width")]]
+    float width = 0.f;
+    [[ge::prop("Magnifier_Height")]]
+    float height = 0.f;
+    [[ge::prop("Magnifier_CornerRadius")]]
+    float cornerRadius = 0.f;
+    [[ge::prop("Magnifier_BorderWidth")]]
+    float borderWidth = 0.f;
+    [[ge::prop("Magnifier_ZoomOffsetX")]]
+    float zoomOffsetX = 0.f;
+    [[ge::prop("Magnifier_ZoomOffsetY")]]
+    float zoomOffsetY = 0.f;
+    [[ge::prop("Magnifier_ShadowOffsetX")]]
+    float shadowOffsetX = 0.f;
+    [[ge::prop("Magnifier_ShadowOffsetY")]]
+    float shadowOffsetY = 0.f;
+    [[ge::prop("Magnifier_ShadowSize")]]
+    float shadowSize = 0.f;
+    [[ge::prop("Magnifier_ShadowStrength")]]
+    float shadowStrength = 0.f;
+    // rgba
+    [[ge::prop("Magnifier_GradientMaskColor1")]]
+    uint32_t gradientMaskColor1 = 0x00000000;
+    [[ge::prop("Magnifier_GradientMaskColor2")]]
+    uint32_t gradientMaskColor2 = 0x00000000;
+    [[ge::prop("Magnifier_OuterContourColor1")]]
+    uint32_t outerContourColor1 = 0x00000000;
+    [[ge::prop("Magnifier_OuterContourColor2")]]
+    uint32_t outerContourColor2 = 0x00000000;
+    [[ge::prop("Magnifier_RotateDegree")]]
+    int32_t rotateDegree = 0;
+    [[ge::prop(name="Magnifier_SDFShape", cast_from="std::shared_ptr<GEShaderShape>")]]
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
+};
