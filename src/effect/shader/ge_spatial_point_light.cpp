@@ -17,18 +17,20 @@
 #include "ge_spatial_point_light.h"
 #include "ge_visual_effect_impl.h"
 
+#undef LOG_TAG
+#define LOG_TAG "GESpatialPointLightShader"
 namespace OHOS {
 namespace Rosen {
 namespace {
-    const int COLOR_CHANNEL = 4;
-    const int POSITION_DIMENSION = 3;
+    constexpr int COLOR_CHANNEL = 4;
+    constexpr int POSITION_DIMENSION = 3;
 }
 
 GESpatialPointLightShader::GESpatialPointLightShader() {}
 
 GESpatialPointLightShader::GESpatialPointLightShader(Drawing::GESpatialPointLightShaderParams& param)
 {
-    GE_LOGD("GESpatialPointLightShader ctor: intensity=%f, attenuation=%f",
+    GE_LOGD("ctor: intensity=%f, attenuation=%f",
         param.lightIntensity, param.attenuation);
     pointLightParams_ = param;
 }
@@ -53,8 +55,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
 
             half4 main(vec2 fragCoord)
             {
-                half4 NormalMap = mask.eval(fragCoord);
-                if (NormalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
+                half4 normalMap = mask.eval(fragCoord);
+                if (normalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
                     return vec4(0.0);
                 }
                 vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
@@ -64,16 +66,16 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
                 vec3 halfwayDir = normalize(lightDir + viewDir);
                 float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
-                vec4 fragColor = spec * lightIntensity * lightColor * NormalMap.r;
+                vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
                 return fragColor;
             }
         )";
         spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
-        GE_LOGD("GESpatialPointLightShader RuntimeEffect created");
+        GE_LOGD("RuntimeEffect created");
     }
 
     if (spatialPointLightShaderEffect_ == nullptr) {
-        GE_LOGE("GESpatialPointLightShader::GetSpatialPointLightBuilder effect is nullptr.");
+        GE_LOGE("GetSpatialPointLightBuilder effect is nullptr.");
         return nullptr;
     }
     return std::make_shared<Drawing::RuntimeShaderBuilder>(spatialPointLightShaderEffect_);
@@ -84,14 +86,14 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     if (width < 1e-6 || height < 1e-6) {
-        GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader invalid rect size: width=%f, height=%f",
+        GE_LOGE("MakeSpatialPointLightShader invalid rect size: width=%f, height=%f",
             width, height);
         return nullptr;
     }
 
     builder_ = GetSpatialPointLightBuilder();
     if (builder_ == nullptr) {
-        GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader builder is nullptr.");
+        GE_LOGE("MakeSpatialPointLightShader builder is nullptr.");
         return nullptr;
     }
     builder_->SetUniform("iResolution", width, height);
@@ -104,7 +106,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     }
     auto spatialPointLightShader = builder_->MakeShader(nullptr, false);
     if (spatialPointLightShader == nullptr) {
-        GE_LOGE("GESpatialPointLightShader::MakeSpatialPointLightShader shader is nullptr.");
+        GE_LOGE("MakeSpatialPointLightShader shader is nullptr.");
         return nullptr;
     }
     return spatialPointLightShader;
