@@ -15,7 +15,7 @@
 # limitations under the License.
 
 """
-Generate C++ static reflection metadata from .params files.
+Generate C++ static reflection metadata from .params.in files.
 
 This script provides a C++ attribute parser to generate metadata for GE Effect Params
 """
@@ -198,7 +198,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
 
 
 def parse_def_file(file_path: Path, report_errors: bool = True) -> Optional[StructInfo]:
-    """Parse a .params file and extract struct information."""
+    """Parse a .params.in file and extract struct information."""
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -1563,7 +1563,7 @@ def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, 
 def main():
     """Main generation function."""
     parser = argparse.ArgumentParser(
-        description="Generate C++ static reflection metadata from .params files",
+        description="Generate C++ static reflection metadata from .params.in files",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -1577,7 +1577,7 @@ Examples:
         type=str,
         nargs="+",
         default=None,
-        help="Directories containing .params files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)",
+        help="Directories containing .params.in files (default: include/effect/filter include/effect/mask include/effect/shader include/effect/shape)",
     )
 
     parser.add_argument("--output-file", type=str, default=None, help="Output header file path (default: include/effect/ge_params_reflection.h)")
@@ -1629,18 +1629,18 @@ Examples:
         for blocked_type, reason in blocked_types.items():
             console.step(f"  Blocked: {blocked_type} - {reason}")
 
-    console.header("Scanning for .params files")
+    console.header("Scanning for .params.in files")
     params_files = []
     for params_dir in params_dirs:
-        params_files.extend(list(params_dir.glob("*.params")))
+        params_files.extend(list(params_dir.glob("*.params.in")))
     params_files.sort(key=lambda p: p.name)
 
     if not params_files:
-        console.error(f"No .params files found in {params_dirs}")
+        console.error(f"No .params.in files found in {params_dirs}")
         console.summary()
         return 1
 
-    console.info(f"Found {len(params_files)} .params files in:")
+    console.info(f"Found {len(params_files)} .params.in files in:")
     for params_dir in params_dirs:
         console.step(f"{params_dir}")
 
