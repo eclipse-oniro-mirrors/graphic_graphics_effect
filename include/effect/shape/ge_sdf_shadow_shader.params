@@ -20,6 +20,7 @@ struct GESDFShadowParams final {
     float radius = 0.0;
     Drawing::Path path;
     bool isFilled = false;
+    float elevation = 0.0f;
 };
 
 struct [[ge::params(type=SDF_SHADOW, name="SDFShadow")]] GESDFShadowShaderParams final {
