@@ -1041,6 +1041,7 @@ void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffect
             LOGD("GERender::DrawShaderEffect shader is null");
             continue;
         }
+        geShaderEffect->SetShaderCanvasInfo(vef->GetCanvasInfo());
         geShaderEffect->SetCache(ve->GetCache());
         geShaderEffect->DrawShader(canvas, bounds);
         ve->SetCache(geShaderEffect->GetCache());

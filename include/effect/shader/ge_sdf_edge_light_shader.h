@@ -34,7 +34,7 @@ public:
 
     DECLARE_GEFILTER_TYPEFUNC(GESDFEdgeLightShader, Drawing::GESDFEdgeLightEffectParams);
 
-    void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     const std::string GetDescription() const { return "GESDFEdgeLightShader"; }
 
@@ -45,7 +45,6 @@ private:
     GESDFEdgeLightShader& operator=(const GESDFEdgeLightShader&&) = delete;
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetEffectShaderBuilder(const Drawing::Rect& rect);
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
     Drawing::GESDFEdgeLightEffectParams params_;
 };

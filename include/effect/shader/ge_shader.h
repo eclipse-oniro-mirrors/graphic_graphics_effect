@@ -21,6 +21,7 @@
 #include "utils/rect.h"
 #include "effect/shader_effect.h"
 #include "ge_common.h"
+#include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
@@ -51,6 +52,11 @@ public:
         return cacheAnyPtr_;
     }
 
+    virtual void SetShaderCanvasInfo(const Drawing::CanvasInfo& canvasInfo)
+    {
+        canvasInfo_ = canvasInfo;
+    }
+
     void SetSupportHeadroom(float supportHeadroom)
     {
         supportHeadroom_ = supportHeadroom;
@@ -73,6 +79,7 @@ protected:
      */
     virtual Drawing::Rect GetSubtractedRect(float width, float height) const { return Drawing::Rect(); }
     uint32_t hash_ = 0;
+    Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;
     std::shared_ptr<Drawing::ShaderEffect> drShader_ = nullptr;
     std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;

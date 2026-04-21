@@ -18,19 +18,14 @@
 #include "draw/canvas.h"
 #include "draw/color.h"
 #include "ge_double_ripple_shader_mask.h"
-#include "image/bitmap.h"
-#include "image/image.h"
 #include "ge_sdf_edge_light_shader.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
-
-constexpr size_t NUM_2 = 2;
-constexpr size_t NUM_50 = 50;
-
 class GESDFEdgeLightShaderTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -39,8 +34,8 @@ public:
     void TearDown() override;
 
     static inline Drawing::Canvas canvas_;
-    std::shared_ptr<Drawing::Image> sdfImage_ { nullptr };
-    std::shared_ptr<Drawing::GEShaderMask> lightMask_ { nullptr };
+    std::shared_ptr<Drawing::GEShaderMask> lightMask_ {};
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape_ {};
 
     Drawing::Rect rect_ { 20.0f, 20.0f, 200.0f, 200.0f };
 
@@ -54,22 +49,20 @@ void GESDFEdgeLightShaderTest::TearDownTestCase() {}
 
 void GESDFEdgeLightShaderTest::SetUp()
 {
-    // Build a 50x50 SDF image (use RED just as placeholder content)
-    Drawing::Bitmap sdfBmp;
-    Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    sdfBmp.Build(NUM_50, NUM_50, fmt);
-    sdfBmp.ClearWithColor(Drawing::Color::COLOR_RED);
-    sdfImage_ = sdfBmp.MakeImage();
-
     // Create a light mask
     Drawing::GEDoubleRippleShaderMaskParams mp;
     lightMask_ = std::make_shared<Drawing::GEDoubleRippleShaderMask>(mp);
+    auto rrect = Drawing::GERRect{ 0.0f, 0.0f, 100.0f, 100.0f };
+    rrect.SetCornerRadius(10.0f, 10.0f);
+    sdfShape_ = std::make_shared<Drawing::GESDFRRectShaderShape>(Drawing::GESDFRRectShapeParams {
+        rrect
+    });
 }
 
 void GESDFEdgeLightShaderTest::TearDown()
 {
-    sdfImage_ = nullptr;
     lightMask_ = nullptr;
+    sdfShape_ = nullptr;
 }
 
 Drawing::GESDFEdgeLightEffectParams GESDFEdgeLightShaderTest::MakeParams()
@@ -84,50 +77,30 @@ Drawing::GESDFEdgeLightEffectParams GESDFEdgeLightShaderTest::MakeParams()
     p.maxBorderWidth = 5.0f;
     p.innerBorderBloomWidth = 30.0f;
     p.outerBorderBloomWidth = 30.0f;
-    // sdfImage and lightMask can be set in params before constructing shader
+    // sdfShape and lightMask can be set in params before constructing shader
     return p;
 }
 
 /**
  * @tc.name: MakeDrawingShader_InvalidInputs
- * @tc.desc: Verify MakeDrawingShader handles invalid inputs gracefully (null sdfImage or lightMask).
+ * @tc.desc: Verify MakeDrawingShader handles invalid inputs gracefully (null sdfShape or lightMask).
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFEdgeLightShaderTest, MakeDrawingShader_InvalidInputs, TestSize.Level0)
 {
     auto params = MakeParams();
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
-
-    // Case 1: sdfImage_ not set → MakeDrawingShader should complete but shader may be invalid
+    // Case 1: sdfShape not set → MakeDrawingShader should complete but shader may be invalid
     shader->MakeDrawingShader(rect_, 0.0f);
-    // On CPU canvas, shader generation may fail silently
+    EXPECT_EQ(shader->drShader_, nullptr);
 
     // Case 2: lightMask not set → MakeDrawingShader should complete but shader may be invalid
     auto params2 = MakeParams();
-    params2.sdfImage = sdfImage_;
+    params2.sdfShape = sdfShape_;
     // lightMask is not set (nullptr)
     auto shader2 = std::make_unique<GESDFEdgeLightShader>(params2);
     shader2->MakeDrawingShader(rect_, 0.0f);
-}
-
-/**
- * @tc.name: MakeDrawingShader_CPUFallback
- * @tc.desc: On CPU Canvas (no GPU context), MakeDrawingShader should complete gracefully.
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFEdgeLightShaderTest, MakeDrawingShader_CPUFallback, TestSize.Level0)
-{
-    ASSERT_NE(sdfImage_, nullptr);
-    ASSERT_NE(lightMask_, nullptr);
-
-    // Provide required resources via constructor params
-    auto params = MakeParams();
-    params.sdfImage = sdfImage_;
-    params.lightMask = lightMask_;
-    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
-
-    // On CPU canvas, MakeDrawingShader should complete (shader may be null due to no GPU context)
-    shader->MakeDrawingShader(rect_, 0.0f);
+    EXPECT_EQ(shader2->drShader_, nullptr);
 }
 
 /**
@@ -137,34 +110,21 @@ HWTEST_F(GESDFEdgeLightShaderTest, MakeDrawingShader_CPUFallback, TestSize.Level
  */
 HWTEST_F(GESDFEdgeLightShaderTest, ParameterVariations_Smoke, TestSize.Level0)
 {
-    ASSERT_NE(sdfImage_, nullptr);
     ASSERT_NE(lightMask_, nullptr);
 
-    // Test with initial SDF image
     auto params1 = MakeParams();
-    params1.sdfImage = sdfImage_;
     params1.lightMask = lightMask_;
+    params1.sdfShape = sdfShape_;
     auto shader1 = std::make_unique<GESDFEdgeLightShader>(params1);
     shader1->MakeDrawingShader(rect_, 0.0f);
-
-    // Test with different SDF image
-    Drawing::Bitmap newSdfBmp;
-    Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    newSdfBmp.Build(NUM_2, NUM_2, fmt);
-    newSdfBmp.ClearWithColor(Drawing::Color::COLOR_GREEN);
-    auto newSdfImage = newSdfBmp.MakeImage();
-    ASSERT_NE(newSdfImage, nullptr);
-
-    auto params2 = MakeParams();
-    params2.sdfImage = newSdfImage;
-    params2.lightMask = lightMask_;
-    auto shader2 = std::make_unique<GESDFEdgeLightShader>(params2);
-    shader2->MakeDrawingShader(rect_, 0.0f);
+    // Test effectShader when second enter
+    shader1->MakeDrawingShader(rect_, 0.0f);
+    EXPECT_NE(shader1->drShader_, nullptr);
 
     // Test with different parameters
     auto params3 = MakeParams();
-    params3.sdfImage = sdfImage_;
     params3.lightMask = lightMask_;
+    params3.sdfShape = sdfShape_;
     params3.bloomIntensityCutoff = 0.5f;
     params3.maxIntensity = 2.0f;
     params3.maxBloomIntensity = 1.5f;
@@ -176,6 +136,7 @@ HWTEST_F(GESDFEdgeLightShaderTest, ParameterVariations_Smoke, TestSize.Level0)
     params3.sdfSpreadFactor = 128.0f;
     auto shader3 = std::make_unique<GESDFEdgeLightShader>(params3);
     shader3->MakeDrawingShader(rect_, 0.0f);
+    EXPECT_NE(shader3->drShader_, nullptr);
 }
 
 /**
@@ -192,5 +153,55 @@ HWTEST_F(GESDFEdgeLightShaderTest, TypeCheck, TestSize.Level0)
     EXPECT_EQ(shader->TypeName(), std::string_view("SDFEdgeLightEffect"));
 }
 
+/**
+ * @tc.name: OnDrawTest001
+ * @tc.desc: test OnDraw with valid shader
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightShaderTest, OnDrawTest001, TestSize.Level0)
+{
+    ASSERT_NE(sdfShape_, nullptr);
+    ASSERT_NE(lightMask_, nullptr);
+    auto params = MakeParams();
+    params.sdfShape = sdfShape_;
+    params.lightMask = lightMask_;
+    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
+    shader->MakeDrawingShader(rect_, 0.0f);
+    Drawing::Canvas canvas;
+    shader->OnDrawShader(canvas, rect_);
+    EXPECT_NE(shader->drShader_, nullptr);
+}
+
+/**
+ * @tc.name: OnDrawTest002
+ * @tc.desc: test OnDraw with null shader
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightShaderTest, OnDrawTest002, TestSize.Level0)
+{
+    auto params = MakeParams();
+    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
+    shader->MakeDrawingShader(rect_, 0.0f);
+    Drawing::Canvas canvas;
+    shader->OnDrawShader(canvas, rect_);
+    EXPECT_EQ(shader->drShader_, nullptr);
+}
+
+/**
+ * @tc.name: GetEffectShaderBuilderTest001
+ * @tc.desc: test GetEffectShaderBuilder with valid params
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightShaderTest, GetEffectShaderBuilderTest001, TestSize.Level0)
+{
+    ASSERT_NE(sdfShape_, nullptr);
+    ASSERT_NE(lightMask_, nullptr);
+    auto params = MakeParams();
+    params.sdfShape = sdfShape_;
+    params.lightMask = lightMask_;
+    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
+    auto builder = shader->GetEffectShaderBuilder(rect_);
+    EXPECT_NE(builder, nullptr);
+}
 } // namespace Rosen
 } // namespace OHOS
