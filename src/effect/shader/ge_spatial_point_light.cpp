@@ -28,8 +28,8 @@ namespace {
     constexpr int COLOR_CHANNEL = 4;
     constexpr int POSITION_DIMENSION = 3;
 
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> spatialPointLightShaderEffect_ = nullptr;
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> spatialPointLightShaderEffectWithMask_ = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffect_ = nullptr;
+    thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffectWithMask_ = nullptr;
 
     // Shader without mask - full screen effect
     static constexpr char PROG_NO_MASK[] = R"(
@@ -97,30 +97,30 @@ void GESpatialPointLightShader::MakeDrawingShader(const Drawing::Rect& rect, flo
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderNoMask()
 {
-    if (spatialPointLightShaderEffect_ == nullptr) {
-        spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
+    if (g_spatialPointLightShaderEffect_ == nullptr) {
+        g_spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
         GE_LOGD("RuntimeEffect (no mask) created");
     }
 
-    if (spatialPointLightShaderEffect_ == nullptr) {
+    if (g_spatialPointLightShaderEffect_ == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderNoMask effect is nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(spatialPointLightShaderEffect_);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_spatialPointLightShaderEffect_);
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderWithMask()
 {
-    if (spatialPointLightShaderEffectWithMask_ == nullptr) {
-        spatialPointLightShaderEffectWithMask_ = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
+    if (g_spatialPointLightShaderEffectWithMask_ == nullptr) {
+        g_spatialPointLightShaderEffectWithMask_ = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
         GE_LOGD("RuntimeEffect (with mask) created");
     }
 
-    if (spatialPointLightShaderEffectWithMask_ == nullptr) {
+    if (g_spatialPointLightShaderEffectWithMask_ == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderWithMask effect is nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(spatialPointLightShaderEffectWithMask_);
+    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_spatialPointLightShaderEffectWithMask_);
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPointLightShader(const Drawing::Rect& rect)
