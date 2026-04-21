@@ -99,6 +99,7 @@ private:
     std::shared_ptr<Drawing::HpsMaskParameter> GenerateRadialGradientShaderMaskParameter(
         const Drawing::GERadialGradientShaderMaskParams& params);
 
+    void UpdateHpsEffectCacheParameter(const std::shared_ptr<Drawing::Image>& image);
     bool DrawImageWithHpsUpscale(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& imageCache,
         std::shared_ptr<Drawing::Image>& outImage, const HpsEffectContext& hpsContext);
     bool IsNeedDownscale();
