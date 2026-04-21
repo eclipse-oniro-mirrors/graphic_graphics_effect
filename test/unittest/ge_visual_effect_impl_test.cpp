@@ -25,6 +25,8 @@
 #include "draw/color.h"
 #include "ge_pixel_map_shader_mask.h"
 #include "image/bitmap.h"
+#include "ge_params_reflection.h"
+#include "ge_effects_params.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -1410,6 +1412,155 @@ HWTEST_F(GEVisualEffectImplTest, SetUnionOpShapeParamsTest, TestSize.Level1)
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPEY, rightShape);
     geVisualEffectImpl.SetParam(Drawing::GE_SHAPE_SDF_SMOOTH_UNION_OP_SHAPEY, leftShape);
     EXPECT_NE(geVisualEffectImpl.GetParams<Drawing::GESDFUnionOpShapeParams>()->right, nullptr);
+}
+
+/**
+ * @tc.name: GetFilterType_SpatialPointLight_001
+ * @tc.desc: Verify function GetFilterType for SPATIAL_POINT_LIGHT
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, GetFilterType_SpatialPointLight_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    EXPECT_EQ(geVisualEffectImpl.GetFilterType(), Drawing::GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT);
+}
+
+/**
+ * @tc.name: MakeSpatialPointLightParams_001
+ * @tc.desc: Verify function MakeParams for GESpatialPointLightShaderParams
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeSpatialPointLightParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("");
+    geVisualEffectImpl.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::SPATIAL_POINT_LIGHT);
+    EXPECT_EQ(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    EXPECT_NE(geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>(), nullptr);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_001
+ * @tc.desc: Verify function SetParam for SpatialPointLight float params
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    float lightIntensity = 2.5f;
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
+        lightIntensity);
+    EXPECT_FLOAT_EQ(params->lightIntensity, lightIntensity);
+
+    float attenuation = 0.8f;
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, attenuation);
+    EXPECT_FLOAT_EQ(params->attenuation, attenuation);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_002
+ * @tc.desc: Verify function SetParam for SpatialPointLight Vector3f param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_002, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    Vector3f lightPosition = Vector3f(0.5f, 0.5f, 1.0f);
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_POSITION,
+        lightPosition);
+    EXPECT_FLOAT_EQ(params->lightPosition.x_, lightPosition.x_);
+    EXPECT_FLOAT_EQ(params->lightPosition.y_, lightPosition.y_);
+    EXPECT_FLOAT_EQ(params->lightPosition.z_, lightPosition.z_);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_003
+ * @tc.desc: Verify function SetParam for SpatialPointLight Vector4f param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_003, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    Vector4f lightColor = Vector4f(1.0f, 0.8f, 0.6f, 1.0f);
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_COLOR, lightColor);
+    EXPECT_FLOAT_EQ(params->lightColor.x_, lightColor.x_);
+    EXPECT_FLOAT_EQ(params->lightColor.y_, lightColor.y_);
+    EXPECT_FLOAT_EQ(params->lightColor.z_, lightColor.z_);
+    EXPECT_FLOAT_EQ(params->lightColor.w_, lightColor.w_);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_004
+ * @tc.desc: Verify function SetParam for SpatialPointLight mask param
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_004, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    Drawing::GERippleShaderMaskParams maskParam;
+    auto geRippleShaderMask = std::make_shared<Drawing::GERippleShaderMask>(maskParam);
+    auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRippleShaderMask);
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_MASK, shaderMask);
+    EXPECT_EQ(params->mask, shaderMask);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_005
+ * @tc.desc: Verify function SetParam for SpatialPointLight with invalid tag
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_005, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    float defaultValue = params->lightIntensity;
+    geVisualEffectImpl.SetParam("", 5.0f);
+    EXPECT_FLOAT_EQ(params->lightIntensity, defaultValue);
+}
+
+/**
+ * @tc.name: SetParam_SpatialPointLight_006
+ * @tc.desc: Verify function SetParam for SpatialPointLight with boundary values
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_006, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl("SpatialPointLight");
+    geVisualEffectImpl.MakeParams<Drawing::GESpatialPointLightShaderParams>();
+    auto params = geVisualEffectImpl.GetParams<Drawing::GESpatialPointLightShaderParams>();
+    ASSERT_NE(params, nullptr);
+
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, 0.0f);
+    EXPECT_FLOAT_EQ(params->lightIntensity, 0.0f);
+
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_LIGHT_INTENSITY, -1.0f);
+    EXPECT_FLOAT_EQ(params->lightIntensity, -1.0f);
+
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, 0.0f);
+    EXPECT_FLOAT_EQ(params->attenuation, 0.0f);
+
+    geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, 100.0f);
+    EXPECT_FLOAT_EQ(params->attenuation, 100.0f);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

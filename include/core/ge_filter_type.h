@@ -102,6 +102,7 @@ enum class GEFilterType : int32_t {
     DISTORTION_COLLAPSE,
     HEAT_DISTORTION,
     BLUR_BUBBLES_RISE,
+    SPATIAL_POINT_LIGHT,
     MAX,
 };
 
