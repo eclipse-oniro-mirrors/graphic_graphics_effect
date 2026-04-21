@@ -13,8 +13,11 @@
  * limitations under the License.
  */
 
-#include "ge_log.h"
 #include "ge_spatial_point_light.h"
+
+#include <algorithm>
+
+#include "ge_log.h"
 #include "ge_visual_effect_impl.h"
 
 #undef LOG_TAG
@@ -82,9 +85,9 @@ GESpatialPointLightShader::GESpatialPointLightShader() {}
 
 GESpatialPointLightShader::GESpatialPointLightShader(Drawing::GESpatialPointLightShaderParams& param)
 {
-    GE_LOGD("ctor: intensity=%f, attenuation=%f",
-        param.lightIntensity, param.attenuation);
     pointLightParams_ = param;
+    GE_LOGD("ctor: intensity=%{public}f, attenuation=%{public}f",
+        pointLightParams_.lightIntensity, pointLightParams_.attenuation);
 }
 
 void GESpatialPointLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
@@ -125,7 +128,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
     if (width < 1e-6 || height < 1e-6) {
-        GE_LOGE("MakeSpatialPointLightShader invalid rect size: width=%f, height=%f",
+        GE_LOGE("MakeSpatialPointLightShader invalid rect size: width=%{public}f, height=%{public}f",
             width, height);
         return nullptr;
     }
@@ -145,7 +148,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), POSITION_DIMENSION);
     builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), COLOR_CHANNEL);
     builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
-    builder_->SetUniform("attenuation", pointLightParams_.attenuation);
+    float clampedAttenuation = std::max(0.001f, pointLightParams_.attenuation);
+    builder_->SetUniform("attenuation", clampedAttenuation);
 
     // Only set mask child when mask exists
     if (pointLightParams_.mask != nullptr) {
