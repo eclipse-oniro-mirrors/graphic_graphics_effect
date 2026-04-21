@@ -25,8 +25,8 @@
 namespace OHOS {
 namespace Rosen {
 namespace {
-    constexpr int COLOR_CHANNEL = 4;
-    constexpr int POSITION_DIMENSION = 3;
+    constexpr int32_t COLOR_CHANNEL = 4;
+    constexpr int32_t POSITION_DIMENSION = 3;
 
     thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffect_ = nullptr;
     thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffectWithMask_ = nullptr;
