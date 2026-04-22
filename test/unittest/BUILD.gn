@@ -59,6 +59,7 @@ ohos_source_set("graphics_effect_test_src") {
 
   sources = [
     "${graphics_effect_root}/src/core/ge_visual_effect.cpp",
+    "${graphics_effect_root}/src/core/ge_effect_factory.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_impl.cpp",
     "${graphics_effect_root}/src/effect/ge_params_reflection.cpp",
@@ -175,6 +176,7 @@ ohos_unittest("GraphicsEffectTest") {
 
   sources = [
     "ge_aibar_shader_filter_test.cpp",
+    "ge_effect_factory_test.cpp",
     "ge_aurora_noise_shader_test.cpp",
     "ge_bezier_warp_shader_filter_test.cpp",
     "ge_blur_bubbles_rise_filter_test.cpp",

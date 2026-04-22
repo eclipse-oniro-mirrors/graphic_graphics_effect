@@ -124,8 +124,6 @@ public:
     const std::shared_ptr<Drawing::GEShaderShape> GenerateShaderShape() const;
 
 private:
-    std::shared_ptr<Drawing::GEShaderShape> GenerateExtShaderRRect(
-        const std::shared_ptr<GESDFRRectShapeParams>& params) const;
     std::string visualEffectName_;
     DrawingPaintType type_;
     std::shared_ptr<GEVisualEffectImpl> visualEffectImpl_;

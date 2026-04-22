@@ -18,6 +18,7 @@
 
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
+#include "core/ge_filter_type_info.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -25,6 +26,7 @@ namespace Drawing {
 
 class GE_EXPORT GESDFTriangleShaderShape : public GESDFShaderShape {
 public:
+    DECLARE_GEFILTER_TYPEFUNC(GESDFTriangleShaderShape, Drawing::GESDFTriangleShapeParams);
     GESDFTriangleShaderShape(const GESDFTriangleShapeParams& param) : params_(param) {}
     GESDFTriangleShaderShape(const GESDFTriangleShaderShape&) = delete;
     virtual ~GESDFTriangleShaderShape() = default;
