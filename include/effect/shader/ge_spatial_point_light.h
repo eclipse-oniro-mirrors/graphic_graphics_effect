@@ -54,7 +54,6 @@ private:
     GESpatialPointLightShader& operator=(GESpatialPointLightShader&&) = delete;
 
     Drawing::GESpatialPointLightShaderParams pointLightParams_;
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder_;
 };
 
 } // namespace Rosen

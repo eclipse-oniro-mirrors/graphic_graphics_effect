@@ -28,9 +28,6 @@ namespace {
     constexpr int32_t COLOR_CHANNEL = 4;
     constexpr int32_t POSITION_DIMENSION = 3;
 
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffect_ = nullptr;
-    thread_local std::shared_ptr<Drawing::RuntimeEffect> g_spatialPointLightShaderEffectWithMask_ = nullptr;
-
     // Shader without mask - full screen effect
     static constexpr char PROG_NO_MASK[] = R"(
         uniform vec2 iResolution;
@@ -42,10 +39,7 @@ namespace {
         half4 main(vec2 fragCoord)
         {
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
-            vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
-
-            vec3 viewDir = lightDir;
-            vec3 halfwayDir = normalize(lightDir + viewDir);
+            vec3 halfwayDir = normalize(lightDirection);
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor;
@@ -69,10 +63,7 @@ namespace {
                 return vec4(0.0);
             }
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
-            vec3 lightDir = normalize(vec3(lightDirection.xy, lightDirection.z));
-
-            vec3 viewDir = lightDir;
-            vec3 halfwayDir = normalize(lightDir + viewDir);
+            vec3 halfwayDir = normalize(lightDirection);
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
@@ -97,30 +88,34 @@ void GESpatialPointLightShader::MakeDrawingShader(const Drawing::Rect& rect, flo
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderNoMask()
 {
-    if (g_spatialPointLightShaderEffect_ == nullptr) {
-        g_spatialPointLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
-        GE_LOGD("RuntimeEffect (no mask) created");
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> shaderBuilder;
+    if (shaderBuilder) {
+        return shaderBuilder;
     }
-
-    if (g_spatialPointLightShaderEffect_ == nullptr) {
+    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
+    if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderNoMask effect is nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_spatialPointLightShaderEffect_);
+    GE_LOGD("RuntimeEffect (no mask) created");
+    shaderBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(effect);
+    return shaderBuilder;
 }
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderWithMask()
 {
-    if (g_spatialPointLightShaderEffectWithMask_ == nullptr) {
-        g_spatialPointLightShaderEffectWithMask_ = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
-        GE_LOGD("RuntimeEffect (with mask) created");
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> shaderBuilder;
+    if (shaderBuilder) {
+        return shaderBuilder;
     }
-
-    if (g_spatialPointLightShaderEffectWithMask_ == nullptr) {
+    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
+    if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderWithMask effect is nullptr.");
         return nullptr;
     }
-    return std::make_shared<Drawing::RuntimeShaderBuilder>(g_spatialPointLightShaderEffectWithMask_);
+    GE_LOGD("RuntimeEffect (with mask) created");
+    shaderBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(effect);
+    return shaderBuilder;
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPointLightShader(const Drawing::Rect& rect)
@@ -134,22 +129,23 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     }
 
     // Choose builder based on whether mask exists
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder;
     if (pointLightParams_.mask != nullptr) {
-        builder_ = GetSpatialPointLightBuilderWithMask();
+        builder = GetSpatialPointLightBuilderWithMask();
     } else {
-        builder_ = GetSpatialPointLightBuilderNoMask();
+        builder = GetSpatialPointLightBuilderNoMask();
     }
 
-    if (builder_ == nullptr) {
+    if (builder == nullptr) {
         GE_LOGE("MakeSpatialPointLightShader builder is nullptr.");
         return nullptr;
     }
-    builder_->SetUniform("iResolution", width, height);
-    builder_->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), POSITION_DIMENSION);
-    builder_->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), COLOR_CHANNEL);
-    builder_->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
+    builder->SetUniform("iResolution", width, height);
+    builder->SetUniform("lightPosition", pointLightParams_.lightPosition.GetData(), POSITION_DIMENSION);
+    builder->SetUniform("lightColor", pointLightParams_.lightColor.GetData(), COLOR_CHANNEL);
+    builder->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     float clampedAttenuation = std::max(0.001f, pointLightParams_.attenuation);
-    builder_->SetUniform("attenuation", clampedAttenuation);
+    builder->SetUniform("attenuation", clampedAttenuation);
 
     // Only set mask child when mask exists
     if (pointLightParams_.mask != nullptr) {
@@ -158,10 +154,10 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
             GE_LOGE("MakeSpatialPointLightShader mask shader is nullptr.");
             return nullptr;
         }
-        builder_->SetChild("mask", maskShader);
+        builder->SetChild("mask", maskShader);
     }
 
-    auto spatialPointLightShader = builder_->MakeShader(nullptr, false);
+    auto spatialPointLightShader = builder->MakeShader(nullptr, false);
     if (spatialPointLightShader == nullptr) {
         GE_LOGE("MakeSpatialPointLightShader shader is nullptr.");
         return nullptr;
