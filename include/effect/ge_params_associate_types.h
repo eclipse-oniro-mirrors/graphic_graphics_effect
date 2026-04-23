@@ -41,6 +41,7 @@ struct CanvasInfo {
     float tranY = 0.0f;
     Drawing::Matrix mat;
     RectF materialDst;
+    bool disableFilterCache = false;
 };
 
 // Rounded rect used by SDF, FrostedGlass, etc

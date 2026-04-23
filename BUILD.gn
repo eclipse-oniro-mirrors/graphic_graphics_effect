@@ -112,6 +112,8 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/filter/ge_magnifier_shader_filter.cpp",
     "src/effect/filter/ge_mask_transition_shader_filter.cpp",
     "src/effect/filter/ge_mesa_blur_shader_filter.cpp",
+    "src/effect/filter/ge_motion_blur_shader_filter.cpp",
+    "src/effect/filter/ge_blur_shader_filter.cpp",
     "src/effect/filter/ge_sound_wave_filter.cpp",
     "src/effect/filter/ge_sdf_edge_light.cpp",
     "src/effect/filter/ge_sdf_from_image_filter.cpp",
