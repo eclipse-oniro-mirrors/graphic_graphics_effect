@@ -825,7 +825,10 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
 GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
-#define GE_STRING_TO_TAG_ENTRY(Tag) { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }
+#define GE_STRING_TO_TAG_ENTRY(Tag)                                                 \
+    {                                                                               \
+        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag \
+    }
 
 #define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag }
 
