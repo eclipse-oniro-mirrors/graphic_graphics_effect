@@ -117,8 +117,10 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
-#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
-    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
+#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \
+    {                                                                                               \
+        std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \
+    }
 
 #define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
 
