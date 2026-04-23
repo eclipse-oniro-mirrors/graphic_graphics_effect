@@ -60,6 +60,8 @@
 #include "effect/shader/ge_contour_diagonal_flow_light_shader.h"
 #include "effect/shader/ge_frosted_glass_effect.h"
 #include "effect/shader/ge_particle_circular_halo_shader.h"
+#include "effect/shader/ge_sdf_edge_light_shader.h"
+#include "effect/shader/ge_spatial_point_light.h"
 #include "effect/shader/ge_wavy_ripple_light_shader.h"
 #include "effect/shader/gex_complex_shader_params.h"
 #include "effect/shader/gex_dot_matrix_shader_params.h"
@@ -110,6 +112,9 @@ GE_FACTORY_REGISTER(GESDFFromImageFilter)
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY_SCALE_TWIST, ::OHOS::Rosen::Drawing::GEGasifyScaleTwistFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY_BLUR, ::OHOS::Rosen::Drawing::GEGasifyBlurFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY, ::OHOS::Rosen::Drawing::GEGasifyFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(PARTICLE_ABLATION, ::OHOS::Rosen::Drawing::GEParticleAblationFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(WATER_DROPLET_TRANSITION, ::OHOS::Rosen::Drawing::GEWaterDropletTransitionFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(MAP_COLOR_BY_BRIGHTNESS, ::OHOS::Rosen::Drawing::GEMapColorByBrightnessFilterParams)
 
 // 3. 外部效果（外部加载 + 内置回退）
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(FROSTED_GLASS,
@@ -189,9 +194,6 @@ GE_FACTORY_REGISTER_CUSTOM(LINEAR_GRADIENT_BLUR,
             const_cast<::OHOS::Rosen::Drawing::GELinearGradientBlurShaderFilterParams&>(*params));
     })
 
-// 未实现效果：WATER_DROPLET_TRANSITION(35), MAP_COLOR_BY_BRIGHTNESS(37),
-//            GAMMA_CORRECTION(38), WATER_GL_GLASS(39), REEDED_GLASS(40)
-
 
 // ============================================================================
 // 二、Shader 效果
@@ -208,6 +210,8 @@ GE_FACTORY_REGISTER(GESDFBorderShader)
 GE_FACTORY_REGISTER(GESDFShadowShader)
 GE_FACTORY_REGISTER(GESDFColorShader)
 GE_FACTORY_REGISTER(GESDFClipShader)
+GE_FACTORY_REGISTER(GESDFEdgeLightShader)
+GE_FACTORY_REGISTER(GESpatialPointLightShader)
 
 // 2. 外部效果（纯外部加载）
 GE_FACTORY_REGISTER_EXTERNAL(DOT_MATRIX, ::OHOS::Rosen::Drawing::GEDotMatrixShaderParams)
@@ -218,8 +222,6 @@ GE_FACTORY_REGISTER_EXTERNAL(AIBAR_GLOW, ::OHOS::Rosen::Drawing::GEXAIBarGlowEff
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_RECT_HALO, ::OHOS::Rosen::Drawing::GEXAIBarRectHaloEffectParams)
 GE_FACTORY_REGISTER_EXTERNAL(ROUNDED_RECT_FLOWLIGHT, ::OHOS::Rosen::Drawing::GEXRoundedRectFlowlightEffectParams)
 GE_FACTORY_REGISTER_EXTERNAL(GRADIENT_FLOW_COLORS, ::OHOS::Rosen::Drawing::GEXGradientFlowColorsEffectParams)
-// GE_FACTORY_REGISTER_EXTERNAL(FLOW_LIGHT_SWEEP, ::OHOS::Rosen::GEXFlowLightSweepParams)  // TODO: ParamType未注册
-// GE_FACTORY_REGISTER_EXTERNAL(COMPLEX_SHADER, ::OHOS::Rosen::GEXComplexShaderParams)     // TODO: ParamType未注册
 
 // 3. 外部效果（外部加载 + 内置回退）
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(COLOR_GRADIENT_EFFECT,

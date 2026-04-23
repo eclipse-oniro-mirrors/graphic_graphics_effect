@@ -79,6 +79,7 @@ inline bool GE_CheckNullptr(const void* ptr, const char* logTag, int filterType 
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
+namespace Internal {  // 内部实现命名空间，不对外暴露
 
 template<typename FullClassName>
 void RegisterEffect(const char* logTag)
@@ -143,10 +144,12 @@ void RegisterExternalFallbackEffect(const char* logTag)
         });
 }
 
+} // namespace Internal
+
 #define GE_REGISTER_IMPL(ClassName, FullClassName) \
     namespace { \
         struct GEEffectRegistrar_##ClassName { \
-            GEEffectRegistrar_##ClassName() { RegisterEffect<FullClassName>(#ClassName); } \
+            GEEffectRegistrar_##ClassName() { Internal::RegisterEffect<FullClassName>(#ClassName); } \
         }; \
         static GEEffectRegistrar_##ClassName g_effectRegistrar_##ClassName; \
     }
@@ -159,7 +162,8 @@ void RegisterExternalFallbackEffect(const char* logTag)
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { RegisterExternalEffect<ParamType, ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
+            { Internal::RegisterExternalEffect<ParamType, \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
     }
@@ -168,7 +172,7 @@ void RegisterExternalFallbackEffect(const char* logTag)
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { RegisterExternalFallbackEffect<ParamType, FallbackClass, \
+            { Internal::RegisterExternalFallbackEffect<ParamType, FallbackClass, \
                 ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
