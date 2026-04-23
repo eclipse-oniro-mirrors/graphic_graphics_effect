@@ -249,18 +249,6 @@ HWTEST_F(GEEffectFactoryTest, CreateSDFRRectShape_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: IsFallbackDisabled_001
- * @tc.desc: Verify IsFallbackDisabled function
- * @tc.type:FUNC
- */
-HWTEST_F(GEEffectFactoryTest, IsFallbackDisabled_001, TestSize.Level1)
-{
-    bool result = GEEffectFactory::IsFallbackDisabled();
-
-    EXPECT_FALSE(result);
-}
-
-/**
  * @tc.name: CreateMultipleEffects_001
  * @tc.desc: Verify creating multiple different effect types
  * @tc.type:FUNC

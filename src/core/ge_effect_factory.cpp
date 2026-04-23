@@ -17,10 +17,6 @@
 #include "ge_system_properties.h"
 #include <memory>
 
-namespace {
-constexpr const char* PROPERTY_FACTORY_FALLBACK_DISABLED = "persist.sys.graphic.factoryFallbackDisable";
-}
-
 namespace OHOS {
 namespace GraphicsEffectEngine {
 
@@ -103,16 +99,6 @@ std::shared_ptr<Rosen::Drawing::GEShaderShape> GEEffectFactory::CreateShape(
         return nullptr;
     }
     return std::static_pointer_cast<Rosen::Drawing::GEShaderShape>(result);
-}
-
-bool GEEffectFactory::IsFallbackDisabled()
-{
-#ifdef GE_OHOS
-    bool disabled = (std::atoi(Rosen::GESystemProperties::GetEventProperty(PROPERTY_FACTORY_FALLBACK_DISABLED).c_str()));
-    return disabled;
-#else
-    return false;
-#endif
 }
 
 } // namespace GraphicsEffectEngine

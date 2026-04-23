@@ -20,15 +20,16 @@
 #include <array>
 #include <memory>
 #include <optional>
+#include <string>
 #include <type_traits>
 #include "ge_visual_effect_impl.h"
 #include "ge_log.h"
+#include "ext/ge_external_dynamic_loader.h"
 
 namespace OHOS {
 namespace Rosen {
 class GEShader;
 class GEShaderFilter;
-class GEExternalDynamicLoader;
 }
 
 namespace GraphicsEffectEngine {
@@ -48,8 +49,6 @@ public:
     std::shared_ptr<Rosen::GEShaderFilter> CreateFilter(VisualEffectImplPtr impl);
     std::shared_ptr<Rosen::Drawing::GEShaderMask> CreateMask(VisualEffectImplPtr impl);
     std::shared_ptr<Rosen::Drawing::GEShaderShape> CreateShape(VisualEffectImplPtr impl);
-
-    static bool IsFallbackDisabled();
 
 private:
     static constexpr size_t MAX_EFFECTS = static_cast<size_t>(Rosen::Drawing::GEFilterType::MAX);
@@ -81,54 +80,86 @@ inline bool GE_CheckNullptr(const void* ptr, const char* logTag, int filterType 
 namespace OHOS {
 namespace GraphicsEffectEngine {
 
-#define _GE_REGISTER_IMPL(ClassName, FullClassName) \
+template<typename FullClassName>
+void RegisterEffect(const char* logTag)
+{
+    using Factory = GEEffectFactory;
+    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
+    Factory::GetInstance().Register(
+        ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ID,
+        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            using ParamType = typename ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ParamType;
+            auto params = ve->template GetParams<ParamType>();
+            if (GE_CheckNullptr(params.get(), logTag, static_cast<int>(ve->GetFilterType()))) return nullptr;
+            return std::make_shared<FullClassName>(const_cast<ParamType&>(*params));
+        });
+}
+
+template<typename ParamType, ::OHOS::Rosen::Drawing::GEFilterType EffectType>
+void RegisterExternalEffect(const char* logTag)
+{
+    using Factory = GEEffectFactory;
+    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
+    Factory::GetInstance().Register(EffectType,
+        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+            std::string tag = std::string(logTag) + ":";
+            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            auto params = ve->template GetParams<ParamType>();
+            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
+                static_cast<int>(ve->GetFilterType()))) return nullptr;
+            uint32_t type = static_cast<uint32_t>(EffectType);
+            void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get())));
+            if (GE_CheckNullptr(impl, (tag + "ExternalLoader").c_str())) return nullptr;
+            return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
+                static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl));
+        });
+}
+
+template<typename ParamType, typename FallbackClass, ::OHOS::Rosen::Drawing::GEFilterType EffectType>
+void RegisterExternalFallbackEffect(const char* logTag)
+{
+    using Factory = GEEffectFactory;
+    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
+    static_assert(std::is_base_of_v<::OHOS::Rosen::Drawing::IGEFilterType, FallbackClass>);
+    Factory::GetInstance().Register(EffectType,
+        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+            std::string tag = std::string(logTag) + ":";
+            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            auto params = ve->template GetParams<ParamType>();
+            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
+                static_cast<int>(ve->GetFilterType()))) return nullptr;
+            uint32_t type = static_cast<uint32_t>(EffectType);
+            void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get())));
+            if (impl) {
+                GE_LOGD("[GEEffectFactory] %{public}s: Using external loader", logTag);
+                return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
+                    static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl));
+            }
+            GE_LOGW("[GEEffectFactory] %{public}s: External failed, using fallback", logTag);
+            return std::make_shared<FallbackClass>(const_cast<ParamType&>(*params));
+        });
+}
+
+#define GE_REGISTER_IMPL(ClassName, FullClassName) \
     namespace { \
         struct GEEffectRegistrar_##ClassName { \
-            GEEffectRegistrar_##ClassName() \
-            { \
-                using Factory = ::OHOS::GraphicsEffectEngine::GEEffectFactory; \
-                using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>; \
-                Factory::GetInstance().Register( \
-                    ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ID, \
-                    [](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr { \
-                        if (GE_CheckNullptr(ve.get(), #ClassName)) return nullptr; \
-                        using ParamType = typename ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ParamType; \
-                        auto params = ve->template GetParams<ParamType>(); \
-                        if (GE_CheckNullptr(params.get(), #ClassName ":GetParams", \
-                            static_cast<int>(ve->GetFilterType()))) return nullptr; \
-                        return std::make_shared<FullClassName>(const_cast<ParamType&>(*params)); \
-                    }); \
-            } \
+            GEEffectRegistrar_##ClassName() { RegisterEffect<FullClassName>(#ClassName); } \
         }; \
         static GEEffectRegistrar_##ClassName g_effectRegistrar_##ClassName; \
     }
 
-#define GE_FACTORY_REGISTER(ClassName) _GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::ClassName)
-#define GE_FACTORY_REGISTER_MASK(ClassName) _GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
-#define GE_FACTORY_REGISTER_SHAPE(ClassName) _GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
+#define GE_FACTORY_REGISTER(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::ClassName)
+#define GE_FACTORY_REGISTER_MASK(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
+#define GE_FACTORY_REGISTER_SHAPE(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
 
 #define GE_FACTORY_REGISTER_EXTERNAL(EffectType, ParamType) \
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { \
-                using Factory = ::OHOS::GraphicsEffectEngine::GEEffectFactory; \
-                using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>; \
-                Factory::GetInstance().Register( \
-                    ::OHOS::Rosen::Drawing::GEFilterType::EffectType, \
-                    [](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr { \
-                        if (GE_CheckNullptr(ve.get(), #EffectType)) return nullptr; \
-                        auto params = ve->template GetParams<ParamType>(); \
-                        if (GE_CheckNullptr(params.get(), #EffectType ":GetParams", \
-                            static_cast<int>(ve->GetFilterType()))) return nullptr; \
-                        uint32_t type = static_cast<uint32_t>(::OHOS::Rosen::Drawing::GEFilterType::EffectType); \
-                        void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType( \
-                            type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get()))); \
-                        if (GE_CheckNullptr(impl, #EffectType ":ExternalLoader")) return nullptr; \
-                        return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>( \
-                            static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl)); \
-                    }); \
-            } \
+            { RegisterExternalEffect<ParamType, ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
     }
@@ -137,30 +168,8 @@ namespace GraphicsEffectEngine {
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { \
-                using Factory = ::OHOS::GraphicsEffectEngine::GEEffectFactory; \
-                using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>; \
-                Factory::GetInstance().Register( \
-                    ::OHOS::Rosen::Drawing::GEFilterType::EffectType, \
-                    [](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr { \
-                        if (GE_CheckNullptr(ve.get(), #EffectType)) return nullptr; \
-                        auto params = ve->template GetParams<ParamType>(); \
-                        if (GE_CheckNullptr(params.get(), #EffectType ":GetParams", \
-                            static_cast<int>(ve->GetFilterType()))) return nullptr; \
-                        static_assert(std::is_base_of_v<::OHOS::Rosen::Drawing::IGEFilterType, FallbackClass>); \
-                        uint32_t type = static_cast<uint32_t>(::OHOS::Rosen::Drawing::GEFilterType::EffectType); \
-                        void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType( \
-                            type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get()))); \
-                        if (impl) { \
-                            GE_LOGD("[GEEffectFactory] %{public}s: Using external loader", #EffectType); \
-                            return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>( \
-                                static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl)); \
-                        } \
-                        GE_LOGW("[GEEffectFactory] %{public}s: External loader failed, using fallback %{public}s", \
-                            #EffectType, #FallbackClass); \
-                        return std::make_shared<FallbackClass>(const_cast<ParamType&>(*params)); \
-                    }); \
-            } \
+            { RegisterExternalFallbackEffect<ParamType, FallbackClass, \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
     }
@@ -169,10 +178,8 @@ namespace GraphicsEffectEngine {
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { \
-                ::OHOS::GraphicsEffectEngine::GEEffectFactory::GetInstance().Register( \
-                    ::OHOS::Rosen::Drawing::GEFilterType::EffectType, Lambda); \
-            } \
+            { ::OHOS::GraphicsEffectEngine::GEEffectFactory::GetInstance().Register( \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType, (Lambda)); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
     }
