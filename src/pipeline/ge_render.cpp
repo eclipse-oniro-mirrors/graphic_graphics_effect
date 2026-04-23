@@ -410,6 +410,24 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
             return out;
         }
     },
+    {GEVisualEffectImpl::FilterType::SPATIAL_GLASS_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetSpatialGlassEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSpatialGlassEffectParams();
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::SPATIAL_GLASS_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GESpatialGlassEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                out = std::make_shared<GESpatialGlassEffect>(*params);
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
+        }
+    },
 };
 
 GERender::GERender() {}

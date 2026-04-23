@@ -15,9 +15,10 @@
 
 #include "ge_visual_effect_container.h"
 
-#include "ge_visual_effect_impl.h"
 #include "ge_log.h"
+#include "ge_params_reflection.h"
 #include "ge_use_effect_shader_mask.h"
+#include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -84,6 +85,7 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
     std::shared_ptr<Drawing::Image> cachedImage, float left, float top)
 {
     for (auto vef : GetFilters()) {
+        auto impl = vef->GetImpl();
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURTOP, top);
@@ -103,6 +105,9 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE, cachedImage);
         }
+        if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
+            impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_BLUR_IMAGE, cachedImage);
+        }
     }
 }
 
@@ -120,8 +125,12 @@ void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Dra
 void GEVisualEffectContainer::UpdateSnapshotRect(const Drawing::RectF& snapshot)
 {
     for (auto vef : GetFilters()) {
+        auto impl = vef->GetImpl();
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTRECT, snapshot);
+        }
+        if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
+            impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_SNAPSHOT_RECT, snapshot);
         }
     }
 }
@@ -138,11 +147,15 @@ void GEVisualEffectContainer::UpdateCornerRadius(float cornerRadius)
 void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
 {
     for (auto vef : GetFilters()) {
+        auto impl = vef->GetImpl();
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_TOTALMATRIX, totalMatrix);
         }
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTMATRIX, totalMatrix);
+        }
+        if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
+            impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_SNAPSHOT_MATRIX, totalMatrix);
         }
     }
 }
