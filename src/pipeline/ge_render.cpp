@@ -50,6 +50,7 @@
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_sound_wave_filter.h"
+#include "ge_spatial_glass_effect.h"
 #include "ge_system_properties.h"
 #include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_visual_effect_impl.h"
