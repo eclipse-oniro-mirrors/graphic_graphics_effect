@@ -295,5 +295,23 @@ HWTEST_F(GEEffectFactoryTest, CreateWithParams_001, TestSize.Level1)
     EXPECT_NE(result2, nullptr);
 }
 
+/**
+ * @tc.name: Create_FallbackSuccess_001
+ * @tc.desc: Verify EXTERNAL_FALLBACK fallback success when external loader fails
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEEffectFactoryTest, Create_FallbackSuccess_001, TestSize.Level1)
+{
+    auto& factory = GEEffectFactory::GetInstance();
+
+    auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_MESA_BLUR);
+    impl->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, 10);
+
+    auto result = factory.CreateFilter(impl);
+
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result->Type(), GEFilterType::MESA_BLUR);
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

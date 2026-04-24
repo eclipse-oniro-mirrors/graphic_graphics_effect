@@ -247,11 +247,11 @@ GE_FACTORY_REGISTER_MASK(GEFrameGradientShaderMask)
 GE_FACTORY_REGISTER_MASK(GELinearGradientShaderMask)
 GE_FACTORY_REGISTER_MASK(GEImageShaderMask)
 GE_FACTORY_REGISTER_MASK(GEUseEffectShaderMask)
+GE_FACTORY_REGISTER_MASK(GEWaveDisturbanceShaderMask)
 
 // 2. 外部效果
 GE_FACTORY_REGISTER_EXTERNAL(DUPOLI_NOISE_MASK, ::OHOS::Rosen::Drawing::GEXDupoliNoiseMaskParams)
 GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::GEXNoisyFrameGradientMaskParams)
-GE_FACTORY_REGISTER_EXTERNAL(WAVE_DISTURBANCE_MASK, ::OHOS::Rosen::Drawing::GEWaveDisturbanceShaderMaskParams)
 
 
 // ============================================================================

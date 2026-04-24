@@ -51,7 +51,8 @@ std::shared_ptr<Rosen::Drawing::IGEFilterType> GEEffectFactory::Create(
     }
 
     if (!creators_[index]) {
-        GE_LOGD("[GEEffectFactory] Create: no creator for type=%{public}d", static_cast<int>(filterType));
+        GE_LOGE("[GEEffectFactory] Create: no creator for type=%{public}d, please register with GE_FACTORY_REGISTER",
+            static_cast<int>(filterType));
         return nullptr;
     }
 

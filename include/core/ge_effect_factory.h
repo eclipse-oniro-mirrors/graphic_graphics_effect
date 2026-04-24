@@ -89,10 +89,12 @@ void RegisterEffect(const char* logTag)
     Factory::GetInstance().Register(
         ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ID,
         [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+            std::string tag = std::string(logTag) + ":";
             if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
             using ParamType = typename ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ParamType;
             auto params = ve->template GetParams<ParamType>();
-            if (GE_CheckNullptr(params.get(), logTag, static_cast<int>(ve->GetFilterType()))) return nullptr;
+            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
+                static_cast<int>(ve->GetFilterType()))) return nullptr;
             return std::make_shared<FullClassName>(const_cast<ParamType&>(*params));
         });
 }
