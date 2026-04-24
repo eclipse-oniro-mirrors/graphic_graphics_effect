@@ -105,6 +105,9 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGE, cachedImage);
         }
+        if (impl == nullptr) {
+            continue;
+        }
         if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
             impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_BLUR_IMAGE, cachedImage);
         }
@@ -128,6 +131,9 @@ void GEVisualEffectContainer::UpdateSnapshotRect(const Drawing::RectF& snapshot)
         auto impl = vef->GetImpl();
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTRECT, snapshot);
+        }
+        if (impl == nullptr) {
+            continue;
         }
         if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
             impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_SNAPSHOT_RECT, snapshot);
@@ -153,6 +159,9 @@ void GEVisualEffectContainer::UpdateTotalMatrix(Drawing::Matrix totalMatrix)
         }
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_SNAPSHOTMATRIX, totalMatrix);
+        }
+        if (impl == nullptr) {
+            continue;
         }
         if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
             impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_SNAPSHOT_MATRIX, totalMatrix);
