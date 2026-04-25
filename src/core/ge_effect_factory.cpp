@@ -32,6 +32,11 @@ void GEEffectFactory::Register(Rosen::Drawing::GEFilterType type, EffectCreator&
     if (index >= MAX_EFFECTS) {
         return;
     }
+    if (creators_[index]) {
+        GE_LOGE("[EffectFactory] Duplicate registration for type=%{public}d, "
+            "previous will be replaced. Please check if multiple files register the same effect.",
+            static_cast<int>(type));
+    }
     creators_[index] = std::forward<EffectCreator>(creator);
 }
 

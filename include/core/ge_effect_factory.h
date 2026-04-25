@@ -151,7 +151,8 @@ void RegisterExternalFallbackEffect(const char* logTag)
 #define GE_REGISTER_IMPL(ClassName, FullClassName) \
     namespace { \
         struct GEEffectRegistrar_##ClassName { \
-            GEEffectRegistrar_##ClassName() { Internal::RegisterEffect<FullClassName>(#ClassName); } \
+            GEEffectRegistrar_##ClassName() \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterEffect<FullClassName>(#ClassName); } \
         }; \
         static GEEffectRegistrar_##ClassName g_effectRegistrar_##ClassName; \
     }
@@ -164,7 +165,7 @@ void RegisterExternalFallbackEffect(const char* logTag)
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { Internal::RegisterExternalEffect<ParamType, \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterExternalEffect<ParamType, \
                 ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
@@ -174,7 +175,7 @@ void RegisterExternalFallbackEffect(const char* logTag)
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { Internal::RegisterExternalFallbackEffect<ParamType, FallbackClass, \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterExternalFallbackEffect<ParamType, FallbackClass, \
                 ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
