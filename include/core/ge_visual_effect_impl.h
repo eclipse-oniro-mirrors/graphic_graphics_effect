@@ -245,6 +245,7 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(SDFDistortOpShapeParams, GESDFDistortOpShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(DistortionCollapseParams, GEDistortionCollapseFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(ParticleAblationFilterParams, GEParticleAblationFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SpatialGlassEffectParams, GESpatialGlassEffectParams)
 #undef GE_DECLARE_MAKE_GET_PARAMS
 
     // ========================================================================

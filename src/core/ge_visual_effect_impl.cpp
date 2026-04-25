@@ -110,6 +110,13 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffectImpl::GetGEShaderSha
             }
             break;
         }
+        case GEParamsMemberTag::SPATIAL_GLASS_EFFECT_SDF_SHAPE: {
+            auto spatialGlassEffectParams = GEFilterParams::Unbox<GESpatialGlassEffectParams>(*params_);
+            if (spatialGlassEffectParams != nullptr) {
+                return spatialGlassEffectParams->sdfShape;
+            }
+            break;
+        }
         default:
             break;
     }
