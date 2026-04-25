@@ -12,9 +12,42 @@ GE_FACTORY_REGISTER(GEGreyShaderFilter)
 
 ---
 
-## 二、基础注册
+## 二、注册方式
 
-### 2.1 Filter效果
+### 2.1 集中注册（推荐）
+
+所有效果注册集中在 `ge_factory_register.cpp`：
+
+```cpp
+// src/core/ge_factory_register.cpp
+
+GE_FACTORY_REGISTER(GEGreyShaderFilter)
+GE_FACTORY_REGISTER(GEMESABlurShaderFilter)
+```
+
+**优点：** 便于统一管理、查找和维护
+
+### 2.2 分散注册（支持）
+
+效果可在自己的 cpp 文件中注册：
+
+```cpp
+// src/effect/filter/ge_grey_shader_filter.cpp
+
+#include "core/ge_effect_factory.h"
+
+namespace {
+GE_FACTORY_REGISTER(GEGreyShaderFilter)
+}
+```
+
+**原理：** 静态对象在 `main()` 前自动构造，调用 `Register()`
+
+---
+
+## 三、基础注册
+
+### 3.1 Filter效果
 
 ```cpp
 GE_FACTORY_REGISTER(GEGreyShaderFilter)
@@ -22,14 +55,14 @@ GE_FACTORY_REGISTER(GEMESABlurShaderFilter)
 GE_FACTORY_REGISTER(GEColorGradientShaderFilter)
 ```
 
-### 2.2 Mask效果
+### 3.2 Mask效果
 
 ```cpp
 GE_FACTORY_REGISTER_MASK(GERippleShaderMask)
 GE_FACTORY_REGISTER_MASK(GEDoubleRippleShaderMask)
 ```
 
-### 2.3 Shape效果
+### 3.3 Shape效果
 
 ```cpp
 GE_FACTORY_REGISTER_SHAPE(GESDFRRectShaderShape)
@@ -38,9 +71,9 @@ GE_FACTORY_REGISTER_SHAPE(GESDFUnionOpShaderShape)
 
 ---
 
-## 三、外部效果注册
+## 四、外部效果注册
 
-### 3.1 纯外部加载
+### 4.1 纯外部加载
 
 效果完全由外部库提供，无内置实现：
 
@@ -49,7 +82,7 @@ GE_FACTORY_REGISTER_EXTERNAL(DOT_MATRIX, Drawing::GEDotMatrixShaderParams)
 GE_FACTORY_REGISTER_EXTERNAL(HARMONIUM_EFFECT, Drawing::GEHarmoniumEffectShaderParams)
 ```
 
-### 3.2 外部加载 + 内置回退
+### 4.2 外部加载 + 内置回退
 
 优先尝试外部加载，失败时使用内置实现：
 
@@ -61,7 +94,7 @@ GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(MESA_BLUR,
 
 ---
 
-## 四、自定义注册
+## 五、自定义注册
 
 复杂效果需要自定义创建逻辑时使用。
 
@@ -82,7 +115,7 @@ GE_FACTORY_REGISTER_CUSTOM(KAWASE_BLUR, [](auto ve) {
 
 ---
 
-## 五、添加新效果
+## 六、添加新效果
 
 ### 步骤1：确认 ParamType 定义
 
@@ -102,10 +135,11 @@ GE_PARAMS_TYPE_INFO(GENewEffectParams, NEW_EFFECT, NewEffect);
 
 ### 步骤3：添加工厂注册
 
-`src/core/ge_factory_register.cpp` 中，在对应分类内按字母序添加：
+**集中注册方式：** 在 `ge_factory_register.cpp` 中按字母序添加
+
+**分散注册方式：** 在效果自己的 cpp 文件中添加
 
 ```cpp
-// Filter效果（字母序）
 GE_FACTORY_REGISTER(GENewEffect)
 ```
 
@@ -123,7 +157,7 @@ hb build graphics_effect -t
 
 ---
 
-## 六、常见问题
+## 七、常见问题
 
 ### Q: "ParamType not found"
 
@@ -148,7 +182,7 @@ DECLARE_GEFILTER_TYPEFUNC(GEYourEffect, Drawing::GEYourEffectParams);
 
 ---
 
-## 七、关键文件
+## 八、关键文件
 
 | 文件 | 路径 | 用途 |
 |------|------|------|
