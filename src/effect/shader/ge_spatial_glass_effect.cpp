@@ -26,10 +26,10 @@ namespace Rosen {
 static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform vec2 iResolution;
     uniform shader baseBlurImg;
-    uniform shader sdfImg;
+    uniform shader sdfNormalImg;
 
     float Get2DSDF(vec2 uv) {
-        return sdfImg.eval(uv).a / iResolution.x;
+        return sdfNormalImg.eval(uv).a / iResolution.x;
     }
 
     half4 main(vec2 fragCoord) {
