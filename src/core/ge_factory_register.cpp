@@ -90,33 +90,41 @@ namespace {
 // ============================================================================
 
 // 1. 内置效果
-GE_FACTORY_REGISTER(GEMaskTransitionShaderFilter)
 GE_FACTORY_REGISTER(GEAIBarShaderFilter)
-GE_FACTORY_REGISTER(GEGreyShaderFilter)
+GE_FACTORY_REGISTER(GEBezierWarpShaderFilter)
+GE_FACTORY_REGISTER(GEBlurBubblesRiseFilter)
 GE_FACTORY_REGISTER(GEColorGradientShaderFilter)
-GE_FACTORY_REGISTER(GEWaterRippleFilter)
-GE_FACTORY_REGISTER(GEDisplacementDistortFilter)
 GE_FACTORY_REGISTER(GEContentLightFilter)
 GE_FACTORY_REGISTER(GEDirectionLightShaderFilter)
-GE_FACTORY_REGISTER(GESoundWaveFilter)
-GE_FACTORY_REGISTER(GEBezierWarpShaderFilter)
-GE_FACTORY_REGISTER(GEMagnifierShaderFilter)
+GE_FACTORY_REGISTER(GEDisplacementDistortFilter)
 GE_FACTORY_REGISTER(GEDistortionCollapseFilter)
-GE_FACTORY_REGISTER(GEHeatDistortionFilter)
-GE_FACTORY_REGISTER(GEBlurBubblesRiseFilter)
 GE_FACTORY_REGISTER(GEGridWarpShaderFilter)
-GE_FACTORY_REGISTER(GESDFEdgeLight)
+GE_FACTORY_REGISTER(GEGreyShaderFilter)
+GE_FACTORY_REGISTER(GEHeatDistortionFilter)
+GE_FACTORY_REGISTER(GEMagnifierShaderFilter)
+GE_FACTORY_REGISTER(GEMaskTransitionShaderFilter)
 GE_FACTORY_REGISTER(GESDFFromImageFilter)
+GE_FACTORY_REGISTER(GESDFEdgeLight)
+GE_FACTORY_REGISTER(GESoundWaveFilter)
+GE_FACTORY_REGISTER(GEWaterRippleFilter)
 
-// 2. 外部效果（纯外部加载）
-GE_FACTORY_REGISTER_EXTERNAL(GASIFY_SCALE_TWIST, ::OHOS::Rosen::Drawing::GEGasifyScaleTwistFilterParams)
-GE_FACTORY_REGISTER_EXTERNAL(GASIFY_BLUR, ::OHOS::Rosen::Drawing::GEGasifyBlurFilterParams)
+// 2. 外部效果
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY, ::OHOS::Rosen::Drawing::GEGasifyFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(GASIFY_BLUR, ::OHOS::Rosen::Drawing::GEGasifyBlurFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(GASIFY_SCALE_TWIST, ::OHOS::Rosen::Drawing::GEGasifyScaleTwistFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(MAP_COLOR_BY_BRIGHTNESS, ::OHOS::Rosen::Drawing::GEMapColorByBrightnessFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(PARTICLE_ABLATION, ::OHOS::Rosen::Drawing::GEParticleAblationFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(WATER_DROPLET_TRANSITION, ::OHOS::Rosen::Drawing::GEWaterDropletTransitionFilterParams)
-GE_FACTORY_REGISTER_EXTERNAL(MAP_COLOR_BY_BRIGHTNESS, ::OHOS::Rosen::Drawing::GEMapColorByBrightnessFilterParams)
 
-// 3. 外部效果（外部加载 + 内置回退）
+// 3. 外部效果 + 回退
+GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(DISPERSION,
+    ::OHOS::Rosen::Drawing::GEDispersionShaderFilterParams,
+    ::OHOS::Rosen::GEDispersionShaderFilter)
+
+GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(EDGE_LIGHT,
+    ::OHOS::Rosen::Drawing::GEEdgeLightShaderFilterParams,
+    ::OHOS::Rosen::GEEdgeLightShaderFilter)
+
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(FROSTED_GLASS,
     ::OHOS::Rosen::Drawing::GEFrostedGlassShaderFilterParams,
     ::OHOS::Rosen::GEFrostedGlassShaderFilter)
@@ -128,14 +136,6 @@ GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(FROSTED_GLASS_BLUR,
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(MESA_BLUR,
     ::OHOS::Rosen::Drawing::GEMESABlurShaderFilterParams,
     ::OHOS::Rosen::GEMESABlurShaderFilter)
-
-GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(EDGE_LIGHT,
-    ::OHOS::Rosen::Drawing::GEEdgeLightShaderFilterParams,
-    ::OHOS::Rosen::GEEdgeLightShaderFilter)
-
-GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(DISPERSION,
-    ::OHOS::Rosen::Drawing::GEDispersionShaderFilterParams,
-    ::OHOS::Rosen::GEDispersionShaderFilter)
 
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(VARIABLE_RADIUS_BLUR,
     ::OHOS::Rosen::Drawing::GEVariableRadiusBlurShaderFilterParams,
@@ -200,30 +200,30 @@ GE_FACTORY_REGISTER_CUSTOM(LINEAR_GRADIENT_BLUR,
 // ============================================================================
 
 // 1. 内置效果
-GE_FACTORY_REGISTER(GEBorderLightShader)
 GE_FACTORY_REGISTER(GEAuroraNoiseShader)
-GE_FACTORY_REGISTER(GEContourDiagonalFlowLightShader)
+GE_FACTORY_REGISTER(GEBorderLightShader)
 GE_FACTORY_REGISTER(GECircleFlowlightEffect)
-GE_FACTORY_REGISTER(GEWavyRippleLightShader)
-GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
+GE_FACTORY_REGISTER(GEContourDiagonalFlowLightShader)
 GE_FACTORY_REGISTER(GESDFBorderShader)
-GE_FACTORY_REGISTER(GESDFShadowShader)
-GE_FACTORY_REGISTER(GESDFColorShader)
 GE_FACTORY_REGISTER(GESDFClipShader)
+GE_FACTORY_REGISTER(GESDFColorShader)
 GE_FACTORY_REGISTER(GESDFEdgeLightShader)
+GE_FACTORY_REGISTER(GESDFShadowShader)
+GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
 GE_FACTORY_REGISTER(GESpatialPointLightShader)
+GE_FACTORY_REGISTER(GEWavyRippleLightShader)
 
-// 2. 外部效果（纯外部加载）
-GE_FACTORY_REGISTER_EXTERNAL(DOT_MATRIX, ::OHOS::Rosen::Drawing::GEDotMatrixShaderParams)
-GE_FACTORY_REGISTER_EXTERNAL(HARMONIUM_EFFECT, ::OHOS::Rosen::Drawing::GEHarmoniumEffectShaderParams)
-GE_FACTORY_REGISTER_EXTERNAL(LIGHT_CAVE, ::OHOS::Rosen::Drawing::GEXLightCaveShaderParams)
-GE_FACTORY_REGISTER_EXTERNAL(DISTORT_CHROMA, ::OHOS::Rosen::Drawing::GEXDistortChromaEffectParams)
+// 2. 外部效果
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_GLOW, ::OHOS::Rosen::Drawing::GEXAIBarGlowEffectParams)
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_RECT_HALO, ::OHOS::Rosen::Drawing::GEXAIBarRectHaloEffectParams)
-GE_FACTORY_REGISTER_EXTERNAL(ROUNDED_RECT_FLOWLIGHT, ::OHOS::Rosen::Drawing::GEXRoundedRectFlowlightEffectParams)
+GE_FACTORY_REGISTER_EXTERNAL(DISTORT_CHROMA, ::OHOS::Rosen::Drawing::GEXDistortChromaEffectParams)
+GE_FACTORY_REGISTER_EXTERNAL(DOT_MATRIX, ::OHOS::Rosen::Drawing::GEDotMatrixShaderParams)
 GE_FACTORY_REGISTER_EXTERNAL(GRADIENT_FLOW_COLORS, ::OHOS::Rosen::Drawing::GEXGradientFlowColorsEffectParams)
+GE_FACTORY_REGISTER_EXTERNAL(HARMONIUM_EFFECT, ::OHOS::Rosen::Drawing::GEHarmoniumEffectShaderParams)
+GE_FACTORY_REGISTER_EXTERNAL(LIGHT_CAVE, ::OHOS::Rosen::Drawing::GEXLightCaveShaderParams)
+GE_FACTORY_REGISTER_EXTERNAL(ROUNDED_RECT_FLOWLIGHT, ::OHOS::Rosen::Drawing::GEXRoundedRectFlowlightEffectParams)
 
-// 3. 外部效果（外部加载 + 内置回退）
+// 3. 外部效果 + 回退
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(COLOR_GRADIENT_EFFECT,
     ::OHOS::Rosen::Drawing::GEXColorGradientEffectParams,
     ::OHOS::Rosen::GEColorGradientEffect)
@@ -238,16 +238,16 @@ GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(FROSTED_GLASS_EFFECT,
 // ============================================================================
 
 // 1. 内置效果
-GE_FACTORY_REGISTER_MASK(GERippleShaderMask)
 GE_FACTORY_REGISTER_MASK(GEDoubleRippleShaderMask)
+GE_FACTORY_REGISTER_MASK(GEFrameGradientShaderMask)
+GE_FACTORY_REGISTER_MASK(GEImageShaderMask)
+GE_FACTORY_REGISTER_MASK(GELinearGradientShaderMask)
 GE_FACTORY_REGISTER_MASK(GEPixelMapShaderMask)
 GE_FACTORY_REGISTER_MASK(GERadialGradientShaderMask)
-GE_FACTORY_REGISTER_MASK(GEWaveGradientShaderMask)
-GE_FACTORY_REGISTER_MASK(GEFrameGradientShaderMask)
-GE_FACTORY_REGISTER_MASK(GELinearGradientShaderMask)
-GE_FACTORY_REGISTER_MASK(GEImageShaderMask)
+GE_FACTORY_REGISTER_MASK(GERippleShaderMask)
 GE_FACTORY_REGISTER_MASK(GEUseEffectShaderMask)
 GE_FACTORY_REGISTER_MASK(GEWaveDisturbanceShaderMask)
+GE_FACTORY_REGISTER_MASK(GEWaveGradientShaderMask)
 
 // 2. 外部效果
 GE_FACTORY_REGISTER_EXTERNAL(DUPOLI_NOISE_MASK, ::OHOS::Rosen::Drawing::GEXDupoliNoiseMaskParams)
@@ -259,13 +259,21 @@ GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::
 // ============================================================================
 
 // 1. 内置效果
-GE_FACTORY_REGISTER_SHAPE(GESDFUnionOpShaderShape)
-GE_FACTORY_REGISTER_SHAPE(GESDFTransformShaderShape)
-GE_FACTORY_REGISTER_SHAPE(GESDFPixelmapShaderShape)
-GE_FACTORY_REGISTER_SHAPE(GESDFTriangleShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFDistortOpShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFPixelmapShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFTransformShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFTriangleShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFUnionOpShaderShape)
 
 // 2. 自定义注册
+GE_FACTORY_REGISTER_CUSTOM(SDF_EMPTY_SHAPE,
+    [](GEEffectFactory::VisualEffectImplPtr ve) -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
+        if (GE_CheckNullptr(ve.get(), "SDF_EMPTY_SHAPE")) {
+            return nullptr;
+        }
+        return std::make_shared<::OHOS::Rosen::Drawing::GESDFEmptyShaderShape>();
+    })
+
 GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
     [](GEEffectFactory::VisualEffectImplPtr ve) -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
         if (GE_CheckNullptr(ve.get(), "SDF_RRECT_SHAPE")) {
@@ -285,14 +293,6 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
         }
         return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
             static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(object));
-    })
-
-GE_FACTORY_REGISTER_CUSTOM(SDF_EMPTY_SHAPE,
-    [](GEEffectFactory::VisualEffectImplPtr ve) -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
-        if (GE_CheckNullptr(ve.get(), "SDF_EMPTY_SHAPE")) {
-            return nullptr;
-        }
-        return std::make_shared<::OHOS::Rosen::Drawing::GESDFEmptyShaderShape>();
     })
 
 } // anonymous namespace
