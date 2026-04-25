@@ -65,7 +65,7 @@
 namespace OHOS {
 namespace GraphicsEffectEngine {
 namespace {
-constexpr int MAX_IMAGE_DIMENSION = 16384;
+constexpr int MAX_IMAGE_DIMENSION = 10000;
 } // namespace
 #define PROPERTY_MESA_BLUR_ALL_ENABLED "persist.sys.graphic.kawaseDisable"
 #ifdef GE_OHOS
@@ -417,7 +417,7 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
     }
     auto imageInfo = image->GetImageInfo();
     if (imageInfo.GetWidth() > MAX_IMAGE_DIMENSION || imageInfo.GetHeight() > MAX_IMAGE_DIMENSION) {
-        LOGE("GERender::DrawImageRect image dimension exceeds limit");
+        LOGE("GERender::DrawImageRect image dimension exceeds limit, max is %{public}d", MAX_IMAGE_DIMENSION);
         return;
     }
 
@@ -442,7 +442,7 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
     }
     auto imageInfo = context.image->GetImageInfo();
     if (imageInfo.GetWidth() > MAX_IMAGE_DIMENSION || imageInfo.GetHeight() > MAX_IMAGE_DIMENSION) {
-        LOGE("GERender::ApplyImageEffect image dimension exceeds limit");
+        LOGE("GERender::ApplyImageEffect image dimension exceeds limit, max is %{public}d", MAX_IMAGE_DIMENSION);
         return nullptr;
     }
     auto resImage = context.image;
