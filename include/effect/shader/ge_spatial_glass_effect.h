@@ -38,7 +38,11 @@ public:
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&) = delete;
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&&) = delete;
 
-    const std::string GetDescription() const { return "GESpatialGlassEffect"; }
+    const std::string& GetDescription() const
+    {
+        static const std::string desc = "GESpatialGlassEffect";
+        return desc;
+    }
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
