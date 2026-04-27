@@ -25,7 +25,8 @@
           "hitrace",
           "hilog",
           "init",
-          "skia"
+          "skia",
+          "libxml2"
         ]
       },
       "build": {
