@@ -1,0 +1,119 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESpatialGlassEffectParams {
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f leftTop = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f leftBot = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f rightTop = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f rightBot = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f cameraPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f cameraIntrinsics = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f lightDir = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={0.0f, 0.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f thickParams = Vector2f(1.0f, 1.0f);
+    [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
+    Vector4f glassBaseColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
+    Vector4f fresnelEnvColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    [[ge::prop(min={-200.0f, -200.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f fresnelEnvParams = Vector2f(1.0f, 1.0f);
+    [[ge::prop(min={0.0f, 0.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f bgRates = Vector2f(0.0f, 0.0f);
+    [[ge::prop(min={-20.0f, -20.0f, 0.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f bgKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f bgPos = Vector3f(0.3f, 0.5f, 1.0f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f bgNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={0.0f, 0.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f weightsEdl = Vector2f(1.0f, 1.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f envLightParams = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={0.0f, 0.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f envLightRates = Vector2f(0.0f, 0.0f);
+    [[ge::prop(min={-20.0f, -20.0f, 0.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f envLightKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f envLightPos = Vector3f(0.3f, 0.5f, 1.0f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f envLightNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
+               max={200.0f, 200.0f, 200.0f})]]
+    Vector3f sdParams = Vector3f(0.0f, 0.0f, 0.0f);
+    [[ge::prop(min={0.0f, 0.0f},
+               max={200.0f, 200.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f sdRates = Vector2f(0.0f, 0.0f);
+    [[ge::prop(min={-20.0f, -20.0f, 0.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f sdKBS = Vector3f(0.010834f, 0.007349f, 1.2f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f sdPos = Vector3f(0.3f, 0.5f, 1.0f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f},
+               max={20.0f, 20.0f, 20.0f})]]
+    Vector3f sdNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
+    std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
+    // Adapt effect component
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::Image>", custom="SharedPtrImageToWeakTransformer")]]
+    std::weak_ptr<Drawing::Image> blurImage; // frosted glass blur by ec
+    [[ge::prop(cast_from="std::shared_ptr<Drawing::Image>", custom="SharedPtrImageToWeakTransformer")]]
+    std::weak_ptr<Drawing::Image> depthImage; // depthImage
+    RectF snapshotRect; // effect component snapshot total rect
+    Drawing::Matrix snapshotMatrix; // effect component total matrix
+    [[ge::prop(min=-500.0f, max=500.0f)]]
+    float refractOutPx = 0.0f; // envlight refraction outward sampling degree
+};

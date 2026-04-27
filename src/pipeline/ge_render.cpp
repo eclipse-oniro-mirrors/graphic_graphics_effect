@@ -50,6 +50,7 @@
 #include "ge_mesa_fusion_pass.h"
 #include "ge_particle_circular_halo_shader.h"
 #include "ge_sound_wave_filter.h"
+#include "ge_spatial_glass_effect.h"
 #include "ge_system_properties.h"
 #include "ge_variable_radius_blur_shader_filter.h"
 #include "ge_visual_effect_impl.h"
@@ -408,6 +409,24 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
             const auto& params = ve->GetParams<Drawing::GESpatialPointLightShaderParams>();
             out = std::make_shared<GESpatialPointLightShader>(*params);
             return out;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::SPATIAL_GLASS_EFFECT, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetSpatialGlassEffectParams() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetSpatialGlassEffectParams();
+            auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::SPATIAL_GLASS_EFFECT);
+            auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                type, sizeof(GESpatialGlassEffectParams), static_cast<void*>(params.get()));
+            if (!impl) {
+                out = std::make_shared<GESpatialGlassEffect>(*params);
+                return out;
+            }
+            std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
+            return dmShader;
         }
     },
 };
