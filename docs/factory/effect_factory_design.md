@@ -14,14 +14,14 @@
 ### 1.2 设计目标
 
 1. **代码维护**：新增效果只需添加一行注册代码
-2. **扩展性**：支持外部动态加载效果
+2. **扩展性**：支持闭源动态加载效果
 3. **兼容性**：完全兼容现有的参数系统
 4. **性能优化**：消除哈希表开销（shaderCreatorLUT）
 
 ### 1.3 适用场景
 
 - 需要频繁创建效果的渲染管线
-- 支持动态加载外部效果库
+- 支持动态加载闭源效果库
 - 需要统一管理大量效果类型
 - 需要快速查找和创建特定效果
 
@@ -29,20 +29,19 @@
 
 ## 二、架构设计
 
-### 2.1 工厂模式架构
+### 2.1 纯静态类架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    GEEffectFactory                            │
+│                    GEEffectFactory (Static Class)            │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              Singleton Instance                       │   │
-│  │  - GetInstance()                                     │   │
-│  │  - CreateFilter/CreateMask/CreateShape               │   │
+│  │              Static Methods                          │   │
+│  │  - Register(type, creator)                          │   │
+│  │  - Create/CreateFilter/CreateMask/CreateShape       │   │
 │  └─────────────────────────────────────────────────────┘   │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │              Registration Table                       │   │
+│  │              Static Registration Table               │   │
 │  │  - std::array<std::optional<Creator>, MAX>          │   │
-│  │  - Register(type, creator)                          │   │
 │  └─────────────────────────────────────────────────────┘   │
 │  ┌─────────────────────────────────────────────────────┐   │
 │  │              Creator Functions                       │   │
@@ -126,7 +125,7 @@ graphics_effect/
 
 ## 三、核心接口
 
-### 3.1 工厂类接口
+### 3.1 工厂类接口（纯静态）
 
 ```cpp
 namespace OHOS {
@@ -137,25 +136,22 @@ public:
     using VisualEffectImplPtr = std::shared_ptr<Rosen::Drawing::GEVisualEffectImpl>;
     using EffectCreator = std::function<std::shared_ptr<Rosen::Drawing::IGEFilterType>(VisualEffectImplPtr)>;
 
-    // 单例模式
-    static GEEffectFactory& GetInstance();
+    // 注册接口（静态）
+    static void Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator);
 
-    // 注册接口
-    void Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator);
-
-    // 创建效果接口
-    std::shared_ptr<Rosen::Drawing::IGEFilterType> Create(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::GEShader> CreateShader(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::GEShaderFilter> CreateFilter(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::Drawing::GEShaderMask> CreateMask(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::Drawing::GEShaderShape> CreateShape(VisualEffectImplPtr impl);
+    // 创建效果接口（静态）
+    static std::shared_ptr<Rosen::Drawing::IGEFilterType> Create(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::GEShader> CreateShader(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::GEShaderFilter> CreateFilter(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::Drawing::GEShaderMask> CreateMask(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::Drawing::GEShaderShape> CreateShape(VisualEffectImplPtr impl);
 
 private:
     static constexpr size_t MAX_EFFECTS = static_cast<size_t>(Rosen::Drawing::GEFilterType::MAX);
-    GEEffectFactory() = default;
+    GEEffectFactory() = delete;  // 禁止实例化
 
-    // 注册表（数组，O(1) 查找）
-    std::array<std::optional<EffectCreator>, MAX_EFFECTS> creators_;
+    // 注册表（静态数组，O(1) 查找）
+    static std::array<std::optional<EffectCreator>, MAX_EFFECTS> creators_;
 };
 
 } // namespace GraphicsEffectEngine
@@ -169,19 +165,19 @@ private:
 ```cpp
 namespace OHOS {
 namespace GraphicsEffectEngine {
-namespace Internal {  // 内部实现命名空间
+namespace Internal {
 
 template<typename FullClassName>
 void RegisterEffect(const char* logTag);
 
 template<typename ParamType, GEFilterType EffectType>
-void RegisterExternalEffect(const char* logTag);
+void RegisterClosedSourceEffect(const char* logTag);
 
 template<typename ParamType, typename FallbackClass, GEFilterType EffectType>
-void RegisterExternalFallbackEffect(const char* logTag);
+void RegisterClosedSourceFallbackEffect(const char* logTag);
 
 } // namespace Internal
-}
+} // GraphicsEffectEngine
 }
 
 // 简化的宏定义（≤10行）
@@ -226,52 +222,49 @@ void RegisterExternalFallbackEffect(const char* logTag);
 |------|-----------|----------|----------|
 | **Switch-case（跳转表）** | O(1) | 修改多处代码 | 高 - 分散维护 |
 | **shaderCreatorLUT（哈希表）** | 平均O(1)，最坏O(n) | 修改多处代码 | 高 |
-| **工厂模式** | O(1) - 数组索引 | 添加一行注册 | 低 - 集中维护 |
+| **工厂模式（纯静态）** | O(1) - 数组索引 | 添加一行注册 | 低 - 集中维护 |
 
 ### 5.2 性能优势
 
 1. **消除哈希开销**：无哈希计算、无初始化构建
 2. **稳定查找**：数组索引 O(1)，无最坏 O(n) 情况
 3. **内存占用**：注册表大小固定，Lambda 函数编译期优化
+4. **直接调用**：纯静态方法，无需单例间接调用
 
 ---
 
 ## 六、线程安全
 
-### 6.1 单例模式线程安全
+### 6.1 静态初始化线程安全
 
-工厂使用 Meyers 单例模式，C++11 标准保证线程安全：
+工厂使用静态成员变量，C++11 标准保证线程安全初始化：
 
 ```cpp
-GEEffectFactory& GEEffectFactory::GetInstance()
-{
-    static GEEffectFactory instance;  // C++11 保证线程安全初始化
-    return instance;
-}
+// 静态成员定义
+std::array<std::optional<EffectCreator>, MAX_EFFECTS> GEEffectFactory::creators_;
 ```
 
 ### 6.2 操作线程安全分析
 
 | 操作 | 线程安全性 | 说明 |
 |------|----------|------|
-| `GetInstance()` | ✅ 安全 | C++11 保证静态局部变量初始化线程安全 |
 | `Register()` | ✅ 安全 | 只在静态初始化阶段调用（程序启动前） |
-| `Create()` | ✅ 安全 | 只读操作，访问 `creators_[]` 数组 |
+| `Create()` | ✅ 安全 | 只读操作，访问静态 `creators_[]` 数组 |
 
 ---
 
 ## 七、扩展机制
 
-### 7.1 外部动态加载
+### 7.1 闭源动态加载
 
-支持动态加载外部效果库：
+支持动态加载闭源效果库：
 
 ```cpp
 void* impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
     static_cast<uint32_t>(type), sizeof(ParamType), params);
 ```
 
-### 7.2 外部效果库要求
+### 7.2 闭源效果库要求
 
 - 导出 `CreateGEXObjectByType` 函数
 - 支持参数序列化/反序列化
@@ -291,6 +284,6 @@ void* impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
 
 ---
 
-**文档版本：** v1.0
-**最后更新：** 2026-04-25
+**文档版本：** v1.1
+**最后更新：** 2026-04-27
 **维护者：** Graphics Effect Team

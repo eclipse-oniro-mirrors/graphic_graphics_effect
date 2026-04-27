@@ -20,11 +20,7 @@
 namespace OHOS {
 namespace GraphicsEffectEngine {
 
-GEEffectFactory& GEEffectFactory::GetInstance()
-{
-    static GEEffectFactory instance;
-    return instance;
-}
+std::array<std::optional<GEEffectFactory::EffectCreator>, GEEffectFactory::MAX_EFFECTS> GEEffectFactory::creators_;
 
 void GEEffectFactory::Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator)
 {

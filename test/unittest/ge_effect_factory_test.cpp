@@ -44,29 +44,14 @@ void GEEffectFactoryTest::SetUp() {}
 void GEEffectFactoryTest::TearDown() {}
 
 /**
- * @tc.name: GetInstance_001
- * @tc.desc: Verify singleton pattern GetInstance
- * @tc.type:FUNC
- */
-HWTEST_F(GEEffectFactoryTest, GetInstance_001, TestSize.Level1)
-{
-    auto& instance1 = GEEffectFactory::GetInstance();
-    auto& instance2 = GEEffectFactory::GetInstance();
-
-    EXPECT_EQ(&instance1, &instance2);
-}
-
-/**
  * @tc.name: Create_001
  * @tc.desc: Verify Create function with valid filter type
  * @tc.type:FUNC
  */
 HWTEST_F(GEEffectFactoryTest, Create_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_GREY);
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -78,10 +63,8 @@ HWTEST_F(GEEffectFactoryTest, Create_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_002, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_SHADER_BORDER_LIGHT);
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -93,10 +76,8 @@ HWTEST_F(GEEffectFactoryTest, Create_002, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_003, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_MASK_RIPPLE);
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -108,10 +89,8 @@ HWTEST_F(GEEffectFactoryTest, Create_003, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_004, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_SHAPE_SDF_RRECT_SHAPE);
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -123,10 +102,8 @@ HWTEST_F(GEEffectFactoryTest, Create_004, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_005, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     std::shared_ptr<GEVisualEffectImpl> nullImpl = nullptr;
-    auto result = factory.Create(nullImpl);
+    auto result = GEEffectFactory::Create(nullImpl);
 
     EXPECT_EQ(result, nullptr);
 }
@@ -138,12 +115,10 @@ HWTEST_F(GEEffectFactoryTest, Create_005, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_006, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_GREY);
     impl->filterType_ = GEVisualEffectImpl::FilterType::MAX;
 
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_EQ(result, nullptr);
 }
@@ -155,12 +130,10 @@ HWTEST_F(GEEffectFactoryTest, Create_006, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_007, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>("");
     impl->filterType_ = GEVisualEffectImpl::FilterType::NONE;
 
-    auto result = factory.Create(impl);
+    auto result = GEEffectFactory::Create(impl);
 
     EXPECT_EQ(result, nullptr);
 }
@@ -172,13 +145,11 @@ HWTEST_F(GEEffectFactoryTest, Create_007, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateGreyFilter_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_GREY);
     impl->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 0.5f);
     impl->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 0.5f);
 
-    auto result = factory.CreateFilter(impl);
+    auto result = GEEffectFactory::CreateFilter(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -190,12 +161,10 @@ HWTEST_F(GEEffectFactoryTest, CreateGreyFilter_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateKawaseBlurFilter_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_KAWASE_BLUR);
     impl->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 5);
 
-    auto result = factory.CreateFilter(impl);
+    auto result = GEEffectFactory::CreateFilter(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -207,11 +176,9 @@ HWTEST_F(GEEffectFactoryTest, CreateKawaseBlurFilter_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateRippleMask_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_MASK_RIPPLE);
 
-    auto result = factory.CreateMask(impl);
+    auto result = GEEffectFactory::CreateMask(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -223,11 +190,9 @@ HWTEST_F(GEEffectFactoryTest, CreateRippleMask_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateBorderLightShader_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_SHADER_BORDER_LIGHT);
 
-    auto result = factory.CreateShader(impl);
+    auto result = GEEffectFactory::CreateShader(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -239,11 +204,9 @@ HWTEST_F(GEEffectFactoryTest, CreateBorderLightShader_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateSDFRRectShape_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_SHAPE_SDF_RRECT_SHAPE);
 
-    auto result = factory.CreateShape(impl);
+    auto result = GEEffectFactory::CreateShape(impl);
 
     EXPECT_NE(result, nullptr);
 }
@@ -255,22 +218,20 @@ HWTEST_F(GEEffectFactoryTest, CreateSDFRRectShape_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateMultipleEffects_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto greyImpl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_GREY);
-    auto greyResult = factory.CreateFilter(greyImpl);
+    auto greyResult = GEEffectFactory::CreateFilter(greyImpl);
     EXPECT_NE(greyResult, nullptr);
 
     auto rippleImpl = std::make_shared<GEVisualEffectImpl>(GE_MASK_RIPPLE);
-    auto rippleResult = factory.CreateMask(rippleImpl);
+    auto rippleResult = GEEffectFactory::CreateMask(rippleImpl);
     EXPECT_NE(rippleResult, nullptr);
 
     auto borderLightImpl = std::make_shared<GEVisualEffectImpl>(GE_SHADER_BORDER_LIGHT);
-    auto borderLightResult = factory.CreateShader(borderLightImpl);
+    auto borderLightResult = GEEffectFactory::CreateShader(borderLightImpl);
     EXPECT_NE(borderLightResult, nullptr);
 
     auto rrectShapeImpl = std::make_shared<GEVisualEffectImpl>(GE_SHAPE_SDF_RRECT_SHAPE);
-    auto rrectShapeResult = factory.CreateShape(rrectShapeImpl);
+    auto rrectShapeResult = GEEffectFactory::CreateShape(rrectShapeImpl);
     EXPECT_NE(rrectShapeResult, nullptr);
 }
 
@@ -281,17 +242,15 @@ HWTEST_F(GEEffectFactoryTest, CreateMultipleEffects_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, CreateWithParams_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl1 = std::make_shared<GEVisualEffectImpl>(GE_FILTER_GREY);
     impl1->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 0.3f);
     impl1->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 0.7f);
-    auto result1 = factory.CreateFilter(impl1);
+    auto result1 = GEEffectFactory::CreateFilter(impl1);
     EXPECT_NE(result1, nullptr);
 
     auto impl2 = std::make_shared<GEVisualEffectImpl>(GE_FILTER_KAWASE_BLUR);
     impl2->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 10);
-    auto result2 = factory.CreateFilter(impl2);
+    auto result2 = GEEffectFactory::CreateFilter(impl2);
     EXPECT_NE(result2, nullptr);
 }
 
@@ -302,12 +261,10 @@ HWTEST_F(GEEffectFactoryTest, CreateWithParams_001, TestSize.Level1)
  */
 HWTEST_F(GEEffectFactoryTest, Create_FallbackSuccess_001, TestSize.Level1)
 {
-    auto& factory = GEEffectFactory::GetInstance();
-
     auto impl = std::make_shared<GEVisualEffectImpl>(GE_FILTER_MESA_BLUR);
     impl->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, 10);
 
-    auto result = factory.CreateFilter(impl);
+    auto result = GEEffectFactory::CreateFilter(impl);
 
     EXPECT_NE(result, nullptr);
     EXPECT_EQ(result->Type(), GEFilterType::MESA_BLUR);

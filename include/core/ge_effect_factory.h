@@ -39,26 +39,22 @@ public:
     using VisualEffectImplPtr = std::shared_ptr<Rosen::Drawing::GEVisualEffectImpl>;
     using EffectCreator = std::function<std::shared_ptr<Rosen::Drawing::IGEFilterType>(VisualEffectImplPtr)>;
 
-    static GEEffectFactory& GetInstance();
+    static void Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator);
 
-    void Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator);
-
-    std::shared_ptr<Rosen::Drawing::IGEFilterType> Create(VisualEffectImplPtr impl);
-
-    std::shared_ptr<Rosen::GEShader> CreateShader(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::GEShaderFilter> CreateFilter(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::Drawing::GEShaderMask> CreateMask(VisualEffectImplPtr impl);
-    std::shared_ptr<Rosen::Drawing::GEShaderShape> CreateShape(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::Drawing::IGEFilterType> Create(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::GEShader> CreateShader(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::GEShaderFilter> CreateFilter(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::Drawing::GEShaderMask> CreateMask(VisualEffectImplPtr impl);
+    static std::shared_ptr<Rosen::Drawing::GEShaderShape> CreateShape(VisualEffectImplPtr impl);
 
 private:
     static constexpr size_t MAX_EFFECTS = static_cast<size_t>(Rosen::Drawing::GEFilterType::MAX);
+    static std::array<std::optional<EffectCreator>, MAX_EFFECTS> creators_;
 
-    GEEffectFactory() = default;
-    ~GEEffectFactory() = default;
+    GEEffectFactory() = delete;
+    ~GEEffectFactory() = delete;
     GEEffectFactory(const GEEffectFactory&) = delete;
     GEEffectFactory& operator=(const GEEffectFactory&) = delete;
-
-    std::array<std::optional<EffectCreator>, MAX_EFFECTS> creators_;
 };
 
 } // namespace GraphicsEffectEngine
@@ -84,7 +80,7 @@ namespace Internal {  // Internal implementation namespace, not exposed external
 template<typename FullClassName>
 void RegisterEffect(const char* logTag)
 {
-    GEEffectFactory::GetInstance().Register(
+    GEEffectFactory::Register(
         ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ID,
         [logTag](GEEffectFactory::VisualEffectImplPtr ve)
             -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
@@ -102,7 +98,7 @@ void RegisterEffect(const char* logTag)
 template<typename ParamType, ::OHOS::Rosen::Drawing::GEFilterType EffectType>
 void RegisterExternalEffect(const char* logTag)
 {
-    GEEffectFactory::GetInstance().Register(EffectType,
+    GEEffectFactory::Register(EffectType,
         [logTag](GEEffectFactory::VisualEffectImplPtr ve)
             -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
             std::string tag = std::string(logTag) + ":";
@@ -125,7 +121,7 @@ template<typename ParamType, typename FallbackClass, ::OHOS::Rosen::Drawing::GEF
 void RegisterExternalFallbackEffect(const char* logTag)
 {
     static_assert(std::is_base_of_v<::OHOS::Rosen::Drawing::IGEFilterType, FallbackClass>);
-    GEEffectFactory::GetInstance().Register(EffectType,
+    GEEffectFactory::Register(EffectType,
         [logTag](GEEffectFactory::VisualEffectImplPtr ve)
             -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
             std::string tag = std::string(logTag) + ":";
@@ -186,7 +182,7 @@ void RegisterExternalFallbackEffect(const char* logTag)
     namespace { \
         struct GEEffectRegistrar_##EffectType { \
             GEEffectRegistrar_##EffectType() \
-            { ::OHOS::GraphicsEffectEngine::GEEffectFactory::GetInstance().Register( \
+            { ::OHOS::GraphicsEffectEngine::GEEffectFactory::Register( \
                 ::OHOS::Rosen::Drawing::GEFilterType::EffectType, (Lambda)); } \
         }; \
         static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \

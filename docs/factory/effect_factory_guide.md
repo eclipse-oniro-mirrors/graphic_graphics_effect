@@ -71,20 +71,20 @@ GE_FACTORY_REGISTER_SHAPE(GESDFUnionOpShaderShape)
 
 ---
 
-## 四、外部效果注册
+## 四、闭源效果注册
 
-### 4.1 纯外部加载
+### 4.1 纯闭源加载
 
-效果完全由外部库提供，无内置实现：
+效果完全由闭源库提供，无内置实现：
 
 ```cpp
 GE_FACTORY_REGISTER_EXTERNAL(DOT_MATRIX, Drawing::GEDotMatrixShaderParams)
 GE_FACTORY_REGISTER_EXTERNAL(HARMONIUM_EFFECT, Drawing::GEHarmoniumEffectShaderParams)
 ```
 
-### 4.2 外部加载 + 内置回退
+### 4.2 闭源加载 + 内置回退
 
-优先尝试外部加载，失败时使用内置实现：
+优先尝试闭源加载，失败时使用内置实现：
 
 ```cpp
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(MESA_BLUR,
@@ -108,7 +108,7 @@ GE_FACTORY_REGISTER_CUSTOM(KAWASE_BLUR, [](auto ve) {
     if (!GERender::IsMesablurAllEnabled()) {
         return std::make_shared<GEKawaseBlurShaderFilter>(*params);
     }
-    // 尝试外部加载或使用内置 MESA_BLUR
+    // 尝试闭源加载或使用内置 MESA_BLUR
     ...
 })
 ```

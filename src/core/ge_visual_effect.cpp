@@ -174,7 +174,7 @@ const std::shared_ptr<Drawing::GEShaderMask> GEVisualEffect::GenerateShaderMask(
         return nullptr;
     }
 
-    return GraphicsEffectEngine::GEEffectFactory::GetInstance().CreateMask(visualEffectImpl_);
+    return GraphicsEffectEngine::GEEffectFactory::CreateMask(visualEffectImpl_);
 }
 
 const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShape() const
@@ -183,7 +183,7 @@ const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GenerateShaderShap
         return nullptr;
     }
 
-    return GraphicsEffectEngine::GEEffectFactory::GetInstance().CreateShape(visualEffectImpl_);
+    return GraphicsEffectEngine::GEEffectFactory::CreateShape(visualEffectImpl_);
 }
 
 } // namespace Drawing
