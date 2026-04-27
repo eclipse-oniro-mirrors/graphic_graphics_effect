@@ -64,7 +64,7 @@ private:
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
 
-inline bool GE_CheckNullptr(const void* ptr, const char* logTag, int filterType = -1)
+inline bool FactoryCheckNullptr(const void* ptr, const char* logTag, int32_t filterType = -1)
 {
     if (ptr == nullptr) {
         if (filterType >= 0) {
@@ -79,42 +79,43 @@ inline bool GE_CheckNullptr(const void* ptr, const char* logTag, int filterType 
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
-namespace Internal {  // 内部实现命名空间，不对外暴露
+namespace Internal {  // Internal implementation namespace, not exposed externally
 
 template<typename FullClassName>
 void RegisterEffect(const char* logTag)
 {
-    using Factory = GEEffectFactory;
-    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
-    Factory::GetInstance().Register(
+    GEEffectFactory::GetInstance().Register(
         ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ID,
-        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+        [logTag](GEEffectFactory::VisualEffectImplPtr ve)
+            -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
             std::string tag = std::string(logTag) + ":";
-            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            if (FactoryCheckNullptr(ve.get(), logTag)) return nullptr;
             using ParamType = typename ::OHOS::Rosen::Drawing::GEFilterTypeInfo<FullClassName>::ParamType;
             auto params = ve->template GetParams<ParamType>();
-            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
-                static_cast<int>(ve->GetFilterType()))) return nullptr;
-            return std::make_shared<FullClassName>(const_cast<ParamType&>(*params));
+            std::string tagGetParams = tag + "GetParams";
+            if (FactoryCheckNullptr(params.get(), tagGetParams.c_str(),
+                static_cast<int32_t>(ve->GetFilterType()))) return nullptr;
+            return std::make_shared<FullClassName>(*params);
         });
 }
 
 template<typename ParamType, ::OHOS::Rosen::Drawing::GEFilterType EffectType>
 void RegisterExternalEffect(const char* logTag)
 {
-    using Factory = GEEffectFactory;
-    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
-    Factory::GetInstance().Register(EffectType,
-        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+    GEEffectFactory::GetInstance().Register(EffectType,
+        [logTag](GEEffectFactory::VisualEffectImplPtr ve)
+            -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
             std::string tag = std::string(logTag) + ":";
-            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            if (FactoryCheckNullptr(ve.get(), logTag)) return nullptr;
             auto params = ve->template GetParams<ParamType>();
-            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
-                static_cast<int>(ve->GetFilterType()))) return nullptr;
+            std::string tagGetParams = tag + "GetParams";
+            if (FactoryCheckNullptr(params.get(), tagGetParams.c_str(),
+                static_cast<int32_t>(ve->GetFilterType()))) return nullptr;
             uint32_t type = static_cast<uint32_t>(EffectType);
             void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get())));
-            if (GE_CheckNullptr(impl, (tag + "ExternalLoader").c_str())) return nullptr;
+                type, sizeof(ParamType), static_cast<void*>(params.get()));
+            std::string tagExternalLoader = tag + "ExternalLoader";
+            if (FactoryCheckNullptr(impl, tagExternalLoader.c_str())) return nullptr;
             return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
                 static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl));
         });
@@ -123,26 +124,26 @@ void RegisterExternalEffect(const char* logTag)
 template<typename ParamType, typename FallbackClass, ::OHOS::Rosen::Drawing::GEFilterType EffectType>
 void RegisterExternalFallbackEffect(const char* logTag)
 {
-    using Factory = GEEffectFactory;
-    using IGEFilterPtr = std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>;
     static_assert(std::is_base_of_v<::OHOS::Rosen::Drawing::IGEFilterType, FallbackClass>);
-    Factory::GetInstance().Register(EffectType,
-        [logTag](Factory::VisualEffectImplPtr ve) -> IGEFilterPtr {
+    GEEffectFactory::GetInstance().Register(EffectType,
+        [logTag](GEEffectFactory::VisualEffectImplPtr ve)
+            -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
             std::string tag = std::string(logTag) + ":";
-            if (GE_CheckNullptr(ve.get(), logTag)) return nullptr;
+            if (FactoryCheckNullptr(ve.get(), logTag)) return nullptr;
             auto params = ve->template GetParams<ParamType>();
-            if (GE_CheckNullptr(params.get(), (tag + "GetParams").c_str(),
-                static_cast<int>(ve->GetFilterType()))) return nullptr;
+            std::string tagGetParams = tag + "GetParams";
+            if (FactoryCheckNullptr(params.get(), tagGetParams.c_str(),
+                static_cast<int32_t>(ve->GetFilterType()))) return nullptr;
             uint32_t type = static_cast<uint32_t>(EffectType);
             void* impl = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-                type, sizeof(ParamType), const_cast<void*>(static_cast<const void*>(params.get())));
+                type, sizeof(ParamType), static_cast<void*>(params.get()));
             if (impl) {
                 GE_LOGD("[GEEffectFactory] %{public}s: Using external loader", logTag);
                 return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
                     static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(impl));
             }
             GE_LOGW("[GEEffectFactory] %{public}s: External failed, using fallback", logTag);
-            return std::make_shared<FallbackClass>(const_cast<ParamType&>(*params));
+            return std::make_shared<FallbackClass>(*params);
         });
 }
 

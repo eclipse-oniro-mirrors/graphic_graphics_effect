@@ -28,14 +28,18 @@ GEEffectFactory& GEEffectFactory::GetInstance()
 
 void GEEffectFactory::Register(Rosen::Drawing::GEFilterType type, EffectCreator&& creator)
 {
+    if (type == Rosen::Drawing::GEFilterType::NONE) {
+        return;  // NONE is invalid type
+    }
     const size_t index = static_cast<size_t>(type);
     if (index >= MAX_EFFECTS) {
-        return;
+        return;  // out of range
     }
     if (creators_[index]) {
         GE_LOGE("[EffectFactory] Duplicate registration for type=%{public}d, "
-            "previous will be replaced. Please check if multiple files register the same effect.",
+            "previous registration is kept. Please check if multiple files register the same effect.",
             static_cast<int>(type));
+        return;
     }
     creators_[index] = std::forward<EffectCreator>(creator);
 }
@@ -43,7 +47,7 @@ void GEEffectFactory::Register(Rosen::Drawing::GEFilterType type, EffectCreator&
 std::shared_ptr<Rosen::Drawing::IGEFilterType> GEEffectFactory::Create(
     std::shared_ptr<Rosen::Drawing::GEVisualEffectImpl> impl)
 {
-    if (GE_CheckNullptr(impl.get(), "Create")) {
+    if (FactoryCheckNullptr(impl.get(), "Create")) {
         return nullptr;
     }
 

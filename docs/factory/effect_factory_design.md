@@ -13,10 +13,10 @@
 
 ### 1.2 设计目标
 
-1. **性能优化**：从 O(n) 的 switch-case 查找优化为 O(1) 的数组索引查找
-2. **代码维护**：新增效果只需添加一行注册代码
-3. **扩展性**：支持外部动态加载效果
-4. **兼容性**：完全兼容现有的参数系统
+1. **代码维护**：新增效果只需添加一行注册代码
+2. **扩展性**：支持外部动态加载效果
+3. **兼容性**：完全兼容现有的参数系统
+4. **性能优化**：消除哈希表开销（shaderCreatorLUT）
 
 ### 1.3 适用场景
 
@@ -224,13 +224,15 @@ void RegisterExternalFallbackEffect(const char* logTag);
 
 | 方式 | 查找复杂度 | 添加新效果 | 维护成本 |
 |------|-----------|----------|----------|
-| **Switch-case** | O(n) - 线性查找 | 修改多处代码 | 高 - 分散维护 |
+| **Switch-case（跳转表）** | O(1) | 修改多处代码 | 高 - 分散维护 |
+| **shaderCreatorLUT（哈希表）** | 平均O(1)，最坏O(n) | 修改多处代码 | 高 |
 | **工厂模式** | O(1) - 数组索引 | 添加一行注册 | 低 - 集中维护 |
 
 ### 5.2 性能优势
 
-1. **查找性能**：数组索引 O(1)，性能稳定不受效果数量影响
-2. **内存占用**：注册表大小固定，Lambda 函数编译期优化
+1. **消除哈希开销**：无哈希计算、无初始化构建
+2. **稳定查找**：数组索引 O(1)，无最坏 O(n) 情况
+3. **内存占用**：注册表大小固定，Lambda 函数编译期优化
 
 ---
 
@@ -277,41 +279,13 @@ void* impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
 
 ---
 
-## 八、覆盖率统计
-
-### 8.1 当前覆盖情况
-
-**已注册效果：** 72个（100%覆盖率）
-
-**分类统计：**
-
-| 类型 | 数量 | 子分类 |
-|------|------|--------|
-| Filter | 31 | 直接17 + External6 + Fallback6 + Custom2 |
-| Shader | 22 | 直接12 + Fallback2 + External8 |
-| Mask | 12 | 直接10 + External2 |
-| Shape | 7 | 直接5 + Custom2 |
-
-### 8.2 注册详情
-
-| 注册方式 | 数量 | 说明 |
-|----------|------|------|
-| GE_FACTORY_REGISTER | 29 | 内置效果直接注册 |
-| GE_FACTORY_REGISTER_EXTERNAL | 16 | 纯外部加载 |
-| GE_FACTORY_REGISTER_EXTERNAL_FALLBACK | 8 | 外部加载+内置回退 |
-| GE_FACTORY_REGISTER_CUSTOM | 4 | 自定义创建逻辑 |
-| GE_FACTORY_REGISTER_MASK | 10 | Mask效果注册 |
-| GE_FACTORY_REGISTER_SHAPE | 5 | Shape效果注册 |
-
----
-
 ## 附录A：文件清单
 
 | 文件 | 路径 | 说明 |
 |------|------|------|
 | 工厂头文件 | include/core/ge_effect_factory.h | 工厂类定义和注册宏 |
 | 工厂实现 | src/core/ge_effect_factory.cpp | 工厂实现 |
-| 集中注册 | src/core/ge_factory_register.cpp | 72个效果注册（字母序） |
+| 集中注册 | src/core/ge_factory_register.cpp | 效果集中注册（字母序） |
 | 工厂测试 | test/unittest/ge_effect_factory_test.cpp | TDD测试 |
 
 
