@@ -66,6 +66,9 @@
 
 namespace OHOS {
 namespace GraphicsEffectEngine {
+namespace {
+constexpr int MAX_IMAGE_DIMENSION = 10000;
+} // namespace
 #define PROPERTY_MESA_BLUR_ALL_ENABLED "persist.sys.graphic.kawaseDisable"
 #ifdef GE_OHOS
 bool GERender::isMesablurAllEnable_ = (std::atoi(
@@ -443,6 +446,11 @@ void GERender::DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectC
         LOGE("GERender::DrawImageRect image is null");
         return;
     }
+    auto imageInfo = image->GetImageInfo();
+    if (imageInfo.GetWidth() > MAX_IMAGE_DIMENSION || imageInfo.GetHeight() > MAX_IMAGE_DIMENSION) {
+        LOGE("GERender::DrawImageRect image dimension exceeds limit, max is %{public}d", MAX_IMAGE_DIMENSION);
+        return;
+    }
 
     auto resImage = ApplyImageEffect(canvas, veContainer, {image, src, dst}, sampling);
     if (!resImage) {
@@ -461,6 +469,11 @@ std::shared_ptr<Drawing::Image> GERender::ApplyImageEffect(Drawing::Canvas& canv
 {
     if (!context.image) {
         LOGE("GERender::ApplyImageEffect image is null");
+        return nullptr;
+    }
+    auto imageInfo = context.image->GetImageInfo();
+    if (imageInfo.GetWidth() > MAX_IMAGE_DIMENSION || imageInfo.GetHeight() > MAX_IMAGE_DIMENSION) {
+        LOGE("GERender::ApplyImageEffect image dimension exceeds limit, max is %{public}d", MAX_IMAGE_DIMENSION);
         return nullptr;
     }
     auto resImage = context.image;
