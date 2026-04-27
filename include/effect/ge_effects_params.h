@@ -93,6 +93,7 @@ namespace Drawing {
 #include "effect/mask/gex_noisy_frame_gradient_mask.params.in"
 #include "effect/shader/ge_aurora_noise_shader.params.in"
 #include "effect/shader/ge_border_light_shader.params.in"
+#include "effect/shader/ge_border_sdf_shader.params.in"
 #include "effect/shader/ge_circle_flowlight_effect.params.in"
 #include "effect/shader/ge_contour_diagonal_flow_light_shader.params.in"
 #include "effect/shader/ge_dot_matrix_shader.params.in"
