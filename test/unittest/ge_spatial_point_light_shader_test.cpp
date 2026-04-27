@@ -238,7 +238,7 @@ HWTEST_F(GESpatialPointLightShaderTest, SetSpatialPointLightParams_UpdatesState,
     shader->SetSpatialPointLightParams(newParams);
     Drawing::Rect rect(0, 0, 200, 200);
     shader->MakeDrawingShader(rect, 1.0f);
-    auto drawingShader = shader.GetDrawingShader();
+    auto drawingShader = shader->GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
 }
 
