@@ -20,7 +20,6 @@
 
 namespace OHOS {
 namespace Rosen {
-static constexpr float BORDER_WIDTH_MIN_THRESHOLD = 0.0001f;
 GEBorderSDFShader::GEBorderSDFShader() {}
 
 GEBorderSDFShader::GEBorderSDFShader(const Drawing::GEBorderSDFShaderParams& params) : params_(params) {}
@@ -39,10 +38,10 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFShader::GetEffect()
 
 void GEBorderSDFShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
-    // 1. Validate sdfShader
+    // 1. Validate param
     auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
-    if (sdfShader == nullptr) {
-        GE_LOGE("GEBorderSDFShader: failed generate GESDFShapeShader.");
+    if (sdfShader == nullptr || ROSEN_LE(params_.width, 0.0f)) {
+        GE_LOGD("GEBorderSDFShader: no valid params.");
         return;
     }
 
@@ -59,14 +58,13 @@ void GEBorderSDFShader::MakeDrawingShader(const Drawing::Rect& rect, float progr
     // 4. Set uniforms
     builder->SetChild("sdfShape", sdfShader);
     builder->SetUniformVec4("u_color", params_.color.x_, params_.color.y_, params_.color.z_, params_.color.w_);
-    builder->SetUniform("u_width", std::max(params_.width, BORDER_WIDTH_MIN_THRESHOLD ));
+    builder->SetUniform("u_width", params_.width);
     builder->SetUniform("u_isOutline", params_.isOutline ? 1.f : -1.f);
     builder->SetUniform("u_dashWidth", params_.dashWidth);
     builder->SetUniform("u_dashGap", params_.dashGap);
 
     // 5. Create shader and store in base class member
     drShader_ = builder->MakeShader(nullptr, false);
-
     if (!drShader_) {
         GE_LOGE("GEBorderSDFShader::MakeDrawingShader shader is nullptr.");
     }

@@ -45,20 +45,13 @@ private:
         uniform float u_isOutline;
         uniform float u_dashWidth;
         uniform float u_dashGap;
-
-        vec4 borderEffect(float d, float width, float direction, vec4 color)
-        {
-            float p = d * direction;
-            return color * (
-                smoothstep(0.0, 1.0, p)                 * step(0.0, p)   * step(p, width) +
-                (1.0 - smoothstep(width, width+1.0, p)) * step(width, p) * step(p, width + 1.0)
-            );
-        }
+        const float aa = 0.5;
 
         half4 main(float2 fragCoord)
         {
             float d = sdfShape.eval(fragCoord).a;
-            return borderEffect(d, u_width, u_isOutline, u_color);
+            float p = d * u_isOutline;
+            return u_color * smoothstep(-aa, 0.0, p) * (1.0 - smoothstep(u_width, u_width+aa, p));
         }
     )";
 
