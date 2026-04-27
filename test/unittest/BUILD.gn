@@ -105,7 +105,6 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/effect/shader/ge_particle_circular_halo_shader.cpp",
     "${graphics_effect_root}/src/effect/shader/ge_sdf_edge_light_shader.cpp",
     "${graphics_effect_root}/src/effect/shader/ge_spatial_glass_effect.cpp",
-    "${graphics_effect_root}/src/effect/shader/ge_wavy_ripple_light_shader.cpp",
     "${graphics_effect_root}/src/effect/shader/ge_spatial_point_light.cpp",
     "${graphics_effect_root}/src/effect/shader/ge_wavy_ripple_light_shader.cpp",
     "${graphics_effect_root}/src/effect/shader/gex_dot_matrix_shader.cpp",
