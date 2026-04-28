@@ -32,7 +32,7 @@ void GEEffectFactory::Register(Rosen::Drawing::GEFilterType type, EffectCreator&
         return;  // out of range
     }
     if (creators_[index]) {
-        GE_LOGE("[EffectFactory] Duplicate registration for type=%{public}d, "
+        GE_LOGE("[GEEffectFactory] Duplicate registration for type=%{public}d, "
             "previous registration is kept. Please check if multiple files register the same effect.",
             static_cast<int>(type));
         return;

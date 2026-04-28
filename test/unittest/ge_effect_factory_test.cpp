@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <memory>
+#include <set>
 
 #include "core/ge_effect_factory.h"
 #include "ge_visual_effect_impl.h"
@@ -268,6 +269,45 @@ HWTEST_F(GEEffectFactoryTest, Create_FallbackSuccess_001, TestSize.Level1)
 
     EXPECT_NE(result, nullptr);
     EXPECT_EQ(result->Type(), GEFilterType::MESA_BLUR);
+}
+
+/**
+ * @tc.name: VerifyRegistrationCoverage_001
+ * @tc.desc: Verify all valid effect types are registered except known unregistered ones
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEEffectFactoryTest, VerifyRegistrationCoverage_001, TestSize.Level1)
+{
+    // Unregistered effect types (fixed list, update when adding new effects)
+    static const std::set<GEFilterType> UNREGISTERED_TYPES = {
+        GEFilterType::GAMMA_CORRECTION,
+        GEFilterType::WATER_GLASS,
+        GEFilterType::REEDED_GLASS,
+        GEFilterType::FLOW_LIGHT_SWEEP,
+        GEFilterType::COMPLEX_SHADER,
+    };
+
+    size_t totalTypes = static_cast<size_t>(GEFilterType::MAX);
+    size_t registeredCount = 0;
+
+    // Count registered types (skip index=0 which is NONE)
+    for (size_t i = 1; i < totalTypes; i++) {
+        if (GEEffectFactory::creators_[i]) {
+            registeredCount++;
+        }
+    }
+
+    // Verify coverage: registered = total - 1 (NONE) - unregistered
+    size_t expectedRegistered = totalTypes - 1 - UNREGISTERED_TYPES.size();
+    EXPECT_EQ(registeredCount, expectedRegistered) <<
+        "Registered: " << registeredCount << ", Expected: " << expectedRegistered;
+
+    // Verify unregistered types are indeed empty
+    for (auto type : UNREGISTERED_TYPES) {
+        size_t index = static_cast<size_t>(type);
+        EXPECT_FALSE(GEEffectFactory::creators_[index])
+            << "Type " << static_cast<int>(type) << " should not be registered";
+    }
 }
 
 } // namespace GraphicsEffectEngine
