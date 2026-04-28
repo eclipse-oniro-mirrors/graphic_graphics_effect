@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_FUZZTEST_GERENDER_FUZZER_H
-#define TEST_FUZZTEST_GERENDER_FUZZER_H
+#ifndef TEST_FUZZTEST_GEVISUALEFFECTFUZZER_H
+#define TEST_FUZZTEST_GEVISUALEFFECTFUZZER_H
 
 #include <climits>
 #include <cstddef>
@@ -22,6 +22,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define FUZZ_PROJECT_NAME "gerender_fuzzer"
+#define FUZZ_PROJECT_NAME "gevisualeffect_fuzzer"
 
-#endif // TEST_FUZZTEST_GERENDER_FUZZER_H
+#endif // TEST_FUZZTEST_GEVISUALEFFECTFUZZER_H

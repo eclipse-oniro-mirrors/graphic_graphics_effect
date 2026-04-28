@@ -20,8 +20,7 @@ module_out_path = "graphics_effect/effect_process"
 ##############################fuzztest##########################################
 ohos_fuzztest("GEVisualEffectContainerFuzzTest") {
   module_out_path = module_out_path
-  fuzz_config_file =
-      "$graphics_effect_root/test/fuzztest/gevisualeffectcontainer_fuzzer"
+  fuzz_config_file = "//foundation/graphic/graphics_effect/test/fuzztest/gevisualeffectcontainer_fuzzer"
 
   include_dirs = [
     "$graphics_effect_root/src",
@@ -29,7 +28,7 @@ ohos_fuzztest("GEVisualEffectContainerFuzzTest") {
   ]
 
   sources = [
-    "ge_visual_effect_container_fuzzer.cpp",
+    "gevisualeffectcontainer_fuzzer.cpp",
     "get_object.h",
   ]
 
