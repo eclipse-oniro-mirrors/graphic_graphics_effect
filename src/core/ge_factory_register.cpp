@@ -106,7 +106,7 @@ GE_FACTORY_REGISTER(GESDFEdgeLight)
 GE_FACTORY_REGISTER(GESoundWaveFilter)
 GE_FACTORY_REGISTER(GEWaterRippleFilter)
 
-// 1.2 Closed-source effects
+// 1.2 Dynamically loaded effects
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY, ::OHOS::Rosen::Drawing::GEGasifyFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY_BLUR, ::OHOS::Rosen::Drawing::GEGasifyBlurFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY_SCALE_TWIST, ::OHOS::Rosen::Drawing::GEGasifyScaleTwistFilterParams)
@@ -114,7 +114,7 @@ GE_FACTORY_REGISTER_EXTERNAL(MAP_COLOR_BY_BRIGHTNESS, ::OHOS::Rosen::Drawing::GE
 GE_FACTORY_REGISTER_EXTERNAL(PARTICLE_ABLATION, ::OHOS::Rosen::Drawing::GEParticleAblationFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(WATER_DROPLET_TRANSITION, ::OHOS::Rosen::Drawing::GEWaterDropletTransitionFilterParams)
 
-// 1.3 Closed-source effects with fallback
+// 1.3 Dynamically loaded effects with fallback
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(DISPERSION,
     ::OHOS::Rosen::Drawing::GEDispersionShaderFilterParams,
     ::OHOS::Rosen::GEDispersionShaderFilter)
@@ -208,7 +208,7 @@ GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
 GE_FACTORY_REGISTER(GESpatialPointLightShader)
 GE_FACTORY_REGISTER(GEWavyRippleLightShader)
 
-// 2.2 Closed-source effects
+// 2.2 Dynamically loaded effects
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_GLOW, ::OHOS::Rosen::Drawing::GEXAIBarGlowEffectParams)
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_RECT_HALO, ::OHOS::Rosen::Drawing::GEXAIBarRectHaloEffectParams)
 GE_FACTORY_REGISTER_EXTERNAL(DISTORT_CHROMA, ::OHOS::Rosen::Drawing::GEXDistortChromaEffectParams)
@@ -218,7 +218,7 @@ GE_FACTORY_REGISTER_EXTERNAL(HARMONIUM_EFFECT, ::OHOS::Rosen::Drawing::GEHarmoni
 GE_FACTORY_REGISTER_EXTERNAL(LIGHT_CAVE, ::OHOS::Rosen::Drawing::GEXLightCaveShaderParams)
 GE_FACTORY_REGISTER_EXTERNAL(ROUNDED_RECT_FLOWLIGHT, ::OHOS::Rosen::Drawing::GEXRoundedRectFlowlightEffectParams)
 
-// 2.3 Closed-source effects with fallback
+// 2.3 Dynamically loaded effects with fallback
 GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(COLOR_GRADIENT_EFFECT,
     ::OHOS::Rosen::Drawing::GEXColorGradientEffectParams,
     ::OHOS::Rosen::GEColorGradientEffect)
@@ -247,7 +247,7 @@ GE_FACTORY_REGISTER_MASK(GEUseEffectShaderMask)
 GE_FACTORY_REGISTER_MASK(GEWaveDisturbanceShaderMask)
 GE_FACTORY_REGISTER_MASK(GEWaveGradientShaderMask)
 
-// 3.2 Closed-source effects
+// 3.2 Dynamically loaded effects
 GE_FACTORY_REGISTER_EXTERNAL(DUPOLI_NOISE_MASK, ::OHOS::Rosen::Drawing::GEXDupoliNoiseMaskParams)
 GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::GEXNoisyFrameGradientMaskParams)
 

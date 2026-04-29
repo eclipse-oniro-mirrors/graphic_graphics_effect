@@ -14,14 +14,14 @@
 ### 1.2 设计目标
 
 1. **代码维护**：新增效果只需添加一行注册代码
-2. **扩展性**：支持闭源动态加载效果
+2. **扩展性**：支持动态加载外部效果
 3. **兼容性**：完全兼容现有的参数系统
 4. **性能优化**：消除哈希表开销（shaderCreatorLUT）
 
 ### 1.3 适用场景
 
 - 需要频繁创建效果的渲染管线
-- 支持动态加载闭源效果库
+- 支持动态加载外部效果库
 - 需要统一管理大量效果类型
 - 需要快速查找和创建特定效果
 
@@ -171,33 +171,66 @@ template<typename FullClassName>
 void RegisterEffect(const char* logTag);
 
 template<typename ParamType, GEFilterType EffectType>
-void RegisterClosedSourceEffect(const char* logTag);
+void RegisterExternalEffect(const char* logTag);
 
 template<typename ParamType, typename FallbackClass, GEFilterType EffectType>
-void RegisterClosedSourceFallbackEffect(const char* logTag);
+void RegisterExternalFallbackEffect(const char* logTag);
 
 } // namespace Internal
 } // GraphicsEffectEngine
 }
 
-// 简化的宏定义（≤10行）
+// 基础宏（用于内置效果）
 #define GE_REGISTER_IMPL(ClassName, FullClassName) \
     namespace { \
         struct GEEffectRegistrar_##ClassName { \
-            GEEffectRegistrar_##ClassName() { Internal::RegisterEffect<FullClassName>(#ClassName); } \
+            GEEffectRegistrar_##ClassName() \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterEffect<FullClassName>(#ClassName); } \
         }; \
         static GEEffectRegistrar_##ClassName g_effectRegistrar_##ClassName; \
     }
 
+// 内置效果注册
 #define GE_FACTORY_REGISTER(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::ClassName)
 #define GE_FACTORY_REGISTER_MASK(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
 #define GE_FACTORY_REGISTER_SHAPE(ClassName) GE_REGISTER_IMPL(ClassName, ::OHOS::Rosen::Drawing::ClassName)
+
+// 动态加载效果注册（无回退）
+#define GE_FACTORY_REGISTER_EXTERNAL(EffectType, ParamType) \
+    namespace { \
+        struct GEEffectRegistrar_##EffectType { \
+            GEEffectRegistrar_##EffectType() \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterExternalEffect<ParamType, \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
+        }; \
+        static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
+    }
+
+// 动态加载效果注册（有回退）
+#define GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(EffectType, ParamType, FallbackClass) \
+    namespace { \
+        struct GEEffectRegistrar_##EffectType { \
+            GEEffectRegistrar_##EffectType() \
+            { ::OHOS::GraphicsEffectEngine::Internal::RegisterExternalFallbackEffect<ParamType, FallbackClass, \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType>(#EffectType); } \
+        }; \
+        static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
+    }
+
+// 自定义注册
+#define GE_FACTORY_REGISTER_CUSTOM(EffectType, Lambda) \
+    namespace { \
+        struct GEEffectRegistrar_##EffectType { \
+            GEEffectRegistrar_##EffectType() \
+            { ::OHOS::GraphicsEffectEngine::GEEffectFactory::Register( \
+                ::OHOS::Rosen::Drawing::GEFilterType::EffectType, (Lambda)); } \
+        }; \
+        static GEEffectRegistrar_##EffectType g_effectRegistrar_##EffectType; \
+    }
 ```
 
 **设计要点：**
-- 模板函数放在 `Internal` 命名空间，明确标识为内部实现
-- 核心逻辑提取到模板函数，宏≤10行符合规范
-- `##ClassName`/`#ClassName` 无法加括号（C++语法限制）
+- 提供 6 种注册宏覆盖不同场景
 
 ---
 
@@ -255,16 +288,16 @@ std::array<std::optional<EffectCreator>, MAX_EFFECTS> GEEffectFactory::creators_
 
 ## 七、扩展机制
 
-### 7.1 闭源动态加载
+### 7.1 动态加载机制
 
-支持动态加载闭源效果库：
+支持动态加载外部效果库：
 
 ```cpp
 void* impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
     static_cast<uint32_t>(type), sizeof(ParamType), params);
 ```
 
-### 7.2 闭源效果库要求
+### 7.2 动态加载库要求
 
 - 导出 `CreateGEXObjectByType` 函数
 - 支持参数序列化/反序列化
