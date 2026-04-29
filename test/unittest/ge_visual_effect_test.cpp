@@ -244,6 +244,156 @@ HWTEST_F(GEVisualEffectTest, SetParam_009, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest SetParam_009 end";
 }
+
+/**
+ * @tc.name: GetName_001
+ * @tc.desc: Verify function GetName
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GetName_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GetName_001 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    EXPECT_EQ(visualEffect->GetName(), GE_FILTER_KAWASE_BLUR);
+
+    auto visualEffect2 = std::make_shared<GEVisualEffect>(GE_FILTER_MESA_BLUR);
+    EXPECT_EQ(visualEffect2->GetName(), GE_FILTER_MESA_BLUR);
+
+    auto visualEffect3 = std::make_shared<GEVisualEffect>("custom_effect");
+    EXPECT_EQ(visualEffect3->GetName(), "custom_effect");
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GetName_001 end";
+}
+
+/**
+ * @tc.name: SetCanvasInfo_001
+ * @tc.desc: Verify function SetCanvasInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetCanvasInfo_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetCanvasInfo_001 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+
+    Drawing::CanvasInfo canvasInfo;
+    canvasInfo.geoWidth = 100.0f;
+    canvasInfo.geoHeight = 200.0f;
+    canvasInfo.tranX = 10.0f;
+    canvasInfo.tranY = 20.0f;
+
+    visualEffect->SetCanvasInfo(canvasInfo);
+
+    Drawing::CanvasInfo result = visualEffect->GetCanvasInfo();
+    EXPECT_FLOAT_EQ(result.geoWidth, 100.0f);
+    EXPECT_FLOAT_EQ(result.geoHeight, 200.0f);
+    EXPECT_FLOAT_EQ(result.tranX, 10.0f);
+    EXPECT_FLOAT_EQ(result.tranY, 20.0f);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetCanvasInfo_001 end";
+}
+
+/**
+ * @tc.name: SetSupportHeadroom_001
+ * @tc.desc: Verify function SetSupportHeadroom and GetSupportHeadroom
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, SetSupportHeadroom_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetSupportHeadroom_001 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+
+    EXPECT_FLOAT_EQ(visualEffect->GetSupportHeadroom(), 0.0f);
+
+    visualEffect->SetSupportHeadroom(1.5f);
+    EXPECT_FLOAT_EQ(visualEffect->GetSupportHeadroom(), 1.5f);
+
+    visualEffect->SetSupportHeadroom(0.0f);
+    EXPECT_FLOAT_EQ(visualEffect->GetSupportHeadroom(), 0.0f);
+
+    visualEffect->SetSupportHeadroom(2.0f);
+    EXPECT_FLOAT_EQ(visualEffect->GetSupportHeadroom(), 2.0f);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest SetSupportHeadroom_001 end";
+}
+
+/**
+ * @tc.name: GenerateShaderMask_001
+ * @tc.desc: Verify function GenerateShaderMask
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GenerateShaderMask_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_001 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_RIPPLE);
+    visualEffect->visualEffectImpl_->MakeRippleMaskParams();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+
+    auto shaderMask = visualEffect->GenerateShaderMask();
+    EXPECT_NE(shaderMask, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_001 end";
+}
+
+/**
+ * @tc.name: GenerateShaderMask_002
+ * @tc.desc: Verify function GenerateShaderMask with invalid type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GenerateShaderMask_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_002 start";
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    visualEffect->visualEffectImpl_->MakeKawaseParams();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::KAWASE_BLUR;
+    auto shaderMask = visualEffect->GenerateShaderMask();
+    EXPECT_EQ(shaderMask, nullptr);
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_002 end";
+}
+
+/**
+ * @tc.name: GenerateShaderShape_001
+ * @tc.desc: Verify function GenerateShaderShape
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GenerateShaderShape_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_001 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_SHAPE_SDF_RRECT_SHAPE);
+    visualEffect->visualEffectImpl_->MakeSDFRRectShapeParams();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::SDF_RRECT_SHAPE;
+
+    Drawing::GERRect rrect { 10.0f, 20.0f, 100.0f, 200.0f };
+    rrect.SetCornerRadius(15.0f, 15.0f);
+    visualEffect->SetParam(GE_SHAPE_SDF_RRECT_SHAPE_RRECT, rrect);
+
+    auto shaderShape = visualEffect->GenerateShaderShape();
+    EXPECT_NE(shaderShape, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_001 end";
+}
+
+/**
+ * @tc.name: GenerateShaderShape_002
+ * @tc.desc: Verify function GenerateShaderShape with invalid type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectTest, GenerateShaderShape_002, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_002 start";
+
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    visualEffect->visualEffectImpl_->MakeKawaseParams();
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::KAWASE_BLUR;
+    auto shaderShape = visualEffect->GenerateShaderShape();
+    EXPECT_EQ(shaderShape, nullptr);
+
+    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_002 end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

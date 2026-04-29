@@ -1562,5 +1562,303 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_SpatialPointLight_006, TestSize.Level1
     geVisualEffectImpl.SetParam(Drawing::GEParamsMemberTag::SPATIAL_POINT_LIGHT_ATTENUATION, 100.0f);
     EXPECT_FLOAT_EQ(params->attenuation, 100.0f);
 }
+
+/**
+ * @tc.name: MakeGetParams_001
+ * @tc.desc: Verify Make and Get params methods for various filters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
+    geVisualEffectImpl.MakeDisplacementDistortParams();
+    auto params = geVisualEffectImpl.GetDisplacementDistortParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_FILTER_SOUND_WAVE);
+    geVisualEffectImpl2.MakeSoundWaveParams();
+    auto params2 = geVisualEffectImpl2.GetSoundWaveParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_FILTER_DIRECTION_LIGHT);
+    geVisualEffectImpl3.MakeDirectionLightParams();
+    auto params3 = geVisualEffectImpl3.GetDirectionLightParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_002
+ * @tc.desc: Verify Make and Get params methods for shader effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_002, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_WAVY_RIPPLE_LIGHT);
+    geVisualEffectImpl.MakeWavyRippleLightParams();
+    auto params = geVisualEffectImpl.GetWavyRippleLightParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHADER_AURORA_NOISE);
+    geVisualEffectImpl2.MakeAuroraNoiseParams();
+    auto params2 = geVisualEffectImpl2.GetAuroraNoiseParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_SHADER_PARTICLE_CIRCULAR_HALO);
+    geVisualEffectImpl3.MakeParticleCircularHaloParams();
+    auto params3 = geVisualEffectImpl3.GetParticleCircularHaloParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_003
+ * @tc.desc: Verify Make and Get params methods for mask effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_003, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_MASK_RADIAL_GRADIENT);
+    geVisualEffectImpl.MakeRadialGradientMaskParams();
+    auto params = geVisualEffectImpl.GetRadialGradientMaskParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_MASK_IMAGE);
+    geVisualEffectImpl2.MakeImageMaskParams();
+    auto params2 = geVisualEffectImpl2.GetImageMaskParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_MASK_USE_EFFECT);
+    geVisualEffectImpl3.MakeUseEffectMaskParams();
+    auto params3 = geVisualEffectImpl3.GetUseEffectMaskParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_004
+ * @tc.desc: Verify Make and Get params methods for transition and blur effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_004, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_MASK_TRANSITION);
+    geVisualEffectImpl.MakeMaskTransitionParams();
+    auto params = geVisualEffectImpl.GetMaskTransitionParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
+    geVisualEffectImpl2.MakeVariableRadiusBlurParams();
+    auto params2 = geVisualEffectImpl2.GetVariableRadiusBlurParams();
+    EXPECT_NE(params2, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_005
+ * @tc.desc: Verify Make and Get params methods for SDF effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_005, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHAPE_SDF_PIXELMAP_SHAPE);
+    geVisualEffectImpl.MakeSDFPixelmapShapeParams();
+    auto params = geVisualEffectImpl.GetSDFPixelmapShapeParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHAPE_SDF_TRANSFORM_SHAPE);
+    geVisualEffectImpl2.MakeSDFTransformShapeParams();
+    auto params2 = geVisualEffectImpl2.GetSDFTransformShapeParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_SHADER_SDF_SHADOW);
+    geVisualEffectImpl3.MakeSDFShadowShaderParams();
+    auto params3 = geVisualEffectImpl3.GetSDFShadowShaderParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_006
+ * @tc.desc: Verify Make and Get params methods for SDF clip and border
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_006, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_SDF_CLIP);
+    geVisualEffectImpl.MakeSDFClipParams();
+    auto params = geVisualEffectImpl.GetSDFClipShaderParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHADER_SDF_BORDER);
+    geVisualEffectImpl2.MakeSDFBorderShaderParams();
+    auto params2 = geVisualEffectImpl2.GetSDFBorderShaderParams();
+    EXPECT_NE(params2, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_007
+ * @tc.desc: Verify Make and Get params methods for light effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_007, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_BORDER_LIGHT);
+    geVisualEffectImpl.MakeBorderLightParams();
+    auto params = geVisualEffectImpl.GetBorderLightParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GEX_SHADER_COLOR_GRADIENT_EFFECT);
+    geVisualEffectImpl2.MakeColorGradientEffectParams();
+    auto params2 = geVisualEffectImpl2.GetColorGradientEffectParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_SHADER_HARMONIUM_EFFECT);
+    geVisualEffectImpl3.MakeHarmoniumEffectParams();
+    auto params3 = geVisualEffectImpl3.GetHarmoniumEffectParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_008
+ * @tc.desc: Verify Make and Get params methods for glow effects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_008, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GEX_SHADER_AIBAR_GLOW);
+    geVisualEffectImpl.MakeAIBarGlowEffectParams();
+    auto params = geVisualEffectImpl.GetAIBarGlowEffectParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GEX_SHADER_ROUNDED_RECT_FLOWLIGHT);
+    geVisualEffectImpl2.MakeRoundedRectFlowlightEffectParams();
+    auto params2 = geVisualEffectImpl2.GetRoundedRectFlowlightEffectParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GEX_SHADER_GRADIENT_FLOW_COLORS);
+    geVisualEffectImpl3.MakeGradientFlowColorsEffectParams();
+    auto params3 = geVisualEffectImpl3.GetGradientFlowColorsEffectParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_009
+ * @tc.desc: Verify Make and Get params methods for mask and grid warp
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_009, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_MASK_FRAME_GRADIENT);
+    geVisualEffectImpl.MakeFrameGradientMaskParams();
+    auto params = geVisualEffectImpl.GetFrameGradientMaskParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_FILTER_GRID_WARP);
+    geVisualEffectImpl2.MakeGridWarpFilterParams();
+    auto params2 = geVisualEffectImpl2.GetGridWarpFilterParams();
+    EXPECT_NE(params2, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_010
+ * @tc.desc: Verify Make and Get params methods for flowlight and frosted glass
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_010, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_CIRCLE_FLOWLIGHT);
+    geVisualEffectImpl.MakeCircleFlowlightEffectParams();
+    auto params = geVisualEffectImpl.GetCircleFlowlightEffectParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHADER_FROSTED_GLASS_EFFECT);
+    geVisualEffectImpl2.MakeFrostedGlassEffectParams();
+    auto params2 = geVisualEffectImpl2.GetFrostedGlassEffectParams();
+    EXPECT_NE(params2, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_FILTER_FROSTED_GLASS_BLUR);
+    geVisualEffectImpl3.MakeFrostedGlassBlurParams();
+    auto params3 = geVisualEffectImpl3.GetFrostedGlassBlurParams();
+    EXPECT_NE(params3, nullptr);
+}
+
+/**
+ * @tc.name: SetCache_001
+ * @tc.desc: Verify function SetCache and GetCache
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetCache_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_KAWASE_BLUR);
+
+    auto cacheData = std::make_shared<std::any>(std::string("test_cache"));
+    geVisualEffectImpl.SetCache(cacheData);
+
+    auto retrievedCache = geVisualEffectImpl.GetCache();
+    EXPECT_NE(retrievedCache, nullptr);
+
+    auto& cacheValue = std::any_cast<std::string&>(*retrievedCache);
+    EXPECT_EQ(cacheValue, "test_cache");
+}
+
+/**
+ * @tc.name: SetCache_002
+ * @tc.desc: Verify function SetCache with nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetCache_002, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_KAWASE_BLUR);
+
+    geVisualEffectImpl.SetCache(nullptr);
+    auto retrievedCache = geVisualEffectImpl.GetCache();
+    EXPECT_EQ(retrievedCache, nullptr);
+}
+
+/**
+ * @tc.name: SetCanvasInfo_001
+ * @tc.desc: Verify function SetCanvasInfo and GetCanvasInfo
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, SetCanvasInfo_001, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_KAWASE_BLUR);
+
+    Drawing::CanvasInfo canvasInfo;
+    canvasInfo.geoWidth = 100.0f;
+    canvasInfo.geoHeight = 200.0f;
+    geVisualEffectImpl.SetCanvasInfo(canvasInfo);
+
+    auto retrievedCanvasInfo = geVisualEffectImpl.GetCanvasInfo();
+    EXPECT_FLOAT_EQ(retrievedCanvasInfo.geoWidth, 100.0f);
+    EXPECT_FLOAT_EQ(retrievedCanvasInfo.geoHeight, 200.0f);
+}
+
+/**
+ * @tc.name: MakeGetParams_011
+ * @tc.desc: Verify Make and Get params methods for content diagonal
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_011, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
+    geVisualEffectImpl.MakeContenDiagonalParams();
+    auto params = geVisualEffectImpl.GetContenDiagonalParams();
+    EXPECT_NE(params, nullptr);
+}
+
+/**
+ * @tc.name: MakeGetParams_012
+ * @tc.desc: Verify Make and Get params methods for ripple masks
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectImplTest, MakeGetParams_012, TestSize.Level1)
+{
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_MASK_RIPPLE);
+    geVisualEffectImpl.MakeRippleMaskParams();
+    auto params = geVisualEffectImpl.GetRippleMaskParams();
+    EXPECT_NE(params, nullptr);
+
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_MASK_DOUBLE_RIPPLE);
+    geVisualEffectImpl2.MakeDoubleRippleMaskParams();
+    auto params2 = geVisualEffectImpl2.GetDoubleRippleMaskParams();
+    EXPECT_NE(params2, nullptr);
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
