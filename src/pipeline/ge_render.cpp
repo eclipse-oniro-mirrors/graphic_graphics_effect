@@ -16,7 +16,6 @@
 
 #include "core/ge_effect_factory.h"
 #include "ge_direct_draw_on_canvas_pass.h"
-#include "ge_external_dynamic_loader.h"
 #include "ge_filter_composer.h"
 #include "ge_hps_build_pass.h"
 #include "ge_hps_effect_filter.h"

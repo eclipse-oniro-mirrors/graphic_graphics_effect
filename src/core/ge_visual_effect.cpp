@@ -18,8 +18,6 @@
 #include "ge_log.h"
 #include "ge_visual_effect.h"
 #include "ge_visual_effect_impl.h"
-#include "ge_sdf_transform_shader_shape.h"
-#include "ge_sdf_union_op_shader_shape.h"
 
 namespace OHOS {
 namespace Rosen {
