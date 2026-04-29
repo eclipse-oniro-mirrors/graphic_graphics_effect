@@ -19,6 +19,7 @@
 #include "ge_bezier_warp_shader_filter.h"
 #include "ge_blur_bubbles_rise_filter.h"
 #include "ge_border_light_shader.h"
+#include "ge_border_sdf_shader.h"
 #include "ge_circle_flowlight_effect.h"
 #include "ge_color_gradient_effect.h"
 #include "ge_color_gradient_shader_filter.h"
@@ -430,6 +431,17 @@ static std::unordered_map<GEVisualEffectImpl::FilterType, ShaderCreator> shaderC
             }
             std::shared_ptr<GEShader> dmShader(static_cast<GEShader*>(impl));
             return dmShader;
+        }
+    },
+    {GEVisualEffectImpl::FilterType::BORDER_SDF_SHADER, [] (std::shared_ptr<GEVisualEffectImpl> ve)
+        {
+            std::shared_ptr<GEShader> out = nullptr;
+            if (ve == nullptr || ve->GetParams<Drawing::GEBorderSDFShaderParams>() == nullptr) {
+                return out;
+            }
+            const auto& params = ve->GetParams<Drawing::GEBorderSDFShaderParams>();
+            out = std::make_shared<GEBorderSDFShader>(*params);
+            return out;
         }
     },
 };
