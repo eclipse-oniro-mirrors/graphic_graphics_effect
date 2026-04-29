@@ -39,9 +39,14 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFShader::GetEffect()
 void GEBorderSDFShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     // 1. Validate param
+    if (!params_.shape) {
+        GE_LOGE("GEBorderSDFShader::MakeSDFBorderShader shape is invalid.");
+        return;
+    }
+
     auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
     if (sdfShader == nullptr || ROSEN_LE(params_.width, 0.0f)) {
-        GE_LOGD("GEBorderSDFShader: no valid params.");
+        GE_LOGD("GEBorderSDFShader::MakeSDFBorderShader no valid params.");
         return;
     }
 

@@ -28,7 +28,7 @@ public:
     GEBorderSDFShader();
     GEBorderSDFShader(const Drawing::GEBorderSDFShaderParams& params);
     GEBorderSDFShader(const GEBorderSDFShader&) = delete;
-    GEBorderSDFShader operator=(const GEBorderSDFShader&) = delete;
+    GEBorderSDFShader& operator=(const GEBorderSDFShader&) = delete;
     GEBorderSDFShader(GEBorderSDFShader&&) = delete;
     GEBorderSDFShader& operator=(GEBorderSDFShader&&) = delete;
     ~GEBorderSDFShader() override = default;

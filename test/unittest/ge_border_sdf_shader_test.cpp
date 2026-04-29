@@ -361,5 +361,27 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest020, TestSize.Level1)
     }
 }
 
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest021, TestSize.Level1)
+{
+    Drawing::GEBorderSDFShaderParams params;
+    params.color = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
+    params.width = 10.0f;
+    params.isOutline = false;
+    params.style = 0;
+
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 300, 300);
+    shader.MakeDrawingShader(rect, 0.5f);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest022, TestSize.Level1)
+{
+    auto shader = GEBorderSDFShader();
+    Drawing::Rect rect(0, 0, 300, 300);
+    shader.MakeDrawingShader(rect, 0.5f);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
 }  // namespace Rosen
 }  // namespace OHOS
