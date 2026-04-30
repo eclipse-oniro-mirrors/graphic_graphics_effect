@@ -65,6 +65,17 @@ std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateDrawingShaderHasN
     return GenerateUnionOpDrawingShader(leftShader, rightShader, true);
 }
 
+void GESDFUnionOpShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal)
+{
+    if (params_.left) {
+        params_.left->Preprocess(canvas, rect, hasNormal);
+    }
+
+    if (params_.right) {
+        params_.right->Preprocess(canvas, rect, hasNormal);
+    }
+}
+
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionOpDrawingShader(
     std::shared_ptr<ShaderEffect> leftShader, std::shared_ptr<ShaderEffect> rightShader, bool hasNormal) const
 {

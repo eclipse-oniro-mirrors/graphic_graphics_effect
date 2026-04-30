@@ -47,6 +47,9 @@ public:
 
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFClipShader(const Drawing::Rect& rect);
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFClipEffect();
     Drawing::GESDFClipShaderParams params_;

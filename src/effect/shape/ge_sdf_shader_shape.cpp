@@ -35,6 +35,19 @@ std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShaderHasNormal(f
     return nullptr;
 }
 
+std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShader(Canvas& canvas, float width, float height)
+{
+    Preprocess(canvas, Rect(0.0, 0.0, width, height), false);
+    return GenerateDrawingShader(width, height);
+}
+
+std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShaderHasNormal(Canvas& canvas,
+    float width, float height)
+{
+    Preprocess(canvas, Rect(0.0, 0.0, width, height), true);
+    return GenerateDrawingShaderHasNormal(width, height);
+}
+
 void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
 {
     if (GetSDFShapeType() != shape.GetSDFShapeType()) {

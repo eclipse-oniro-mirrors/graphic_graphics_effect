@@ -46,6 +46,13 @@ void GESDFBorderShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     canvas.DetachBrush();
 }
 
+void GESDFBorderShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, false);
+    }
+}
+
 std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(const Drawing::Rect &rect)
 {
     auto width = rect.GetWidth();

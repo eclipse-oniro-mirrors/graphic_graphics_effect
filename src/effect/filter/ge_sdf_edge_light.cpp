@@ -33,7 +33,7 @@ std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
         LOGE("GESDFEdgeLight::OnProcessImage sdfShape_ is null");
         return nullptr;
     }
-    auto shader = sdfShape->GenerateDrawingShader(imageWidth, imageHeight);
+    auto shader = sdfShape->GenerateDrawingShader(canvas, imageWidth, imageHeight);
     if (!shader) {
         LOGE("GESDFEdgeLight::OnProcessImage GenerateDrawingShader failed");
         return nullptr;

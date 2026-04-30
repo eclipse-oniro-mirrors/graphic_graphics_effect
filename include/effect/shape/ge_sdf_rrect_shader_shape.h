@@ -28,6 +28,8 @@ namespace Drawing {
 
 class GE_EXPORT GESDFRRectShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     GESDFRRectShaderShape(const GESDFRRectShapeParams& param) : params_(param) {}
     GESDFRRectShaderShape(const GESDFRRectShaderShape&) = delete;
     virtual ~GESDFRRectShaderShape() = default;

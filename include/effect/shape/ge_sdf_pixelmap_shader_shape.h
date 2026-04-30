@@ -26,6 +26,8 @@ namespace Drawing {
 
 class GE_EXPORT GESDFPixelmapShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     GESDFPixelmapShaderShape(const GESDFPixelmapShapeParams& param) : params_(param) {}
     GESDFPixelmapShaderShape(const GESDFPixelmapShaderShape&) = delete;
     virtual ~GESDFPixelmapShaderShape() = default;

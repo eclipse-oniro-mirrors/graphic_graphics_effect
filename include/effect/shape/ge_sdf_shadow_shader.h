@@ -45,6 +45,9 @@ public:
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFShadowShader(const Drawing::Rect& rect);
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     bool IsElevationMode() const { return params_.shadow.elevation > 0.0f; }
 

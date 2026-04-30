@@ -46,6 +46,10 @@ public:
 
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
         std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect);
+
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
         const Drawing::Rect& dst, Drawing::Matrix& outMatrix,

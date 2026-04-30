@@ -49,6 +49,13 @@ void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect&
     canvas.DetachBrush();
 }
 
+void GESDFClipShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, false);
+    }
+}
+
 void GESDFClipShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     if (!rect.IsValid()) {

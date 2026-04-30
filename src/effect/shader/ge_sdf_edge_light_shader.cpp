@@ -73,6 +73,13 @@ GESDFEdgeLightShader::GESDFEdgeLightShader(const Drawing::GESDFEdgeLightEffectPa
     : params_(params)
 {}
 
+void GESDFEdgeLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (params_.sdfShape) {
+        params_.sdfShape->Preprocess(canvas, rect, false);
+    }
+}
+
 void GESDFEdgeLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = nullptr;

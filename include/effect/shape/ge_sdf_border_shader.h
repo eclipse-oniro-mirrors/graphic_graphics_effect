@@ -43,6 +43,9 @@ public:
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFBorderShader(const Drawing::Rect& rect);
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFBorderEffect();
     Drawing::GESDFBorderShaderParams params_;

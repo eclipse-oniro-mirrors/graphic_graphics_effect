@@ -42,6 +42,13 @@ std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDrawingShaderHa
     return GenerateDistortOpDrawingShader(shapeShader, true, width, height);
 }
 
+void GESDFDistortOpShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, hasNormal);
+    }
+}
+
 std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDistortOpDrawingShader(
     std::shared_ptr<ShaderEffect> shapeShader, bool hasNormal, float width, float height) const
 {

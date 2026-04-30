@@ -82,6 +82,7 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     } else {
         UpdateRectForShadow(newRect);
     }
+    Preprocess(canvas, newRect);
     MakeDrawingShader(newRect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
@@ -92,6 +93,13 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     canvas.AttachBrush(brush);
     canvas.DrawRect(newRect);
     canvas.DetachBrush();
+}
+
+void GESDFShadowShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, false);
+    }
 }
 
 std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(const Drawing::Rect& rect)

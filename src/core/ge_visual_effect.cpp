@@ -151,6 +151,11 @@ void GEVisualEffect::SetParam(const std::string& tag, const GESDFShadowParams& p
     visualEffectImpl_->SetParam(tag, param);
 }
 
+void GEVisualEffect::SetParam(const std::string& tag, const Drawing::Path& param)
+{
+    visualEffectImpl_->SetParam(tag, param);
+}
+
 const std::shared_ptr<Drawing::GEShaderShape> GEVisualEffect::GetGEShaderShape(const std::string& tag) const
 {
     return visualEffectImpl_->GetGEShaderShape(tag);

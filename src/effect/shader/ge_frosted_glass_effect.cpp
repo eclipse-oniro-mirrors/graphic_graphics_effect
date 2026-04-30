@@ -367,6 +367,13 @@ bool GEFrostedGlassEffect::IsValidParam(float width, float height)
     return true;
 }
 
+void GEFrostedGlassEffect::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (frostedGlassEffectParams_.sdfShape) {
+        frostedGlassEffectParams_.sdfShape->Preprocess(canvas, rect, true);
+    }
+}
+
 void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     drShader_ = nullptr;

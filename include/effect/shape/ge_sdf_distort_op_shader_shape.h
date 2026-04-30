@@ -25,13 +25,17 @@ namespace Drawing {
 
 class GE_EXPORT GESDFDistortOpShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     DECLARE_GEFILTER_TYPEFUNC(GESDFDistortOpShaderShape, Drawing::GESDFDistortOpShapeParams);
+
     GESDFDistortOpShaderShape(const GESDFDistortOpShapeParams& param) : params_(param) {}
     GESDFDistortOpShaderShape(const GESDFDistortOpShaderShape&) = delete;
     virtual ~GESDFDistortOpShaderShape() = default;
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override;
 
     GESDFShapeType GetSDFShapeType() const override
     {

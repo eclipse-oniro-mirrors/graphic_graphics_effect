@@ -214,6 +214,7 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(MaskTransitionParams, GEMaskTransitionShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFUnionOpShapeParams, GESDFUnionOpShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFRRectShapeParams, GESDFRRectShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFPathShapeParams, GESDFPathShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFPixelmapShapeParams, GESDFPixelmapShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFTransformShapeParams, GESDFTransformShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFClipParams, GESDFClipShaderParams)

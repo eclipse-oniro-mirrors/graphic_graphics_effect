@@ -48,6 +48,9 @@ public:
 
     std::shared_ptr<Drawing::ShaderEffect> MakeSDFColorShader(const Drawing::Rect& rect);
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFColorEffect();
     Drawing::GESDFColorShaderParams params_;

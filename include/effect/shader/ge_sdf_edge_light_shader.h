@@ -38,6 +38,9 @@ public:
 
     const std::string GetDescription() const { return "GESDFEdgeLightShader"; }
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+
 private:
     GESDFEdgeLightShader(const GESDFEdgeLightShader&) = delete;
     GESDFEdgeLightShader(const GESDFEdgeLightShader&&) = delete;

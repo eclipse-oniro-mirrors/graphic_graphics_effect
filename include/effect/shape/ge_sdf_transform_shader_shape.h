@@ -26,6 +26,8 @@ namespace Drawing {
 
 class GE_EXPORT GESDFTransformShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     GESDFTransformShaderShape(const GESDFTransformShapeParams& param) : params_(param) {}
     GESDFTransformShaderShape(const GESDFTransformShaderShape&) = delete;
     virtual ~GESDFTransformShaderShape() = default;
@@ -34,6 +36,7 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override;
     GESDFShapeType GetSDFShapeType() const override
     {
         return GESDFShapeType::TRANSFORM;

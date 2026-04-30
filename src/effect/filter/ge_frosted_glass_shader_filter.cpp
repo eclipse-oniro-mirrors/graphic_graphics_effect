@@ -422,7 +422,7 @@ bool GEFrostedGlassShaderFilter::PrepareDrawing(Drawing::Canvas& canvas,
         return false;
     }
 
-    auto sdfNormalShader = MakeSDFNormalShader(canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    auto sdfNormalShader = MakeSDFNormalShader(canvas, canvasInfo_.geoWidth, canvasInfo_.geoHeight);
     if (!sdfNormalShader) {
         LOGE("GEFrostedGlassShaderFilter::OnProcessImage sdfShapeShader is null");
         return false;
@@ -502,10 +502,11 @@ std::shared_ptr<Drawing::Image> GEFrostedGlassShaderFilter::MakeSmallRadiusBlurI
     return blurShader_->OnProcessImage(canvas, image, src, dst);
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::MakeSDFNormalShader(float width, float height) const
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassShaderFilter::MakeSDFNormalShader(Drawing::Canvas& canvas,
+    float width, float height) const
 {
     if (auto shape = frostedGlassParams_.sdfShape) {
-        return shape->GenerateDrawingShaderHasNormal(width, height);
+        return shape->GenerateDrawingShaderHasNormal(canvas, width, height);
     }
     return nullptr;
 }

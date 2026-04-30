@@ -32,6 +32,9 @@ public:
     virtual ~GEShaderShape() = default;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const = 0;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const = 0;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(Canvas& canvas, float width, float height);
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(Canvas& canvas, float width, float height);
+    virtual void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal = false);
 };
 } // namespace Drawing
 } // namespace Rosen

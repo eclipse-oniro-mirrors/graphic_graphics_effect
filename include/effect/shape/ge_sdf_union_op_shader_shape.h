@@ -26,13 +26,17 @@ namespace Drawing {
 
 class GE_EXPORT GESDFUnionOpShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderShape, Drawing::GESDFUnionOpShapeParams);
+
     GESDFUnionOpShaderShape(const GESDFUnionOpShapeParams& param) : params_(param) {}
     GESDFUnionOpShaderShape(const GESDFUnionOpShaderShape&) = delete;
     virtual ~GESDFUnionOpShaderShape() = default;
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override;
 
     GESDFShapeType GetSDFShapeType() const override
     {
