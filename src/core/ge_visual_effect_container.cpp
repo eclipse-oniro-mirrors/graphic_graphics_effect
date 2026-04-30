@@ -179,6 +179,20 @@ void GEVisualEffectContainer::SetDisplayHeadroom(float headroom)
     }
 }
 
+void GEVisualEffectContainer::SetDisableFilterCache(bool disableFilterCache)
+{
+    for (auto vef : GetFilters()) {
+        if (vef) {
+            auto impl = vef->GetImpl();
+            if (impl) {
+                auto canvasInfo = impl->GetCanvasInfo();
+                canvasInfo.disableFilterCache = disableFilterCache;
+                impl->SetCanvasInfo(canvasInfo);
+            }
+        }
+    }
+}
+
 void GEVisualEffectContainer::UpdateDarkScale(float darkScale)
 {
     for (auto vef : GetFilters()) {

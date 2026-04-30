@@ -103,6 +103,10 @@ enum class GEParamsMemberTag : uint32_t {
     BLUR_BUBBLES_RISE_MIX_STRENGTH,
     BLUR_BUBBLES_RISE_PROGRESS,
     BLUR_BUBBLES_RISE_MASK_IMAGE,
+    BLUR_RADIUS_X,
+    BLUR_RADIUS_Y,
+    BLUR_DISABLE_SYSTEM_ADAPTATION,
+    BLUR_EXPAND_DRAW_REGION,
     BORDER_LIGHT_POSITION,
     BORDER_LIGHT_COLOR,
     BORDER_LIGHT_INTENSITY,
@@ -395,6 +399,9 @@ enum class GEParamsMemberTag : uint32_t {
     MESA_BLUR_HEIGHT,
     MESA_BLUR_IS_DIRECTION,
     MESA_BLUR_ANGLE,
+    MOTION_BLUR_RADIUS,
+    MOTION_BLUR_ANCHOR,
+    MOTION_BLUR_SAMPLE_COUNT,
     PARTICLE_ABLATION_PROGRESS,
     PARTICLE_ABLATION_ABLATION_RATE,
     PARTICLE_ABLATION_CENTERS0,
@@ -1428,6 +1435,7 @@ GE_PARAMS_TYPE_INFO(GEAIBarShaderFilterParams, AIBAR, AIBAR);
 GE_PARAMS_TYPE_INFO(GEAuroraNoiseShaderParams, AURORA_NOISE, AuroraNoise);
 GE_PARAMS_TYPE_INFO(GEBezierWarpShaderFilterParams, BEZIER_WARP, BezierWarp);
 GE_PARAMS_TYPE_INFO(GEBlurBubblesRiseFilterParams, BLUR_BUBBLES_RISE, BlurBubblesRise);
+GE_PARAMS_TYPE_INFO(GEBlurShaderFilterParams, BLUR, Blur);
 GE_PARAMS_TYPE_INFO(GEBorderLightShaderParams, BORDER_LIGHT, BorderLight);
 GE_PARAMS_TYPE_INFO(GEBorderSDFShaderParams, BORDER_SDF_SHADER, BorderSDFShader);
 GE_PARAMS_TYPE_INFO(GECircleFlowlightEffectParams, CIRCLE_FLOWLIGHT, CircleFlowlight);
@@ -1460,6 +1468,7 @@ GE_PARAMS_TYPE_INFO(GEMagnifierShaderFilterParams, MAGNIFIER, Magnifier);
 GE_PARAMS_TYPE_INFO(GEMapColorByBrightnessFilterParams, MAP_COLOR_BY_BRIGHTNESS, MapColorByBrightness);
 GE_PARAMS_TYPE_INFO(GEMaskTransitionShaderFilterParams, MASK_TRANSITION, MaskTransition);
 GE_PARAMS_TYPE_INFO(GEMESABlurShaderFilterParams, MESA_BLUR, MESA_BLUR);
+GE_PARAMS_TYPE_INFO(GEMotionBlurShaderFilterParams, MOTION_BLUR, MotionBlur);
 GE_PARAMS_TYPE_INFO(GEParticleAblationFilterParams, PARTICLE_ABLATION, ParticleAblation);
 GE_PARAMS_TYPE_INFO(GEParticleCircularHaloShaderParams, PARTICLE_CIRCULAR_HALO, ParticleCircularHalo);
 GE_PARAMS_TYPE_INFO(GEPixelMapMaskParams, PIXEL_MAP_MASK, PixelMapMask);
@@ -1596,6 +1605,11 @@ GE_PARAMS_FIELD_ACCESSOR(
 GE_PARAMS_FIELD_ACCESSOR(GEBlurBubblesRiseFilterParams, progress, BLUR_BUBBLES_RISE_PROGRESS, BlurBubblesRise_Progress);
 GE_PARAMS_FIELD_ACCESSOR(
     GEBlurBubblesRiseFilterParams, maskImage, BLUR_BUBBLES_RISE_MASK_IMAGE, BlurBubblesRise_MaskImage);
+GE_PARAMS_FIELD_ACCESSOR(GEBlurShaderFilterParams, radiusX, BLUR_RADIUS_X, Blur_RadiusX);
+GE_PARAMS_FIELD_ACCESSOR(GEBlurShaderFilterParams, radiusY, BLUR_RADIUS_Y, Blur_RadiusY);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEBlurShaderFilterParams, disableSystemAdaptation, BLUR_DISABLE_SYSTEM_ADAPTATION, Blur_DisableSystemAdaptation);
+GE_PARAMS_FIELD_ACCESSOR(GEBlurShaderFilterParams, expandDrawRegion, BLUR_EXPAND_DRAW_REGION, Blur_ExpandDrawRegion);
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, position, BORDER_LIGHT_POSITION, BorderLight_Position);
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, color, BORDER_LIGHT_COLOR, BorderLight_Color);
 GE_PARAMS_FIELD_ACCESSOR(GEBorderLightShaderParams, intensity, BORDER_LIGHT_INTENSITY, BorderLight_Intensity);
@@ -2066,6 +2080,9 @@ GE_PARAMS_FIELD_ACCESSOR(GEMESABlurShaderFilterParams, width, MESA_BLUR_WIDTH, W
 GE_PARAMS_FIELD_ACCESSOR(GEMESABlurShaderFilterParams, height, MESA_BLUR_HEIGHT, HEIGHT);
 GE_PARAMS_FIELD_ACCESSOR(GEMESABlurShaderFilterParams, isDirection, MESA_BLUR_IS_DIRECTION, MESA_BLUR_IS_DIRECTION);
 GE_PARAMS_FIELD_ACCESSOR(GEMESABlurShaderFilterParams, angle, MESA_BLUR_ANGLE, MESA_BLUR_ANGLE);
+GE_PARAMS_FIELD_ACCESSOR(GEMotionBlurShaderFilterParams, radius, MOTION_BLUR_RADIUS, MotionBlur_Radius);
+GE_PARAMS_FIELD_ACCESSOR(GEMotionBlurShaderFilterParams, anchor, MOTION_BLUR_ANCHOR, MotionBlur_Anchor);
+GE_PARAMS_FIELD_ACCESSOR(GEMotionBlurShaderFilterParams, sampleCount, MOTION_BLUR_SAMPLE_COUNT, MotionBlur_SampleCount);
 GE_PARAMS_FIELD_ACCESSOR(
     GEParticleAblationFilterParams, progress_, PARTICLE_ABLATION_PROGRESS, ParticleAblation_Progress);
 GE_PARAMS_FIELD_ACCESSOR(
