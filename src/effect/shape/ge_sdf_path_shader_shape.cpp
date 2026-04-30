@@ -33,7 +33,7 @@ namespace Rosen {
 namespace Drawing {
 
 namespace {
-static constexpr float MIN_SCALE = 400.0f;
+static constexpr float MIN_SCALE = 200.0f;
 static constexpr size_t LINE = 2;
 static constexpr size_t QUADRATIC_BEZIER = 3;
 static constexpr size_t CUBIC_BEZIER = 4;
@@ -71,11 +71,14 @@ bool IntersectBBox(const Box4f& a, const Box4f& b)
 std::vector<Vector2f> ConvertPixelToNDC(const std::vector<Vector2f>& pixelPoints, float baseWidth = DEFAULT_BASE_WIDTH,
     float baseHeight = DEFAULT_BASE_HEIGHT)
 {
+    if (baseWidth < 1.0f || baseHeight < 1.0f) { // 1.0f is minimum pixel size
+        return {};
+    }
     std::vector<Vector2f> ndcPoints;
     ndcPoints.reserve(pixelPoints.size());
     for (const auto& p : pixelPoints) {
         float normalizedX = p[0] / baseWidth;
-        float normalizedY = p[1] / baseHeight;
+        float normalizedY = p[1] / baseHeight; // 1 is index of y in point
         float ndcX = (normalizedX * NDC_MULTIPLIER - NDC_OFFSET) * (baseWidth / baseHeight);
         float ndcY = normalizedY * NDC_MULTIPLIER - NDC_OFFSET;
         ndcPoints.emplace_back(ndcX, ndcY);
@@ -171,7 +174,7 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
 
     vec4 main(vec2 fragCoord) {
         vec2 uv = fragCoord / iResolution.xy;
-        
+
         float mask = u_maskTex.eval(fragCoord).r;
         float currentSdf = u_sdfTex.eval(fragCoord).r;
         if (mask < 1.0 || (abs(currentSdf - UNCOMPUTED) > EPSILON && currentSdf < INF)) {
@@ -183,11 +186,11 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
         minSdf = min(minSdf, sampleSdf(uv, vec2(-step, -step)));
         minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, -step)));
         minSdf = min(minSdf, sampleSdf(uv, vec2(step, -step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(-step,  0.0)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(step,  0.0)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(-step,  step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(0.0,  step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(step,  step)));
+        minSdf = min(minSdf, sampleSdf(uv, vec2(-step, 0.0)));
+        minSdf = min(minSdf, sampleSdf(uv, vec2(step, 0.0)));
+        minSdf = min(minSdf, sampleSdf(uv, vec2(-step, step)));
+        minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, step)));
+        minSdf = min(minSdf, sampleSdf(uv, vec2(step, step)));
 
         return vec4(minSdf < INF ? minSdf : UNCOMPUTED);
     }
@@ -216,7 +219,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     float cro(vec2 a, vec2 b) {
         return a.x * b.y - a.y * b.x;
     }
-    
+
     float dot2(vec2 v) {
         return dot(v, v);
     }
@@ -241,17 +244,17 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         for (int i = 0; i < MAX_CURVES_IN_GRID; i++) {
             int global_curve_idx = int(segmentIndex[i]);
             if (global_curve_idx < 0 || global_curve_idx >= curveCount) break;
-            
+
             int idx_A = global_curve_idx * 3;
             int idx_B = global_curve_idx * 3 + 1;
             int idx_C = global_curve_idx * 3 + 2;
-            
+
             vec2 A = getPoint(idx_A);
             vec2 B = getPoint(idx_B);
             vec2 C = getPoint(idx_C);
 
             float d = SdfControlSegment(p, A, B, C);
-            
+
             if (d < minDist) {
                 minDist = d;
                 outA = A;
@@ -262,7 +265,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         return minDist;
     }
 
-        float sdBezier(vec2 p, vec2 v0, vec2 v1, vec2 v2)
+    float sdBezier(vec2 p, vec2 v0, vec2 v1, vec2 v2)
     {
         vec2 i = v0 - v2;
         vec2 j = v2 - v1;
@@ -270,16 +273,16 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         vec2 w = j - k;
 
         v0 -= p; v1 -= p; v2 -= p;
-        
+
         float x = cro(v0, v2);
         float y = cro(v1, v0);
         float z = cro(v2, v1);
 
-        vec2 s = 2.0*(y*j + z*k) - x*i;
+        vec2 s = 2.0 * (y * j + z * k) - x * i;
 
-        float r = (y*z - x*x*0.25) / dot2(s);
-        float t = clamp((0.5*x + y + r*dot(s,w)) / (x + y + z), 0.0, 1.0);
-        vec2 d = v0 + t*(k + k + t*w);
+        float r = (y * z - x * x * 0.25) / dot2(s);
+        float t = clamp((0.5 * x + y + r * dot(s, w)) / (x + y + z), 0.0, 1.0);
+        vec2 d = v0 + t * (k + k + t * w);
 
         return length(d);
     }
@@ -288,7 +291,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         const float EPSILON = 1e-4;
         vec2 a = B - A;
         vec2 b = A - 2.0 * B + C;
-        
+
         // 如果三个点几乎在一条直线上，退化为线段距离
         if (dot(b, b) < EPSILON) {
             vec2 pa = pos - A;
@@ -305,33 +308,33 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         vec2 d = A - pos;
         float kk = 1.0 / dot(b, b);
         float kx = kk * dot(a, b);
-        float ky = kk * (2.0 * dot(a,a) + dot(d,b)) * ONE_THIRD;
+        float ky = kk * (2.0 * dot(a, a) + dot(d, b)) * ONE_THIRD;
         float kz = kk * dot(d, a);
         float res = 0.0;
-        float p = ky - kx*kx;
-        float q = kx * (2.0*kx*kx - 3.0*ky) + kz;
-        float h = q*q + 4.0*p*p*p;
+        float p = ky - kx * kx;
+        float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
+        float h = q * q + 4.0 * p * p * p;
 
         if (h >= 0.0) {
             h = sqrt(h);
             vec2 x = 0.5 * (vec2(h, -h) - q);
             vec2 uv = sign(x) * pow(abs(x), vec2(ONE_THIRD));
             float t = clamp(uv.x + uv.y - kx, 0.0, 1.0);
-            vec2 qv = d + (c + b*t)*t;
+            vec2 qv = d + (c + b * t) * t;
             res = dot(qv, qv);
         } else {
             float z = sqrt(-p);
-            float v = acos(q/(p*z*2.0)) * ONE_THIRD;
+            float v = acos(q / (p * z * 2.0)) * ONE_THIRD;
             float m = cos(v);
-            float n = sin(v)*SQRT3;
-            
-            float t1 = clamp((m+m)*z - kx, 0.0, 1.0);
-            float t2 = clamp((-n-m)*z - kx, 0.0, 1.0);
+            float n = sin(v) * SQRT3;
 
-            vec2 q1 = d + (c + b*t1)*t1;
-            float d1 = dot(q1,q1);
-            vec2 q2 = d + (c + b*t2)*t2;
-            float d2 = dot(q2,q2);
+            float t1 = clamp((m + m) * z - kx, 0.0, 1.0);
+            float t2 = clamp((-n - m) * z - kx, 0.0, 1.0);
+
+            vec2 q1 = d + (c + b * t1) * t1;
+            float d1 = dot(q1, q1);
+            vec2 q2 = d + (c + b * t2) * t2;
+            float d2 = dot(q2, q2);
 
             res = min(d1, d2);
         }
@@ -343,7 +346,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         vec2 B = vec2(0.0);
         vec2 C = vec2(0.0);
         float min_dist = FindClosestControlPolygon(p, A, B, C);
-        
+
         // if (length(A - B) < 1e-4) {
         //     return min_dist;
         // }
@@ -354,7 +357,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     }
 
     vec4 main(vec2 fragCoord) {
-        vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y; // 2 个 NDC 单位 = height 个像素 → 1 个 NDC 单位 = height / 2 个像素
+        vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
         float d = get_sdf_shape(uv);
         return vec4(vec3(iResolution.y * 1.2 * d), 1.0);
     }
@@ -371,13 +374,13 @@ static const std::string NORMAL_CALCULATION_SHADER = R"(
         float mask = pathShader.eval(fragCoord).r;
 
         // if (centerSdf < 1e-2 && mask < 1.0) {
-        if (centerSdf > 50. && mask < 1e-5) {
+        if (centerSdf > 50.0 && mask < 1e-5) {
             return vec4(0.0, 0.0, 0.0, centerSdf);
         }
 
         float L = u_seeds.eval(fragCoord + vec2(-1.0, 0.0)).r;
         float R = u_seeds.eval(fragCoord + vec2(1.0, 0.0)).r;
-        float T = u_seeds.eval(fragCoord + vec2(0.0,-1.0)).r;
+        float T = u_seeds.eval(fragCoord + vec2(0.0, -1.0)).r;
         float B = u_seeds.eval(fragCoord + vec2(0.0, 1.0)).r;
 
         vec2 normal = vec2(R - L, T - B) * 0.5;
@@ -543,8 +546,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
         return nullptr;
     }
 
-    auto maskShader =
-        ShaderEffect::CreateImageShader(*maskTex, TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
+    auto maskShader = ShaderEffect::CreateImageShader(*maskTex, TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
     builder->SetChild("u_maskTex", maskShader);
     builder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
 
@@ -627,6 +629,12 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenCanvas is invalid");
         return;
     }
+
+    Drawing::Brush clearBrush;
+    clearBrush.SetColor(TRANSPARENT_COLOR);
+    offscreenCanvas_->AttachBrush(clearBrush);
+    offscreenCanvas_->DrawRect(rect);
+    offscreenCanvas_->DetachBrush();
 }
 
 void GESDFPathShaderShape::AutoGridPartition(int width, int height, float maxThickness)
@@ -769,7 +777,7 @@ void GESDFPathShaderShape::ProcessFinalGrid(Grid& current, const std::vector<Box
     Grid processedGrid = current;
     std::vector<float> gridCurves;
     std::vector<float> inOrderSeg;
-    for (size_t i = 0; i < controlPoints_.size(); i += 2) {
+    for (size_t i = 0; i < controlPoints_.size(); i += 2) { // 2 is step
         gridCurves.push_back(controlPoints_[i]);
         gridCurves.push_back(controlPoints_[i + 1]);
     }
@@ -813,19 +821,20 @@ std::vector<Vector2f> GESDFPathShaderShape::ProcessCurveSegments(const std::vect
         if (segment.size() == LINE) {
             pixelControlPoints.push_back(segment[0]);
             pixelControlPoints.push_back(segment[0]);
-            pixelControlPoints.push_back(segment[1]);
+            pixelControlPoints.push_back(segment[1]); // 1 is index
             numCurves_++;
         } else if (segment.size() == QUADRATIC_BEZIER) {
             pixelControlPoints.push_back(segment[0]);
-            pixelControlPoints.push_back(segment[1]);
-            pixelControlPoints.push_back(segment[2]);
+            pixelControlPoints.push_back(segment[1]); // 1 is index
+            pixelControlPoints.push_back(segment[2]); // 2 is index of QUADRATIC BEZIER
             numCurves_++;
         } else if (segment.size() == CUBIC_BEZIER) {
-            Vector2f controlPoint = segment[1];
+            Vector2f controlPoint = segment[1]; // 1 is index
+            // 0, 2, 3 is index of CUBIC BEZIER
             cubicToQuadraticSingle(segment[0], controlPoint, segment[2], segment[3]);
             pixelControlPoints.push_back(segment[0]);
             pixelControlPoints.push_back(controlPoint);
-            pixelControlPoints.push_back(segment[2]);
+            pixelControlPoints.push_back(segment[2]); // 2 is index of CUBIC BEZIER
             numCurves_++;
         }
     }
@@ -848,7 +857,7 @@ void GESDFPathShaderShape::RenderGridsToSurface(const Drawing::Rect& targetRect)
         if (curvesInGrid_[i].first.size() > 0) {
             Box4f area = curvesInGrid_[i].second.bbox;
             const Drawing::Rect rectN(area[XMIN_I], area[YMIN_I], area[XMAX_I], area[YMAX_I]);
-    
+
             builder->SetUniform("controlPoints", curvesInGrid_[i].first.data(), curvesInGrid_[i].first.size());
             builder->SetUniform("segmentIndex", segmentIndex_[i].data(), segmentIndex_[i].size());
 
@@ -906,18 +915,17 @@ void GESDFPathShaderShape::cubicToQuadraticSingle(
     Vector2f q2 = p3;
 
     // Bezier curve coefficients for cubic to quadratic conversion
-    double c0 = 0.125, c1 = 0.375, c2 = 0.375, c3 = 0.125;
-    Vector2f midCubic = {
-        c0 * p0.x_ + c1 * p1.x_ + c2 * p2.x_ + c3 * p3.x_,
-        c0 * p0.y_ + c1 * p1.y_ + c2 * p2.y_ + c3 * p3.y_
-    };
+    const double c0 = 0.125;
+    const double c1 = 0.375;
+    const double c2 = 0.375;
+    const double c3 = 0.125;
+    Vector2f midCubic = { c0 * p0.x_ + c1 * p1.x_ + c2 * p2.x_ + c3 * p3.x_,
+        c0 * p0.y_ + c1 * p1.y_ + c2 * p2.y_ + c3 * p3.y_ };
 
     const float weightDouble = 2.0f;
     const float weightHalf = 0.5f;
-    Vector2f q1 = {
-        weightDouble * midCubic.x_ - weightHalf * q0.x_ - weightHalf * q2.x_,
-        weightDouble * midCubic.y_ - weightHalf * q0.y_ - weightHalf * q2.y_
-    };
+    Vector2f q1 = { weightDouble * midCubic.x_ - weightHalf * q0.x_ - weightHalf * q2.x_,
+        weightDouble * midCubic.y_ - weightHalf * q0.y_ - weightHalf * q2.y_ };
     p1 = q1;
 }
 
@@ -934,6 +942,9 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
     float width = rect.GetWidth() * scaleX;
     float height = rect.GetHeight() * scaleY;
     float maxDerivLen = std::max(width, height);
+    if (maxDerivLen < 1.0f) { // 1.0f is min pixel size
+        return;
+    }
     if (maxDerivLen < MIN_SCALE) {
         float temp = MIN_SCALE / maxDerivLen;
         scaleX *= temp;
@@ -950,7 +961,6 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
         LOGE("GESDFJFAShape::Preprocess: the paths is invalid.");
         return;
     }
-
     float width = 0.0f;
     float height = 0.0f;
     Drawing::Path path = PreparePathForRendering(rect, width, height);
@@ -985,17 +995,10 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
         return;
     }
 
-    Drawing::Brush clearBrush;
-    clearBrush.SetColor(TRANSPARENT_COLOR);
-    offscreenCanvas_->AttachBrush(clearBrush);
-    offscreenCanvas_->DrawRect(targetRect);
-    offscreenCanvas_->DetachBrush();
-
     RenderGridsToSurface(targetRect);
 
-    std::shared_ptr<Image> seedImage = offscreenSurface_->GetImageSnapshot();
-    std::shared_ptr<Image> propagatedSdf =
-        RunSDFPropagation(canvas, seedImage, pathImage, static_cast<int>(width), static_cast<int>(height));
+    std::shared_ptr<Image> propagatedSdf = RunSDFPropagation(canvas, offscreenSurface_->GetImageSnapshot(),
+        pathImage, static_cast<int>(width), static_cast<int>(height));
 
     disResult_ =
         ComputeDistanceField(canvas, propagatedSdf, static_cast<int>(width), static_cast<int>(height), pathImage);
@@ -1015,12 +1018,12 @@ std::shared_ptr<ShaderEffect> GESDFPathShaderShape::GenerateDrawingShader(float 
     auto inputImageInfo = disResult_->GetImageInfo();
     float inputHeight = inputImageInfo.GetHeight();
     float inputWidth = inputImageInfo.GetWidth();
+    // upScale to target resolution
     // check for division by zero
-    if (ROSEN_LE(inputWidth, 0.0f) || ROSEN_LE(inputHeight, 0.0f)) {
+    if (inputWidth < 1.0f || inputHeight < 1.0f) { // 1.0f is minimum pixel size
         LOGE("GESDFJFAShape::GenerateDrawingShader invalid input size");
         return nullptr;
     }
-    // upScale to target resolution
     float scaleX = width / inputWidth;
     float scaleY = height / inputHeight;
     LOGI("GESDFJFAShape::GenerateDrawingShader: inputWidth: %{public}f, inputHeight: %{public}f", inputWidth,
