@@ -188,7 +188,7 @@ ohos_source_set("graphics_effect_src") {
       "init:libbegetutil",
       "c_utils:utils",
     ]
-  } else if (!(current_os == "android" || current_os == "ios")) {
+  } else if (!is_arkui_x) {
     deps += [ ":mock_utils" ]
   }
 
@@ -249,7 +249,7 @@ if (is_arkui_x) {
 
 # utils {{{
 group("utils") {
-  if (current_os == "android" || current_os == "ios") {
+  if (is_arkui_x) {
     public_external_deps = [ "c_utils:utilsbase" ]
   }
 }
