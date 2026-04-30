@@ -70,6 +70,7 @@ namespace {
             return fragColor;
         }
     )";
+    Drawing::RuntimeEffectOptions g_highpUVOption{ .useHighpLocalCoords = true };
 }
 
 GESpatialPointLightShader::GESpatialPointLightShader() {}
@@ -92,7 +93,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
     if (shaderBuilder) {
         return shaderBuilder;
     }
-    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK);
+    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK, g_highpUVOption);
     if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderNoMask effect is nullptr.");
         return nullptr;
@@ -108,7 +109,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
     if (shaderBuilder) {
         return shaderBuilder;
     }
-    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK);
+    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK, g_highpUVOption);
     if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderWithMask effect is nullptr.");
         return nullptr;
