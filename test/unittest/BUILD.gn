@@ -58,6 +58,8 @@ ohos_source_set("graphics_effect_test_src") {
   ]
 
   sources = [
+    "${graphics_effect_root}/src/core/ge_effect_factory.cpp",
+    "${graphics_effect_root}/src/core/ge_factory_register.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_container.cpp",
     "${graphics_effect_root}/src/core/ge_visual_effect_impl.cpp",
@@ -190,6 +192,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_distortion_collapse_filter_test.cpp",
     "ge_double_ripple_shader_mask_test.cpp",
     "ge_edge_light_shader_filter_test.cpp",
+    "ge_effect_factory_test.cpp",
     "ge_filter_composer_test.cpp",
     "ge_frame_gradient_shader_mask_test.cpp",
     "ge_frosted_glass_blur_shader_filter_test.cpp",

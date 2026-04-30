@@ -20,6 +20,7 @@
 #include "effect/runtime_shader_builder.h"
 
 #include "ge_common.h"
+#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_visual_effect.h"
 
@@ -37,6 +38,8 @@ public:
     GESpatialGlassEffect(const GESpatialGlassEffect&&) = delete;
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&) = delete;
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&&) = delete;
+
+    DECLARE_GEFILTER_TYPEFUNC(GESpatialGlassEffect, Drawing::GESpatialGlassEffectParams);
 
     const std::string& GetDescription() const
     {

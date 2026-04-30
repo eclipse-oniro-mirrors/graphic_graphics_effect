@@ -166,6 +166,7 @@ public:
     }
 
     static void SetMesablurAllEnabledByCCM(bool flag);
+    static bool IsMesablurAllEnabled() { return isMesablurAllEnable_; }
 
 private:
     // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
@@ -225,35 +226,6 @@ private:
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(
         const Drawing::GEVisualEffectContainer& veContainer);
 
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderFilter(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderMESABlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderGradientBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderEdgeLight(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderDispersion(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasifyScaleTwist(
-        const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
- 
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasifyBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
- 
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderGasify(const std::shared_ptr<Drawing::GEVisualEffectImpl> &);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderParticleAblation(
-        const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderVariableRadiusBlur(
-        const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-        
-    std::shared_ptr<GEShaderFilter> GenerateShaderKawaseBlur(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlass(const std::shared_ptr<Drawing::GEVisualEffectImpl>&);
-
-    std::shared_ptr<GEShaderFilter> GenerateExtShaderFrostedGlassBlur(
-        const std::shared_ptr<Drawing::GEVisualEffectImpl> &ve);
     static bool isMesablurAllEnable_;
 
     bool isNeedExpansionFilter_ = false;

@@ -17,6 +17,7 @@
 
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
+#include "core/ge_filter_type_info.h"
 
 
 namespace OHOS {
@@ -25,6 +26,7 @@ namespace Drawing {
 
 class GE_EXPORT GESDFUnionOpShaderShape : public GESDFShaderShape {
 public:
+    DECLARE_GEFILTER_TYPEFUNC(GESDFUnionOpShaderShape, Drawing::GESDFUnionOpShapeParams);
     GESDFUnionOpShaderShape(const GESDFUnionOpShapeParams& param) : params_(param) {}
     GESDFUnionOpShaderShape(const GESDFUnionOpShaderShape&) = delete;
     virtual ~GESDFUnionOpShaderShape() = default;
