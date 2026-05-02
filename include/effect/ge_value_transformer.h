@@ -109,14 +109,6 @@ struct SDFUnionOpTransformer {
     }
 };
 
-struct DistortionCollapsePairToVector4fTransformer {
-    static bool Transform(const std::pair<float, float>& value, Vector4f& out)
-    {
-        out = Vector4f(value.first, value.first, value.second, value.second);
-        return true;
-    }
-};
-
 struct SharedPtrImageToWeakTransformer {
     static bool Transform(const std::shared_ptr<Drawing::Image>& value, std::weak_ptr<Drawing::Image>& out)
     {

@@ -16,9 +16,17 @@
 struct [[ge::params(type=SDF_DISTORT_OP_SHAPE, name="SDFDistortOpShape")]] GESDFDistortOpShapeParams {
     [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<GESDFShaderShape> shape;
+    [[ge::prop(cast_from="std::pair<float, float>",
+               custom="PairToPointTransformer")]]
     Drawing::Point LUCorner;
+    [[ge::prop(cast_from="std::pair<float, float>",
+               custom="PairToPointTransformer")]]
     Drawing::Point RUCorner;
+    [[ge::prop(cast_from="std::pair<float, float>",
+               custom="PairToPointTransformer")]]
     Drawing::Point RBCorner;
+    [[ge::prop(cast_from="std::pair<float, float>",
+               custom="PairToPointTransformer")]]
     Drawing::Point LBCorner;
     Vector4f barrelDistortion = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };

@@ -30,8 +30,5 @@ struct [[ge::params(type=DISTORTION_COLLAPSE, name="DistortionCollapse")]] GEDis
                cast_from="std::pair<float, float>",
                custom="PairToPointTransformer")]]
     Drawing::Point LBCorner_;
-    [[ge::prop(name="DistortionCollapse_BarrelDistortion",
-               cast_from="std::pair<float, float>",
-               custom="DistortionCollapsePairToVector4fTransformer")]]
     Vector4f barrelDistortion_ = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };

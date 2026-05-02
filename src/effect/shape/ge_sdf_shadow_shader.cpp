@@ -107,7 +107,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(width, height);
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
+        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFShadowShader: failed generate GESDFShadowShader.");
         return nullptr;
@@ -202,7 +203,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowSha
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(width, height);
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
+        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFShadowShader::MakeElevationShadowShader failed generate SDF shader.");
         return nullptr;
