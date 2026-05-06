@@ -114,7 +114,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeSdfPropShaderBuilder();
 
 
-    std::shared_ptr<Image> disResult_;
+    std::shared_ptr<Image> disResult_ = nullptr;
 
     GESDFPathShapeParams params_ {};
     int numPasses_ = 6;

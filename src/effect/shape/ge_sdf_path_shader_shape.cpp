@@ -54,8 +54,6 @@ constexpr int TOTAL_FLOATS_MULTIPLIER = 2;
 constexpr int MAX_INDEX_COUNT = 16;
 constexpr float INVALID_INDEX_MARKER = -1.0f;
 constexpr float INVALID_POINT_MARKER = -2.0f;
-constexpr float DEFAULT_SCALE_X = 0.25f;
-constexpr float DEFAULT_SCALE_Y = 0.25f;
 constexpr float MIN_SCALE_CLAMP = 0.001f;
 constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate conversion
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
@@ -599,16 +597,10 @@ std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
     normalBuilder->SetChild("pathShader", pathShader);
     normalBuilder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
 #ifdef RS_ENABLE_GPU
-    auto output = normalBuilder->MakeImage(gpuContext.get(), nullptr, inputImageInfo, false);
+    return normalBuilder->MakeImage(gpuContext.get(), nullptr, inputImageInfo, false);
 #else
-    auto output = normalBuilder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
+    return normalBuilder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
-    if (output) {
-        LOGI("GESDFPathShaderShape::ComputeDistanceField MakeNormalImage Succ");
-    } else {
-        LOGE("GESDFPathShaderShape::ComputeDistanceField MakeNormalImage Fail");
-    }
-    return output;
 }
 
 void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect)
@@ -798,7 +790,7 @@ void GESDFPathShaderShape::ProcessFinalGrid(Grid& current, const std::vector<Box
 Drawing::Path GESDFPathShaderShape::PreparePathForRendering(const Drawing::Rect& rect, float& width, float& height)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::PreparePathForRendering");
-    Vector2f scale(DEFAULT_SCALE_X, DEFAULT_SCALE_Y);
+    Vector2f scale = params_.scale;
     UpdateScale(scale, rect);
     width = rect.GetWidth() * scale.x_;
     height = rect.GetHeight() * scale.y_;
@@ -943,6 +935,7 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
     float height = rect.GetHeight() * scaleY;
     float maxDerivLen = std::max(width, height);
     if (maxDerivLen < 1.0f) { // 1.0f is min pixel size
+        scale = Vector2f(1.0, 1.0); // 1.0: keep original size
         return;
     }
     if (maxDerivLen < MIN_SCALE) {
@@ -1003,7 +996,7 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     disResult_ =
         ComputeDistanceField(canvas, propagatedSdf, static_cast<int>(width), static_cast<int>(height), pathImage);
     if (!disResult_) {
-        LOGE("GESDFPathShaderShape::PrePass ComputeDistanceField failed");
+        LOGE("GESDFPathShaderShape::Preprocess ComputeDistanceField failed");
         return;
     }
 }

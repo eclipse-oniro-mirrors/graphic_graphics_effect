@@ -212,6 +212,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_image_shader_mask_test.cpp",
     "ge_render_test.cpp",
     "ge_ripple_shader_mask_test.cpp",
+    "ge_sdf_path_shader_shape_test.cpp",
     "ge_sdf_pixelmap_shader_shape_test.cpp",
     "ge_sdf_clip_shader_test.cpp",
     "ge_sdf_empty_shader_shape_test.cpp",
