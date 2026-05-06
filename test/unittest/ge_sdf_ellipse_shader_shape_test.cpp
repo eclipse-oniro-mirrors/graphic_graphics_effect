@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "ge_sdf_ellipse_shader_shape.h"
 
 using namespace testing;
@@ -46,7 +47,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShader_001, TestSize.Level1
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateDrawingShader_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(300.0f, 300.0f);
@@ -56,7 +58,7 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShader_001, TestSize.Level1
 
 /**
  * @tc.name: GenerateDrawingShader_002
- * @tc.desc: Verify GenerateDrawingShader returns null for invalid radius
+ * @tc.desc: Verify GenerateDrawingShader returns null for invalid size
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShader_002, TestSize.Level1)
@@ -64,7 +66,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShader_002, TestSize.Level1
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateDrawingShader_002 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(0.0f, 40.0f);
+    param.width = 0.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(300.0f, 300.0f);
@@ -82,7 +85,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSi
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateDrawingShaderHasNormal_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(300.0f, 300.0f);
@@ -92,7 +96,7 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSi
 
 /**
  * @tc.name: GenerateDrawingShaderHasNormal_002
- * @tc.desc: Verify GenerateDrawingShaderHasNormal returns null for invalid radius
+ * @tc.desc: Verify GenerateDrawingShaderHasNormal returns null for invalid size
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShaderHasNormal_002, TestSize.Level1)
@@ -100,7 +104,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateDrawingShaderHasNormal_002, TestSi
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateDrawingShaderHasNormal_002 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, -1.0f);
+    param.width = 60.0f;
+    param.height = -1.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(300.0f, 300.0f);
@@ -118,7 +123,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GetSDFShapeType_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetSDFShapeType_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     EXPECT_EQ(shape.GetSDFShapeType(), GESDFShapeType::ELLIPSE);
@@ -137,7 +143,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GetCenter_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetCenter_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     const auto& center = shape.GetCenter();
@@ -147,22 +154,24 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GetCenter_001, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetRadius_001
- * @tc.desc: Verify GetRadius returns correct value
+ * @tc.name: GetSize_001
+ * @tc.desc: Verify GetWidth and GetHeight return correct values
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFEllipseShaderShapeTest, GetRadius_001, TestSize.Level1)
+HWTEST_F(GESDFEllipseShaderShapeTest, GetSize_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetRadius_001 start";
+    GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetSize_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
-    const auto& radius = shape.GetRadius();
-    EXPECT_EQ(radius.x_, 60.0f);
-    EXPECT_EQ(radius.y_, 40.0f);
-    GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetRadius_001 end";
+    float width = shape.GetWidth();
+    float height = shape.GetHeight();
+    EXPECT_EQ(width, 60.0f);
+    EXPECT_EQ(height, 40.0f);
+    GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetSize_001 end";
 }
 
 /**
@@ -175,11 +184,13 @@ HWTEST_F(GESDFEllipseShaderShapeTest, CopyState_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest CopyState_001 start";
     GESDFEllipseShapeParams param1;
     param1.center = Vector2f(100.0f, 120.0f);
-    param1.radius = Vector2f(60.0f, 40.0f);
+    param1.width = 60.0f;
+    param1.height = 40.0f;
 
     GESDFEllipseShapeParams param2;
     param2.center = Vector2f(50.0f, 70.0f);
-    param2.radius = Vector2f(20.0f, 30.0f);
+    param2.width = 20.0f;
+    param2.height = 30.0f;
 
     GESDFEllipseShaderShape shape1(param1);
     GESDFEllipseShaderShape shape2(param2);
@@ -187,8 +198,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, CopyState_001, TestSize.Level1)
 
     EXPECT_EQ(shape1.GetCenter().x_, 50.0f);
     EXPECT_EQ(shape1.GetCenter().y_, 70.0f);
-    EXPECT_EQ(shape1.GetRadius().x_, 20.0f);
-    EXPECT_EQ(shape1.GetRadius().y_, 30.0f);
+    EXPECT_EQ(shape1.GetWidth(), 20.0f);
+    EXPECT_EQ(shape1.GetHeight(), 30.0f);
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest CopyState_001 end";
 }
 
@@ -202,7 +213,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GetSDFEllipseShaderShapeBuilder_001, TestS
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetSDFEllipseShaderShapeBuilder_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto builder = shape.GetSDFEllipseShaderShapeBuilder();
@@ -221,7 +233,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GetSDFEllipseNormalShapeBuilder_001, TestS
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GetSDFEllipseNormalShapeBuilder_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto builder = shape.GetSDFEllipseNormalShapeBuilder();
@@ -240,7 +253,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateShaderEffect_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateShaderEffect_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto builder = shape.GetSDFEllipseShaderShapeBuilder();
@@ -259,7 +273,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, GenerateShaderEffect_002, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest GenerateShaderEffect_002 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     auto shader = shape.GenerateShaderEffect(nullptr);
@@ -277,7 +292,8 @@ HWTEST_F(GESDFEllipseShaderShapeTest, TryGetCenter_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFEllipseShaderShapeTest TryGetCenter_001 start";
     GESDFEllipseShapeParams param;
     param.center = Vector2f(100.0f, 120.0f);
-    param.radius = Vector2f(60.0f, 40.0f);
+    param.width = 60.0f;
+    param.height = 40.0f;
 
     GESDFEllipseShaderShape shape(param);
     float x = 0.0f;

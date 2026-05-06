@@ -45,9 +45,14 @@ public:
         return params_.center;
     }
 
-    const Vector2f& GetRadius() const
+    const float& GetWidth() const
     {
-        return params_.radius;
+        return params_.width;
+    }
+
+    const float& GetHeight() const
+    {
+        return params_.height;
     }
 
     void CopyState(const GESDFEllipseShaderShape& shape)
@@ -66,7 +71,7 @@ private:
     std::shared_ptr<ShaderEffect> GenerateShaderEffect(std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
     GESDFEllipseShapeParams params_ {};
 };
-} // Drawing
+} // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
 

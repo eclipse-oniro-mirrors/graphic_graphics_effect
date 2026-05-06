@@ -7,7 +7,8 @@ Implementation at [src/effect/shape/ge_sdf_ellipse_shader_shape.cpp](../../src/e
 The ellipse shape is defined by two uniforms:
 
 - `centerPos`: ellipse center in fragment coordinates
-- `radius`: x/y radii in pixels
+- `width`: ellipse width in pixels
+- `height`: ellipse height in pixels
 
 For each fragment, the shader first moves into ellipse-local space:
 
@@ -15,9 +16,9 @@ For each fragment, the shader first moves into ellipse-local space:
 vec2 p = fragCoord - centerPos;
 ```
 
-The valid input requirement is that both radius components are positive. The
-CPU side rejects a radius smaller than `MIN_SIZE`, and the shader still clamps
-with `EPS` to avoid division by zero in generated GPU code.
+The valid input requirement is that both `width` and `height` are positive. The
+CPU side rejects a size smaller than `MIN_SIZE`, and the shader still clamps the
+derived half-size with `EPS` to avoid division by zero in generated GPU code.
 
 ## Distance Formula
 
@@ -149,8 +150,8 @@ tangent direction differs strongly from the true closest-point direction.
 
 Typical risk cases:
 
-- `radius.x` much larger than `radius.y`
-- `radius.y` much larger than `radius.x`
+- `width` much larger than `height`
+- `height` much larger than `width`
 - fragments far away along the high-curvature side of the ellipse
 
 Those cases can change far-field falloff, but they should not affect the most
@@ -168,4 +169,3 @@ The normal variant adds one gradient evaluation, one normalization, and the
 packed direction encode. There is no iterative closest-point solve, which keeps
 the implementation cheap and predictable for effects that evaluate the SDF over
 large render targets.
-

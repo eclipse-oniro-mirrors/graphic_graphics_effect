@@ -27,19 +27,20 @@ constexpr float MIN_SIZE = 0.0001f;
 
 static constexpr char SDF_GRAD_PROG[] = R"(
     uniform vec2 centerPos;
-    uniform vec2 radius;
+    uniform float width;
+    uniform float height;
 
     const float EPS = 1e-6;
     const float N_SCALE = 2048.0;
 
-    float sdEllipse(vec2 p, vec2 r)
+    float sdEllipse(vec2 p, vec2 halfSize)
     {
-        vec2 safeR = max(r, vec2(EPS));
-        vec2 invR = p / safeR;
-        vec2 invR2 = p / max(safeR * safeR, vec2(EPS));
+        vec2 safeHalfSize = max(halfSize, vec2(EPS));
+        vec2 invR = p / safeHalfSize;
+        vec2 invR2 = p / max(safeHalfSize * safeHalfSize, vec2(EPS));
         float k0 = length(invR);
         if (k0 < EPS) {
-            return -min(safeR.x, safeR.y);
+            return -min(safeHalfSize.x, safeHalfSize.y);
         }
         float k1 = max(length(invR2), EPS);
         return k0 * (k0 - 1.0) / k1;
@@ -50,15 +51,15 @@ static constexpr char SDF_GRAD_PROG[] = R"(
         return v / max(length(v), EPS);
     }
 
-    vec2 ellipseGrad(vec2 p, vec2 r)
+    vec2 ellipseGrad(vec2 p, vec2 halfSize)
     {
-        vec2 safeR = max(r, vec2(EPS));
-        vec2 scaled = p / safeR;
+        vec2 safeHalfSize = max(halfSize, vec2(EPS));
+        vec2 scaled = p / safeHalfSize;
         float scaledLen = length(scaled);
         if (scaledLen < EPS) {
             return vec2(0.0, -1.0);
         }
-        return safeNorm(p / max(safeR * safeR * scaledLen, vec2(EPS)));
+        return safeNorm(p / max(safeHalfSize * safeHalfSize * scaledLen, vec2(EPS)));
     }
 
     float EncodeDir(vec2 dir)
@@ -70,9 +71,10 @@ static constexpr char SDF_GRAD_PROG[] = R"(
 
     vec4 main(float2 fragCoord)
     {
+        vec2 halfSize = vec2(width, height) * 0.5;
         vec2 posFromCenter = fragCoord - centerPos;
-        float sdf = sdEllipse(posFromCenter, radius);
-        vec2 grad = ellipseGrad(posFromCenter, radius);
+        float sdf = sdEllipse(posFromCenter, halfSize);
+        vec2 grad = ellipseGrad(posFromCenter, halfSize);
         float packedDir = EncodeDir(posFromCenter);
         return vec4(grad, packedDir, sdf);
     }
@@ -89,11 +91,9 @@ std::shared_ptr<ShaderEffect> GESDFEllipseShaderShape::GenerateDrawingShader(flo
     return GenerateShaderEffect(builder);
 }
 
-std::shared_ptr<ShaderEffect> GESDFEllipseShaderShape::GenerateDrawingShaderHasNormal(
-    float width, float height) const
+std::shared_ptr<ShaderEffect> GESDFEllipseShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
-    GE_TRACE_NAME_FMT("GESDFEllipseShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g",
-        width, height);
+    GE_TRACE_NAME_FMT("GESDFEllipseShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFEllipseNormalShapeBuilder();
     if (!builder) {
         LOGE("GESDFEllipseShaderShape::GenerateDrawingShaderHasNormal has builder error");
@@ -111,18 +111,19 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEllipseShaderShape::GetSDFEl
 
     static constexpr char prog[] = R"(
         uniform vec2 centerPos;
-        uniform vec2 radius;
+        uniform float width;
+        uniform float height;
 
         const float EPS = 1e-6;
 
-        float sdEllipse(vec2 p, vec2 r)
+        float sdEllipse(vec2 p, vec2 halfSize)
         {
-            vec2 safeR = max(r, vec2(EPS));
-            vec2 invR = p / safeR;
-            vec2 invR2 = p / max(safeR * safeR, vec2(EPS));
+            vec2 safeHalfSize = max(halfSize, vec2(EPS));
+            vec2 invR = p / safeHalfSize;
+            vec2 invR2 = p / max(safeHalfSize * safeHalfSize, vec2(EPS));
             float k0 = length(invR);
             if (k0 < EPS) {
-                return -min(safeR.x, safeR.y);
+                return -min(safeHalfSize.x, safeHalfSize.y);
             }
             float k1 = max(length(invR2), EPS);
             return k0 * (k0 - 1.0) / k1;
@@ -130,7 +131,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEllipseShaderShape::GetSDFEl
 
         half4 main(vec2 fragCoord)
         {
-            float sdf = sdEllipse(fragCoord - centerPos, radius);
+            vec2 halfSize = vec2(width, height) * 0.5;
+            float sdf = sdEllipse(fragCoord - centerPos, halfSize);
             return half4(0, 0, 0, sdf);
         }
     )";
@@ -170,13 +172,14 @@ std::shared_ptr<ShaderEffect> GESDFEllipseShaderShape::GenerateShaderEffect(
         LOGE("GESDFEllipseShaderShape::GenerateShaderEffect builder error");
         return nullptr;
     }
-    if (params_.radius.x_ < MIN_SIZE || params_.radius.y_ < MIN_SIZE) {
-        LOGE("GESDFEllipseShaderShape::GenerateShaderEffect invalid radius");
+    if (params_.width < MIN_SIZE || params_.height < MIN_SIZE) {
+        LOGE("GESDFEllipseShaderShape::GenerateShaderEffect invalid size");
         return nullptr;
     }
 
     builder->SetUniform("centerPos", params_.center.x_, params_.center.y_);
-    builder->SetUniform("radius", params_.radius.x_, params_.radius.y_);
+    builder->SetUniform("width", params_.width);
+    builder->SetUniform("height", params_.height);
 
     auto sdfEllipseShapeShader = builder->MakeShader(nullptr, false);
     if (!sdfEllipseShapeShader) {
@@ -191,6 +194,6 @@ bool GESDFEllipseShaderShape::TryGetCenter(float& outX, float& outY) const
     outY = params_.center.y_;
     return true;
 }
-} // Drawing
+} // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

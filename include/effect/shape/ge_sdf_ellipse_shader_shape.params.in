@@ -16,6 +16,6 @@
 struct [[ge::params(type=SDF_ELLIPSE_SHAPE, name="SDFEllipseShape")]] GESDFEllipseShapeParams {
     [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f center = Vector2f(0.0f, 0.0f);
-    [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
-    Vector2f radius = Vector2f(0.0f, 0.0f);
+    float width = 0.0f;
+    float height = 0.0f;
 };
