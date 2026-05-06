@@ -40,6 +40,8 @@ public:
 
     void SetDisplayHeadroom(float headroom);
 
+    void SetDisableFilterCache(bool disableFilterCache);
+
     void RemoveFilterWithType(int32_t typeToRemove);
 
     void UpdateCachedBlurImage(Drawing::Canvas* canvas, std::shared_ptr<Drawing::Image> cachedImage,

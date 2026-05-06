@@ -112,6 +112,8 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/filter/ge_magnifier_shader_filter.cpp",
     "src/effect/filter/ge_mask_transition_shader_filter.cpp",
     "src/effect/filter/ge_mesa_blur_shader_filter.cpp",
+    "src/effect/filter/ge_motion_blur_shader_filter.cpp",
+    "src/effect/filter/ge_blur_shader_filter.cpp",
     "src/effect/filter/ge_sound_wave_filter.cpp",
     "src/effect/filter/ge_sdf_edge_light.cpp",
     "src/effect/filter/ge_sdf_from_image_filter.cpp",
@@ -191,7 +193,7 @@ ohos_source_set("graphics_effect_src") {
       "init:libbegetutil",
       "c_utils:utils",
     ]
-  } else if (!(current_os == "android" || current_os == "ios")) {
+  } else if (!is_arkui_x) {
     deps += [ ":mock_utils" ]
   }
 
@@ -252,7 +254,7 @@ if (is_arkui_x) {
 
 # utils {{{
 group("utils") {
-  if (current_os == "android" || current_os == "ios") {
+  if (is_arkui_x) {
     public_external_deps = [ "c_utils:utilsbase" ]
   }
 }

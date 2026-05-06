@@ -247,6 +247,8 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(DistortionCollapseParams, GEDistortionCollapseFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(ParticleAblationFilterParams, GEParticleAblationFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(SpatialGlassEffectParams, GESpatialGlassEffectParams)
+    GE_DECLARE_MAKE_GET_PARAMS(MotionBlurParams, GEMotionBlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(BlurShaderParams, GEBlurShaderFilterParams)
 #undef GE_DECLARE_MAKE_GET_PARAMS
 
     // ========================================================================
