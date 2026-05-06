@@ -34,7 +34,7 @@ class GE_EXPORT $CLASS_NAME : public GEShaderMask {
 public:
     $CLASS_NAME(const $PARAMS_CLASS& params);
     $CLASS_NAME(const $CLASS_NAME&) = delete;
-    $CLASS_NAME operator=(const $CLASS_NAME&) = delete;
+    $CLASS_NAME& operator=(const $CLASS_NAME&) = delete;
     $CLASS_NAME($CLASS_NAME&&) = delete;
     $CLASS_NAME& operator=($CLASS_NAME&&) = delete;
     ~$CLASS_NAME() override = default;
@@ -53,11 +53,9 @@ public:
     // virtual bool GetUseEffect() const override;
 
 private:
-    // Helper method to get/create shader builder
-    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder() const;
-    // static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder() const;
-
-$MEMBER_DECLARATIONS
+    // Helper methods to get/create shader builder
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder() const;
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder() const;
 };
 
 } // namespace Drawing

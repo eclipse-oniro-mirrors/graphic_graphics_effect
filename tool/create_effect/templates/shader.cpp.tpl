@@ -41,12 +41,7 @@ inline static const std::string g_shaderString$CLASS_NAME = R"(
     }
 )";
 
-$CLASS_NAME::$CLASS_NAME( )
-{
-}
-
 $CLASS_NAME::$CLASS_NAME(const Drawing::$PARAMS_CLASS& params)
-$INITIALIZATION_LIST
 {
 }
 

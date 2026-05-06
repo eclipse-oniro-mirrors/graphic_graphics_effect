@@ -9,13 +9,15 @@ Scaffold CLI for creating new visual effects in Graphics Effect (GE) library. Ge
 ## TL;DR
 
 ```bash
-python tool/create_effect/create_effect.py <name> <type>
-```
+python tool/create_effect/create_effect.py <name> <type> [--no-enum]
 
 **Types**: `filter` | `mask` | `shader` | `shape`
 
+**Options**:
+- `--no-enum`: Disable automatic enum addition (useful for testing without modifying ge_filter_type.h)
+
 **Post-scaffold steps**:
-1. Add enum to `include/core/ge_filter_type.h`
+1. ~~Add enum to `include/core/ge_filter_type.h`~~ **Auto-added** (if fails, manual required)
 2. Implement render logic
 3. Run `python tool/generate_metadata/gen_metadata.py` and `python tool/generate_metadata/gen_effect_header.py`
 
@@ -70,8 +72,8 @@ struct [[ge::params(type=MY_BLUR, name="MyBlur")]] GEMyBlurShaderFilterParams {
 # 1. Scaffold
 python tool/create_effect/create_effect.py my_blur filter
 
-# 2. Add enum (manual)
-# Edit include/core/ge_filter_type.h → add MY_BLUR
+# 2. Enum auto-added to ge_filter_type.h (or manually if failed)
+#    Check console output for "Added enum" or "Manual action required"
 
 # 3. Implement shader logic (manual)
 # Edit src/effect/filter/ge_my_blur_shader_filter.cpp
@@ -159,8 +161,6 @@ Templates in `tool/templates/` use Python `string.Template`:
 | `$HEADER_GUARD` | Header guard macro |
 | `$CLASS_NAME` | Generated class name |
 | `$PARAMS_CLASS` | Parameter class name |
-| `$MEMBER_DECLARATIONS` | Member variable declarations |
-| `$INITIALIZATION_LIST` | Constructor init list |
 
 To modify scaffolds, edit template files:
 - `*.h.tpl` - Class declarations

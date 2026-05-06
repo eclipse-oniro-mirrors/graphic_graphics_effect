@@ -42,8 +42,8 @@ inline static const std::string g_shaderString$CLASS_NAME = R"(
 )";
 
 $CLASS_NAME::$CLASS_NAME(const $PARAMS_CLASS& params)
-$INITIALIZATION_LIST
 {
+    // TODO: Initialize members from params if needed
 }
 
 std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShader(float width, float height) const
@@ -109,24 +109,29 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder() const
     return std::make_shared<Drawing::RuntimeShaderBuilder>(s_effect);
 }
 
-// Optional: Separate builder for normal shader (if different from standard shader)
-// std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() const
-// {
-//     static const std::string g_normalShaderString = R"(
-//         // Normal-specific shader code
-//     )";
-//
-//     static const std::shared_ptr<Drawing::RuntimeEffect> g_effect =
-//         Drawing::RuntimeEffect::CreateForShader(g_normalShaderString);
-//
-//     if (g_effect == nullptr) {
-//         LOGE("$CLASS_NAME::GetNormalShaderBuilder effect error");
-//         return nullptr;
-//     }
-//
-//     return std::make_shared<Drawing::RuntimeShaderBuilder>(g_effect);
-// }
+std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() const
+{
+    // For simple masks, normal shader can be same as standard shader
+    // Uncomment below if you need a different normal shader:
+    // static const std::string g_normalShaderString = R"(
+    //     uniform vec2 iResolution;
+    //     half4 main(vec2 fragCoord) {
+    //         // TODO: Implement normal-specific shader logic
+    //         return half4(1.0);
+    //     }
+    // )";
+    // static const std::shared_ptr<Drawing::RuntimeEffect> g_effect =
+    //     Drawing::RuntimeEffect::CreateForShader(g_normalShaderString);
+    // if (g_effect == nullptr) {
+    //     LOGE("$CLASS_NAME::GetNormalShaderBuilder effect error");
+    //     return nullptr;
+    // }
+    // return std::make_shared<Drawing::RuntimeShaderBuilder>(g_effect);
+
+    // Default: use same shader builder as standard shader
+    return GetShaderBuilder();
+}
 
 } // namespace Drawing
 } // namespace Rosen
-} // // namespace OHOS
+} // namespace OHOS

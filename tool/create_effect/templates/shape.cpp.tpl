@@ -87,8 +87,8 @@ inline static const std::string g_shaderString$CLASS_NAME = R"(
 )";
 
 $CLASS_NAME::$CLASS_NAME(const $PARAMS_CLASS& params)
-$INITIALIZATION_LIST
 {
+    // TODO: Store params in member variables if needed
 }
 
 std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShader(float width, float height) const
@@ -117,9 +117,9 @@ std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShaderHasNormal(float 
     return GenerateShaderEffect(builder);
 }
 
-std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder() const
+std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder()
 {
-    static const std::shared_ptr<Drawing::RuntimeShader> s_effect =
+    static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
         Drawing::RuntimeEffect::CreateForShader(g_shaderString$CLASS_NAME);
 
     if (!s_effect) {
@@ -130,9 +130,9 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder() const
     return std::make_shared<Drawing::RuntimeShaderBuilder>(s_effect);
 }
 
-std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() const
+std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder()
 {
-    static const std::shared_ptr<Drawing::RuntimeShader> s_effect =
+    static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
         Drawing::RuntimeEffect::CreateForShader(g_sdfGradProg$CLASS_NAME);
 
     if (!s_effect) {
@@ -144,7 +144,7 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() cons
 }
 
 std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateShaderEffect(
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> builder)
 {
     if (!builder) {
         LOGE("$CLASS_NAME::GenerateShaderEffect builder error");
