@@ -50,7 +50,7 @@ int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featur
     GE_LOGI("GEFrostedGlassEffectCfg start");
     xmlNode *currNode = &node;
     for (; currNode; currNode = currNode->next) {
-        if (ExtractPropertyValue("name", node) != "FrostedGlassEffectCfg") {
+        if (ExtractPropertyValue("name", *currNode) != "FrostedGlassEffectCfg") {
             break;
         }
     }
