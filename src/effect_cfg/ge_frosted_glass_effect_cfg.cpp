@@ -42,7 +42,7 @@ bool GEFrostedGlassEffectCfg::FeatureParamParseEntry()
         GE_LOGE("GEFrostedGlassEffectCfg failed to load xml configuration file");
         return false;
     }
-    return ParseSysDoc() != GE_PARSE_EXEC_SUCCESS && ParseProdDoc() != GE_PARSE_EXEC_SUCCESS;
+    return ParseSysDoc() == GE_PARSE_EXEC_SUCCESS && ParseProdDoc() == GE_PARSE_EXEC_SUCCESS;
 }
 
 int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featureMap, xmlNode &node)
