@@ -36,6 +36,13 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFShader::GetEffect()
     return nullptr;
 }
 
+void GEBorderSDFShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, false);
+    }
+}
+
 void GEBorderSDFShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
 {
     // 1. Validate param

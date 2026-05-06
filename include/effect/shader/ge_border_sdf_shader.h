@@ -36,6 +36,8 @@ public:
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
+protected:
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 private:
     Drawing::GEBorderSDFShaderParams params_;
     inline static const std::string borderShaderCode_ = R"(
