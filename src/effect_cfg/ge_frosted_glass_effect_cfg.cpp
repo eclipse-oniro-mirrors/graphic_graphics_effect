@@ -83,7 +83,7 @@ int32_t GEFrostedGlassEffectCfg::ParseFrostedGlassInternal(xmlNode &node)
 
     if (xmlParamType == GE_PARSE_XML_FEATURE_SWITCH) {
         bool isEnabled = ParseFeatureSwitch(val);
-        if (name == "EnableAntiAliasCode") {
+        if (name == "DisableAntiAliasCode") {
             SetDisableAntiAliasCode(isEnabled);
             GE_LOGI("GEFrostedGlassEffectCfg parse FrostedGlassEnabled %{public}d",
                 GetIsDisableAntiAliasCode());
