@@ -86,7 +86,6 @@ int32_t GEXmlParserBase::ParseSysDoc()
         return GE_PARSE_GET_ROOT_FAIL;
     }
 
-    GEFeatureParamMapType featureMap;
     return ParseInternal(*root) ? GE_PARSE_EXEC_SUCCESS : GE_PARSE_INTERNAL_FAIL;
 }
 
@@ -103,7 +102,6 @@ int32_t GEXmlParserBase::ParseProdDoc()
         return GE_PARSE_GET_ROOT_FAIL;
     }
 
-    GEFeatureParamMapType featureMap;
     return ParseInternal(*root) ? GE_PARSE_EXEC_SUCCESS : GE_PARSE_INTERNAL_FAIL;
 }
 
