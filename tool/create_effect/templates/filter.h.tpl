@@ -20,13 +20,17 @@
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
-// Additional includes for complex filters:
+#include "draw/canvas.h"
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+#include "image/image.h"
+
+// Optional includes for specific filters:
 // #include <memory>
 // #include <vector>
-// #include "draw/canvas.h"
 // #include "effect/color_filter.h"
-// #include "image/image.h"
 // #include "utils/matrix.h"
+// #include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {

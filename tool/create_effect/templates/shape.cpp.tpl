@@ -29,66 +29,24 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// SDF shader code with gradient support (for GenerateDrawingShaderHasNormal)
-inline static const std::string g_sdfGradProg$CLASS_NAME = R"(
-    uniform vec2 centerPos;
-    uniform vec2 halfSize;
-    uniform float radius;
-
-    const float N_EPS = 1e-6;
-    const float N_SCALE = 2048.0;
-
-    vec2 safeNorm(vec2 v)
-    {
-        return v / max(length(v), N_EPS);
-    }
-
-    vec3 sdgShape(vec2 p, vec2 b, float r)
-    {
-        // TODO: Implement your SDF shape function with gradient
-        // Return vec3(distance, gradientX, gradientY)
-        return vec3(0.0);
-    }
-
-    float EncodeDir(vec2 dir)
-    {
-        float xPos = floor(dir.x + N_SCALE);
-        float yPos = floor(dir.y + N_SCALE);
-        return xPos + (yPos / N_SCALE) / 2.0;
-    }
-
-    vec4 main(float2 fragCoord)
-    {
-        vec2 posFromCenter = fragCoord - centerPos;
-        vec3 sdg = sdgShape(posFromCenter, halfSize, radius);
-        float packedDir = EncodeDir(posFromCenter);
-        return vec4(sdg.yz, packedDir, sdg.x);
-    }
-)";
-
-// Standard SDF shader code (for GenerateDrawingShader)
-inline static const std::string g_shaderString$CLASS_NAME = R"(
-    uniform vec2 centerPos;
-    uniform vec2 halfSize;
-    uniform float radius;
-
-    float sdfShape(vec2 p, vec2 b, float r)
-    {
-        // TODO: Implement your SDF shape function
-        // Return signed distance
-        return 0.0;
-    }
-
-    half4 main(vec2 fragCoord)
-    {
-        float sdf = sdfShape(fragCoord, centerPos, halfSize, radius);
-        return half4(0, 0, 0, sdf);  // Alpha channel stores SDF
-    }
-)";
-
 $CLASS_NAME::$CLASS_NAME(const $PARAMS_CLASS& params)
 {
     // TODO: Store params in member variables if needed
+}
+
+GESDFShapeType $CLASS_NAME::GetSDFShapeType() const
+{
+    // TODO: Return your specific shape type from GESDFShapeType enum
+    // Example: return GESDFShapeType::RRECT;
+    return GESDFShapeType::EMPTY;
+}
+
+bool $CLASS_NAME::HasType(const GESDFShapeType type) const
+{
+    // TODO: Implement type checking logic
+    // For simple shapes: return GetSDFShapeType() == type;
+    // For composite shapes: also check children
+    return GetSDFShapeType() == type;
 }
 
 std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShader(float width, float height) const
@@ -119,8 +77,27 @@ std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShaderHasNormal(float 
 
 std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder()
 {
+    static constexpr char s_prog$EFFECT_NAME[] = R"(
+        uniform vec2 centerPos;
+        uniform vec2 halfSize;
+        uniform float radius;
+
+        float sdfShape(vec2 p, vec2 b, float r)
+        {
+            // TODO: Implement your SDF shape function
+            // Return signed distance
+            return 0.0;
+        }
+
+        half4 main(vec2 fragCoord)
+        {
+            float sdf = sdfShape(fragCoord, centerPos, halfSize, radius);
+            return half4(0, 0, 0, sdf);  // Alpha channel stores SDF
+        }
+    )";
+
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(g_shaderString$CLASS_NAME);
+        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
 
     if (!s_effect) {
         LOGE("$CLASS_NAME::GetShaderBuilder effect error");
@@ -132,8 +109,44 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder()
 
 std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder()
 {
+    static constexpr char s_progNormal$EFFECT_NAME[] = R"(
+        uniform vec2 centerPos;
+        uniform vec2 halfSize;
+        uniform float radius;
+
+        const float N_EPS = 1e-6;
+        const float N_SCALE = 2048.0;
+
+        vec2 safeNorm(vec2 v)
+        {
+            return v / max(length(v), N_EPS);
+        }
+
+        vec3 sdgShape(vec2 p, vec2 b, float r)
+        {
+            // TODO: Implement your SDF shape function with gradient
+            // Return vec3(distance, gradientX, gradientY)
+            return vec3(0.0);
+        }
+
+        float EncodeDir(vec2 dir)
+        {
+            float xPos = floor(dir.x + N_SCALE);
+            float yPos = floor(dir.y + N_SCALE);
+            return xPos + (yPos / N_SCALE) / 2.0;
+        }
+
+        vec4 main(float2 fragCoord)
+        {
+            vec2 posFromCenter = fragCoord - centerPos;
+            vec3 sdg = sdgShape(posFromCenter, halfSize, radius);
+            float packedDir = EncodeDir(posFromCenter);
+            return vec4(sdg.yz, packedDir, sdg.x);
+        }
+    )";
+
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(g_sdfGradProg$CLASS_NAME);
+        Drawing::RuntimeEffect::CreateForShader(s_progNormal$EFFECT_NAME);
 
     if (!s_effect) {
         LOGE("$CLASS_NAME::GetNormalShaderBuilder effect error");

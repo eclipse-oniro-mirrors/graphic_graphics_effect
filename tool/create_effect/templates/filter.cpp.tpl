@@ -29,21 +29,6 @@
 namespace OHOS {
 namespace Rosen {
 
-// Shader code (inline static for simple effects, or in GetEffect() for complex effects)
-inline static const std::string g_shaderString$CLASS_NAME = R"(
-    uniform shader image;
-    uniform vec2 iResolution;
-
-    half4 main(vec2 fragCoord)
-    {
-        vec2 uv = fragCoord.xy / iResolution.xy;
-        vec4 color = image.eval(fragCoord);
-
-        // TODO: Implement your effect logic here
-        return color;
-    }
-)";
-
 $CLASS_NAME::$CLASS_NAME(const Drawing::$PARAMS_CLASS& params)
 {
     // Optional: Initialize shader effects in constructor
@@ -55,8 +40,22 @@ $CLASS_NAME::$CLASS_NAME(const Drawing::$PARAMS_CLASS& params)
 
 std::shared_ptr<Drawing::RuntimeEffect> $CLASS_NAME::GetEffect()
 {
+    static constexpr char s_prog$EFFECT_NAME[] = R"(
+        uniform shader image;
+        uniform vec2 iResolution;
+
+        half4 main(vec2 fragCoord)
+        {
+            vec2 uv = fragCoord.xy / iResolution.xy;
+            vec4 color = image.eval(fragCoord);
+
+            // TODO: Implement your effect logic here
+            return color;
+        }
+    )";
+
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(g_shaderString$CLASS_NAME);
+        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
 
     if (s_effect == nullptr) {
         LOGE("$CLASS_NAME::GetEffect create failed");

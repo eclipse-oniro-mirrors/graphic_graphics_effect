@@ -194,7 +194,8 @@ def generate_cpp_file(name: str, effect_type: str, output_dir: Path, templates_d
     content = get_copyright_header() + Template(template_content).substitute(
         HEADER_FILE=header_file_name,
         CLASS_NAME=class_name,
-        PARAMS_CLASS=params_class
+        PARAMS_CLASS=params_class,
+        EFFECT_NAME=pascal_name
     )
 
     cpp_file = output_dir / file_name
@@ -307,9 +308,9 @@ def generate_effect(name: str, effect_type: str, root_dir: Path, templates_dir: 
         console.summary()
         
         if console.error_count == 0:
-            if not add_enum:
-                console.step(f"Add {to_snake_case(name).upper()} enum to include/core/ge_filter_type.h manually")
             console.info("\nNext steps:")
+            if not add_enum:
+                console.step(f"Add {to_snake_case(name).upper()} enum to include/core/ge_filter_type.h")
             console.step(f"Add \"{cpp_file.relative_to(root_dir)}\" to sources in BUILD.gn")
             console.step("Implement shader logic in the generated .cpp file")
             console.step("Run `python tool/generate_metadata/gen_effect_header.py` to generate include")

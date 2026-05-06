@@ -10,14 +10,14 @@ Scaffold CLI for creating new visual effects in Graphics Effect (GE) library. Ge
 
 ```bash
 python tool/create_effect/create_effect.py <name> <type> [--no-enum]
-
+```
 **Types**: `filter` | `mask` | `shader` | `shape`
 
 **Options**:
-- `--no-enum`: Disable automatic enum addition (useful for testing without modifying ge_filter_type.h)
+- `--no-enum`: Disable automatic enum addition
 
 **Post-scaffold steps**:
-1. ~~Add enum to `include/core/ge_filter_type.h`~~ **Auto-added** (if fails, manual required)
+1. Add enum to `include/core/ge_filter_type.h` if auto-add is disabled
 2. Implement render logic
 3. Run `python tool/generate_metadata/gen_metadata.py` and `python tool/generate_metadata/gen_effect_header.py`
 

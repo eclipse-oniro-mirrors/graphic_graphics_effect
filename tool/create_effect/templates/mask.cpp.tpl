@@ -28,19 +28,6 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// Shader code (inline static for simple effects, or in GetShaderBuilder() for complex effects)
-inline static const std::string g_shaderString$CLASS_NAME = R"(
-    uniform vec2 iResolution;
-
-    half4 main(vec2 fragCoord)
-    {
-        vec2 uv = fragCoord.xy / iResolution.xy;
-
-        // TODO: Implement your mask logic here
-        return half4(1.0);  // Default: fully opaque mask
-    }
-)";
-
 $CLASS_NAME::$CLASS_NAME(const $PARAMS_CLASS& params)
 {
     // TODO: Initialize members from params if needed
@@ -98,8 +85,20 @@ std::shared_ptr<ShaderEffect> $CLASS_NAME::GenerateDrawingShaderHasNormal(float 
 
 std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder() const
 {
+    static constexpr char s_prog$EFFECT_NAME[] = R"(
+        uniform vec2 iResolution;
+
+        half4 main(vec2 fragCoord)
+        {
+            vec2 uv = fragCoord.xy / iResolution.xy;
+
+            // TODO: Implement your mask logic here
+            return half4(1.0);  // Default: fully opaque mask
+        }
+    )";
+
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(g_shaderString$CLASS_NAME);
+        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
 
     if (s_effect == nullptr) {
         LOGE("$CLASS_NAME::GetShaderBuilder effect error");
@@ -113,20 +112,20 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() cons
 {
     // For simple masks, normal shader can be same as standard shader
     // Uncomment below if you need a different normal shader:
-    // static const std::string g_normalShaderString = R"(
+    // static constexpr char s_progNormal$EFFECT_NAME[] = R"(
     //     uniform vec2 iResolution;
     //     half4 main(vec2 fragCoord) {
     //         // TODO: Implement normal-specific shader logic
     //         return half4(1.0);
     //     }
     // )";
-    // static const std::shared_ptr<Drawing::RuntimeEffect> g_effect =
-    //     Drawing::RuntimeEffect::CreateForShader(g_normalShaderString);
-    // if (g_effect == nullptr) {
+    // static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
+    //     Drawing::RuntimeEffect::CreateForShader(s_progNormal$EFFECT_NAME);
+    // if (s_effect == nullptr) {
     //     LOGE("$CLASS_NAME::GetNormalShaderBuilder effect error");
     //     return nullptr;
     // }
-    // return std::make_shared<Drawing::RuntimeShaderBuilder>(g_effect);
+    // return std::make_shared<Drawing::RuntimeShaderBuilder>(s_effect);
 
     // Default: use same shader builder as standard shader
     return GetShaderBuilder();

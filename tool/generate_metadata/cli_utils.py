@@ -127,7 +127,7 @@ class Console:
     def header(self, message: str) -> None:
         """Print section header in cyan with bold."""
         symbol = self._get_symbol('header')
-        print(f"\n{self._colorize(symbol, Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
+        print(f"{self._colorize(symbol, Colors.BRIGHT_CYAN)} {self._colorize(message, Colors.BOLD + Colors.BRIGHT_CYAN)}")
 
     def step(self, message: str) -> None:
         """Print step message in blue."""

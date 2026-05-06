@@ -23,7 +23,6 @@
 // Additional includes for complex shapes:
 // #include "effect/runtime_shader_builder.h"
 // #include "ge_shader.h"
-// #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -41,6 +40,10 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+
+    // Required: Override pure virtual methods from GESDFShaderShape
+    GESDFShapeType GetSDFShapeType() const override;  // TODO: Return your shape type
+    bool HasType(const GESDFShapeType type) const override;  // TODO: Check if this shape or children match type
 
 private:
     static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder();

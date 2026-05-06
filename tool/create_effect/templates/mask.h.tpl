@@ -44,13 +44,13 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
     // Optional: Override for nine-patch layout optimization
-    // virtual Drawing::Rect GetSubtractedRect(float width, float height) const override;
+    // Drawing::Rect GetSubtractedRect(float width, float height) const override;
 
     // Optional: Return associated image (for image-based masks)
-    // virtual std::weak_ptr<Drawing::Image> GetImage() const override;
+    // std::weak_ptr<Drawing::Image> GetImage() const override;
 
     // Optional: Return whether effect is used (for use-effect masks)
-    // virtual bool GetUseEffect() const override;
+    // bool GetUseEffect() const override;
 
 private:
     // Helper methods to get/create shader builder

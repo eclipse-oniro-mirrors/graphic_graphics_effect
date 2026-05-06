@@ -28,27 +28,27 @@
 namespace OHOS {
 namespace Rosen {
 
-// Shader code (inline static for simple effects, or in GetEffect() for complex effects)
-inline static const std::string g_shaderString$CLASS_NAME = R"(
-    uniform vec2 iResolution;
-
-    half4 main(vec2 fragCoord)
-    {
-        vec2 uv = fragCoord.xy / iResolution.xy;
-
-        // TODO: Implement your shader logic here
-        return half4(1.0);  // Default: white color
-    }
-)";
-
 $CLASS_NAME::$CLASS_NAME(const Drawing::$PARAMS_CLASS& params)
 {
+    // TODO: Initialize members from params if needed
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> $CLASS_NAME::GetEffect()
 {
+    static constexpr char s_prog$EFFECT_NAME[] = R"(
+        uniform vec2 iResolution;
+
+        half4 main(vec2 fragCoord)
+        {
+            vec2 uv = fragCoord.xy / iResolution.xy;
+
+            // TODO: Implement your shader logic here
+            return half4(1.0);  // Default: white color
+        }
+    )";
+
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(g_shaderString$CLASS_NAME);
+        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
 
     if (s_effect == nullptr) {
         GE_LOGE("$CLASS_NAME::GetEffect effect is nullptr.");
