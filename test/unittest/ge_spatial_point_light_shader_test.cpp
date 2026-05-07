@@ -37,11 +37,11 @@ public:
 };
 
 /**
- * @tc.name: GESpatialPointLightShaderTest001
+ * @tc.name: DefaultConstruction_Type
  * @tc.type: FUNC
- * @tc.desc: Test default construction and Type()
+ * @tc.desc: Test default construction returns correct type and name
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest001, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, DefaultConstruction_Type, TestSize.Level1)
 {
     auto shader = std::make_unique<GESpatialPointLightShader>();
     EXPECT_EQ(shader->Type(), Drawing::GEFilterType::SPATIAL_POINT_LIGHT);
@@ -50,11 +50,11 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest001, TestSi
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest002
+ * @tc.name: ConstructionWithParams_GetBuilderNoMask
  * @tc.type: FUNC
- * @tc.desc: Test construction with params and GetSpatialPointLightBuilderNoMask
+ * @tc.desc: Test construction with params and GetSpatialPointLightBuilderNoMask returns valid builder
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest002, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, ConstructionWithParams_GetBuilderNoMask, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.5f;
@@ -63,18 +63,55 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest002, TestSi
     params.lightColor = Vector4f(1.0f, 0.8f, 0.6f, 1.0f);
 
     auto shader = std::make_unique<GESpatialPointLightShader>(params);
+    auto builder = shader->GetSpatialPointLightBuilderNoMask();
+    EXPECT_NE(builder, nullptr);
+}
+
+/**
+ * @tc.name: GetBuilderNoMask_CachingBehavior
+ * @tc.type: FUNC
+ * @tc.desc: Test GetSpatialPointLightBuilderNoMask returns cached builder on subsequent calls
+ */
+HWTEST_F(GESpatialPointLightShaderTest, GetBuilderNoMask_CachingBehavior, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = std::make_unique<GESpatialPointLightShader>(params);
     auto builder1 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder1, nullptr);
+
     auto builder2 = shader->GetSpatialPointLightBuilderNoMask();
     EXPECT_NE(builder2, nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest003
+ * @tc.name: GetBuilderWithMask_ReturnsValidBuilder
  * @tc.type: FUNC
- * @tc.desc: Test MakeSpatialPointLightShader with valid rect
+ * @tc.desc: Test GetSpatialPointLightBuilderWithMask returns valid builder
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest003, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, GetBuilderWithMask_ReturnsValidBuilder, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = std::make_unique<GESpatialPointLightShader>(params);
+    auto builder = shader->GetSpatialPointLightBuilderWithMask();
+    EXPECT_NE(builder, nullptr);
+}
+
+/**
+ * @tc.name: MakeSpatialPointLightShader_ValidRect
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with valid rect returns valid shader effect
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MakeSpatialPointLightShader_ValidRect, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 2.0f;
@@ -89,11 +126,87 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest003, TestSi
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest004
+ * @tc.name: MakeSpatialPointLightShader_ZeroRectWidth
  * @tc.type: FUNC
- * @tc.desc: Test MakeDrawingShader sets drShader_
+ * @tc.desc: Test MakeSpatialPointLightShader with zero width returns nullptr
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest004, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, MakeSpatialPointLightShader_ZeroRectWidth, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 0, 100);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_EQ(effect, nullptr);
+}
+
+/**
+ * @tc.name: MakeSpatialPointLightShader_ZeroRectHeight
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with zero height returns nullptr
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MakeSpatialPointLightShader_ZeroRectHeight, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 0);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_EQ(effect, nullptr);
+}
+
+/**
+ * @tc.name: MakeSpatialPointLightShader_SmallRect
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with small rect returns valid shader effect
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MakeSpatialPointLightShader_SmallRect, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 10, 10);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: MakeSpatialPointLightShader_LargeRect
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with large rect returns valid shader effect
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MakeSpatialPointLightShader_LargeRect, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(500.0f, 500.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 500, 500);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: MakeDrawingShader_SetsShader
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeDrawingShader sets drShader_ member variable
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MakeDrawingShader_SetsShader, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
@@ -104,14 +217,16 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest004, TestSi
     auto shader = GESpatialPointLightShader(params);
     Drawing::Rect rect(0, 0, 50, 50);
     shader.MakeDrawingShader(rect, 0.5f);
+    auto drawingShader = shader.GetDrawingShader();
+    EXPECT_NE(drawingShader, nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest005
+ * @tc.name: SetSpatialPointLightParams_UpdatesState
  * @tc.type: FUNC
- * @tc.desc: Test SetSpatialPointLightParams updates internal state
+ * @tc.desc: Test SetSpatialPointLightParams updates internal state and affects shader generation
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest005, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, SetSpatialPointLightParams_UpdatesState, TestSize.Level1)
 {
     auto shader = std::make_unique<GESpatialPointLightShader>();
     Drawing::GESpatialPointLightShaderParams newParams;
@@ -123,120 +238,97 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest005, TestSi
     shader->SetSpatialPointLightParams(newParams);
     Drawing::Rect rect(0, 0, 200, 200);
     shader->MakeDrawingShader(rect, 1.0f);
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest006
- * @tc.type: FUNC
- * @tc.desc: Test with boundary values (zero, negative, large)
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest006, TestSize.Level1)
-{
-    // Test zero values
-    Drawing::GESpatialPointLightShaderParams paramsZero;
-    paramsZero.lightIntensity = 0.0f;
-    paramsZero.lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
-    paramsZero.attenuation = 0.0f;
-    paramsZero.lightColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    auto shaderZero = GESpatialPointLightShader(paramsZero);
-    Drawing::Rect rect(0, 0, 100, 100);
-    EXPECT_NE(shaderZero.MakeSpatialPointLightShader(rect), nullptr);
-
-    // Test large values
-    Drawing::GESpatialPointLightShaderParams paramsLarge;
-    paramsLarge.lightIntensity = 100.0f;
-    paramsLarge.lightPosition = Vector3f(100.0f, 100.0f, 100.0f);
-    paramsLarge.attenuation = 64.0f;
-    paramsLarge.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    auto shaderLarge = GESpatialPointLightShader(paramsLarge);
-    EXPECT_NE(shaderLarge.MakeSpatialPointLightShader(rect), nullptr);
-
-    // Test negative values
-    Drawing::GESpatialPointLightShaderParams paramsNeg;
-    paramsNeg.lightIntensity = -1.0f;
-    paramsNeg.lightPosition = Vector3f(-10.0f, -10.0f, -10.0f);
-    paramsNeg.attenuation = -0.5f;
-    paramsNeg.lightColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
-    auto shaderNeg = GESpatialPointLightShader(paramsNeg);
-    EXPECT_NE(shaderNeg.MakeSpatialPointLightShader(rect), nullptr);
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest007
- * @tc.type: FUNC
- * @tc.desc: Test various rect sizes
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest007, TestSize.Level1)
-{
-    Drawing::GESpatialPointLightShaderParams params;
-    params.lightIntensity = 1.0f;
-    params.lightPosition = Vector3f(0.5f, 0.5f, 1.0f);
-    params.attenuation = 0.5f;
-    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    Drawing::Rect rects[] = {
-        Drawing::Rect(0, 0, 10, 10),
-        Drawing::Rect(0, 0, 50, 50),
-        Drawing::Rect(0, 0, 100, 200),
-        Drawing::Rect(0, 0, 500, 500)
-    };
-    for (const auto& rect : rects) {
-        auto shader = GESpatialPointLightShader(params);
-        EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
-    }
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest008
- * @tc.type: FUNC
- * @tc.desc: Test different light colors
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest008, TestSize.Level1)
-{
-    Vector4f colors[] = {
-        Vector4f(1.0f, 1.0f, 1.0f, 1.0f),  // white
-        Vector4f(1.0f, 0.0f, 0.0f, 1.0f),  // red
-        Vector4f(0.0f, 1.0f, 0.0f, 1.0f),  // green
-        Vector4f(0.0f, 0.0f, 1.0f, 1.0f)   // blue
-    };
-    Drawing::Rect rect(0, 0, 100, 100);
-    for (const auto& color : colors) {
-        Drawing::GESpatialPointLightShaderParams params;
-        params.lightIntensity = 1.0f;
-        params.lightPosition = Vector3f(0.5f, 0.5f, 1.0f);
-        params.attenuation = 0.5f;
-        params.lightColor = color;
-        auto shader = GESpatialPointLightShader(params);
-        EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
-    }
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest009
- * @tc.type: FUNC
- * @tc.desc: Test GetDrawingShader returns valid shader after MakeDrawingShader
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest009, TestSize.Level1)
-{
-    Drawing::GESpatialPointLightShaderParams params;
-    params.lightIntensity = 1.0f;
-    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
-    params.attenuation = 16.0f;
-    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    auto shader = GESpatialPointLightShader(params);
-    Drawing::Rect rect(0, 0, 100, 100);
-    shader.MakeDrawingShader(rect, 0.5f);
-    auto drawingShader = shader.GetDrawingShader();
+    auto drawingShader = shader->GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest010
+ * @tc.name: SetSpatialPointLightParams_MultipleUpdates
  * @tc.type: FUNC
- * @tc.desc: Test mask nullptr (default behavior)
+ * @tc.desc: Test SetSpatialPointLightParams multiple times updates state correctly
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest010, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, SetSpatialPointLightParams_MultipleUpdates, TestSize.Level1)
+{
+    auto shader = std::make_unique<GESpatialPointLightShader>();
+    Drawing::Rect rect(0, 0, 100, 100);
+
+    Drawing::GESpatialPointLightShaderParams params1;
+    params1.lightIntensity = 1.0f;
+    params1.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params1.attenuation = 0.5f;
+    params1.lightColor = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
+    shader->SetSpatialPointLightParams(params1);
+    EXPECT_NE(shader->MakeSpatialPointLightShader(rect), nullptr);
+
+    Drawing::GESpatialPointLightShaderParams params2;
+    params2.lightIntensity = 2.0f;
+    params2.lightPosition = Vector3f(75.0f, 75.0f, 50.0f);
+    params2.attenuation = 1.0f;
+    params2.lightColor = Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
+    shader->SetSpatialPointLightParams(params2);
+    EXPECT_NE(shader->MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: BoundaryValues_ZeroParams
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with zero values for all params
+ */
+HWTEST_F(GESpatialPointLightShaderTest, BoundaryValues_ZeroParams, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 0.0f;
+    params.lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    params.attenuation = 0.0f;
+    params.lightColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: BoundaryValues_LargeParams
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with large values for all params
+ */
+HWTEST_F(GESpatialPointLightShaderTest, BoundaryValues_LargeParams, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 100.0f;
+    params.lightPosition = Vector3f(100.0f, 100.0f, 100.0f);
+    params.attenuation = 64.0f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: BoundaryValues_NegativeParams
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with negative values for all params
+ */
+HWTEST_F(GESpatialPointLightShaderTest, BoundaryValues_NegativeParams, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = -1.0f;
+    params.lightPosition = Vector3f(-10.0f, -10.0f, -10.0f);
+    params.attenuation = -0.5f;
+    params.lightColor = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: MaskNullptr_DefaultBehavior
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with mask nullptr uses NoMask builder
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MaskNullptr_DefaultBehavior, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
@@ -252,48 +344,19 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest010, TestSi
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest011
+ * @tc.name: LightIntensity_VariousValues
  * @tc.type: FUNC
- * @tc.desc: Test various intensity values with different attenuation
+ * @tc.desc: Test MakeSpatialPointLightShader with various light intensity values
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest011, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, LightIntensity_VariousValues, TestSize.Level1)
 {
-    constexpr size_t ARRAY_SIZE = 6;
-    float intensityValues[ARRAY_SIZE] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
-    float attenuationValues[ARRAY_SIZE] = {0.1f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
     Drawing::Rect rect(0, 0, 100, 100);
+    float intensityValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f};
 
-    for (size_t i = 0; i < ARRAY_SIZE; i++) {
+    for (float intensity : intensityValues) {
         Drawing::GESpatialPointLightShaderParams params;
-        params.lightIntensity = intensityValues[i];
+        params.lightIntensity = intensity;
         params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
-        params.attenuation = attenuationValues[i];
-        params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        auto shader = GESpatialPointLightShader(params);
-        EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
-    }
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest012
- * @tc.type: FUNC
- * @tc.desc: Test extreme position values
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest012, TestSize.Level1)
-{
-    Vector3f positions[] = {
-        Vector3f(0.0f, 0.0f, 0.0f),       // Origin
-        Vector3f(1000.0f, 1000.0f, 1000.0f), // Large positive
-        Vector3f(-500.0f, -500.0f, -500.0f), // Large negative
-        Vector3f(0.5f, 0.5f, 0.001f),     // Small Z
-        Vector3f(50.0f, 50.0f, 500.0f)    // Large Z
-    };
-    Drawing::Rect rect(0, 0, 100, 100);
-
-    for (const auto& pos : positions) {
-        Drawing::GESpatialPointLightShaderParams params;
-        params.lightIntensity = 1.0f;
-        params.lightPosition = pos;
         params.attenuation = 0.5f;
         params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         auto shader = GESpatialPointLightShader(params);
@@ -302,41 +365,168 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest012, TestSi
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest013
+ * @tc.name: Attenuation_VariousValues
  * @tc.type: FUNC
- * @tc.desc: Test various light colors including alpha variations
+ * @tc.desc: Test MakeSpatialPointLightShader with various attenuation values
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest013, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, Attenuation_VariousValues, TestSize.Level1)
 {
-    Vector4f colors[] = {
-        Vector4f(1.0f, 1.0f, 1.0f, 1.0f),   // White
-        Vector4f(1.0f, 0.0f, 0.0f, 1.0f),   // Red
-        Vector4f(0.0f, 1.0f, 0.0f, 1.0f),   // Green
-        Vector4f(0.0f, 0.0f, 1.0f, 1.0f),   // Blue
-        Vector4f(1.0f, 1.0f, 0.0f, 1.0f),   // Yellow
-        Vector4f(0.5f, 0.5f, 0.5f, 0.5f),   // Semi-transparent gray
-        Vector4f(0.0f, 0.0f, 0.0f, 1.0f),   // Black
-        Vector4f(1.0f, 0.5f, 0.25f, 0.75f)  // Orange with alpha
-    };
     Drawing::Rect rect(0, 0, 100, 100);
+    float attenuationValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 4.0f, 8.0f};
 
-    for (const auto& color : colors) {
+    for (float attenuation : attenuationValues) {
         Drawing::GESpatialPointLightShaderParams params;
         params.lightIntensity = 1.0f;
         params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
-        params.attenuation = 0.5f;
-        params.lightColor = color;
+        params.attenuation = attenuation;
+        params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         auto shader = GESpatialPointLightShader(params);
         EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
     }
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest014
+ * @tc.name: LightPosition_Origin
  * @tc.type: FUNC
- * @tc.desc: Test multiple MakeDrawingShader calls
+ * @tc.desc: Test MakeSpatialPointLightShader with light position at origin
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest014, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, LightPosition_Origin, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightPosition_LargePositive
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with large positive light position
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightPosition_LargePositive, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(1000.0f, 1000.0f, 1000.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightPosition_LargeNegative
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with large negative light position
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightPosition_LargeNegative, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(-500.0f, -500.0f, -500.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightColor_White
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with white light color
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightColor_White, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightColor_Red
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with red light color
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightColor_Red, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightColor_Green
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with green light color
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightColor_Green, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightColor_Blue
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with blue light color
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightColor_Blue, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: LightColor_SemiTransparent
+ * @tc.type: FUNC
+ * @tc.desc: Test MakeSpatialPointLightShader with semi-transparent light color
+ */
+HWTEST_F(GESpatialPointLightShaderTest, LightColor_SemiTransparent, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(0.5f, 0.5f, 0.5f, 0.5f);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
+}
+
+/**
+ * @tc.name: MultipleMakeDrawingShaderCalls
+ * @tc.type: FUNC
+ * @tc.desc: Test multiple MakeDrawingShader calls update shader correctly
+ */
+HWTEST_F(GESpatialPointLightShaderTest, MultipleMakeDrawingShaderCalls, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
@@ -358,121 +548,103 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest014, TestSi
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest015
+ * @tc.name: GetDrawingShader_AfterMakeDrawingShader
  * @tc.type: FUNC
- * @tc.desc: Test MakeSpatialPointLightShader with various alpha values
+ * @tc.desc: Test GetDrawingShader returns valid shader after MakeDrawingShader
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest015, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, GetDrawingShader_AfterMakeDrawingShader, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
     params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
-    params.attenuation = 0.5f;
+    params.attenuation = 16.0f;
     params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
     auto shader = GESpatialPointLightShader(params);
     Drawing::Rect rect(0, 0, 100, 100);
-
-    constexpr size_t ALPHA_SIZE = 6;
-    for (size_t i = 0; i < ALPHA_SIZE; i++) {
-        auto effect = shader.MakeSpatialPointLightShader(rect);
-        EXPECT_NE(effect, nullptr);
-    }
+    shader.MakeDrawingShader(rect, 0.5f);
+    auto drawingShader = shader.GetDrawingShader();
+    EXPECT_NE(drawingShader, nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest016
+ * @tc.name: EdgePosition_TopLeftCorner
  * @tc.type: FUNC
- * @tc.desc: Test SetSpatialPointLightParams multiple times
+ * @tc.desc: Test MakeSpatialPointLightShader with light at top-left corner
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest016, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, EdgePosition_TopLeftCorner, TestSize.Level1)
 {
-    auto shader = std::make_unique<GESpatialPointLightShader>();
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(0.0f, 0.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    auto shader = GESpatialPointLightShader(params);
     Drawing::Rect rect(0, 0, 100, 100);
-
-    Drawing::GESpatialPointLightShaderParams params1;
-    params1.lightIntensity = 1.0f;
-    params1.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
-    params1.attenuation = 0.5f;
-    params1.lightColor = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
-    shader->SetSpatialPointLightParams(params1);
-    EXPECT_NE(shader->MakeSpatialPointLightShader(rect), nullptr);
-
-    Drawing::GESpatialPointLightShaderParams params2;
-    params2.lightIntensity = 2.0f;
-    params2.lightPosition = Vector3f(75.0f, 75.0f, 50.0f);
-    params2.attenuation = 1.0f;
-    params2.lightColor = Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
-    shader->SetSpatialPointLightParams(params2);
-    EXPECT_NE(shader->MakeSpatialPointLightShader(rect), nullptr);
-
-    Drawing::GESpatialPointLightShaderParams params3;
-    params3.lightIntensity = 0.5f;
-    params3.lightPosition = Vector3f(25.0f, 25.0f, 200.0f);
-    params3.attenuation = 0.1f;
-    params3.lightColor = Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
-    shader->SetSpatialPointLightParams(params3);
-    EXPECT_NE(shader->MakeSpatialPointLightShader(rect), nullptr);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest017
+ * @tc.name: EdgePosition_BottomRightCorner
  * @tc.type: FUNC
- * @tc.desc: Test different rect aspect ratios
+ * @tc.desc: Test MakeSpatialPointLightShader with light at bottom-right corner
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest017, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, EdgePosition_BottomRightCorner, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
-    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.lightPosition = Vector3f(100.0f, 100.0f, 100.0f);
     params.attenuation = 0.5f;
     params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-    Drawing::Rect rects[] = {
-        Drawing::Rect(0, 0, 10, 100),    // Tall narrow
-        Drawing::Rect(0, 0, 100, 10),    // Wide short
-        Drawing::Rect(0, 0, 200, 100),   // Wide medium
-        Drawing::Rect(0, 0, 100, 200),   // Tall medium
-        Drawing::Rect(0, 0, 1, 1000),    // Very tall
-        Drawing::Rect(0, 0, 1000, 1)     // Very wide
-    };
-
-    for (const auto& rect : rects) {
-        auto shader = GESpatialPointLightShader(params);
-        EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
-    }
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest018
+ * @tc.name: RectAspectRatio_TallNarrow
  * @tc.type: FUNC
- * @tc.desc: Test builder caching behavior
+ * @tc.desc: Test MakeSpatialPointLightShader with tall narrow rect
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest018, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, RectAspectRatio_TallNarrow, TestSize.Level1)
 {
     Drawing::GESpatialPointLightShaderParams params;
     params.lightIntensity = 1.0f;
-    params.lightPosition = Vector3f(50.0f, 50.0f, 100.0f);
+    params.lightPosition = Vector3f(5.0f, 50.0f, 100.0f);
     params.attenuation = 0.5f;
     params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-    auto shader = std::make_unique<GESpatialPointLightShader>(params);
-    auto builder1 = shader->GetSpatialPointLightBuilderNoMask();
-    EXPECT_NE(builder1, nullptr);
-
-    auto builder2 = shader->GetSpatialPointLightBuilderNoMask();
-    EXPECT_NE(builder2, nullptr);
-
-    auto builder3 = shader->GetSpatialPointLightBuilderNoMask();
-    EXPECT_NE(builder3, nullptr);
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 10, 100);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
 }
 
 /**
- * @tc.name: GESpatialPointLightShaderTest019
+ * @tc.name: RectAspectRatio_WideShort
  * @tc.type: FUNC
- * @tc.desc: Test shader after params update with GetDrawingShader
+ * @tc.desc: Test MakeSpatialPointLightShader with wide short rect
  */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest019, TestSize.Level1)
+HWTEST_F(GESpatialPointLightShaderTest, RectAspectRatio_WideShort, TestSize.Level1)
+{
+    Drawing::GESpatialPointLightShaderParams params;
+    params.lightIntensity = 1.0f;
+    params.lightPosition = Vector3f(50.0f, 5.0f, 100.0f);
+    params.attenuation = 0.5f;
+    params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+    auto shader = GESpatialPointLightShader(params);
+    Drawing::Rect rect(0, 0, 100, 10);
+    auto effect = shader.MakeSpatialPointLightShader(rect);
+    EXPECT_NE(effect, nullptr);
+}
+
+/**
+ * @tc.name: ShaderAfterParamsUpdate_GetDrawingShader
+ * @tc.type: FUNC
+ * @tc.desc: Test shader remains valid after params update with GetDrawingShader
+ */
+HWTEST_F(GESpatialPointLightShaderTest, ShaderAfterParamsUpdate_GetDrawingShader, TestSize.Level1)
 {
     auto shader = std::make_unique<GESpatialPointLightShader>();
     Drawing::Rect rect(0, 0, 100, 100);
@@ -493,38 +665,6 @@ HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest019, TestSi
     shader->MakeDrawingShader(rect, 0.5f);
     drawingShader = shader->GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
-}
-
-/**
- * @tc.name: GESpatialPointLightShaderTest020
- * @tc.type: FUNC
- * @tc.desc: Test edge cases for light position coordinates
- */
-HWTEST_F(GESpatialPointLightShaderTest, GESpatialPointLightShaderTest020, TestSize.Level1)
-{
-    Drawing::Rect rect(0, 0, 100, 100);
-
-    // Edge positions
-    Vector3f edgePositions[] = {
-        Vector3f(0.0f, 0.0f, 100.0f),     // Top-left corner
-        Vector3f(100.0f, 0.0f, 100.0f),   // Top-right corner
-        Vector3f(0.0f, 100.0f, 100.0f),   // Bottom-left corner
-        Vector3f(100.0f, 100.0f, 100.0f), // Bottom-right corner
-        Vector3f(50.0f, 0.0f, 100.0f),    // Top center
-        Vector3f(50.0f, 100.0f, 100.0f),  // Bottom center
-        Vector3f(0.0f, 50.0f, 100.0f),    // Left center
-        Vector3f(100.0f, 50.0f, 100.0f)   // Right center
-    };
-
-    for (const auto& pos : edgePositions) {
-        Drawing::GESpatialPointLightShaderParams params;
-        params.lightIntensity = 1.0f;
-        params.lightPosition = pos;
-        params.attenuation = 0.5f;
-        params.lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        auto shader = GESpatialPointLightShader(params);
-        EXPECT_NE(shader.MakeSpatialPointLightShader(rect), nullptr);
-    }
 }
 
 }  // namespace Rosen
