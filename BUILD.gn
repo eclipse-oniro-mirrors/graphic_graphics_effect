@@ -26,7 +26,6 @@ config("export_config") {
     "include/effect/shader",
     "include/effect/mask",
     "include/effect/shape",
-    "include/effect_cfg",
     "include/util"
   ]
   cflags_cc = [ "-std=c++17" ]
@@ -75,7 +74,6 @@ ohos_source_set("graphics_effect_src") {
     "include/effect/shader",
     "include/effect/mask",
     "include/effect/shape",
-    "include/effect_cfg",
     "include/util"
   ]
 
@@ -93,8 +91,6 @@ ohos_source_set("graphics_effect_src") {
     "src/pipeline/ge_hps_upscale_pass.cpp",
     "src/hps/ge_hps_effect_filter.cpp",
     "src/effect/ge_params_reflection.cpp",
-    "src/effect_cfg/ge_frosted_glass_effect_cfg.cpp",
-    "src/effect_cfg/ge_xml_parser_base.cpp",
     "src/effect/filter/ge_shader_filter.cpp",
     "src/effect/filter/ge_aibar_shader_filter.cpp",
     "src/effect/filter/ge_bezier_warp_shader_filter.cpp",
@@ -182,7 +178,6 @@ ohos_source_set("graphics_effect_src") {
       "bounds_checking_function:libsec_shared",
       "graphic_2d:2d_graphics",
       "hilog:libhilog",
-      "libxml2:libxml2",
     ]
   }
 

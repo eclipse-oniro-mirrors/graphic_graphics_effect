@@ -54,7 +54,6 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/include/effect/shader",
     "${graphics_effect_root}/include/effect/mask",
     "${graphics_effect_root}/include/effect/shape",
-    "${graphics_effect_root}/include/effect_cfg",
     "${graphics_effect_root}/include/util"
   ]
 
@@ -137,8 +136,6 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/effect/shape/ge_sdf_clip_shader.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_color_shader.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_shadow_shader.cpp",
-    "${graphics_effect_root}/src/effect_cfg/ge_frosted_glass_effect_cfg.cpp",
-    "${graphics_effect_root}/src/effect_cfg/ge_xml_parser_base.cpp",
     "${graphics_effect_root}/src/util/ge_system_properties.cpp",
     "${graphics_effect_root}/src/util/ge_tone_mapping_helper.cpp",
     "${graphics_effect_root}/src/ext/ge_external_dynamic_loader.cpp",
@@ -160,7 +157,6 @@ ohos_source_set("graphics_effect_test_src") {
       "bounds_checking_function:libsec_shared",
       "graphic_2d:2d_graphics",
       "hilog:libhilog",
-      "libxml2:libxml2",
     ]
   }
 
@@ -203,7 +199,6 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_filter_composer_test.cpp",
     "ge_frame_gradient_shader_mask_test.cpp",
     "ge_frosted_glass_blur_shader_filter_test.cpp",
-    "ge_frosted_glass_effect_cfg_test.cpp",
     "ge_frosted_glass_shader_filter_test.cpp",
     "ge_grey_shader_filter_test.cpp",
     "ge_grid_warp_shader_filter_test.cpp",
@@ -251,8 +246,7 @@ ohos_unittest("GraphicsEffectTest") {
     "gex_flow_light_sweep_shader_test.cpp",
     "gex_complex_shader_test.cpp",
     "ge_hps_effect_filter_test.cpp",
-    "ge_wave_gradient_shader_mask_test.cpp",
-    "ge_xml_parser_base_test.cpp"
+    "ge_wave_gradient_shader_mask_test.cpp"
   ]
 
   if (!is_mingw && !is_win) {
@@ -270,7 +264,6 @@ ohos_unittest("GraphicsEffectTest") {
     "${graphics_effect_root}/include/effect/shader",
     "${graphics_effect_root}/include/effect/mask",
     "${graphics_effect_root}/include/effect/shape",
-    "${graphics_effect_root}/include/effect_cfg",
     "${graphics_effect_root}/include/util"
   ]
 
@@ -286,7 +279,6 @@ ohos_unittest("GraphicsEffectTest") {
     "graphic_2d:2d_graphics",
     "hilog:libhilog",
     "graphic_2d:librender_service_base",
-    "libxml2:libxml2",
   ]
 
   part_name = "graphics_effect"
