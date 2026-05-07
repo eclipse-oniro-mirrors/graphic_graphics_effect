@@ -46,12 +46,12 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     GESDFShadowShader shadowShader(shadowParams);
 
     Drawing::Rect rect0;
-    auto shader = shadowShader.MakeSDFShadowShader(rect0);
+    auto shader = shadowShader.MakeSDFShadowShader(canvas_, rect0);
     EXPECT_EQ(shader, nullptr);
 
     // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
     Drawing::Rect rect1 { 1.0f, 1.0f, 2.0f, 2.0f };
-    shader = shadowShader.MakeSDFShadowShader(rect1);
+    shader = shadowShader.MakeSDFShadowShader(canvas_, rect1);
     EXPECT_EQ(shader, nullptr);
 
     Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
@@ -59,12 +59,12 @@ HWTEST_F(GESDFShadowShaderTest, MakeSDFShadowShaderTest, TestSize.Level1)
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     shadowParams.shape = sdfShape;
     shadowShader.SetSDFShadowParams(shadowParams);
-    shader = shadowShader.MakeSDFShadowShader(rect1);
+    shader = shadowShader.MakeSDFShadowShader(canvas_, rect1);
     EXPECT_NE(shader, nullptr);
 
     shadowParams.shadow.color = Drawing::Color::COLOR_GRAY;
     shadowShader.SetSDFShadowParams(shadowParams);
-    shader = shadowShader.MakeSDFShadowShader(rect1);
+    shader = shadowShader.MakeSDFShadowShader(canvas_, rect1);
     EXPECT_NE(shader, nullptr);
 }
 
@@ -116,24 +116,24 @@ HWTEST_F(GESDFShadowShaderTest, MakeDrawingShaderElevationTest, TestSize.Level1)
     GESDFShadowShader shadowShader(shadowParams);
 
     Drawing::Rect rect0;
-    shadowShader.MakeDrawingShader(rect0, -1.f);
+    shadowShader.MakeDrawingShader(canvas_, rect0, -1.f);
     EXPECT_EQ(shadowShader.GetDrawingShader(), nullptr);
 
     // 1.0f, 1.0f, 200.0f, 200.0f is left top right bottom
     Drawing::Rect rect1 { 1.0f, 1.0f, 200.0f, 200.0f };
-    shadowShader.MakeDrawingShader(rect1, -1.f);
+    shadowShader.MakeDrawingShader(canvas_, rect1, -1.f);
     EXPECT_EQ(shadowShader.GetDrawingShader(), nullptr);
 
     Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     shadowParams.shape = sdfShape;
     shadowShader.SetSDFShadowParams(shadowParams);
-    shadowShader.MakeDrawingShader(rect1, -1.f);
+    shadowShader.MakeDrawingShader(canvas_, rect1, -1.f);
     EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
 
     shadowParams.shadow.color = Drawing::Color::COLOR_GRAY;
     shadowShader.SetSDFShadowParams(shadowParams);
-    shadowShader.MakeDrawingShader(rect1, -1.f);
+    shadowShader.MakeDrawingShader(canvas_, rect1, -1.f);
     EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
 }
 

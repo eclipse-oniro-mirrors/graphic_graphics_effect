@@ -26,15 +26,15 @@ static constexpr float SDF_BORDER_MIN_THRESHOLD = 0.0001f;
 GESDFBorderShader::GESDFBorderShader(const Drawing::GESDFBorderShaderParams& params) : params_(params)
 {}
 
-void GESDFBorderShader::MakeDrawingShader(const Drawing::Rect &rect, float progress)
+void GESDFBorderShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect &rect, float progress)
 {
-    drShader_ = MakeSDFBorderShader(rect);
+    drShader_ = MakeSDFBorderShader(canvas, rect);
 }
 
 void GESDFBorderShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
-    MakeDrawingShader(rect, -1.f); // not use progress
+    MakeDrawingShader(canvas, rect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -46,14 +46,8 @@ void GESDFBorderShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     canvas.DetachBrush();
 }
 
-void GESDFBorderShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
-{
-    if (params_.shape) {
-        params_.shape->Preprocess(canvas, rect, false);
-    }
-}
-
-std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(const Drawing::Rect &rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(Drawing::Canvas& canvas,
+    const Drawing::Rect &rect)
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
@@ -66,7 +60,7 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFBorderShader::MakeSDFBorderShader(co
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(width, height);
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas, width, height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFBorderShader: failed generate GESDFBorderShader.");
         return nullptr;

@@ -34,10 +34,10 @@ public:
     ~GEBorderSDFShader() override = default;
     DECLARE_GEFILTER_TYPEFUNC(GEBorderSDFShader, Drawing::GEBorderSDFShaderParams);
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
 
-protected:
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
+    void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
+
 private:
     Drawing::GEBorderSDFShaderParams params_;
     inline static const std::string borderShaderCode_ = R"(

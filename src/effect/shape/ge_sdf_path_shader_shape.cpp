@@ -537,7 +537,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
         builder->SetUniform("u_step", static_cast<float>(pixelStep));
         output = builder->MakeImage(gpuContext.get(), nullptr, outputImageInfo, false);
         if (!output) {
-            LOGE("GESDFPathShaderShape::RunSDFPropagation pass %d MakeImage failed", i);
+            LOGE("GESDFPathShaderShape::RunSDFPropagation pass %zu MakeImage failed", i);
             return input;
         }
 
@@ -701,7 +701,7 @@ Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float max
     float maxY = std::max({ y0, cy, y1 }) + maxThickness;
     // map ndc to [0, 1]
     float aspect;
-    if (height < MIN_SCALE_CLAMP || width < MIN_SCALE_CLAMP) {
+    if (height < 0.001f || width < 0.001f) { // 0.001f is the minimum value
         aspect = ASPECT_DEFAULT;
     } else {
         aspect = width / height;
@@ -722,7 +722,7 @@ Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float max
 void GESDFPathShaderShape::InitializeWorkQueue(
     const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue)
 {
-    std::vector<int> initialCurves;
+    std::vector<uint32_t> initialCurves;
     for (size_t i = 0; i < numCurves_; ++i) {
         if (IntersectBBox(canvasBBox, curveBBoxes[i])) {
             initialCurves.push_back(i);

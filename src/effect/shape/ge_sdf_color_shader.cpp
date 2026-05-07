@@ -27,7 +27,7 @@ GESDFColorShader::GESDFColorShader(const Drawing::GESDFColorShaderParams& params
 void GESDFColorShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     Preprocess(canvas, rect); // to calculate your cache data
-    MakeDrawingShader(rect, -1.f);
+    MakeDrawingShader(canvas, rect, -1.f);
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -39,30 +39,24 @@ void GESDFColorShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect
     canvas.DetachBrush();
 }
 
-void GESDFColorShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
-{
-    if (params_.shape) {
-        params_.shape->Preprocess(canvas, rect, false);
-    }
-}
-
-void GESDFColorShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GESDFColorShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     if (!rect.IsValid()) {
         GE_LOGE("GESDFColorShader::MakeSDFColorShader rect is invalid.");
         return;
     }
-    drShader_ = MakeSDFColorShader(rect);
+    drShader_ = MakeSDFColorShader(canvas, rect);
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GESDFColorShader::MakeSDFColorShader(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFColorShader::MakeSDFColorShader(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect)
 {
     if (!params_.shape) {
         GE_LOGE("GESDFColorShader::MakeSDFColorShader shape is invalid.");
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas, rect.GetWidth(), rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFColorShader: failed generate GESDFColorShader.");
         return nullptr;

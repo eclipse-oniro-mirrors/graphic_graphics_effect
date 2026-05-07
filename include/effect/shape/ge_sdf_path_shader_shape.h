@@ -17,6 +17,7 @@
 
 #include <queue>
 
+#include "ge_filter_type_info.h"
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
@@ -42,6 +43,7 @@ public:
     GESDFPathShaderShape(const GESDFPathShapeParams& param) : params_(param) {}
     GESDFPathShaderShape(const GESDFPathShaderShape&) = delete;
     virtual ~GESDFPathShaderShape() = default;
+    DECLARE_GEFILTER_TYPEFUNC(GESDFPathShaderShape, Drawing::GESDFPathShapeParams);
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;

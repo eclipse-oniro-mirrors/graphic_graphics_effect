@@ -367,14 +367,7 @@ bool GEFrostedGlassEffect::IsValidParam(float width, float height)
     return true;
 }
 
-void GEFrostedGlassEffect::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
-{
-    if (frostedGlassEffectParams_.sdfShape) {
-        frostedGlassEffectParams_.sdfShape->Preprocess(canvas, rect, true);
-    }
-}
-
-void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GEFrostedGlassEffect::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     drShader_ = nullptr;
     if (!IsValidParam(rect.GetWidth(), rect.GetHeight())) {
@@ -395,7 +388,7 @@ void GEFrostedGlassEffect::MakeDrawingShader(const Drawing::Rect& rect, float pr
         return;
     }
 
-    auto builder = MakeFrostedGlassShader(shader, rect);
+    auto builder = MakeFrostedGlassShader(canvas, shader, rect);
     if (builder == nullptr) {
         GE_LOGE("GEFrostedGlassEffect::OnProcessImage builder is null");
         return;
@@ -421,15 +414,16 @@ bool GEFrostedGlassEffect::InitFrostedGlassEffect()
     return true;
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassEffect::MakeSDFNormalShader(float width, float height) const
+std::shared_ptr<Drawing::ShaderEffect> GEFrostedGlassEffect::MakeSDFNormalShader(Drawing::Canvas& canvas,
+    float width, float height)
 {
     if (auto shape = frostedGlassEffectParams_.sdfShape) {
-        return shape->GenerateDrawingShaderHasNormal(width, height);
+        return shape->GenerateDrawingShaderHasNormal(canvas, width, height);
     }
     return nullptr;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrostedGlassShader(
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrostedGlassShader(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect)
 {
     float imageWidth = rect.GetWidth();
@@ -443,7 +437,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEFrostedGlassEffect::MakeFrosted
     }
     FrostedGlassEffect::InterpolateAdaptiveParams(frostedGlassEffectParams_);
 
-    auto sdfNormalShader = MakeSDFNormalShader(imageWidth, imageHeight);
+    auto sdfNormalShader = MakeSDFNormalShader(canvas, imageWidth, imageHeight);
     if (!sdfNormalShader) {
         GE_LOGE("GEFrostedGlassEffect::MakeFrostedGlassShader sdfShapeShader is null");
         return nullptr;

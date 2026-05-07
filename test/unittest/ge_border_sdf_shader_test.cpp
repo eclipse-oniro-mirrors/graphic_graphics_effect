@@ -31,6 +31,7 @@ public:
     static void TearDownTestCase() {}
     void SetUp() override {}
     void TearDown() override {}
+    static inline Drawing::Canvas canvas_;
 
     std::shared_ptr<Drawing::GESDFShaderShape> CreateTestShape() const
     {
@@ -74,7 +75,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest003, TestSize.Level1)
     auto params = GetTestParams();
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 300, 300);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     auto drawingShader = shader.GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
 }
@@ -85,7 +86,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest004, TestSize.Level1)
     params.isOutline = true;
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 300, 300);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     auto drawingShader = shader.GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
 }
@@ -101,7 +102,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest005, TestSize.Level1)
 
     auto shaderZero = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 100, 100);
-    shaderZero.MakeDrawingShader(rect, 0.5f);
+    shaderZero.MakeDrawingShader(canvas_, rect, 0.5f);
 
     Drawing::GEBorderSDFShaderParams paramsLarge;
     paramsLarge.color = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -111,7 +112,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest005, TestSize.Level1)
     paramsLarge.shape = CreateTestShape();
 
     auto shaderLarge = GEBorderSDFShader(paramsLarge);
-    shaderLarge.MakeDrawingShader(rect, 0.5f);
+    shaderLarge.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_NE(shaderLarge.GetDrawingShader(), nullptr);
 }
 
@@ -126,7 +127,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest006, TestSize.Level1)
 
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 300, 300);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
 }
 
 HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest007, TestSize.Level1)
@@ -141,7 +142,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest007, TestSize.Level1)
     };
     for (const auto& rect : rects) {
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
     }
 }
 
@@ -158,7 +159,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest008, TestSize.Level1)
         auto params = GetTestParams();
         params.color = color;
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -168,7 +169,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest009, TestSize.Level1)
     auto params = GetTestParams();
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 100, 100);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     auto drawingShader = shader.GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
 }
@@ -180,7 +181,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest010, TestSize.Level1)
 
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 100, 100);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
@@ -194,7 +195,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest011, TestSize.Level1)
         auto params = GetTestParams();
         params.width = widthValues[i];
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -217,7 +218,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest012, TestSize.Level1)
         auto params = GetTestParams();
         params.color = color;
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -230,9 +231,9 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest013, TestSize.Level1)
     Drawing::Rect rect2(0, 0, 100, 100);
     Drawing::Rect rect3(0, 0, 200, 200);
 
-    shader.MakeDrawingShader(rect1, 0.5f);
-    shader.MakeDrawingShader(rect2, 0.75f);
-    shader.MakeDrawingShader(rect3, 1.0f);
+    shader.MakeDrawingShader(canvas_, rect1, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect2, 0.75f);
+    shader.MakeDrawingShader(canvas_, rect3, 1.0f);
 
     auto drawingShader = shader.GetDrawingShader();
     EXPECT_NE(drawingShader, nullptr);
@@ -246,7 +247,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest014, TestSize.Level1)
 
     constexpr size_t CALL_COUNT = 6;
     for (size_t i = 0; i < CALL_COUNT; i++) {
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -266,7 +267,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest015, TestSize.Level1)
 
     for (const auto& rect : rects) {
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -278,7 +279,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest016, TestSize.Level1)
     params1.width = 5.0f;
     auto shader1 = GEBorderSDFShader(params1);
     Drawing::Rect rect(0, 0, 100, 100);
-    shader1.MakeDrawingShader(rect, 0.5f);
+    shader1.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_NE(shader1.GetDrawingShader(), nullptr);
 
     auto params2 = GetTestParams();
@@ -286,14 +287,14 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest016, TestSize.Level1)
     params2.width = 15.0f;
     params2.isOutline = true;
     auto shader2 = GEBorderSDFShader(params2);
-    shader2.MakeDrawingShader(rect, 0.75f);
+    shader2.MakeDrawingShader(canvas_, rect, 0.75f);
     EXPECT_NE(shader2.GetDrawingShader(), nullptr);
 
     auto params3 = GetTestParams();
     params3.color = Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
     params3.width = 20.0f;
     auto shader3 = GEBorderSDFShader(params3);
-    shader3.MakeDrawingShader(rect, 1.0f);
+    shader3.MakeDrawingShader(canvas_, rect, 1.0f);
     EXPECT_NE(shader3.GetDrawingShader(), nullptr);
 }
 
@@ -321,7 +322,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest018, TestSize.Level1)
         auto params = GetTestParams();
         params.isOutline = isOutline;
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -342,7 +343,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest019, TestSize.Level1)
         params.dashWidth = config[0];
         params.dashGap = config[1];
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -356,7 +357,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest020, TestSize.Level1)
         auto params = GetTestParams();
         params.width = w;
         auto shader = GEBorderSDFShader(params);
-        shader.MakeDrawingShader(rect, 0.5f);
+        shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
     }
 }
@@ -371,7 +372,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest021, TestSize.Level1)
 
     auto shader = GEBorderSDFShader(params);
     Drawing::Rect rect(0, 0, 300, 300);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
@@ -379,7 +380,7 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest022, TestSize.Level1)
 {
     auto shader = GEBorderSDFShader();
     Drawing::Rect rect(0, 0, 300, 300);
-    shader.MakeDrawingShader(rect, 0.5f);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 

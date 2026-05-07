@@ -47,7 +47,7 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
 
     // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
     Drawing::Rect rect { 1.0f, 1.0f, 2.0f, 2.0f };
-    auto shader = clipShader.MakeSDFClipShader(rect);
+    auto shader = clipShader.MakeSDFClipShader(canvas_, rect);
     EXPECT_EQ(shader, nullptr);
 
     Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
@@ -55,7 +55,7 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
     auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
     params.shape = sdfShape;
     clipShader.SetSDFClipParams(params);
-    shader = clipShader.MakeSDFClipShader(rect);
+    shader = clipShader.MakeSDFClipShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
 }
 } // namespace Rosen

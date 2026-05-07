@@ -73,14 +73,7 @@ GESDFEdgeLightShader::GESDFEdgeLightShader(const Drawing::GESDFEdgeLightEffectPa
     : params_(params)
 {}
 
-void GESDFEdgeLightShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
-{
-    if (params_.sdfShape) {
-        params_.sdfShape->Preprocess(canvas, rect, false);
-    }
-}
-
-void GESDFEdgeLightShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GESDFEdgeLightShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     drShader_ = nullptr;
 
@@ -94,7 +87,7 @@ void GESDFEdgeLightShader::MakeDrawingShader(const Drawing::Rect& rect, float pr
         return;
     }
 
-    auto builder = GetEffectShaderBuilder(rect);
+    auto builder = GetEffectShaderBuilder(canvas, rect);
     if (builder == nullptr) {
         LOGE("GESDFEdgeLightShader::MakeDrawingShader builder is nullptr");
         return;
@@ -107,7 +100,8 @@ void GESDFEdgeLightShader::MakeDrawingShader(const Drawing::Rect& rect, float pr
     drShader_ = sdfEdgeLightShader;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectShaderBuilder(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectShaderBuilder(
+    Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> effectShader_ = nullptr;
 
@@ -127,7 +121,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
     auto width = canvasInfo_.geoWidth;
     auto height = canvasInfo_.geoHeight;
 
-    auto sdfShader = params_.sdfShape->GenerateDrawingShader(width, height);
+    auto sdfShader = params_.sdfShape->GenerateDrawingShader(canvas, width, height);
     if (sdfShader == nullptr) {
         LOGE("GESDFEdgeLightShader::GetEffectShaderBuilder sdfShader is nullptr");
         return nullptr;

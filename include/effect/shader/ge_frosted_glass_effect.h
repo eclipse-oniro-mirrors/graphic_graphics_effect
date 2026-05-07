@@ -42,19 +42,18 @@ public:
 
     const std::string GetDescription() const { return "GEFrostedGlassEffect"; }
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
 
-    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
+    void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
+
+    std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(Drawing::Canvas& canvas,
         std::shared_ptr<Drawing::ShaderEffect> imageShader, const Drawing::Rect& rect);
-
-protected:
-    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
     bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
         const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
         std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder);
-    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(float width, float height) const;
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(Drawing::Canvas& canvas, float width, float height);
 
     bool IsValidParam(float width, float height);
     bool InitFrostedGlassEffect();

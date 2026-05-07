@@ -91,7 +91,7 @@ HWTEST_F(GESDFEdgeLightShaderTest, MakeDrawingShader_InvalidInputs, TestSize.Lev
     auto params = MakeParams();
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
     // Case 1: sdfShape not set → MakeDrawingShader should complete but shader may be invalid
-    shader->MakeDrawingShader(rect_, 0.0f);
+    shader->MakeDrawingShader(canvas_, rect_, 0.0f);
     EXPECT_EQ(shader->drShader_, nullptr);
 
     // Case 2: lightMask not set → MakeDrawingShader should complete but shader may be invalid
@@ -99,7 +99,7 @@ HWTEST_F(GESDFEdgeLightShaderTest, MakeDrawingShader_InvalidInputs, TestSize.Lev
     params2.sdfShape = sdfShape_;
     // lightMask is not set (nullptr)
     auto shader2 = std::make_unique<GESDFEdgeLightShader>(params2);
-    shader2->MakeDrawingShader(rect_, 0.0f);
+    shader2->MakeDrawingShader(canvas_, rect_, 0.0f);
     EXPECT_EQ(shader2->drShader_, nullptr);
 }
 
@@ -116,9 +116,9 @@ HWTEST_F(GESDFEdgeLightShaderTest, ParameterVariations_Smoke, TestSize.Level0)
     params1.lightMask = lightMask_;
     params1.sdfShape = sdfShape_;
     auto shader1 = std::make_unique<GESDFEdgeLightShader>(params1);
-    shader1->MakeDrawingShader(rect_, 0.0f);
+    shader1->MakeDrawingShader(canvas_, rect_, 0.0f);
     // Test effectShader when second enter
-    shader1->MakeDrawingShader(rect_, 0.0f);
+    shader1->MakeDrawingShader(canvas_, rect_, 0.0f);
     EXPECT_NE(shader1->drShader_, nullptr);
 
     // Test with different parameters
@@ -135,7 +135,7 @@ HWTEST_F(GESDFEdgeLightShaderTest, ParameterVariations_Smoke, TestSize.Level0)
     params3.outerBorderBloomWidth = 40.0f;
     params3.sdfSpreadFactor = 128.0f;
     auto shader3 = std::make_unique<GESDFEdgeLightShader>(params3);
-    shader3->MakeDrawingShader(rect_, 0.0f);
+    shader3->MakeDrawingShader(canvas_, rect_, 0.0f);
     EXPECT_NE(shader3->drShader_, nullptr);
 }
 
@@ -166,8 +166,8 @@ HWTEST_F(GESDFEdgeLightShaderTest, OnDrawTest001, TestSize.Level0)
     params.sdfShape = sdfShape_;
     params.lightMask = lightMask_;
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
-    shader->MakeDrawingShader(rect_, 0.0f);
     Drawing::Canvas canvas;
+    shader->MakeDrawingShader(canvas, rect_, 0.0f);
     shader->OnDrawShader(canvas, rect_);
     EXPECT_NE(shader->drShader_, nullptr);
 }
@@ -181,8 +181,8 @@ HWTEST_F(GESDFEdgeLightShaderTest, OnDrawTest002, TestSize.Level0)
 {
     auto params = MakeParams();
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
-    shader->MakeDrawingShader(rect_, 0.0f);
     Drawing::Canvas canvas;
+    shader->MakeDrawingShader(canvas, rect_, 0.0f);
     shader->OnDrawShader(canvas, rect_);
     EXPECT_EQ(shader->drShader_, nullptr);
 }
@@ -200,7 +200,7 @@ HWTEST_F(GESDFEdgeLightShaderTest, GetEffectShaderBuilderTest001, TestSize.Level
     params.sdfShape = sdfShape_;
     params.lightMask = lightMask_;
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
-    auto builder = shader->GetEffectShaderBuilder(rect_);
+    auto builder = shader->GetEffectShaderBuilder(canvas_, rect_);
     EXPECT_NE(builder, nullptr);
 }
 } // namespace Rosen
