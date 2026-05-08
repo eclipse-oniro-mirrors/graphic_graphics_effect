@@ -51,6 +51,7 @@ class GEFilterParams;
     X(ESCAPE(DotMatrixEffectType))                       \
     X(ESCAPE(Drawing::Color4f))                          \
     X(ESCAPE(Drawing::Matrix))                           \
+    X(ESCAPE(Drawing::Path))                             \
     X(ESCAPE(Drawing::Point))                            \
     X(ESCAPE(GEBezierWarpShaderFilterControlPointArray)) \
     X(ESCAPE(GERRect))                                   \
@@ -470,6 +471,9 @@ enum class GEParamsMemberTag : uint32_t {
     SDF_EDGE_LIGHT_SDF_SHAPE,
     SDF_FROM_IMAGE_SPREAD_FACTOR,
     SDF_FROM_IMAGE_GENERATE_DERIVS,
+    SDF_PATH_SHAPE_PATH,
+    SDF_PATH_SHAPE_OFFSET,
+    SDF_PATH_SHAPE_SCALE,
     SDF_PIXELMAP_SHAPE_IMAGE,
     SDF_RRECT_SHAPE_RRECT,
     SDF_SHADOW_SHAPE,
@@ -1262,6 +1266,9 @@ GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_EDGE_LIGHT_EFFECT_SDF_SHAPE, ESCAPE(s
 GE_PARAMS_CONSTRAINT_MIN(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float, 0.0f);
 GE_PARAMS_CONSTRAINT_MAX(SDF_EDGE_LIGHT_SDF_SPREAD_FACTOR, float, 4096.0f);
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_EDGE_LIGHT_SDF_SHAPE, ESCAPE(std::shared_ptr<GEShaderShape>));
+GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_PATH_SHAPE_PATH, ESCAPE(Drawing::Path));
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SDF_PATH_SHAPE_OFFSET, ESCAPE(std::pair<float, float>), PairToVector2fTransformer);
+GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(SDF_PATH_SHAPE_SCALE, ESCAPE(std::pair<float, float>), PairToVector2fTransformer);
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_SHADOW_SHAPE, ESCAPE(std::shared_ptr<Drawing::GEShaderShape>));
 GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM(SDF_TRANSFORM_SHAPE_SHAPE, ESCAPE(std::shared_ptr<GEShaderShape>));
 GE_PARAMS_CONSTRAINT_CONVERT_CUSTOM(
@@ -1487,6 +1494,7 @@ GE_PARAMS_TYPE_INFO(GESDFDistortOpShapeParams, SDF_DISTORT_OP_SHAPE, SDFDistortO
 GE_PARAMS_TYPE_INFO(GESDFEdgeLightEffectParams, SDF_EDGE_LIGHT_EFFECT, SDFEdgeLightEffect);
 GE_PARAMS_TYPE_INFO(GESDFEdgeLightFilterParams, SDF_EDGE_LIGHT, SDFEdgeLight);
 GE_PARAMS_TYPE_INFO(GESDFFromImageFilterParams, SDF_FROM_IMAGE, SDF_FROM_IMAGE);
+GE_PARAMS_TYPE_INFO(GESDFPathShapeParams, SDF_PATH_SHAPE, SDFPathShape);
 GE_PARAMS_TYPE_INFO(GESDFPixelmapShapeParams, SDF_PIXELMAP_SHAPE, SDFPixelmapShape);
 GE_PARAMS_TYPE_INFO(GESDFRRectShapeParams, SDF_RRECT_SHAPE, SDFRRectShape);
 GE_PARAMS_TYPE_INFO(GESDFShadowShaderParams, SDF_SHADOW, SDFShadow);
@@ -2207,6 +2215,9 @@ GE_PARAMS_FIELD_ACCESSOR(
     GESDFFromImageFilterParams, spreadFactor, SDF_FROM_IMAGE_SPREAD_FACTOR, SDF_FROM_IMAGE_SPREAD_FACTOR);
 GE_PARAMS_FIELD_ACCESSOR(
     GESDFFromImageFilterParams, generateDerivs, SDF_FROM_IMAGE_GENERATE_DERIVS, SDF_FROM_IMAGE_GENERATE_DERIVS);
+GE_PARAMS_FIELD_ACCESSOR(GESDFPathShapeParams, path, SDF_PATH_SHAPE_PATH, SDFPathShape_Path);
+GE_PARAMS_FIELD_ACCESSOR(GESDFPathShapeParams, offset, SDF_PATH_SHAPE_OFFSET, SDFPathShape_Offset);
+GE_PARAMS_FIELD_ACCESSOR(GESDFPathShapeParams, scale, SDF_PATH_SHAPE_SCALE, SDFPathShape_Scale);
 GE_PARAMS_FIELD_ACCESSOR(GESDFPixelmapShapeParams, image, SDF_PIXELMAP_SHAPE_IMAGE, SDFPixelmapShape_Image);
 GE_PARAMS_FIELD_ACCESSOR(GESDFRRectShapeParams, rrect, SDF_RRECT_SHAPE_RRECT, SDFRRectShape_RRect);
 GE_PARAMS_FIELD_ACCESSOR(GESDFShadowShaderParams, shape, SDF_SHADOW_SHAPE, SDFShadow_Shape);
@@ -2598,6 +2609,7 @@ public:
     static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const DotMatrixEffectType& value);
     static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Color4f& value);
     static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Matrix& value);
+    static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Path& value);
     static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Point& value);
     static void SetParamsMemberByTag(
         GEFilterParams& params, GEParamsMemberTag tag, const GEBezierWarpShaderFilterControlPointArray& value);

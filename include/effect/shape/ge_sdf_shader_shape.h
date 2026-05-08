@@ -28,6 +28,7 @@ enum class GESDFShapeType : uint8_t {
     RRECT,
     TRIANGLE,
     TRANSFORM,
+    PATH,
     UNION_OP,
     DISTORT_OP,
     MAX = DISTORT_OP,
@@ -41,6 +42,10 @@ public:
 
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(Canvas& canvas, float width, float height) override;
+    virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(Canvas& canvas,
+        float width, float height) override;
+    virtual void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override {}
 
     virtual bool TryGetCenter(float& outX, float& outY) const;
     virtual GESDFShapeType GetSDFShapeType() const = 0;

@@ -85,6 +85,7 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
         GE_BUILD_PARAMS_CASE(SDF_EDGE_LIGHT_EFFECT, GESDFEdgeLightEffectParams)
         GE_BUILD_PARAMS_CASE(SDF_EDGE_LIGHT, GESDFEdgeLightFilterParams)
         GE_BUILD_PARAMS_CASE(SDF_FROM_IMAGE, GESDFFromImageFilterParams)
+        GE_BUILD_PARAMS_CASE(SDF_PATH_SHAPE, GESDFPathShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_PIXELMAP_SHAPE, GESDFPixelmapShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_RRECT_SHAPE, GESDFRRectShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_SHADOW, GESDFShadowShaderParams)
@@ -177,6 +178,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFEdgeLightEffectParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFEdgeLightFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFFromImageFilterParams),
+        GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFPathShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFPixelmapShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFRRectShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFShadowShaderParams),
@@ -615,6 +617,9 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
         GE_GET_FILTER_TYPE_CASE(SDF_EDGE_LIGHT_SDF_SHAPE, SDF_EDGE_LIGHT)
         GE_GET_FILTER_TYPE_CASE(SDF_FROM_IMAGE_SPREAD_FACTOR, SDF_FROM_IMAGE)
         GE_GET_FILTER_TYPE_CASE(SDF_FROM_IMAGE_GENERATE_DERIVS, SDF_FROM_IMAGE)
+        GE_GET_FILTER_TYPE_CASE(SDF_PATH_SHAPE_PATH, SDF_PATH_SHAPE)
+        GE_GET_FILTER_TYPE_CASE(SDF_PATH_SHAPE_OFFSET, SDF_PATH_SHAPE)
+        GE_GET_FILTER_TYPE_CASE(SDF_PATH_SHAPE_SCALE, SDF_PATH_SHAPE)
         GE_GET_FILTER_TYPE_CASE(SDF_PIXELMAP_SHAPE_IMAGE, SDF_PIXELMAP_SHAPE)
         GE_GET_FILTER_TYPE_CASE(SDF_RRECT_SHAPE_RRECT, SDF_RRECT_SHAPE)
         GE_GET_FILTER_TYPE_CASE(SDF_SHADOW_SHAPE, SDF_SHADOW)
@@ -1244,6 +1249,9 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
         GE_STRING_TO_TAG_ENTRY(SDF_EDGE_LIGHT_SDF_SHAPE),
         GE_STRING_TO_TAG_ENTRY(SDF_FROM_IMAGE_SPREAD_FACTOR),
         GE_STRING_TO_TAG_ENTRY(SDF_FROM_IMAGE_GENERATE_DERIVS),
+        GE_STRING_TO_TAG_ENTRY(SDF_PATH_SHAPE_PATH),
+        GE_STRING_TO_TAG_ENTRY(SDF_PATH_SHAPE_OFFSET),
+        GE_STRING_TO_TAG_ENTRY(SDF_PATH_SHAPE_SCALE),
         GE_STRING_TO_TAG_ENTRY(SDF_PIXELMAP_SHAPE_IMAGE),
         GE_STRING_TO_TAG_ENTRY(SDF_RRECT_SHAPE_RRECT),
         GE_STRING_TO_TAG_ENTRY(SDF_SHADOW_SHAPE),
@@ -1591,6 +1599,24 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
 }
 
 void GEParamsMemberHelper::SetParamsMemberByTag(
+    GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Path& value)
+{
+    auto expectedFilterType = GetFilterTypeFromTag(tag);
+    if (params.GetType() != expectedFilterType) {
+        return;
+    }
+
+    switch (tag) {
+        GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_PATH)
+        default:
+            GE_LOGE("SetParamsMemberByTag<Drawing::Path>: No matching case for tag %u (filter type %u, params type %u)",
+                static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
+                static_cast<uint32_t>(params.GetType()));
+            break;
+    }
+}
+
+void GEParamsMemberHelper::SetParamsMemberByTag(
     GEFilterParams& params, GEParamsMemberTag tag, const Drawing::Point& value)
 {
     auto expectedFilterType = GetFilterTypeFromTag(tag);
@@ -1792,6 +1818,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_BG_RATES)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_MODE_ED_LIGHT_ANGLES)
         GE_VALIDATE_AND_SET(MOTION_BLUR_ANCHOR)
+        GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_OFFSET)
+        GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_SCALE)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_CENTER_POSITION)
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX0)
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)
@@ -2387,6 +2415,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_U_CORNER)
         GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_R_B_CORNER)
         GE_VALIDATE_AND_SET(SDF_DISTORT_OP_SHAPE_L_B_CORNER)
+        GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_OFFSET)
+        GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_SCALE)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_CENTER_POSITION)
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX0)
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)

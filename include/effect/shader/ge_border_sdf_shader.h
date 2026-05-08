@@ -34,7 +34,9 @@ public:
     ~GEBorderSDFShader() override = default;
     DECLARE_GEFILTER_TYPEFUNC(GEBorderSDFShader, Drawing::GEBorderSDFShaderParams);
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
+
+    void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
 
 private:
     Drawing::GEBorderSDFShaderParams params_;

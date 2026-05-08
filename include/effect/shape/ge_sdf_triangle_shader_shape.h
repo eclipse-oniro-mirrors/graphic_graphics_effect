@@ -26,6 +26,8 @@ namespace Drawing {
 
 class GE_EXPORT GESDFTriangleShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     DECLARE_GEFILTER_TYPEFUNC(GESDFTriangleShaderShape, Drawing::GESDFTriangleShapeParams);
     GESDFTriangleShaderShape(const GESDFTriangleShapeParams& param) : params_(param) {}
     GESDFTriangleShaderShape(const GESDFTriangleShaderShape&) = delete;

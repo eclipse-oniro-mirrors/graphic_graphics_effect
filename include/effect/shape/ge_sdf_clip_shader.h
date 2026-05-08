@@ -38,14 +38,16 @@ public:
 
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
+
+    void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
 
     void SetSDFClipParams(const Drawing::GESDFClipShaderParams& params)
     {
         params_ = params;
     }
 
-    std::shared_ptr<Drawing::ShaderEffect> MakeSDFClipShader(const Drawing::Rect& rect);
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFClipShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFClipEffect();

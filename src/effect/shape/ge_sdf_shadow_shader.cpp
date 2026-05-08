@@ -40,12 +40,12 @@ GESDFShadowShader::GESDFShadowShader(const Drawing::GESDFShadowShaderParams& par
     }
 }
 
-void GESDFShadowShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GESDFShadowShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     if (IsElevationMode()) {
-        drShader_ = MakeElevationShadowShader(rect);
+        drShader_ = MakeElevationShadowShader(canvas, rect);
     } else {
-        drShader_ = MakeSDFShadowShader(rect);
+        drShader_ = MakeSDFShadowShader(canvas, rect);
     }
 }
 
@@ -82,7 +82,7 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     } else {
         UpdateRectForShadow(newRect);
     }
-    MakeDrawingShader(newRect, -1.f); // not use progress
+    MakeDrawingShader(canvas, newRect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -94,7 +94,8 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     canvas.DetachBrush();
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect)
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
@@ -107,7 +108,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeSDFShadowShader(co
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
+        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
         canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFShadowShader: failed generate GESDFShadowShader.");
@@ -190,7 +192,8 @@ void GESDFShadowShader::UpdateRectForElevationShadow(Drawing::Rect& rect)
     rect.SetBottom(rect.GetBottom() + params_.shadow.offsetY + maxBlur);
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowShader(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowShader(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect)
 {
     auto width = rect.GetWidth();
     auto height = rect.GetHeight();
@@ -203,7 +206,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFShadowShader::MakeElevationShadowSha
         return nullptr;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
+        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : width,
         canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFShadowShader::MakeElevationShadowShader failed generate SDF shader.");

@@ -55,7 +55,8 @@ private:
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
     std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
         const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
-    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(float width, float height) const;
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(Drawing::Canvas& canvas,
+        float width, float height) const;
     bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
         const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
         std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder);

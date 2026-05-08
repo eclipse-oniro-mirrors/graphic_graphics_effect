@@ -72,6 +72,13 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
     return sdfTransformShapeShader;
 }
 
+void GESDFTransformShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal)
+{
+    if (params_.shape) {
+        params_.shape->Preprocess(canvas, rect, hasNormal);
+    }
+}
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder() const
 {
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfTransformShaderShapeBuilder = nullptr;

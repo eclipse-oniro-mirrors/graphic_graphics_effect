@@ -33,7 +33,7 @@ void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect&
         return;
     }
     Preprocess(canvas, rect); // to calculate your cache data
-    MakeDrawingShader(rect, -1.f);
+    MakeDrawingShader(canvas, rect, -1.f);
     auto shader = GetDrawingShader();
     Drawing::Brush brush;
     if (shader == nullptr) {
@@ -49,23 +49,24 @@ void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect&
     canvas.DetachBrush();
 }
 
-void GESDFClipShader::MakeDrawingShader(const Drawing::Rect& rect, float progress)
+void GESDFClipShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     if (!rect.IsValid()) {
         GE_LOGE("GESDFClipShader::MakeSDFClipShader rect is invalid.");
         return;
     }
-    drShader_ = MakeSDFClipShader(rect);
+    drShader_ = MakeSDFClipShader(canvas, rect);
 }
 
-std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(const Drawing::Rect& rect)
+std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(Drawing::Canvas& canvas,
+    const Drawing::Rect& rect)
 {
     if (!params_.shape) {
         GE_LOGE("GESDFClipShader::MakeSDFClipShader mask is invalid.");
         return nullptr;
     }
     GE_TRACE_NAME_FMT("GESDFClipShader::GetSDFClipEffect, normal type");
-    auto sdfShader = params_.shape->GenerateDrawingShader(
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
         canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : rect.GetWidth(),
         canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : rect.GetHeight());
     if (sdfShader == nullptr) {

@@ -30,6 +30,7 @@ public:
     static void TearDownTestCase() {}
     void SetUp() override {}
     void TearDown() override {}
+    static inline Drawing::Canvas canvas_;
 
     std::shared_ptr<GESDFShaderShape> CreateTestShape() const
     {
@@ -151,7 +152,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Inner_001, TestSize.Level1)
 
     GESDFBorderShader borderShader(params);
     Rect rect {0, 0, 300.0f, 300.0f};
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Inner_001 end";
 }
@@ -171,7 +172,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_Outline_001, TestSize.Level1
 
     GESDFBorderShader borderShader(params);
     Rect rect {0, 0, 300.0f, 300.0f};
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_Outline_001 end";
 }
@@ -190,7 +191,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_NullShape_001, TestSize.Leve
 
     GESDFBorderShader borderShader(params);
     Rect rect {0, 0, 300.0f, 300.0f};
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_NullShape_001 end";
 }
@@ -210,7 +211,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroWidth_001, TestSize.Leve
 
     GESDFBorderShader borderShader(params);
     Rect rect {0, 0, 0.0f, 300.0f};
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroWidth_001 end";
 }
@@ -230,7 +231,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_ZeroHeight_001, TestSize.Lev
 
     GESDFBorderShader borderShader(params);
     Rect rect {0, 0, 300.0f, 0.0f};
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_ZeroHeight_001 end";
 }
@@ -254,7 +255,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_InnerBorder_001, TestSize.Le
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);
 
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_InnerBorder_001 end";
 }
@@ -278,7 +279,7 @@ HWTEST_F(GESDFBorderShaderTest, MakeSDFBorderShader_OutlineBorder_001, TestSize.
     auto effect = borderShader.GetSDFBorderEffect();
     EXPECT_NE(effect, nullptr);
 
-    auto shader = borderShader.MakeSDFBorderShader(rect);
+    auto shader = borderShader.MakeSDFBorderShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "MakeSDFBorderShader_OutlineBorder_001 end";
 }

@@ -71,6 +71,7 @@
 #include "effect/shape/ge_sdf_color_shader.h"
 #include "effect/shape/ge_sdf_distort_op_shader_shape.h"
 #include "effect/shape/ge_sdf_empty_shader_shape.h"
+#include "effect/shape/ge_sdf_path_shader_shape.h"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.h"
 #include "effect/shape/ge_sdf_rrect_shader_shape.h"
 #include "effect/shape/ge_sdf_shadow_shader.h"
@@ -259,6 +260,7 @@ GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::
  *    4.1 Built-in effects
  */
 GE_FACTORY_REGISTER_SHAPE(GESDFDistortOpShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFPathShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFPixelmapShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFTransformShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFTriangleShaderShape)

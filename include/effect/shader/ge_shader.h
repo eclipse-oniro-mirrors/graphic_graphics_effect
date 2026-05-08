@@ -34,6 +34,8 @@ public:
 
     virtual void MakeDrawingShader(const Drawing::Rect& rect, float progress) = 0;
 
+    virtual void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress);
+
     virtual const std::shared_ptr<Drawing::ShaderEffect>& GetDrawingShader() { return drShader_; }
 
     uint32_t Hash() const { return hash_; }

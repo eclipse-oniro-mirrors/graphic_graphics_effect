@@ -1,0 +1,555 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <gtest/gtest.h>
+
+#include "draw/canvas.h"
+#include "draw/path.h"
+#include "ge_external_dynamic_loader.h"
+#include "ge_sdf_path_shader_shape.h"
+#include "render_context/render_context.h"
+
+using namespace testing;
+using namespace testing::ext;
+
+namespace OHOS {
+namespace Rosen {
+namespace Drawing {
+
+namespace {
+    struct TestConfig {
+        std::function<Drawing::Path()> buildPath;
+        Drawing::Rect rect;
+        Vector2f offset = Vector2f(0.0f, 0.0f);
+        Vector2f scale = Vector2f(1.0f, 1.0f);
+        std::string description;
+    };
+
+    static std::vector<TestConfig> VALID_CONFIGS = {
+        { []() {
+            Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            path.LineTo(100.0f, 200.0f);
+            return path;
+            },
+            Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f), Vector2f(0.0f, 0.0f),
+            Vector2f(1.0f, 1.0f), "valid rect"},
+        { []() {
+            Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            path.LineTo(100.0f, 200.0f);
+            path.LineTo(150.0f, 250.0f);
+            path.LineTo(200.0f, 300.0f);
+            path.LineTo(200.0f, 20.0f);
+            path.LineTo(10.0f, 20.0f);
+            return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 300.0f, 300.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "multiple line segments" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f), Vector2f(0.0f, 0.0f), Vector2f(0.1f, 0.1f),
+            "very small rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 1000.0f, 1000.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "very large rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             path.LineTo(10.0f, 200.0f);
+             path.LineTo(10.0f, 20.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 200.0f, 100.0f), Vector2f(0.0f, 0.0f), Vector2f(0.5f, 0.5f),
+            "asymmetric rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             path.QuadTo(150.0f, 250.0f, 200.0f, 300.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 250.0f, 350.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "compute all curve bounding boxes" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f), Vector2f(0.0f, 0.0f), Vector2f(2.0f, 2.0f),
+            "large scale factor" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             path.LineTo(100.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f), Vector2f(0.0f, 0.0f), Vector2f(0.001f, 0.001f),
+            "small scale factor" },
+        { []() {
+             Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            path.QuadTo(30.0f, 50.0f, 50.0f, 80.0f);
+            path.QuadTo(70.0f, 110.0f, 90.0f, 140.0f);
+            path.QuadTo(110.0f, 170.0f, 130.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 150.0f, 150.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "multiple quadratic bezier curves" },
+        { []() {
+            Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            path.CubicTo(20.0f, 30.0f, 40.0f, 60.0f, 50.0f, 80.0f);
+            path.CubicTo(60.0f, 90.0f, 80.0f, 120.0f, 90.0f, 140.0f);
+            path.CubicTo(100.0f, 150.0f, 120.0f, 180.0f, 130.0f, 200.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 150.0f, 150.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "multiple cubic bezier curves" },
+        { []() {
+            Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            path.LineTo(50.0f, 100.0f);
+            path.QuadTo(75.0f, 150.0f, 100.0f, 200.0f);
+            path.CubicTo(120.0f, 220.0f, 150.0f, 280.0f, 200.0f, 300.0f);
+            path.LineTo(250.0f, 350.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 300.0f, 300.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "complex path with multiple curves" },
+    };
+
+    static std::vector<TestConfig> INVALID_CONFIGS = {
+        { []() {
+            Drawing::Path path;
+            path.MoveTo(10.0f, 20.0f);
+            return path;
+        },
+            Drawing::Rect(0.0f, 0.0f, -10.0f, -10.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "invalid rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 0.0f, 100.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "zero width rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(10.0f, 20.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 100.0f, 0.0f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "zero height rect" },
+        { []() {
+             Drawing::Path path;
+             path.MoveTo(50.0f, 100.0f);
+             return path;
+         },
+            Drawing::Rect(0.0f, 0.0f, 0.5f, 0.5f), Vector2f(0.0f, 0.0f), Vector2f(1.0f, 1.0f),
+            "very small dimensions" }
+        };
+};
+
+class GESDFPathShaderShapeTest : public testing::Test {
+public:
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp() override;
+    void TearDown() override;
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
+    Drawing::Rect rect_;
+    Drawing::ImageInfo imageInfo_ = {};
+};
+
+void GESDFPathShaderShapeTest::SetUpTestCase(void) {}
+void GESDFPathShaderShapeTest::TearDownTestCase(void) {}
+
+void GESDFPathShaderShapeTest::SetUp()
+{
+    Drawing::Rect rect { 0.0f, 0.0f, 400.0f, 400.0f };
+    rect_ = rect;
+    imageInfo_ = Drawing::ImageInfo { rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_F16,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE };
+    surface_ = CreateSurface();
+    canvas_ = surface_->GetCanvas();
+}
+
+void GESDFPathShaderShapeTest::TearDown() {}
+
+std::shared_ptr<Drawing::Surface> GESDFPathShaderShapeTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
+}
+
+/**
+ * @tc.name: GetPath_001
+ * @tc.desc: Verify GetPath returns correct path
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetPath_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    const auto& resultPath = shape.GetPath();
+    EXPECT_TRUE(resultPath.IsValid());
+}
+
+/**
+ * @tc.name: GetOffset_001
+ * @tc.desc: Verify GetOffset returns correct offset
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetOffset_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    param.path = path;
+    param.offset = Vector2f(15.0f, 25.0f);
+
+    GESDFPathShaderShape shape(param);
+    const auto& offset = shape.GetOffset();
+    EXPECT_EQ(offset.x_, 15.0f);
+    EXPECT_EQ(offset.y_, 25.0f);
+}
+
+/**
+ * @tc.name: CopyState_001
+ * @tc.desc: Verify CopyState correctly copies parameters
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, CopyState_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param1;
+    Drawing::Path path1;
+    path1.MoveTo(10.0f, 20.0f);
+    param1.path = path1;
+    param1.offset = Vector2f(5.0f, 10.0f);
+
+    GESDFPathShapeParams param2;
+    Drawing::Path path2;
+    path2.MoveTo(30.0f, 40.0f);
+    path2.LineTo(50.0f, 60.0f);
+    param2.path = path2;
+    param2.offset = Vector2f(15.0f, 25.0f);
+
+    GESDFPathShaderShape shape1(param1);
+    GESDFPathShaderShape shape2(param2);
+
+    shape1.CopyState(shape2);
+    EXPECT_TRUE(shape1.GetPath().IsValid());
+    EXPECT_EQ(shape1.GetOffset().x_, 15.0f);
+    EXPECT_EQ(shape1.GetOffset().y_, 25.0f);
+}
+
+/**
+ * @tc.name: PreprocessValidParamstest_001
+ * @tc.desc: Verify Preprocess with valid scenarios including valid rect, proper path,
+ *            different rect sizes, scale and offset
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, PreprocessValidParamstest_001, TestSize.Level1)
+{
+    for (const auto& config : VALID_CONFIGS) {
+        GESDFPathShapeParams param;
+        param.path = config.buildPath();
+        param.offset = config.offset;
+        param.scale = config.scale;
+
+        GESDFPathShaderShape shape(param);
+        shape.Preprocess(*canvas_, config.rect, false);
+        EXPECT_NE(shape.disResult_, nullptr);
+
+        auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
+        EXPECT_NE(shader, nullptr);
+    }
+}
+
+/**
+ * @tc.name: PreprocessInvalidParamsTest_001
+ * @tc.desc: Verify Preprocess with invalid scenarios including invalid rect, zero width/height rect, small dimensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, PreprocessInvalidParamsTest_001, TestSize.Level1)
+{
+    for (const auto& config : INVALID_CONFIGS) {
+        GESDFPathShapeParams param;
+        param.path = config.buildPath();
+        param.offset = config.offset;
+        param.scale = config.scale;
+
+        GESDFPathShaderShape shape(param);
+        shape.Preprocess(*canvas_, config.rect, false);
+        EXPECT_EQ(shape.disResult_, nullptr);
+
+        auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
+        EXPECT_EQ(shader, nullptr);
+    }
+}
+
+/**
+ * @tc.name: GetCurveByPath_001
+ * @tc.desc: Verify GetCurveByPath with valid path
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetCurveByPath_001, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+
+    auto result = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(result.empty());
+}
+
+/**
+ * @tc.name: GetCurveByPath_002
+ * @tc.desc: Verify GetCurveByPath with quadratic bezier curve
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetCurveByPath_002, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.QuadTo(50.0f, 100.0f, 100.0f, 200.0f);
+
+    auto result = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0].size(), 3);
+}
+
+/**
+ * @tc.name: GetCurveByPath_003
+ * @tc.desc: Verify GetCurveByPath with cubic bezier curve
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetCurveByPath_003, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.CubicTo(30.0f, 40.0f, 60.0f, 80.0f, 100.0f, 200.0f);
+
+    auto result = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result.size(), 1);
+    EXPECT_EQ(result[0].size(), 4);
+}
+
+/**
+ * @tc.name: GetCurveByPath_004
+ * @tc.desc: Verify GetCurveByPath with multiple segments
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GetCurveByPath_004, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.LineTo(150.0f, 250.0f);
+    path.QuadTo(200.0f, 300.0f, 250.0f, 350.0f);
+
+    auto result = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(result.empty());
+    EXPECT_EQ(result.size(), 3);
+}
+
+/**
+ * @tc.name: Preprocess_001
+ * @tc.desc: Verify Preprocess with valid path and invalid canvas
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, Preprocess_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+    Drawing::Canvas canvas;
+
+    shape.Preprocess(canvas, rect, false);
+    EXPECT_EQ(shape.disResult_, nullptr);
+}
+
+/**
+ * @tc.name: Preprocess_002
+ * @tc.desc: Verify Preprocess with hasNormal parameter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, Preprocess_002, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+
+    shape.Preprocess(*canvas_, rect, true);
+    EXPECT_NE(shape.disResult_, nullptr);
+}
+
+/**
+ * @tc.name: cubicToQuadraticSingle_001
+ * @tc.desc: Verify cubicToQuadraticSingle with valid points
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, cubicToQuadraticSingle_001, TestSize.Level1)
+{
+    Vector2f p0(0.0f, 0.0f);
+    Vector2f p1(50.0f, 100.0f);
+    Vector2f p2(100.0f, 150.0f);
+    Vector2f p3(150.0f, 200.0f);
+
+    Vector2f originalP1 = p1;
+    GESDFPathShaderShape::cubicToQuadraticSingle(p0, p1, p2, p3);
+    EXPECT_NE(p1.y_, originalP1.y_);
+}
+
+/**
+ * @tc.name: cubicToQuadraticSingle_002
+ * @tc.desc: Verify cubicToQuadraticSingle with different end points
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, cubicToQuadraticSingle_002, TestSize.Level1)
+{
+    Vector2f p0(10.0f, 20.0f);
+    Vector2f p1(30.0f, 60.0f);
+    Vector2f p2(80.0f, 120.0f);
+    Vector2f p3(200.0f, 300.0f);
+
+    Vector2f originalP1 = p1;
+    GESDFPathShaderShape::cubicToQuadraticSingle(p0, p1, p2, p3);
+    EXPECT_NE(p1.y_, originalP1.y_);
+}
+
+/**
+ * @tc.name: AutoGridPartition_001
+ * @tc.desc: Verify AutoGridPartition with valid dimensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartition_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.LineTo(150.0f, 250.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.segmentIndex_.empty());
+    EXPECT_GT(shape.curvesInGrid_.size(), 0);
+    EXPECT_EQ(shape.numCurves_, 2);
+}
+
+
+/**
+ * @tc.name: SplitGrid_001
+ * @tc.desc: Verify SplitGrid behavior through AutoGridPartition with complex path
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, SplitGrid_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    for (int i = 0; i < 10; i++) {
+        path.MoveTo(i * 10.0f, i * 20.0f);
+        path.LineTo(i * 10.0f + 50.0f, i * 20.0f + 100.0f);
+        path.QuadTo(i * 10.0f + 75.0f, i * 20.0f + 150.0f, i * 10.0f + 100.0f, i * 20.0f + 200.0f);
+    }
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 300.0f, 300.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+    EXPECT_EQ(shape.numCurves_, 20);
+    EXPECT_EQ(shape.controlPoints_.size(), 120);
+    EXPECT_GT(shape.curvesInGrid_.size(), 1);
+    EXPECT_GT(shape.segmentIndex_.size(), 1);
+    EXPECT_EQ(shape.numPasses_, 6);
+}
+
+/**
+ * @tc.name: ParseNumbers_001
+ * @tc.desc: Verify parseNumbers through GetCurveByPath with simple path
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_001, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+
+    auto curves = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(curves.empty());
+}
+
+/**
+ * @tc.name: ParseNumbers_002
+ * @tc.desc: Verify parseNumbers with negative numbers
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(-10.0f, -20.0f);
+    path.LineTo(-100.0f, -200.0f);
+
+    auto curves = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_FALSE(curves.empty());
+}
+
+} // namespace Drawing
+} // namespace Rosen
+} // namespace OHOS

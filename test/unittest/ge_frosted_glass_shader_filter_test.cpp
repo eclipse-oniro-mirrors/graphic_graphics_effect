@@ -277,7 +277,7 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     shapeParam.rrect.SetCornerRadius(10.0f, 10.0f);
     auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(shapeParam);
     filter.frostedGlassParams_.sdfShape = shape;
-    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
     ASSERT_NE(childImage, nullptr);
     ASSERT_NE(childBig, nullptr);
     ASSERT_NE(childSml, nullptr);
@@ -300,7 +300,7 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSDFNormalShader_WO_SDFShape, TestSi
     auto params = MakeParams();
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
     EXPECT_EQ(sdfNormalShader, nullptr);
 }
 
@@ -318,7 +318,7 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSDFNormalShader_W_SDFShape, TestSiz
     params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
     EXPECT_NE(sdfNormalShader, nullptr);
 }
 

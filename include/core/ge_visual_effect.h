@@ -59,6 +59,7 @@ public:
     void SetParam(const std::string& tag, const std::vector<Vector2f>& param);
     void SetParam(const std::string& tag, const std::vector<Vector4f>& param);
     void SetParam(const std::string& tag, const std::shared_ptr<Drawing::Path> param) {};
+    void SetParam(const std::string& tag, const Drawing::Path& param);
     void SetParam(const std::string& tag, const std::array<Drawing::Point, POINT_NUM>& param);
     void SetParam(const std::string& tag, bool param);
     void SetParam(const std::string& tag, uint32_t param);

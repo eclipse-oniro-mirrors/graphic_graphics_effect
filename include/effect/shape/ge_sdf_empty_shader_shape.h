@@ -23,6 +23,8 @@ namespace Rosen {
 namespace Drawing {
 class GE_EXPORT GESDFEmptyShaderShape : public GESDFShaderShape {
 public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
     GESDFEmptyShaderShape() = default;
     GESDFEmptyShaderShape(const GESDFEmptyShaderShape&) = delete;
     virtual ~GESDFEmptyShaderShape() = default;

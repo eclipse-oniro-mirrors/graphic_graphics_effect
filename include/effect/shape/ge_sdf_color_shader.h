@@ -39,14 +39,16 @@ public:
 
     void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
-    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
+
+    void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
 
     void SetSDFColorParams(const Drawing::GESDFColorShaderParams& params)
     {
         params_ = params;
     }
 
-    std::shared_ptr<Drawing::ShaderEffect> MakeSDFColorShader(const Drawing::Rect& rect);
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFColorShader(Drawing::Canvas& canvas, const Drawing::Rect& rect);
 
 private:
     std::shared_ptr<Drawing::RuntimeEffect> GetSDFColorEffect();
