@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+
 #include "ge_visual_effect_container.h"
 #include "ge_visual_effect_impl.h"
 
@@ -39,13 +40,13 @@ void GEVisualEffectContainerTest::SetUp() {}
 void GEVisualEffectContainerTest::TearDown() {}
 
 /**
- * @tc.name: AddToChainedFilter_ValidVisualEffect
+ * @tc.name: AddToChainedFilter_001
  * @tc.desc: Verify the AddToChainedFilter adds valid visual effect
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_ValidVisualEffect, TestSize.Level0)
+HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_ValidVisualEffect start";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_001 start";
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(GE_FILTER_KAWASE_BLUR_RADIUS, 1);
@@ -53,32 +54,32 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_ValidVisualEffect, Test
     auto visualEffectContainer = std::make_shared<GEVisualEffectContainer>();
     visualEffectContainer->AddToChainedFilter(visualEffect);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_ValidVisualEffect end";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_001 end";
 }
 
 /**
- * @tc.name: AddToChainedFilter_NullVisualEffect
+ * @tc.name: AddToChainedFilter_002
  * @tc.desc: Verify the AddToChainedFilter handles null visual effect
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_NullVisualEffect, TestSize.Level0)
+HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_002, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_NullVisualEffect start";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_002 start";
 
     auto visualEffectContainer = std::make_shared<GEVisualEffectContainer>();
     visualEffectContainer->AddToChainedFilter(nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_NullVisualEffect end";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_002 end";
 }
 
 /**
- * @tc.name: UpdateDarkScale_FrostedGlassEffect
+ * @tc.name: UpdateDarkScale_001
  * @tc.desc: Verify UpdateDarkScale sets darkScale for FrostedGlass effect
  * @tc.type: FUNC
  */
-HWTEST_F(GEVisualEffectContainerTest, UpdateDarkScale_FrostedGlassEffect, TestSize.Level0)
+HWTEST_F(GEVisualEffectContainerTest, UpdateDarkScale_001, TestSize.Level0)
 {
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_FrostedGlassEffect start";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_001 start";
 
     auto frosted = std::make_shared<GEVisualEffect>(GE_FILTER_FROSTED_GLASS);
     auto other = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
@@ -92,7 +93,7 @@ HWTEST_F(GEVisualEffectContainerTest, UpdateDarkScale_FrostedGlassEffect, TestSi
     auto impl = frosted->GetImpl();
     ASSERT_NE(impl, nullptr);
 
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_FrostedGlassEffect end";
+    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateDarkScale_001 end";
 }
 
 /**
