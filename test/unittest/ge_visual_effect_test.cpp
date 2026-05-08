@@ -113,7 +113,7 @@ HWTEST_F(GEVisualEffectTest, SetParam_005, TestSize.Level1)
     std::pair<float, float> factor = {0.5f, 0.5f};
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_RIPPLE);
     visualEffect->visualEffectImpl_->MakeRippleMaskParams();
-    visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::RIPPLE_MASK);
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::RIPPLE_MASK;
     visualEffect->SetParam(GE_MASK_RIPPLE_CENTER, factor);
     EXPECT_EQ(visualEffect->visualEffectImpl_->GetRippleMaskParams()->center_, factor);
 
@@ -160,7 +160,7 @@ HWTEST_F(GEVisualEffectTest, SetParam_007, TestSize.Level1)
 
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_CONTENT_LIGHT);
     visualEffect->visualEffectImpl_->MakeContentLightParams();
-    visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::CONTENT_LIGHT);
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::CONTENT_LIGHT;
 
     Vector3f lightPosition = Vector3f(0.0f, 0.0f, 0.0f);
     visualEffect->SetParam(GE_FILTER_CONTENT_LIGHT_POSITION, lightPosition);
@@ -217,7 +217,7 @@ HWTEST_F(GEVisualEffectTest, SetParam_008, TestSize.Level1)
     std::pair<float, float> factor = {0.5f, 0.5f};
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_WAVE_GRADIENT);
     visualEffect->visualEffectImpl_->MakeWaveGradientMaskParams();
-    visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK);
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK;
     visualEffect->SetParam(GE_MASK_WAVE_GRADIENT_CENTER, factor);
     EXPECT_EQ(visualEffect->visualEffectImpl_->GetWaveGradientMaskParams()->center_, factor);
 
@@ -236,7 +236,7 @@ HWTEST_F(GEVisualEffectTest, SetParam_009, TestSize.Level1)
     std::pair<float, float> factor = {0.5f, 0.5f};
     auto visualEffect = std::make_shared<GEVisualEffect>(GE_MASK_DOUBLE_RIPPLE);
     visualEffect->visualEffectImpl_->MakeDoubleRippleMaskParams();
-    visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK);
+    visualEffect->visualEffectImpl_->filterType_ = GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK;
     visualEffect->SetParam(GE_MASK_DOUBLE_RIPPLE_CENTER1, factor);
     EXPECT_EQ(visualEffect->visualEffectImpl_->GetDoubleRippleMaskParams()->center1_, factor);
     visualEffect->SetParam(GE_MASK_DOUBLE_RIPPLE_CENTER2, factor);
