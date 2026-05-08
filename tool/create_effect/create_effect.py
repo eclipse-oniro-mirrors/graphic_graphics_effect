@@ -64,15 +64,39 @@ class EffectType:
 
 
 def to_snake_case(name: str) -> str:
-    """Convert CamelCase to snake_case."""
-    s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
+    """Convert to snake_case by character scanning"""
+    result = []
+    for i, char in enumerate(name):
+        if char == '_':
+            result.append('_')
+        elif char.isupper():
+            if i > 0:
+                prev = name[i-1]
+                # Lowercase/digit followed by uppercase -> insert underscore
+                if prev.islower() or prev.isdigit():
+                    result.append('_')
+                # Uppercase followed by uppercase but next is lowercase (e.g., SDFColor)
+                elif prev.isupper() and i + 1 < len(name) and name[i+1].islower():
+                    result.append('_')
+            result.append(char.lower())
+        else:
+            result.append(char)
+    return ''.join(result)
 
 
 def to_pascal_case(name: str) -> str:
-    """Convert snake_case to PascalCase."""
-    components = name.split('_')
-    return ''.join(x.title() for x in components)
+    """Convert to PascalCase, preserving uppercase acronyms."""
+    parts = name.split('_')
+    result = []
+    for part in parts:
+        if not part:
+            continue
+        # Keep all-uppercase acronyms (e.g., SDF, LG) as-is
+        if part.isupper():
+            result.append(part)
+        else:
+            result.append(part[0].upper() + part[1:])
+    return ''.join(result)
 
 
 def load_template(template_path: Path) -> Template:
@@ -134,7 +158,7 @@ def generate_params_file(name: str, effect_type: str, output_dir: Path, template
     class_name = f"GE{pascal_name}{suffix_pascal}"
     params_class = f"{class_name}Params"
 
-    file_name = f"{to_snake_case(class_name)}.params.in"
+    file_name = f"ge_{snake_name}{info['params_suffix']}.params.in"
 
     template = load_template(templates_dir / f"{effect_type}.params.tpl")
     template_content = strip_template_copyright(template.template)
@@ -160,7 +184,7 @@ def generate_header_file(name: str, effect_type: str, output_dir: Path, template
     params_class = f"{class_name}Params"
 
     file_name = f"ge_{snake_name}{info['params_suffix']}.h"
-    header_guard = f"GRAPHICS_EFFECT_{to_snake_case(class_name).upper()}_H"
+    header_guard = f"GRAPHICS_EFFECT_GE_{snake_name.upper()}{info['params_suffix'].upper()}_H"
 
     template = load_template(templates_dir / f"{effect_type}.h.tpl")
     template_content = strip_template_copyright(template.template)
