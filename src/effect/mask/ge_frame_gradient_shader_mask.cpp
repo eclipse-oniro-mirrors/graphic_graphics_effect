@@ -23,92 +23,89 @@ namespace Drawing {
 namespace {
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> frameGradientMaskShaderEffect_ = nullptr;
 
-static constexpr float EPSILON = 1e-6;
+static constexpr float EPSILON = 1e-6f;
 static constexpr float SQRT_2 = 1.41421356f;
 static constexpr float NORMALIZATION_FACTOR = 2.0f;
+static constexpr float PI = 3.14159265358979323846f;
+static constexpr float GRADIENT_EPSILON = 1e-5f;
+static constexpr float AXIAL_EPSILON = 1e-5f;
 
 inline static const std::string maskString = R"(
     uniform half2 iResolution;
-    uniform half4 innerBezier;
-    uniform half4 outerBezier;
+    uniform half3 innerBezierCoeff;
+    uniform half3 outerBezierCoeff;
+
     uniform half innerFrameWidth;
     uniform half outerFrameWidth;
-    uniform half cornerRadius;
-    uniform half2 rectWH;
+    uniform half invInnerFrameWidth;
+    uniform half invOuterFrameWidth;
+    
+    uniform half2 boxHalfSize;
+    uniform half clampedCornerRadius;
     uniform half2 rectPos;
-    uniform half axialFeatherStrength;
-    uniform half axialCenter;
-    uniform half axialCoreWidth;
-    uniform half2 axialDirection;
-    uniform half boxAngleDeg;
 
-    const half PI = 3.1415926;
+    uniform half2 localBasis0;
+    uniform half2 localBasis1;
+
+    uniform half axialFeatherStrength;
+    uniform half axialEnable;
+    uniform half2 axialCoordWeights;
+    uniform half axialInvSpan;
+    uniform half axialRiseEnd;
+    uniform half axialFallStart;
 
     half sdRoundedBox(half2 p, half2 b, half r)
     {
         half2 q = abs(p) - b + r;
-        return (min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r);
+        return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
     }
 
-    half cubicBezierInterpolation(half4 controlPoints, half t)
+    half cubicBezierInterpolationFromCoeff(half3 coeff, half t)
     {
-        // [(1-t)^3 * {0,0} + 3(1-t)^2 * t * CP.xy + 3t^2 * (1-t) * CP.zw + t^3 * {1,1}].y
-        half2 XY = controlPoints.yw + controlPoints.yw + controlPoints.yw;
-        return (((1.0 + XY.x - XY.y) * t - XY.x - XY.x + XY.y) * t + XY.x) * t;
+        return ((coeff.x * t + coeff.y) * t + coeff.z) * t;
     }
 
-    half AxialEnvelope(half t, half axialCenter, half axialCoreWidth)
+    half AxialEnvelope(half t)
     {
-        half halfWidth = 0.5 * axialCoreWidth;
-        half riseEnd = axialCenter - halfWidth;
-        half fallStart = axialCenter + halfWidth;
-
-        half rise = smoothstep(0.0, riseEnd, t);
-        half fall = 1.0 - smoothstep(fallStart, 1.0, t);
+        half rise = smoothstep(0.0, axialRiseEnd, t);
+        half fall = 1.0 - smoothstep(axialFallStart, 1.0, t);
         return rise * fall;
     }
 
-    half2 Rotate2D(half2 p, half a)
+    half4 main(float2 fragCoord)
     {
-        half s = sin(a);
-        half c = cos(a);
-        return half2(c * p.x - s * p.y,
-            s * p.x + c * p.y);
-    }
-
-    half4 main(float2 fragCoord) {
         half2 uv = fragCoord / iResolution.xy;
-        half2 centeredUvs = (uv - 0.5) * 2.0 - rectPos;
-        half screenRatio = iResolution.x / iResolution.y;
-        centeredUvs.x *= screenRatio;
+        half2 centered = (uv - 0.5) * 2.0 - rectPos;
 
-        half angle = boxAngleDeg * PI / 180.0;
-        half2 localPos = Rotate2D(centeredUvs, -angle);
+        // Transform into local box space using the precomputed basis.
+        half2 localPos = half2(dot(centered, localBasis0), dot(centered, localBasis1));
 
-        half sdfrect = sdRoundedBox(localPos.xy, half2(screenRatio * rectWH.x, rectWH.y),
-                        clamp(cornerRadius, 0.0, min(screenRatio * rectWH.x, rectWH.y)));
+        half sdfrect = sdRoundedBox(localPos, boxHalfSize, clampedCornerRadius);
 
-        half2 sdfInOut = half2(sdfrect, -sdfrect) + half2(innerFrameWidth, outerFrameWidth);
+        // Normalize the inner and outer transition bands separately.
+        half innerGradient = (sdfrect + innerFrameWidth) * invInnerFrameWidth;
+        half outerGradient = (-sdfrect + outerFrameWidth) * invOuterFrameWidth;
+        half gradient = min(innerGradient, outerGradient);
 
-        sdfInOut /= half2(innerFrameWidth, outerFrameWidth) + 1e-5;
-
-        half gradient = min(sdfInOut.x, sdfInOut.y);
-
+        // Outside both bands: no contribution.
         if (gradient <= 0.0) {
             return half4(0.0);
         }
-        gradient = cubicBezierInterpolation(sdfrect > 0.0 ? outerBezier : innerBezier, gradient);
 
-        // new optional axial modulation
-        half dirLen2 = dot(axialDirection, axialDirection);
-        half enable = step(1e-5, dirLen2) * step(1e-5, axialFeatherStrength);
-        half2 dir = (dirLen2 > 1e-5) ? axialDirection * inversesqrt(dirLen2) : half2(0.0, 0.0);
-        half halfExtent = abs(dir.x) * rectWH.x + abs(dir.y) * rectWH.y;
-        half axisCoord = dot(half2(localPos.x / screenRatio, localPos.y), dir);
-        half t = clamp(axisCoord / (2.0 * max(halfExtent, 1e-5)) + 0.5, 0.0, 1.0);
-        half envelope = AxialEnvelope(t, axialCenter, axialCoreWidth);
-        half axialMask = mix(1.0, mix(1.0, envelope, axialFeatherStrength), enable);
-        return half4(gradient * axialMask);
+        // Use different Bezier response curves for inner and outer regions.
+        half3 bezierCoeff = (sdfrect > 0.0) ? outerBezierCoeff : innerBezierCoeff;
+        gradient = cubicBezierInterpolationFromCoeff(bezierCoeff, gradient);
+
+        // Optional axial modulation along a precomputed direction.
+        if (axialEnable > 0.0) {
+            half t = clamp(dot(localPos, axialCoordWeights) * axialInvSpan + 0.5, 0.0, 1.0);
+            half envelope = AxialEnvelope(t);
+
+            // Equivalent to mixing the gradient by the axial envelope strength.
+            gradient *= (1.0 + axialFeatherStrength * (envelope - 1.0));
+        }
+
+        return half4(gradient);
     }
 )";
 
@@ -172,27 +169,90 @@ std::shared_ptr<ShaderEffect> GEFrameGradientShaderMask::CreateFrameGradientMask
 
     auto maskBuilder = std::make_shared<Drawing::RuntimeShaderBuilder>(frameGradientMaskShaderEffect_);
     maskBuilder->SetUniform("iResolution", width, height);
-    std::array<float, ARRAY_SIZE_FOUR> innerBezier = {innerBezier_[0],
-        innerBezier_[1], innerBezier_[2], innerBezier_[3]};
-    std::array<float, ARRAY_SIZE_FOUR> outerBezier = {outerBezier_[0],
-        outerBezier_[1], outerBezier_[2], outerBezier_[3]};
-    maskBuilder->SetUniform("innerBezier", innerBezier.data(), ARRAY_SIZE_FOUR);
-    maskBuilder->SetUniform("outerBezier", outerBezier.data(), ARRAY_SIZE_FOUR);
-    maskBuilder->SetUniform("cornerRadius", cornerRadius_ * NORMALIZATION_FACTOR / height);
-    maskBuilder->SetUniform("innerFrameWidth", innerFrameWidth_ * NORMALIZATION_FACTOR / height);
-    maskBuilder->SetUniform("outerFrameWidth", outerFrameWidth_ * NORMALIZATION_FACTOR / height);
-    maskBuilder->SetUniform("rectWH", rectWH_.first, rectWH_.second);
+    // Pre-expand the cubic Bezier mapping into polynomial coefficients.
+    auto MakeBezierCoeff = [](float y1, float y2) -> std::array<float, 3> {
+        return {
+            1.0f + 3.0f * y1 - 3.0f * y2,
+            -6.0f * y1 + 3.0f * y2,
+            3.0f * y1
+        };
+    };
+
+    // controlPoints.yw are the effective y-values used by the interpolation polynomial
+    auto innerCoeff = MakeBezierCoeff(innerBezier_[1], innerBezier_[3]); // 1, 3: controlPoints.yw
+    auto outerCoeff = MakeBezierCoeff(outerBezier_[1], outerBezier_[3]); // 1, 3: controlPoints.yw
+    maskBuilder->SetUniform("innerBezierCoeff", innerCoeff.data(), 3); // 3: cubic polynomial coefficients
+    maskBuilder->SetUniform("outerBezierCoeff", outerCoeff.data(), 3); // 3: cubic polynomial coefficients
+
+    // Normalize frame widths to the shader's normalized coordinate space.
+    const float innerFrameWidth = innerFrameWidth_ * NORMALIZATION_FACTOR / height;
+    const float outerFrameWidth = outerFrameWidth_ * NORMALIZATION_FACTOR / height;
+    maskBuilder->SetUniform("innerFrameWidth", innerFrameWidth);
+    maskBuilder->SetUniform("outerFrameWidth", outerFrameWidth);
+    maskBuilder->SetUniform("invInnerFrameWidth", 1.0f / (innerFrameWidth + GRADIENT_EPSILON));
+    maskBuilder->SetUniform("invOuterFrameWidth", 1.0f / (outerFrameWidth + GRADIENT_EPSILON));
+
+    // Precompute screen-ratio-dependent rounded-box parameters.
+    const float screenRatio = static_cast<float>(width) / std::max(static_cast<float>(height), EPSILON);
+    const float boxHalfSizeX = screenRatio * rectWH_.first;
+    const float boxHalfSizeY = rectWH_.second;
+    const float cornerRadius = cornerRadius_ * NORMALIZATION_FACTOR / height;
+    const float clampedCornerRadius = std::clamp(cornerRadius, 0.0f, std::min(boxHalfSizeX, boxHalfSizeY));
+    maskBuilder->SetUniform("boxHalfSize", boxHalfSizeX, boxHalfSizeY);
+    maskBuilder->SetUniform("clampedCornerRadius", clampedCornerRadius);
     maskBuilder->SetUniform("rectPos", rectPos_.first, rectPos_.second);
-    maskBuilder->SetUniform("axialFeatherStrength", axialFeatherStrength_);
-    maskBuilder->SetUniform("axialCenter", axialCenter_);
-    maskBuilder->SetUniform("axialCoreWidth", axialCoreWidth_);
-    maskBuilder->SetUniform("axialDirection", axialDirection_.first, axialDirection_.second);
-    maskBuilder->SetUniform("boxAngleDeg", boxAngleDeg_);
+
+    // Merge aspect-ratio scaling and box rotation into two local-space basis vectors.
+    const float angleRad = boxAngleDeg_ * PI / 180.0f;
+    const float cosA = std::cos(angleRad);
+    const float sinA = std::sin(angleRad);
+    maskBuilder->SetUniform("localBasis0", cosA * screenRatio,  sinA);
+    maskBuilder->SetUniform("localBasis1", -sinA * screenRatio, cosA);
+
+    ComputeAndSetUniforms(maskBuilder, screenRatio);
+
     auto maskShader = maskBuilder->MakeShader(nullptr, false);
     if (!maskShader) {
         GE_LOGE("GEFrameGradientShaderMask::CreateFrameGradientMaskShader fail");
     }
     return maskShader;
+}
+
+void GEFrameGradientShaderMask::ComputeAndSetUniforms(
+    const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder, float screenRatio) const
+{
+    // Precompute axial modulation parameters.
+    const float dirXRaw = axialDirection_.first;
+    const float dirYRaw = axialDirection_.second;
+    const float dirLen2 = dirXRaw * dirXRaw + dirYRaw * dirYRaw;
+
+    float axialEnable = 0.0f;
+    float axialCoordWeightX = 0.0f;
+    float axialCoordWeightY = 0.0f;
+    float axialInvSpan = 0.0f;
+
+    if (dirLen2 >= AXIAL_EPSILON && axialFeatherStrength_ >= AXIAL_EPSILON) {
+        const float invLen = 1.0f / std::sqrt(dirLen2);
+        const float dirX = dirXRaw * invLen;
+        const float dirY = dirYRaw * invLen;
+
+        // Project the normalized axial direction onto the local box extents
+        // to obtain the half span of the modulation range.
+        const float halfExtent = std::abs(dirX) * rectWH_.first + std::abs(dirY) * rectWH_.second;
+
+        axialCoordWeightX = dirX / std::max(screenRatio, AXIAL_EPSILON);
+        axialCoordWeightY = dirY;
+        axialInvSpan = 1.0f / (2.0f * std::max(halfExtent, AXIAL_EPSILON));
+        axialEnable = 1.0f;
+    }
+    builder->SetUniform("axialFeatherStrength", axialFeatherStrength_);
+    builder->SetUniform("axialEnable", axialEnable);
+    builder->SetUniform("axialCoordWeights", axialCoordWeightX, axialCoordWeightY);
+    builder->SetUniform("axialInvSpan", axialInvSpan);
+
+    // Precompute the rising and falling boundaries of the axial envelope.
+    builder->SetUniform("axialRiseEnd", axialCenter_ - 0.5f * axialCoreWidth_);
+    builder->SetUniform("axialFallStart", axialCenter_ + 0.5f * axialCoreWidth_);
 }
 
 void GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect() const

@@ -44,6 +44,7 @@ public:
 private:
     Drawing::Rect GetSubtractedRect(float width, float height) const override;
     bool ValidateParams(float width, float height) const;
+    void ComputeAndSetUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder, float screenRatio) const;
     void MakeFrameGradientMaskShaderEffect() const;
     Vector4f innerBezier_;
     Vector4f outerBezier_;

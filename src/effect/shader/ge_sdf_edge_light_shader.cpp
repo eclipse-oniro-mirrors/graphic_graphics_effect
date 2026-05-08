@@ -26,8 +26,6 @@ constexpr char SHADER[] = R"(
     uniform shader sdfShader;
     uniform shader lightMaskShader;
 
-    uniform float spreadFactor;
-
     uniform vec3 lightColor;
     uniform float bloomIntensityCutoff;
     uniform float maxIntensity;
@@ -35,27 +33,37 @@ constexpr char SHADER[] = R"(
     uniform float bloomFalloffPow;
 
     uniform float minBorderWidth;
-    uniform float maxBorderWidth;
+    uniform float borderWidthDelta;
 
     uniform float innerBorderBloomWidth;
     uniform float outerBorderBloomWidth;
 
+    uniform float invInnerBorderBloomWidth;
+    uniform float invOuterBorderBloomWidth;
+    uniform float enableBloom;
+
     float BloomMultiplierFromDist(float d)
     {
-        float dNorm = abs(d) / (d > 0 ? outerBorderBloomWidth : innerBorderBloomWidth);
-        float falloff = max((1 - dNorm) / pow(1 + dNorm, bloomFalloffPow), 0);
+        float dNorm = (d > 0.0) ? (d * invOuterBorderBloomWidth) : (-d * invInnerBorderBloomWidth);
+        float falloff = max((1.0 - dNorm) / pow(1.0 + dNorm, bloomFalloffPow), 0.0);
         return maxBloomIntensity * falloff;
     }
 
-    float EdgeLightFakeBloom(float intensity, float d, float smoothD)
+    float EdgeLightFakeBloom(float intensity, float d)
     {
-        float bloomBorder = 1 - step(outerBorderBloomWidth, d);
+        float bloomBorder = 1.0 - step(outerBorderBloomWidth, d);
         bloomBorder *= step(-innerBorderBloomWidth, d);
-        float edgeThickness = smoothstep(0, 1, intensity) *
-                              (maxBorderWidth - minBorderWidth) + minBorderWidth;
-        float thinBorder = (1 - smoothstep(0, edgeThickness, d)) * smoothstep(-edgeThickness, 0, d);
-        float b = intensity * maxIntensity * (thinBorder + smoothstep(bloomIntensityCutoff, 1, intensity) *
-                  bloomBorder * BloomMultiplierFromDist(smoothD));
+
+        float edgeThickness = smoothstep(0.0, 1.0, intensity) * borderWidthDelta + minBorderWidth;
+        float thinBorder = 1.0 - smoothstep(0.0, edgeThickness, abs(d));
+
+        float bloomGate = smoothstep(bloomIntensityCutoff, 1.0, intensity);
+        float bloomPart = 0.0;
+        if (enableBloom > 0.0 && bloomGate > 0.0 && bloomBorder > 0.0) {
+            bloomPart = bloomGate * bloomBorder * BloomMultiplierFromDist(d);
+        }
+
+        float b = intensity * maxIntensity * (thinBorder + bloomPart);
         return b;
     }
 
@@ -63,8 +71,8 @@ constexpr char SHADER[] = R"(
     {
         float lightMaskValue = lightMaskShader.eval(fragCoord).r;
         vec4 sdfSample = sdfShader.eval(fragCoord);
-        half3 rgb = lightColor * EdgeLightFakeBloom(lightMaskValue, sdfSample.a, sdfSample.a);
-        return half4(rgb, 1.0);
+        float alpha = EdgeLightFakeBloom(lightMaskValue, sdfSample.a);
+        return half4(lightColor * alpha, alpha);
     }
 )";
 } // namespace
@@ -114,10 +122,6 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
         return nullptr;
     }
 
-    const Drawing::Matrix matrix;
-    const Drawing::SamplingOptions sampling(Drawing::FilterMode::LINEAR);
-    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader_);
-
     auto width = canvasInfo_.geoWidth;
     auto height = canvasInfo_.geoHeight;
 
@@ -131,10 +135,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
         LOGE("GESDFEdgeLightShader::GetEffectShaderBuilder lightMaskShader is nullptr");
         return nullptr;
     }
-    builder->SetUniform("iResolution", width, height);
+
+    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(effectShader_);
     builder->SetChild("sdfShader", sdfShader);
     builder->SetChild("lightMaskShader", lightMaskShader);
-    builder->SetUniform("spreadFactor", params_.sdfSpreadFactor);
     builder->SetUniform("lightColor", params_.color[0], params_.color[1], params_.color[2]); // 0 is R, 1 is G, 2 is B
     builder->SetUniform("bloomIntensityCutoff", params_.bloomIntensityCutoff);
     builder->SetUniform("maxIntensity", params_.maxIntensity);
@@ -142,12 +146,19 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
     builder->SetUniform("bloomFalloffPow", params_.bloomFalloffPow);
 
     builder->SetUniform("minBorderWidth", params_.minBorderWidth);
-    builder->SetUniform("maxBorderWidth", params_.maxBorderWidth);
-
+    builder->SetUniform("borderWidthDelta", params_.maxBorderWidth - params_.minBorderWidth);
     builder->SetUniform("innerBorderBloomWidth",
         std::max(params_.innerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
     builder->SetUniform("outerBorderBloomWidth",
         std::max(params_.outerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
+    builder->SetUniform("invInnerBorderBloomWidth",
+        1.0f / std::max(params_.innerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
+    builder->SetUniform("invOuterBorderBloomWidth",
+        1.0f / std::max(params_.outerBorderBloomWidth, std::numeric_limits<float>::epsilon()));
+    const float enableBloom = (params_.maxBloomIntensity > 0.0f &&
+        params_.innerBorderBloomWidth > std::numeric_limits<float>::epsilon() &&
+        params_.outerBorderBloomWidth > std::numeric_limits<float>::epsilon()) ? 1.0f : 0.0f;
+    builder->SetUniform("enableBloom", enableBloom);
 
     return builder;
 }
