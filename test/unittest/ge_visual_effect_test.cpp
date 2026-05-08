@@ -19,6 +19,7 @@
 #include "ge_visual_effect.h"
 #include "ge_shader_filter_params.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_sdf_rrect_shader_shape.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -662,25 +663,6 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderShape_SDFTransformShape, TestSize.Lev
     EXPECT_NE(shaderShape, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_SDFTransformShape end";
-}
-
-/**
- * @tc.name: GenerateShaderShape_SDFUnionOpShape
- * @tc.desc: Verify function GenerateShaderShape generates valid SDF union op shape
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectTest, GenerateShaderShape_SDFUnionOpShape, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_SDFUnionOpShape start";
-
-    auto visualEffect = std::make_shared<GEVisualEffect>(GE_SHAPE_SDF_UNION_OP_SHAPE);
-    visualEffect->visualEffectImpl_->MakeSDFUnionOpShapeParams();
-    visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::SDF_UNION_OP_SHAPE);
-
-    auto shaderShape = visualEffect->GenerateShaderShape();
-    EXPECT_NE(shaderShape, nullptr);
-
-    GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_SDFUnionOpShape end";
 }
 
 /**

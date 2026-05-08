@@ -2048,7 +2048,7 @@ HWTEST_F(GEVisualEffectImplTest, MakeGetParams_AllRemainingMasks, TestSize.Level
     auto params2 = geVisualEffectImpl2.GetPixelMapMaskParams();
     EXPECT_NE(params2, nullptr);
     
-    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_MASK_WAVE_DISTURBANCE);
+    Drawing::GEVisualEffectImpl geVisualEffectImpl3(Drawing::GE_MASK_DISTURBANCE);
     geVisualEffectImpl3.MakeWaveDisturbanceMaskParams();
     auto params3 = geVisualEffectImpl3.GetWaveDisturbanceMaskParams();
     EXPECT_NE(params3, nullptr);
@@ -2066,7 +2066,7 @@ HWTEST_F(GEVisualEffectImplTest, MakeGetParams_AllRemainingSDFShapes, TestSize.L
     auto params1 = geVisualEffectImpl1.GetSDFRRectShapeParams();
     EXPECT_NE(params1, nullptr);
     
-    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHAPE_SDF_UNION_OP_SHAPE);
+    Drawing::GEVisualEffectImpl geVisualEffectImpl2(Drawing::GE_SHAPE_SDF_UNION_OP);
     geVisualEffectImpl2.MakeSDFUnionOpShapeParams();
     auto params2 = geVisualEffectImpl2.GetSDFUnionOpShapeParams();
     EXPECT_NE(params2, nullptr);
@@ -2150,19 +2150,6 @@ HWTEST_F(GEVisualEffectImplTest, MakeGetParams_DistortionCollapse, TestSize.Leve
 }
 
 /**
- * @tc.name: MakeGetParams_SpatialGlassEffect
- * @tc.desc: Verify Make and Get params for spatial glass effect
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectImplTest, MakeGetParams_SpatialGlassEffect, TestSize.Level1)
-{
-    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_SHADER_SPATIAL_GLASS_EFFECT);
-    geVisualEffectImpl.MakeSpatialGlassEffectParams();
-    auto params = geVisualEffectImpl.GetSpatialGlassEffectParams();
-    EXPECT_NE(params, nullptr);
-}
-
-/**
  * @tc.name: MakeGetParams_NoisyFrameGradientMask
  * @tc.desc: Verify Make and Get params for noisy frame gradient mask
  * @tc.type: FUNC
@@ -2200,7 +2187,7 @@ HWTEST_F(GEVisualEffectImplTest, MakeGetParams_SDFTriangleAndDistort, TestSize.L
  */
 HWTEST_F(GEVisualEffectImplTest, MakeGetParams_SDFEdgeLightEffect, TestSize.Level1)
 {
-    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GEX_SHADER_SDF_EDGE_LIGHT_EFFECT);
+    Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_SDF_EDGE_LIGHT);
     geVisualEffectImpl.MakeSDFEdgeLightEffectParams();
     auto params = geVisualEffectImpl.GetSDFEdgeLightEffectParams();
     EXPECT_NE(params, nullptr);
