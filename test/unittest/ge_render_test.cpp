@@ -941,21 +941,6 @@ HWTEST_F(GERenderTest, IsFrostedGlassFilter_ValidAndInvalidCases, TestSize.Level
 }
 
 /**
- * @tc.name: SetMesablurAllEnabledByCCM_EnableAndDisable
- * @tc.desc: Verify function SetMesablurAllEnabledByCCM with enable and disable flags
- * @tc.type: FUNC
- */
-HWTEST_F(GERenderTest, SetMesablurAllEnabledByCCM_EnableAndDisable, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GERenderTest SetMesablurAllEnabledByCCM_EnableAndDisable start";
-
-    GERender::SetMesablurAllEnabledByCCM(true);
-    GERender::SetMesablurAllEnabledByCCM(false);
-
-    GTEST_LOG_(INFO) << "GERenderTest SetMesablurAllEnabledByCCM_EnableAndDisable end";
-}
-
-/**
  * @tc.name: DrawImageEffect_KawaseBlurSmallRadius
  * @tc.desc: Verify DrawImageEffect with Kawase blur effect with small radius
  * @tc.type: FUNC
@@ -964,6 +949,7 @@ HWTEST_F(GERenderTest, DrawImageEffect_KawaseBlurSmallRadius, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurSmallRadius start";
 
+    GERender::SetMesablurAllEnabledByCCM(true);
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
 

@@ -372,7 +372,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_011, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_013, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplRippleMask(Drawing::GE_MASK_RIPPLE);
-    geVisualEffectImplRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+    geVisualEffectImplRippleMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK);
     geVisualEffectImplRippleMask.MakeParams<Drawing::GERippleShaderMaskParams>();
 
     // test invalid params setting
@@ -398,7 +398,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_013, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplRippleMask(Drawing::GE_MASK_RIPPLE);
-    geVisualEffectImplRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK;
+    geVisualEffectImplRippleMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::RIPPLE_MASK);
     geVisualEffectImplRippleMask.MakeParams<Drawing::GERippleShaderMaskParams>();
 
     std::pair<float, float> center = {0.5f, 0.5f};
@@ -408,16 +408,16 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_014, TestSize.Level1)
 
     std::pair<float, float> factor = {0.5f, 0.5f};
     Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
-    geVisualEffectImplDisplaceDistort.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Factor", factor);
     EXPECT_EQ(
         geVisualEffectImplDisplaceDistort.GetParams<Drawing::GEDisplacementDistortFilterParams>()->factor_, factor);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplRadialGradientMask(Drawing::GE_MASK_RADIAL_GRADIENT);
-    geVisualEffectImplRadialGradientMask.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK;
+    geVisualEffectImplRadialGradientMask.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK);
     geVisualEffectImplRadialGradientMask.MakeParams<Drawing::GERadialGradientShaderMaskParams>();
 
     std::pair<float, float> radial_gradient_center = {0.5f, 0.5f};
@@ -437,8 +437,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_015, TestSize.Level1)
     auto geRippleShaderMask = std::make_shared<Drawing::GERippleShaderMask>(param);
     auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRippleShaderMask);
     Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
-    geVisualEffectImplDisplaceDistort.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
     EXPECT_EQ(
@@ -750,7 +750,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_017, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_018, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplRadialGradientMask(Drawing::GE_MASK_RADIAL_GRADIENT);
-    geVisualEffectImplRadialGradientMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK;
+    geVisualEffectImplRadialGradientMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::RADIAL_GRADIENT_MASK);
     geVisualEffectImplRadialGradientMask.MakeParams<Drawing::GERadialGradientShaderMaskParams>();
 
     // test invalid params setting
@@ -792,8 +792,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_19, TestSize.Level1)
     auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geRadialGradientShaderMask);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
-    geVisualEffectImplDisplaceDistort.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
     EXPECT_EQ(
@@ -835,7 +835,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_020, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_021, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplPixelMapMask(Drawing::GE_MASK_PIXEL_MAP);
-    geVisualEffectImplPixelMapMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK;
+    geVisualEffectImplPixelMapMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::PIXEL_MAP_MASK);
     geVisualEffectImplPixelMapMask.MakeParams<Drawing::GEPixelMapMaskParams>();
 
     // Test RectF parameters (src and dst)
@@ -866,7 +866,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_021, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_022, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplWaveGradientMask(Drawing::GE_MASK_WAVE_GRADIENT);
-    geVisualEffectImplWaveGradientMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK;
+    geVisualEffectImplWaveGradientMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::WAVE_GRADIENT_MASK);
     geVisualEffectImplWaveGradientMask.MakeParams<Drawing::GEWaveGradientShaderMaskParams>();
 
     // test invalid params setting
@@ -908,8 +908,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_023, TestSize.Level1)
     auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geWaveGradientShaderMask);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
-    geVisualEffectImplDisplaceDistort.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
     EXPECT_EQ(
@@ -924,7 +924,7 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_023, TestSize.Level1)
 HWTEST_F(GEVisualEffectImplTest, SetParam_024, TestSize.Level1)
 {
     Drawing::GEVisualEffectImpl geVisualEffectImplDoubleRippleMask(Drawing::GE_MASK_DOUBLE_RIPPLE);
-    geVisualEffectImplDoubleRippleMask.filterType_ = Drawing::GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK;
+    geVisualEffectImplDoubleRippleMask.SetFilterType(Drawing::GEVisualEffectImpl::FilterType::DOUBLE_RIPPLE_MASK);
     geVisualEffectImplDoubleRippleMask.MakeParams<Drawing::GEDoubleRippleShaderMaskParams>();
 
     // test invalid params setting
@@ -964,8 +964,8 @@ HWTEST_F(GEVisualEffectImplTest, SetParam_025, TestSize.Level1)
     auto shaderMask = std::static_pointer_cast<Drawing::GEShaderMask>(geDoubleRippleShaderMask);
 
     Drawing::GEVisualEffectImpl geVisualEffectImplDisplaceDistort(Drawing::GE_FILTER_DISPLACEMENT_DISTORT);
-    geVisualEffectImplDisplaceDistort.filterType_ =
-        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER;
+    geVisualEffectImplDisplaceDistort.SetFilterType(
+        Drawing::GEVisualEffectImpl::FilterType::DISPLACEMENT_DISTORT_FILTER);
     geVisualEffectImplDisplaceDistort.MakeParams<Drawing::GEDisplacementDistortFilterParams>();
     geVisualEffectImplDisplaceDistort.SetParam("DispDistort_Mask", shaderMask);
     EXPECT_EQ(

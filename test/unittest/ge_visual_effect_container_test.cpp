@@ -111,11 +111,11 @@ HWTEST_F(GEVisualEffectContainerTest, GetFilters_QueryFilterList, TestSize.Level
     EXPECT_EQ(container->GetFilters().size(), 0);
 
     container->AddToChainedFilter(visualEffect1);
-    EXPECT_EQ(container->GetFilters().size(), 1);
+    ASSERT_EQ(container->GetFilters().size(), 1);
     EXPECT_EQ(container->GetFilters()[0]->GetName(), GE_FILTER_KAWASE_BLUR);
 
     container->AddToChainedFilter(visualEffect2);
-    EXPECT_EQ(container->GetFilters().size(), 2);
+    ASSERT_EQ(container->GetFilters().size(), 2);
 
     GTEST_LOG_(INFO) << "GEVisualEffectContainerTest GetFilters_QueryFilterList end";
 }
