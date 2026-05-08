@@ -41,7 +41,7 @@ void GEVisualEffectContainerTest::TearDown() {}
 
 /**
  * @tc.name: AddToChainedFilter_001
- * @tc.desc: Verify the AddToChainedFilter adds valid visual effect
+ * @tc.desc: Verify the AddToChainedFilter
  * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_001, TestSize.Level0)
@@ -59,7 +59,7 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_001, TestSize.Level0)
 
 /**
  * @tc.name: AddToChainedFilter_002
- * @tc.desc: Verify the AddToChainedFilter handles null visual effect
+ * @tc.desc: Verify the AddToChainedFilter
  * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_002, TestSize.Level0)
@@ -74,7 +74,7 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_002, TestSize.Level0)
 
 /**
  * @tc.name: UpdateDarkScale_001
- * @tc.desc: Verify UpdateDarkScale sets darkScale for FrostedGlass effect
+ * @tc.desc: Verify UpdateDarkScale sets darkScale for FrostedGlass
  * @tc.type: FUNC
  */
 HWTEST_F(GEVisualEffectContainerTest, UpdateDarkScale_001, TestSize.Level0)
