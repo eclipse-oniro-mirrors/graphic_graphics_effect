@@ -20,13 +20,17 @@
 #include "ge_shader_filter.h"
 #include "ge_visual_effect.h"
 
-// Additional includes for complex filters:
+#include "draw/canvas.h"
+#include "effect/runtime_effect.h"
+#include "effect/runtime_shader_builder.h"
+#include "image/image.h"
+
+// Optional includes for specific filters:
 // #include <memory>
 // #include <vector>
-// #include "draw/canvas.h"
 // #include "effect/color_filter.h"
-// #include "image/image.h"
 // #include "utils/matrix.h"
+// #include "utils/rect.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -35,7 +39,7 @@ class GE_EXPORT $CLASS_NAME : public GEShaderFilter {
 public:
     $CLASS_NAME(const Drawing::$PARAMS_CLASS& params);
     $CLASS_NAME(const $CLASS_NAME&) = delete;
-    $CLASS_NAME operator=(const $CLASS_NAME&) = delete;
+    $CLASS_NAME& operator=(const $CLASS_NAME&) = delete;
     $CLASS_NAME($CLASS_NAME&&) = delete;
     $CLASS_NAME& operator=($CLASS_NAME&&) = delete;
     ~$CLASS_NAME() override = default;
@@ -50,8 +54,6 @@ public:
 private:
     // Helper method to get/create shader effect
     static std::shared_ptr<Drawing::RuntimeEffect> GetEffect();
-
-$MEMBER_DECLARATIONS
 };
 
 } // namespace Rosen

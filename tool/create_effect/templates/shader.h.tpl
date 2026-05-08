@@ -33,7 +33,7 @@ class GE_EXPORT $CLASS_NAME : public GEShader {
 public:
     $CLASS_NAME(const Drawing::$PARAMS_CLASS& params);
     $CLASS_NAME(const $CLASS_NAME&) = delete;
-    $CLASS_NAME operator=(const $CLASS_NAME&) = delete;
+    $CLASS_NAME& operator=(const $CLASS_NAME&) = delete;
     $CLASS_NAME($CLASS_NAME&&) = delete;
     $CLASS_NAME& operator=($CLASS_NAME&&) = delete;
     ~$CLASS_NAME() override = default;
@@ -49,8 +49,6 @@ public:
 
 private:
     static std::shared_ptr<Drawing::RuntimeEffect> GetEffect();
-
-$MEMBER_DECLARATIONS
 };
 
 } // namespace Rosen

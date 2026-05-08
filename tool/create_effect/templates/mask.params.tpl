@@ -15,6 +15,6 @@
 
 
 // TODO: Add type to GEFilterType in include/core/ge_filter_type.h and remove this line
-struct [[ge::.params(type=$TYPE_ENUM, name="$DISPLAY_NAME")]] $PARAMS_CLASS {
-$PARAM_DECLARATIONS
+struct [[ge::params(type=$TYPE_ENUM, name="$DISPLAY_NAME")]] $PARAMS_CLASS {
+    // TODO: Add params fields here
 };

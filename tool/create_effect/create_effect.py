@@ -22,11 +22,16 @@ Supports creating filter, mask, shader, and shape effect types with params files
 
 import argparse
 import re
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 from string import Template
+from typing import Dict
+
+# Import clang-format utilities from generate_metadata
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from generate_metadata.cli_utils import Console, find_clang_format
 
 
 def get_copyright_header() -> str:
@@ -82,10 +87,14 @@ def strip_template_copyright(template_content: str) -> str:
     Tpl files have copyright header for linter compliance, but we generate
     fresh copyright headers when creating actual source files.
     """
-    COPYRIGHT_HEADER_LINES = 15
     lines = template_content.split('\n')
-    if len(lines) > COPYRIGHT_HEADER_LINES:
-        return '\n'.join(lines[COPYRIGHT_HEADER_LINES:])
+    end_idx = 0
+    for i, line in enumerate(lines):
+        if '*/' in line:
+            end_idx = i + 1
+            break
+    if end_idx > 0 and end_idx < len(lines):
+        return '\n'.join(lines[end_idx:])
     return template_content
 
 
@@ -116,12 +125,13 @@ def get_effect_info(effect_type: str) -> Dict:
     return info.get(effect_type, {})
 
 
-def generate_params_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+def generate_params_file(name: str, effect_type: str, output_dir: Path, templates_dir: Path) -> Path:
     """Generate .params.in file."""
     info = get_effect_info(effect_type)
     snake_name = to_snake_case(name)
     pascal_name = to_pascal_case(name)
-    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    suffix_pascal = to_pascal_case(info['params_suffix'])
+    class_name = f"GE{pascal_name}{suffix_pascal}"
     params_class = f"{class_name}Params"
 
     file_name = f"{to_snake_case(class_name)}.params.in"
@@ -129,22 +139,10 @@ def generate_params_file(name: str, effect_type: str, params: List[Dict], output
     template = load_template(templates_dir / f"{effect_type}.params.tpl")
     template_content = strip_template_copyright(template.template)
 
-    param_declarations = []
-    for param in params:
-        param_name = param['name']
-        param_type = param['type']
-        default_value = param.get('default', "")
-
-        if default_value:
-            param_declarations.append(f"    {param_type} {param_name} = {default_value};")
-        else:
-            param_declarations.append(f"    {param_type} {param_name};")
-
     content = get_copyright_header() + Template(template_content).substitute(
         TYPE_ENUM=snake_name.upper(),
         DISPLAY_NAME=pascal_name,
-        PARAMS_CLASS=params_class,
-        PARAM_DECLARATIONS='\n'.join(param_declarations) if param_declarations else ""
+        PARAMS_CLASS=params_class
     )
 
     params_file = output_dir / file_name
@@ -152,12 +150,13 @@ def generate_params_file(name: str, effect_type: str, params: List[Dict], output
     return params_file
 
 
-def generate_header_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+def generate_header_file(name: str, effect_type: str, output_dir: Path, templates_dir: Path) -> Path:
     """Generate .h file."""
     info = get_effect_info(effect_type)
     snake_name = to_snake_case(name)
     pascal_name = to_pascal_case(name)
-    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    suffix_pascal = to_pascal_case(info['params_suffix'])
+    class_name = f"GE{pascal_name}{suffix_pascal}"
     params_class = f"{class_name}Params"
 
     file_name = f"ge_{snake_name}{info['params_suffix']}.h"
@@ -166,17 +165,10 @@ def generate_header_file(name: str, effect_type: str, params: List[Dict], output
     template = load_template(templates_dir / f"{effect_type}.h.tpl")
     template_content = strip_template_copyright(template.template)
 
-    member_declarations = []
-    for param in params:
-        param_name = param['name']
-        param_type = param['type']
-        member_declarations.append(f"    {param_type} {param_name}_;")
-
     content = get_copyright_header() + Template(template_content).substitute(
         HEADER_GUARD=header_guard,
         CLASS_NAME=class_name,
-        PARAMS_CLASS=params_class,
-        MEMBER_DECLARATIONS='\n'.join(member_declarations) if member_declarations else ""
+        PARAMS_CLASS=params_class
     )
 
     header_file = output_dir / file_name
@@ -184,12 +176,13 @@ def generate_header_file(name: str, effect_type: str, params: List[Dict], output
     return header_file
 
 
-def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_dir: Path, templates_dir: Path) -> Path:
+def generate_cpp_file(name: str, effect_type: str, output_dir: Path, templates_dir: Path) -> Path:
     """Generate .cpp file."""
     info = get_effect_info(effect_type)
     snake_name = to_snake_case(name)
     pascal_name = to_pascal_case(name)
-    class_name = f"GE{pascal_name}{info['params_suffix'].replace('_', ' ').title().replace(' ', '')}"
+    suffix_pascal = to_pascal_case(info['params_suffix'])
+    class_name = f"GE{pascal_name}{suffix_pascal}"
     params_class = f"{class_name}Params"
 
     file_name = f"ge_{snake_name}{info['params_suffix']}.cpp"
@@ -198,20 +191,11 @@ def generate_cpp_file(name: str, effect_type: str, params: List[Dict], output_di
     template = load_template(templates_dir / f"{effect_type}.cpp.tpl")
     template_content = strip_template_copyright(template.template)
 
-    init_list = []
-    for param in params:
-        param_name = param['name']
-        init_list.append(f"    {param_name}_(params.{param_name})")
-
-    initialization = ""
-    if init_list:
-        initialization = ":\n" + ',\n'.join(init_list)
-
     content = get_copyright_header() + Template(template_content).substitute(
         HEADER_FILE=header_file_name,
         CLASS_NAME=class_name,
         PARAMS_CLASS=params_class,
-        INITIALIZATION_LIST=initialization
+        EFFECT_NAME=pascal_name
     )
 
     cpp_file = output_dir / file_name
@@ -233,8 +217,67 @@ def get_output_dir(effect_type: str, target: str, root_dir: Path) -> Path:
         raise ValueError(f"Unknown effect type: {effect_type}")
 
 
-def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: Path, templates_dir: Path) -> bool:
+def try_add_filter_type_enum(name: str, root_dir: Path, console: Console) -> bool:
+    """Try to add enum entry to ge_filter_type.h before MAX."""
+    snake_name = to_snake_case(name)
+    enum_name = snake_name.upper()
+    
+    filter_type_file = root_dir / "include" / "core" / "ge_filter_type.h"
+    if not filter_type_file.exists():
+        console.warning(f"{filter_type_file.relative_to(root_dir)} not found")
+        console.step(f"Add {enum_name} enum to include/core/ge_filter_type.h manually")
+        return False
+    
+    content = filter_type_file.read_text()
+    
+    if re.search(rf'\b{enum_name}\b', content):
+        return True
+    
+    lines = content.split('\n')
+    max_line_idx = -1
+    for i, line in enumerate(lines):
+        if 'MAX,' in line:
+            max_line_idx = i
+            break
+    
+    if max_line_idx == -1:
+        console.warning(f"Could not find 'MAX,' in ge_filter_type.h")
+        console.step(f"Add {enum_name} enum to include/core/ge_filter_type.h manually")
+        return False
+    
+    max_line = lines[max_line_idx]
+    indent = len(max_line) - len(max_line.lstrip())
+    indent_str = max_line[:indent]
+    
+    new_enum_line = f"{indent_str}{enum_name},"
+    lines.insert(max_line_idx, new_enum_line)
+    
+    filter_type_file.write_text('\n'.join(lines))
+    console.step(f"Added enum {enum_name} to include/core/ge_filter_type.h")
+    return True
+
+
+def format_generated_file(file_path: Path, clang_format_path: str, console: Console) -> bool:
+    """Format a generated file using clang-format."""
+    try:
+        result = subprocess.run(
+            [clang_format_path, "-i", str(file_path)],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            return True
+        console.warning(f"clang-format failed for {file_path}: {result.stderr}")
+        return False
+    except Exception as e:
+        console.warning(f"Failed to run clang-format: {e}")
+        return False
+
+
+def generate_effect(name: str, effect_type: str, root_dir: Path, templates_dir: Path, add_enum: bool = True) -> bool:
     """Generate all files for a new effect."""
+    console = Console()
+    
     try:
         output_dir = get_output_dir(effect_type, "include", root_dir)
         src_output_dir = get_output_dir(effect_type, "src", root_dir)
@@ -242,30 +285,46 @@ def generate_effect(name: str, effect_type: str, params: List[Dict], root_dir: P
         output_dir.mkdir(parents=True, exist_ok=True)
         src_output_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"Generating {effect_type} effect: {name}")
-        print(f"- Header Output directory: {output_dir}")
+        console.header(f"Creating {effect_type} effect: {name}")
 
-        params_file = generate_params_file(name, effect_type, params, output_dir, templates_dir)
-        print(f"  Generated: {params_file.name}")
+        params_file = generate_params_file(name, effect_type, output_dir, templates_dir)
+        console.file(str(params_file.relative_to(root_dir)))
 
-        header_file = generate_header_file(name, effect_type, params, output_dir, templates_dir)
-        print(f"  Generated: {header_file.name}")
+        header_file = generate_header_file(name, effect_type, output_dir, templates_dir)
+        console.file(str(header_file.relative_to(root_dir)))
 
-        print(f"- Source Output directory: {src_output_dir}")
-        cpp_file = generate_cpp_file(name, effect_type, params, src_output_dir, templates_dir)
-        print(f"  Generated: {cpp_file.name}")
+        cpp_file = generate_cpp_file(name, effect_type, src_output_dir, templates_dir)
+        console.file(str(cpp_file.relative_to(root_dir)))
 
-        print(f"\nSuccessfully generated {name} {effect_type} effect!\n")
-        print(f"Hint: run `python tool/generate_metadata/gen_effect_header.py` to generate include for your params")
-        print(f"      run `python tool/generate_metadata/gen_metadata.py` to generate param setters for your params")
-        return True
+        clang_format_path = find_clang_format()
+        if clang_format_path:
+            format_generated_file(params_file, clang_format_path, console)
+            format_generated_file(header_file, clang_format_path, console)
+            format_generated_file(cpp_file, clang_format_path, console)
+
+        if add_enum:
+            try_add_filter_type_enum(name, root_dir, console)
+        
+        console.summary()
+        
+        if console.error_count == 0:
+            console.info("\nNext steps:")
+            if not add_enum:
+                console.step(f"Add {to_snake_case(name).upper()} enum to include/core/ge_filter_type.h")
+            console.step(f"Add \"{cpp_file.relative_to(root_dir)}\" to sources in BUILD.gn")
+            console.step("Implement shader logic in the generated .cpp file")
+            console.step("Run `python tool/generate_metadata/gen_effect_header.py` to generate include")
+            console.step("Run `python tool/generate_metadata/gen_metadata.py` to generate param setters")
+        
+        return console.error_count == 0
 
     except Exception as e:
-        print(f"Error generating effect: {e}", file=sys.stderr)
+        console.error(f"Error generating effect: {e}")
         return False
 
 
 def main():
+    """Parse CLI arguments and generate effect."""
     parser = argparse.ArgumentParser(
         description="Create GE Effects - Create new Graphics Effect by templates",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -318,14 +377,19 @@ Available effect types:
         help="Directory containing template files (default: tool/templates)"
     )
 
+    parser.add_argument(
+        "--no-enum",
+        action="store_true",
+        help="Disable automatic enum addition to ge_filter_type.h (useful for testing)"
+    )
+
     args = parser.parse_args()
 
     if not args.name or not args.type:
         parser.print_help()
         return 1
 
-    params = []
-    return 0 if generate_effect(args.name, args.type, params, args.root, args.templates) else 1
+    return 0 if generate_effect(args.name, args.type, args.root, args.templates, add_enum=not args.no_enum) else 1
 
 
 if __name__ == "__main__":

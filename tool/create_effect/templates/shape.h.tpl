@@ -16,13 +16,13 @@
 #ifndef $HEADER_GUARD
 #define $HEADER_GUARD
 
+#include "ge_filter_type_info.h"
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
 
 // Additional includes for complex shapes:
 // #include "effect/runtime_shader_builder.h"
 // #include "ge_shader.h"
-// #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -32,7 +32,7 @@ class GE_EXPORT $CLASS_NAME : public GESDFShaderShape {
 public:
     $CLASS_NAME(const $PARAMS_CLASS& params);
     $CLASS_NAME(const $CLASS_NAME&) = delete;
-    $CLASS_NAME operator=(const $CLASS_NAME&) = delete;
+    $CLASS_NAME& operator=(const $CLASS_NAME&) = delete;
     $CLASS_NAME($CLASS_NAME&&) = delete;
     $CLASS_NAME& operator=($CLASS_NAME&&) = delete;
     ~$CLASS_NAME() override = default;
@@ -41,15 +41,17 @@ public:
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
 
+    // Required: Override pure virtual methods from GESDFShaderShape
+    GESDFShapeType GetSDFShapeType() const override;  // TODO: Return your shape type
+    bool HasType(const GESDFShapeType type) const override;  // TODO: Check if this shape or children match type
+
 private:
-    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder() const;
-    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder() const;
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetShaderBuilder();
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetNormalShaderBuilder();
 
     // Optional: Common implementation for both shader types
     static std::shared_ptr<ShaderEffect> GenerateShaderEffect(
-        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder) const;
-
-$MEMBER_DECLARATIONS
+        std::shared_ptr<Drawing::RuntimeShaderBuilder> builder);
 };
 
 } // namespace Drawing
