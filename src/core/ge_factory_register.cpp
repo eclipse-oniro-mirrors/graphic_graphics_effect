@@ -284,11 +284,14 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
         if (FactoryCheckNullptr(params.get(), "SDF_RRECT_SHAPE GetParams")) {
             return nullptr;
         }
+        if (!::OHOS::Rosen::Drawing::GEVisualEffect::CanBeContinuous(params)) {
+            return std::make_shared<::OHOS::Rosen::Drawing::GESDFRRectShaderShape>(*params);
+        }
         auto object = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
             static_cast<uint32_t>(::OHOS::Rosen::Drawing::GEFilterType::SDF_RRECT_SHAPE),
             sizeof(::OHOS::Rosen::Drawing::GESDFRRectShapeParams),
             static_cast<void*>(params.get()));
-        if (!object || !::OHOS::Rosen::Drawing::GEVisualEffect::CanBeContinuous(params)) {
+        if (!object) {
             return std::make_shared<::OHOS::Rosen::Drawing::GESDFRRectShaderShape>(*params);
         }
         return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
