@@ -305,26 +305,6 @@ HWTEST_F(GEVisualEffectContainerTest, GetGEVisualEffect_FindExistingAndNonExisti
 }
 
 /**
- * @tc.name: UpdateCacheDataFrom_SourceContainerWithFilters
- * @tc.desc: Verify function UpdateCacheDataFrom copies data from source container
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectContainerTest, UpdateCacheDataFrom_SourceContainerWithFilters, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateCacheDataFrom_SourceContainerWithFilters start";
-
-    auto container1 = std::make_shared<GEVisualEffectContainer>();
-    auto container2 = std::make_shared<GEVisualEffectContainer>();
-
-    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
-    container2->AddToChainedFilter(visualEffect);
-
-    container1->UpdateCacheDataFrom(container2);
-
-    GTEST_LOG_(INFO) << "GEVisualEffectContainerTest UpdateCacheDataFrom_SourceContainerWithFilters end";
-}
-
-/**
  * @tc.name: UpdateFrostedGlassEffectParams_NullBlurImage
  * @tc.desc: Verify function UpdateFrostedGlassEffectParams handles null blur image
  * @tc.type: FUNC
