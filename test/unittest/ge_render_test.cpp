@@ -949,7 +949,6 @@ HWTEST_F(GERenderTest, DrawImageEffect_KawaseBlurSmallRadius, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurSmallRadius start";
 
-    GERender::SetMesablurAllEnabledByCCM(true);
     auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
 
