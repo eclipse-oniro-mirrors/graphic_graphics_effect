@@ -20,6 +20,7 @@
 #include "pipeline/rs_paint_filter_canvas.h"
 #include "render_context/render_context.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "effect/ge_shader_filter_params_namesonly.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -909,6 +910,727 @@ HWTEST_F(GERenderTest, GenerateShaderEffectTest_LightCave, TestSize.Level1)
     geVisualEffectImpl->MakeLightCaveParams();
     shader = geRender->GenerateShaderEffect(geVisualEffectImpl);
     EXPECT_EQ(shader, nullptr);
+}
+
+/**
+ * @tc.name: IsFrostedGlassFilter_ValidAndInvalidCases
+ * @tc.desc: Verify function IsFrostedGlassFilter with frosted glass filter, other filters, and empty container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, IsFrostedGlassFilter_ValidAndInvalidCases, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest IsFrostedGlassFilter_ValidAndInvalidCases start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer1;
+    auto visualEffect1 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_FROSTED_GLASS);
+    veContainer1.AddToChainedFilter(visualEffect1);
+    EXPECT_TRUE(geRender->IsFrostedGlassFilter(veContainer1));
+
+    Drawing::GEVisualEffectContainer veContainer2;
+    auto visualEffect2 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    veContainer2.AddToChainedFilter(visualEffect2);
+    EXPECT_FALSE(geRender->IsFrostedGlassFilter(veContainer2));
+
+    Drawing::GEVisualEffectContainer veContainer3;
+    EXPECT_FALSE(geRender->IsFrostedGlassFilter(veContainer3));
+
+    GTEST_LOG_(INFO) << "GERenderTest IsFrostedGlassFilter_ValidAndInvalidCases end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_KawaseBlurSmallRadius
+ * @tc.desc: Verify DrawImageEffect with Kawase blur effect with small radius
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_KawaseBlurSmallRadius, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurSmallRadius start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurSmallRadius end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_MesaBlurWithGreyCoefs
+ * @tc.desc: Verify DrawImageEffect with MESA blur effect with grey coefficients
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_MesaBlurWithGreyCoefs, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_MesaBlurWithGreyCoefs start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_MESA_BLUR_RADIUS, 10);
+    visualEffect->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_1, 0.0f);
+    visualEffect->SetParam(Drawing::GE_FILTER_MESA_BLUR_GREY_COEF_2, 0.0f);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_MesaBlurWithGreyCoefs end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_LinearGradientBlur
+ * @tc.desc: Verify DrawImageEffect with linear gradient blur effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_LinearGradientBlur, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_LinearGradientBlur start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR_RADIUS, 1.0f);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_LinearGradientBlur end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_EdgeLight
+ * @tc.desc: Verify DrawImageEffect with edge light effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_EdgeLight, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_EdgeLight start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_EDGE_LIGHT);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_EdgeLight end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_Dispersion
+ * @tc.desc: Verify DrawImageEffect with dispersion effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_Dispersion, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_Dispersion start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_DISPERSION);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_Dispersion end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_GasifyScaleTwist
+ * @tc.desc: Verify DrawImageEffect with gasify scale twist effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_GasifyScaleTwist, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_GasifyScaleTwist start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY_SCALE_TWIST);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_GasifyScaleTwist end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_GasifyBlur
+ * @tc.desc: Verify DrawImageEffect with gasify blur effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_GasifyBlur, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_GasifyBlur start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY_BLUR);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_GasifyBlur end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_Gasify
+ * @tc.desc: Verify DrawImageEffect with gasify effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_Gasify, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_Gasify start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GASIFY);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_Gasify end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_VariableRadiusBlur
+ * @tc.desc: Verify DrawImageEffect with variable radius blur effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_VariableRadiusBlur, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_VariableRadiusBlur start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_VariableRadiusBlur end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_KawaseBlurMediumRadius
+ * @tc.desc: Verify DrawImageEffect with Kawase blur effect with medium radius
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_KawaseBlurMediumRadius, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurMediumRadius start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 5);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_KawaseBlurMediumRadius end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_FrostedGlass
+ * @tc.desc: Verify DrawImageEffect with frosted glass effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_FrostedGlass, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_FrostedGlass start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_FROSTED_GLASS);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_FrostedGlass end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_FrostedGlassBlur
+ * @tc.desc: Verify DrawImageEffect with frosted glass blur effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_FrostedGlassBlur, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_FrostedGlassBlur start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_FROSTED_GLASS_BLUR);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_FrostedGlassBlur end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_ValidFilterType
+ * @tc.desc: Verify DrawImageEffect handles valid filter type gracefully
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_ValidFilterType, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_ValidFilterType start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_ValidFilterType end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_EmptyContainer
+ * @tc.desc: Verify function DrawShaderEffect with empty visual effect container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_EmptyContainer, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_EmptyContainer start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    Drawing::Rect bounds(0.0f, 0.0f, 10.0f, 10.0f);
+
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_EmptyContainer end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_AuroraNoiseShader
+ * @tc.desc: Verify function DrawShaderEffect with Aurora noise shader visual effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_AuroraNoiseShader, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_AuroraNoiseShader start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_SHADER_AURORA_NOISE);
+    visualEffect->SetParam(Drawing::GE_SHADER_AURORA_NOISE_VALUE, 0.5f);
+    visualEffect->SetParam(Drawing::GE_SHADER_AURORA_FREQX_VALUE, 10.0f);
+    visualEffect->SetParam(Drawing::GE_SHADER_AURORA_FREQY_VALUE, 10.0f);
+    veContainer.AddToChainedFilter(visualEffect);
+
+    Drawing::Rect bounds(0.0f, 0.0f, 100.0f, 100.0f);
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_AuroraNoiseShader end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_WithEmptyFilterList
+ * @tc.desc: Verify function DrawShaderEffect with container but empty filter list
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_WithEmptyFilterList, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_WithEmptyFilterList start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    Drawing::Rect bounds(0.0f, 0.0f, 100.0f, 100.0f);
+
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_WithEmptyFilterList end";
+}
+
+/**
+ * @tc.name: IsNeedExpansionFilter_DefaultState
+ * @tc.desc: Verify function IsNeedExpansionFilter returns default state
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, IsNeedExpansionFilter_DefaultState, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest IsNeedExpansionFilter_DefaultState start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    EXPECT_FALSE(geRender->IsNeedExpansionFilter());
+
+    GTEST_LOG_(INFO) << "GERenderTest IsNeedExpansionFilter_DefaultState end";
+}
+
+/**
+ * @tc.name: GetExpansionRect_DefaultRect
+ * @tc.desc: Verify function GetExpansionRect returns default rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, GetExpansionRect_DefaultRect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest GetExpansionRect_DefaultRect start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    auto rect = geRender->GetExpansionRect();
+    EXPECT_FLOAT_EQ(rect.GetLeft(), 0.0f);
+    EXPECT_FLOAT_EQ(rect.GetTop(), 0.0f);
+    EXPECT_FLOAT_EQ(rect.GetRight(), 0.0f);
+    EXPECT_FLOAT_EQ(rect.GetBottom(), 0.0f);
+
+    GTEST_LOG_(INFO) << "GERenderTest GetExpansionRect_DefaultRect end";
+}
+
+/**
+ * @tc.name: ApplyImageEffect_EmptyContainer
+ * @tc.desc: Verify ApplyImageEffect with empty visual effect container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyImageEffect_EmptyContainer, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_EmptyContainer start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    Drawing::GEVisualEffectContainer veContainer;
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    auto outImage = geRender->ApplyImageEffect(*canvas_, veContainer, {image, src, dst}, sampling);
+    EXPECT_EQ(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_EmptyContainer end";
+}
+
+/**
+ * @tc.name: ApplyImageEffect_MultipleFiltersChain
+ * @tc.desc: Verify ApplyImageEffect with multiple filters in chain
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyImageEffect_MultipleFiltersChain, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_MultipleFiltersChain start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    Drawing::GEVisualEffectContainer veContainer;
+    
+    auto visualEffect1 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect1->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 2);
+    veContainer.AddToChainedFilter(visualEffect1);
+    
+    auto visualEffect2 = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
+    visualEffect2->SetParam(Drawing::GE_FILTER_GREY_COEF_1, 0.5f);
+    visualEffect2->SetParam(Drawing::GE_FILTER_GREY_COEF_2, 0.5f);
+    veContainer.AddToChainedFilter(visualEffect2);
+    
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    auto outImage = geRender->ApplyImageEffect(*canvas_, veContainer, {image, src, dst}, sampling);
+    EXPECT_NE(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_MultipleFiltersChain end";
+}
+
+/**
+ * @tc.name: ApplyImageEffect_WithCacheProvider
+ * @tc.desc: Verify ApplyImageEffect with cache provider
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, ApplyImageEffect_WithCacheProvider, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_WithCacheProvider start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    Drawing::GEVisualEffectContainer veContainer;
+    
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+    veContainer.AddToChainedFilter(visualEffect);
+    
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    IGECacheProvider* cacheProvider = nullptr;
+    auto outImage = geRender->ApplyImageEffect(*canvas_, veContainer, {image, src, dst, cacheProvider}, sampling);
+    EXPECT_NE(outImage, nullptr);
+
+    GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_WithCacheProvider end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_EmptyContainer
+ * @tc.desc: Verify DrawImageEffect with empty visual effect container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_EmptyContainer, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_EmptyContainer start";
+
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    Drawing::GEVisualEffectContainer veContainer;
+    const Drawing::Rect src(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    geRender->DrawImageEffect(*canvas_, veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_EmptyContainer end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_InvalidRectNegativeCoords
+ * @tc.desc: Verify DrawImageEffect handles invalid rect with negative coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_InvalidRectNegativeCoords, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_InvalidRectNegativeCoords start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+    
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+    
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    const Drawing::Rect src(-1.0f, -1.0f, 1.0f, 1.0f);
+    const Drawing::Rect dst(-1.0f, -1.0f, 1.0f, 1.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_InvalidRectNegativeCoords end";
+}
+
+/**
+ * @tc.name: DrawImageEffect_InvalidRectZeroSize
+ * @tc.desc: Verify DrawImageEffect handles invalid rect with zero size
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawImageEffect_InvalidRectZeroSize, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_InvalidRectZeroSize start";
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, 1);
+    
+    auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
+    veContainer->AddToChainedFilter(visualEffect);
+    
+    auto image = MakeImage();
+    ASSERT_NE(image, nullptr);
+    
+    const Drawing::Rect src(0.0f, 0.0f, 0.0f, 0.0f);
+    const Drawing::Rect dst(0.0f, 0.0f, 0.0f, 0.0f);
+    const Drawing::SamplingOptions sampling;
+    
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    
+    geRender->DrawImageEffect(*canvas_, *veContainer, image, src, dst, sampling);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawImageEffect_InvalidRectZeroSize end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_InvalidShaderType
+ * @tc.desc: Verify DrawShaderEffect handles invalid shader type gracefully
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_InvalidShaderType, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidShaderType start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>("");
+    veContainer.AddToChainedFilter(visualEffect);
+
+    Drawing::Rect bounds(0.0f, 0.0f, 100.0f, 100.0f);
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidShaderType end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_InvalidBoundsNegativeCoords
+ * @tc.desc: Verify DrawShaderEffect handles invalid bounds with negative coordinates
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_InvalidBoundsNegativeCoords, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidBoundsNegativeCoords start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    Drawing::Rect bounds(-10.0f, -10.0f, 10.0f, 10.0f);
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidBoundsNegativeCoords end";
+}
+
+/**
+ * @tc.name: DrawShaderEffect_InvalidBoundsZeroSize
+ * @tc.desc: Verify DrawShaderEffect handles invalid bounds with zero size
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawShaderEffect_InvalidBoundsZeroSize, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidBoundsZeroSize start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    Drawing::GEVisualEffectContainer veContainer;
+    Drawing::Rect bounds(0.0f, 0.0f, 0.0f, 0.0f);
+    geRender->DrawShaderEffect(*canvas_, veContainer, bounds);
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidBoundsZeroSize end";
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
