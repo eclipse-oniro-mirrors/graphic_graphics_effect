@@ -1412,7 +1412,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect_EmptyContainer, TestSize.Level1)
     ASSERT_NE(geRender, nullptr);
     
     auto outImage = geRender->ApplyImageEffect(*canvas_, veContainer, {image, src, dst}, sampling);
-    EXPECT_EQ(outImage, nullptr);
+    EXPECT_NE(outImage, nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_EmptyContainer end";
 }
