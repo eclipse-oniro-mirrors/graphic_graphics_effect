@@ -92,8 +92,10 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(Drawin
 std::shared_ptr<Drawing::RuntimeEffect> GESDFClipShader::GetSDFClipEffect()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfClipShader = nullptr;
+    Drawing::RuntimeEffectOptions reo;
+    reo.useHighpLocalCoords = true;
     if (sdfClipShader == nullptr) {
-        sdfClipShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+        sdfClipShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_, reo);
     }
     return sdfClipShader;
 }
