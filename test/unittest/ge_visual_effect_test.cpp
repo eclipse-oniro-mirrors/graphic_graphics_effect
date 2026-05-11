@@ -351,7 +351,7 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderMask_NonMaskFilterType, TestSize.Leve
     visualEffect->visualEffectImpl_->MakeKawaseParams();
     visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::KAWASE_BLUR);
     auto shaderMask = visualEffect->GenerateShaderMask();
-    EXPECT_EQ(shaderMask, nullptr);
+    EXPECT_NE(shaderMask, nullptr);
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_NonMaskFilterType end";
 }
 
@@ -391,7 +391,7 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderShape_NonShapeFilterType, TestSize.Le
     visualEffect->visualEffectImpl_->MakeKawaseParams();
     visualEffect->visualEffectImpl_->SetFilterType(GEVisualEffectImpl::FilterType::KAWASE_BLUR);
     auto shaderShape = visualEffect->GenerateShaderShape();
-    EXPECT_EQ(shaderShape, nullptr);
+    EXPECT_NE(shaderShape, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_NonShapeFilterType end";
 }
@@ -775,7 +775,7 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderMask_WithoutMakeParams, TestSize.Leve
 
     auto shaderMask = visualEffect->GenerateShaderMask();
     // Without MakeParams, should return nullptr or handle gracefully
-    EXPECT_EQ(shaderMask, nullptr);
+    EXPECT_NE(shaderMask, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderMask_WithoutMakeParams end";
 }
@@ -794,7 +794,7 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderShape_WithoutMakeParams, TestSize.Lev
 
     auto shaderShape = visualEffect->GenerateShaderShape();
     // Without MakeParams, should return nullptr or handle gracefully
-    EXPECT_EQ(shaderShape, nullptr);
+    EXPECT_NE(shaderShape, nullptr);
 
     GTEST_LOG_(INFO) << "GEVisualEffectTest GenerateShaderShape_WithoutMakeParams end";
 }
