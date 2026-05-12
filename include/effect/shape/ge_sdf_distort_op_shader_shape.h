@@ -59,6 +59,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFDistortBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateDistortShaderEffect(std::shared_ptr<ShaderEffect> shapeShader,
         std::shared_ptr<Drawing::RuntimeShaderBuilder> builder, float width, float height) const;
+    void ComputeAndSetUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder) const;
     GESDFDistortOpShapeParams params_ {};
 };
 

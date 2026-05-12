@@ -42,6 +42,7 @@ public:
         const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
 
 private:
+    void ComputeAndSetUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder);
     Drawing::Point LUCorner_;
     Drawing::Point RUCorner_;
     Drawing::Point RBCorner_;
