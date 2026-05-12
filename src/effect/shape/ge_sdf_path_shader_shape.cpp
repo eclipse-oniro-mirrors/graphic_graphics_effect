@@ -36,7 +36,7 @@ static constexpr float MIN_SCALE = 200.0f;
 static constexpr uint32_t LINE = 2;
 static constexpr uint32_t QUADRATIC_BEZIER = 3;
 static constexpr uint32_t CUBIC_BEZIER = 4;
-constexpr uint32_t MAX_CURVES_PER_GRID = 2;
+constexpr uint32_t MAX_CURVES_PER_GRID = 4;
 constexpr uint32_t MAX_CURVES_SUBMIT_PER_GRID = 20;
 constexpr uint32_t MIN_GRID_SIZE = 64;
 constexpr uint32_t CURVE_FLOAT_COUNT = 6;
@@ -50,13 +50,13 @@ constexpr float DEFAULT_BASE_WIDTH = 150.0f;
 constexpr float DEFAULT_BASE_HEIGHT = 250.0f;
 constexpr float MAX_THICKNESS = 0.05f;
 constexpr float POWER_BASE = 2.0f;
-constexpr float TRANSPARENT_COLOR = 0.00000000f;
 constexpr float MIN_SCALE_CLAMP = 0.001f;
 constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate conversion
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
 constexpr float ASPECT_DEFAULT = 1.0f;      // default aspect ratio when width/height is zero
 constexpr float MIDPOINT_FACTOR = 0.5f;     // factor for calculating midpoint
-constexpr float POINT_COUNT_DIVISOR = 2.0f; // divisor for control point count (3 points per curve)
+constexpr float INVALID_CONTROL_POINT = -2.0f; // not included in the NDC space
+constexpr float INVALID_SEGMENT_INDEX = -1.0f; // invalid negative curve index
 
 bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
@@ -155,17 +155,17 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
     uniform shader u_sdfTex;
     uniform shader u_maskTex;
 
-    const float UNCOMPUTED = 0.0;
-    const float INF = 1e4;
-    const float EPSILON = 0.001;
+    const float INF_1E4 = 1e4;
+    const float EPSILON_1E_MINUS_3 = 0.001;
 
     float sampleSdf(vec2 baseUv, vec2 offset) {
         vec2 sampleUv = baseUv + offset / iResolution.xy;
         float sdf = u_sdfTex.eval(sampleUv * iResolution).r;
-        if (abs(sdf - UNCOMPUTED) > EPSILON && sdf < INF) {
-            return sdf + length(offset);
+        if (sdf < INF_1E4 - EPSILON_1E_MINUS_3) {
+            float ndcOffset = length(offset) * (2.0 / iResolution.y);
+            return sdf + ndcOffset;
         }
-        return INF;
+        return INF_1E4;
     }
 
     vec4 main(vec2 fragCoord) {
@@ -173,12 +173,12 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
 
         float mask = u_maskTex.eval(fragCoord).r;
         float currentSdf = u_sdfTex.eval(fragCoord).r;
-        if (mask < 1.0 || (abs(currentSdf - UNCOMPUTED) > EPSILON && currentSdf < INF)) {
+        if (mask < 1.0 || currentSdf < INF_1E4 - EPSILON_1E_MINUS_3) {
             return vec4(vec3(currentSdf), 1.0);
         }
 
         float step = u_step;
-        float minSdf = INF;
+        float minSdf = currentSdf;
         minSdf = min(minSdf, sampleSdf(uv, vec2(-step, -step)));
         minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, -step)));
         minSdf = min(minSdf, sampleSdf(uv, vec2(step, -step)));
@@ -188,7 +188,7 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
         minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, step)));
         minSdf = min(minSdf, sampleSdf(uv, vec2(step, step)));
 
-        return vec4(minSdf < INF ? minSdf : UNCOMPUTED);
+        return vec4(minSdf);
     }
 )";
 
@@ -199,89 +199,22 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     uniform float u_curveCount;
     uniform vec2 controlPoints[CAPACITY];
     uniform float segmentIndex[MAX_CURVES_IN_GRID];
+    uniform shader u_prevD;
+    uniform float u_isFirstBatch;
 
-    const float INF = 1e20;
+    const float INF_1E20 = 1e20;
     const float SQRT3 = 1.7320508;
-    const float EPSILON = 1e-6;
-
-    float cro(vec2 a, vec2 b) {
-        return a.x * b.y - a.y * b.x;
-    }
-
-    float dot2(vec2 v) {
-        return dot(v, v);
-    }
-
-    float SdfLine(vec2 p, vec2 a, vec2 b) {
-        vec2 pa = p - a;
-        vec2 ba = b - a;
-        float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
-        return length(pa - h * ba);
-    }
-
-    float SdfControlSegment(vec2 p, vec2 A, vec2 B, vec2 C) {
-        float d1 = SdfLine(p, A, B);
-        float d2 = SdfLine(p, B, C);
-        return min(d1, d2);
-    }
-
-    float FindClosestControlPolygon(vec2 p, inout vec2 outA, inout vec2 outB, inout vec2 outC) {
-        float minDist = INF;
-        int curveCount = int(u_curveCount);
-
-        for (int i = 0; i < MAX_CURVES_IN_GRID; i++) {
-            int global_curve_idx = int(segmentIndex[i]);
-            if (global_curve_idx < 0) break;
-
-            vec2 A = controlPoints[i * 3];
-            vec2 B = controlPoints[i * 3 + 1];
-            vec2 C = controlPoints[i * 3 + 2];
-
-            float d = SdfControlSegment(p, A, B, C);
-
-            if (d < minDist) {
-                minDist = d;
-                outA = A;
-                outB = B;
-                outC = C;
-            }
-        }
-        return minDist;
-    }
-
-    float sdBezier(vec2 p, vec2 v0, vec2 v1, vec2 v2)
-    {
-        vec2 i = v0 - v2;
-        vec2 j = v2 - v1;
-        vec2 k = v1 - v0;
-        vec2 w = j - k;
-
-        v0 -= p; v1 -= p; v2 -= p;
-
-        float x = cro(v0, v2);
-        float y = cro(v1, v0);
-        float z = cro(v2, v1);
-
-        vec2 s = 2.0 * (y * j + z * k) - x * i;
-
-        float r = (y * z - x * x * 0.25) / dot2(s);
-        float t = clamp((0.5 * x + y + r * dot(s, w)) / (x + y + z), 0.0, 1.0);
-        vec2 d = v0 + t * (k + k + t * w);
-
-        return length(d);
-    }
 
     float sdf_bezier_unsigned_sq(vec2 pos, vec2 A, vec2 B, vec2 C) {
-        const float EPSILON = 1e-4;
+        const float EPSILON_1E_MINUS_3 = 1e-8;
         vec2 a = B - A;
         vec2 b = A - 2.0 * B + C;
 
-        // 如果三个点几乎在一条直线上，退化为线段距离
-        if (dot(b, b) < EPSILON) {
+        if (dot(b, b) < EPSILON_1E_MINUS_3) {
             vec2 pa = pos - A;
             vec2 ba = C - A;
             float ba2 = dot(ba, ba);
-            if (ba2 < EPSILON) return dot(pa, pa);
+            if (ba2 < EPSILON_1E_MINUS_3) return dot(pa, pa);
             float h = clamp(dot(pa, ba) / ba2, 0.0, 1.0);
             vec2 dvec = pa - h * ba;
             return dot(dvec, dvec);
@@ -325,19 +258,49 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         return res;
     }
 
+    float FindClosestBezier(vec2 p, inout vec2 outA, inout vec2 outB, inout vec2 outC) {
+        float minDist = INF_1E20;
+        int curveCount = int(u_curveCount);
+
+        for (int i = 0; i < MAX_CURVES_IN_GRID; i++) {
+            int global_curve_idx = int(segmentIndex[i]);
+            if (global_curve_idx < 0) break;
+
+            vec2 A = controlPoints[i * 3];
+            vec2 B = controlPoints[i * 3 + 1];
+            vec2 C = controlPoints[i * 3 + 2];
+
+            float d = sdf_bezier_unsigned_sq(p, A, B, C);
+            if (d < minDist) {
+                minDist = d;
+            }
+        }
+        return minDist;
+    }
+
     float get_sdf_shape(vec2 p) {
         vec2 A = vec2(0.0);
         vec2 B = vec2(0.0);
         vec2 C = vec2(0.0);
-        float min_dist = FindClosestControlPolygon(p, A, B, C);
-        min_dist = sdf_bezier_unsigned_sq(p, A, B, C);
+        float min_dist = FindClosestBezier(p, A, B, C);
         return sqrt(min_dist);
     }
 
     vec4 main(vec2 fragCoord) {
-        vec2 uv = (2.0 * fragCoord - iResolution.xy) / iResolution.y;
-        float d = get_sdf_shape(uv);
-        return vec4(vec3(iResolution.y * 2.0 * d), 1.0);
+        vec2 uv = fragCoord / iResolution;
+        float ndcAspect = iResolution.x / iResolution.y;
+        vec2 ndc = vec2(
+            (uv.x * 2.0 - 1.0) * ndcAspect,
+            uv.y * 2.0 - 1.0
+        );
+        float currentD = get_sdf_shape(ndc);
+
+        if (u_isFirstBatch < 1e-3) {
+            float prevD = u_prevD.eval(fragCoord).r;
+            currentD = min(currentD, prevD);
+        }
+
+        return vec4(vec3(currentD), 1.0);
     }
 )";
 
@@ -347,12 +310,12 @@ static const std::string NORMAL_CALCULATION_SHADER = R"(
     uniform shader pathShader;
 
     vec4 main(vec2 fragCoord) {
-        float centerSdf = u_seeds.eval(fragCoord).r;
+        float centerD = u_seeds.eval(fragCoord).r;
 
         float mask = pathShader.eval(fragCoord).r;
-
-        if (centerSdf > 50.0 && mask < 1e-5) {
-            return vec4(0.0, 0.0, 0.0, centerSdf);
+        float pixelDFactor = iResolution.y * 2.0;
+        if (mask < 1e-5) {
+            return vec4(0.0, 0.0, 0.0, centerD * pixelDFactor);
         }
 
         float L = u_seeds.eval(fragCoord + vec2(-1.0, 0.0)).r;
@@ -369,12 +332,20 @@ static const std::string NORMAL_CALCULATION_SHADER = R"(
             normal = vec2(0.0, 0.0);
         }
 
-        centerSdf = (centerSdf + L + R + T + B) * 0.2;
+        centerD = (centerD + L + R + T + B) * 0.2 * pixelDFactor;
 
-        float factor = 1.0 - smoothstep(15.0, 0.0, centerSdf);
+        float factor = 1.0 - smoothstep(10.0, 0.0, centerD);
         normal *= factor;
+        float aaMargin = 3.0;
 
-        return vec4(normal, 0.0, -centerSdf * mask * factor + 2.5);
+        return vec4(normal, 0.0, -centerD * mask * factor + aaMargin);
+    }
+)";
+
+static const std::string CLEAR_INF_SHADER = R"(
+        const float INF_1E4 = 1e4;
+        vec4 main(vec2 fragCoord) {
+            return vec4(vec3(INF_1E4), 1.0);
     }
 )";
 
@@ -385,6 +356,7 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_pathSeedShaderEffe
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_precalcShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_sdfPropEffect_ = nullptr;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_clearInfEffect = nullptr;
 
 static std::vector<float> parseNumbers(const std::string& s, size_t& i)
 {
@@ -511,7 +483,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     auto gpuContext = canvas.GetGPUContext();
     if (!gpuContext) {
         LOGE("GESDFPathShaderShape::RunSDFPropagation no GPU context");
-        return nullptr;
+        return sdfTex;
     }
 
     SamplingOptions nearest(FilterMode::NEAREST, MipmapMode::NONE);
@@ -520,7 +492,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     auto builder = MakeSdfPropShaderBuilder();
     if (!builder) {
         LOGE("GESDFPathShaderShape::RunSDFPropagation pass builder failed");
-        return nullptr;
+        return sdfTex;
     }
 
     auto maskShader = ShaderEffect::CreateImageShader(*maskTex, TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
@@ -579,7 +551,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
 #ifdef RS_ENABLE_GPU
     return normalBuilder->MakeImage(gpuContext.get(), nullptr, inputImageInfo, false);
 #else
-    return normalBuilder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
+    return normalBuilder->MakeImage(nullptr, nullptr, inputImageInfo, false);
 #endif
 }
 
@@ -592,18 +564,49 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
     }
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
     offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
-    if (offscreenSurface_ == nullptr) {
+    if (!offscreenSurface_) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenSurface is invalid");
         return;
     }
     offscreenCanvas_ = offscreenSurface_->GetCanvas();
-    if (offscreenCanvas_ == nullptr) {
+    if (!offscreenCanvas_) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenCanvas is invalid");
         return;
     }
 
+    auto FallbackClear = [this, &rect]() {
+        Drawing::Brush brush;
+        brush.SetColor(0x00000000);
+        offscreenCanvas_->AttachBrush(brush);
+        offscreenCanvas_->DrawRect(rect);
+        offscreenCanvas_->DetachBrush();
+    };
+
+    if (!g_clearInfEffect) {
+        g_clearInfEffect = RuntimeEffect::CreateForShader(CLEAR_INF_SHADER);
+        if (!g_clearInfEffect) {
+            LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas CreateForShader failed");
+            FallbackClear();
+            return;
+        }
+    }
+
+    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_clearInfEffect);
+    if (!builder) {
+        LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas create builder failed");
+        FallbackClear();
+        return;
+    }
+
+    auto clearShader = builder->MakeShader(nullptr, false);
+    if (!clearShader) {
+        LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas clear Shader failed");
+        FallbackClear();
+        return;
+    }
+
     Drawing::Brush clearBrush;
-    clearBrush.SetColor(TRANSPARENT_COLOR);
+    clearBrush.SetShaderEffect(clearShader);
     offscreenCanvas_->AttachBrush(clearBrush);
     offscreenCanvas_->DrawRect(rect);
     offscreenCanvas_->DetachBrush();
@@ -748,14 +751,6 @@ void GESDFPathShaderShape::ProcessFinalGrid(Grid& current, const std::vector<Box
         gridCurves.push_back(controlPoints_[baseIdx + 5]); // 5: endPoint.y
         inOrderSeg.push_back(static_cast<float>(idx));
     }
- 
-    if (gridCurves.size() < MAX_CURVES_SUBMIT_PER_GRID * CURVE_FLOAT_COUNT) {
-            gridCurves.resize(MAX_CURVES_SUBMIT_PER_GRID * CURVE_FLOAT_COUNT, -2.0f); // -2.0: invalid coordinate
-        }
- 
-    if (inOrderSeg.size() < MAX_CURVES_SUBMIT_PER_GRID) {
-        inOrderSeg.resize(MAX_CURVES_SUBMIT_PER_GRID, -1.0f); // -1.0: invalid index
-    }
     curvesInGrid_.push_back(std::make_pair(gridCurves, processedGrid));
     segmentIndex_.push_back(inOrderSeg);
 }
@@ -763,13 +758,12 @@ void GESDFPathShaderShape::ProcessFinalGrid(Grid& current, const std::vector<Box
 Drawing::Path GESDFPathShaderShape::PreparePathForRendering(const Drawing::Rect& rect, float& width, float& height)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::PreparePathForRendering");
-    Vector2f scale = params_.scale;
-    UpdateScale(scale, rect);
-    width = rect.GetWidth() * scale.x_;
-    height = rect.GetHeight() * scale.y_;
+    UpdateScale(params_.scale, rect);
+    width = rect.GetWidth() * params_.scale.x_;
+    height = rect.GetHeight() * params_.scale.y_;
 
     Drawing::Matrix matrix;
-    matrix.SetScale(scale.x_, scale.y_);
+    matrix.SetScale(params_.scale.x_, params_.scale.y_);
     Drawing::Path path = params_.path;
     path.Offset(params_.offset.x_, params_.offset.y_);
     path.Transform(matrix);
@@ -799,11 +793,71 @@ std::vector<Vector2f> GESDFPathShaderShape::ProcessCurveSegments(const std::vect
             cubicToQuadraticSingle(segment[0], controlPoint, segment[2], segment[3]);
             pixelControlPoints.push_back(segment[0]);
             pixelControlPoints.push_back(controlPoint);
-            pixelControlPoints.push_back(segment[2]); // 2 is index of CUBIC BEZIER
+            pixelControlPoints.push_back(segment[3]); // 3 is index of CUBIC BEZIER
             numCurves_++;
         }
     }
     return pixelControlPoints;
+}
+
+void GESDFPathShaderShape::ProcessSingleBatch(Drawing::RuntimeShaderBuilder& builder, size_t gridIndex, size_t batch,
+    std::shared_ptr<Drawing::Image>& prevSdf, std::shared_ptr<Drawing::ShaderEffect>& prevShader)
+{
+    const auto& grid = curvesInGrid_[gridIndex];
+    const auto& allCurves = grid.first;
+    const auto& allSegments = segmentIndex_[gridIndex];
+    const Box4f area = grid.second.bbox;
+    const Drawing::Rect rectN(area[XMIN_I], area[YMIN_I], area[XMAX_I], area[YMAX_I]);
+    
+    const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
+    const size_t totalCurves = allCurves.size() / CURVE_FLOAT_COUNT;
+    const size_t start = batch * curvesPerBatch;
+    const size_t end = std::min(start + curvesPerBatch, totalCurves);
+
+    std::vector<float> batchCurves;
+    std::vector<float> batchSegments;
+    batchCurves.reserve(curvesPerBatch * CURVE_FLOAT_COUNT);
+    batchSegments.reserve(curvesPerBatch);
+    for (size_t j = start; j < end; j++) {
+        size_t base = j * CURVE_FLOAT_COUNT;
+        batchCurves.insert(batchCurves.end(), allCurves.begin() + base, allCurves.begin() + base + CURVE_FLOAT_COUNT);
+        batchSegments.push_back(allSegments[j]);
+    }
+    batchCurves.resize(curvesPerBatch * CURVE_FLOAT_COUNT, INVALID_CONTROL_POINT);
+    batchSegments.resize(curvesPerBatch, INVALID_SEGMENT_INDEX);
+
+    builder.SetUniform("controlPoints", batchCurves.data(), batchCurves.size());
+    builder.SetUniform("segmentIndex", batchSegments.data(), batchSegments.size());
+    builder.SetUniform("u_isFirstBatch", (batch == 0) ? 1.0f : 0.0f);
+    // Note: u_prevD is not sampled when u_isFirstBatch == 1.0f, no need to set for batch 0
+
+    SamplingOptions nearest(FilterMode::LINEAR, MipmapMode::LINEAR);
+    if (batch > 0) {
+        prevSdf = offscreenSurface_->GetImageSnapshot();
+        if (!prevSdf) {
+            LOGE("GESDFPathShaderShape::ProcessSingleBatch: failed to get image snapshot from offscreen surface");
+            return;
+        }
+        prevShader = ShaderEffect::CreateImageShader(*prevSdf,
+            TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
+        if (!prevShader) {
+            LOGE("GESDFPathShaderShape::ProcessSingleBatch failed: failed to create image shader");
+            return;
+        }
+        builder.SetChild("u_prevD", prevShader);
+    }
+
+    auto shader = builder.MakeShader(nullptr, false);
+    if (!shader) {
+        LOGE("GESDFPathShaderShape::ProcessSingleBatch shader create failed");
+        return;
+    }
+
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    offscreenCanvas_->AttachBrush(brush);
+    offscreenCanvas_->DrawRect(rectN);
+    offscreenCanvas_->DetachBrush();
 }
 
 void GESDFPathShaderShape::RenderGridsToSurface(const Drawing::Rect& targetRect)
@@ -816,27 +870,24 @@ void GESDFPathShaderShape::RenderGridsToSurface(const Drawing::Rect& targetRect)
     }
 
     builder->SetUniform("iResolution", targetRect.GetWidth(), targetRect.GetHeight());
-    builder->SetUniform("u_pointCount", static_cast<float>(pointCnt_) / POINT_COUNT_DIVISOR);
     builder->SetUniform("u_curveCount", static_cast<float>(numCurves_));
+    SamplingOptions nearest(FilterMode::LINEAR, MipmapMode::LINEAR);
+    auto prevSdf = offscreenSurface_->GetImageSnapshot();
+    if (!prevSdf) {
+            LOGE("GESDFPathShaderShape::RenderGridsToSurface: failed to get image snapshot from offscreen surface");
+            return;
+        }
+    auto prevShader = ShaderEffect::CreateImageShader(*prevSdf,
+        TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
     for (size_t i = 0; i < curvesInGrid_.size(); i++) {
         if (curvesInGrid_[i].first.size() > 0) {
-            Box4f area = curvesInGrid_[i].second.bbox;
-            const Drawing::Rect rectN(area[XMIN_I], area[YMIN_I], area[XMAX_I], area[YMAX_I]);
+            const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
+            const size_t totalCurves = curvesInGrid_[i].first.size() / CURVE_FLOAT_COUNT;
+            const size_t numBatches = (totalCurves + curvesPerBatch - 1) / curvesPerBatch;
 
-            builder->SetUniform("controlPoints", curvesInGrid_[i].first.data(), curvesInGrid_[i].first.size());
-            builder->SetUniform("segmentIndex", segmentIndex_[i].data(), segmentIndex_[i].size());
-
-            auto shader = builder->MakeShader(nullptr, false);
-            if (!shader) {
-                LOGE("GESDFPathShaderShape::RenderGridsToSurface shader create failed");
-                continue;
+            for (size_t batch = 0; batch < numBatches; batch++) {
+                ProcessSingleBatch(*builder, i, batch, prevSdf, prevShader);
             }
-
-            Drawing::Brush brush;
-            brush.SetShaderEffect(shader);
-            offscreenCanvas_->AttachBrush(brush);
-            offscreenCanvas_->DrawRect(rectN);
-            offscreenCanvas_->DetachBrush();
         }
     }
 }
@@ -895,22 +946,16 @@ void GESDFPathShaderShape::cubicToQuadraticSingle(
 
 void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rect)
 {
-    if (std::max(rect.GetWidth(), rect.GetHeight()) < MIN_SCALE) {
-        scale = Vector2f(1.0, 1.0); // 1.0: keep original size
-        return;
-    }
-
-    // update scale
     float scaleX = std::clamp(scale.x_, MIN_SCALE_CLAMP, 1.0f); // 1.0f: maximum scale
     float scaleY = std::clamp(scale.y_, MIN_SCALE_CLAMP, 1.0f); // 1.0f: maximum scale
     float width = rect.GetWidth() * scaleX;
     float height = rect.GetHeight() * scaleY;
-    float maxDerivLen = std::max(width, height);
-    if (maxDerivLen < MIN_SCALE) {
-        float maxOrigValue = std::max(rect.GetWidth(), rect.GetHeight());
-        float temp = maxOrigValue / MIN_SCALE;
-        scaleX = temp;
-        scaleY = temp;
+    if (width < MIN_SCALE && width > 0.0f) {
+        scaleX = MIN_SCALE / rect.GetWidth();
+    }
+    
+    if (height < MIN_SCALE && height > 0.0f) {
+        scaleY = MIN_SCALE / rect.GetHeight();
     }
     scale = Vector2f(scaleX, scaleY);
 }

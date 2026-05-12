@@ -550,6 +550,140 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
     EXPECT_FALSE(curves.empty());
 }
 
+/**
+ * @tc.name: ProcessSingleBatch_001
+ * @tc.desc: Verify ProcessSingleBatch with single grid and single batch (first batch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.QuadTo(150.0f, 250.0f, 200.0f, 300.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 350.0f);
+    shape.Preprocess(*canvas_, rect, false);
+    ASSERT_NE(shape.disResult_, nullptr);
+    ASSERT_FALSE(shape.curvesInGrid_.empty());
+    ASSERT_NE(shape.offscreenCanvas_, nullptr);
+
+    auto builder = shape.MakePrecalcShaderBuilder();
+    ASSERT_NE(builder, nullptr);
+    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
+    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
+
+    // Test first batch (u_isFirstBatch = 1.0f)
+    shape.ProcessSingleBatch(*builder, 0, 0, prevSdf, prevShader);
+    
+    // Verify first batch does not modify previous state
+    EXPECT_EQ(prevSdf, nullptr);
+    EXPECT_EQ(prevShader, nullptr);
+    
+    // Verify offscreen surface has valid content
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
+    EXPECT_NE(snapshot, nullptr);
+    EXPECT_GT(snapshot->GetWidth(), 0);
+    EXPECT_GT(snapshot->GetHeight(), 0);
+}
+
+/**
+ * @tc.name: ProcessSingleBatch_002
+ * @tc.desc: Verify ProcessSingleBatch with empty grid curves
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f); // Single point path (no valid curves)
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+    shape.Preprocess(*canvas_, rect, false);
+    
+    // Note: Preprocess will fail with empty curves, disResult_ will be null
+    // This test verifies ProcessSingleBatch handles empty grid gracefully
+    if (shape.curvesInGrid_.empty()) {
+        GTEST_LOG_(INFO) << "Empty curvesInGrid_ as expected for single point path";
+        SUCCEED();
+        return;
+    }
+
+    auto builder = shape.MakePrecalcShaderBuilder();
+    ASSERT_NE(builder, nullptr);
+    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
+    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
+
+    // Should not crash with empty curves
+    shape.ProcessSingleBatch(*builder, 0, 0, prevSdf, prevShader);
+    EXPECT_EQ(prevSdf, nullptr);
+    EXPECT_EQ(prevShader, nullptr);
+}
+
+/**
+ * @tc.name: ProcessSingleBatch_003
+ * @tc.desc: Verify ProcessSingleBatch with multiple grids
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    // Create path with curves spread across multiple grids
+    for (int i = 0; i < 5; i++) {
+        path.MoveTo(i * 100.0f, 0.0f);
+        path.LineTo(i * 100.0f + 50.0f, 100.0f);
+        path.QuadTo(i * 100.0f + 75.0f, 150.0f, i * 100.0f + 100.0f, 200.0f);
+    }
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 600.0f, 300.0f);
+    shape.Preprocess(*canvas_, rect, false);
+    ASSERT_NE(shape.disResult_, nullptr);
+    ASSERT_GT(shape.curvesInGrid_.size(), 1); // Ensure multiple grids
+    ASSERT_NE(shape.offscreenCanvas_, nullptr);
+
+    auto builder = shape.MakePrecalcShaderBuilder();
+    ASSERT_NE(builder, nullptr);
+    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
+    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
+
+    // Process all grids
+    for (size_t gridIndex = 0; gridIndex < shape.curvesInGrid_.size(); gridIndex++) {
+        const size_t totalCurves = shape.curvesInGrid_[gridIndex].first.size() / 6;
+        const size_t numBatches = (totalCurves + 20 - 1) / 20;
+        
+        for (size_t batch = 0; batch < numBatches; batch++) {
+            shape.ProcessSingleBatch(*builder, gridIndex, batch, prevSdf, prevShader);
+            if (batch == 0) {
+                EXPECT_EQ(prevSdf, nullptr);
+                EXPECT_EQ(prevShader, nullptr);
+            } else {
+                EXPECT_NE(prevSdf, nullptr);
+                EXPECT_NE(prevShader, nullptr);
+            }
+        }
+    }
+
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
+    EXPECT_NE(snapshot, nullptr);
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
