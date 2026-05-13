@@ -176,17 +176,12 @@ void GEContentLightFilter::GenerateContentLightEffect()
             half4 shinningColor = half4(0.0);
             half3 lightPos = half3(lightPosition.x * screenRatio, lightPosition.y, lightPosition.z);
 
-            if (dot(contentRotationAngle, contentRotationAngle) < 0.01) {
-                half3 fragPos = half3(uv, 0.0);
-                shinningColor = lightColor * pow(max(normalize(lightPos - fragPos).z, 0.), 36.0);
-            } else {
-                mat3 rotM = GetRotationMatrix(contentRotationAngle);
-                half4 specularColor = lightColor;
-                half shinning = 6.0;
-                half3 viewPos = lightPos;
-                shinningColor =
-                    ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
-            }
+            mat3 rotM = GetRotationMatrix(contentRotationAngle);
+            half4 specularColor = lightColor;
+            half shinning = 36.0;
+            half3 viewPos = lightPos;
+            shinningColor =
+                ContentShinning(uv, specularColor, shinning, lightPos, viewPos, rotM, inputImage.w);
 
             half intensity = clamp(lightIntensity, 0.0, 1.0) * lightColor.a;
             shinningColor.rgb *= intensity;
