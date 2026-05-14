@@ -19,6 +19,7 @@
 
 #include "draw/color.h"
 #include "image/bitmap.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -33,7 +34,9 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    static inline Drawing::Canvas canvas_;
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
     std::shared_ptr<Drawing::Image> image_ { nullptr };
 
     Drawing::Rect src_ { 1.0f, 1.0f, 51.0f, 51.0f };
@@ -48,13 +51,36 @@ void GEBlurShaderFilterTest::TearDownTestCase() {}
 
 void GEBlurShaderFilterTest::SetUp()
 {
-    canvas_.Restore();
+    surface_ = CreateSurface();
+    ASSERT_NE(surface_, nullptr);
+    canvas_ = surface_->GetCanvas();
+    ASSERT_NE(canvas_, nullptr);
 
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(imageWidth_, imageHeight_, format);
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
+}
+
+std::shared_ptr<Drawing::Surface> GEBlurShaderFilterTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GEBlurShaderFilterTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    Drawing::ImageInfo imageInfo = Drawing::ImageInfo {
+        100,
+        100,
+        Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE
+    };
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo);
 }
 
 void GEBlurShaderFilterTest::TearDown() {}
@@ -150,7 +176,7 @@ HWTEST_F(GEBlurShaderFilterTest, OnProcessImage_001, TestSize.Level1)
     params.radiusY = 10.0f;
     params.expandDrawRegion = false;
     auto filter = std::make_shared<GEBlurShaderFilter>(params);
-    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
 
@@ -166,7 +192,7 @@ HWTEST_F(GEBlurShaderFilterTest, OnProcessImage_002, TestSize.Level1)
     params.radiusY = 20.0f;
     params.expandDrawRegion = true;
     auto filter = std::make_shared<GEBlurShaderFilter>(params);
-    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
 
@@ -181,7 +207,7 @@ HWTEST_F(GEBlurShaderFilterTest, OnProcessImage_003, TestSize.Level1)
     params.radiusX = 10.0f;
     params.radiusY = 10.0f;
     auto filter = std::make_shared<GEBlurShaderFilter>(params);
-    auto result = filter->OnProcessImage(canvas_, nullptr, src_, dst_);
+    auto result = filter->OnProcessImage(*canvas_, nullptr, src_, dst_);
     EXPECT_EQ(result, nullptr);
 }
 
@@ -230,5 +256,59 @@ HWTEST_F(GEBlurShaderFilterTest, Type_001, TestSize.Level1)
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::BLUR);
 }
 
+/**
+ * @tc.name: ProcessImageWithMesa_NullSurface_001
+ * @tc.desc: Verify ProcessImageWithMesa returns original image when canvas has no surface
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurShaderFilterTest, ProcessImageWithMesa_NullSurface_001, TestSize.Level1)
+{
+    Drawing::GEBlurShaderFilterParams params;
+    params.radiusX = 10.0f;
+    params.radiusY = 10.0f;
+    params.expandDrawRegion = true;
+    auto filter = std::make_shared<GEBlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    Drawing::Canvas canvasNoSurface;
+    auto result = filter->ProcessImageWithMesa(canvasNoSurface, image_, src_, 10);
+    EXPECT_EQ(result, image_);
+}
+
+/**
+ * @tc.name: ProcessImageWithMesa_NullImage_001
+ * @tc.desc: Verify ProcessImageWithMesa returns nullptr when image is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurShaderFilterTest, ProcessImageWithMesa_NullImage_001, TestSize.Level1)
+{
+    Drawing::GEBlurShaderFilterParams params;
+    params.radiusX = 10.0f;
+    params.radiusY = 10.0f;
+    params.expandDrawRegion = true;
+    auto filter = std::make_shared<GEBlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    auto result = filter->ProcessImageWithMesa(*canvas_, nullptr, src_, 10);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: ProcessImageWithMesa_MakeSurfaceFail_001
+ * @tc.desc: Verify ProcessImageWithMesa returns image when make surface failed
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurShaderFilterTest, ProcessImageWithMesa_MakeSurfaceFail_001, TestSize.Level1)
+{
+    Drawing::GEBlurShaderFilterParams params;
+    params.radiusX = 10.0f;
+    params.radiusY = 10.0f;
+    params.expandDrawRegion = true;
+    auto filter = std::make_shared<GEBlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    auto result = filter->ProcessImageWithMesa(*canvas_, image_, src_, -100);
+    EXPECT_EQ(result, image_);
+}
 } // namespace Rosen
 } // namespace OHOS

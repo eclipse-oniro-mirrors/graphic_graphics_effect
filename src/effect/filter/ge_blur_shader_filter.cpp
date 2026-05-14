@@ -34,12 +34,15 @@ std::shared_ptr<Drawing::Image> GEBlurShaderFilter::ProcessImageWithMesa(Drawing
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, int extension)
 {
     auto surface = canvas.GetSurface();
-    if (surface == nullptr) {
+    if (surface == nullptr || image == nullptr) {
         return image;
     }
     auto width = image->GetWidth() + extension * 2;
     auto height = image->GetHeight() + extension * 2;
     auto extensionSurface = surface->MakeSurface(width, height);
+    if (extensionSurface == nullptr) {
+        return image;
+    }
 
     Drawing::Matrix matrix;
     matrix.Translate(extension, extension);
