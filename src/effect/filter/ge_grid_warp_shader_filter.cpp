@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#include "ge_log.h"
-#include "draw/surface.h"
 #include "ge_grid_warp_shader_filter.h"
+
+#include "draw/surface.h"
+#include "ge_log.h"
 
 namespace OHOS {
 namespace Rosen {
