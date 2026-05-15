@@ -1179,38 +1179,39 @@ HWTEST_F(GESDFTransformShaderShapeTest, GetGravPullDrawingShaderHasNormBuilder_0
 }
 
 /**
- * @tc.name: TryGetCenter_001
- * @tc.desc: Verify TryGetCenter returns true with valid shape and identity matrix
+ * @tc.name: TryGetCenterAndHalfSize_001
+ * @tc.desc: Verify TryGetCenterAndHalfSize returns true with valid shape and identity matrix
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_001, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_001 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_001 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
-    param.matrix = Drawing::Matrix(); // Identity matrix
+    param.matrix = Drawing::Matrix();
 
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // For identity matrix, output should equal the center of the child shape
-    // GESDFRRectShaderShape center is at (50, 50) for rect (0, 0, 100, 100)
     EXPECT_FLOAT_EQ(outX, 50.0f);
     EXPECT_FLOAT_EQ(outY, 50.0f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_001 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_001 end";
 }
 
 /**
- * @tc.name: TryGetCenter_002
- * @tc.desc: Verify TryGetCenter returns false when shape is null
+ * @tc.name: TryGetCenterAndHalfSize_002
+ * @tc.desc: Verify TryGetCenterAndHalfSize returns false when shape is null
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_002, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_002 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_002 start";
     GESDFTransformShapeParams param;
     param.shape = nullptr;
     param.matrix = Drawing::Matrix();
@@ -1218,26 +1219,28 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_002, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_FALSE(result);
     EXPECT_FLOAT_EQ(outX, 0.f);
     EXPECT_FLOAT_EQ(outY, 0.f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_002 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 0.f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 0.f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_002 end";
 }
 
 /**
- * @tc.name: TryGetCenter_003
- * @tc.desc: Verify TryGetCenter with translation matrix
+ * @tc.name: TryGetCenterAndHalfSize_003
+ * @tc.desc: Verify TryGetCenterAndHalfSize with translation matrix
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_003, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_003, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_003 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_003 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create a translation matrix
     Drawing::Matrix matrix;
     matrix.Translate(10.0f, 20.0f);
     param.matrix = matrix;
@@ -1245,27 +1248,28 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_003, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) translated by (10, 20) should be (60, 70)
     EXPECT_FLOAT_EQ(outX, 60.0f);
     EXPECT_FLOAT_EQ(outY, 70.0f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_003 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_003 end";
 }
 
 /**
- * @tc.name: TryGetCenter_004
- * @tc.desc: Verify TryGetCenter with scale matrix
+ * @tc.name: TryGetCenterAndHalfSize_004
+ * @tc.desc: Verify TryGetCenterAndHalfSize with scale matrix
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_004, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_004, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_004 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_004 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create a scale matrix
     Drawing::Matrix matrix;
     matrix.Scale(2.0f, 1.5f, 1.0f, 1.0f);
     param.matrix = matrix;
@@ -1273,30 +1277,28 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_004, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) scaled by (2.0, 1.5) with pivot (1.0, 1.0)
-    // Formula: (center - pivot) * scale + pivot
-    // X: (50 - 1.0) * 2.0 + 1.0 = 99.0
-    // Y: (50 - 1.0) * 1.5 + 1.0 = 74.5
     EXPECT_NEAR(outX, 99.0f, 0.1f);
     EXPECT_NEAR(outY, 74.5f, 0.1f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_004 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_004 end";
 }
 
 /**
- * @tc.name: TryGetCenter_005
- * @tc.desc: Verify TryGetCenter with rotation matrix
+ * @tc.name: TryGetCenterAndHalfSize_005
+ * @tc.desc: Verify TryGetCenterAndHalfSize with rotation matrix
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_005, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_005, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_005 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_005 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create a rotation matrix (90 degrees around origin)
     Drawing::Matrix matrix;
     matrix.Rotate(90.0f, 0.0f, 0.0f);
     param.matrix = matrix;
@@ -1304,29 +1306,28 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_005, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) rotated 90 degrees around origin should be (-50, 50)
     EXPECT_FLOAT_EQ(outX, -50.0f);
     EXPECT_FLOAT_EQ(outY, 50.0f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_005 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_005 end";
 }
 
 /**
- * @tc.name: TryGetCenter_006
- * @tc.desc: Verify TryGetCenter with combined transformation
+ * @tc.name: TryGetCenterAndHalfSize_006
+ * @tc.desc: Verify TryGetCenterAndHalfSize with combined transformation
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_006, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_006, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_006 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_006 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create combined transformation using Pre/Post methods for concatenation
-    // Note: Simple Scale() and Translate() replace the matrix, not concatenate
-    // Use PostTranslate to add translation after existing transformation
     Drawing::Matrix matrix;
     matrix.Scale(2.0f, 1.5f, 1.0f, 1.0f);
     matrix.PostTranslate(10.0f, 20.0f);
@@ -1335,28 +1336,26 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_006, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) -> scale by (2.0, 1.5) with pivot (1.0, 1.0)
-    // X: (50 - 1.0) * 2.0 + 1.0 = 99.0
-    // Y: (50 - 1.0) * 1.5 + 1.0 = 74.5
-    // Then PostTranslate (10, 20): 99 + 10 = 109, 74.5 + 20 = 94.5
     EXPECT_NEAR(outX, 109.0f, 0.1f);
     EXPECT_NEAR(outY, 94.5f, 0.1f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_006 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_006 end";
 }
 
 /**
- * @tc.name: TryGetCenter_007
- * @tc.desc: Verify TryGetCenter with boundary values
+ * @tc.name: TryGetCenterAndHalfSize_007
+ * @tc.desc: Verify TryGetCenterAndHalfSize with boundary values
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_007, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_007, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_007 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_007 start";
     
-    // Test with very large translation
     {
         GESDFTransformShapeParams param;
         param.shape = CreateTestShape();
@@ -1367,14 +1366,16 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_007, TestSize.Level1)
         GESDFTransformShaderShape shape(param);
         float outX = 0.f;
         float outY = 0.f;
-        bool result = shape.TryGetCenter(outX, outY);
+        Vector2f shapeHalfSize;
+        bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
         
         EXPECT_TRUE(result);
         EXPECT_FLOAT_EQ(outX, 10050.0f);
         EXPECT_FLOAT_EQ(outY, 10050.0f);
+        EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+        EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
     }
     
-    // Test with negative translation
     {
         GESDFTransformShapeParams param;
         param.shape = CreateTestShape();
@@ -1385,28 +1386,30 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_007, TestSize.Level1)
         GESDFTransformShaderShape shape(param);
         float outX = 0.f;
         float outY = 0.f;
-        bool result = shape.TryGetCenter(outX, outY);
+        Vector2f shapeHalfSize;
+        bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
         
         EXPECT_TRUE(result);
         EXPECT_FLOAT_EQ(outX, -50.0f);
         EXPECT_FLOAT_EQ(outY, -150.0f);
+        EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+        EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
     }
     
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_007 end";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_007 end";
 }
 
 /**
- * @tc.name: TryGetCenter_008
- * @tc.desc: Verify TryGetCenter with zero scale
+ * @tc.name: TryGetCenterAndHalfSize_008
+ * @tc.desc: Verify TryGetCenterAndHalfSize with zero scale
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_008, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_008, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_008 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_008 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     
-    // Create a scale matrix with zero scale
     Drawing::Matrix matrix;
     matrix.Scale(0.0f, 0.0f, 1.0f, 1.0f);
     param.matrix = matrix;
@@ -1414,51 +1417,53 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_008, TestSize.Level1)
     GESDFTransformShaderShape shape(param);
     float outX = 0.f;
     float outY = 0.f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize;
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Center (50, 50) scaled by (0.0, 0.0) with pivot (1.0, 1.0)
-    // Formula: (center - pivot) * scale + pivot
-    // X: (50 - 1.0) * 0.0 + 1.0 = 1.0
-    // Y: (50 - 1.0) * 0.0 + 1.0 = 1.0
     EXPECT_NEAR(outX, 1.0f, 0.1f);
     EXPECT_NEAR(outY, 1.0f, 0.1f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_008 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_008 end";
 }
 
 /**
- * @tc.name: TryGetCenter_009
- * @tc.desc: Verify TryGetCenter updates output parameters correctly
+ * @tc.name: TryGetCenterAndHalfSize_009
+ * @tc.desc: Verify TryGetCenterAndHalfSize updates output parameters correctly
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenter_009, TestSize.Level1)
+HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_009, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_009 start";
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_009 start";
     GESDFTransformShapeParams param;
     param.shape = CreateTestShape();
     param.matrix = Drawing::Matrix();
 
     GESDFTransformShaderShape shape(param);
     
-    // Test with initial non-zero values
     float outX = 999.0f;
     float outY = 888.0f;
-    bool result = shape.TryGetCenter(outX, outY);
+    Vector2f shapeHalfSize(777.0f, 666.0f);
+    bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
-    // Values should be updated to the correct center
     EXPECT_FLOAT_EQ(outX, 50.0f);
     EXPECT_FLOAT_EQ(outY, 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize[1], 50.0f);
     
-    // Test multiple calls
     float outX2 = 0.f;
     float outY2 = 0.f;
-    bool result2 = shape.TryGetCenter(outX2, outY2);
+    Vector2f shapeHalfSize2;
+    bool result2 = shape.TryGetCenterAndHalfSize(outX2, outY2, shapeHalfSize2);
     
     EXPECT_TRUE(result2);
     EXPECT_FLOAT_EQ(outX2, 50.0f);
     EXPECT_FLOAT_EQ(outY2, 50.0f);
-    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenter_009 end";
+    EXPECT_FLOAT_EQ(shapeHalfSize2[0], 50.0f);
+    EXPECT_FLOAT_EQ(shapeHalfSize2[1], 50.0f);
+    GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest TryGetCenterAndHalfSize_009 end";
 }
 } // namespace Drawing
 } // namespace Rosen

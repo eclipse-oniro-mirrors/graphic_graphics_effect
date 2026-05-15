@@ -415,11 +415,12 @@ std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateShaderEffect(
     return sdfRRectShapeShader;
 }
 
-bool GESDFRRectShaderShape::TryGetCenter(float& outX, float& outY) const
+bool GESDFRRectShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const
 {
     const GERRect& rect = GetRRect();
     outX = rect.left_ + rect.width_ * 0.5f;
     outY = rect.top_ + rect.height_ * 0.5f;
+    shapeHalfSize  = Vector2f(rect.width_ * 0.5f, rect.height_ * 0.5f);
     return true;
 }
 } // Drawing

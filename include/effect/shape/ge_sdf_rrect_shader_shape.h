@@ -43,7 +43,7 @@ public:
         return GESDFShapeType::RRECT;
     }
 
-    bool TryGetCenter(float& outX, float& outY) const override;
+    bool TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const override;
     
     const GERRect& GetRRect() const
     {

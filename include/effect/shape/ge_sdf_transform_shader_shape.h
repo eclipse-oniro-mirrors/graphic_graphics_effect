@@ -42,7 +42,7 @@ public:
         return GESDFShapeType::TRANSFORM;
     }
 
-    bool TryGetCenter(float& outX, float& outY) const override;
+    bool TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const override;
 
     const Drawing::Matrix& GetMatrix() const
     {
