@@ -28,7 +28,6 @@ enum class GESDFShapeType : uint8_t {
     PIXELMAP,
     RRECT,
     TRIANGLE,
-    ELLIPSE,
     TRANSFORM,
     PATH,
     UNION_OP,
