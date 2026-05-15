@@ -73,10 +73,9 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
     }
 }
 
-bool GESDFShaderShape::TryGetCenter(float& outX, float& outY) const
+bool GESDFShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const
 {
-    outX = 0.f;
-    outY = 0.f;
+    LOGE("GESDFShaderShape::TryGetCenterAndHalfSize error");
     return false;
 }
 } // Drawing

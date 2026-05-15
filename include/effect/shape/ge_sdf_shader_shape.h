@@ -17,6 +17,7 @@
 #define GRAPHICS_EFFECT_GE_SDF_SHAPE_H
 
 #include "ge_shader_shape.h"
+#include "common/rs_vector2.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -48,7 +49,7 @@ public:
         float width, float height) override;
     virtual void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override {}
 
-    virtual bool TryGetCenter(float& outX, float& outY) const;
+    virtual bool TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const;
     virtual GESDFShapeType GetSDFShapeType() const = 0;
     virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);
