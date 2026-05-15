@@ -243,7 +243,6 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(NoisyFrameGradientMaskParams, GEXNoisyFrameGradientMaskParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFEdgeLightEffectParams, GESDFEdgeLightEffectParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFTriangleShapeParams, GESDFTriangleShapeParams)
-    GE_DECLARE_MAKE_GET_PARAMS(SDFEllipseShapeParams, GESDFEllipseShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFDistortOpShapeParams, GESDFDistortOpShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(DistortionCollapseParams, GEDistortionCollapseFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(ParticleAblationFilterParams, GEParticleAblationFilterParams)

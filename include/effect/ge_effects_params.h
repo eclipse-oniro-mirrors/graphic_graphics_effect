@@ -117,7 +117,6 @@ namespace Drawing {
 #include "effect/shape/ge_sdf_clip_shader.params.in"
 #include "effect/shape/ge_sdf_color_shader.params.in"
 #include "effect/shape/ge_sdf_distort_op_shader_shape.params.in"
-#include "effect/shape/ge_sdf_ellipse_shader_shape.params.in"
 #include "effect/shape/ge_sdf_path_shader_shape.params.in"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.params.in"
 #include "effect/shape/ge_sdf_rrect_shader_shape.params.in"
