@@ -19,7 +19,9 @@
 #include "common/rs_vector3.h"
 #include "common/rs_vector4.h"
 #include "ge_log.h"
+#include <iomanip>
 #include "util/ge_common.h"
+#include <sstream>
 
 namespace OHOS {
 namespace Rosen {
@@ -29,6 +31,8 @@ struct GECameraIntrinsics {
     float aspectRatio = 1.0f;
     float near = 0.1f;
     float far = 100.0f;
+    float xOffset = 0.f;
+    float yOffset = 0.f;
 };
 
 struct GECameraExtrinsics {
@@ -36,6 +40,21 @@ struct GECameraExtrinsics {
     float position[3] = {0.0f};
 };
 }  // namespace Drawing
+
+template <size_t Rows, size_t Cols>
+std::string MatrixToString(const std::array<float, Rows * Cols> &matrix)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < Rows; ++i) {
+        oss << "[";
+        for (size_t j = 0; j < Cols; ++j) {
+            size_t index = i * Cols + j;
+            oss << std::fixed << std::setprecision(8) << std::setw(20) << matrix[index];
+        }
+        oss << "]";
+    }
+    return oss.str();
+}
 
 class GE_EXPORT PerspectiveTransformCalculator {
 public:

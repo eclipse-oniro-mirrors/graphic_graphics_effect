@@ -15,6 +15,7 @@
 
 #include "util/ge_transform_helper.h"
 #include <cmath>
+#include "ge_trace.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -41,6 +42,10 @@ std::array<float, 16> PerspectiveTransformCalculator::BuildProjectionMatrixRhZo(
     projMatrix[10] = - intrinsics.far / (intrinsics.far - intrinsics.near);
     projMatrix[11] = -1.0f;
     projMatrix[14] = -(intrinsics.far * intrinsics.near) / (intrinsics.far - intrinsics.near);
+
+    // off-axis
+    projMatrix[8] = 2 * intrinsics.xOffset;
+    projMatrix[9] = 2 * intrinsics.yOffset;
 
     return projMatrix;
 }
@@ -82,6 +87,8 @@ std::array<float, 16> PerspectiveTransformCalculator::ComputeVPMatrix(const Draw
 {
     auto viewMatrix = BuildViewMatrixRh(extrinsics);
     auto projMatrix = BuildProjectionMatrixRhZo(intrinsics);
+    GE_TRACE_NAME_FMT("ComputeVPMatrix view matrix: %s, projection matrix: %s",
+        MatrixToString<4, 4>(viewMatrix).c_str(), MatrixToString<4, 4>(projMatrix).c_str());
 
     std::array<float, 16> vpMatrix;
     MatrixMultiply(vpMatrix, projMatrix, viewMatrix);
