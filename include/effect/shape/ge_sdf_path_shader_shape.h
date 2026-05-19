@@ -97,6 +97,8 @@ private:
     Drawing::Path PreparePathForRendering(const Drawing::Rect& rect, float& width, float& height);
     std::vector<Vector2f> ProcessCurveSegments(const std::vector<std::vector<Vector2f>>& paramsCoef);
     void RenderGridsToSurface(const Drawing::Rect& targetRect);
+    void ProcessSingleBatch(Drawing::RuntimeShaderBuilder& builder, size_t gridIndex, size_t batch,
+        std::shared_ptr<Drawing::Image>& prevSdf, std::shared_ptr<Drawing::ShaderEffect>& prevShader);
 
     // ========== Quadtree grid partition ==========
     void AutoGridPartition(float width, float height, float maxThickness);
