@@ -38,7 +38,7 @@ std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDrawingShaderHa
 {
     GE_TRACE_NAME_FMT("GESDFDistortOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g",
         width, height);
-    auto shapeShader = params_.shape ? params_.shape->GenerateDrawingShader(width, height) : nullptr;
+    auto shapeShader = params_.shape ? params_.shape->GenerateDrawingShaderHasNormal(width, height) : nullptr;
     if (!shapeShader) {
         return nullptr;
     }
