@@ -14,7 +14,6 @@
  */
 
 struct [[ge::params(type=SDF_PATH_SHAPE, name="SDFPathShape")]] GESDFPathShapeParams {
-    [[ge::prop(cast_from="Drawing::Path")]]
     Drawing::Path path;
     [[ge::prop(cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f offset = Vector2f(0.0f, 0.0f);
