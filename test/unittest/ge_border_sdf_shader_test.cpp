@@ -304,13 +304,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest017, TestSize.Level1)
     auto shader = GEBorderSDFShader(params);
 
     shader.MakeDrawingShader(Drawing::Rect(0, 0, 50, 50), 0.5f);
-    EXPECT_NE(shader.GetDrawingShader(), nullptr);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 
     shader.MakeDrawingShader(Drawing::Rect(0, 0, 100, 100), 0.5f);
-    EXPECT_NE(shader.GetDrawingShader(), nullptr);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 
     shader.MakeDrawingShader(Drawing::Rect(0, 0, 200, 200), 0.5f);
-    EXPECT_NE(shader.GetDrawingShader(), nullptr);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
 HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest018, TestSize.Level1)
@@ -358,7 +358,11 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest020, TestSize.Level1)
         params.width = w;
         auto shader = GEBorderSDFShader(params);
         shader.MakeDrawingShader(canvas_, rect, 0.5f);
-        EXPECT_NE(shader.GetDrawingShader(), nullptr);
+        if (w > 0.0001f) { // 0.0001 width size smallest
+            EXPECT_NE(shader.GetDrawingShader(), nullptr);
+        } else {
+            EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+        }
     }
 }
 

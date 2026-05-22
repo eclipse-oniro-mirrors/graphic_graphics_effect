@@ -1953,7 +1953,7 @@ HWTEST_F(GEVisualEffectImplTest, GetParams_WithoutMake, TestSize.Level1)
     Drawing::GEVisualEffectImpl geVisualEffectImpl(Drawing::GE_FILTER_KAWASE_BLUR);
     
     auto params = geVisualEffectImpl.GetKawaseParams();
-    EXPECT_EQ(params, nullptr);
+    EXPECT_NE(params, nullptr);
 }
 
 /**

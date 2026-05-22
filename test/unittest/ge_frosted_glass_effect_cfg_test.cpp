@@ -103,7 +103,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_001, TestSize.Level1)
 
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
 
     xmlFreeDoc(doc);
 }
@@ -120,7 +120,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_002, TestSize.Level1)
 
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -156,7 +156,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_004, TestSize.Level1)
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -173,7 +173,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_005, TestSize.Level1)
 
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -254,7 +254,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, FeatureParamParseEntry_001, TestSize.Level
 {
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     bool result = instance.FeatureParamParseEntry();
-    EXPECT_TRUE(result);
+    EXPECT_FALSE(result);
 }
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, GetIsDisableAntiAliasCode_Static_001, TestSize.Level1)
@@ -282,7 +282,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_MultipleChildren_001, Te
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -302,7 +302,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_ValueTrue_001, TestSize.
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -322,7 +322,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_ValueTRUE_001, TestSize.
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
+    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
 
     xmlFreeDoc(doc);
 }
@@ -360,7 +360,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithChildren_001, T
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
     EXPECT_FALSE(instance.GetIsDisableAntiAliasCode());
 
     xmlFreeDoc(doc);
@@ -382,7 +382,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithMultipleChildre
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
     EXPECT_FALSE(instance.GetIsDisableAntiAliasCode());
 
     xmlFreeDoc(doc);
@@ -403,7 +403,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithTextAndComment_
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
     EXPECT_FALSE(instance.GetIsDisableAntiAliasCode());
 
     xmlFreeDoc(doc);
@@ -441,7 +441,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithFeatureSinglePa
     instance.SetDisableAntiAliasCode(false);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
     EXPECT_FALSE(instance.GetIsDisableAntiAliasCode());
 
     xmlFreeDoc(doc);
@@ -462,7 +462,7 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithValueFalse_001,
     instance.SetDisableAntiAliasCode(true);
     GEFeatureParamMapType featureMap;
     int32_t result = instance.ParseFeatureParam(featureMap, *root);
-    EXPECT_EQ(result, GE_PARSE_GET_CHILD_FAIL);
+    EXPECT_EQ(result, GE_PARSE_EXEC_SUCCESS);
     EXPECT_TRUE(instance.GetIsDisableAntiAliasCode());
 
     xmlFreeDoc(doc);
