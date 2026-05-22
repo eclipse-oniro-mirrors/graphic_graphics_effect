@@ -34,26 +34,34 @@ struct [[ge::params(type=ENUM_VALUE, name="DisplayName")]] GEYourParams {
 
 ## Field Attribute
 
-Three syntax forms:
+Three syntax forms, ordered by preference:
 
-**Positional** (single tag name, no options):
+**No attribute** (preferred — auto-generates `StructName_PascalCaseField`):
+```cpp
+float radius;  // Auto-generates "FrostedGlassBlur_Radius" from struct name= + PascalCase field name
+```
+Use this when you don't need `min`, `max`, `cast_from`, or other options. It produces PascalCase names, matching the existing codebase convention.
+
+**Positional** (single tag name, no other options):
 ```cpp
 [[ge::prop("FrostedGlassBlur_Radius")]]
 float field;
 ```
+Only viable when `name` is the sole option — this is shorthand for `name="FrostedGlassBlur_Radius"`. **Invalid** when other options like `min`, `max`, `cast_from`, or `array_accessor_length` are present.
 
-**Key-value** (tag name with options):
+**Key-value** (other options, name= optional):
 ```cpp
+// With name= omitted — auto-generates tag:
+[[ge::prop(min=0.0, max=100.0)]]
+float field;
+
+// With explicit name= — only when auto-gen would be misleading:
 [[ge::prop(name="FrostedGlassBlur_Radius", min=0.0, max=100.0)]]
 float field;
 ```
+Required syntax when any option beyond `name` is present (`min`, `max`, `cast_from`, `custom`, `array_accessor_length`, or `alias`). Within key-value syntax, you can still omit `name=` — the tag will be auto-generated. Only add explicit `name=` when the auto-generated name would be misleading or doesn't match the desired exposed string name.
 
-**No attribute** (auto-generates `StructName_PascalCaseField`):
-```cpp
-float radius;  // Auto-generates "FrostedGlassBlur_Radius" from struct name= + PascalCase field name
-```
-
-**Naming convention**: Use `EffectName_ParamTag` format (e.g., `FrostedGlassBlur_Radius`, `BorderLight_Color`). Explicit `name=` gives full control; omitting it auto-generates the same format from `[[ge::params(name=...)]]`. Bare names like `"Radius"` in explicit `name=` cause collisions.
+**Naming convention**: Auto-generated tags use PascalCase (`StructName_PascalCaseField`). Explicit `name=` also uses PascalCase format (`EffectName_ParamTag`, e.g., `FrostedGlassBlur_Radius`). **Avoid ALL_CAPS prop names** — the existing codebase uses PascalCase exclusively for new effects.
 
 ---
 
@@ -75,7 +83,11 @@ float radius;  // Auto-generates "FrostedGlassBlur_Radius" from struct name= + P
 
 `cast_from` specifies a type that callers can pass which differs from the actual field type. The code generator creates an additional setter that accepts the `cast_from` type and converts it to the field type.
 
-**Critical rule**: `cast_from` must specify a **different** type than the field itself. If both are the same, the generator produces duplicate switch cases, causing a compile error.
+**Three critical rules**:
+
+1. **`cast_from` must specify a different type** than the field itself. If both are the same, the generator produces duplicate switch cases, causing a compile error.
+2. **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type. If the user doesn't need a different type, omit `cast_from`.
+3. **`custom` must be paired with `cast_from`** — `custom` without `cast_from` triggers a compile error. Use `custom` for non-trivial conversions (e.g., `std::pair` → `Vector2f`).
 
 **Valid uses** (different types):
 ```cpp
@@ -173,7 +185,9 @@ Both "MyEffect_Opacity" and "alpha" map to the same param at runtime. Use `alias
 
 When no explicit `name=` is provided, the tag is auto-generated as `StructName_PascalCaseField` using the `name=` from `[[ge::params]]` as prefix. E.g., struct `name="FrostedGlassBlur"` with field `radius` → `FrostedGlassBlur_Radius`. Collision risk is low since different struct names produce different prefixes.
 
-**Best practice**: Always use explicit `name=` with `EffectName_ParamTag` format. This ensures consistent PascalCase naming regardless of the struct's `name=` value (which may be ALL_CAPS like `"KAWASE_BLUR"`, producing mixed-style auto-tags like `"KAWASE_BLUR_Radius"`).
+**Best practice**: Prefer omitting `name=` — auto-generation produces PascalCase names matching the codebase convention. Only add explicit `name=` when the auto-generated name would be misleading or doesn't match the desired exposed string name (e.g., you want callers to use `"Radius"` but auto-gen would produce `"FrostedGlassBlur_Radius"`). Other options like `min`, `max`, `cast_from` determine syntax form (key-value vs positional), not whether you need `name=` — you can omit `name=` even in key-value syntax.
+
+**Note on `name=` format**: The struct's `name=` parameter uses PascalCase (e.g., `name="FrostedGlassBlur"`), so auto-generated tags naturally produce PascalCase. Some older files use ALL_CAPS `type` values (e.g., `type=KAWASE_BLUR`) with PascalCase `name` — the auto-generation still produces PascalCase tags because it derives from `name=`, not `type=`.
 
 ---
 

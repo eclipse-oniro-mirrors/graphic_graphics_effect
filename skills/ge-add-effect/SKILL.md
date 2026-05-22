@@ -115,7 +115,7 @@ Before writing syntax, decide what parameters your effect needs. A well-designed
 
 1. **What uniform inputs does the shader need?** — Each shader uniform should map to a `.params.in` field. Think about what the GPU needs: radius, intensity, color vectors, direction angles, texture inputs.
 2. **Which values need runtime clamping?** — Visual-sensitive params (blur radius, intensity, color components) should have `min`/`max` to prevent garbage output from out-of-range callers. Values with natural bounds (e.g., color 0-1) always need clamping. Values where any range is valid (e.g., offsets) can skip `min`/`max`.
-3. **Which parameters need `cast_from` for caller convenience?** — Only when the public API exposes a different type than what the shader consumes internally (e.g., caller sends `int` index but shader needs `float` weight). Never use `cast_from` when types match — that creates duplicate switch cases and compile errors.
+3. **Does any parameter need `cast_from` for type conversion?** — Ask the user first: "Should callers pass a different type than what the shader stores internally?" Only add `cast_from` when the answer is yes (e.g., caller sends `int` index but shader needs `float` weight). Never use `cast_from` when types match — that creates duplicate switch cases and compile errors. When `cast_from` is needed for non-trivial conversions (e.g., `std::pair` → `Vector2f`), it must be paired with `custom` transformer — `custom` without `cast_from` triggers a compile error.
 
 ### Step 2b: Write Parameters (.params.in)
 
@@ -123,16 +123,16 @@ Replace the skeleton struct with actual parameter definitions:
 
 ```cpp
 struct [[ge::params(type=YOUR_ENUM, name="YourName")]] GEYourParams {
-    [[ge::prop(name="YourName_ParamTag", min=0.0, max=100.0)]]
-    float yourParam = 50.0f;
+    float yourParam = 50.0f;  // Auto-generates "YourName_YourParam" tag
 };
 ```
 
 **Key rules** — the most common source of errors:
 - `type` must match the `GEFilterType` enum value
-- Prop tag naming: use `EffectName_ParamTag` format (e.g., `FrostedGlassBlur_Radius`). `name=` is optional — omitting it auto-generates `StructName_PascalCaseField` from the struct's `name=`
-- `cast_from` is **only** for type conversion where the caller type differs from the field type — never when both are the same type (causes duplicate switch case)
-- `cast_from` for non-trivial conversions (e.g., `std::pair` → `Vector2f`) must be paired with `custom` transformer class
+- **Prefer omitting `name=` on `[[ge::prop]]`** — auto-generation produces `StructName_PascalCaseField` (e.g., `name="FrostedGlassBlur"` + field `radius` → `FrostedGlassBlur_Radius`). Only add explicit `name=` when the auto-generated name would be misleading or doesn't match the desired exposed string name. Other options like `min`, `max`, `cast_from` determine syntax form (key-value vs positional), not whether you need `name=`
+- **Positional syntax** `[[ge::prop("TagName")]]` is only viable when `name` is the sole option — it's shorthand for `name="TagName"`. When any other option is present (`min`, `max`, `cast_from`, `custom`, `array_accessor_length`), you must use key-value syntax — but you can still omit `name=` within it: `[[ge::prop(min=0.0, max=100.0)]]` auto-generates the tag
+- `cast_from` is **only** for type conversion where the caller type differs from the field type — never when both are the same type (causes duplicate switch case). **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type
+- `cast_from` for non-trivial conversions (e.g., `std::pair` → `Vector2f`) must be paired with `custom` transformer — `custom` without `cast_from` triggers a compile error
 - `min`/`max` on numeric fields generate constraint metadata for runtime validation
 
 **MANDATORY**: Read `references/params-syntax.md` entirely before writing a new `.params.in` from scratch. **Do NOT load** `references/effect-types.md` or `references/pitfalls.md` for this step.
@@ -229,13 +229,14 @@ Read the file and check this checklist. Report issues and ask whether to fix or 
 | # | Check | Why It Matters |
 |---|-------|---------------|
 | 1 | `[[ge::params(type=..., name=...)]]` present, `type` is valid enum-style identifier | gen_metadata.py won't parse the struct without it |
-| 2 | Each field has `[[ge::prop(...)]]` or accepts auto-tag | Missing attributes auto-generate tags with effect prefix, but explicit `name=` gives full control over naming format |
-| 3 | No `cast_from` where type equals field type | Duplicate switch cases → compile error. Most common params.in mistake |
-| 4 | `cast_from` paired with `custom` for non-trivial conversions | `std::pair` → `Vector2f` needs a transformer, not bare cast |
-| 5 | `min`/`max` values valid for the type | Negative min on unsigned fields is wrong |
-| 6 | Defaults specified and within min/max range | Missing defaults → uninitialized values |
-| 7 | Struct named `GE<ClassName>Params` | Wrong naming breaks DECLARE_GEFILTER_TYPEFUNC |
-| 8 | `type` enum value matches what will be added to `GEFilterType` | Mismatch breaks type-info specialization |
+| 2 | Each field either has `[[ge::prop(...)]]` or accepts auto-tag | Auto-generated tags use PascalCase (`StructName_PascalCaseField`), not ALL_CAPS. Prefer omitting `name=` unless the auto-generated name would be misleading |
+| 3 | No `cast_from` where type equals field type | Duplicate switch cases → compile error. Most common params.in mistake. Also: `cast_from` should only be added when the user explicitly wants callers to pass a different type |
+| 4 | `cast_from` paired with `custom` for non-trivial conversions | `custom` without `cast_from` triggers compile error. `std::pair` → `Vector2f` needs a transformer, not bare cast |
+| 5 | Positional syntax used only when `name` is sole option | `[[ge::prop("TagName")]]` is shorthand for `name="TagName"` — invalid when other options like `min`, `max`, or `cast_from` are present |
+| 6 | `min`/`max` values valid for the type | Negative min on unsigned fields is wrong |
+| 7 | Defaults specified and within min/max range | Missing defaults → uninitialized values |
+| 8 | Struct named `GE<ClassName>Params` | Wrong naming breaks DECLARE_GEFILTER_TYPEFUNC |
+| 9 | `type` enum value matches what will be added to `GEFilterType` | Mismatch breaks type-info specialization |
 
 **MANDATORY**: Read `references/params-syntax.md` during review. **Do NOT load** `references/effect-types.md` or `references/pitfalls.md` for this step — focus on syntax correctness, not type comparison or debugging.
 
@@ -245,7 +246,11 @@ Read the file and check this checklist. Report issues and ask whether to fix or 
 
 | Practice | Why It's Wrong | What to Do Instead |
 |----------|---------------|-------------------|
-| Use `cast_from` with same type as the field | Duplicate switch cases → compile error | Use `[[ge::prop("YourEffect_TagName")]]` without `cast_from` when types match |
+| Use `cast_from` with same type as the field | Duplicate switch cases → compile error | Remove `cast_from`; use auto-generated tag or `[[ge::prop("TagName")]]` when types match |
+| Add `cast_from` without confirming user wants it | Unnecessary type conversion complicates the API | Ask the user: "Should callers pass a different type?" If no, omit `cast_from` |
+| Use `custom` without `cast_from` | Compile error — `custom` only works with type conversion | Only use `custom` when `cast_from` is also specified |
+| Use positional syntax with multiple options | `[[ge::prop("TagName", min=0.0)]]` is invalid — positional only works for single `name` option | Use key-value syntax: `[[ge::prop(name="TagName", min=0.0)]]` |
+| Add explicit `name=` when auto-generation suffices | Adds verbosity without benefit; auto-generated PascalCase is the convention | Omit `name=` unless the auto-generated name would be misleading or doesn't match the desired exposed string name |
 | Skip clang-format installation | Generated files produce 100s of lines of noise diff | Install clang-format before running gen tools |
 | Add enum after `MAX` | Breaks type-info dispatch — `MAX` is a sentinel | Always place new values before `MAX` |
 | Skip gen_metadata.py + gen_effect_header.py | Reflection files won't include new parameters | Run both tools after any `.params.in` change |

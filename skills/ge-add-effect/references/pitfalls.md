@@ -46,13 +46,20 @@ Drawing::Path path;
 
 This was observed in `ge_sdf_path_shader_shape.params.in` in the real codebase. It caused `duplicate case value 'SDF_PATH_SHAPE_PATH'`.
 
-**Fix**: Remove `cast_from` when the type is the same as the field. Use a simple prop tag instead:
+**Fix**: Remove `cast_from` when the type is the same as the field. Prefer omitting `name=` entirely — auto-generation handles naming correctly:
+```cpp
+Drawing::Path path;  // Auto-generates "SDFDiamondShape_Path" tag
+```
+Or use positional syntax if you want an explicit PascalCase tag:
 ```cpp
 [[ge::prop("SDFPathShape_Path")]]
 Drawing::Path path;
 ```
 
-**Rule**: `cast_from` exists for type conversion — the caller passes one type, the field stores another. If they're the same, there's nothing to convert, so don't use `cast_from`.
+**Rules**:
+1. `cast_from` exists for type conversion — the caller passes one type, the field stores another. If they're the same, there's nothing to convert, so don't use `cast_from`.
+2. **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type. If not, omit it.
+3. **`custom` must be paired with `cast_from`** — `custom` without `cast_from` triggers a compile error. Only use `custom` when `cast_from` is also specified for non-trivial conversions.
 
 ---
 
@@ -200,7 +207,7 @@ radius_ = std::clamp(params.radius, 0.0f, 200.0f);
 
 **Detection**: `gen_metadata.py` reports a tag conflict during generation.
 
-**Fix**: Use the `EffectName_ParamTag` naming convention — each prop tag starts with the effect's PascalCase name. `FrostedGlassBlur_Radius` and `KawaseBlur_Radius` are distinct; bare `Radius` in explicit `name=` clashes. Auto-generated tags (fields without `name=`) already include the effect prefix from `[[ge::params(name=...)]]`, so collision risk is low. The real danger is explicitly writing `name="Radius"` without prefix.
+**Fix**: Auto-generated tags (fields without `name=`) already include the effect prefix from `[[ge::params(name=...)]]`, producing `StructName_PascalCaseField` format. Collision risk is low since different struct names produce different prefixes. The real danger is explicitly writing bare names like `name="Radius"` without prefix, or using ALL_CAPS format that differs from the codebase convention. Prefer omitting `name=` — auto-generation handles naming correctly. Only add explicit `name=` when the auto-generated name would be misleading or doesn't match the desired exposed string name.
 
 ---
 
@@ -213,10 +220,11 @@ When `hb build graphics_effect -i` fails, or when other problems arise during th
 | Error Contains | Root Cause | Fix |
 |---------------|-----------|-----|
 | `duplicate case value` | `cast_from` same-type bug | Remove `cast_from` where type equals field type (see [cast_from Same Type](#cast_from-same-type) above for example) |
+| `custom` without `cast_from` compile error | `custom` attribute requires `cast_from` to be specified | Only use `custom` when `cast_from` is also present for type conversion |
 | `undefined reference` / `undefined symbol` | Missing BUILD.gn entry | Add `.cpp` path to sources list alphabetically |
 | `clang-format not found` (warning only) | Missing clang-format | Install clang-format; not a build error but re-run gen tools to avoid noisy diff |
 | `no matching function` / constructor error | Wrong namespace in constructor | Check `references/effect-types.md` for namespace conventions per type |
-| Parse error from gen tool | Invalid `.params.in` syntax | Read `references/params-syntax.md` for correct attribute format |
+| Parse error from gen tool | Invalid `.params.in` syntax — positional syntax with multiple options, or missing `[[ge::params]]` | Read `references/params-syntax.md` for correct attribute format. Positional syntax only works for single `name` option |
 | Other / unrelated | Not an effect-creation bug | Do NOT modify effect files; diagnose separately |
 
 ### Workflow Fallbacks
