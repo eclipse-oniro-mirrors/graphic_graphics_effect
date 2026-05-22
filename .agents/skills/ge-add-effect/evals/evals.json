@@ -1,0 +1,97 @@
+{
+  "skill_name": "ge-add-effect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我需要在 graphics_effect 项目中新增一个 posterize 滤镜效果，用来将图像色彩量化到指定级数。这个效果需要两个参数：levels（int，范围 2-256，默认 8）控制量化级数，intensity（float，范围 0.0-1.0，默认 1.0）控制效果强度。请帮我完成添加效果的全流程。",
+      "expected_output": "Complete posterize filter effect: .params.in with GEPosterizeShaderFilterParams struct (levels and intensity fields with min/max, preferring auto-generated PascalCase tags or key-value syntax when options are needed), POSTERIZE enum before MAX, .h/.cpp with GEShaderFilter base class in Rosen namespace, OnProcessImage + GetEffect with SkSL shader string, constructor reads params and clamps, BUILD.gn entry, gen tools run, reflection files include POSTERIZE tags, unit tests covering constructor + SetParam + OnProcessImage.",
+      "files": [],
+      "expectations": [
+        "Agent recognizes the effect type as filter (not shader/mask/shape)",
+        "Agent writes .params.in with [[ge::params(type=POSTERIZE, name=\"Posterize\")]] and prefers omitting name= on [[ge::prop]], using key-value syntax when min/max/cast_from are needed (still omitting name= within key-value)",
+        "Agent defines levels field with min=2, max=256 (using key-value syntax: [[ge::prop(min=2, max=256)]] auto-generates Posterize_Levels) and intensity field with min=0.0, max=1.0 (similarly [[ge::prop(min=0.0, max=1.0)]] auto-generates Posterize_Intensity)",
+        "Agent uses GEShaderFilter base class in Rosen namespace (not Drawing)",
+        "Agent adds POSTERIZE enum value before MAX in ge_filter_type.h",
+        "Agent implements .cpp with OnProcessImage method and GetEffect containing SkSL shader string (not just empty stub)",
+        "Agent constructor reads params and stores as member variables with clamping/validation",
+        "Agent .h file includes DECLARE_GEFILTER_TYPEFUNC macro",
+        "Agent adds .cpp path to BUILD.gn sources list alphabetically",
+        "Generated reflection files (ge_effects_params.h, ge_params_reflection) include POSTERIZE-related tags and setter methods",
+        "Agent writes unit tests covering: constructor with valid params, SetParam round-trip with clamping, GetEffect/OnProcessImage returns non-null",
+        "Agent does NOT use cast_from for any field where types match (int for int, float for float)",
+        "Agent does NOT add name= unnecessarily — even fields with min/max/cast_from can omit name= when auto-generation suffices"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我已经写好了 sunset_gradient shader mask 的 .params.in 文件（在 evals/files/ge_sunset_gradient_shader_mask.params.in），但还没做其他步骤。请帮我检查这个 params.in 文件是否有问题，然后完成添加效果的剩余流程。",
+      "expected_output": "Agent reviews .params.in, detects issues (blendStrength missing [[ge::prop]], SUNSET_GRADIENT_* naming uses ALL_CAPS instead of PascalName auto-generation convention), fixes by preferring to omit name= and relying on auto-generation, adds [[ge::prop]] for blendStrength with auto-generated tag SunsetGradientMask_BlendStrength, handles topColor/bottomColor defaults (suggests adding explicit defaults or notes risk), then completes workflow: SUNSET_GRADIENT_MASK enum, .h/.cpp with GEShaderMask in Drawing namespace, BUILD.gn, gen tools, unit tests.",
+      "files": ["evals/files/ge_sunset_gradient_shader_mask.params.in"],
+      "expectations": [
+        "Agent detects that blendStrength has no [[ge::prop]] attribute and fixes it (prefer omitting name= so auto-generates SunsetGradientMask_BlendStrength)",
+        "Agent detects that SUNSET_GRADIENT_TOP_COLOR and SUNSET_GRADIENT_BOTTOM_COLOR use ALL_CAPS naming and fixes by removing explicit name= to let auto-generation produce PascalCase, or changes to PascalCase explicit names",
+        "Agent detects that topColor and bottomColor have no explicit default values and either adds defaults or flags this as a risk",
+        "Agent detects SUNSET_GRADIENT_DIRECTION uses old ALL_CAPS naming — since this field has cast_from+custom, it must use key-value syntax with name= omitted (auto-generates PascalCase tag)",
+        "Agent recognizes the effect type as mask (from .params.in content and directory)",
+        "Agent uses GEShaderMask base class in Drawing namespace (not Rosen)",
+        "Agent implements GenerateDrawingShader as the key virtual method for masks",
+        "Agent .h/.cpp files exist and have correct structure (constructor reads params, DECLARE_GEFILTER_TYPEFUNC)",
+        "Agent adds SUNSET_GRADIENT_MASK enum value before MAX",
+        "Generated reflection files include SUNSET_GRADIENT_MASK-related tags and setters",
+        "Agent writes unit tests covering: constructor with valid params, SetParam round-trip, GenerateDrawingShader returns non-null"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "我在 graphics_effect 项目里新增了一个 SDF diamond shape 效果，写好了 .params.in 文件（在 evals/files/ge_diamond_sdf_shader_shape.params.in.buggy），然后跑了 gen_metadata.py 和 gen_effect_header.py，接着 hb build 就报错：duplicate case value 'SDF_DIAMOND_SHAPE_PATH'。请帮我排查哪里有问题。",
+      "expected_output": "Agent diagnoses cast_from same-type bug on diamondPath (Drawing::Path field with cast_from=\"Drawing::Path\"), removes cast_from and prefers omitting name= (auto-generates SDFDiamondShape_DiamondPath), also fixes other ALL_CAPS names (SDF_DIAMOND_HALF_SIZE → auto-generate or PascalCase SDFDiamondShape_HalfSize etc.), adds [[ge::prop]] on offset field with key-value syntax for cast_from+custom, keeps valid cast_from usages, re-runs gen tools.",
+      "files": ["evals/files/ge_diamond_sdf_shader_shape.params.in.buggy"],
+      "expectations": [
+        "Agent correctly diagnoses the root cause: cast_from=\"Drawing::Path\" on a Drawing::Path field causes duplicate switch cases",
+        "Agent removes cast_from=\"Drawing::Path\" from the diamondPath field and prefers omitting name= entirely (auto-generates SDFDiamondShape_DiamondPath in PascalCase)",
+        "Agent fixes SDF_DIAMOND_HALF_SIZE — prefers omitting name= with min=0.0 only, using key-value syntax: [[ge::prop(min=0.0)]] which auto-generates SDFDiamondShape_HalfSize",
+        "Agent fixes SDF_DIAMOND_CORNER_RADIUS similarly — [[ge::prop(min=0.0)]] auto-generates SDFDiamondShape_CornerRadius",
+        "Agent fixes SDF_DIAMOND_SHAPE_SCALE — since it has cast_from+custom, must use key-value: [[ge::prop(cast_from=\"std::pair<float,float>\", custom=\"PairToVector2fTransformer\")]] (name= omitted, auto-generates SDFDiamondShape_Scale)",
+        "Agent fixes offset field — since it has cast_from+custom, must use key-value: [[ge::prop(cast_from=\"std::pair<float,float>\", custom=\"PairToVector2fTransformer\")]] (name= omitted, auto-generates SDFDiamondShape_Offset)",
+        "Agent keeps the valid cast_from usage for offset and scale fields (std::pair → Vector2f with custom transformer)",
+        "Agent re-runs gen_metadata.py and gen_effect_header.py after the fix (or explicitly states this must be done)",
+        "Agent does NOT add cast_from without confirming it's needed for type conversion"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "我已经完成了 aurora_flow shader 效果的所有代码文件：.params.in、.h 和 .cpp 都已经写好放在对应的 include/effect/shader/ 和 src/effect/shader/ 目录下，BUILD.gn 也已经更新了。但我还没运行 gen_metadata.py 和 gen_effect_header.py，也没有写单元测试。请帮我完成添加效果需要的剩余部分。",
+      "expected_output": "Agent runs gen_metadata.py + gen_effect_header.py (order doesn't matter), verifies build passes, writes unit tests at test/unittest/ge_aurora_flow_shader_test.cpp covering constructor + SetParam + MakeDrawingShader, adds test to BUILD.gn, builds test target.",
+      "files": [],
+      "expectations": [
+        "Agent runs both gen_metadata.py and gen_effect_header.py (order is not enforced)",
+        "Agent verifies build passes with hb build graphics_effect -i (or equivalent)",
+        "Agent writes unit test at test/unittest/ge_aurora_flow_shader_test.cpp",
+        "Agent adds test to test/unittest/BUILD.gn sources list",
+        "Agent builds test target with hb build graphics_effect -t (or equivalent)",
+        "Agent tests cover: constructor with valid params, SetParam round-trip, MakeDrawingShader produces shader effect"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "我要在 graphics_effect 中添加一个 diamond SDF shape 效果，用于支持菱形几何的 SDF 渲染。这个效果需要三个参数：halfSize（float，范围 0.0-无穷，默认 50.0）控制菱形半尺寸，cornerRadius（float，范围 0.0-无穷，默认 0.0）控制圆角半径，以及一个 offset（Vector2f）控制偏移。请帮我完成添加效果全流程。",
+      "expected_output": "Complete diamond SDF shape effect: .params.in with GESDFDiamondShapeParams struct (halfSize/cornerRadius with min=0.0 using key-value syntax, offset with auto-generated tag since no cast_from needed unless user requests), SDF_DIAMOND_SHAPE enum before MAX, .h/.cpp with GESDFShaderShape base class in Drawing namespace, GenerateDrawingShader + GetSDFShapeType + HasType methods, BUILD.gn entry, gen tools run, unit tests.",
+      "files": [],
+      "expectations": [
+        "Agent recognizes the effect type as shape (not filter/shader/mask)",
+        "Agent uses GESDFShaderShape base class in Drawing namespace (not Rosen)",
+        "Agent writes .params.in with [[ge::params(type=SDF_DIAMOND_SHAPE, name=\"SDFDiamondShape\")]] and prefers omitting name= on [[ge::prop]], using key-value syntax when min/max/cast_from are needed (still omitting name= within key-value when auto-gen suffices)",
+        "Agent defines halfSize with min=0.0 using key-value syntax: [[ge::prop(min=0.0)]] (auto-generates SDFDiamondShape_HalfSize), and cornerRadius similarly",
+        "Agent does NOT add cast_from on offset (Vector2f) unless user explicitly requests a different caller type",
+        "Agent adds SDF_DIAMOND_SHAPE enum value before MAX in ge_filter_type.h",
+        "Agent implements GenerateDrawingShader, GetSDFShapeType, and HasType as required methods for shapes",
+        "Agent .h includes DECLARE_GEFILTER_TYPEFUNC macro",
+        "Agent constructor reads params and stores as member variables",
+        "Agent adds .cpp path to BUILD.gn sources list alphabetically",
+        "Generated reflection files include SDF_DIAMOND_SHAPE-related tags and setters",
+        "Agent writes unit tests covering: constructor with valid params, SetParam round-trip, GenerateDrawingShader returns non-null, GetSDFShapeType returns correct type",
+        "Agent uses Drawing namespace for both class and params (shape-specific namespace convention)"
+      ]
+    }
+  ]
+}
