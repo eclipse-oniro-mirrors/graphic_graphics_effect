@@ -156,6 +156,40 @@ HWTEST_F(GEHpsEffectFilterTest, GenerateVisualEffectFromGE_001, TestSize.Level0)
     hpsEffectFilter->GenerateVisualEffectFromGE(visualEffectImpl, src_, dst_, saturationForHPS_,
         brightnessForHPS_, image_);
 
+    // Test null params paths
+    size_t prevSize = hpsEffectFilter->hpsEffect_.size();
+    auto nullParamsImpl = std::make_shared<Drawing::GEVisualEffectImpl>("");
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::GREY);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::AIBAR);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
+    nullParamsImpl->SetFilterType(Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT);
+    hpsEffectFilter->GenerateVisualEffectFromGE(nullParamsImpl, src_, dst_, saturationForHPS_,
+        brightnessForHPS_, image_);
+    EXPECT_EQ(hpsEffectFilter->hpsEffect_.size(), prevSize);
+
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateVisualEffectFromGE_001 end";
 }
 
@@ -181,6 +215,25 @@ HWTEST_F(GEHpsEffectFilterTest, GenerateMaskParameter_001, TestSize.Level0)
 
     shaderMask = CreateRippleShaderMask();
     maskParams = hpsEffectFilter->GenerateMaskParameter(shaderMask);
+    EXPECT_EQ(maskParams, nullptr);
+
+    // Test zero dst size returns nullptr
+    Drawing::GEPixelMapMaskParams zeroWidthParams;
+    zeroWidthParams.image = ::OHOS::Rosen::MakeImage();
+    zeroWidthParams.src = {0.5, 1.0, 0.1, 0.2};
+    zeroWidthParams.dst = {1.3, 1.2, 1.3, 2.0};
+    zeroWidthParams.fillColor = Vector4f(0.2, 0.8, 0.1, 0.9);
+    auto zeroWidthMask = std::make_shared<Drawing::GEPixelMapShaderMask>(zeroWidthParams);
+    maskParams = hpsEffectFilter->GenerateMaskParameter(zeroWidthMask);
+    EXPECT_EQ(maskParams, nullptr);
+
+    Drawing::GEPixelMapMaskParams zeroHeightParams;
+    zeroHeightParams.image = ::OHOS::Rosen::MakeImage();
+    zeroHeightParams.src = {0.5, 1.0, 0.1, 0.2};
+    zeroHeightParams.dst = {1.3, 1.2, 1.6, 1.2};
+    zeroHeightParams.fillColor = Vector4f(0.2, 0.8, 0.1, 0.9);
+    auto zeroHeightMask = std::make_shared<Drawing::GEPixelMapShaderMask>(zeroHeightParams);
+    maskParams = hpsEffectFilter->GenerateMaskParameter(zeroHeightMask);
     EXPECT_EQ(maskParams, nullptr);
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GenerateMaskParameter_001 end";

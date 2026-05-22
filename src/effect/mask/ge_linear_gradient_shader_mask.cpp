@@ -14,6 +14,8 @@
  */
 #include "ge_linear_gradient_shader_mask.h"
 
+#include <algorithm>
+
 #include "ge_log.h"
 #include "ge_system_properties.h"
 
@@ -60,7 +62,7 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::MakeCommonMask(float w
     }
 
     for (const auto&  [color, stop] : fractionStops_) {
-        uint8_t alpha = static_cast<uint8_t>(color * ColorMax);
+        uint8_t alpha = static_cast<uint8_t>(std::clamp(color, 0.0f, 1.0f) * ColorMax);
         c.emplace_back(Drawing::Color::ColorQuadSetARGB(alpha, alpha, alpha, alpha));
         p.emplace_back(stop);
     }
