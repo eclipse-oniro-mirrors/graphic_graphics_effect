@@ -309,36 +309,56 @@ static const std::string NORMAL_CALCULATION_SHADER = R"(
     uniform shader u_seeds;
     uniform shader pathShader;
 
+    float smoothSign(float mask) {
+        const float TRANSITION_WIDTH = 0.499;
+        return 1.0 - 2.0 * smoothstep(0.5 - TRANSITION_WIDTH, 0.5 + TRANSITION_WIDTH, mask);
+    }
+
     vec4 main(vec2 fragCoord) {
-        float centerD = u_seeds.eval(fragCoord).r;
+        float centerD_raw = u_seeds.eval(fragCoord).r;
+        float L_raw = u_seeds.eval(fragCoord + vec2(-1.0, 0.0)).r;
+        float R_raw = u_seeds.eval(fragCoord + vec2(1.0, 0.0)).r;
+        float T_raw = u_seeds.eval(fragCoord + vec2(0.0, -1.0)).r;
+        float B_raw = u_seeds.eval(fragCoord + vec2(0.0, 1.0)).r;
 
-        float mask = pathShader.eval(fragCoord).r;
-        float pixelDFactor = iResolution.y * 2.0;
-        if (mask < 1e-5) {
-            return vec4(0.0, 0.0, 0.0, centerD * pixelDFactor);
-        }
+        const float PIXEL_SCALE = 2.0;
+        float pixelDFactor = iResolution.y * PIXEL_SCALE;
+        centerD_raw = (centerD_raw + L_raw + R_raw + T_raw + B_raw) * 0.2 * pixelDFactor;
+        float factor = 1.0 - smoothstep(10.0, 0.0, centerD_raw);
+        centerD_raw *= factor;
 
-        float L = u_seeds.eval(fragCoord + vec2(-1.0, 0.0)).r;
-        float R = u_seeds.eval(fragCoord + vec2(1.0, 0.0)).r;
-        float T = u_seeds.eval(fragCoord + vec2(0.0, -1.0)).r;
-        float B = u_seeds.eval(fragCoord + vec2(0.0, 1.0)).r;
+        float mask_center = pathShader.eval(fragCoord).r;
+        float mask_L = pathShader.eval(fragCoord + vec2(-1.0, 0.0)).r;
+        float mask_R = pathShader.eval(fragCoord + vec2(1.0, 0.0)).r;
+        float mask_T = pathShader.eval(fragCoord + vec2(0.0, -1.0)).r;
+        float mask_B = pathShader.eval(fragCoord + vec2(0.0, 1.0)).r;
 
-        vec2 normal = vec2(R - L, T - B) * 0.5;
+        float sign_center = smoothSign(mask_center);
+        float sign_L = smoothSign(mask_L);
+        float sign_R = smoothSign(mask_R);
+        float sign_T = smoothSign(mask_T);
+        float sign_B = smoothSign(mask_B);
+        
+        float centerD = centerD_raw * sign_center;
+        float L = L_raw * sign_L;
+        float R = R_raw * sign_R;
+        float T = T_raw * sign_T;
+        float B = B_raw * sign_B;
 
+        vec2 normal = vec2(R - L, B - T) * 0.5;
+
+        const float NORMAL_EPSILON = 0.00001;
         float len = length(normal);
-        if (len > 0.00001) {
+        if (len > NORMAL_EPSILON) {
             normal /= len;
         } else {
             normal = vec2(0.0, 0.0);
         }
 
-        centerD = (centerD + L + R + T + B) * 0.2 * pixelDFactor;
+        const float AA_MARGIN = 3.0;
+        float finalSdf = centerD + AA_MARGIN;
 
-        float factor = 1.0 - smoothstep(10.0, 0.0, centerD);
-        normal *= factor;
-        float aaMargin = 3.0;
-
-        return vec4(normal, 0.0, -centerD * mask * factor + aaMargin);
+        return vec4(normal, 0.0, finalSdf);
     }
 )";
 
