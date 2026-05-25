@@ -246,6 +246,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_shader_test.cpp",
     "ge_sound_wave_filter_test.cpp",
     "ge_spatial_glass_effect_test.cpp",
+    "ge_source_location_test.cpp",
     "ge_system_properties_test.cpp",
     "ge_tone_mapping_helper_test.cpp",
     "ge_variable_radius_blur_shader_filter_test.cpp",
