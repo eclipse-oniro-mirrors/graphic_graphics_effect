@@ -49,7 +49,7 @@ std::string MatrixToString(const std::array<float, Rows * Cols> &matrix)
         oss << "[";
         for (size_t j = 0; j < Cols; ++j) {
             size_t index = i * Cols + j;
-            oss << std::fixed << std::setprecision(8) << std::setw(20) << matrix[index];
+            oss << std::fixed << std::setprecision(4) << " " << matrix[index];
         }
         oss << "]";
     }
