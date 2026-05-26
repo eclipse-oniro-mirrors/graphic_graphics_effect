@@ -45,12 +45,12 @@ public:
         return params_.center;
     }
 
-    const float& GetWidth() const
+    float GetWidth() const
     {
         return params_.width;
     }
 
-    const float& GetHeight() const
+    float GetHeight() const
     {
         return params_.height;
     }
