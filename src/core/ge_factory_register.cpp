@@ -55,6 +55,7 @@
 #include "effect/mask/ge_wave_gradient_shader_mask.h"
 #include "effect/shader/ge_aurora_noise_shader.h"
 #include "effect/shader/ge_border_light_shader.h"
+#include "effect/shader/ge_border_sdf_lg_color_shader.h"
 #include "effect/shader/ge_border_sdf_shader.h"
 #include "effect/shader/ge_circle_flowlight_effect.h"
 #include "effect/shader/ge_color_gradient_effect.h"
@@ -200,6 +201,7 @@ GE_FACTORY_REGISTER_CUSTOM(LINEAR_GRADIENT_BLUR,
 GE_FACTORY_REGISTER(GEAuroraNoiseShader)
 GE_FACTORY_REGISTER(GEBorderLightShader)
 GE_FACTORY_REGISTER(GEBorderSDFShader)
+GE_FACTORY_REGISTER(GEBorderSDFLGColorShader)
 GE_FACTORY_REGISTER(GECircleFlowlightEffect)
 GE_FACTORY_REGISTER(GEContourDiagonalFlowLightShader)
 GE_FACTORY_REGISTER(GESDFBorderShader)

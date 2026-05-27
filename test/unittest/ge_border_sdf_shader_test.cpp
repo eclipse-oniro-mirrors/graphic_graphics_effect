@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include "ge_border_sdf_shader.h"
+#include "ge_sdf_empty_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
 #include "ge_external_dynamic_loader.h"
 #include "ge_visual_effect_impl.h"
@@ -380,6 +381,85 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest022, TestSize.Level1)
 {
     auto shader = GEBorderSDFShader();
     Drawing::Rect rect(0, 0, 300, 300);
+    shader.MakeDrawingShader(canvas_, rect, 0.5f);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader001, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    shader.OnDrawShader(canvas_, rect);
+    EXPECT_NE(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader002, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    params.isOutline = true;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    shader.OnDrawShader(canvas_, rect);
+    EXPECT_NE(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader003, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    params.width = 0.0f;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    shader.OnDrawShader(canvas_, rect);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader004, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    params.width = -1.0f;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    shader.OnDrawShader(canvas_, rect);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader005, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    params.isOutline = true;
+    params.width = 5.0f;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rects[] = {
+        Drawing::Rect(0, 0, 50, 50),
+        Drawing::Rect(0, 0, 100, 100),
+        Drawing::Rect(0, 0, 200, 200),
+    };
+    for (const auto& rect : rects) {
+        auto s = GEBorderSDFShader(params);
+        s.OnDrawShader(canvas_, rect);
+        EXPECT_NE(s.GetDrawingShader(), nullptr);
+    }
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader006, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    params.style = 1;
+    params.width = 10.0f;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
+    shader.OnDrawShader(canvas_, rect);
+    EXPECT_EQ(shader.GetDrawingShader(), nullptr);
+}
+
+HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader007, TestSize.Level1)
+{
+    auto params = GetTestParams();
+    auto baseShape = std::make_shared<Drawing::GESDFEmptyShaderShape>();
+    params.shape = baseShape;
+    auto shader = GEBorderSDFShader(params);
+    Drawing::Rect rect(0, 0, 100, 100);
     shader.MakeDrawingShader(canvas_, rect, 0.5f);
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }

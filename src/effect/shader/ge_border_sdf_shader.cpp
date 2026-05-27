@@ -45,7 +45,7 @@ void GEBorderSDFShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing
     }
 
     auto sdfShader = params_.shape->GenerateDrawingShader(canvas, rect.GetWidth(), rect.GetHeight());
-    if (sdfShader == nullptr || ROSEN_LE(params_.width, 0.0f)) {
+    if (sdfShader == nullptr) {
         GE_LOGD("GEBorderSDFShader::MakeSDFBorderShader no valid params.");
         return;
     }
@@ -73,6 +73,30 @@ void GEBorderSDFShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing
     if (!drShader_) {
         GE_LOGE("GEBorderSDFShader::MakeDrawingShader shader is nullptr.");
     }
+}
+
+void GEBorderSDFShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    Drawing::Rect newRect(rect);
+    if (ROSEN_LE(params_.width, 0.0f)) {
+        return;
+    }
+
+    if (params_.isOutline) {
+        float outset = params_.width + 0.5f;
+        newRect.MakeOutset(outset, outset);
+    }
+    
+    MakeDrawingShader(canvas, rect, -1.f);
+    auto shader = GetDrawingShader();
+    if (!shader) {
+        return;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(newRect);
+    canvas.DetachBrush();
 }
 
 } // namespace Rosen
