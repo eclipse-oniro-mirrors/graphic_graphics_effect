@@ -33,7 +33,9 @@ enum class GESDFShapeType : uint8_t {
     PATH,
     UNION_OP,
     DISTORT_OP,
-    MAX = DISTORT_OP,
+    SUB_OP,
+    SMOOTH_SUB_OP,
+    MAX = SMOOTH_SUB_OP,
 };
 
 class GE_EXPORT GESDFShaderShape : public GEShaderShape {

@@ -75,6 +75,7 @@
 #include "effect/shape/ge_sdf_path_shader_shape.h"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.h"
 #include "effect/shape/ge_sdf_rrect_shader_shape.h"
+#include "effect/shape/ge_sdf_sub_op_shader_shape.h"
 #include "effect/shape/ge_sdf_shadow_shader.h"
 #include "effect/shape/ge_sdf_transform_shader_shape.h"
 #include "effect/shape/ge_sdf_triangle_shader_shape.h"
@@ -267,6 +268,8 @@ GE_FACTORY_REGISTER_SHAPE(GESDFPixelmapShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFTransformShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFTriangleShaderShape)
 GE_FACTORY_REGISTER_SHAPE(GESDFUnionOpShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFSubOpShaderShape)
+GE_FACTORY_REGISTER_SHAPE(GESDFSmoothSubOpShaderShape)
 
 // 4.2 Custom registration
 GE_FACTORY_REGISTER_CUSTOM(SDF_EMPTY_SHAPE,

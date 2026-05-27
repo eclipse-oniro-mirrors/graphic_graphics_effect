@@ -213,6 +213,8 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(WaveGradientMaskParams, GEWaveGradientShaderMaskParams)
     GE_DECLARE_MAKE_GET_PARAMS(MaskTransitionParams, GEMaskTransitionShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFUnionOpShapeParams, GESDFUnionOpShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFSubOpShapeParams, GESDFSubOpShapeParams)
+    GE_DECLARE_MAKE_GET_PARAMS(SDFSmoothSubOpShapeParams, GESDFSmoothSubOpShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFRRectShapeParams, GESDFRRectShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFPathShapeParams, GESDFPathShapeParams)
     GE_DECLARE_MAKE_GET_PARAMS(SDFPixelmapShapeParams, GESDFPixelmapShapeParams)
