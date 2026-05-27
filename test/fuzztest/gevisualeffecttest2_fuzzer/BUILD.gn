@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Huawei Device Co., Ltd.
+# Copyright (c) 2026 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -18,18 +18,18 @@ import("//foundation/graphic/graphics_effect/config.gni")
 module_out_path = "graphics_effect/effect_process"
 
 ##############################fuzztest##########################################
-ohos_fuzztest("GEAIBarShaderFilterFuzzTest") {
+ohos_fuzztest("GEVisualEffectTest2FuzzTest") {
   module_out_path = module_out_path
-  fuzz_config_file =
-      "$graphics_effect_root/test/fuzztest/geaibarshaderfilter_fuzzer"
+  fuzz_config_file = "//foundation/graphic/graphics_effect/test/fuzztest/gevisualeffecttest2_fuzzer"
 
   include_dirs = [
+    "$graphics_effect_root/include",
     "$graphics_effect_root/src",
     "$graphics_effect_root/test/fuzztest/",
   ]
 
   sources = [
-    "ge_aibar_shader_filter_fuzzer.cpp",
+    "gevisualeffecttest2_fuzzer.cpp",
     "get_object.h",
   ]
 
@@ -57,6 +57,6 @@ ohos_fuzztest("GEAIBarShaderFilterFuzzTest") {
 group("fuzztest") {
   testonly = true
 
-  deps = [ ":GEAIBarShaderFilterFuzzTest" ]
+  deps = [ ":GEVisualEffectTest2FuzzTest" ]
 }
 ###############################################################################

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Huawei Device Co., Ltd.
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TEST_FUZZTEST_GEKAWASEBLURSHADERFILTER_FUZZER_H
-#define TEST_FUZZTEST_GEKAWASEBLURSHADERFILTER_FUZZER_H
+#ifndef TEST_FUZZTEST_GEVISUALEFFECTTEST1_FUZZER_H
+#define TEST_FUZZTEST_GEVISUALEFFECTTEST1_FUZZER_H
 
 #include <climits>
 #include <cstddef>
@@ -22,6 +22,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define FUZZ_PROJECT_NAME "gekawaseblurshaderfilter_fuzzer"
+#define FUZZ_PROJECT_NAME "gevisualeffecttest1_fuzzer"
 
-#endif // TEST_FUZZTEST_GEKAWASEBLURSHADERFILTER_FUZZER_H
+#endif // TEST_FUZZTEST_GEVISUALEFFECTTEST1_FUZZER_H

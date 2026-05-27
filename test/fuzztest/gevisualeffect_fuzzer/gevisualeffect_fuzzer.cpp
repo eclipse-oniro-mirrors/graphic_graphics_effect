@@ -29,7 +29,7 @@ constexpr size_t VEC_SIZE_MAX = 4;
 constexpr size_t FUZZER_POINT_NUM = 12;
 constexpr size_t CORNER_COUNT = 4;
 constexpr uint8_t FUZZER_TEST_CASE_COUNT = 9;
- 
+
 enum TestCaseIndex {
     TEST_CASE_INT_PARAMS = 0,
     TEST_CASE_FLOAT_PARAMS = 1,
@@ -237,7 +237,7 @@ void GEVisualEffectFuzzTestGetInterfaces(FuzzedDataProvider& fdp)
     std::string name = fdp.ConsumeRandomLengthString(STR_LEN);
     DrawingPaintType type = static_cast<DrawingPaintType>(fdp.ConsumeIntegral<uint8_t>());
     auto geVisualEffect = std::make_shared<GEVisualEffect>(name, type);
- 
+  
     std::string res = geVisualEffect->GetName();
     auto impl = geVisualEffect->GetImpl();
 }
@@ -245,15 +245,14 @@ void GEVisualEffectFuzzTestGetInterfaces(FuzzedDataProvider& fdp)
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
- 
-/* Fuzzer entry point */
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return 0;
     }
     FuzzedDataProvider fdp(data, size);
- 
+
     uint8_t choice = fdp.ConsumeIntegral<uint8_t>() % OHOS::Rosen::Drawing::FUZZER_TEST_CASE_COUNT;
     switch (choice) {
         case OHOS::Rosen::Drawing::TEST_CASE_INT_PARAMS:

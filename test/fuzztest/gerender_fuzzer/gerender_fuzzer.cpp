@@ -25,11 +25,10 @@ namespace GraphicsEffectEngine {
 using namespace Rosen;
  
 namespace {
-constexpr size_t STR_LEN = 32;
 constexpr size_t VEC_SIZE_MAX = 4;
 constexpr size_t FILTER_COUNT_MAX = 5;
 constexpr uint8_t TEST_CASE_COUNT = 10;
- 
+
 enum TestCaseIndex {
     TEST_CASE_KAWASE_BLUR_DRAW_IMAGE = 0,
     TEST_CASE_KAWASE_BLUR_APPLY_IMAGE = 1,
@@ -312,27 +311,48 @@ void GERenderFuzzTest010(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
- 
+
+    std::vector<std::string> predefinedNames = {
+        Drawing::GE_FILTER_KAWASE_BLUR,
+        Drawing::GE_FILTER_MESA_BLUR,
+        Drawing::GE_FILTER_GREY,
+        Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR,
+        Drawing::GE_FILTER_MAGNIFIER,
+        Drawing::GE_FILTER_WATER_RIPPLE,
+        Drawing::GE_FILTER_AI_BAR,
+        Drawing::GE_FILTER_FROSTED_GLASS,
+        Drawing::GE_FILTER_SDF_EDGE_LIGHT,
+    };
     size_t filterCount = fdp.ConsumeIntegral<uint8_t>() % FILTER_COUNT_MAX;
     for (size_t i = 0; i <= filterCount; i++) {
-        std::string name = fdp.ConsumeRandomLengthString(STR_LEN);
+        size_t nameIndex = fdp.ConsumeIntegral<uint8_t>() % predefinedNames.size();
         Drawing::DrawingPaintType type = static_cast<Drawing::DrawingPaintType>(fdp.ConsumeIntegral<uint8_t>());
-        auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(name, type);
-        visualEffect->SetParam("radius", fdp.ConsumeFloatingPoint<float>());
+        auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(predefinedNames[nameIndex], type);
+        visualEffect->SetParam(Drawing::GE_FILTER_KAWASE_BLUR_RADIUS, fdp.ConsumeIntegral<int32_t>());
+        visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_1, fdp.ConsumeFloatingPoint<float>());
+        visualEffect->SetParam(Drawing::GE_FILTER_GREY_COEF_2, fdp.ConsumeFloatingPoint<float>());
         veContainer->AddToChainedFilter(visualEffect);
     }
+
+    Drawing::Canvas canvas;
+    std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
+    Drawing::Rect src = CreateFuzzedRect(fdp);
+    Drawing::Rect dst = CreateFuzzedRect(fdp);
+    Drawing::SamplingOptions sampling;
+    geRender->DrawImageEffect(canvas, *veContainer, image, src, dst, sampling);
+    geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
  
 }  // namespace GraphicsEffectEngine
 }  // namespace OHOS
- 
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return 0;
     }
     FuzzedDataProvider fdp(data, size);
- 
+
     uint8_t choice = fdp.ConsumeIntegral<uint8_t>() % OHOS::GraphicsEffectEngine::TEST_CASE_COUNT;
     switch (choice) {
         case OHOS::GraphicsEffectEngine::TEST_CASE_KAWASE_BLUR_DRAW_IMAGE:
