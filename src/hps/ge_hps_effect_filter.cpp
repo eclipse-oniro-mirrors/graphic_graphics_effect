@@ -335,32 +335,56 @@ void HpsEffectFilter::GenerateVisualEffectFromGE(const std::shared_ptr<Drawing::
     switch (visualEffectImpl->GetFilterType()) {
         case Drawing::GEVisualEffectImpl::FilterType::MESA_BLUR: {
             const auto& mesaParams = visualEffectImpl->GetMESAParams();
+            if (mesaParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE mesaParams is null");
+                break;
+            }
             params = GenerateMesaBlurEffect(*mesaParams, src, dst, image);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::KAWASE_BLUR: {
             const auto& kawaseParams = visualEffectImpl->GetKawaseParams();
+            if (kawaseParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE kawaseParams is null");
+                break;
+            }
             params = GenerateKawaseBlurEffect(*kawaseParams, src, dst, saturationForHPS, brightnessForHPS);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::GREY: {
             const auto& greyParams = visualEffectImpl->GetGreyParams();
+            if (greyParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE greyParams is null");
+                break;
+            }
             params = GenerateGreyEffect(*greyParams, src, dst);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::AIBAR: {
             const auto& aiBarParams = visualEffectImpl->GetAIBarParams();
+            if (aiBarParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE aiBarParams is null");
+                break;
+            }
             params = GenerateAIBarEffect(*aiBarParams, src, dst);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::LINEAR_GRADIENT_BLUR: {
             const auto& linearGradientBlurParams = visualEffectImpl->GetLinearGradientBlurParams();
+            if (linearGradientBlurParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE linearGradientBlurParams is null");
+                break;
+            }
             auto canvasInfo = visualEffectImpl->GetCanvasInfo();
             params = GenerateGradientBlurEffect(*linearGradientBlurParams, src, dst, image, canvasInfo);
             break;
         }
         case Drawing::GEVisualEffectImpl::FilterType::EDGE_LIGHT: {
             const auto& edgeLightParams = visualEffectImpl->GetEdgeLightParams();
+            if (edgeLightParams == nullptr) {
+                LOGW("HpsEffectFilter::GenerateVisualEffectFromGE edgeLightParams is null");
+                break;
+            }
             auto canvasInfo = visualEffectImpl->GetCanvasInfo();
             params = GenerateEdgeLightEffect(*edgeLightParams, src, dst, image, canvasInfo);
             break;
@@ -549,7 +573,10 @@ std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GenerateMaskParamete
 std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GeneratePixelMapMaskParameter(
     const Drawing::GEPixelMapMaskParams& params)
 {
-    /* Compare to standard pixel map mask, HPS use difference transform matrix */
+    if (params.dst.GetWidth() == 0 || params.dst.GetHeight() == 0) {
+        LOGE("HpsEffectFilter::GeneratePixelMapMaskParameter dst width or height is zero");
+        return nullptr;
+    }
     Drawing::Matrix matrix;
     auto sx = params.src.GetWidth() / params.dst.GetWidth();
     auto sy = params.src.GetHeight() / params.dst.GetHeight();
