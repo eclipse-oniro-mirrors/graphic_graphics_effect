@@ -72,11 +72,8 @@ std::shared_ptr<ShaderEffect> GESDFSubOpShaderShape::GenerateDrawingShader(float
     GE_TRACE_NAME_FMT("GESDFSubOpShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
     auto leftShader = params_.left ? params_.left->GenerateDrawingShader(width, height) : nullptr;
     auto rightShader = params_.right ? params_.right->GenerateDrawingShader(width, height) : nullptr;
-    if (!leftShader && !rightShader) {
-        return nullptr;
-    }
     if (!leftShader) {
-        return rightShader;
+        return nullptr;
     }
     if (!rightShader) {
         return leftShader;
@@ -89,11 +86,8 @@ std::shared_ptr<ShaderEffect> GESDFSubOpShaderShape::GenerateDrawingShaderHasNor
     GE_TRACE_NAME_FMT("GESDFSubOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
     auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
     auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
-    if (!leftShader && !rightShader) {
-        return nullptr;
-    }
     if (!leftShader) {
-        return rightShader;
+        return nullptr;
     }
     if (!rightShader) {
         return leftShader;
@@ -180,11 +174,8 @@ std::shared_ptr<ShaderEffect> GESDFSmoothSubOpShaderShape::GenerateDrawingShader
     GE_TRACE_NAME_FMT("GESDFSmoothSubOpShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
     auto leftShader = params_.left ? params_.left->GenerateDrawingShader(width, height) : nullptr;
     auto rightShader = params_.right ? params_.right->GenerateDrawingShader(width, height) : nullptr;
-    if (!leftShader && !rightShader) {
-        return nullptr;
-    }
     if (!leftShader) {
-        return rightShader;
+        return nullptr;
     }
     if (!rightShader) {
         return leftShader;
@@ -199,11 +190,8 @@ std::shared_ptr<ShaderEffect> GESDFSmoothSubOpShaderShape::GenerateDrawingShader
         "GESDFSmoothSubOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g", width, height);
     auto leftShader = params_.left ? params_.left->GenerateDrawingShaderHasNormal(width, height) : nullptr;
     auto rightShader = params_.right ? params_.right->GenerateDrawingShaderHasNormal(width, height) : nullptr;
-    if (!leftShader && !rightShader) {
-        return nullptr;
-    }
     if (!leftShader) {
-        return rightShader;
+        return nullptr;
     }
     if (!rightShader) {
         return leftShader;
