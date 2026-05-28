@@ -56,7 +56,6 @@ int32_t GEXmlParserBase::LoadSysConfiguration(const std::string& fileDir)
         std::string fullPath = sysPath + fileDir;
         xmlSysDocument_ = xmlParseFile(fullPath.c_str());
         if (xmlSysDocument_ != nullptr) {
-            GE_LOGI("GEXmlParserBase load sys config from %{public}s", fullPath.c_str());
             return GE_PARSE_EXEC_SUCCESS;
         }
     }
@@ -69,7 +68,6 @@ void GEXmlParserBase::LoadProdConfiguration(const std::string& fileDir)
     std::string fullPath = prodPath_ + fileDir;
     xmlProdDocument_ = xmlParseFile(fullPath.c_str());
     if (xmlProdDocument_ != nullptr) {
-        GE_LOGI("GEXmlParserBase load prod config from %{public}s", fullPath.c_str());
     }
 }
 
