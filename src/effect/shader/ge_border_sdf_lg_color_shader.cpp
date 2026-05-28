@@ -34,29 +34,32 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFLGColorShader::GetEffect()
     }
     return lgColorEffect;
 }
+
 void GEBorderSDFLGColorShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect)
 {
     const Vector4f zeroColor(0.0f, 0.0f, 0.0f, 0.0f);
-    if (params_.colorNumber <= 2) {
+    static constexpr int COLOR_INDEX_2 = 2;
+    static constexpr int COLOR_INDEX_3 = 3;
+    static constexpr int COLOR_INDEX_4 = 4;
+    if (params_.colorNumber <= COLOR_INDEX_2) {
         params_.color2 = zeroColor;
         params_.position2 = 0.0f;
     }
-    if (params_.colorNumber <= 3) {
+    if (params_.colorNumber <= COLOR_INDEX_3) {
         params_.color3 = zeroColor;
         params_.position3 = 0.0f;
     }
-    if (params_.colorNumber <= 4) {
+    if (params_.colorNumber <= COLOR_INDEX_4) {
         params_.color4 = zeroColor;
         params_.position4 = 0.0f;
     }
 }
 
-void GEBorderSDFLGColorShader::MakeDrawingShader(Drawing::Canvas& canvas, Drawing::Rect& rect, float progress)
+void GEBorderSDFLGColorShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     // 1. Validate parameters
-    float positions[5] = {
-        params_.position0, params_.position1, params_.position2, params_.position3, params_.position4
-    };
+    float positions[5] = {params_.position0, params_.position1, params_.position2, params_.position3,
+        params_.position4};
     for (int i = 1; i < params_.colorNumber; i++) {
         if (ROSEN_LE(positions[i], positions[i - 1])) {
             GE_LOGE("GEBorderSDFLGColorShader::MakeDrawingShader positions not increasing at index=%{public}d.", i);

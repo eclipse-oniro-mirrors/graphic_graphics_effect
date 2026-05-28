@@ -23,6 +23,11 @@
 using namespace testing;
 using namespace testing::ext;
 
+static constexpr int COLOR_COUNT_TWO = 2;
+static constexpr int COLOR_COUNT_THREE = 3;
+static constexpr int COLOR_COUNT_FOUR = 4;
+static constexpr int COLOR_COUNT_FIVE = 5;
+
 namespace OHOS {
 namespace Rosen {
 
@@ -47,7 +52,7 @@ public:
         params.angle = 45.0f;
         params.width = 10.0f;
         params.isOutline = false;
-        params.colorNumber = 2;
+        params.colorNumber = COLOR_COUNT_TWO;
         params.color0 = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
         params.color1 = Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
         params.position0 = 0.0f;
@@ -59,14 +64,26 @@ public:
     static inline Drawing::Canvas canvas_;
 };
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest001, TestSize.Level1)
+
+/**
+ * @tc.name: DefaultConstructor_TypeAndTypeName
+ * @tc.desc: Test default constructor returns correct type and type name
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, DefaultConstructor_TypeAndTypeName, TestSize.Level1)
 {
     auto shader = std::make_unique<GEBorderSDFLGColorShader>();
     EXPECT_EQ(shader->Type(), Drawing::GEFilterType::BORDER_SDF_LG_COLOR);
     EXPECT_EQ(shader->TypeName(), "BorderSDFLGColor");
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest002, TestSize.Level1)
+
+/**
+ * @tc.name: ParamConstructor_Type
+ * @tc.desc: Test parameterized constructor returns correct type
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, ParamConstructor_Type, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = std::make_unique<GEBorderSDFLGColorShader>(params);
@@ -74,7 +91,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest002, TestSize
     EXPECT_EQ(shader->Type(), Drawing::GEFilterType::BORDER_SDF_LG_COLOR);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest003, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_Border
+ * @tc.desc: Test MakeDrawingShader with border mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_Border, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -84,7 +107,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest003, TestSize
     EXPECT_NE(drawingShader, nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest004, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_Outline
+ * @tc.desc: Test MakeDrawingShader with outline mode and preprocess
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_Outline, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.isOutline = true;
@@ -96,7 +125,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest004, TestSize
     EXPECT_NE(drawingShader, nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest005, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_SmallRect
+ * @tc.desc: Test MakeDrawingShader with small rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_SmallRect, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -105,10 +140,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest005, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest006, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_ZeroWidth
+ * @tc.desc: Test MakeDrawingShader with zero width
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_ZeroWidth, TestSize.Level1)
 {
     Drawing::GEBorderSDFLGColorShaderParams params;
-    params.colorNumber = 2;
+    params.colorNumber = COLOR_COUNT_TWO;
     params.position0 = 0.0f;
     params.position1 = 1.0f;
     params.width = 0.0f;
@@ -119,10 +160,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest006, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest007, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_ThreeColors
+ * @tc.desc: Test MakeDrawingShader with 3 colors gradient
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_ThreeColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 3;
+    params.colorNumber = COLOR_COUNT_THREE;
     params.color0 = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
     params.position0 = 0.0f;
     params.color1 = Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
@@ -135,10 +182,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest007, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest008, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_FiveColors
+ * @tc.desc: Test MakeDrawingShader with 5 colors gradient
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_FiveColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 5;
+    params.colorNumber = COLOR_COUNT_FIVE;
     params.position0 = 0.0f;
     params.position1 = 0.25f;
     params.position2 = 0.5f;
@@ -155,7 +208,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest008, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest009, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_DescendingPositions
+ * @tc.desc: Test MakeDrawingShader with descending positions returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_DescendingPositions, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.position0 = 0.5f;
@@ -166,10 +225,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest009, TestSize
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest010, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_ThreeColorsDescendingLast
+ * @tc.desc: Test 3 colors with last position descending returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_ThreeColorsDescendingLast, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 3;
+    params.colorNumber = COLOR_COUNT_THREE;
     params.position0 = 0.0f;
     params.position1 = 0.5f;
     params.position2 = 0.3f;
@@ -179,7 +244,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest010, TestSize
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest011, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_EqualPositions
+ * @tc.desc: Test MakeDrawingShader with equal positions returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_EqualPositions, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.position0 = 0.3f;
@@ -190,7 +261,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest011, TestSize
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest012, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleRects
+ * @tc.desc: Test MakeDrawingShader with various rect sizes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleRects, TestSize.Level1)
 {
     auto params = GetTestParams();
 
@@ -207,7 +284,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest012, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest013, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleAngles
+ * @tc.desc: Test MakeDrawingShader with various gradient angles
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleAngles, TestSize.Level1)
 {
     float angles[] = {0.0f, 45.0f, 90.0f, 135.0f, 180.0f, 270.0f, 360.0f};
     Drawing::Rect rect(0, 0, 100, 100);
@@ -220,7 +303,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest013, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest014, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleWidths
+ * @tc.desc: Test MakeDrawingShader with various border widths
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleWidths, TestSize.Level1)
 {
     float widthValues[] = {0.1f, 0.5f, 1.0f, 2.0f, 5.0f, 10.0f, 20.0f};
     Drawing::Rect rect(0, 0, 100, 100);
@@ -233,7 +322,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest014, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest015, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleColors
+ * @tc.desc: Test MakeDrawingShader with various color values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleColors, TestSize.Level1)
 {
     Vector4f colors[] = {
         Vector4f(1.0f, 1.0f, 1.0f, 1.0f),
@@ -255,7 +350,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest015, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest016, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleScales
+ * @tc.desc: Test MakeDrawingShader with different scale factors
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleScales, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -271,7 +372,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest016, TestSize
     EXPECT_NE(drawingShader, nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest017, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_RepeatedCalls
+ * @tc.desc: Test MakeDrawingShader with repeated calls
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_RepeatedCalls, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -284,7 +391,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest017, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest018, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_BorderAndOutline
+ * @tc.desc: Test MakeDrawingShader with border and outline modes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_BorderAndOutline, TestSize.Level1)
 {
     auto params = GetTestParams();
     Drawing::Rect rect(0, 0, 100, 100);
@@ -299,7 +412,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest018, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest019, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_AspectRatios
+ * @tc.desc: Test MakeDrawingShader with various aspect ratios
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_AspectRatios, TestSize.Level1)
 {
     auto params = GetTestParams();
     Drawing::Rect rects[] = {
@@ -317,7 +436,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest019, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest020, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_SmallWidths
+ * @tc.desc: Test MakeDrawingShader with very small border widths
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_SmallWidths, TestSize.Level1)
 {
     float widthValues[] = {0.0f, 0.0001f, 0.001f, 0.01f, 0.1f, 1.0f};
     Drawing::Rect rect(0, 0, 100, 100);
@@ -330,7 +455,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest020, TestSize
     }
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest021, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_MultipleParamSets
+ * @tc.desc: Test MakeDrawingShader with multiple parameter combinations
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_MultipleParamSets, TestSize.Level1)
 {
     auto params1 = GetTestParams();
     params1.color0 = Vector4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -362,7 +493,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest021, TestSize
     EXPECT_NE(shader3.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest022, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_IncreasingRects
+ * @tc.desc: Test MakeDrawingShader with progressively larger rects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_IncreasingRects, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -377,10 +514,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest022, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest023, TestSize.Level1)
+
+/**
+ * @tc.name: Preprocess_ClearUnusedColors_TwoColors
+ * @tc.desc: Test Preprocess clears unused colors when colorNumber is 2
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, Preprocess_ClearUnusedColors_TwoColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 2;
+    params.colorNumber = COLOR_COUNT_TWO;
     params.color2 = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     params.position2 = 0.5f;
     params.color3 = Vector4f(1.0f, 0.0f, 1.0f, 1.0f);
@@ -400,10 +543,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest023, TestSize
     EXPECT_EQ(shader.params_.position4, 0.0f);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest024, TestSize.Level1)
+
+/**
+ * @tc.name: Preprocess_ClearUnusedColors_ThreeColors
+ * @tc.desc: Test Preprocess clears unused colors when colorNumber is 3
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, Preprocess_ClearUnusedColors_ThreeColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 3;
+    params.colorNumber = COLOR_COUNT_THREE;
     params.position0 = 0.0f;
     params.position1 = 0.5f;
     params.position2 = 1.0f;
@@ -422,10 +571,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest024, TestSize
     EXPECT_EQ(shader.params_.position4, 0.0f);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest025, TestSize.Level1)
+
+/**
+ * @tc.name: Preprocess_ClearUnusedColors_FourColors
+ * @tc.desc: Test Preprocess clears unused color4 when colorNumber is 4
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, Preprocess_ClearUnusedColors_FourColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 4;
+    params.colorNumber = COLOR_COUNT_FOUR;
     params.position0 = 0.0f;
     params.position1 = 0.33f;
     params.position2 = 0.66f;
@@ -441,10 +596,16 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest025, TestSize
     EXPECT_EQ(shader.params_.position4, 0.0f);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest026, TestSize.Level1)
+
+/**
+ * @tc.name: PreprocessAndMakeDrawingShader_FiveColors
+ * @tc.desc: Test Preprocess and MakeDrawingShader with 5 colors
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, PreprocessAndMakeDrawingShader_FiveColors, TestSize.Level1)
 {
     auto params = GetTestParams();
-    params.colorNumber = 5;
+    params.colorNumber = COLOR_COUNT_FIVE;
     params.position0 = 0.0f;
     params.position1 = 0.25f;
     params.position2 = 0.5f;
@@ -458,8 +619,12 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest026, TestSize
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader001, TestSize.Level1)
+/**
+ * @tc.name: OnDrawShader_Border
+ * @tc.desc: Test OnDrawShader with border mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, OnDrawShader_Border, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFLGColorShader(params);
@@ -468,7 +633,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader002, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_Outline
+ * @tc.desc: Test OnDrawShader with outline mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, OnDrawShader_Outline, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.isOutline = true;
@@ -478,7 +649,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader003, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_ZeroWidth
+ * @tc.desc: Test OnDrawShader with zero width returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, OnDrawShader_ZeroWidth, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.width = 0.0f;
@@ -488,7 +665,13 @@ HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest_OnDrawShader
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFLGColorShaderTest, GEBorderSDFLGColorShaderTest027, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_EmptyShape
+ * @tc.desc: Test MakeDrawingShader with empty shape returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFLGColorShaderTest, MakeDrawingShader_EmptyShape, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto emptyShape = std::make_shared<Drawing::GESDFEmptyShaderShape>();

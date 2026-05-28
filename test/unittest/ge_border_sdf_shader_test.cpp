@@ -385,7 +385,12 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest022, TestSize.Level1)
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader001, TestSize.Level1)
+/**
+ * @tc.name: OnDrawShader_Border
+ * @tc.desc: Test OnDrawShader with border mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_Border, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto shader = GEBorderSDFShader(params);
@@ -394,7 +399,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader001, TestSize.
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader002, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_Outline
+ * @tc.desc: Test OnDrawShader with outline mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_Outline, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.isOutline = true;
@@ -404,7 +415,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader002, TestSize.
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader003, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_ZeroWidth
+ * @tc.desc: Test OnDrawShader with zero width returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_ZeroWidth, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.width = 0.0f;
@@ -414,7 +431,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader003, TestSize.
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader004, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_NegativeWidth
+ * @tc.desc: Test OnDrawShader with negative width returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_NegativeWidth, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.width = -1.0f;
@@ -424,7 +447,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader004, TestSize.
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader005, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_OutlineMultipleRects
+ * @tc.desc: Test OnDrawShader with outline mode across various rects
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_OutlineMultipleRects, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.isOutline = true;
@@ -442,7 +471,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader005, TestSize.
     }
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader006, TestSize.Level1)
+
+/**
+ * @tc.name: OnDrawShader_DashStyle
+ * @tc.desc: Test OnDrawShader with dash style returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, OnDrawShader_DashStyle, TestSize.Level1)
 {
     auto params = GetTestParams();
     params.style = 1;
@@ -453,7 +488,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader006, TestSize.
     EXPECT_EQ(shader.GetDrawingShader(), nullptr);
 }
 
-HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest_OnDrawShader007, TestSize.Level1)
+
+/**
+ * @tc.name: MakeDrawingShader_EmptyShape
+ * @tc.desc: Test MakeDrawingShader with empty shape returns null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBorderSDFShaderTest, MakeDrawingShader_EmptyShape, TestSize.Level1)
 {
     auto params = GetTestParams();
     auto baseShape = std::make_shared<Drawing::GESDFEmptyShaderShape>();

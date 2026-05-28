@@ -71,9 +71,9 @@ private:
             // Four corners
             vec2 halfRes = res * 0.5;
             vec2 c1 = vec2(-halfRes.x, -halfRes.y);
-            vec2 c2 = vec2( halfRes.x, -halfRes.y);
-            vec2 c3 = vec2(-halfRes.x,  halfRes.y);
-            vec2 c4 = vec2( halfRes.x,  halfRes.y);
+            vec2 c2 = vec2(halfRes.x, -halfRes.y);
+            vec2 c3 = vec2(-halfRes.x, halfRes.y);
+            vec2 c4 = vec2(halfRes.x, halfRes.y);
 
             // Projection of four corners towards the gradient direction
             float p1 = dot(c1, dir);
@@ -81,8 +81,8 @@ private:
             float p3 = dot(c3, dir);
             float p4 = dot(c4, dir);
 
-            float minP = min( min(p1,p2), min(p3,p4) );
-            float maxP = max( max(p1,p2), max(p3,p4) );
+            float minP = min(min(p1, p2), min(p3, p4));
+            float maxP = max(max(p1, p2), max(p3, p4));
             float curr = dot(p, dir);
             float range = maxP - minP;
             return (range > eps) ? (curr - minP) / range : 0.0;
