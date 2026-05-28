@@ -36,6 +36,19 @@ from tool.generate_metadata.cpp_tokenizer import CppTokenizer
 from tool.generate_metadata.cpp_parser import CppParser, FieldInfo, StructInfo
 
 
+def params_in_stem(file_path: Path) -> str:
+    """Extract the test name from a .params.in file path.
+
+    For a file like 'foo.params.in', file_path.stem returns 'foo.params'
+    (because .in is the only recognized suffix). This function strips the
+    trailing '.params' to yield the correct test name 'foo'.
+    """
+    stem = file_path.stem
+    if stem.endswith(".params"):
+        stem = stem[: -len(".params")]
+    return stem
+
+
 class TestStatus(Enum):
     """Test result status."""
 
@@ -104,6 +117,7 @@ class TestCase:
     results: List[Any] = field(default_factory=list)
     parser_errors: List[Any] = field(default_factory=list)
     error: Optional[str] = None
+    error_traceback: Optional[str] = None
     passed: bool = False
     validation_passed: Optional[bool] = None
     validation_differences: List[str] = field(default_factory=list)
@@ -292,7 +306,7 @@ class Validator:
     ) -> Dict[str, Any]:
         """Validate a single test case against expected results."""
         validation = {
-            "test_name": test_case.file_path.stem,
+            "test_name": params_in_stem(test_case.file_path),
             "file_name": test_case.file_path.name,
             "passed": True,
             "differences": [],
@@ -350,7 +364,7 @@ class Validator:
         validation_results = []
 
         for test_case in test_cases:
-            test_name = test_case.file_path.stem
+            test_name = params_in_stem(test_case.file_path)
 
             if test_name not in expected_results:
                 validation = {
@@ -614,7 +628,7 @@ class TestRunner:
                     for s in result_data.get("structs", [])
                 ]
 
-                self.expected_results[test_case.file_path.stem] = (
+                self.expected_results[params_in_stem(test_case.file_path)] = (
                     TestCaseExpectedResult(
                         name=result_data["name"],
                         should_parse=result_data["should_parse"],
@@ -634,7 +648,7 @@ class TestRunner:
         """Save current test results as expected results to individual JSON files."""
         saved_count = 0
         for test_case in self.test_cases:
-            test_name = test_case.file_path.stem
+            test_name = params_in_stem(test_case.file_path)
 
             structs_data = []
             for struct in test_case.results:
@@ -686,6 +700,7 @@ class TestRunner:
             output_file = Path(str(test_case.file_path) + ".json")
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(asdict(expected_result), f, indent=2, ensure_ascii=False)
+                f.write('\n')
 
             saved_count += 1
 
@@ -697,7 +712,7 @@ class TestRunner:
         valid_files = sorted(self.valid_dir.glob("*.params.in"))
         for file_path in valid_files:
             test_case = TestCase(
-                name=f"[syntax valid test] {file_path.stem}",
+                name=f"[syntax valid test] {params_in_stem(file_path)}",
                 file_path=file_path,
                 should_parse=True,
             )
@@ -706,7 +721,7 @@ class TestRunner:
         invalid_files = sorted(self.invalid_dir.glob("*.params.in"))
         for file_path in invalid_files:
             test_case = TestCase(
-                name=f"[syntax invalid test] {file_path.stem}",
+                name=f"[syntax invalid test] {params_in_stem(file_path)}",
                 file_path=file_path,
                 should_parse=False,
             )

@@ -1,0 +1,77 @@
+{
+  "name": "cast_from_same_type",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "TestCastFromSameTypeParams",
+      "enum_type": "CAST_FROM_SAME_TYPE",
+      "filter_name": "CastFromSameType",
+      "fields": [
+        {
+          "type": "Drawing::Path",
+          "name": "path",
+          "default_value": "",
+          "prop_name": "PATH_FIELD",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "PATH_FIELD",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": "Drawing::Path",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "int32_t",
+          "name": "intValue",
+          "default_value": "0",
+          "prop_name": "INT_VALUE",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "INT_VALUE",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": "int",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "float",
+          "name": "floatValue",
+          "default_value": "0.0f",
+          "prop_name": "FLOAT_VALUE",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "FLOAT_VALUE",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": "int32_t",
+              "custom": null,
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "CAST_FROM_SAME_TYPE",
+        "name": "CastFromSameType"
+      }
+    }
+  ],
+  "notes": "SYNTAX VALID but SEMANTIC INVALID. The parser accepts this file because 'cast_from=\"SomeType\"' is syntactically correct. Semantic analysis in gen_metadata.py (check_cast_from_same_type()) will reject it because cast_from type equals field type (e.g., Drawing::Path field with cast_from=\"Drawing::Path\", or int32_t field with cast_from=\"int\" which resolves to int32_t via type alias). This test verifies the parser handles cast_from syntax correctly; semantic validation is tested by running gen_metadata.py on this file."
+}

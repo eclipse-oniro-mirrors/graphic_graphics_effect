@@ -122,9 +122,21 @@ float field;                      // No attribute - auto-generates "Field" (Pasc
 | `min` / `max` | `min=0.0, max=1.0` | `GEParamsConstraintMinInfo` / `MaxInfo` with value |
 | `array_accessor_length=N` | `array_accessor_length=3` | Generates FIELD0, FIELD1, FIELD2 tags |
 | `array_accessor_type="Type"` | `array_accessor_type="float"` | Type for element accessors (default: field type) |
-| `cast_from="Type"` | `cast_from=int` | `SetParamsMemberByTag` overload accepting that type |
-| `custom="Transformer"` | `custom="PairToPointTransformer"` | Custom type conversion class |
+| `cast_from="Type"` | `cast_from=int` | `SetParamsMemberByTag` overload accepting that type; must differ from field type |
+| `custom="Transformer"` | `custom="PairToPointTransformer"` | Custom type conversion class; can be used alone (identity cast) or with `cast_from` |
 | `alias="STRING"` | `alias="alpha"` | Alternative string-to-tag mapping (backward compat) |
+
+### Constraint Validation Rules
+
+**cast_from constraints**:
+- `cast_from` type **must differ** from the field type (after type alias resolution from `config.json`)
+- Example: `cast_from=int` on `int32_t` field is invalid (`int` resolves to `int32_t` via alias)
+- Same-type cast_from would generate duplicate switch cases, causing compilation errors
+
+**custom constraints**:
+- `custom` can be used **alone** without `cast_from` (identity cast: source type = field type)
+- When `custom` is alone, `CastFromType` in generated metadata equals the field type
+- When `cast_from` and `custom` are combined, `cast_from` type must differ from field type (rule above applies)
 
 ### Examples
 
@@ -141,9 +153,17 @@ float intensity;  // Generates constraint metadata for validation
 [[ge::prop(name="POSITION", array_accessor_length=3)]]
 Vector3f position;  // Generates: POSITION0, POSITION1, POSITION2
 
-// Type conversion
+// Type conversion (cast_from must differ from field type)
 [[ge::prop(name="SIZE", cast_from=int)]]
 float size;  // Accepts both float and int via SetParamsMemberByTag
+
+// Custom transformer alone (identity cast - source type = field type)
+[[ge::prop(name="OPACITY", custom="ClampTransformer")]]
+float opacity;  // Custom transformer validates/clamps float→float
+
+// Custom transformer with cast_from (source type differs from field type)
+[[ge::prop(name="POINT", cast_from=std::pair<float,float>, custom="PairToPointTransformer")]]
+Vector2f point;  // Pair→Vector2f via custom transformer
 
 // Alias for backward compatibility
 [[ge::prop(name="OPACITY", alias="alpha")]]
@@ -227,8 +247,13 @@ struct GEParamsConstraintMaxInfo { ... };
 template<GEParamsMemberTag Tag>
 struct GEParamsConstraintConvertInfo {
     static constexpr bool HAS_CONVERT = true;
-    using CastFromType = int;  // Type from cast_from= parameter
+    static constexpr bool HAS_CAST_FROM = true;  // Always true for convert constraints
+    using CastFromType = int;  // Type from cast_from=, or field type when custom-only
 };
+
+// Two generation scenarios:
+// 1. cast_from + custom: CastFromType = cast_from type (must differ from field type)
+// 2. custom only: CastFromType = field type (identity cast, source = target type)
 ```
 
 ---

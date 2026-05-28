@@ -1,0 +1,77 @@
+{
+  "name": "custom_only",
+  "should_parse": true,
+  "expected_error_count": 0,
+  "expected_errors": [],
+  "structs": [
+    {
+      "name": "PropCustomOnlyParams",
+      "enum_type": "PROP_CUSTOM_ONLY",
+      "filter_name": "PropCustomOnly",
+      "fields": [
+        {
+          "type": "float",
+          "name": "value",
+          "default_value": "0.0f",
+          "prop_name": "TestValue",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "TestValue",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": "MyFloatTransformer",
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        },
+        {
+          "type": "float",
+          "name": "intensity",
+          "default_value": "0.5f",
+          "prop_name": "TestIntensity",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "TestIntensity",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": "IntensityTransformer",
+              "min_value": "0.0",
+              "max_value": "1.0"
+            }
+          ]
+        },
+        {
+          "type": "Drawing::Color4f",
+          "name": "color",
+          "default_value": "{1.0f,1.0f,1.0f,1.0f}",
+          "prop_name": "TestColor",
+          "array_accessor_length": null,
+          "prop_attributes": [
+            {
+              "name": "TestColor",
+              "array_accessor_length": null,
+              "array_accessor_type": null,
+              "alias": null,
+              "cast_from": null,
+              "custom": "ColorClampTransformer",
+              "min_value": null,
+              "max_value": null
+            }
+          ]
+        }
+      ],
+      "params": {
+        "type": "PROP_CUSTOM_ONLY",
+        "name": "PropCustomOnly"
+      }
+    }
+  ],
+  "notes": ""
+}

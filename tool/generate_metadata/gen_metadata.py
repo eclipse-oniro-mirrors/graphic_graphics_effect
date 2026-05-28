@@ -25,7 +25,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 from dataclasses import dataclass
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -118,7 +118,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
 
     # Tokenize type string, preserving structure
     # We need to track template depth to know when we're inside <...>
-    tokens = []
+    tokens: List[Union[str, Tuple[str, str]]] = []
     depth = 0
     i = 0
     while i < len(type_str):
@@ -161,7 +161,7 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
             tokens.append(ident)
 
     # Build normalized string
-    result = []
+    result: List[str] = []
     i = 0
     while i < len(tokens):
         token = tokens[i]
@@ -171,6 +171,8 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
             i += 1
             continue
 
+        # After skipping whitespace tuples, remaining tokens are always strings
+        assert isinstance(token, str)
         # Add token
         result.append(token)
 
@@ -261,7 +263,7 @@ def to_upper_case(name: str) -> str:
     """Convert camelCase or snake_case to UPPER_CASE."""
     if name.endswith("_"):
         name = name[:-1]
-    result = []
+    result: List[str] = []
     for c in name:
         if c.isupper():
             if result:
@@ -326,18 +328,24 @@ def get_effective_type_for_tag(
     if field.prop_attributes and prop_attr_index < len(field.prop_attributes):
         cast_from_type = field.prop_attributes[prop_attr_index].cast_from
 
+    effective_type = field.type
     if cast_from_type:
         effective_type = cast_from_type
     elif is_array_elem and field.prop_attributes:
+        found = False
         for prop_attr in field.prop_attributes:
             if prop_attr.array_accessor_length is not None:
                 if prop_attr.array_accessor_type:
                     effective_type = prop_attr.array_accessor_type
                 else:
                     effective_type = field.type
+                found = True
                 break
-    else:
-        effective_type = field.type
+        if not found:
+            console.warning(
+                f"is_array_elem=True for {field.name} but no prop attribute has array_accessor_length; "
+                f"falling back to field type '{field.type}'"
+            )
 
     return normalize_type(effective_type, type_aliases)
 
@@ -375,6 +383,39 @@ def has_cast_from(field: FieldInfo, prop_attr_index: int) -> bool:
     if field.prop_attributes and prop_attr_index < len(field.prop_attributes):
         return field.prop_attributes[prop_attr_index].cast_from is not None
     return False
+
+
+def has_custom(field: FieldInfo, prop_attr_index: int) -> bool:
+    """Check if field has custom transformer specified.
+
+    Args:
+        field: The field info
+        prop_attr_index: The index of the prop attribute to check
+
+    Returns:
+        True if custom is specified, False otherwise
+    """
+    if field.prop_attributes and prop_attr_index < len(field.prop_attributes):
+        return field.prop_attributes[prop_attr_index].custom is not None
+    return False
+
+
+def has_convert_constraint(field: FieldInfo, prop_attr_index: int) -> bool:
+    """Check if field has any convert constraint (cast_from or custom or both).
+
+    A convert constraint exists when:
+    - cast_from is specified (type conversion from different source type)
+    - custom is specified alone (identity cast with custom transformer)
+    - cast_from + custom both specified (type conversion with custom transformer)
+
+    Args:
+        field: The field info
+        prop_attr_index: The index of the prop attribute to check
+
+    Returns:
+        True if any convert constraint is present, False otherwise
+    """
+    return has_cast_from(field, prop_attr_index) or has_custom(field, prop_attr_index)
 
 
 def to_member_tag_name(enum_type: str, field_name: str, index: Optional[int] = None) -> str:
@@ -475,7 +516,7 @@ def generate_member_enums(structs: List[StructInfo]) -> Tuple[str, Dict[str, Tup
     return "\n".join(output), struct_tag_ranges
 
 
-def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_struct_tag_ranges_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate GEParamsMemberHelper class declaration."""
     if blocked_types is None:
         blocked_types = {}
@@ -537,7 +578,7 @@ def generate_get_filter_type_from_tag_impl(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate overloaded SetParamsMemberByTag function implementations."""
     if blocked_types is None:
         blocked_types = {}
@@ -565,7 +606,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
 
     # Group tags by their effective type (considering prop attributes and array_accessor_type)
     # When cast_from is specified, tags are added to BOTH cast_from type AND original field type
-    type_to_tags = {}
+    type_to_tags: Dict[str, List[Tuple[str, str, str]]] = {}
     for struct in structs:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
@@ -575,19 +616,20 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
                 )
 
                 if normalized_type not in blocked_types:
-                    if normalized_type not in type_to_tags:
-                        type_to_tags[normalized_type] = []
-                    type_to_tags[normalized_type].append((tag_info.tag_name, struct.name, field.name))
+                    type_to_tags.setdefault(normalized_type, []).append((tag_info.tag_name, struct.name, field.name))
 
                 # If cast_from is specified, also add to original field type group
-                if has_cast_from(field, tag_info.prop_attr_index):
-                    original_type = get_original_field_type(field, tag_info.is_array_element)
-                    normalized_original = normalize_type(original_type, type_aliases)
-
-                    if normalized_original not in blocked_types:
-                        if normalized_original not in type_to_tags:
-                            type_to_tags[normalized_original] = []
-                        type_to_tags[normalized_original].append((tag_info.tag_name, struct.name, field.name))
+                # When cast_from type differs from field type, we add BOTH groups.
+                # When custom is alone (no cast_from), source=target=field type,
+                # so we only add the field type group once (no duplicate).
+                # When cast_from type equals field type (after alias resolution), skip duplicate.
+                if not has_cast_from(field, tag_info.prop_attr_index):
+                    continue
+                original_type = get_original_field_type(field, tag_info.is_array_element)
+                normalized_original = normalize_type(original_type, type_aliases)
+                if normalized_type == normalized_original or normalized_original in blocked_types:
+                    continue
+                type_to_tags.setdefault(normalized_original, []).append((tag_info.tag_name, struct.name, field.name))
 
     for field_type, tags in sorted(type_to_tags.items()):
         output.append(f"void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params,")
@@ -736,7 +778,7 @@ def generate_set_member_cases(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_set_params_member_overloads_decl(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate overloaded SetParamsMemberByTag function declarations."""
     if blocked_types is None:
         blocked_types = {}
@@ -924,7 +966,7 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     return "\n".join(output)
 
 
-def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> set:
+def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> set:
     """Collect unique effective types from all tags.
 
     When cast_from is specified, both cast_from type AND original field type
@@ -952,18 +994,18 @@ def collect_effective_types(structs: List[StructInfo], type_aliases: Dict[str, s
                 if normalized_type not in blocked_types:
                     unique_types.add(normalized_type)
 
-                # If cast_from is specified, also add original field type
-                # This ensures we generate overloads for both types
+                # If cast_from type differs from field type, add both types
+                # If cast_from type equals field type (or custom-only), skip duplicate
                 if has_cast_from(field, tag_info.prop_attr_index):
                     original_type = get_original_field_type(field, tag_info.is_array_element)
                     normalized_original = normalize_type(original_type, type_aliases)
-                    if normalized_original not in blocked_types:
+                    if normalized_original not in blocked_types and normalized_type != normalized_original:
                         unique_types.add(normalized_original)
 
     return unique_types
 
 
-def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_type_xmacro(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate X-Macro listing all unique member variable types."""
     if blocked_types is None:
         blocked_types = {}
@@ -1079,8 +1121,12 @@ def generate_constraint_metadata(field_info: FieldInfo, tag: str, prop_attr_inde
         output.append(generate_max_constraint(tag, field_type, prop_attr.max_value))
 
     # Handle convert constraints (cast_from/custom)
+    # When cast_from is present: normal type conversion (possibly with custom transformer)
+    # When custom is present alone: identity cast with custom transformer (source=target=field type)
     if prop_attr.cast_from is not None:
         output.append(generate_convert_constraint(tag, prop_attr.cast_from, prop_attr.custom))
+    elif prop_attr.custom is not None:
+        output.append(generate_convert_constraint(tag, field_type, prop_attr.custom))
 
     return "\n".join(output)
 
@@ -1389,7 +1435,7 @@ def generate_constraints(structs: List[StructInfo]):
     return "\n".join(output)
 
 
-def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate the complete header file."""
     if blocked_types is None:
         blocked_types = {}
@@ -1464,7 +1510,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blo
     return "\n".join(output)
 
 
-def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> str:
+def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> str:
     """Generate complete cpp file."""
     if blocked_types is None:
         blocked_types = {}
@@ -1507,7 +1553,7 @@ def generate_cpp(structs: List[StructInfo], type_aliases: Dict[str, str], blocke
     return "\n".join(output)
 
 
-def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Dict[str, str] = None) -> None:
+def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, str], blocked_types: Optional[Dict[str, str]] = None) -> None:
     """Check for enum values that are not referenced in any SetParamsMemberByTag implementation.
 
     This can happen when a type is in member_setter_blocked_types, which prevents
@@ -1558,6 +1604,35 @@ def check_unused_enum_values(structs: List[StructInfo], type_aliases: Dict[str, 
             )
             reason = blocked_types.get(normalized_type, "unknown reason")
             console.step(f"  {tag} ({struct.name}::{field.name}) - type '{normalized_type}' is blocked: {reason}")
+
+
+def check_cast_from_same_type(structs: List[StructInfo], type_aliases: Dict[str, str]) -> None:
+    """Check that cast_from type differs from the field type.
+
+    When cast_from specifies the same type as the field (after type alias resolution),
+    the generated code produces duplicate switch cases, causing compilation failure.
+
+    Args:
+        structs: List of struct information
+        type_aliases: Type alias mapping for normalization
+    """
+    for struct in structs:
+        for field in struct.fields:
+            for _, prop_attr in enumerate(field.prop_attributes or []):
+                if prop_attr.cast_from is None:
+                    continue
+                normalized_cast_from = normalize_type(prop_attr.cast_from, type_aliases)
+                normalized_field_type = normalize_type(field.type, type_aliases)
+                if normalized_cast_from != normalized_field_type:
+                    continue
+                console.error(
+                    f"cast_from type '{prop_attr.cast_from}' equals field type "
+                    f"'{field.type}' on {struct.name}::{field.name} "
+                    f"(both normalize to '{normalized_field_type}')"
+                )
+                console.step(
+                    f"  Remove cast_from or specify a different source type"
+                )
 
 
 def main():
@@ -1701,6 +1776,7 @@ Examples:
 
     console.step(f"Found {len(macro_infos)} filter type info specializations")
 
+    check_cast_from_same_type(structs, type_aliases)
     check_unused_enum_values(structs, type_aliases, blocked_types)
 
     console.summary()

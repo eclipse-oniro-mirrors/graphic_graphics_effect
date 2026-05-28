@@ -57,9 +57,9 @@ Drawing::Path path;
 ```
 
 **Rules**:
-1. `cast_from` exists for type conversion — the caller passes one type, the field stores another. If they're the same, there's nothing to convert, so don't use `cast_from`.
+1. `cast_from` exists for type conversion — the caller passes one type, the field stores another. If they're the same (after type alias resolution, e.g., `int` → `int32_t`), there's nothing to convert, so don't use `cast_from`.
 2. **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type. If not, omit it.
-3. **`custom` must be paired with `cast_from`** — `custom` without `cast_from` triggers a compile error. Only use `custom` when `cast_from` is also specified for non-trivial conversions.
+3. **`custom` can be used alone** — `custom` without `cast_from` acts as an identity cast (source type = field type), useful for validation, clamping, or sanitization where the type doesn't change but the value needs transformation. When paired with `cast_from`, `custom` handles non-trivial conversions between different types.
 
 ---
 
@@ -219,8 +219,7 @@ When `hb build graphics_effect -i` fails, or when other problems arise during th
 
 | Error Contains | Root Cause | Fix |
 |---------------|-----------|-----|
-| `duplicate case value` | `cast_from` same-type bug | Remove `cast_from` where type equals field type (see [cast_from Same Type](#cast_from-same-type) above for example) |
-| `custom` without `cast_from` compile error | `custom` attribute requires `cast_from` to be specified | Only use `custom` when `cast_from` is also present for type conversion |
+| `duplicate case value` | `cast_from` same-type bug | Remove `cast_from` where type equals field type (see [cast_from Same Type](#cast_from-same-type)). Or use `custom` alone for same-type validation/clamping |
 | `undefined reference` / `undefined symbol` | Missing BUILD.gn entry | Add `.cpp` path to sources list alphabetically |
 | `clang-format not found` (warning only) | Missing clang-format | Install clang-format; not a build error but re-run gen tools to avoid noisy diff |
 | `no matching function` / constructor error | Wrong namespace in constructor | Check `references/effect-types.md` for namespace conventions per type |

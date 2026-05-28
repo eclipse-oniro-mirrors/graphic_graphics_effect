@@ -7,7 +7,7 @@ Complete reference for defining effect parameters in `.params.in` files.
 1. [Struct Attribute](#struct-attribute)
 2. [Field Attribute](#field-attribute)
 3. [Field Options](#field-options)
-4. [cast_from Rules](#cast_from-rules)
+4. [cast_from and custom Rules](#cast_from-and-custom-rules)
 5. [Examples](#examples)
 6. [Auto-generated Tag Naming](#auto-generated-tag-naming)
 
@@ -71,23 +71,25 @@ Required syntax when any option beyond `name` is present (`min`, `max`, `cast_fr
 |--------|---------|--------|
 | `min` | `min=0.0` | Runtime validation constraint — only enforced via SetParam API, not on direct field access |
 | `max` | `max=100.0` | Runtime validation constraint — only enforced via SetParam API, not on direct field access |
-| `cast_from` | `cast_from="int32_t"` | Creates an additional setter accepting that type, which converts to the field type |
-| `custom` | `custom="PairToVector2fTransformer"` | Transformer class for non-trivial `cast_from` conversion |
+| `cast_from` | `cast_from="int32_t"` | Creates an additional setter accepting that type, which converts to the field type; must differ from field type (after type alias resolution) |
+| `custom` | `custom="PairToVector2fTransformer"` | Transformer class for type conversion; can be used alone (identity cast — ask user first if they need custom validation beyond min/max) or paired with `cast_from` |
 | `array_accessor_length` | `array_accessor_length=3` | Splits into TAG0, TAG1, TAG2 element accessors |
 | `array_accessor_type` | `array_accessor_type="float"` | Type for element accessors (default: field type) |
 | `alias` | `alias="alpha"` | Alternative string-to-tag mapping (backward compat) |
 
 ---
 
-## cast_from Rules
+## cast_from and custom Rules
 
 `cast_from` specifies a type that callers can pass which differs from the actual field type. The code generator creates an additional setter that accepts the `cast_from` type and converts it to the field type.
 
+`custom` specifies a transformer class for non-trivial conversions. It can be used in two scenarios:
+
 **Three critical rules**:
 
-1. **`cast_from` must specify a different type** than the field itself. If both are the same, the generator produces duplicate switch cases, causing a compile error.
+1. **`cast_from` must specify a different type** than the field itself (after type alias resolution from `config.json`). If both are the same (e.g., `cast_from="int"` on an `int32_t` field, where `int` resolves to `int32_t`), the generator produces duplicate switch cases, causing a compile error.
 2. **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type. If the user doesn't need a different type, omit `cast_from`.
-3. **`custom` must be paired with `cast_from`** — `custom` without `cast_from` triggers a compile error. Use `custom` for non-trivial conversions (e.g., `std::pair` → `Vector2f`).
+3. **`custom` can be used alone, but ask the user first** — when `custom` is specified without `cast_from`, it acts as an identity cast (source type = field type = target type), useful for validation, clamping, or sanitization where the type doesn't change but the value needs transformation. **Don't add `custom` alone unnecessarily** — ask the user: "Does this parameter need custom validation or clamping beyond what `min`/`max` already provides?" Only add `custom` alone when the answer is yes. When paired with `cast_from`, `custom` handles non-trivial conversions (e.g., `std::pair` → `Vector2f`).
 
 **Valid uses** (different types):
 ```cpp
@@ -104,16 +106,34 @@ Vector2f offset;
 std::shared_ptr<Drawing::GESDFShaderShape> shape;
 ```
 
-**Invalid use** (same type — causes duplicate switch case):
+**Valid use** (custom alone — identity cast):
 ```cpp
-// WRONG: cast_from type equals field type
-[[ge::prop(cast_from="Drawing::Path")]]
-Drawing::Path path;  // Compile error: duplicate case value
+// Custom transformer for validation/clamping without type change
+[[ge::prop(name="MyEffect_Opacity", custom="ClampTransformer")]]
+float opacity;  // ClampTransformer::Transform(float, float&) validates/clamps the value
+
+// Custom transformer with min/max for sanitization
+[[ge::prop(custom="ColorClampTransformer", min=0.0, max=1.0)]]
+float intensity;
 ```
 
-Fix: Remove `cast_from` and use a simple prop tag instead:
+**Invalid use** (same type — causes duplicate switch case):
 ```cpp
-[[ge::prop("SDFPathShape_Path")]]
+// WRONG: cast_from type equals field type (after alias resolution)
+[[ge::prop(cast_from="Drawing::Path")]]
+Drawing::Path path;  // Compile error: duplicate case value
+
+// WRONG: cast_from="int" on int32_t field — "int" resolves to "int32_t" via type alias
+[[ge::prop(cast_from="int")]]
+int32_t count;  // Compile error: duplicate case value
+```
+
+Fix: Remove `cast_from` when the type is the same as the field. If you need custom transformation on same-type values, use `custom` alone without `cast_from`:
+```cpp
+Drawing::Path path;  // Auto-generates tag, no cast_from needed
+
+// Or with custom transformer for same-type validation:
+[[ge::prop(custom="PathSanitizer")]]
 Drawing::Path path;
 ```
 
