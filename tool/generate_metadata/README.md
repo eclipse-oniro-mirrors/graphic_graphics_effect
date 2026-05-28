@@ -42,11 +42,11 @@ Create a `.params.in` file in `include/effect/filter/` (or `shader/`, `mask/`, `
 
 ```cpp
 // include/effect/filter/ge_my_filter.params.in
-struct [[ge::params(type=MY_FILTER, name="MY_FILTER")]] GEMyFilterParams {
-    [[ge::prop("INTENSITY")]]
+struct [[ge::params(type=MY_FILTER, name="MyFilter")]] GEMyFilterParams {
+    [[ge::prop("MyFilter_Intensity")]]
     float intensity;
 
-    [[ge::prop(name="RADIUS", min=0.0, max=100.0)]]
+    [[ge::prop(name="MyFilter_Radius", min=0.0, max=100.0)]]
     float radius;
 };
 ```
@@ -94,7 +94,7 @@ auto filterType = GEParamsMemberHelper::GetFilterTypeFromTag(tag);
 ### Struct Attribute
 
 ```cpp
-struct [[ge::params(type=ENUM_VALUE, name="FILTER_NAME")]] ParamsStruct { ... };
+struct [[ge::params(type=ENUM_VALUE, name="FilterName")]] ParamsStruct { ... };
 ```
 
 | Parameter | Required | Description |
@@ -141,24 +141,24 @@ float field;                      // No attribute - auto-generates "Field" (Pasc
 ### Examples
 
 ```cpp
-// Simple property
-[[ge::prop("RADIUS")]]
+// Simple property (PascalCase style - more common in newer effects)
+[[ge::prop("Radius")]]
 float radius;  // Generates: GEParamsMemberTag::FILTER_RADIUS
 
-// With constraints
+// With constraints (UPPER_CASE style - legacy convention)
 [[ge::prop(name="INTENSITY", min=0.0, max=1.0)]]
 float intensity;  // Generates constraint metadata for validation
 
 // Array accessor - splits into 3 tags
-[[ge::prop(name="POSITION", array_accessor_length=3)]]
-Vector3f position;  // Generates: POSITION0, POSITION1, POSITION2
+[[ge::prop(name="Position", array_accessor_length=3, array_accessor_type="float")]]
+std::array<float, 3> position;  // Generates: Position0, Position1, Position2
 
 // Type conversion (cast_from must differ from field type)
 [[ge::prop(name="SIZE", cast_from=int)]]
 float size;  // Accepts both float and int via SetParamsMemberByTag
 
 // Custom transformer alone (identity cast - source type = field type)
-[[ge::prop(name="OPACITY", custom="ClampTransformer")]]
+[[ge::prop(name="Opacity", custom="ClampTransformer")]]
 float opacity;  // Custom transformer validates/clamps float→float
 
 // Custom transformer with cast_from (source type differs from field type)
@@ -169,9 +169,9 @@ Vector2f point;  // Pair→Vector2f via custom transformer
 [[ge::prop(name="OPACITY", alias="alpha")]]
 float opacity;  // "OPACITY" and "alpha" both map to same tag
 
-// Multiple props on same field
+// Multiple props on same field (mixed naming styles)
 [[ge::prop(name="DESTINATION_PATCH")]]
-[[ge::prop(name="ControlPoint", array_accessor_length=12)]]
+[[ge::prop(name="ControlPoint", array_accessor_length=12, array_accessor_type="int")]]
 std::array<int, 12> patch;  // Whole array + individual element accessors
 ```
 
