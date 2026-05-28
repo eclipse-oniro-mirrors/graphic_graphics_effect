@@ -29,6 +29,30 @@ constexpr float TEST_HEIGHT = 100.0f;
 constexpr float TEST_RADIUS = 10.0f;
 constexpr float TEST_SPACING = 5.0f;
 constexpr float INVALID_SPACING = 0.0f;
+
+class CountingSDFShaderShape : public GESDFShaderShape {
+public:
+    void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override
+    {
+        (void)canvas;
+        (void)rect;
+        ++preprocessCount_;
+        lastHasNormal_ = hasNormal;
+    }
+
+    GESDFShapeType GetSDFShapeType() const override
+    {
+        return GESDFShapeType::RRECT;
+    }
+
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return type == GESDFShapeType::RRECT;
+    }
+
+    int preprocessCount_ = 0;
+    bool lastHasNormal_ = false;
+};
 } // namespace
 
 class GESDFSubOpShaderShapeTest : public testing::Test {
@@ -185,6 +209,50 @@ HWTEST_F(GESDFSubOpShaderShapeTest, ShapeState_001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: BaseCopyStateSubOp_001
+ * @tc.desc: Verify base SDF shader shape CopyState dispatches to sub op shape
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFSubOpShaderShapeTest, BaseCopyStateSubOp_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest BaseCopyStateSubOp_001 start";
+    GESDFSubOpShapeParams param;
+    param.left = CreateTestShape();
+    GESDFSubOpShaderShape shape(param);
+
+    GESDFSubOpShapeParams emptyParam;
+    GESDFSubOpShaderShape emptyShape(emptyParam);
+    EXPECT_FALSE(emptyShape.HasType(GESDFShapeType::RRECT));
+
+    GESDFShaderShape& baseEmptyShape = emptyShape;
+    const GESDFShaderShape& baseShape = shape;
+    baseEmptyShape.CopyState(baseShape);
+    EXPECT_TRUE(emptyShape.HasType(GESDFShapeType::RRECT));
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest BaseCopyStateSubOp_001 end";
+}
+
+/**
+ * @tc.name: PreprocessRightShape_001
+ * @tc.desc: Verify SDF sub Preprocess forwards to right child shape
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFSubOpShaderShapeTest, PreprocessRightShape_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest PreprocessRightShape_001 start";
+    auto rightShape = std::make_shared<CountingSDFShaderShape>();
+    GESDFSubOpShapeParams param;
+    param.right = rightShape;
+    GESDFSubOpShaderShape shape(param);
+
+    Canvas canvas;
+    Rect rect = {0.0f, 0.0f, TEST_WIDTH, TEST_HEIGHT};
+    shape.Preprocess(canvas, rect, true);
+    EXPECT_EQ(rightShape->preprocessCount_, 1);
+    EXPECT_TRUE(rightShape->lastHasNormal_);
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest PreprocessRightShape_001 end";
+}
+
+/**
  * @tc.name: SmoothShapeState_001
  * @tc.desc: Verify smooth sub shape type, HasType, Preprocess, and CopyState branches
  * @tc.type: FUNC
@@ -209,6 +277,30 @@ HWTEST_F(GESDFSubOpShaderShapeTest, SmoothShapeState_001, TestSize.Level1)
     emptyShape.CopyState(shape);
     EXPECT_TRUE(emptyShape.HasType(GESDFShapeType::RRECT));
     GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest SmoothShapeState_001 end";
+}
+
+/**
+ * @tc.name: BaseCopyStateSmoothSubOp_001
+ * @tc.desc: Verify base SDF shader shape CopyState dispatches to smooth sub op shape
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFSubOpShaderShapeTest, BaseCopyStateSmoothSubOp_001, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest BaseCopyStateSmoothSubOp_001 start";
+    GESDFSmoothSubOpShapeParams param;
+    param.left = CreateTestShape();
+    param.spacing = TEST_SPACING;
+    GESDFSmoothSubOpShaderShape shape(param);
+
+    GESDFSmoothSubOpShapeParams emptyParam;
+    GESDFSmoothSubOpShaderShape emptyShape(emptyParam);
+    EXPECT_FALSE(emptyShape.HasType(GESDFShapeType::RRECT));
+
+    GESDFShaderShape& baseEmptyShape = emptyShape;
+    const GESDFShaderShape& baseShape = shape;
+    baseEmptyShape.CopyState(baseShape);
+    EXPECT_TRUE(emptyShape.HasType(GESDFShapeType::RRECT));
+    GTEST_LOG_(INFO) << "GESDFSubOpShaderShapeTest BaseCopyStateSmoothSubOp_001 end";
 }
 } // namespace Drawing
 } // namespace Rosen
