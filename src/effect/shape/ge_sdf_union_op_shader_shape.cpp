@@ -157,6 +157,105 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFSm
     return sdfSmoothUnionShaderShapeBuilder;
 }
 
+static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
+    uniform float spacing;
+    uniform shader left;
+    uniform shader right;
+    const float N_EPS = 1.0e-6;
+    const float HIDDEN_TEST_EPS = 1.0;
+    const float EXIT_STEP = 2.0;
+    const int EXIT_STEPS = 20;
+    const float HIDDEN_FIX_START = -0.5;
+    const float HIDDEN_FIX_END = 1.5;
+    vec2 safeNormalize(vec2 v, vec2 fallback)
+    {
+        float len2 = dot(v, v);
+        return (len2 > N_EPS) ? v * inversesqrt(len2) : fallback;
+    }
+    float smoothUnionSdfValue(float da, float db, float k)
+    {
+        k = max(k, 0.0001) * 4.0;
+        float h = max(k - abs(da - db), 0.0) / (2.0 * k);
+        return min(da, db) - h * h * k;
+    }
+    float smoothUnionSdfAt(vec2 p)
+    {
+        vec4 d1 = left.eval(p);
+        vec4 d2 = right.eval(p);
+        return smoothUnionSdfValue(d1.a, d2.a, spacing);
+    }
+    bool outsideUnion(vec2 p)
+    {
+        return smoothUnionSdfAt(p) > 0.0;
+    }
+    void testExitDir(vec2 p, vec2 dir, inout float bestT, inout vec2 bestDir)
+    {
+        dir = safeNormalize(dir, bestDir);
+        float t = EXIT_STEP;
+        for (int i = 0; i < EXIT_STEPS; ++i) {
+            vec2 q = p + dir * t;
+            if (outsideUnion(q)) {
+                if (t < bestT) {
+                    bestT = t;
+                    bestDir = dir;
+                }
+                break;
+            }
+            t += EXIT_STEP;
+        }
+    }
+    vec2 firstExitGrad(vec2 p, vec2 gDominant, vec2 gOther, vec2 gSmooth)
+    {
+        vec2 bestDir = -gDominant;
+        float bestT = 1000000.0;
+        testExitDir(p, -gDominant, bestT, bestDir);
+        testExitDir(p, gDominant, bestT, bestDir);
+        testExitDir(p, gOther, bestT, bestDir);
+        testExitDir(p, -gOther, bestT, bestDir);
+        testExitDir(p, gSmooth, bestT, bestDir);
+        testExitDir(p, -gSmooth, bestT, bestDir);
+        return (bestT < 100000.0) ? bestDir : gSmooth;
+    }
+    float dominantBoundaryHidden(vec2 p, float dDom, vec2 gDom, bool dominantIsLeft)
+    {
+        vec2 q = p - dDom * gDom;
+        vec2 qOut = q + HIDDEN_TEST_EPS * gDom;
+        float otherD = dominantIsLeft ? right.eval(qOut).a : left.eval(qOut).a;
+        return 1.0 - smoothstep(HIDDEN_FIX_START, HIDDEN_FIX_END, otherD);
+    }
+    vec4 sdgSmoothUnionAt(vec2 p, vec4 d1, vec4 d2, float k)
+    {
+        k = max(k, 0.0001) * 4.0;
+        float da = d1.a;
+        float db = d2.a;
+        vec2 g1 = safeNormalize(d1.xy, vec2(0.0, 1.0));
+        vec2 g2 = safeNormalize(d2.xy, g1);
+        float h = max(k - abs(da - db), 0.0) / (2.0 * k);
+        float t = (da < db) ? h : 1.0 - h;
+        float d = min(da, db) - h * h * k;
+        vec2 gSmooth = safeNormalize(mix(g1, g2, t), g1);
+        float z = mix(d1.z, d2.z, t);
+        bool dominantIsLeft = da < db;
+        float dDom = dominantIsLeft ? da : db;
+        vec2 gDom = dominantIsLeft ? g1 : g2;
+        vec2 gOther = dominantIsLeft ? g2 : g1;
+        float hiddenMask = dominantBoundaryHidden(p, dDom, gDom, dominantIsLeft);
+        vec2 gFinal = gSmooth;
+        if (hiddenMask > 0.001) {
+            vec2 gExit = firstExitGrad(p, gDom, gOther, gSmooth);
+            gFinal = safeNormalize(mix(gSmooth, gExit, hiddenMask), gSmooth);
+        }
+        return vec4(gFinal, z, d);
+    }
+    half4 main(vec2 fragCoord)
+    {
+        vec4 leftShape = left.eval(fragCoord);
+        vec4 rightShape = right.eval(fragCoord);
+        vec4 sdg = sdgSmoothUnionAt(fragCoord, leftShape, rightShape, spacing);
+        return half4(sdg.x, sdg.y, sdg.z, sdg.w);
+    }
+)";
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder() const
 {
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfNormalSmoothUnionShaderShapeBuilder = nullptr;
@@ -164,27 +263,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNo
         return sdfNormalSmoothUnionShaderShapeBuilder;
     }
 
-    static constexpr char prog[] = R"(
-        uniform float spacing;
-        uniform shader left;
-        uniform shader right;
-
-        vec4 sdgSmoothUnion(vec4 d1, vec4 d2, float k)
-        {
-            k *= 4.0;
-            float h = max(k - abs(d1.a - d2.a), 0.0) / (2.0 * k);
-            return vec4(mix(d1.xyz, d2.xyz, (d1.a < d2.a) ? h : 1.0 - h), min(d1.a, d2.a) - h * h * k);
-        }
-
-        half4 main(vec2 fragCoord)
-        {
-            vec4 leftShape = left.eval(fragCoord);
-            vec4 rightShape = right.eval(fragCoord);
-            return sdgSmoothUnion(leftShape, rightShape, spacing);
-        }
-    )";
-
-    auto sdfNormalSmoothUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfNormalSmoothUnionShaderBuilderEffect =
+        Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_UNION_NORMAL_PROG);
     if (!sdfNormalSmoothUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder effect error");
         return nullptr;
