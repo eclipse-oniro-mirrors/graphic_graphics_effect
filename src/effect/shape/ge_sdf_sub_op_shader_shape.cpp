@@ -43,7 +43,7 @@ static constexpr char SDF_NORMAL_SMOOTH_SUB_OP_PROG[] = R"(
     {
         vec4 leftShape = left.eval(fragCoord);
         vec4 rightShape = right.eval(fragCoord);
-        return sdgSmoothSub(leftShape, rightShape, spacing);
+        return sdgSmoothSub(rightShape, leftShape, spacing);
     }
 )";
 
@@ -62,7 +62,7 @@ static constexpr char SDF_SMOOTH_SUB_OP_PROG[] = R"(
     {
         vec4 leftShape = left.eval(fragCoord);
         vec4 rightShape = right.eval(fragCoord);
-        return sdfSmoothSub(leftShape, rightShape, spacing);
+        return sdfSmoothSub(rightShape, leftShape, spacing);
     }
 )";
 }
@@ -120,10 +120,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFSubOpShaderShape::GetSDFSubO
         {
             vec4 leftShape = left.eval(fragCoord);
             vec4 rightShape = right.eval(fragCoord);
-            vec4 inverseLeft = vec4(-leftShape.xyz, -leftShape.a);
+            vec4 inverseRight = vec4(-rightShape.xyz, -rightShape.a);
 
-            // ShapeX maps to d1 and ShapeY maps to d2: max(-d1, d2).
-            return inverseLeft.a > rightShape.a ? inverseLeft : rightShape;
+            // ShapeX maps to d1 and ShapeY maps to d2: max(d1, -d2).
+            return leftShape.a > inverseRight.a ? leftShape : inverseRight;
         }
     )";
 
