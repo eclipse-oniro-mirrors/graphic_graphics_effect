@@ -94,7 +94,7 @@ class CppParser:
     Focuses on parsing struct definitions with attributes.
     """
 
-    def __init__(self, tokens: List[Token], file_path: str = None):
+    def __init__(self, tokens: List[Token], file_path: Optional[str] = None):
         self.tokens = tokens
         self.pos = 0
         self.file_path = file_path
@@ -112,8 +112,10 @@ class CppParser:
 
                 # Collect all consecutive attributes
                 attributes = []
-                while self._peek() and self._peek().type == "attribute":
+                peeked = self._peek()
+                while peeked is not None and peeked.type == "attribute":
                     attributes.append(self._consume())
+                    peeked = self._peek()
 
                 # Check if any attribute is ge::params
                 ge_params_attr = None
@@ -136,7 +138,8 @@ class CppParser:
                         structs.append(struct)
                     else:
                         # _parse_struct returned None - check if it's because struct name is missing
-                        if self._peek() and self._peek().type not in ("identifier", "keyword"):
+                        peeked = self._peek()
+                        if peeked is not None and peeked.type not in ("identifier", "keyword"):
                             self._add_warning(
                                 "Struct has [[ge::params(...)]] attribute but is missing a struct name",
                                 ge_params_attr.line,
@@ -174,7 +177,7 @@ class CppParser:
         token = self._peek()
         return token is not None and token.type == "keyword" and token.value == keyword
 
-    def _match_identifier(self, identifier: str = None) -> bool:
+    def _match_identifier(self, identifier: Optional[str] = None) -> bool:
         """Check if current token is an identifier (optionally with a specific value)."""
         token = self._peek()
         if token is None or token.type != "identifier":
@@ -191,6 +194,7 @@ class CppParser:
     def _consume(self) -> Token:
         """Consume and return current token."""
         token = self._peek()
+        assert token is not None, "No token available to consume"
         self.pos += 1
         return token
 
@@ -285,13 +289,15 @@ class CppParser:
 
         # Collect attributes
         attributes = []
-        while self._peek() and self._peek().type == "attribute":
+        peeked = self._peek()
+        while peeked is not None and peeked.type == "attribute":
             attributes.append(self._consume())
+            peeked = self._peek()
 
         # Collect all tokens until semicolon or closing brace at depth 0
         # We use a formal parse method: collect tokens and validate afterwards,
         # rather than trying to detect patterns early with hard-coded type lists.
-        tokens_until_semicolon = []
+        tokens_until_semicolon: List[Token] = []
         depth = 0  # Track nesting depth for templates/brackets/braces
 
         # Check if this looks like a function declaration (for function body detection)
@@ -304,8 +310,10 @@ class CppParser:
         # We need to peek ahead to see if there's a function pattern
         # But we haven't collected tokens yet, so we'll check after collection
 
-        while self._peek():
+        while True:
             next_token = self._peek()
+            if next_token is None:
+                break
 
             # Stop at semicolon
             if self._match_operator(";"):
@@ -418,7 +426,8 @@ class CppParser:
             # Only consume the next brace if we actually have a function body
             # For simple declarations like "void func();", the next } is the struct's closing brace
             # For function definitions like "void func() {}", the next } is the function body's closing brace
-            if has_function_body and self._peek() and self._peek().value == "}":
+            peeked = self._peek()
+            if has_function_body and peeked is not None and peeked.value == "}":
                 self._consume()  # Consume the function body's closing brace
             # Return None without adding a field
             return None
@@ -622,6 +631,7 @@ class CppParser:
         # The field name is the last identifier/keyword
         # Everything before it is the type
         field_name = None
+        type_tokens: List[Token] = []
         for i in range(len(tokens_until_semicolon) - 1, -1, -1):
             token = tokens_until_semicolon[i]
             if token.type in ("identifier", "keyword"):

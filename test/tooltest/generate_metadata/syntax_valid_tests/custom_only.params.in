@@ -13,8 +13,16 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=TEST_PROP_INVALID_CUSTOM, name="TestPropInvalidCustom")]] TestPropInvalidCustomParams {
-    // Invalid: custom without cast_from
-    [[ge::prop(name="FIELD1X", custom="MyTransformer")]]
-    float field1 = 0.0f;
+struct [[ge::params(type=PROP_CUSTOM_ONLY, name="PropCustomOnly")]] PropCustomOnlyParams {
+    // custom alone without cast_from: identity cast with custom transformer
+    [[ge::prop(name="TestValue", custom="MyFloatTransformer")]]
+    float value = 0.0f;
+
+    // custom alone with min/max constraints
+    [[ge::prop(name="TestIntensity", custom="IntensityTransformer", min=0.0, max=1.0)]]
+    float intensity = 0.5f;
+
+    // custom alone on complex type
+    [[ge::prop(name="TestColor", custom="ColorClampTransformer")]]
+    Drawing::Color4f color = {1.0f, 1.0f, 1.0f, 1.0f};
 };

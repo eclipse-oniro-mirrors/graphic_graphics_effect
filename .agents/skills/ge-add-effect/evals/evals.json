@@ -19,6 +19,7 @@
         "Generated reflection files (ge_effects_params.h, ge_params_reflection) include POSTERIZE-related tags and setter methods",
         "Agent writes unit tests covering: constructor with valid params, SetParam round-trip with clamping, GetEffect/OnProcessImage returns non-null",
         "Agent does NOT use cast_from for any field where types match (int for int, float for float)",
+        "Agent does NOT add custom alone unnecessarily — asks the user first if they need custom validation/clamping beyond what min/max already provides; only adds custom when the user confirms they need it",
         "Agent does NOT add name= unnecessarily — even fields with min/max/cast_from can omit name= when auto-generation suffices"
       ]
     },
@@ -55,7 +56,8 @@
         "Agent fixes offset field — since it has cast_from+custom, must use key-value: [[ge::prop(cast_from=\"std::pair<float,float>\", custom=\"PairToVector2fTransformer\")]] (name= omitted, auto-generates SDFDiamondShape_Offset)",
         "Agent keeps the valid cast_from usage for offset and scale fields (std::pair → Vector2f with custom transformer)",
         "Agent re-runs gen_metadata.py and gen_effect_header.py after the fix (or explicitly states this must be done)",
-        "Agent does NOT add cast_from without confirming it's needed for type conversion"
+        "Agent does NOT add cast_from without confirming it's needed for type conversion",
+        "Agent does NOT suggest custom alone as a replacement for same-type cast_from without asking the user first whether they need custom validation/clamping beyond what min/max provides"
       ]
     },
     {
@@ -83,6 +85,7 @@
         "Agent writes .params.in with [[ge::params(type=SDF_DIAMOND_SHAPE, name=\"SDFDiamondShape\")]] and prefers omitting name= on [[ge::prop]], using key-value syntax when min/max/cast_from are needed (still omitting name= within key-value when auto-gen suffices)",
         "Agent defines halfSize with min=0.0 using key-value syntax: [[ge::prop(min=0.0)]] (auto-generates SDFDiamondShape_HalfSize), and cornerRadius similarly",
         "Agent does NOT add cast_from on offset (Vector2f) unless user explicitly requests a different caller type",
+        "Agent does NOT add custom alone on any field without first asking whether the user needs custom validation/clamping beyond what min/max provides",
         "Agent adds SDF_DIAMOND_SHAPE enum value before MAX in ge_filter_type.h",
         "Agent implements GenerateDrawingShader, GetSDFShapeType, and HasType as required methods for shapes",
         "Agent .h includes DECLARE_GEFILTER_TYPEFUNC macro",

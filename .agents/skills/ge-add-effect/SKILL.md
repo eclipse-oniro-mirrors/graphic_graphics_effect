@@ -115,7 +115,7 @@ Before writing syntax, decide what parameters your effect needs. A well-designed
 
 1. **What uniform inputs does the shader need?** — Each shader uniform should map to a `.params.in` field. Think about what the GPU needs: radius, intensity, color vectors, direction angles, texture inputs.
 2. **Which values need runtime clamping?** — Visual-sensitive params (blur radius, intensity, color components) should have `min`/`max` to prevent garbage output from out-of-range callers. Values with natural bounds (e.g., color 0-1) always need clamping. Values where any range is valid (e.g., offsets) can skip `min`/`max`.
-3. **Does any parameter need `cast_from` for type conversion?** — Ask the user first: "Should callers pass a different type than what the shader stores internally?" Only add `cast_from` when the answer is yes (e.g., caller sends `int` index but shader needs `float` weight). Never use `cast_from` when types match — that creates duplicate switch cases and compile errors. When `cast_from` is needed for non-trivial conversions (e.g., `std::pair` → `Vector2f`), it must be paired with `custom` transformer — `custom` without `cast_from` triggers a compile error.
+3. **Does any parameter need `cast_from` for type conversion, or `custom` for validation?** — For `cast_from`: ask the user first: "Should callers pass a different type than what the shader stores internally?" Only add `cast_from` when the answer is yes (e.g., caller sends `int` index but shader needs `float` weight). Never use `cast_from` when types match (even after type alias resolution, e.g., `int` resolves to `int32_t`) — that creates duplicate switch cases and compile errors. For `custom` alone (without `cast_from`): ask the user first: "Does this parameter need custom validation or clamping beyond what `min`/`max` already provides?" Only add `custom` alone when the answer is yes — don't add it unnecessarily if `min`/`max` constraints are sufficient. `custom` paired with `cast_from` is for non-trivial conversions between different types (e.g., `std::pair` → `Vector2f`).
 
 ### Step 2b: Write Parameters (.params.in)
 
@@ -131,8 +131,8 @@ struct [[ge::params(type=YOUR_ENUM, name="YourName")]] GEYourParams {
 - `type` must match the `GEFilterType` enum value
 - **Prefer omitting `name=` on `[[ge::prop]]`** — auto-generation produces `StructName_PascalCaseField` (e.g., `name="FrostedGlassBlur"` + field `radius` → `FrostedGlassBlur_Radius`). Only add explicit `name=` when the auto-generated name would be misleading or doesn't match the desired exposed string name. Other options like `min`, `max`, `cast_from` determine syntax form (key-value vs positional), not whether you need `name=`
 - **Positional syntax** `[[ge::prop("TagName")]]` is only viable when `name` is the sole option — it's shorthand for `name="TagName"`. When any other option is present (`min`, `max`, `cast_from`, `custom`, `array_accessor_length`), you must use key-value syntax — but you can still omit `name=` within it: `[[ge::prop(min=0.0, max=100.0)]]` auto-generates the tag
-- `cast_from` is **only** for type conversion where the caller type differs from the field type — never when both are the same type (causes duplicate switch case). **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type
-- `cast_from` for non-trivial conversions (e.g., `std::pair` → `Vector2f`) must be paired with `custom` transformer — `custom` without `cast_from` triggers a compile error
+- `cast_from` is **only** for type conversion where the caller type differs from the field type — never when both are the same type (even after alias resolution like `int`→`int32_t`; causes duplicate switch case). **Ask the user before adding `cast_from`** — confirm they want callers to pass a different type
+- `custom` can be used **alone** for same-type validation/clamping (identity cast: source = field type) — but **ask the user first** whether they need custom validation beyond what `min`/`max` already provides; don't add it unnecessarily. Or paired with `cast_from` for non-trivial conversions between different types (e.g., `std::pair` → `Vector2f`)
 - `min`/`max` on numeric fields generate constraint metadata for runtime validation
 
 **MANDATORY**: Read `references/params-syntax.md` entirely before writing a new `.params.in` from scratch. **Do NOT load** `references/effect-types.md` or `references/pitfalls.md` for this step.
@@ -231,7 +231,7 @@ Read the file and check this checklist. Report issues and ask whether to fix or 
 | 1 | `[[ge::params(type=..., name=...)]]` present, `type` is valid enum-style identifier | gen_metadata.py won't parse the struct without it |
 | 2 | Each field either has `[[ge::prop(...)]]` or accepts auto-tag | Auto-generated tags use PascalCase (`StructName_PascalCaseField`), not ALL_CAPS. Prefer omitting `name=` unless the auto-generated name would be misleading |
 | 3 | No `cast_from` where type equals field type | Duplicate switch cases → compile error. Most common params.in mistake. Also: `cast_from` should only be added when the user explicitly wants callers to pass a different type |
-| 4 | `cast_from` paired with `custom` for non-trivial conversions | `custom` without `cast_from` triggers compile error. `std::pair` → `Vector2f` needs a transformer, not bare cast |
+| 4 | `cast_from` paired with `custom` for non-trivial conversions, OR `custom` alone for identity cast | `custom` alone is valid (identity cast: source = field type, useful for validation/clamping). `cast_from`+`custom` for non-trivial conversions like `std::pair` → `Vector2f` |
 | 5 | Positional syntax used only when `name` is sole option | `[[ge::prop("TagName")]]` is shorthand for `name="TagName"` — invalid when other options like `min`, `max`, or `cast_from` are present |
 | 6 | `min`/`max` values valid for the type | Negative min on unsigned fields is wrong |
 | 7 | Defaults specified and within min/max range | Missing defaults → uninitialized values |
@@ -248,7 +248,6 @@ Read the file and check this checklist. Report issues and ask whether to fix or 
 |----------|---------------|-------------------|
 | Use `cast_from` with same type as the field | Duplicate switch cases → compile error | Remove `cast_from`; use auto-generated tag or `[[ge::prop("TagName")]]` when types match |
 | Add `cast_from` without confirming user wants it | Unnecessary type conversion complicates the API | Ask the user: "Should callers pass a different type?" If no, omit `cast_from` |
-| Use `custom` without `cast_from` | Compile error — `custom` only works with type conversion | Only use `custom` when `cast_from` is also specified |
 | Use positional syntax with multiple options | `[[ge::prop("TagName", min=0.0)]]` is invalid — positional only works for single `name` option | Use key-value syntax: `[[ge::prop(name="TagName", min=0.0)]]` |
 | Add explicit `name=` when auto-generation suffices | Adds verbosity without benefit; auto-generated PascalCase is the convention | Omit `name=` unless the auto-generated name would be misleading or doesn't match the desired exposed string name |
 | Skip clang-format installation | Generated files produce 100s of lines of noise diff | Install clang-format before running gen tools |
@@ -284,6 +283,6 @@ Load conditionally — only the reference files needed for your current task, no
 
 | File | Load When | Do NOT Load When | Content |
 |------|------------|-------------------|---------|
-| `references/params-syntax.md` | Writing or reviewing `.params.in` | Fixing build error (use pitfalls.md) or choosing effect type (use effect-types.md) | Full attribute syntax, field options, cast_from rules, examples |
+| `references/params-syntax.md` | Writing or reviewing `.params.in` | Fixing build error (use pitfalls.md) or choosing effect type (use effect-types.md) | Full attribute syntax, field options, cast_from and custom rules, examples |
 | `references/effect-types.md` | Choosing effect type or implementing per-type methods | Writing `.params.in` (use params-syntax.md) or debugging build error (use pitfalls.md) | Base classes, namespaces, file naming, key virtual methods per type |
 | `references/pitfalls.md` | Debugging gen tool errors or build failures | Writing `.params.in` (use params-syntax.md) or choosing effect type (use effect-types.md) | Common mistakes, root cause analysis, build failure diagnosis, workflow fallbacks |

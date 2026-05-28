@@ -1,0 +1,25 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+struct [[ge::params(type=CAST_FROM_SAME_TYPE, name="CastFromSameType")]] TestCastFromSameTypeParams {
+    // Invalid: cast_from type equals field type (Drawing::Path)
+    [[ge::prop(name="PATH_FIELD", cast_from="Drawing::Path")]]
+    Drawing::Path path;
+    // Invalid: cast_from type equals field type after alias resolution (int == int32_t)
+    [[ge::prop(name="INT_VALUE", cast_from="int")]]
+    int32_t intValue = 0;
+    // Valid: cast_from with different type (should not trigger error)
+    [[ge::prop(name="FLOAT_VALUE", cast_from="int32_t")]]
+    float floatValue = 0.0f;
+};
