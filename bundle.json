@@ -14,7 +14,7 @@
       "subsystem": "graphic",
       "syscap": [ ],
       "adapted_system_type": [ "standard" ],
-      "features": [ "graphics_effect_feature_upgrade_skia" ],
+      "features": [ "graphics_effect_feature_upgrade_skia", "graphics_effect_feature_diagnostics_dump_shader_creator" ],
       "rom": "",
       "ram": "",
       "deps": {
@@ -25,6 +25,7 @@
           "hitrace",
           "hilog",
           "init",
+          "openssl",
           "skia",
           "libxml2"
         ]
