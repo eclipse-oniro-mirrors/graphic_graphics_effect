@@ -67,8 +67,6 @@ void GEXmlParserBase::LoadProdConfiguration(const std::string& fileDir)
 {
     std::string fullPath = prodPath_ + fileDir;
     xmlProdDocument_ = xmlParseFile(fullPath.c_str());
-    if (xmlProdDocument_ != nullptr) {
-    }
 }
 
 int32_t GEXmlParserBase::ParseSysDoc()
