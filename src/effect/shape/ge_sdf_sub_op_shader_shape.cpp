@@ -160,10 +160,10 @@ bool GESDFSubOpShaderShape::HasType(const GESDFShapeType type) const
     if (type == GetSDFShapeType()) {
         return true;
     }
-    if (params_.left ? params_.left->HasType(type) : false) {
+    if (params_.left && params_.left->HasType(type)) {
         return true;
     }
-    if (params_.right ? params_.right->HasType(type) : false) {
+    if (params_.right && params_.right->HasType(type)) {
         return true;
     }
     return false;
@@ -270,10 +270,10 @@ bool GESDFSmoothSubOpShaderShape::HasType(const GESDFShapeType type) const
     if (type == GetSDFShapeType()) {
         return true;
     }
-    if (params_.left ? params_.left->HasType(type) : false) {
+    if (params_.left && params_.left->HasType(type)) {
         return true;
     }
-    if (params_.right ? params_.right->HasType(type) : false) {
+    if (params_.right && params_.right->HasType(type)) {
         return true;
     }
     return false;
