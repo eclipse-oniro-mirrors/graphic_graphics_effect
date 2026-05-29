@@ -22,6 +22,8 @@
 #include "draw/color.h"
 #include "draw/path.h"
 #include "ge_shader_filter_params.h"
+#include "ge_visual_effect.h"
+#include "ge_visual_effect_impl.h"
 #include "pipeline/rs_paint_filter_canvas.h"
 #include "platform/common/rs_system_properties.h"
 #include "render_context/render_context.h"
@@ -1170,6 +1172,59 @@ HWTEST_F(GEContourDiagonalFlowLightShaderTest, DrawWithLightSurfaceTest, TestSiz
     filter->DrawWithLightSurface(*canvas_, filter->GetContourDiagonalFlowLightBuilder(), imageInfo_);
     EXPECT_NE(filter->lightSurface_, nullptr);
     GTEST_LOG_(INFO) << "GEContourDiagonalFlowLightShaderTest DrawWithLightSurfaceTest end";
+}
+
+/**
+ * @tc.name: ContourTruncation_001
+ * @tc.desc: Verify contour_ is truncated to 256 elements when exceeding capacity via SetParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, ContourTruncation_001, TestSize.Level1)
+{
+    constexpr size_t CAPACITY = 256;
+    constexpr size_t EXCEED_SIZE = 300;
+    auto visualEffect = std::make_shared<GEVisualEffect>(Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
+    visualEffect->visualEffectImpl_->MakeContenDiagonalParams();
+
+    std::vector<Vector2f> contour(EXCEED_SIZE);
+    for (size_t i = 0; i < EXCEED_SIZE; ++i) {
+        contour[i] = Vector2f(static_cast<float>(i) * 0.001f, static_cast<float>(i) * 0.002f);
+    }
+    visualEffect->SetParam(Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR, contour);
+    auto params = visualEffect->visualEffectImpl_->GetContenDiagonalParams();
+
+    ASSERT_NE(params, nullptr);
+    ASSERT_EQ(params->contour_.size(), CAPACITY);
+    for (size_t i = 0; i < CAPACITY; ++i) {
+        EXPECT_FLOAT_EQ(params->contour_[i][0], static_cast<float>(i) * 0.001f);
+        EXPECT_FLOAT_EQ(params->contour_[i][1], static_cast<float>(i) * 0.002f);
+    }
+}
+
+/**
+ * @tc.name: ContourNoTruncation_001
+ * @tc.desc: Verify contour_ is not truncated when size is less than 256 via SetParam
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEContourDiagonalFlowLightShaderTest, ContourNoTruncation_001, TestSize.Level1)
+{
+    constexpr size_t LESS_SIZE = 128;
+    auto visualEffect = std::make_shared<GEVisualEffect>(Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT);
+    visualEffect->visualEffectImpl_->MakeContenDiagonalParams();
+
+    std::vector<Vector2f> contour(LESS_SIZE);
+    for (size_t i = 0; i < LESS_SIZE; ++i) {
+        contour[i] = Vector2f(static_cast<float>(i) * 0.003f, static_cast<float>(i) * 0.004f);
+    }
+    visualEffect->SetParam(Drawing::GE_SHADER_CONTOUR_DIAGONAL_FLOW_LIGHT_CONTOUR, contour);
+    auto params = visualEffect->visualEffectImpl_->GetContenDiagonalParams();
+
+    ASSERT_NE(params, nullptr);
+    ASSERT_EQ(params->contour_.size(), LESS_SIZE);
+    for (size_t i = 0; i < LESS_SIZE; ++i) {
+        EXPECT_FLOAT_EQ(params->contour_[i][0], static_cast<float>(i) * 0.003f);
+        EXPECT_FLOAT_EQ(params->contour_[i][1], static_cast<float>(i) * 0.004f);
+    }
 }
 } // namespace Rosen
 } // namespace OHOS

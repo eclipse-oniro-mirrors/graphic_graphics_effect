@@ -117,6 +117,20 @@ struct SharedPtrImageToWeakTransformer {
     }
 };
 
+struct ContourDiagonalFlowLimitContourCapacityTransformer {
+    static bool Transform(const std::vector<Vector2f>& value, std::vector<Vector2f>& out)
+    {
+        constexpr size_t CAPACITY = 256;
+        size_t size = value.size();
+        if (size > CAPACITY) {
+            out.assign(value.begin(), value.begin() + CAPACITY);
+        } else {
+            out = value;
+        }
+        return true;
+    }
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
