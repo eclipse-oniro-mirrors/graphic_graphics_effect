@@ -33,6 +33,7 @@ static constexpr char SDF_NORMAL_SMOOTH_SUB_OP_PROG[] = R"(
 
     vec4 sdgSmoothSub(vec4 d1, vec4 d2, float k)
     {
+        k *= 4.0;
         vec4 inverseD1 = vec4(-d1.xyz, -d1.a);
         float h = max(k - abs(inverseD1.a - d2.a), 0.0) / (2.0 * k);
         return vec4(mix(inverseD1.xyz, d2.xyz, (inverseD1.a > d2.a) ? h : 1.0 - h),
@@ -54,6 +55,7 @@ static constexpr char SDF_SMOOTH_SUB_OP_PROG[] = R"(
 
     vec4 sdfSmoothSub(vec4 d1, vec4 d2, float k)
     {
+        k *= 4.0;
         float h = max(k - abs(-d1.a - d2.a), 0.0);
         return vec4(d2.xyz, max(-d1.a, d2.a) + h * h * 0.25 / k);
     }
