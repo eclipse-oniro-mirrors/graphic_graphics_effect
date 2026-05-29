@@ -26,6 +26,10 @@
 namespace OHOS {
 namespace Rosen {
 
+#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_service/";
+#endif
+
 /**
  * @brief Creates a RuntimeEffect for shader with optional diagnostics tracking.
  *
@@ -40,12 +44,11 @@ namespace Rosen {
  * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined, this function will:
  *       1. Compute SHA256 digest of the shader source
  *       2. Atomically write per-hash files using O_CREAT|O_EXCL (no cross-process contention):
- *          - /data/local/tmp/ge_shader_diagnostics.{hash}.csv  (file,function,line,srcLen)
- *          - /data/local/tmp/ge_shader_diagnostics.{hash}.sksl (shader source)
+ *          - /data/service/el0/render_service/ge_shader_diagnostics.{hash}.csv  (file,function,line,srcLen)
+ *          - /data/service/el0/render_service/ge_shader_diagnostics.{hash}.sksl (shader source)
  *       3. If files already exist (same hash from another process), skip writing.
  *          Only the first process to encounter a given shader hash records its source
  *          location; subsequent encounters across processes are silently skipped.
- *       4. Use a post-processing Python script to merge individual .csv files for analysis
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc = GESourceLocation::Current());

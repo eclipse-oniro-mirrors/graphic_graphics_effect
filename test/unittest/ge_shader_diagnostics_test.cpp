@@ -83,8 +83,8 @@ std::string GEShaderDiagnosticsTest::ComputeTestSHA256(const std::string& src)
 
 void GEShaderDiagnosticsTest::CleanupDiagnosticsFiles(const std::string& hash)
 {
-    std::string csvPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".sksl";
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
     unlink(csvPath.c_str());
     unlink(skslPath.c_str());
 }
@@ -234,8 +234,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_FileCreation, TestSize.Level1)
 
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
 
-    std::string csvPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".sksl";
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
 
     int csvFd = open(csvPath.c_str(), O_RDONLY);
     EXPECT_GE(csvFd, 0);
@@ -265,7 +265,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_CsvContent, TestSize.Level1)
     auto srcLoc = GESourceLocation::Current();
     GECreateRuntimeEffectForShader(SKSL_RED, srcLoc);
 
-    std::string csvPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".csv";
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
     std::string csvContent = ReadFileContent(csvPath);
     EXPECT_FALSE(csvContent.empty());
 
@@ -291,7 +291,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_SkslContent, TestSize.Level1)
 
     GECreateRuntimeEffectForShader(SKSL_PASSTHROUGH);
 
-    std::string skslPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".sksl";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
     std::string skslContent = ReadFileContent(skslPath);
     EXPECT_EQ(skslContent, SKSL_PASSTHROUGH);
 
@@ -310,7 +310,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_FirstWriterWins, TestSize.Level1)
 
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
 
-    std::string csvPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".csv";
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
     std::string firstCsvContent = ReadFileContent(csvPath);
 
     // Second call — files already exist, should not overwrite
@@ -339,8 +339,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_DifferentHash, TestSize.Level1)
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
     GECreateRuntimeEffectForShader(SKSL_RED);
 
-    std::string csvPath1 = "/data/local/tmp/ge_shader_diagnostics." + hash1 + ".csv";
-    std::string csvPath2 = "/data/local/tmp/ge_shader_diagnostics." + hash2 + ".csv";
+    std::string csvPath1 = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash1 + ".csv";
+    std::string csvPath2 = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash2 + ".csv";
 
     int fd1 = open(csvPath1.c_str(), O_RDONLY);
     int fd2 = open(csvPath2.c_str(), O_RDONLY);
@@ -370,8 +370,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_OptionsOverloadFileCreation, TestS
     Drawing::RuntimeEffectOptions options;
     GECreateRuntimeEffectForShader(SKSL_MINIMAL, options);
 
-    std::string csvPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = "/data/local/tmp/ge_shader_diagnostics." + hash + ".sksl";
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
 
     int csvFd = open(csvPath.c_str(), O_RDONLY);
     EXPECT_GE(csvFd, 0);

@@ -49,8 +49,6 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std
 
 namespace {
 
-constexpr const char* OUT_DIR = "/data/local/tmp/";
-
 std::string ComputeSHA256(const std::string& src)
 {
     unsigned char digest[SHA256_DIGEST_LENGTH];
@@ -135,7 +133,7 @@ bool DumpDiagnostics(const std::string& hash, const GESourceLocation& srcLoc, si
     }
     char csvPath[256];
     int pathLen = snprintf_s(
-        csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv", OUT_DIR, hash.c_str());
+        csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv", GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
     if (pathLen <= 0) {
         return false;
     }
@@ -146,7 +144,7 @@ void DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
 {
     char skslPath[256];
     int pathLen = snprintf_s(
-        skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl", OUT_DIR, hash.c_str());
+        skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl", GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
     if (pathLen <= 0) {
         return;
     }
