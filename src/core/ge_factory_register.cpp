@@ -20,6 +20,7 @@
 #include "effect/filter/ge_aibar_shader_filter.h"
 #include "effect/filter/ge_bezier_warp_shader_filter.h"
 #include "effect/filter/ge_blur_bubbles_rise_filter.h"
+#include "effect/filter/ge_blur_shader_filter.h"
 #include "effect/filter/ge_color_gradient_shader_filter.h"
 #include "effect/filter/ge_content_light_shader_filter.h"
 #include "effect/filter/ge_direction_light_shader_filter.h"
@@ -37,6 +38,7 @@
 #include "effect/filter/ge_magnifier_shader_filter.h"
 #include "effect/filter/ge_mask_transition_shader_filter.h"
 #include "effect/filter/ge_mesa_blur_shader_filter.h"
+#include "effect/filter/ge_motion_blur_shader_filter.h"
 #include "effect/filter/ge_sdf_edge_light.h"
 #include "effect/filter/ge_sdf_from_image_filter.h"
 #include "effect/filter/ge_sound_wave_filter.h"
@@ -93,6 +95,7 @@ namespace {
 GE_FACTORY_REGISTER(GEAIBarShaderFilter)
 GE_FACTORY_REGISTER(GEBezierWarpShaderFilter)
 GE_FACTORY_REGISTER(GEBlurBubblesRiseFilter)
+GE_FACTORY_REGISTER(GEBlurShaderFilter)
 GE_FACTORY_REGISTER(GEColorGradientShaderFilter)
 GE_FACTORY_REGISTER(GEContentLightFilter)
 GE_FACTORY_REGISTER(GEDirectionLightShaderFilter)
@@ -103,6 +106,7 @@ GE_FACTORY_REGISTER(GEGreyShaderFilter)
 GE_FACTORY_REGISTER(GEHeatDistortionFilter)
 GE_FACTORY_REGISTER(GEMagnifierShaderFilter)
 GE_FACTORY_REGISTER(GEMaskTransitionShaderFilter)
+GE_FACTORY_REGISTER(GEMotionBlurShaderFilter)
 GE_FACTORY_REGISTER(GESDFFromImageFilter)
 GE_FACTORY_REGISTER(GESDFEdgeLight)
 GE_FACTORY_REGISTER(GESoundWaveFilter)
