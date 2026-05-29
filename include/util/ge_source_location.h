@@ -18,15 +18,25 @@
 
 #include <cstdint>
 
+#if defined(__has_builtin)
+#if __has_builtin(__builtin_COLUMN)
+#define GE_BUILTIN_COLUMN() __builtin_COLUMN()
+#endif
+#endif
+#ifndef GE_BUILTIN_COLUMN
+#define GE_BUILTIN_COLUMN() 0
+#endif
+
 namespace OHOS {
 namespace Rosen {
 
 /**
  * @brief GESourceLocation provides source code location information similar to C++20's std::source_location.
  *
- * This class captures the file name, function name, line number, and optionally column number
- * at the point where it is constructed. It uses compiler builtins (__builtin_FILE, __builtin_FUNCTION,
- * __builtin_LINE) to achieve this without requiring C++20.
+ * This class captures the file name, function name, line number, and column number
+ * at the point where it is constructed. It uses compiler builtins (__builtin_FILE,
+ * __builtin_FUNCTION, __builtin_LINE, __builtin_COLUMN) to achieve this without
+ * requiring C++20.
  *
  * Usage example:
  * @code
@@ -48,11 +58,12 @@ public:
      * @param file The source file name (default: __builtin_FILE())
      * @param function The function name (default: __builtin_FUNCTION())
      * @param line The line number (default: __builtin_LINE())
-     * @param column The column number (default: 0, as __builtin_COLUMN is less widely supported)
+     * @param column The column number (default: __builtin_COLUMN())
      * @return GESourceLocation object with captured location information
      */
     static constexpr GESourceLocation Current(const char* file = __builtin_FILE(),
-        const char* function = __builtin_FUNCTION(), uint32_t line = __builtin_LINE(), uint32_t column = 0) noexcept
+        const char* function = __builtin_FUNCTION(), uint32_t line = __builtin_LINE(),
+        uint32_t column = GE_BUILTIN_COLUMN()) noexcept
     {
         return GESourceLocation(file, function, line, column);
     }

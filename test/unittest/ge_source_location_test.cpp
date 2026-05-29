@@ -51,6 +51,7 @@ HWTEST_F(GESourceLocationTest, CurrentTest, TestSize.Level1)
     EXPECT_NE(loc.FileName(), nullptr);
     EXPECT_NE(loc.FunctionName(), nullptr);
     EXPECT_GT(loc.Line(), 0u);
+    EXPECT_GT(loc.Column(), 0u);
 }
 
 /**
@@ -86,6 +87,7 @@ HWTEST_F(GESourceLocationTest, AccessorMethodsTest, TestSize.Level1)
 
     if (loc.IsValid()) {
         EXPECT_GT(loc.Line(), 0u);
+        EXPECT_GT(loc.Column(), 0u);
     }
 
     EXPECT_GE(loc.Column(), 0u);
