@@ -61,7 +61,7 @@ void GEEdgeLightShaderFilterTest::SetUp()
  
     Rosen::Drawing::Bitmap bmp;
     Rosen::Drawing::BitmapFormat format { Rosen::Drawing::COLORTYPE_RGBA_8888, Rosen::Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(50, 50, format); // 50, 50  bitmap size
+    bmp.Build(50, 50, format, 0, Rosen::Drawing::ColorSpace::CreateSRGB()); // 50, 50  bitmap size
     bmp.ClearWithColor(Rosen::Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
     imageComposite_ = bmp.MakeImage();
