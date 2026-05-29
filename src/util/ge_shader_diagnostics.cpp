@@ -15,16 +15,16 @@
 
 #include "ge_shader_diagnostics.h"
 
-#include <atomic>
-#include <cstdio>
-#include <fstream>
-#include <mutex>
 #include <string>
 
 #include "ge_log.h"
 
 #ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+#include <cerrno>
+#include <fcntl.h>
 #include <openssl/sha.h>
+#include <unistd.h>
+
 #include "securec.h"
 #endif
 
@@ -34,20 +34,22 @@ namespace Rosen {
 #ifndef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
-    const std::string& shaderSrc, const GESourceLocation& srcLoc)
+    const std::string& shaderSrc, [[maybe_unused]] const GESourceLocation& srcLoc)
 {
     return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
+}
+
+std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
+    const Drawing::RuntimeEffectOptions& options, [[maybe_unused]] const GESourceLocation& srcLoc)
+{
+    return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
 }
 
 #else // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 namespace {
 
-constexpr const char* CSV_PATH = "/data/local/tmp/ge_shader_diagnostics.csv";
-constexpr const char* SKSL_DIR = "/data/local/tmp/";
-
-std::mutex g_fileMutex;
-std::atomic<bool> g_headerWritten{false};
+constexpr const char* OUT_DIR = "/data/local/tmp/";
 
 std::string ComputeSHA256(const std::string& src)
 {
@@ -68,9 +70,8 @@ std::string ComputeSHA256(const std::string& src)
 
 std::string FormatCsvField(const std::string& field)
 {
-    if (field.find(',') != std::string::npos ||
-        field.find('"') != std::string::npos ||
-        field.find('\n') != std::string::npos) {
+    if (field.find(',') != std::string::npos || field.find('"') != std::string::npos ||
+        field.find('\n') != std::string::npos || field.find('\r') != std::string::npos) {
         std::string escaped;
         escaped.reserve(field.size() + 2);
         escaped.push_back('"');
@@ -86,51 +87,94 @@ std::string FormatCsvField(const std::string& field)
     return field;
 }
 
-void WriteCsvRecord(const std::string& record)
+/**
+ * Atomically create a file and write content using O_CREAT|O_EXCL.
+ * Returns true if the file was newly created and written.
+ * Returns false if the file already existed (EEXIST) — this is the expected
+ * "skip" case for duplicate shaders across processes.
+ * Logs and returns false on other I/O errors.
+ *
+ * Note: fsync() is intentionally omitted — diagnostics data is non-critical
+ * and does not need crash durability guarantees.
+ */
+bool AtomicWriteFile(const char* path, const void* data, size_t len)
 {
-    std::lock_guard<std::mutex> lock(g_fileMutex);
-    std::ofstream file(CSV_PATH, std::ios::app);
-    if (!file.is_open()) {
-        LOGE("GEShaderDiagnostics: Failed to open %{public}s", CSV_PATH);
-        return;
+    int fd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
+    if (fd < 0) {
+        if (errno == EEXIST) {
+            return false;
+        }
+        LOGE("GEShaderDiagnostics: open(%{public}s) failed: errno=%{public}d", path, errno);
+        return false;
     }
-    if (!g_headerWritten.exchange(true)) {
-        file << "hash,file,function,line,srcLen\n";
+    const char* buf = static_cast<const char*>(data);
+    size_t written = 0;
+    while (written < len) {
+        ssize_t n = write(fd, buf + written, len - written);
+        if (n <= 0) {
+            int savedErrno = errno;
+            close(fd);
+            unlink(path);
+            LOGE("GEShaderDiagnostics: write(%{public}s) failed: errno=%{public}d", path, savedErrno);
+            return false;
+        }
+        written += static_cast<size_t>(n);
     }
-    file << record << "\n";
-    file.flush();
+    close(fd);
+    return true;
 }
 
+bool DumpDiagnostics(const std::string& hash, const GESourceLocation& srcLoc, size_t srcLen)
+{
+    char csvBuf[512];
+    int len = snprintf_s(csvBuf, sizeof(csvBuf), sizeof(csvBuf) - 1, "%s,%s,%u,%zu",
+        FormatCsvField(srcLoc.FileName()).c_str(), FormatCsvField(srcLoc.FunctionName()).c_str(), srcLoc.Line(),
+        srcLen);
+    if (len <= 0) {
+        return false;
+    }
+    char csvPath[256];
+    int pathLen = snprintf_s(
+        csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv", OUT_DIR, hash.c_str());
+    if (pathLen <= 0) {
+        return false;
+    }
+    return AtomicWriteFile(csvPath, csvBuf, static_cast<size_t>(len));
 }
+
+void DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
+{
+    char skslPath[256];
+    int pathLen = snprintf_s(
+        skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl", OUT_DIR, hash.c_str());
+    if (pathLen <= 0) {
+        return;
+    }
+    AtomicWriteFile(skslPath, shaderSrc.data(), shaderSrc.size());
+}
+
+} // anonymous namespace
 
 std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc)
 {
     std::string hash = ComputeSHA256(shaderSrc);
-    char lineBuf[512];
-    int len = snprintf_s(lineBuf, sizeof(lineBuf), sizeof(lineBuf) - 1,
-        "%s,%s,%s,%u,%zu",
-        hash.c_str(),
-        FormatCsvField(srcLoc.FileName()).c_str(),
-        FormatCsvField(srcLoc.FunctionName()).c_str(),
-        srcLoc.Line(),
-        shaderSrc.length());
-    if (len > 0) {
-        WriteCsvRecord(std::string(lineBuf, len));
+    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
+        DumpSkslSource(hash, shaderSrc);
     }
-    char skslPath[256];
-    len = snprintf_s(skslPath, sizeof(skslPath), sizeof(skslPath) - 1,
-        "%sge_shader_diagnostics.%s.sksl", SKSL_DIR, hash.c_str());
-    if (len > 0) {
-        std::ofstream skslFile(skslPath, std::ios::out);
-        if (skslFile.is_open()) {
-            skslFile << shaderSrc;
-            skslFile.flush();
-        }
-    }
-    LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s",
-         srcLoc.FileName(), srcLoc.Line(), hash.c_str());
+    LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s", srcLoc.FileName(), srcLoc.Line(), hash.c_str());
     return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
+}
+
+std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
+    const std::string& shaderSrc, const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc)
+{
+    std::string hash = ComputeSHA256(shaderSrc);
+    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
+        DumpSkslSource(hash, shaderSrc);
+    }
+    LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s", srcLoc.FileName(), srcLoc.Line(), hash.c_str());
+    return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
 }
 
 #endif // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR

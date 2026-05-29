@@ -39,11 +39,29 @@ namespace Rosen {
  *
  * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined, this function will:
  *       1. Compute SHA256 digest of the shader source
- *       2. Append digest + source location to CSV (lazy-init on first call)
- *       3. Dump shader source to /data/local/tmp/ge_shader_diagnostics.{hash}.sksl
+ *       2. Atomically write per-hash files using O_CREAT|O_EXCL (no cross-process contention):
+ *          - /data/local/tmp/ge_shader_diagnostics.{hash}.csv  (file,function,line,srcLen)
+ *          - /data/local/tmp/ge_shader_diagnostics.{hash}.sksl (shader source)
+ *       3. If files already exist (same hash from another process), skip writing.
+ *          Only the first process to encounter a given shader hash records its source
+ *          location; subsequent encounters across processes are silently skipped.
+ *       4. Use a post-processing Python script to merge individual .csv files for analysis
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc = GESourceLocation::Current());
+
+/**
+ * @brief Overload that accepts RuntimeEffectOptions.
+ *
+ * Same diagnostics behavior as the two-parameter version above.
+ *
+ * @param shaderSrc The shader source code string
+ * @param options RuntimeEffectOptions (forceNoInline, useAF, useHighpLocalCoords)
+ * @param srcLoc Source location captured at call site (default: GESourceLocation::Current())
+ * @return std::shared_ptr<Drawing::RuntimeEffect> The created runtime effect, or nullptr on failure
+ */
+GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
+    const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc = GESourceLocation::Current());
 
 } // namespace Rosen
 } // namespace OHOS
