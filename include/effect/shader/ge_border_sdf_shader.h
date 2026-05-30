@@ -37,6 +37,7 @@ public:
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override {}
 
     void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override;
+    void OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect) override;
 
 private:
     Drawing::GEBorderSDFShaderParams params_;

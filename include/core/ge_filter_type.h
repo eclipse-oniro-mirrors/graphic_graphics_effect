@@ -107,6 +107,7 @@ enum class GEFilterType : int32_t {
     SPATIAL_POINT_LIGHT,
     SPATIAL_GLASS_EFFECT,
     BORDER_SDF_SHADER,
+    BORDER_SDF_LG_COLOR,
     MOTION_BLUR,
     BLUR,
     MAX,
