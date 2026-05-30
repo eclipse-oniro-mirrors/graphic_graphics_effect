@@ -132,8 +132,8 @@ bool DumpDiagnostics(const std::string& hash, const GESourceLocation& srcLoc, si
         return false;
     }
     char csvPath[256];
-    int pathLen = snprintf_s(
-        csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv", GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
+    int pathLen = snprintf_s(csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv",
+        GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
     if (pathLen <= 0) {
         return false;
     }
@@ -143,8 +143,8 @@ bool DumpDiagnostics(const std::string& hash, const GESourceLocation& srcLoc, si
 void DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
 {
     char skslPath[256];
-    int pathLen = snprintf_s(
-        skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl", GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
+    int pathLen = snprintf_s(skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl",
+        GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
     if (pathLen <= 0) {
         return;
     }
