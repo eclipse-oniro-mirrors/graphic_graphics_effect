@@ -273,7 +273,7 @@ static constexpr char GRAVITY_PULL_PROG[] = R"(
         float centerDist = sqrt(centerDistSq);
         float maxWarpScale = min(0.8 * warpRadius, 0.8 * centerDist);
         float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
-        if (abs(warpScale) <= kEpsilon) {
+        if (abs(warpScale) <= 1e-3) {
             return p;
         }
 
@@ -317,6 +317,11 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateGravityPullDrawingShader, Width: %g, Height: %g",
         width, height);
     
+    if (!params_.shape) {
+        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader has empty shape");
+        return nullptr;
+    }
+    
     auto baseShapeShader = params_.shape->GenerateDrawingShader(width, height);
     if (!baseShapeShader) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader has empty base shader");
@@ -344,11 +349,12 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     float shapeCenterY = 0.f;
     if (!TryGetCenter(shapeCenterX, shapeCenterY)) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
+        return nullptr;
     }
 
     gravityPullShaderBuilder->SetUniform("spacing", std::max(params_.spacing, 0.0001f));
     gravityPullShaderBuilder->SetUniform("warpStrength", params_.warpStrength);
-    gravityPullShaderBuilder->SetUniform("hotZone", params_.hotZone);
+    gravityPullShaderBuilder->SetUniform("hotZone", std::max(params_.hotZone, 0.0001f));
     gravityPullShaderBuilder->SetUniform("shapeCenterPos", shapeCenterX, shapeCenterY);
     gravityPullShaderBuilder->SetUniform("centerPos", params_.centerPosition[0], params_.centerPosition[1]);
     gravityPullShaderBuilder->SetChild("shapeShader", transformedShapeShader);
@@ -407,7 +413,7 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
         float centerDist = sqrt(centerDistSq);
         float maxWarpScale = min(0.8 * warpRadius, 0.8 * centerDist);
         float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
-        if (abs(warpScale) <= kEpsilon) {
+        if (abs(warpScale) <= 1e-3) {
             return p;
         }
 
@@ -446,6 +452,11 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
 {
     GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal, Width: %g, Height: %g",
         width, height);
+
+    if (!params_.shape) {
+        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal has empty shape");
+        return nullptr;
+    }
     
     auto baseShapeShader = params_.shape->GenerateDrawingShaderHasNormal(width, height);
     if (!baseShapeShader) {
@@ -474,6 +485,7 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     float shapeCenterY = 0.f;
     if (!TryGetCenter(shapeCenterX, shapeCenterY)) {
         LOGE("GESDFTransformShaderShape::GenerateGravPullDrawingShader get transformed shape center error");
+        return nullptr;
     }
 
     gravityPullShaderBuilder->SetUniform("spacing", std::max(params_.spacing, 0.0001f));
