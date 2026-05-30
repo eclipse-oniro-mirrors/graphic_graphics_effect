@@ -1,1 +1,0 @@
-"""GE Shader Diagnostics Post-Processing Tool."""
