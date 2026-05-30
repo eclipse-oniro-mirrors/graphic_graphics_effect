@@ -19,6 +19,7 @@
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -405,7 +406,7 @@ void GEFrostedGlassEffect::MakeDrawingShader(Drawing::Canvas& canvas, const Draw
 bool GEFrostedGlassEffect::InitFrostedGlassEffect()
 {
     if (g_frostedGlassShaderEffect == nullptr) {
-        g_frostedGlassShaderEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
+        g_frostedGlassShaderEffect = GECreateRuntimeEffectForShader(MAIN_SHADER_PROG);
         if (g_frostedGlassShaderEffect == nullptr) {
             GE_LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
             return false;

@@ -18,6 +18,7 @@
 #include "effect/shader_effect.h"
 #include "ge_log.h"
 #include "ge_pixel_map_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_shader_filter_params.h"
 #include "platform/common/rs_log.h"
 #include "utils/matrix.h"
@@ -123,7 +124,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEPixelMapShaderMask::GetPixelMap
         }
     )";
 
-    auto pixelMapShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto pixelMapShaderMaskEffect = GECreateRuntimeEffectForShader(prog);
     if (pixelMapShaderMaskEffect == nullptr) {
         LOGE("GEPixelMapShaderMask::GetPixelMapShaderMaskBuilder effect error");
         return nullptr;

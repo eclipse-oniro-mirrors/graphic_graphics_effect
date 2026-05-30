@@ -18,6 +18,7 @@
 #include <unordered_map>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS::Rosen {
 namespace {
@@ -154,7 +155,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
     thread_local std::shared_ptr<Drawing::RuntimeEffect> effectShader_ = nullptr;
 
     if (effectShader_ == nullptr) {
-        effectShader_ = Drawing::RuntimeEffect::CreateForShader(SHADER);
+        effectShader_ = GECreateRuntimeEffectForShader(SHADER);
     }
 
     if (effectShader_ == nullptr) {

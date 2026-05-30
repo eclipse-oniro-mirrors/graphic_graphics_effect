@@ -15,6 +15,7 @@
 
 #include "ge_content_light_shader_filter.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -191,7 +192,7 @@ void GEContentLightFilter::GenerateContentLightEffect()
         }
     )";
     if (contentLightShaderEffect_ == nullptr) {
-        contentLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(shaderStringContentLight);
+        contentLightShaderEffect_ = GECreateRuntimeEffectForShader(shaderStringContentLight);
     }
 }
 } // namespace Rosen

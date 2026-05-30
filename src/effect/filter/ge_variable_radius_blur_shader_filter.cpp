@@ -15,6 +15,7 @@
 #include "ge_variable_radius_blur_shader_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "ge_trace.h"
 
@@ -64,7 +65,7 @@ void GEVariableRadiusBlurShaderFilter::MakeTextureShaderEffect()
             return imageInput.eval(xy);
         }
     )");
-    textureShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(generateTextureShader);
+    textureShaderEffect_ = GECreateRuntimeEffectForShader(generateTextureShader);
     if (textureShaderEffect_ == nullptr) {
         LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader textureShaderEffect create failed");
     }
@@ -139,9 +140,8 @@ void GEVariableRadiusBlurShaderFilter::MakeHorizontalBoxBlurEffect(bool applyIns
             return boxFilter(coord, radius);
         }
     )");
-    horizontalBoxBlurShaderEffect_ = applyInsideMask ?
-        Drawing::RuntimeEffect::CreateForShader(HorizontalBlurMaskedString) :
-        Drawing::RuntimeEffect::CreateForShader(HorizontalBlurString);
+    horizontalBoxBlurShaderEffect_ = applyInsideMask ? GECreateRuntimeEffectForShader(HorizontalBlurMaskedString)
+                                                     : GECreateRuntimeEffectForShader(HorizontalBlurString);
     if (horizontalBoxBlurShaderEffect_ == nullptr) {
         LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader horizontalBoxBlurShaderEffect create failed");
     }
@@ -215,10 +215,9 @@ void GEVariableRadiusBlurShaderFilter::MakeVerticalBoxBlurEffect(bool applyInsid
             radius = clamp(radius, 1.0, r);
             return boxFilter(coord, radius);
         }
-    )");    
-    verticalBoxBlurShaderEffect_ = applyInsideMask ?
-        Drawing::RuntimeEffect::CreateForShader(VerticalBlurMaskedString) :
-        Drawing::RuntimeEffect::CreateForShader(VerticalBlurString);
+    )");
+    verticalBoxBlurShaderEffect_ = applyInsideMask ? GECreateRuntimeEffectForShader(VerticalBlurMaskedString)
+                                                   : GECreateRuntimeEffectForShader(VerticalBlurString);
     if (verticalBoxBlurShaderEffect_ == nullptr) {
         LOGE("GEVariableRadiusBlurShaderFilter::RuntimeShader verticalBoxBlurShaderEffect create failed");
     }

@@ -16,6 +16,7 @@
 #include "ge_direction_light_shader_filter.h"
 #include <memory>
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -313,7 +314,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetNormalM
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_normalMaskShaderEffect = nullptr;
     if (g_normalMaskShaderEffect == nullptr) {
-        g_normalMaskShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringNormalMask);
+        g_normalMaskShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringNormalMask);
     }
     return g_normalMaskShaderEffect;
 }
@@ -322,7 +323,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetDirecti
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightShaderEffect = nullptr;
     if (g_directionLightShaderEffect == nullptr) {
-        g_directionLightShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDirectionLight);
+        g_directionLightShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDirectionLight);
     }
     return g_directionLightShaderEffect;
 }
@@ -331,8 +332,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetDirecti
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightNoNormalShaderEffect = nullptr;
     if (g_directionLightNoNormalShaderEffect == nullptr) {
-        g_directionLightNoNormalShaderEffect =
-            Drawing::RuntimeEffect::CreateForShader(g_shaderStringDirectionLightNoNormal);
+        g_directionLightNoNormalShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDirectionLightNoNormal);
     }
     return g_directionLightNoNormalShaderEffect;
 }

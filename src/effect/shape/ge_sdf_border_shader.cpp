@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_sdf_border_shader.h"
+#include "ge_shader_diagnostics.h"
 
 
 namespace OHOS {
@@ -89,13 +90,13 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFBorderShader::GetSDFBorderEffect()
     if (params_.border.isOutline) {
         thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfOutlineBorderEffect = nullptr;
         if (sdfOutlineBorderEffect == nullptr) {
-            sdfOutlineBorderEffect = Drawing::RuntimeEffect::CreateForShader(outlineShaderCode_);
+            sdfOutlineBorderEffect = GECreateRuntimeEffectForShader(outlineShaderCode_);
         }
         return sdfOutlineBorderEffect;
     } else {
         thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfBorderEffect = nullptr;
         if (sdfBorderEffect == nullptr) {
-            sdfBorderEffect = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+            sdfBorderEffect = GECreateRuntimeEffectForShader(shaderCode_);
         }
         return sdfBorderEffect;
     }

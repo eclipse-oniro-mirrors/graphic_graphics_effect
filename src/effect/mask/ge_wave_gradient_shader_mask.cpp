@@ -15,6 +15,7 @@
 #include <chrono>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_wave_gradient_shader_mask.h"
 
 namespace OHOS {
@@ -122,7 +123,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEWaveGradientShaderMask::GetWave
         }
     )";
 
-    auto waveShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto waveShaderMaskEffect = GECreateRuntimeEffectForShader(prog);
     if (!waveShaderMaskEffect) {
         LOGE("GEWaveGradientShaderMask::GetWaveShaderMaskBuilder effect error");
         return nullptr;
@@ -241,7 +242,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEWaveGradientShaderMask::GetWave
         }
     )";
 
-    auto waveShaderMaskNormalEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto waveShaderMaskNormalEffect = GECreateRuntimeEffectForShader(prog);
     if (!waveShaderMaskNormalEffect) {
         LOGE("GEWaveGradientShaderMask::GetWaveShaderNormalMaskBuilder effect error");
         return nullptr;

@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "ge_magnifier_shader_filter.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 
 #include "ge_log.h"
@@ -247,7 +248,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMagnifierShaderFilter::MakeMagn
     }
 
     if (g_magnifierShaderEffectWithSDF == nullptr) {
-        g_magnifierShaderEffectWithSDF = Drawing::RuntimeEffect::CreateForShader(MAGNIFIER_SHADER_WITH_SDF_PROG);
+        g_magnifierShaderEffectWithSDF = GECreateRuntimeEffectForShader(MAGNIFIER_SHADER_WITH_SDF_PROG);
         if (g_magnifierShaderEffectWithSDF == nullptr) {
             LOGE("GEMagnifierShaderFilter::MakeMagnifierShaderWithSDFShape failed to create RuntimeEffect");
             return nullptr;

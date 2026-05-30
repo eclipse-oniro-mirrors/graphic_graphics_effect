@@ -17,6 +17,7 @@
 #include "common/rs_vector4.h"
 #include "effect/shader_effect.h"
 #include "ge_use_effect_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_shader_filter_params.h"
 #include "platform/common/rs_log.h"
 #include "utils/matrix.h"
@@ -82,7 +83,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEUseEffectShaderMask::GetUseEffe
         }
     )";
 
-    auto useEffectShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto useEffectShaderMaskEffect = GECreateRuntimeEffectForShader(prog);
     if (useEffectShaderMaskEffect == nullptr) {
         LOGE("GEUseEffectShaderMask::GetUseEffectShaderMaskBuilder effect error");
         return nullptr;

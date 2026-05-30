@@ -15,6 +15,7 @@
 
 #include "ge_wave_disturb_shader_mask.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -117,7 +118,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEWaveDisturbanceShaderMask::GetW
         return waveDisturbanceBuilder;
     }
 
-    auto waveDisturbanceBuilderEffect = Drawing::RuntimeEffect::CreateForShader(WAVE_DISTURBANCE_PROG);
+    auto waveDisturbanceBuilderEffect = GECreateRuntimeEffectForShader(WAVE_DISTURBANCE_PROG);
     if (!waveDisturbanceBuilderEffect) {
         LOGE("GEWaveDisturbanceShaderMask::GetWaveDisturbanceBuilder effect error");
         return nullptr;

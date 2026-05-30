@@ -20,6 +20,7 @@
 
 #include "draw/surface.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -79,7 +80,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEMotionBlurShaderFilter::GetMotionBlurE
                 return color;
             }
         )";
-        g_motionBlurEffect = Drawing::RuntimeEffect::CreateForShader(motionBlurProg);
+        g_motionBlurEffect = GECreateRuntimeEffectForShader(motionBlurProg);
         if (g_motionBlurEffect == nullptr) {
             LOGE("GEMotionBlurShaderFilter::GetMotionBlurEffect create failed");
             return nullptr;

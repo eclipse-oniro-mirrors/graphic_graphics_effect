@@ -15,6 +15,7 @@
 
 #include "ge_mask_transition_shader_filter.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -110,7 +111,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEMaskTransitionShaderFilter::Get
             }
         )";
 
-        g_transitionBlendShader_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        g_transitionBlendShader_ = GECreateRuntimeEffectForShader(prog);
         if (g_transitionBlendShader_ == nullptr) {
             GE_LOGE("GEMaskTransitionShaderFilter::MakeTransitionBlendShadereffect failed");
             return nullptr;

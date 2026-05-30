@@ -19,6 +19,7 @@
 #include "ge_common.h"
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_tone_mapping_helper.h"
 
 namespace OHOS {
@@ -182,7 +183,7 @@ void MakeColorGradientEffect()
     if (g_colorGradientShaderEffect_ != nullptr) {
         return;
     }
-    g_colorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING);
+    g_colorGradientShaderEffect_ = GECreateRuntimeEffectForShader(COLOR_GRADIENT_SHADER_STRING);
     if (g_colorGradientShaderEffect_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeColorGradientEffect colorGradientShaderEffect create failed");
     }
@@ -193,8 +194,7 @@ void MakeColorGradientEffectWithMask()
     if (g_colorGradientShaderEffectHasMask_ != nullptr) {
         return;
     }
-    g_colorGradientShaderEffectHasMask_ =
-        Drawing::RuntimeEffect::CreateForShader(COLOR_GRADIENT_SHADER_STRING_WITH_MASK);
+    g_colorGradientShaderEffectHasMask_ = GECreateRuntimeEffectForShader(COLOR_GRADIENT_SHADER_STRING_WITH_MASK);
     if (g_colorGradientShaderEffectHasMask_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeColorGradientEffectWithMask colorGradientShaderEffect create failed");
     }
@@ -205,8 +205,7 @@ void MakeBrightnessEffect()
     if (g_brightnessShaderEffect_ != nullptr) {
         return;
     }
-    g_brightnessShaderEffect_ =
-        Drawing::RuntimeEffect::CreateForShader(BRIGHTNESS_SHADER_CODE);
+    g_brightnessShaderEffect_ = GECreateRuntimeEffectForShader(BRIGHTNESS_SHADER_CODE);
     if (g_brightnessShaderEffect_ == nullptr) {
         LOGE("GEColorGradientEffect::MakeBrightnessEffect brightnessShaderEffect create failed");
     }

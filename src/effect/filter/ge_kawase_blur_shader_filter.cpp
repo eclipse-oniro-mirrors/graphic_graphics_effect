@@ -16,6 +16,7 @@
 #include "ge_kawase_blur_shader_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
 
@@ -310,7 +311,7 @@ bool GEKawaseBlurShaderFilter::InitBlurEffect()
             return half4(c.rgba * 0.2);
         }
     )");
-    g_blurEffect = Drawing::RuntimeEffect::CreateForShader(blurString);
+    g_blurEffect = GECreateRuntimeEffectForShader(blurString);
     if (g_blurEffect == nullptr) {
         LOGE("GEKawaseBlurShaderFilter::RuntimeShader blurEffect create failed");
         return false;
@@ -343,7 +344,7 @@ bool GEKawaseBlurShaderFilter::InitMixEffect()
             return finalColor;
         }
     )");
-    g_mixEffect = Drawing::RuntimeEffect::CreateForShader(mixString);
+    g_mixEffect = GECreateRuntimeEffectForShader(mixString);
     if (g_mixEffect == nullptr) {
         LOGE("GEKawaseBlurShaderFilter::RuntimeShader mixEffect create failed");
         return false;
@@ -364,7 +365,7 @@ bool GEKawaseBlurShaderFilter::InitSimpleFilter()
             return imageInput.eval(xy);
         }
     )");
-    g_simpleFilter = Drawing::RuntimeEffect::CreateForShader(simpleShader);
+    g_simpleFilter = GECreateRuntimeEffectForShader(simpleShader);
     if (g_simpleFilter == nullptr) {
         LOGE("GEKawaseBlurShaderFilter::RuntimeShader failed to create simple filter");
         return false;
@@ -394,7 +395,7 @@ bool GEKawaseBlurShaderFilter::InitBlurEffectForAdvancedFilter()
             return half4(c.rgba * 0.2);
         }
     )");
-    g_blurEffectAf = Drawing::RuntimeEffect::CreateForShader(blurStringAF, ops);
+    g_blurEffectAf = GECreateRuntimeEffectForShader(blurStringAF, ops);
     if (g_blurEffectAf == nullptr) {
         LOGE("%s: RuntimeShader blurEffectAF create failed", __func__);
         return false;

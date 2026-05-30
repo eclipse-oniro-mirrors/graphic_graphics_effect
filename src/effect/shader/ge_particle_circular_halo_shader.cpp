@@ -15,6 +15,7 @@
 
 #include "ge_log.h"
 #include "ge_particle_circular_halo_shader.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
@@ -525,7 +526,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     thread_local std::shared_ptr<Drawing::RuntimeEffect> glowHaloEffect = nullptr;
 
     if (glowHaloEffect == nullptr) {
-        glowHaloEffect = Drawing::RuntimeEffect::CreateForShader(GLOW_HALO_PROG);
+        glowHaloEffect = GECreateRuntimeEffectForShader(GLOW_HALO_PROG);
     }
     if (glowHaloEffect == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::GetGlowHaloBuilder glowHaloEffect is nullptr.");
@@ -539,7 +540,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     thread_local std::shared_ptr<Drawing::RuntimeEffect> singleParticleHaloEffect = nullptr;
 
     if (singleParticleHaloEffect == nullptr) {
-        singleParticleHaloEffect = Drawing::RuntimeEffect::CreateForShader(SINGLE_PARTICLE_HALO_PROG);
+        singleParticleHaloEffect = GECreateRuntimeEffectForShader(SINGLE_PARTICLE_HALO_PROG);
     }
     if (singleParticleHaloEffect == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::GetParticleHaloBuilder singleParticleHaloEffect is "
@@ -554,7 +555,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     thread_local std::shared_ptr<Drawing::RuntimeEffect> particleHaloEffect = nullptr;
 
     if (particleHaloEffect == nullptr) {
-        particleHaloEffect = Drawing::RuntimeEffect::CreateForShader(PARTICLE_HALO_PROG);
+        particleHaloEffect = GECreateRuntimeEffectForShader(PARTICLE_HALO_PROG);
     }
     if (particleHaloEffect == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader::GetParticleHaloBuilder particleHaloEffect is "
@@ -569,7 +570,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEParticleCircularHaloShader::Get
     thread_local std::shared_ptr<Drawing::RuntimeEffect> glowHaloEffect = nullptr;
 
     if (glowHaloEffect == nullptr) {
-        glowHaloEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
+        glowHaloEffect = GECreateRuntimeEffectForShader(MAIN_SHADER_PROG);
     }
     if (glowHaloEffect == nullptr) {
         GE_LOGE("GEParticleCircularHaloShader:: GetParticleCircularHaloBuilder glowHaloEffect is nullptr.");

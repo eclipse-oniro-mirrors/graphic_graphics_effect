@@ -17,6 +17,7 @@
 #include "ge_log.h"
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -516,7 +517,7 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_frostedGlassShader
 bool GEFrostedGlassShaderFilter::InitFrostedGlassEffect()
 {
     if (g_frostedGlassShaderEffect == nullptr) {
-        g_frostedGlassShaderEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
+        g_frostedGlassShaderEffect = GECreateRuntimeEffectForShader(MAIN_SHADER_PROG);
         if (g_frostedGlassShaderEffect == nullptr) {
             LOGE("InitFrostedGlassEffect::RuntimeShader effect error\n");
             return false;

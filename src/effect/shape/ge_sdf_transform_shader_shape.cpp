@@ -14,6 +14,7 @@
  */
 
 #include "ge_sdf_transform_shader_shape.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_log.h"
 #include "ge_trace.h"
 
@@ -100,7 +101,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
         }
     )";
 
-    auto sdfTransformShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfTransformShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfTransformShaderBuilderEffect) {
         LOGE("GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder effect error");
         return nullptr;
@@ -132,7 +133,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
         }
     )";
 
-    auto sdfTransformShaderHasNormalBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfTransformShaderHasNormalBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfTransformShaderHasNormalBuilderEffect) {
         LOGE("GESDFTransformShaderShape::sdfTransformShaderHasNormalShapeBuilder effect error");
         return nullptr;
@@ -372,7 +373,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGra
         return gravityPullShaderBuilder;
     }
 
-    auto gravityPullShaderEffect = Drawing::RuntimeEffect::CreateForShader(GRAVITY_PULL_PROG);
+    auto gravityPullShaderEffect = GECreateRuntimeEffectForShader(GRAVITY_PULL_PROG);
     if (!gravityPullShaderEffect) {
         LOGE("GESDFTransformShaderShape::GetGravityPullDrawingShaderBuilder effect error");
         return nullptr;
@@ -569,7 +570,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetGra
         return gravPullShaderHasNormalBuilder;
     }
 
-    auto gravityPullShaderHasNormalEffect = Drawing::RuntimeEffect::CreateForShader(GRAVITY_PULL_NORMAL_PROG);
+    auto gravityPullShaderHasNormalEffect = GECreateRuntimeEffectForShader(GRAVITY_PULL_NORMAL_PROG);
     if (!gravityPullShaderHasNormalEffect) {
         LOGE("GESDFTransformShaderShape::GetGravPullDrawingShaderHasNormBuilder effect error");
         return nullptr;

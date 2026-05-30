@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -90,7 +91,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEHeatDistortionFilter::GetHeatDistortio
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_heatDistortionShader = nullptr;
     if (g_heatDistortionShader == nullptr) {
-        g_heatDistortionShader = Drawing::RuntimeEffect::CreateForShader(shaderStringHeatDistortion);
+        g_heatDistortionShader = GECreateRuntimeEffectForShader(shaderStringHeatDistortion);
     }
     return g_heatDistortionShader;
 }
