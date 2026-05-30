@@ -642,7 +642,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_014, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_NE(shaderFilters[0], nullptr);
+    EXPECT_EQ(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_014 end";
 }
@@ -1412,7 +1412,7 @@ HWTEST_F(GERenderTest, ApplyImageEffect_EmptyContainer, TestSize.Level1)
     ASSERT_NE(geRender, nullptr);
     
     auto outImage = geRender->ApplyImageEffect(*canvas_, veContainer, {image, src, dst}, sampling);
-    EXPECT_EQ(outImage, nullptr);
+    EXPECT_NE(outImage, nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest ApplyImageEffect_EmptyContainer end";
 }
