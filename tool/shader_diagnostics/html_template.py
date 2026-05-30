@@ -2,9 +2,12 @@
 
 All HTML output is self-contained with embedded CSS — no external dependencies.
 Uses semantic HTML with <details>/<summary> for expandable source code sections.
+Source code is syntax-highlighted via the highlighter module (GLSL/SkSL tokenizer).
 """
 
-import html
+import html as html_lib
+
+from .highlighter import highlight_glsl, format_glsl_source
 
 CSS = """\
 :root {
@@ -29,9 +32,9 @@ CSS = """\
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Noto Sans, Helvetica, Arial, sans-serif;
   color: var(--text);
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 24px 32px;
+  padding: 24px 40px;
   line-height: 1.6;
 }
 h1 { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 8px; }
@@ -54,10 +57,14 @@ h2 { margin-top: 28px; margin-bottom: 12px; }
 .card-value.green { color: var(--green); }
 .card-value.red { color: var(--red); }
 .card-value.amber { color: var(--amber); }
-table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; }
-th, td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; table-layout: fixed; }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
 th { background: var(--surface); font-weight: 600; font-size: 13px; color: var(--text-secondary); }
-.hash { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; }
+.col-hash { width: 260px; }
+.col-len { width: 70px; }
+.col-sites { width: 22%; }
+.col-src { }
+.hash { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 12px; word-break: break-all; line-height: 1.4; }
 .source-code {
   background: var(--code-bg);
   border: 1px solid var(--border);
@@ -66,8 +73,9 @@ th { background: var(--surface); font-weight: 600; font-size: 13px; color: var(-
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 13px;
   line-height: 1.5;
-  white-space: pre;
-  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
   max-height: 400px;
   overflow-y: auto;
 }
@@ -81,9 +89,25 @@ summary:hover { text-decoration: underline; }
 .section h3 { margin: 0 0 8px; font-size: 16px; }
 .site-left { color: var(--red); font-weight: 500; }
 .site-right { color: var(--green); font-weight: 500; }
-.call-site { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; }
+.call-site { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 13px; word-break: break-all; overflow-wrap: break-word; }
 .empty { color: var(--text-secondary); font-style: italic; padding: 16px; }
 footer { border-top: 1px solid var(--border); margin-top: 32px; padding-top: 12px; color: var(--text-secondary); font-size: 12px; }
+/* Syntax highlighting — GitHub-style colors for GLSL/SkSL */
+.hl-cmt { color: #6a737d; }
+.hl-pp  { color: #005cc5; }
+.hl-str { color: #032f62; }
+.hl-type { color: #0550ae; font-weight: 500; }
+.hl-kw  { color: #d73a49; }
+.hl-fn  { color: #6f42c1; }
+.hl-num { color: #e36209; }
+.hl-op  { color: #24292e; }
+@media (max-width: 768px) {
+  body { padding: 12px 16px; }
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  table { display: block; overflow-x: auto; }
+  th, td { padding: 6px 8px; }
+  .section { padding: 12px 14px; }
+}
 """
 
 
@@ -103,7 +127,7 @@ def render_page(title, body_html):
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{html.escape(title)}</title>
+<title>{html_lib.escape(title)}</title>
 <style>{CSS}</style>
 </head>
 <body>
@@ -125,18 +149,18 @@ def render_summary_cards(cards):
     items = []
     for card in cards:
         value_class = card.get("class", "")
-        value_attr = f' class="{html.escape(value_class)}"' if value_class else ""
+        value_attr = f' class="{html_lib.escape(value_class)}"' if value_class else ""
         items.append(
             f'<div class="card">'
-            f'<p class="card-label">{html.escape(card["label"])}</p>'
-            f'<p class="card-value"{value_attr}>{html.escape(str(card["value"]))}</p>'
+            f'<p class="card-label">{html_lib.escape(card["label"])}</p>'
+            f'<p class="card-value"{value_attr}>{html_lib.escape(str(card["value"]))}</p>'
             f'</div>'
         )
     return f'<div class="summary-grid">{"".join(items)}</div>'
 
 
 def render_shader_table(shaders):
-    """Render shader details as an HTML table with expandable source code.
+    """Render shader details as an HTML table with expandable highlighted source code.
 
     Args:
         shaders: List of shader dicts with keys 'hash', 'source_length', 'source_text', 'call_sites'.
@@ -146,9 +170,8 @@ def render_shader_table(shaders):
     """
     rows = []
     for shader in shaders:
-        hash_short = shader["hash"][:16] + "..."
         sites_html = "".join(
-            f'<div class="call-site">{html.escape(s["file"])}:{html.escape(s["function"])}:{s["line"]}</div>'
+            f'<div class="call-site">{html_lib.escape(s["file"])}:{html_lib.escape(s["function"])}:{s["line"]}</div>'
             for s in shader["call_sites"]
         )
         if not sites_html:
@@ -156,25 +179,31 @@ def render_shader_table(shaders):
 
         source_html = ""
         if shader["source_text"]:
-            escaped_src = html.escape(shader["source_text"])
-            line_count = len(shader["source_text"].split("\n"))
+            formatted = format_glsl_source(shader["source_text"])
+            highlighted = highlight_glsl(formatted)
+            line_count = len(formatted.split("\n"))
             source_html = (
                 f'<details><summary>Source code ({line_count} lines)</summary>'
-                f'<div class="source-code">{escaped_src}</div></details>'
+                f'<div class="source-code">{highlighted}</div></details>'
             )
 
         rows.append(
             f'<tr>'
-            f'<td class="hash">{html.escape(hash_short)}</td>'
-            f'<td>{shader["source_length"]}</td>'
-            f'<td>{sites_html}</td>'
-            f'<td>{source_html}</td>'
+            f'<td class="hash col-hash">{html_lib.escape(shader["hash"])}</td>'
+            f'<td class="col-len">{shader["source_length"]}</td>'
+            f'<td class="col-sites">{sites_html}</td>'
+            f'<td class="col-src">{source_html}</td>'
             f'</tr>'
         )
 
     return (
         f'<table>'
-        f'<thead><tr><th>Hash</th><th>Source Length</th><th>Call Sites</th><th>Source</th></tr></thead>'
+        f'<thead><tr>'
+        f'<th class="col-hash">Hash</th>'
+        f'<th class="col-len">Source Length</th>'
+        f'<th class="col-sites">Call Sites</th>'
+        f'<th class="col-src">Source</th>'
+        f'</tr></thead>'
         f'<tbody>{"".join(rows)}</tbody>'
         f'</table>'
     )
@@ -184,7 +213,7 @@ def render_diff_summary(summary):
     """Render diff summary as cards with color-coded values.
 
     Args:
-        summary: Dict with keys 'added', 'removed', 'common', 'changed_call_sites', 'source_integrity_issues'.
+        summary: Dict with keys 'added', 'removed', 'common', 'changed_call_sites'.
 
     Returns:
         HTML string for the summary grid.
@@ -199,21 +228,22 @@ def render_diff_summary(summary):
 
 
 def _render_source_details(source_text):
-    """Render expandable source code details for a shader in a diff section.
+    """Render expandable highlighted source code details for a shader in a diff section.
 
     Args:
         source_text: Shader source text string, or empty string if unavailable.
 
     Returns:
-        HTML string with <details>/<summary> element.
+        HTML string with <details>/<summary> element containing syntax-highlighted code.
     """
     if not source_text:
         return '<div class="call-site" style="color:var(--text-secondary)">Source not available</div>'
-    escaped_src = html.escape(source_text)
-    line_count = len(source_text.split("\n"))
+    formatted = format_glsl_source(source_text)
+    highlighted = highlight_glsl(formatted)
+    line_count = len(formatted.split("\n"))
     return (
         f'<details><summary>Source code ({line_count} lines)</summary>'
-        f'<div class="source-code">{escaped_src}</div></details>'
+        f'<div class="source-code">{highlighted}</div></details>'
     )
 
 
@@ -230,15 +260,14 @@ def render_added_section(added_shaders):
         return ""
     items = []
     for shader in added_shaders:
-        hash_short = shader["hash"][:16] + "..."
         sites_html = "".join(
-            f'<div class="call-site">{html.escape(s["file"])}:{html.escape(s["function"])}:{s["line"]}</div>'
+            f'<div class="call-site">{html_lib.escape(s["file"])}:{html_lib.escape(s["function"])}:{s["line"]}</div>'
             for s in shader["call_sites"]
         )
         source_html = _render_source_details(shader.get("source_text", ""))
         items.append(
             f'<div>'
-            f'<span class="hash">{html.escape(hash_short)}</span> '
+            f'<span class="hash">{html_lib.escape(shader["hash"])}</span> '
             f'(srcLen={shader["source_length"]})'
             f'{sites_html}'
             f'{source_html}'
@@ -265,15 +294,14 @@ def render_removed_section(removed_shaders):
         return ""
     items = []
     for shader in removed_shaders:
-        hash_short = shader["hash"][:16] + "..."
         sites_html = "".join(
-            f'<div class="call-site">{html.escape(s["file"])}:{html.escape(s["function"])}:{s["line"]}</div>'
+            f'<div class="call-site">{html_lib.escape(s["file"])}:{html_lib.escape(s["function"])}:{s["line"]}</div>'
             for s in shader["call_sites"]
         )
         source_html = _render_source_details(shader.get("source_text", ""))
         items.append(
             f'<div>'
-            f'<span class="hash">{html.escape(hash_short)}</span> '
+            f'<span class="hash">{html_lib.escape(shader["hash"])}</span> '
             f'(srcLen={shader["source_length"]})'
             f'{sites_html}'
             f'{source_html}'
@@ -300,19 +328,18 @@ def render_changed_section(changed_sites):
         return ""
     items = []
     for entry in changed_sites:
-        hash_short = entry["hash"][:16] + "..."
         left_html = "".join(
-            f'<div class="call-site site-left">{html.escape(s["file"])}:{html.escape(s["function"])}:{s["line"]}</div>'
+            f'<div class="call-site site-left">{html_lib.escape(s["file"])}:{html_lib.escape(s["function"])}:{s["line"]}</div>'
             for s in entry["left_sites"]
         )
         right_html = "".join(
-            f'<div class="call-site site-right">{html.escape(s["file"])}:{html.escape(s["function"])}:{s["line"]}</div>'
+            f'<div class="call-site site-right">{html_lib.escape(s["file"])}:{html_lib.escape(s["function"])}:{s["line"]}</div>'
             for s in entry["right_sites"]
         )
         source_html = _render_source_details(entry.get("source_text", ""))
         items.append(
             f'<div>'
-            f'<span class="hash">{html.escape(hash_short)}</span>'
+            f'<span class="hash">{html_lib.escape(entry["hash"])}</span>'
             f'{source_html}'
             f'<div style="margin-left:16px">'
             f'<div><strong>Left:</strong>{left_html}</div>'

@@ -63,8 +63,7 @@ def format_report_text(data):
     lines.append("")
 
     for shader in data["shaders"]:
-        hash_short = shader["hash"][:16]
-        lines.append(f"  [{hash_short}...] srcLen={shader['source_length']}")
+        lines.append(f"  [{shader['hash']}] srcLen={shader['source_length']}")
         for site in shader["call_sites"]:
             lines.append(f"    {site['file']}:{site['function']}:{site['line']}")
         if shader["source_text"]:

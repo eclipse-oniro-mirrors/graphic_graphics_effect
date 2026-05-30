@@ -74,8 +74,7 @@ def format_diff_text(data):
         lines.append(f"Added shaders ({summary['added']}):")
         lines.append("-" * 40)
         for item in data["added"]:
-            hash_short = item["hash"][:16]
-            lines.append(f"  [{hash_short}...] srcLen={item['source_length']}")
+            lines.append(f"  [{item['hash']}] srcLen={item['source_length']}")
             for site in item["call_sites"]:
                 lines.append(f"    {site['file']}:{site['function']}:{site['line']}")
         lines.append("")
@@ -84,8 +83,7 @@ def format_diff_text(data):
         lines.append(f"Removed shaders ({summary['removed']}):")
         lines.append("-" * 40)
         for item in data["removed"]:
-            hash_short = item["hash"][:16]
-            lines.append(f"  [{hash_short}...] srcLen={item['source_length']}")
+            lines.append(f"  [{item['hash']}] srcLen={item['source_length']}")
             for site in item["call_sites"]:
                 lines.append(f"    {site['file']}:{site['function']}:{site['line']}")
         lines.append("")
@@ -94,8 +92,7 @@ def format_diff_text(data):
         lines.append(f"Changed call sites ({summary['changed_call_sites']}):")
         lines.append("-" * 40)
         for item in data["changed_call_sites"]:
-            hash_short = item["hash"][:16]
-            lines.append(f"  [{hash_short}...]")
+            lines.append(f"  [{item['hash']}]")
             lines.append("    Left:")
             for site in item["left_sites"]:
                 lines.append(f"      {site['file']}:{site['function']}:{site['line']}")
