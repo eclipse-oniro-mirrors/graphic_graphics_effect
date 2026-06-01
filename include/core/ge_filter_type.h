@@ -110,6 +110,8 @@ enum class GEFilterType : int32_t {
     BORDER_SDF_LG_COLOR,
     MOTION_BLUR,
     BLUR,
+    SDF_SUB_OP_SHAPE,
+    SDF_SMOOTH_SUB_OP_SHAPE,
     MAX,
 };
 

@@ -123,6 +123,8 @@ namespace Drawing {
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.params.in"
 #include "effect/shape/ge_sdf_rrect_shader_shape.params.in"
 #include "effect/shape/ge_sdf_shadow_shader.params.in"
+#include "effect/shape/ge_sdf_smooth_sub_op_shape.params.in"
+#include "effect/shape/ge_sdf_sub_op_shape.params.in"
 #include "effect/shape/ge_sdf_transform_shader_shape.params.in"
 #include "effect/shape/ge_sdf_triangle_shape.params.in"
 #include "effect/shape/ge_sdf_union_op_shape.params.in"

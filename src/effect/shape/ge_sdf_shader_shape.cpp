@@ -16,6 +16,7 @@
 #include "ge_sdf_shader_shape.h"
 #include "ge_sdf_pixelmap_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_sub_op_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
 
@@ -62,6 +63,14 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         const auto* unionShape = static_cast<const GESDFUnionOpShaderShape*>(&shape);
         auto* thisUnion = static_cast<GESDFUnionOpShaderShape*>(this);
         thisUnion->CopyState(*unionShape);
+    } else if (GetSDFShapeType() == GESDFShapeType::SUB_OP) {
+        const auto* subOpShape = static_cast<const GESDFSubOpShaderShape*>(&shape);
+        auto* thisSubOp = static_cast<GESDFSubOpShaderShape*>(this);
+        thisSubOp->CopyState(*subOpShape);
+    } else if (GetSDFShapeType() == GESDFShapeType::SMOOTH_SUB_OP) {
+        const auto* smoothSubOpShape = static_cast<const GESDFSmoothSubOpShaderShape*>(&shape);
+        auto* thisSmoothSubOp = static_cast<GESDFSmoothSubOpShaderShape*>(this);
+        thisSmoothSubOp->CopyState(*smoothSubOpShape);
     } else if (GetSDFShapeType() == GESDFShapeType::TRANSFORM) {
         const auto* transformShape = static_cast<const GESDFTransformShaderShape*>(&shape);
         auto* thisTransform = static_cast<GESDFTransformShaderShape*>(this);
