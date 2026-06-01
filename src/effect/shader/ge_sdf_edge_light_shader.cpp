@@ -81,6 +81,25 @@ GESDFEdgeLightShader::GESDFEdgeLightShader(const Drawing::GESDFEdgeLightEffectPa
     : params_(params)
 {}
 
+void GESDFEdgeLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    canvs.Save();
+    canvas.ResetClip();
+    Preprocess(canvas, rect); // to calculate your cache data
+    MakeDrawingShader(canvas, rect, -1.f); // not use progress
+    auto shader = GetDrawingShader();
+    if (!shader) {
+        LOGE("GESDFEdgeLightShader::OnDrawShader: no shader generated, draw nothing");
+        return;
+    }
+    Drawing::Brush brush;
+    brush.SetShaderEffect(shader);
+    canvas.AttachBrush(brush);
+    canvas.DrawRect(rect);
+    canvas.DetachBrush();
+    canvas.Restore();
+}
+
 void GESDFEdgeLightShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress)
 {
     drShader_ = nullptr;
