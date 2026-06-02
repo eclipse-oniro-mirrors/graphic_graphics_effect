@@ -50,8 +50,7 @@ struct GERRect {
     float top_ = 0.f;
     float width_ = 0.f;
     float height_ = 0.f;
-    float radiusX_ = 0.f;
-    float radiusY_ = 0.f;
+
     enum Corner : uint32_t {
         TOP_LEFT = 0,
         TOP_RIGHT,
