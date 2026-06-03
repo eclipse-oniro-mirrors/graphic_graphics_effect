@@ -4,295 +4,172 @@ This file provides guidance to Agents when working with code in this repository.
 
 ## Overview
 
-This is `graphics_effect`, often abbreviated as `GE`, a component of OpenHarmony's graphics subsystem providing visual effects algorithm capabilities including blur, shadow, gradient, grayscale, edge lighting, and other shader-based effects. The library is part of the OpenHarmony foundation graphics stack and integrates with the 2D graphics rendering pipeline.
+This is `graphics_effect` (abbreviated `GE`), a component of OpenHarmony's graphics subsystem providing visual effects algorithm capabilities including blur, shadow, gradient, grayscale, edge lighting, and other shader-based effects. The library integrates with the 2D graphics rendering pipeline.
 
 ## Build System
 
-This project uses GN (Generate Ninja) as its build system, which is standard for OpenHarmony projects.
+This project uses GN (Generate Ninja) as its build system, standard for OpenHarmony projects.
 
 ### Building
 
-Build commands are typically run from the OpenHarmony root directory (not this repository root):
-
 ```bash
-# Build the main graphics_effect library
-# Build with part of OH code, independently built by component
+# Build the main graphics_effect library (independent build)
+# MUST run from the OpenHarmony root (where build.py lives), NOT from this repo!
 hb build graphics_effect -i
-# Build with full of OH code, product could be rk3568 etc.
+
+# Build with full OH code, product could be rk3568 etc.
 ./build.sh --product-name <product> --build-target graphics_effect
 ```
 
 ### Testing
 
 ```bash
-# Build all tests for graphics_effect
-# Build with part of OH code, independently built by component
+# Build all tests (independent build)
 hb build graphics_effect -t
-# Build with full of OH code, product could be rk3568 etc.
+
+# Build with full OH code
 ./build.sh --product-name <product> --build-target graphics_effect_test
 ```
 
 ### Test Organization
 
-- **Unit tests**: `test/unittest/` - Test files follow pattern `ge_*_test.cpp`
-- **Fuzz tests**: `test/fuzztest/` - Each fuzzer has its own subdirectory
-- Tests use cflags `-Dprivate=public -Dprotected=public` to test private members
+- **Unit tests**: `test/unittest/` — files follow pattern `ge_*_test.cpp`
+- **Fuzz tests**: `test/fuzztest/` — each fuzzer has its own subdirectory
+- **Tool tests**: `test/tooltest/` — tool robustness tests
+- Tests use cflags `-Dprivate=public -Dprotected=public` to access private members (OpenHarmony test framework cannot access private members without this)
+
+### Test Naming Convention
+
+- **Don't use `_001` suffix** — use descriptive names (e.g., `TestKawaseBlurRadius` not `TestKawaseBlur_001`). Numbered suffixes are a legacy pattern.
+
+## Tool Chain
+
+Python-based tooling for effect scaffolding and parameter metadata generation. See `tool/create_effect/README.md` and `tool/generate_metadata/README.md` for detailed syntax and configuration.
+
+### Effect Scaffolding
+
+```bash
+python tool/create_effect/create_effect.py <name> <type>
+```
+
+- **Types**: `filter`, `mask`, `shader`, `shape`
+- Generates `.params.in`, `.h`, `.cpp` scaffold files — shader logic must be implemented manually
+
+### Code Generation
+
+- **`python tool/generate_metadata/gen_metadata.py`** — Run after any `.params.in` file is **modified**. Generates `ge_params_reflection.h/cpp` (auto-generated — do not manually edit).
+- **`python tool/generate_metadata/gen_effect_header.py`** — Run after any `.params.in` file is **added or removed**. Generates `ge_effects_params.h` (auto-generated — do not manually edit).
+
+### Complete New Effect Workflow
+
+1. **Scaffold**: `python tool/create_effect/create_effect.py <name> <type>`
+2. **Register**: Add enum value to `ge_filter_type.h`
+3. **Implement**: Write shader logic in the generated `.cpp` file
+4. **Generate metadata**: `python tool/generate_metadata/gen_metadata.py`
+5. **Generate effects header**: `python tool/generate_metadata/gen_effect_header.py`
 
 ## Directory Structure
 
-The codebase is organized into the following structure:
-
-```
-graphics_effect/
-├── include/              # Public header files
-│   ├── core/            # Core components (interfaces, base classes)
-│   ├── effect/          # Effect implementations
-│   │   ├── filter/      # Shader-based filters
-│   │   ├── shader/      # Direct shader effects
-│   │   ├── mask/        # Masking operations
-│   │   └── shape/       # Shape-based effects (including SDF)
-│   ├── pipeline/        # Rendering pipeline and composition
-│   ├── hps/             # HPS (High Performance Shaders) integration
-│   ├── ext/             # Extension functionality
-│   └── util/            # Utility classes
-├── src/                 # Implementation files (mirrors include structure)
-│   ├── core/
-│   ├── effect/
-│   │   ├── filter/
-│   │   ├── shader/
-│   │   ├── mask/
-│   │   └── shape/
-│   ├── pipeline/
-│   ├── hps/
-│   ├── ext/
-│   └── util/
-└── test/                # Unit tests and fuzz tests
-    ├── unittest/
-    └── fuzztest/
-```
+- `include/` — Public headers (core, effect/{filter,shader,mask,shape}, pipeline, hps, ext, effect_cfg, util)
+- `src/` — Implementations (mirrors include structure)
+- `tool/` — Code generation and scaffolding (create_effect, generate_metadata)
+- `test/` — Tests (unittest, fuzztest, tooltest)
 
 ## Architecture
 
-The codebase follows a modular, layered architecture:
+The codebase follows a modular, layered architecture. → [Full architecture details](docs/architecture.md)
 
-### 1. Core Layer (`include/core/`, `src/core/`)
-- **IGEFilterType** (`ge_filter_type.h`) - Base interface for all filter types
-- **GEVisualEffect** (`ge_visual_effect.h`, `ge_visual_effect_impl.h`) - Main effect implementation class
-- **GEVisualEffectContainer** (`ge_visual_effect_container.h`) - Manages chains of multiple effects
-- **GEFilterTypeInfo** (`ge_filter_type_info.h`) - Type registration and reflection
-
-### 2. Pipeline Layer (`include/pipeline/`, `src/pipeline/`)
-- **GERender** (`ge_render.h`) - Main rendering interface and effect pipeline orchestration
-  - `DrawImageEffect()` - Applies effects and draws to canvas
-  - `ApplyImageEffect()` - Applies effects and returns resulting image
-  - `DrawShaderEffect()` - Draws shader-based effects
-  - `ApplyHpsGEImageEffect()` - Applies effects using mixed GE/HPS pipeline with composition system
-- **GEFilterComposer** (`ge_filter_composer.h`) - Multi-pass effect composition system
-- **Rendering Passes**:
-  - `GEDirectDrawOnCanvasPass` - Direct drawing to canvas
-  - `GEHPSBuildPass`, `GEHPSUpscalePass` - HPS-specific passes
-  - `GEMesaFusionPass` - Mesa fusion rendering strategy
-  - `GEFilterComposerPass` - Generic filter composition pass
-- **Caching**:
-  - `IGECacheProvider` (`ge_cache_provider.h`) - Cache provider interface
-  - `GEImageCacheProvider` (`ge_image_cache_provider.h`) - Image-based caching implementation
-
-### 3. Effect Layer (`include/effect/`, `src/effect/`)
-
-#### Filter Effects (`effect/filter/`)
-Shader-based image processing filters (all inherit from `GEShaderFilter`):
-- **Blur filters**: Kawase blur, Mesa blur, Linear gradient blur, Variable radius blur, Frosted glass blur
-- **Distortion filters**: Displacement distortion, Bezier warp, Grid warp, Magnifier
-- **Color filters**: Grey, Color gradient, Dispersion
-- **Light/Glow filters**: Edge light, Content light, Direction light, Border light
-- **SDF filters**: SDF edge light, SDF from image
-- **Transition filters**: Mask transition
-- **Other**: AI bar, Sound wave, Water ripple
-
-#### Shader Effects (`effect/shader/`)
-Direct shader effects (inherit from `GEShader`):
-- **Lighting**: Border light, Circle flowlight, Contour diagonal flow light, Particle circular halo, Wavy ripple light
-- **Material**: Frosted glass effect
-- **Color**: Color gradient effect
-- **Noise**: Aurora noise shader
-- **Extension effects (GEX prefix)**:
-  - `GEXComplexShader` - Complex shader composition
-  - `GEXDotMatrixShader` - Dot matrix pattern
-  - `GEXFlowLightSweepShader` - Flow light sweep animation
-
-#### Mask Effects (`effect/mask/`)
-Masking operations (inherit from `GEShaderMask`):
-- **Gradient masks**: Frame gradient, Linear gradient, Radial gradient, Wave gradient
-- **Image-based**: Image shader mask, Pixel map shader mask, Use effect shader mask
-- **Animated**: Ripple shader mask, Double ripple shader mask, Wave disturb shader mask
-
-#### Shape Effects (`effect/shape/`)
-Shape-based effects including SDF (Signed Distance Field) system:
-- **SDF Base** (`ge_sdf_shader_shape.h`) - Base SDF shape representation
-- **SDF Shapes**:
-  - `GESDFRRectShaderShape` - Rounded rectangle shapes
-  - `GESDFPixelmapShaderShape` - Pixelmap-based shapes
-  - `GESDFTransformShaderShape` - Transformable SDF shapes
-  - `GESDFUnionOpShaderShape` - Union operation for combining shapes
-- **SDF Effects**:
-  - `GESDFBorderShader` - SDF-based borders
-  - `GESDFColorShader` - SDF-based coloring
-  - `GESDFClipShader` - SDF-based clipping
-  - `GESDFShadowShader` - SDF-based shadow rendering
-- **Base**: `GEShaderShape` (`ge_shader_shape.h`) - Base shape interface
-
-### 4. HPS Layer (`include/hps/`, `src/hps/`)
-- **HpsEffectFilter** (`ge_hps_effect_filter.h`) - HPS-specific effect filter integration
-
-### 5. Extension Layer (`include/ext/`, `src/ext/`)
-- **GEExternalDynamicLoader** (`ge_external_dynamic_loader.h`) - Dynamic loading of external effects
-- **GEXMarshallingHelper** (`gex_marshalling_helper.cpp`) - Parameter marshalling for extension effects
-
-### 6. Utility Layer (`include/util/`, `src/util/`)
-- **GECommon** (`ge_common.h`) - Common definitions and utilities
-- **GEDowncast** (`ge_downcast.h`) - Safe downcasting utilities
-- **GELog** (`ge_log.h`) - Logging interface
-- **GETrace** (`ge_trace.h`) - Tracing utilities
-- **GESystemProperties** (`ge_system_properties.h`) - System property queries
-- **GEToneMappingHelper** (`ge_tone_mapping_helper.h`) - Tone mapping utilities
-- **Mock** (`util/mock/`) - Mock implementations for testing
-
-### Effect Type Hierarchy
-
-```
-IGEFilterType (base interface in core/ge_filter_type.h)
-├── GEShaderFilter (effect/filter/ge_shader_filter.h) - Processes images through shaders
-│   ├── Blur filters (Kawase, Mesa, Linear Gradient, Variable Radius, Frosted Glass)
-│   ├── Distortion filters (Displacement, Bezier Warp, Grid Warp, Magnifier)
-│   ├── Color filters (Grey, Color Gradient, Dispersion)
-│   ├── Light/Glow filters (Edge Light, Content Light, Direction Light, Border Light)
-│   ├── SDF filters (SDF Edge Light, SDF From Image)
-│   └── Transition/Other (Mask Transition, Water Ripple, Sound Wave, AI Bar)
-├── GEShader (effect/shader/ge_shader.h) - Direct shader effects
-│   ├── Lighting effects (Border Light, Flow Light, etc.)
-│   ├── Material effects (Frosted Glass, Color Gradient)
-│   └── Extension effects (GEX prefix - Complex, Dot Matrix, etc.)
-├── GEShaderMask (effect/mask/ge_shader_mask.h) - Masking operations
-│   ├── Gradient masks (Frame, Linear, Radial, Wave)
-│   ├── Image-based masks (Image, Pixel Map, Use Effect)
-│   └── Animated masks (Ripple, Double Ripple, Wave Disturb)
-└── GEShaderShape (effect/shape/ge_shader_shape.h) - Shape-based effects
-    ├── SDF shapes (RRect, Pixelmap, Transform, Union Op)
-    └── SDF effects (Border, Color, Clip, Shadow)
-```
+- **Core Layer** (`include/core/`) — Base interfaces (`IGEFilterType`), visual effect container, type registration, effect factory.
+- **Pipeline Layer** (`include/pipeline/`) — Rendering interface (`GERender`), multi-pass composition (`GEFilterComposer`), caching.
+- **Effect Layer** (`include/effect/`) — Four effect types: `GEShaderFilter` (image filters), `GEShader` (direct shaders), `GEShaderMask` (masking), `GEShaderShape` (SDF shapes).
+- **HPS Layer** (`include/hps/`) — High Performance Shader integration for optimized rendering.
+- **Extension Layer** (`include/ext/`) — Dynamic loading of external effects.
+- **Utility Layer** (`include/util/`) — Common definitions, logging, tracing, system properties, tone mapping, transform helpers.
+- **Effect Configuration Layer** (`include/effect_cfg/`) — XML configuration parsing (system `graphic_config.xml`).
 
 ## Key Subsystems
 
 ### SDF (Signed Distance Field) System
 
-- **Location**: `src/effect/shape/`, `include/effect/shape/`
-- **Purpose**: SDF-based shape rendering and effects (edge lighting, shadows, borders, clipping)
-- **Components**:
-  - `GESDFShaderShape` - Base SDF shape representation
-  - `GESDFRRectShaderShape` - Rounded rectangle SDF shapes
-  - `GESDFPixelmapShaderShape` - Pixelmap-based SDF shapes
-  - `GESDFTransformShaderShape` - Transformable SDF shapes
-  - `GESDFUnionOpShaderShape` - Union operations for combining SDF shapes
-  - `GESDFBorderShader` - SDF-based border rendering
-  - `GESDFColorShader` - SDF-based color effects
-  - `GESDFClipShader` - SDF-based clipping
-  - `GESDFShadowShader` - SDF-based shadow rendering
-  - `GESDFEdgeLight` (in `effect/filter/`) - SDF-based edge lighting effects
-  - `GESDFFromImageFilter` (in `effect/filter/`) - Converts images to SDF representation
+SDF-based shape rendering and effects (edge lighting, shadows, borders, clipping). Flow: define shape → optionally combine shapes → generate SDF distance shader → bind effect shader → draw. → [Full details](docs/architecture.md#sdf-signed-distance-field-system)
 
 ### Filter Composition Pipeline
 
-- **Location**: `src/pipeline/`, `include/pipeline/`
-- **Purpose**: Multi-pass effect composition system with different rendering strategies
-- **Components**:
-  - `GEFilterComposer` - Orchestrates multi-pass effect composition
-  - `GEDirectDrawOnCanvasPass` - Direct drawing to canvas
-  - `GEHPSBuildPass` - HPS build pass
-  - `GEHPSUpscalePass` - HPS upscale pass
-  - `GEMesaFusionPass` - Mesa fusion rendering pass
-  - `GEFilterComposerPass` - Generic filter composition pass
+Multi-pass effect composition with different rendering strategies. Four passes in fixed order: HpsBuild → MesaFusion → HpsUpscale → DirectDrawOnCanvas. → [Full details](docs/architecture.md#filter-composition-pipeline)
 
 ### Rendering System
 
-- **Location**: `src/pipeline/ge_render.cpp`, `include/pipeline/ge_render.h`
-- **Purpose**: Main rendering interface and effect pipeline orchestration
-- **Key APIs**:
-  - `DrawImageEffect()` - Applies effects and draws to canvas
-  - `ApplyImageEffect()` - Applies effects and returns resulting image
-  - `DrawShaderEffect()` - Draws shader-based effects
-  - `ApplyHpsGEImageEffect()` - Applies effects using mixed GE/HPS pipeline with composition system
+Main rendering interface via `GERender`. Key entry points: `DrawImageEffect()`, `ApplyImageEffect()`, `DrawShaderEffect()`, `ApplyHpsGEImageEffect()`. → [Full details](docs/architecture.md#rendering-system)
 
 ### Caching System
 
-- **Location**: `src/pipeline/`, `include/pipeline/`
-- **Purpose**: Provides caching infrastructure for rendered images
-- **Interface**:
-  - `IGECacheProvider` - Cache provider interface
-  - `GEImageCacheProvider` - Image-based caching implementation
+Two independent mechanisms: per-effect cache (`std::any` per filter) and cross-effect shared store (`IGECacheProvider` dependency injection). → [Full details](docs/architecture.md#caching-system)
 
 ### HPS Integration
 
-- **Location**: `src/hps/`, `include/hps/`
-- **Purpose**: High Performance Shaders (HPS) integration for optimized rendering
-- **Components**:
-  - `HpsEffectFilter` - HPS-specific effect filter integration
+GPU-optimized rendering via High Performance Shaders. Requires GPU extension support + system property enablement. Pure HPS or mixed GE/HPS composition. → [Full details](docs/architecture.md#hps-integration)
 
 ### Extension System
 
-- **Location**: `src/ext/`, `include/ext/`
-- **Purpose**: Dynamic loading and marshalling for external effects
-- **Components**:
-  - `GEExternalDynamicLoader` - Dynamic loading of external effect libraries
-  - `GEXMarshallingHelper` - Parameter marshalling for extension effects
+Dynamic loading of external effects via `dlopen`. Factory registration with `EXTERNAL`/`EXTERNAL_FALLBACK`/`CUSTOM` macros. Runtime dispatch via system property. → [Full details](docs/architecture.md#extension-system)
+
+## Effect Development
+
+Shaders are written inline as GLSL/SkSL strings in C++ source files. Key patterns:
+
+1. **RuntimeEffect creation**: Use `Drawing::RuntimeEffect` for shader compilation
+2. **Shader parameters**: Set via `RuntimeShaderBuilder` uniform binding
+3. **Image inputs**: Pass as shader children via `RuntimeShaderBuilder`
+4. **Output**: Shaders generate `Drawing::Image` or draw to `Drawing::Canvas`
+
+The parameter system follows a three-stage pipeline: definition (`.params.in` files) → generation (`gen_metadata.py`) → runtime (`SetParam` API). Two entry points for setting parameters:
+
+- **Tag-based**: `SetParam(GEParamsMemberTag tag, T value)` — type-safe, compile-time checked
+- **String-based**: `SetParam(const std::string& tag, T value)` — converts string to tag, then delegates to tag-based path
+
+```cpp
+auto ve = GEEffectFactory::CreateFilter(GEFilterType::DISPERSION);
+ve->SetParam(GEParamsMemberTag::DISPERSION_OPACITY, 0.5f);  // tag-based (type-safe)
+ve->SetParam(GE_FILTER_DISPERSION_OPACITY, 0.5f);           // constexpr char[] (string-based)
+```
+
+See `tool/generate_metadata/README.md` for `.params.in` definition syntax and generated API details.
 
 ## Code Conventions
 
 ### Naming
 
-- **Classes**: `GE` prefix for Graphics Effect classes (e.g., `GERender`, `GEVisualEffect`)
+- **Classes**: `GE` prefix (e.g., `GERender`, `GEVisualEffect`)
 - **Files**: Match class names with snake_case (e.g., `ge_render.cpp` for `GERender`)
-- **Parameters**: Shader parameters use string tags (e.g., `"radius"`, `"intensity"`)
 - **SDF classes**: `GESDF` prefix (e.g., `GESDFEdgeLight`)
 - **Extension classes**: `GEX` prefix (e.g., `GEXDotMatrixShader`)
 
 ### Platform Macros
 
-- `GE_OHOS` - OpenHarmony platform
-- `GE_PLATFORM_UNIX` - Unix-like platforms (Linux, OHOS)
-- `USE_M133_SKIA` - Skia version flag (M133+)
-
-### Compilation Flags
-
-- C++17 standard (`-std=c++17`)
-- Security hardening: `-D_FORTIFY_SOURCE=2`, `-ftrapv`
-- Hidden visibility by default: `-fvisibility=hidden`
-- Branch protection: `branch_protector_ret = "pac_ret"`
+- `GE_OHOS` — OpenHarmony platform
+- `GE_PLATFORM_UNIX` — Unix-like platforms (Linux, OHOS)
+- `USE_M133_SKIA` — Skia version flag (M133+)
 
 ## Dependencies
 
-- **2D Graphics**: `graphic_2d:2d_graphics` (Drawing API, Canvas, Image)
+- **2D Graphics**: `graphic_2d:2d_graphics` — provides Drawing API (`Canvas`, `Image`, `RuntimeEffect`)
 - **Logging**: `hilog:libhilog`
-- **Security**: `bounds_checking_function:libsec_shared`
-- **Utilities**: `c_utils:utils` (OpenHarmony only)
-- **Test dependencies**: `graphic_surface:surface`, `egl:libEGL`, `opengles:libGLES`
 
-## Shader Development
+## Boundaries
 
-Shaders are typically written inline as GLSL/SkSL strings within C++ source files. Key patterns:
+- ✅ **Always:**
+  - Run `gen_metadata.py` after modifying `.params.in`
+  - Run `gen_effect_header.py` after adding/removing `.params.in`
+  - Follow scaffolding workflow for new effects
+  - Use `GE` prefix for new classes
+  - Run `git clang-format` on modified code before committing
 
-1. **RuntimeEffect creation**: Effects use `Drawing::RuntimeEffect` for shader compilation
-2. **Shader parameters**: Set via `RuntimeShaderBuilder` uniform binding
-3. **Image inputs**: Passed as shader children via `RuntimeShaderBuilder`
-4. **Output**: Shaders generate `Drawing::Image` or draw to `Drawing::Canvas`
+- ⚠️ **Ask first:**
+  - Before changing core interfaces (`IGEFilterType`, `GEVisualEffect`, `GERender`)
+  - Before modifying `graphic_config.xml` parsing logic
 
-## Parameter System
-
-Visual effects use a strongly-typed parameter system via overloaded `SetParam()` methods:
-
-- Numeric: `int32_t`, `float`, `double`
-- Geometric: `Vector2f`, `Vector3f`, `Vector4f`, `Matrix`, `GERRect`
-- Images: `std::shared_ptr<Drawing::Image>`
-- Shader objects: `GEShaderMask`, `GEShaderShape`
-- SDF parameters: `GESDFBorderParams`, `GESDFShadowParams`
-
-Parameters are identified by string tags defined in `effect/ge_shader_filter_params.h`.
+- 🚫 **Never:**
+  - Manually edit `ge_params_reflection.h/cpp` or `ge_effects_params.h` (auto-generated)
+  - Run `hb` from this repo root (must run from OpenHarmony root where `build.py` lives)
+  - Use `_001` suffix in test names
+  - Commit secrets/API keys
