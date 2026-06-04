@@ -23,6 +23,7 @@ ohos_fuzztest("GEVisualEffectContainerFuzzTest") {
   fuzz_config_file = "//foundation/graphic/graphics_effect/test/fuzztest/gevisualeffectcontainer_fuzzer"
 
   include_dirs = [
+    "$graphics_effect_root/include",
     "$graphics_effect_root/src",
     "$graphics_effect_root/test/fuzztest/",
   ]
