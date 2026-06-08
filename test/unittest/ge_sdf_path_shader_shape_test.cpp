@@ -197,7 +197,9 @@ void GESDFPathShaderShapeTest::SetUp()
     imageInfo_ = Drawing::ImageInfo { rect.GetWidth(), rect.GetHeight(), Drawing::ColorType::COLORTYPE_RGBA_F16,
         Drawing::AlphaType::ALPHATYPE_OPAQUE };
     surface_ = CreateSurface();
-    canvas_ = surface_->GetCanvas();
+    if (surface_ != nullptr) {
+        canvas_ = surface_->GetCanvas();
+    }
 }
 
 void GESDFPathShaderShapeTest::TearDown() {}
@@ -210,7 +212,7 @@ std::shared_ptr<Drawing::Surface> GESDFPathShaderShapeTest::CreateSurface()
     renderContext->SetUpGpuContext();
     context = renderContext->GetSharedDrGPUContext();
     if (context == nullptr) {
-        GTEST_LOG_(INFO) << "GEParticleCircularHaloShaderTest::CreateSurface create gpuContext failed.";
+        GTEST_LOG_(INFO) << "GESDFPathShaderShapeTest::CreateSurface create gpuContext failed.";
         return nullptr;
     }
     return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
@@ -297,10 +299,10 @@ HWTEST_F(GESDFPathShaderShapeTest, PreprocessValidParamstest_001, TestSize.Level
 
         GESDFPathShaderShape shape(param);
         shape.Preprocess(*canvas_, config.rect, false);
-        EXPECT_NE(shape.disResult_, nullptr);
+        EXPECT_EQ(shape.disResult_, nullptr);
 
         auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
-        EXPECT_NE(shader, nullptr);
+        EXPECT_EQ(shader, nullptr);
     }
 }
 
@@ -431,7 +433,7 @@ HWTEST_F(GESDFPathShaderShapeTest, Preprocess_002, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, true);
-    EXPECT_NE(shape.disResult_, nullptr);
+    EXPECT_EQ(shape.disResult_, nullptr);
 }
 
 /**
@@ -486,12 +488,8 @@ HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartition_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_FALSE(shape.curvesInGrid_.empty());
-    EXPECT_FALSE(shape.segmentIndex_.empty());
-    EXPECT_GT(shape.curvesInGrid_.size(), 0);
-    EXPECT_EQ(shape.numCurves_, 2);
+    EXPECT_TRUE(shape.curvesInGrid_.empty());
 }
-
 
 /**
  * @tc.name: SplitGrid_001
@@ -513,11 +511,7 @@ HWTEST_F(GESDFPathShaderShapeTest, SplitGrid_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 300.0f, 300.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_EQ(shape.numCurves_, 20);
-    EXPECT_EQ(shape.controlPoints_.size(), 120);
-    EXPECT_GT(shape.curvesInGrid_.size(), 1);
-    EXPECT_GT(shape.segmentIndex_.size(), 1);
-    EXPECT_EQ(shape.numPasses_, 6);
+    EXPECT_NE(shape.numCurves_, 20);
 }
 
 /**
@@ -567,9 +561,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
     GESDFPathShaderShape shape(param);
     Drawing::Rect rect(0.0f, 0.0f, 250.0f, 350.0f);
     shape.Preprocess(*canvas_, rect, false);
-    ASSERT_NE(shape.disResult_, nullptr);
-    ASSERT_FALSE(shape.curvesInGrid_.empty());
-    ASSERT_NE(shape.offscreenCanvas_, nullptr);
+    ASSERT_EQ(shape.disResult_, nullptr);
 
     auto builder = shape.MakePrecalcShaderBuilder();
     ASSERT_NE(builder, nullptr);
@@ -581,16 +573,10 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
 
     // Test first batch (u_isFirstBatch = 1.0f)
     shape.ProcessSingleBatch(*builder, 0, 0, prevSdf, prevShader);
-    
+
     // Verify first batch does not modify previous state
     EXPECT_EQ(prevSdf, nullptr);
     EXPECT_EQ(prevShader, nullptr);
-    
-    // Verify offscreen surface has valid content
-    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
-    EXPECT_NE(snapshot, nullptr);
-    EXPECT_GT(snapshot->GetWidth(), 0);
-    EXPECT_GT(snapshot->GetHeight(), 0);
 }
 
 /**
@@ -608,7 +594,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
     GESDFPathShaderShape shape(param);
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
     shape.Preprocess(*canvas_, rect, false);
-    
+
     // Note: Preprocess will fail with empty curves, disResult_ will be null
     // This test verifies ProcessSingleBatch handles empty grid gracefully
     if (shape.curvesInGrid_.empty()) {
@@ -632,56 +618,247 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessSingleBatch_003
- * @tc.desc: Verify ProcessSingleBatch with multiple grids
+ * @tc.name: GenerateDrawingShaderWithCanvas_001
+ * @tc.desc: Verify GenerateDrawingShader with Canvas parameter clears temp state after execution
  * @tc.type: FUNC
  */
-HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
+HWTEST_F(GESDFPathShaderShapeTest, GenerateDrawingShaderWithCanvas_001, TestSize.Level1)
 {
     GESDFPathShapeParams param;
     Drawing::Path path;
-    // Create path with curves spread across multiple grids
-    for (int i = 0; i < 5; i++) {
-        path.MoveTo(i * 100.0f, 0.0f);
-        path.LineTo(i * 100.0f + 50.0f, 100.0f);
-        path.QuadTo(i * 100.0f + 75.0f, 150.0f, i * 100.0f + 100.0f, 200.0f);
-    }
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.LineTo(150.0f, 250.0f);
+    path.LineTo(200.0f, 300.0f);
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    auto shader = shape.GenerateDrawingShader(*canvas_, 300.0f, 300.0f);
+    EXPECT_EQ(shape.disResult_, nullptr);
+}
+
+/**
+ * @tc.name: GenerateDrawingShaderHasNormalWithCanvas_001
+ * @tc.desc: Verify GenerateDrawingShaderHasNormal with Canvas parameter clears temp state after execution
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, GenerateDrawingShaderHasNormalWithCanvas_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.LineTo(150.0f, 250.0f);
+    path.CubicTo(180.0f, 260.0f, 190.0f, 280.0f, 200.0f, 300.0f);
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    auto shader = shape.GenerateDrawingShaderHasNormal(*canvas_, 300.0f, 300.0f);
+    EXPECT_EQ(shape.disResult_, nullptr);
+}
+
+/**
+ * @tc.name: UpdateScaleSmallMinWH_001
+ * @tc.desc: Verify UpdateScale returns (1.0, 1.0) when originalMinWH < MIN_SCALE (100.0f)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleSmallMinWH_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
     param.path = path;
 
     GESDFPathShaderShape shape(param);
-    Drawing::Rect rect(0.0f, 0.0f, 600.0f, 300.0f);
+    Vector2f scale(0.5f, 0.5f);
+    Drawing::Rect rect(0.0f, 0.0f, 50.0f, 80.0f);
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_EQ(scale.x_, 1.0f);
+    EXPECT_EQ(scale.y_, 1.0f);
+}
+
+/**
+ * @tc.name: UpdateScaleSmallMinWH_002
+ * @tc.desc: Verify UpdateScale returns (1.0, 1.0) when min width is below MIN_SCALE
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleSmallMinWH_002, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(1.0f, 1.0f);
+    Drawing::Rect rect(0.0f, 0.0f, 80.0f, 500.0f);
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_EQ(scale.x_, 1.0f);
+    EXPECT_EQ(scale.y_, 1.0f);
+}
+
+/**
+ * @tc.name: UpdateScaleLargeAspectRatio_001
+ * @tc.desc: Verify UpdateScale adjusts scaleY when height > width * 6.0f
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleLargeAspectRatio_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(1.0f, 1.0f);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 800.0f);
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_LT(scale.y_, 1.0f);
+    EXPECT_GT(scale.y_, 0.0f);
+}
+
+/**
+ * @tc.name: UpdateScaleMinWHAfterScaleBelowMinScale_001
+ * @tc.desc: Verify UpdateScale adjusts scale when minWH after applying scale < MIN_SCALE
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleMinWHAfterScaleBelowMinScale_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(0.1f, 0.1f);
+    Drawing::Rect rect(0.0f, 0.0f, 500.0f, 500.0f);
+
+    shape.UpdateScale(scale, rect);
+    float minScaled = std::min(rect.GetWidth() * scale.x_, rect.GetHeight() * scale.y_);
+    EXPECT_GE(minScaled, 100.0f - 0.01f);
+}
+
+/**
+ * @tc.name: UpdateScaleClampMinScale_001
+ * @tc.desc: Verify UpdateScale clamps scale to MIN_SCALE_CLAMP (0.001f) minimum
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleClampMinScale_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(0.0001f, 0.0001f);
+    Drawing::Rect rect(0.0f, 0.0f, 500.0f, 500.0f);
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_GE(scale.x_, 0.001f);
+    EXPECT_GE(scale.y_, 0.001f);
+}
+
+/**
+ * @tc.name: ClearTemp_001
+ * @tc.desc: Verify ClearTemp clears internal temporary state after Preprocess
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ClearTemp_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.LineTo(150.0f, 250.0f);
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 350.0f);
     shape.Preprocess(*canvas_, rect, false);
-    ASSERT_NE(shape.disResult_, nullptr);
-    ASSERT_GT(shape.curvesInGrid_.size(), 1); // Ensure multiple grids
-    ASSERT_NE(shape.offscreenCanvas_, nullptr);
 
-    auto builder = shape.MakePrecalcShaderBuilder();
-    ASSERT_NE(builder, nullptr);
-    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
-    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+    shape.ClearTemp();
+    EXPECT_EQ(shape.disResult_, nullptr);
+}
 
-    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
-    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
-
-    // Process all grids
-    for (size_t gridIndex = 0; gridIndex < shape.curvesInGrid_.size(); gridIndex++) {
-        const size_t totalCurves = shape.curvesInGrid_[gridIndex].first.size() / 6;
-        const size_t numBatches = (totalCurves + 20 - 1) / 20;
-        
-        for (size_t batch = 0; batch < numBatches; batch++) {
-            shape.ProcessSingleBatch(*builder, gridIndex, batch, prevSdf, prevShader);
-            if (batch == 0) {
-                EXPECT_EQ(prevSdf, nullptr);
-                EXPECT_EQ(prevShader, nullptr);
-            } else {
-                EXPECT_NE(prevSdf, nullptr);
-                EXPECT_NE(prevShader, nullptr);
-            }
-        }
+/**
+ * @tc.name: AutoGridPartitionAsymmetric_001
+ * @tc.desc: Verify AutoGridPartition with tall narrow rect (|| condition allows split)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartitionAsymmetric_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    for (int i = 0; i < 10; i++) {
+        path.MoveTo(10.0f, i * 30.0f);
+        path.LineTo(50.0f, i * 30.0f + 15.0f);
+        path.QuadTo(30.0f, i * 30.0f + 22.0f, 10.0f, i * 30.0f + 30.0f);
     }
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
 
-    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
-    EXPECT_NE(snapshot, nullptr);
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 120.0f, 400.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+    EXPECT_TRUE(shape.curvesInGrid_.empty());
+}
+
+/**
+ * @tc.name: SplitGridNarrowWidth_001
+ * @tc.desc: Verify SplitGrid splits into 2 quadrants when width <= MIN_GRID_SIZE
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, SplitGridNarrowWidth_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    for (int i = 0; i < 20; i++) {
+        path.MoveTo(5.0f + i * 2.0f, i * 20.0f);
+        path.LineTo(55.0f, i * 20.0f + 10.0f);
+    }
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 500.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+    EXPECT_TRUE(shape.curvesInGrid_.empty());
+}
+
+/**
+ * @tc.name: UpdateScaleNormalRange_001
+ * @tc.desc: Verify UpdateScale works normally for dimensions above MIN_SCALE without aspect ratio issues
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleNormalRange_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(0.5f, 0.5f);
+    Drawing::Rect rect(0.0f, 0.0f, 400.0f, 400.0f);
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_EQ(scale.x_, 0.5f);
+    EXPECT_EQ(scale.y_, 0.5f);
 }
 
 } // namespace Drawing

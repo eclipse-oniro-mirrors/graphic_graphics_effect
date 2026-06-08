@@ -32,11 +32,8 @@ namespace Rosen {
 namespace Drawing {
 
 namespace {
-static constexpr float MIN_SCALE = 200.0f;
+static constexpr float MIN_SCALE = 100.0f;
 static constexpr uint32_t LINE = 2;
-static constexpr uint32_t QUADRATIC_BEZIER = 3;
-static constexpr uint32_t CUBIC_BEZIER = 4;
-constexpr uint32_t MAX_CURVES_PER_GRID = 4;
 constexpr uint32_t MAX_CURVES_SUBMIT_PER_GRID = 20;
 constexpr uint32_t MIN_GRID_SIZE = 64;
 constexpr uint32_t CURVE_FLOAT_COUNT = 6;
@@ -45,26 +42,19 @@ constexpr uint32_t XMAX_I = 1;
 constexpr uint32_t YMIN_I = 2;
 constexpr uint32_t YMAX_I = 3;
 constexpr Drawing::ColorType RGBA_F16 = Drawing::ColorType::COLORTYPE_RGBA_F16;
-constexpr bool NOT_BUDGETED = false;
-constexpr float DEFAULT_BASE_WIDTH = 150.0f;
-constexpr float DEFAULT_BASE_HEIGHT = 250.0f;
-constexpr float MAX_THICKNESS = 0.05f;
-constexpr float POWER_BASE = 2.0f;
 constexpr float MIN_SCALE_CLAMP = 0.001f;
 constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate conversion
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
-constexpr float ASPECT_DEFAULT = 1.0f;      // default aspect ratio when width/height is zero
 constexpr float MIDPOINT_FACTOR = 0.5f;     // factor for calculating midpoint
-constexpr float INVALID_CONTROL_POINT = -2.0f; // not included in the NDC space
-constexpr float INVALID_SEGMENT_INDEX = -1.0f; // invalid negative curve index
 
 bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
     return !(a[XMAX_I] < b[XMIN_I] || a[XMIN_I] > b[XMAX_I] || a[YMAX_I] < b[YMIN_I] || a[YMIN_I] > b[YMAX_I]);
 }
 
-std::vector<Vector2f> ConvertPixelToNDC(const std::vector<Vector2f>& pixelPoints, float baseWidth = DEFAULT_BASE_WIDTH,
-    float baseHeight = DEFAULT_BASE_HEIGHT)
+// 150.0f: default base width, 250.0f: default base height
+std::vector<Vector2f> ConvertPixelToNDC(const std::vector<Vector2f>& pixelPoints, float baseWidth = 150.0f,
+    float baseHeight = 250.0f)
 {
     if (baseWidth < 1.0f || baseHeight < 1.0f) { // 1.0f is minimum pixel size
         return {};
@@ -159,8 +149,7 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
     const float EPSILON_1E_MINUS_3 = 0.001;
 
     float sampleSdf(vec2 baseUv, vec2 offset) {
-        vec2 sampleUv = baseUv + offset / iResolution.xy;
-        float sdf = u_sdfTex.eval(sampleUv * iResolution).r;
+        float sdf = abs(u_sdfTex.eval(baseUv + offset).r);
         if (sdf < INF_1E4 - EPSILON_1E_MINUS_3) {
             float ndcOffset = length(offset) * (2.0 / iResolution.y);
             return sdf + ndcOffset;
@@ -169,26 +158,25 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
     }
 
     vec4 main(vec2 fragCoord) {
-        vec2 uv = fragCoord / iResolution.xy;
-
         float mask = u_maskTex.eval(fragCoord).r;
         float currentSdf = u_sdfTex.eval(fragCoord).r;
-        if (mask < 1.0 || currentSdf < INF_1E4 - EPSILON_1E_MINUS_3) {
+        if (mask < 1.0) {
             return vec4(vec3(currentSdf), 1.0);
         }
 
         float step = u_step;
-        float minSdf = currentSdf;
-        minSdf = min(minSdf, sampleSdf(uv, vec2(-step, -step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, -step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(step, -step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(-step, 0.0)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(step, 0.0)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(-step, step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(0.0, step)));
-        minSdf = min(minSdf, sampleSdf(uv, vec2(step, step)));
+        float minSdf = abs(currentSdf);
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(-step, -step)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(0.0, -step)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(step, -step)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(-step, 0.0)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(step, 0.0)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(-step, step)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(0.0, step)));
+        minSdf = min(minSdf, sampleSdf(fragCoord, vec2(step, step)));
 
-        return vec4(minSdf);
+        minSdf *= -1.0;
+        return vec4(vec3(minSdf), 1.0);
     }
 )";
 
@@ -202,65 +190,184 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     uniform shader u_prevD;
     uniform float u_isFirstBatch;
 
-    const float INF_1E20 = 1e20;
+    const float INF_1E4 = 1e4;
     const float SQRT3 = 1.7320508;
+    const float ENDPOINT_MATCH_EPS = 1e-3;
+    const float CORNER_TYPE_EPS = 1e-6;
+    const float EPSILON_1E_MINUS_8 = 1e-8;
+    const float ONE_THIRD = 1.0 / 3.0;
 
-    float sdf_bezier_unsigned_sq(vec2 pos, vec2 A, vec2 B, vec2 C) {
-        const float EPSILON_1E_MINUS_3 = 1e-8;
-        vec2 a = B - A;
-        vec2 b = A - 2.0 * B + C;
+    float cro(vec2 a, vec2 b) {
+        return a.x * b.y - a.y * b.x;
+    }
 
-        if (dot(b, b) < EPSILON_1E_MINUS_3) {
-            vec2 pa = pos - A;
-            vec2 ba = C - A;
-            float ba2 = dot(ba, ba);
-            if (ba2 < EPSILON_1E_MINUS_3) return dot(pa, pa);
-            float h = clamp(dot(pa, ba) / ba2, 0.0, 1.0);
-            vec2 dvec = pa - h * ba;
-            return dot(dvec, dvec);
+    bool isDistinct(vec2 p1, vec2 p2) {
+        return length(p1 - p2) > 1e-4;
+    }
+
+    float sdSegmentSigned(vec2 p, vec2 a, vec2 b) {
+        vec2 pa = p - a;
+        vec2 ba = b - a;
+        float cross_val = cro(ba, pa);
+        float side = cross_val > 0.0 ? -1.0 : 1.0;
+        float ba2 = dot(ba, ba);
+        if (ba2 < EPSILON_1E_MINUS_8) {
+            return dot(pa, pa) * side;
+        }
+        float h = clamp(dot(pa, ba) / ba2, 0.0, 1.0);
+        vec2 dvec = pa - h * ba;
+        return dot(dvec, dvec) * side;
+    }
+
+    float sdfBezierStable(vec2 p, vec2 v0, vec2 v1, vec2 v2)
+    {
+        vec2 a = v1 - v0;
+        vec2 b = v0 - 2.0 * v1 + v2;
+        if (dot(b, b) < EPSILON_1E_MINUS_8) {
+            return sdSegmentSigned(p, v0, v2);
         }
 
-        const float ONE_THIRD = 1.0 / 3.0;
+        // Solving cubic equations
         vec2 c = a * 2.0;
-        vec2 d = A - pos;
+        vec2 d = v0 - p;
         float kk = 1.0 / dot(b, b);
         float kx = kk * dot(a, b);
         float ky = kk * (2.0 * dot(a, a) + dot(d, b)) * ONE_THIRD;
         float kz = kk * dot(d, a);
         float res = 0.0;
-        float p = ky - kx * kx;
-        float q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
-        float h = q * q + 4.0 * p * p * p;
+        float pp = ky - kx * kx;
+        float qq = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
+        float hh = qq * qq + 4.0 * pp * pp * pp;
 
-        if (h >= 0.0) {
-            h = sqrt(h);
-            vec2 x = 0.5 * (vec2(h, -h) - q);
+        float tCubic;
+        vec2 qvCubic;
+        float distCubic;
+        bool ishh = false;
+
+        if (hh >= 0.0) {
+            hh = sqrt(hh);
+            vec2 x = 0.5 * (vec2(hh, -hh) - qq);
             vec2 uv = sign(x) * pow(abs(x), vec2(ONE_THIRD));
-            float t = clamp(uv.x + uv.y - kx, 0.0, 1.0);
-            vec2 qv = d + (c + b * t) * t;
-            res = dot(qv, qv);
-        } else {
-            float z = sqrt(-p);
-            float v = acos(q / (p * z * 2.0)) * ONE_THIRD;
+            tCubic = clamp(uv.x + uv.y - kx, 0.0, 1.0);
+            qvCubic = d + (c + b * tCubic) * tCubic;
+            distCubic = dot(qvCubic, qvCubic);
+            ishh = true;
+        }
+        if (!ishh) {
+            float z = sqrt(-pp);
+            float v = acos(clamp(qq / (pp * z * 2.0), -1.0, 1.0)) * ONE_THIRD;
             float m = cos(v);
             float n = sin(v) * SQRT3;
 
             float t1 = clamp((m + m) * z - kx, 0.0, 1.0);
-            float t2 = clamp((-n - m) * z - kx, 0.0, 1.0);
-
             vec2 q1 = d + (c + b * t1) * t1;
             float d1 = dot(q1, q1);
+
+            float t2 = clamp((-n - m) * z - kx, 0.0, 1.0);
             vec2 q2 = d + (c + b * t2) * t2;
             float d2 = dot(q2, q2);
 
-            res = min(d1, d2);
+            tCubic = (d1 <= d2) ? t1 : t2;
+            qvCubic = (d1 <= d2) ? q1 : q2;
+            distCubic = min(d1, d2);
         }
-        return res;
+
+        // calculate signs
+        float distV0 = dot(d, d);
+        vec2 dV2 = v2 - p;
+        float distV2 = dot(dV2, dV2);
+        float bestDist2 = min(distCubic, min(distV0, distV2));
+
+        float bestT = tCubic;
+        vec2 bestVec = qvCubic;
+        bool check1 = false;
+        if (distV0 <= distCubic && distV0 <= distV2) {
+            bestT = 0.0;
+            bestVec = d;
+            check1 = true;
+        }
+        if (!check1 && distV2 <= distCubic && distV2 <= distV0) {
+            bestT = 1.0;
+            bestVec = dV2;
+        }
+
+        vec2 tangent = 2.0 * (a + b * bestT);
+        float side = cro(tangent, bestVec) < 0.0 ? -1.0 : 1.0;
+        return bestDist2 * side;
     }
 
-    float FindClosestBezier(vec2 p, inout vec2 outA, inout vec2 outB, inout vec2 outC) {
-        float minDist = INF_1E20;
-        int curveCount = int(u_curveCount);
+    int bezierCornerType(vec2 p1, vec2 p2, vec2 p3, float eps)
+    {
+        vec2 v1 = p1 - p2;
+        vec2 v2 = p3 - p2;
+        float cross = cro(v1, v2);
+        return cross > eps ? 1 : (cross < -eps ? -1 : 0);
+    }
+
+    float calculateMinimumWithCorrectSign(vec2 p, float d1, float d2,
+        vec2 c1_0, vec2 c1_1, vec2 c1_2,
+        vec2 c2_0, vec2 c2_1, vec2 c2_2)
+    {
+        float sgn1 = sign(d1);
+        float sgn2 = sign(d2);
+        float absD1 = abs(d1);
+        float absD2 = abs(d2);
+
+        float finalD = absD1 < absD2 ? d1 : d2;
+
+        bool share1 = length(c1_2 - c2_0) < ENDPOINT_MATCH_EPS;
+        bool share2 = length(c2_2 - c1_0) < ENDPOINT_MATCH_EPS;
+
+        vec2 p1, p2, p3;
+        bool isCorner = false;
+        bool isshare1 = false;
+
+        if (share1) {
+            p2 = c1_2;
+            float distToCorner = length(p - p2);
+            if (absD1 >= distToCorner - 1e-3 && absD2 >= distToCorner - 1e-3) {
+                p1 = isDistinct(c1_1, c1_2) ? c1_1 : c1_0;
+                p3 = isDistinct(c2_0, c2_1) ? c2_1 : c2_2;
+                isCorner = true;
+            }
+            isshare1 = true;
+        }
+        if (!isshare1 && share2) {
+            p2 = c2_2;
+            float distToCorner = length(p - p2);
+            if (absD1 >= distToCorner - 1e-3 && absD2 >= distToCorner - 1e-3) {
+                p1 = isDistinct(c2_1, c2_2) ? c2_1 : c2_0;
+                p3 = isDistinct(c1_0, c1_1) ? c1_1 : c1_2;
+                isCorner = true;
+            }
+        }
+
+        if (!isCorner) {
+            return finalD;
+        }
+        int cornerType = bezierCornerType(p1, p2, p3, CORNER_TYPE_EPS);
+        if (cornerType > 0) {
+            finalD = min(absD1, absD2) * min(sgn1, sgn2);
+        }
+        if (cornerType < 0) {
+            finalD = min(absD1, absD2) * max(sgn1, sgn2);
+        }
+
+        return finalD;
+    }
+
+    void FindTwoClosestCurves(vec2 p, out float d1, out float d2,
+        out vec2 c1_0, out vec2 c1_1, out vec2 c1_2,
+        out vec2 c2_0, out vec2 c2_1, out vec2 c2_2)
+    {
+        d1 = INF_1E4;
+        d2 = INF_1E4;
+        c1_0 = vec2(0.0);
+        c1_1 = vec2(0.0);
+        c1_2 = vec2(0.0);
+        c2_0 = vec2(0.0);
+        c2_1 = vec2(0.0);
+        c2_2 = vec2(0.0);
 
         for (int i = 0; i < MAX_CURVES_IN_GRID; i++) {
             int global_curve_idx = int(segmentIndex[i]);
@@ -270,36 +377,44 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
             vec2 B = controlPoints[i * 3 + 1];
             vec2 C = controlPoints[i * 3 + 2];
 
-            float d = sdf_bezier_unsigned_sq(p, A, B, C);
-            if (d < minDist) {
-                minDist = d;
+            float d = sdfBezierStable(p, A, B, C);
+            float absD = abs(d);
+            bool isd1 = false;
+
+            if (absD < abs(d1)) {
+                d2 = d1; c2_0 = c1_0; c2_1 = c1_1; c2_2 = c1_2;
+                d1 = d;  c1_0 = A;    c1_1 = B;    c1_2 = C;
+                isd1 = true;
+            }
+            if (!isd1 && absD < abs(d2)) {
+                d2 = d;  c2_0 = A;    c2_1 = B;    c2_2 = C;
             }
         }
-        return minDist;
-    }
-
-    float get_sdf_shape(vec2 p) {
-        vec2 A = vec2(0.0);
-        vec2 B = vec2(0.0);
-        vec2 C = vec2(0.0);
-        float min_dist = FindClosestBezier(p, A, B, C);
-        return sqrt(min_dist);
     }
 
     vec4 main(vec2 fragCoord) {
         vec2 uv = fragCoord / iResolution;
         float ndcAspect = iResolution.x / iResolution.y;
-        vec2 ndc = vec2(
-            (uv.x * 2.0 - 1.0) * ndcAspect,
-            uv.y * 2.0 - 1.0
-        );
-        float currentD = get_sdf_shape(ndc);
+        vec2 ndc = uv * 2.0 - 1.0;
+        ndc.x *= ndcAspect;
 
-        if (u_isFirstBatch < 1e-3) {
-            float prevD = u_prevD.eval(fragCoord).r;
-            currentD = min(currentD, prevD);
+        float d1;
+        float d2;
+        vec2 c1[3];
+        vec2 c2[3];
+        FindTwoClosestCurves(ndc, d1, d2, c1[0], c1[1], c1[2], c2[0], c2[1], c2[2]);
+        d1 = sqrt(abs(d1)) * sign(d1);
+        d2 = sqrt(abs(d2)) * sign(d2);
+
+        float currentD = calculateMinimumWithCorrectSign(ndc, d1, d2, c1[0], c1[1], c1[2], c2[0], c2[1], c2[2]);
+
+        if (u_isFirstBatch > 0.0) {
+            return vec4(vec3(currentD), 1.0);
         }
-
+        float prevD = u_prevD.eval(fragCoord).r;
+        if (abs(prevD) < abs(currentD)) {
+            currentD = prevD;
+        }
         return vec4(vec3(currentD), 1.0);
     }
 )";
@@ -307,58 +422,26 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
 static const std::string NORMAL_CALCULATION_SHADER = R"(
     uniform vec2 iResolution;
     uniform shader u_seeds;
-    uniform shader pathShader;
-
-    float smoothSign(float mask) {
-        const float TRANSITION_WIDTH = 0.499;
-        return 1.0 - 2.0 * smoothstep(0.5 - TRANSITION_WIDTH, 0.5 + TRANSITION_WIDTH, mask);
-    }
+    uniform float pixelScale;
 
     vec4 main(vec2 fragCoord) {
-        float centerD_raw = u_seeds.eval(fragCoord).r;
-        float L_raw = u_seeds.eval(fragCoord + vec2(-1.0, 0.0)).r;
-        float R_raw = u_seeds.eval(fragCoord + vec2(1.0, 0.0)).r;
-        float T_raw = u_seeds.eval(fragCoord + vec2(0.0, -1.0)).r;
-        float B_raw = u_seeds.eval(fragCoord + vec2(0.0, 1.0)).r;
+        float centerSdf = u_seeds.eval(fragCoord).r * pixelScale;
+        float h = 1.0 + clamp(abs(centerSdf) * 0.2, 0.0, 8.0);
 
-        const float PIXEL_SCALE = 2.0;
-        float pixelDFactor = iResolution.y * PIXEL_SCALE;
-        centerD_raw = (centerD_raw + L_raw + R_raw + T_raw + B_raw) * 0.2 * pixelDFactor;
-        float factor = 1.0 - smoothstep(10.0, 0.0, centerD_raw);
-        centerD_raw *= factor;
-
-        float mask_center = pathShader.eval(fragCoord).r;
-        float mask_L = pathShader.eval(fragCoord + vec2(-1.0, 0.0)).r;
-        float mask_R = pathShader.eval(fragCoord + vec2(1.0, 0.0)).r;
-        float mask_T = pathShader.eval(fragCoord + vec2(0.0, -1.0)).r;
-        float mask_B = pathShader.eval(fragCoord + vec2(0.0, 1.0)).r;
-
-        float sign_center = smoothSign(mask_center);
-        float sign_L = smoothSign(mask_L);
-        float sign_R = smoothSign(mask_R);
-        float sign_T = smoothSign(mask_T);
-        float sign_B = smoothSign(mask_B);
-        
-        float centerD = centerD_raw * sign_center;
-        float L = L_raw * sign_L;
-        float R = R_raw * sign_R;
-        float T = T_raw * sign_T;
-        float B = B_raw * sign_B;
+        float L = u_seeds.eval(fragCoord + vec2(-h, 0.0)).r;
+        float R = u_seeds.eval(fragCoord + vec2(h, 0.0)).r;
+        float T = u_seeds.eval(fragCoord + vec2(0.0, -h)).r;
+        float B = u_seeds.eval(fragCoord + vec2(0.0, h)).r;
 
         vec2 normal = vec2(R - L, B - T) * 0.5;
-
-        const float NORMAL_EPSILON = 0.00001;
         float len = length(normal);
-        if (len > NORMAL_EPSILON) {
-            normal /= len;
-        } else {
-            normal = vec2(0.0, 0.0);
+        vec2 tempNormal = vec2(0.0, 0.0);
+        if (len > 0.00001) {
+            tempNormal = normal / len;
         }
+        normal = tempNormal;
 
-        const float AA_MARGIN = 3.0;
-        float finalSdf = centerD + AA_MARGIN;
-
-        return vec4(normal, 0.0, finalSdf);
+        return vec4(normal, 0.0, centerSdf);
     }
 )";
 
@@ -368,10 +451,6 @@ static const std::string CLEAR_INF_SHADER = R"(
             return vec4(vec3(INF_1E4), 1.0);
     }
 )";
-
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_jfaShaderEffect_ = nullptr;
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_distanceShaderEffect_ = nullptr;
-thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_pathSeedShaderEffect_ = nullptr;
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_precalcShaderEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalShaderEffect_ = nullptr;
@@ -391,7 +470,7 @@ static std::vector<float> parseNumbers(const std::string& s, size_t& i)
         }
 
         // check whether it is the next command (letter).
-        char c = std::toupper(s[i]);
+        char c = static_cast<char>(std::toupper(s[i]));
         if (std::isalpha(c) && !(i + 1 < s.length() && (s[i + 1] == '-' || std::isdigit(s[i + 1])))) {
             LOGD("next command: %{public}c", c);
             break;
@@ -439,7 +518,7 @@ std::vector<std::vector<Vector2f>> GESDFPathShaderShape::GetCurveByPath(const Dr
             break;
         }
 
-        char cmd = std::toupper(svgPath[i]);
+        char cmd = static_cast<char>(std::toupper(svgPath[i]));
         i++;
         // Read the corresponding number of digits according to the letters
         std::vector<float> numbers = parseNumbers(svgPath, i);
@@ -522,7 +601,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     std::shared_ptr<Image> input = sdfTex;
     std::shared_ptr<Image> output = nullptr;
     for (size_t i = 0; i < numPasses_; i++) {
-        int pixelStep = static_cast<int>(pow(POWER_BASE, numPasses_ - i - 1));
+        int pixelStep = static_cast<int>(pow(2.0f, numPasses_ - i - 1)); // 2.0f: power base
         auto inputSdfShader =
             ShaderEffect::CreateImageShader(*input, TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
         builder->SetChild("u_sdfTex", inputSdfShader);
@@ -566,7 +645,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
 
     auto inputShader = ShaderEffect::CreateImageShader(*sdfTex, TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
     normalBuilder->SetChild("u_seeds", inputShader);
-    normalBuilder->SetChild("pathShader", pathShader);
+    normalBuilder->SetUniform("pixelScale", static_cast<float>(height * (1.0f / params_.scale.y_)));
     normalBuilder->SetUniform("iResolution", static_cast<float>(width), static_cast<float>(height));
 #ifdef RS_ENABLE_GPU
     return normalBuilder->MakeImage(gpuContext.get(), nullptr, inputImageInfo, false);
@@ -583,7 +662,7 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         return;
     }
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), NOT_BUDGETED, imageInfo);
+    offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), false, imageInfo);
     if (!offscreenSurface_) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenSurface is invalid");
         return;
@@ -593,7 +672,6 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenCanvas is invalid");
         return;
     }
-
     auto FallbackClear = [this, &rect]() {
         Drawing::Brush brush;
         brush.SetColor(0x00000000);
@@ -601,7 +679,6 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         offscreenCanvas_->DrawRect(rect);
         offscreenCanvas_->DetachBrush();
     };
-
     if (!g_clearInfEffect) {
         g_clearInfEffect = RuntimeEffect::CreateForShader(CLEAR_INF_SHADER);
         if (!g_clearInfEffect) {
@@ -610,21 +687,18 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
             return;
         }
     }
-
     auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_clearInfEffect);
     if (!builder) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas create builder failed");
         FallbackClear();
         return;
     }
-
     auto clearShader = builder->MakeShader(nullptr, false);
     if (!clearShader) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas clear Shader failed");
         FallbackClear();
         return;
     }
-
     Drawing::Brush clearBrush;
     clearBrush.SetShaderEffect(clearShader);
     offscreenCanvas_->AttachBrush(clearBrush);
@@ -653,8 +727,8 @@ void GESDFPathShaderShape::AutoGridPartition(float width, float height, float ma
         workQueue.pop();
         float w = current.bbox[XMAX_I] - current.bbox[XMIN_I];
         float h = current.bbox[YMAX_I] - current.bbox[YMIN_I];
-        bool needsSplit = (current.curveIndices.size() > MAX_CURVES_PER_GRID) &&
-                          (w > MIN_GRID_SIZE && h > MIN_GRID_SIZE);
+        bool needsSplit = (current.curveIndices.size() > 4) && // 4: max curves per grid
+                          (w > MIN_GRID_SIZE || h > MIN_GRID_SIZE);
         if (needsSplit) {
             SplitGrid(current, curveBBoxes, workQueue, MIN_GRID_SIZE);
         } else {
@@ -671,12 +745,24 @@ void GESDFPathShaderShape::SplitGrid(
     float midY = (current.bbox[YMIN_I] + current.bbox[YMAX_I]) * MIDPOINT_FACTOR;
 
     // Divide into four quadrants
-    Box4f quadrants[4] = {
+    std::vector<Box4f> quadrants = {
         { current.bbox[XMIN_I], midX, current.bbox[YMIN_I], midY }, // Top-Left
         { midX, current.bbox[XMAX_I], current.bbox[YMIN_I], midY }, // Top-Right
         { current.bbox[XMIN_I], midX, midY, current.bbox[YMAX_I] }, // Bottom-Left
         { midX, current.bbox[XMAX_I], midY, current.bbox[YMAX_I] }  // Bottom-Right
     };
+
+    if (current.bbox[XMAX_I] - current.bbox[XMIN_I] <= MIN_GRID_SIZE) {
+        quadrants = {
+            { current.bbox[XMIN_I], current.bbox[XMAX_I], current.bbox[YMIN_I], midY }, // Top
+            { current.bbox[XMIN_I], current.bbox[XMAX_I], midY, current.bbox[YMAX_I] }  // Bottom
+        };
+    } else if (current.bbox[YMAX_I] - current.bbox[YMIN_I] <= MIN_GRID_SIZE) {
+        quadrants = {
+            { current.bbox[XMIN_I], midX, current.bbox[YMIN_I], current.bbox[YMAX_I] }, // Left
+            { midX, current.bbox[XMAX_I], current.bbox[YMIN_I], current.bbox[YMAX_I] }  // Right
+        };
+    }
 
     for (const auto& quad : quadrants) {
         Grid child { quad, {} };
@@ -725,7 +811,7 @@ Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float max
     // map ndc to [0, 1]
     float aspect;
     if (height < 0.001f || width < 0.001f) { // 0.001f is the minimum value
-        aspect = ASPECT_DEFAULT;
+        aspect = 1.0; // 1.0f: default aspect ratio when width or height is zero
     } else {
         aspect = width / height;
     }
@@ -802,12 +888,12 @@ std::vector<Vector2f> GESDFPathShaderShape::ProcessCurveSegments(const std::vect
             pixelControlPoints.push_back(segment[0]);
             pixelControlPoints.push_back(segment[1]); // 1 is index
             numCurves_++;
-        } else if (segment.size() == QUADRATIC_BEZIER) {
+        } else if (segment.size() == 3) { // 3 is size of QUADRATIC BEZIER
             pixelControlPoints.push_back(segment[0]);
             pixelControlPoints.push_back(segment[1]); // 1 is index
             pixelControlPoints.push_back(segment[2]); // 2 is index of QUADRATIC BEZIER
             numCurves_++;
-        } else if (segment.size() == CUBIC_BEZIER) {
+        } else if (segment.size() == 4) { // 4 is size of CUBIC BEZIER
             Vector2f controlPoint = segment[1]; // 1 is index
             // 0, 2, 3 is index of CUBIC BEZIER
             cubicToQuadraticSingle(segment[0], controlPoint, segment[2], segment[3]);
@@ -828,7 +914,7 @@ void GESDFPathShaderShape::ProcessSingleBatch(Drawing::RuntimeShaderBuilder& bui
     const auto& allSegments = segmentIndex_[gridIndex];
     const Box4f area = grid.second.bbox;
     const Drawing::Rect rectN(area[XMIN_I], area[YMIN_I], area[XMAX_I], area[YMAX_I]);
-    
+
     const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
     const size_t totalCurves = allCurves.size() / CURVE_FLOAT_COUNT;
     const size_t start = batch * curvesPerBatch;
@@ -843,8 +929,8 @@ void GESDFPathShaderShape::ProcessSingleBatch(Drawing::RuntimeShaderBuilder& bui
         batchCurves.insert(batchCurves.end(), allCurves.begin() + base, allCurves.begin() + base + CURVE_FLOAT_COUNT);
         batchSegments.push_back(allSegments[j]);
     }
-    batchCurves.resize(curvesPerBatch * CURVE_FLOAT_COUNT, INVALID_CONTROL_POINT);
-    batchSegments.resize(curvesPerBatch, INVALID_SEGMENT_INDEX);
+    batchCurves.resize(curvesPerBatch * CURVE_FLOAT_COUNT, -2.0f); // -2.0f: not included in the NDC space
+    batchSegments.resize(curvesPerBatch, -1.0f); // -1.0f: invalid negative curve index
 
     builder.SetUniform("controlPoints", batchCurves.data(), batchCurves.size());
     builder.SetUniform("segmentIndex", batchSegments.data(), batchSegments.size());
@@ -892,13 +978,8 @@ void GESDFPathShaderShape::RenderGridsToSurface(const Drawing::Rect& targetRect)
     builder->SetUniform("iResolution", targetRect.GetWidth(), targetRect.GetHeight());
     builder->SetUniform("u_curveCount", static_cast<float>(numCurves_));
     SamplingOptions nearest(FilterMode::LINEAR, MipmapMode::LINEAR);
-    auto prevSdf = offscreenSurface_->GetImageSnapshot();
-    if (!prevSdf) {
-            LOGE("GESDFPathShaderShape::RenderGridsToSurface: failed to get image snapshot from offscreen surface");
-            return;
-        }
-    auto prevShader = ShaderEffect::CreateImageShader(*prevSdf,
-        TileMode::CLAMP, TileMode::CLAMP, nearest, Matrix());
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
     for (size_t i = 0; i < curvesInGrid_.size(); i++) {
         if (curvesInGrid_[i].first.size() > 0) {
             const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
@@ -966,17 +1047,30 @@ void GESDFPathShaderShape::cubicToQuadraticSingle(
 
 void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rect)
 {
+    float originalW = rect.GetWidth();
+    float originalH = rect.GetHeight();
+    float originalMinWH = std::min(originalW, originalH);
+    if (originalMinWH < MIN_SCALE) {
+        scale = Vector2f(1.0f, 1.0f); // 1.0f: maximum scale
+        return;
+    }
     float scaleX = std::clamp(scale.x_, MIN_SCALE_CLAMP, 1.0f); // 1.0f: maximum scale
     float scaleY = std::clamp(scale.y_, MIN_SCALE_CLAMP, 1.0f); // 1.0f: maximum scale
-    float width = rect.GetWidth() * scaleX;
-    float height = rect.GetHeight() * scaleY;
-    if (width < MIN_SCALE && width > 0.0f) {
-        scaleX = MIN_SCALE / rect.GetWidth();
+    float width = originalW * scaleX;
+    float height = originalH * scaleY;
+    float minWH = std::min(width, height);
+    if (minWH < MIN_SCALE) {
+        scaleX = MIN_SCALE / originalMinWH;
+        scaleY = scaleX;
+        width = originalW * scaleX;
+        height = originalH * scaleY;
     }
-    
-    if (height < MIN_SCALE && height > 0.0f) {
-        scaleY = MIN_SCALE / rect.GetHeight();
+    if (height > (width * 6.0f)) { // 6.0f: Large aspect ratio difference
+        scaleY *= (width * 6.0f) / height; // 6.0f: Reduce aspect ratio differences
     }
+
+    scaleX = std::max(scaleX, MIN_SCALE_CLAMP);
+    scaleY = std::max(scaleY, MIN_SCALE_CLAMP);
     scale = Vector2f(scaleX, scaleY);
 }
 
@@ -1009,7 +1103,7 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     ConvertPointsToFloats(ndcControlPoints, controlPoints_);
     pointCnt_ = controlPoints_.size();
 
-    AutoGridPartition(width, height, MAX_THICKNESS);
+    AutoGridPartition(width, height, 0.05f); // 0.05f is the max thickne of grid size
     if (curvesInGrid_.empty()) {
         LOGE("GESDFPathShaderShape::Preprocess: AutoGridPartition failed.");
         return;
@@ -1062,6 +1156,30 @@ std::shared_ptr<ShaderEffect> GESDFPathShaderShape::GenerateDrawingShader(float 
 std::shared_ptr<ShaderEffect> GESDFPathShaderShape::GenerateDrawingShaderHasNormal(float width, float height) const
 {
     return GenerateDrawingShader(width, height);
+}
+
+void GESDFPathShaderShape::ClearTemp()
+{
+    disResult_ = nullptr;
+    offscreenSurface_ = nullptr;
+    offscreenCanvas_ = nullptr;
+}
+
+std::shared_ptr<ShaderEffect> GESDFPathShaderShape::GenerateDrawingShader(Canvas& canvas, float width, float height)
+{
+    Preprocess(canvas, Rect(0.0, 0.0, width, height), false);
+    auto out = GenerateDrawingShader(width, height);
+    ClearTemp(); // delete member variables that are no longer used.
+    return out;
+}
+
+std::shared_ptr<ShaderEffect> GESDFPathShaderShape::GenerateDrawingShaderHasNormal(Canvas& canvas,
+    float width, float height)
+{
+    Preprocess(canvas, Rect(0.0, 0.0, width, height), true);
+    auto out = GenerateDrawingShaderHasNormal(width, height);
+    ClearTemp(); // delete member variables that are no longer used.
+    return out;
 }
 
 } // namespace Drawing

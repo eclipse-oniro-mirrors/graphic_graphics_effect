@@ -47,6 +47,9 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShader(Canvas& canvas, float width, float height) override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(Canvas& canvas,
+        float width, float height) override;
     void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override;
     static std::vector<std::vector<Vector2f>> GetCurveByPath(const Drawing::Path& path);
 
@@ -120,6 +123,7 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeNormalShaderBuilder();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeSdfPropShaderBuilder();
 
+    void ClearTemp();
 
     std::shared_ptr<Image> disResult_ = nullptr;
 
