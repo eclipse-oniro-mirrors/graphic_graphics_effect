@@ -223,6 +223,24 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
         float otherD = dominantIsLeft ? right.eval(qOut).a : left.eval(qOut).a;
         return 1.0 - smoothstep(HIDDEN_FIX_START, HIDDEN_FIX_END, otherD);
     }
+    
+    const float N_SCALE = 2048.0;
+
+    float EncodeDir(vec2 dir)
+    {
+        float xPos = floor(dir.x + N_SCALE);
+        float yPos = floor(dir.y + N_SCALE);
+        return xPos + (yPos / N_SCALE) / 2.0;
+    }
+
+    vec2 DecodeDir(float z)
+    {
+        float xPos = floor(z);
+        float yPos = (z - xPos) * N_SCALE * 2.0 - N_SCALE;
+        xPos -= N_SCALE;
+        return vec2(xPos, yPos);
+    }
+
     vec4 sdgSmoothUnionAt(vec2 p, vec4 d1, vec4 d2, float k)
     {
         k = max(k, 0.0001) * 4.0;
@@ -234,7 +252,11 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
         float t = (da < db) ? h : 1.0 - h;
         float d = min(da, db) - h * h * k;
         vec2 gSmooth = safeNormalize(mix(g1, g2, t), g1);
-        float z = mix(d1.z, d2.z, t);
+
+        vec2 centerDir1 = DecodeDir(d1.z);
+        vec2 centerDir2 = DecodeDir(d2.z);
+        vec2 centerDirUnion = mix(centerDir1, centerDir2, (d1.a < d2.a) ? h : 1.0 - h);
+        float z = EncodeDir(centerDirUnion);
         bool dominantIsLeft = da < db;
         float dDom = dominantIsLeft ? da : db;
         vec2 gDom = dominantIsLeft ? g1 : g2;
