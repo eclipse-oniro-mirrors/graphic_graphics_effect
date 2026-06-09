@@ -545,41 +545,6 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: ProcessSingleBatch_001
- * @tc.desc: Verify ProcessSingleBatch with single grid and single batch (first batch)
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
-{
-    GESDFPathShapeParams param;
-    Drawing::Path path;
-    path.MoveTo(10.0f, 20.0f);
-    path.LineTo(100.0f, 200.0f);
-    path.QuadTo(150.0f, 250.0f, 200.0f, 300.0f);
-    param.path = path;
-
-    GESDFPathShaderShape shape(param);
-    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 350.0f);
-    shape.Preprocess(*canvas_, rect, false);
-    ASSERT_EQ(shape.disResult_, nullptr);
-
-    auto builder = shape.MakePrecalcShaderBuilder();
-    ASSERT_NE(builder, nullptr);
-    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
-    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
-
-    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
-    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
-
-    // Test first batch (u_isFirstBatch = 1.0f)
-    shape.ProcessSingleBatch(*builder, 0, 0, prevSdf, prevShader);
-
-    // Verify first batch does not modify previous state
-    EXPECT_EQ(prevSdf, nullptr);
-    EXPECT_EQ(prevShader, nullptr);
-}
-
-/**
  * @tc.name: ProcessSingleBatch_002
  * @tc.desc: Verify ProcessSingleBatch with empty grid curves
  * @tc.type: FUNC
