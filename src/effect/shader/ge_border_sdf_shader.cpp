@@ -44,7 +44,9 @@ void GEBorderSDFShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing
         return;
     }
 
-    auto sdfShader = params_.shape->GenerateDrawingShader(canvas, rect.GetWidth(), rect.GetHeight());
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
+        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : rect.GetWidth(),
+        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGD("GEBorderSDFShader::MakeSDFBorderShader no valid params.");
         return;

@@ -67,7 +67,9 @@ void GEBorderSDFLGColorShader::MakeDrawingShader(Drawing::Canvas& canvas, const 
         }
     }
     float posMax = positions[params_.colorNumber - 1];
-    auto sdfShader = params_.shape->GenerateDrawingShader(rect.GetWidth(), rect.GetHeight());
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
+        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : rect.GetWidth(),
+        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : rect.GetHeight());
     if (sdfShader == nullptr) {
         GE_LOGE("GEBorderSDFLGColorShader::MakeSDFBorderShader no valid sdfShader.");
         return;
