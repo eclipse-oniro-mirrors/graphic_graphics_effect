@@ -1003,7 +1003,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::DrawPathToImage(
 
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::DrawPathToImage");
     Drawing::ImageInfo imageInfo = Drawing::ImageInfo { width, height, Drawing::ColorType::COLORTYPE_RGBA_F16,
-        Drawing::AlphaType::ALPHATYPE_UNKNOWN };
+        Drawing::AlphaType::ALPHATYPE_PREMUL };
     std::shared_ptr<Drawing::Surface> surface =
         Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), false, imageInfo);
     if (!surface) {
