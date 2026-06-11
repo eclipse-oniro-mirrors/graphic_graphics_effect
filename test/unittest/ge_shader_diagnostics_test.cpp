@@ -59,8 +59,18 @@ public:
 
 void GEShaderDiagnosticsTest::SetUpTestCase(void) {}
 void GEShaderDiagnosticsTest::TearDownTestCase(void) {}
-void GEShaderDiagnosticsTest::SetUp() {}
-void GEShaderDiagnosticsTest::TearDown() {}
+void GEShaderDiagnosticsTest::SetUp()
+{
+#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+    GESetShaderDiagnosticsEnabledForTest(true);
+#endif
+}
+void GEShaderDiagnosticsTest::TearDown()
+{
+#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+    GESetShaderDiagnosticsEnabledForTest(false);
+#endif
+}
 
 #ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
@@ -221,6 +231,73 @@ HWTEST_F(GEShaderDiagnosticsTest, CreateForShaderWithOptions_DefaultSourceLocati
 // ============================================================================
 
 #ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+
+/**
+ * @tc.name: Diagnostics_RuntimeDisabled_NoFileCreation
+ * @tc.desc: Verify that when diagnostics are runtime-disabled, no diagnostic files are created
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_RuntimeDisabled_NoFileCreation, TestSize.Level1)
+{
+    // Force-disable diagnostics (overrides the test SetUp which force-enabled them)
+    GESetShaderDiagnosticsEnabledForTest(false);
+
+    std::string hash = ComputeTestSHA256(SKSL_MINIMAL);
+    CleanupDiagnosticsFiles(hash);
+
+    GECreateRuntimeEffectForShader(SKSL_MINIMAL);
+
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
+
+    int csvFd = open(csvPath.c_str(), O_RDONLY);
+    EXPECT_LT(csvFd, 0); // File should NOT exist
+    if (csvFd >= 0) {
+        close(csvFd);
+    }
+
+    int skslFd = open(skslPath.c_str(), O_RDONLY);
+    EXPECT_LT(skslFd, 0); // File should NOT exist
+    if (skslFd >= 0) {
+        close(skslFd);
+    }
+
+    CleanupDiagnosticsFiles(hash);
+}
+
+/**
+ * @tc.name: Diagnostics_RuntimeDisabled_OptionsOverload_NoFileCreation
+ * @tc.desc: Verify RuntimeEffectOptions overload also skips diagnostics when runtime-disabled
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_RuntimeDisabled_OptionsOverload_NoFileCreation, TestSize.Level1)
+{
+    // Force-disable diagnostics
+    GESetShaderDiagnosticsEnabledForTest(false);
+
+    std::string hash = ComputeTestSHA256(SKSL_MINIMAL);
+    CleanupDiagnosticsFiles(hash);
+
+    Drawing::RuntimeEffectOptions options;
+    GECreateRuntimeEffectForShader(SKSL_MINIMAL, options);
+
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
+
+    int csvFd = open(csvPath.c_str(), O_RDONLY);
+    EXPECT_LT(csvFd, 0);
+    if (csvFd >= 0) {
+        close(csvFd);
+    }
+
+    int skslFd = open(skslPath.c_str(), O_RDONLY);
+    EXPECT_LT(skslFd, 0);
+    if (skslFd >= 0) {
+        close(skslFd);
+    }
+
+    CleanupDiagnosticsFiles(hash);
+}
 
 /**
  * @tc.name: Diagnostics_FileCreation

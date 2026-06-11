@@ -18,6 +18,7 @@
 #include <string>
 
 #include "ge_log.h"
+#include "ge_system_properties.h"
 
 #ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 #include <cerrno>
@@ -48,6 +49,24 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std
 #else // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 namespace {
+
+constexpr const char* PROPERTY_SHADER_DIAGNOSTICS_ENABLED = "persist.sys.graphic.geShaderDiagnosticsEnabled";
+
+bool g_shaderDiagnosticsForceEnabledForTest = false;
+
+static bool IsShaderDiagnosticsEnabled()
+{
+    if (g_shaderDiagnosticsForceEnabledForTest) {
+        return true;
+    }
+#ifdef GE_OHOS
+    static bool enabled =
+        (std::atoi(GESystemProperties::GetEventProperty(PROPERTY_SHADER_DIAGNOSTICS_ENABLED).c_str()) != 0);
+    return enabled;
+#else
+    return false;
+#endif
+}
 
 std::string ComputeSHA256(const std::string& src)
 {
@@ -153,9 +172,17 @@ void DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
 
 } // anonymous namespace
 
+void GESetShaderDiagnosticsEnabledForTest(bool enabled)
+{
+    g_shaderDiagnosticsForceEnabledForTest = enabled;
+}
+
 std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc)
 {
+    if (!IsShaderDiagnosticsEnabled()) {
+        return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
+    }
     std::string hash = ComputeSHA256(shaderSrc);
     if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
         DumpSkslSource(hash, shaderSrc);
@@ -167,6 +194,9 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
 std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc)
 {
+    if (!IsShaderDiagnosticsEnabled()) {
+        return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
+    }
     std::string hash = ComputeSHA256(shaderSrc);
     if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
         DumpSkslSource(hash, shaderSrc);

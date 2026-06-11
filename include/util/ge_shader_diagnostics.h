@@ -35,13 +35,15 @@ constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_
  *
  * This function wraps Drawing::RuntimeEffect::CreateForShader to provide:
  * - Zero-overhead forwarding when GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is not defined
- * - Shader source hash and source location tracking when diagnostics are enabled
+ * - Runtime-controlled diagnostics when GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined:
+ *   diagnostics are disabled by default and enabled via the system property
+ *   "persist.sys.graphic.geShaderDiagnosticsEnabled" (set to "1" to enable)
  *
  * @param shaderSrc The shader source code string
  * @param srcLoc Source location captured at call site (default: GESourceLocation::Current())
  * @return std::shared_ptr<Drawing::RuntimeEffect> The created runtime effect, or nullptr on failure
  *
- * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined, this function will:
+ * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined AND the runtime property is enabled:
  *       1. Compute SHA256 digest of the shader source
  *       2. Atomically write per-hash files using O_CREAT|O_EXCL (no cross-process contention):
  *          - /data/service/el0/render_service/ge_shader_diagnostics.{hash}.csv  (file,function,line,srcLen)
@@ -49,6 +51,10 @@ constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_
  *       3. If files already exist (same hash from another process), skip writing.
  *          Only the first process to encounter a given shader hash records its source
  *          location; subsequent encounters across processes are silently skipped.
+ *
+ * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined but the runtime property is
+ *       disabled (default), this function forwards directly to
+ *       Drawing::RuntimeEffect::CreateForShader with no diagnostics overhead.
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc = GESourceLocation::Current());
@@ -65,6 +71,19 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
     const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc = GESourceLocation::Current());
+
+#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
+/**
+ * @brief Test-only override to force-enable or force-disable shader diagnostics.
+ *
+ * This function bypasses the runtime property check, allowing unit tests to
+ * verify diagnostics behavior regardless of the system property state.
+ * Must be restored to false after each test to avoid leaking state.
+ *
+ * @param enabled True to force-enable diagnostics, false to restore runtime-property control.
+ */
+GE_EXPORT void GESetShaderDiagnosticsEnabledForTest(bool enabled);
+#endif
 
 } // namespace Rosen
 } // namespace OHOS
