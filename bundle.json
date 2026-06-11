@@ -14,7 +14,7 @@
       "subsystem": "graphic",
       "syscap": [ ],
       "adapted_system_type": [ "standard" ],
-      "features": [ "graphics_effect_feature_upgrade_skia", "graphics_effect_feature_diagnostics_dump_shader_creator" ],
+      "features": [ "graphics_effect_feature_upgrade_skia" ],
       "rom": "",
       "ram": "",
       "deps": {

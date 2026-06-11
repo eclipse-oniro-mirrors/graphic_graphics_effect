@@ -180,10 +180,7 @@ ohos_source_set("graphics_effect_test_src") {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
 
-  if (graphics_effect_feature_diagnostics_dump_shader_creator) {
-    defines += [ "GE_DIAGNOSTICS_DUMP_SHADER_CREATOR" ]
-    external_deps += [ "openssl:libcrypto_shared" ]
-  }
+  external_deps += [ "openssl:libcrypto_shared" ]
 
   part_name = "graphics_effect"
   subsystem_name = "graphic"
@@ -304,13 +301,10 @@ ohos_unittest("GraphicsEffectTest") {
     "hilog:libhilog",
     "graphic_2d:librender_service_base",
     "libxml2:libxml2",
+    "openssl:libcrypto_shared",
   ]
 
   defines = []
-  if (graphics_effect_feature_diagnostics_dump_shader_creator) {
-    defines += [ "GE_DIAGNOSTICS_DUMP_SHADER_CREATOR" ]
-    external_deps += [ "openssl:libcrypto_shared" ]
-  }
 
   part_name = "graphics_effect"
   subsystem_name = "graphic"

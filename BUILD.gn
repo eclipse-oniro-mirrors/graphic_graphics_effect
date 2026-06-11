@@ -217,10 +217,7 @@ ohos_source_set("graphics_effect_src") {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
 
-  if (graphics_effect_feature_diagnostics_dump_shader_creator) {
-    defines += [ "GE_DIAGNOSTICS_DUMP_SHADER_CREATOR" ]
-    external_deps += [ "openssl:libcrypto_shared" ]
-  }
+  external_deps += [ "openssl:libcrypto_shared" ]
 
   output_name = "graphics_effect"
   part_name = "graphics_effect"

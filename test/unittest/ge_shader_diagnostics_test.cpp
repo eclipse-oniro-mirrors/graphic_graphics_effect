@@ -13,18 +13,14 @@
  * limitations under the License.
  */
 
+#include <fcntl.h>
 #include <gtest/gtest.h>
+#include <openssl/sha.h>
+#include <string>
+#include <unistd.h>
 
 #include "ge_shader_diagnostics.h"
 #include "ge_source_location.h"
-
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
-#include <openssl/sha.h>
-
-#include <fcntl.h>
-#include <string>
-#include <unistd.h>
-#endif
 
 using namespace testing;
 using namespace testing::ext;
@@ -50,29 +46,21 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
     static std::string ComputeTestSHA256(const std::string& src);
     void CleanupDiagnosticsFiles(const std::string& hash);
     static std::string ReadFileContent(const std::string& path);
-#endif
 };
 
 void GEShaderDiagnosticsTest::SetUpTestCase(void) {}
 void GEShaderDiagnosticsTest::TearDownTestCase(void) {}
 void GEShaderDiagnosticsTest::SetUp()
 {
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
     GESetShaderDiagnosticsEnabledForTest(true);
-#endif
 }
 void GEShaderDiagnosticsTest::TearDown()
 {
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
     GESetShaderDiagnosticsEnabledForTest(false);
-#endif
 }
-
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 std::string GEShaderDiagnosticsTest::ComputeTestSHA256(const std::string& src)
 {
@@ -114,8 +102,6 @@ std::string GEShaderDiagnosticsTest::ReadFileContent(const std::string& path)
     close(fd);
     return content;
 }
-
-#endif // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 // ============================================================================
 // Both-mode tests
@@ -227,10 +213,8 @@ HWTEST_F(GEShaderDiagnosticsTest, CreateForShaderWithOptions_DefaultSourceLocati
 }
 
 // ============================================================================
-// Diagnostics-mode tests
+// Diagnostics tests
 // ============================================================================
-
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 /**
  * @tc.name: Diagnostics_RuntimeDisabled_NoFileCreation
@@ -464,8 +448,6 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_OptionsOverloadFileCreation, TestS
 
     CleanupDiagnosticsFiles(hash);
 }
-
-#endif // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 } // namespace Rosen
 } // namespace OHOS

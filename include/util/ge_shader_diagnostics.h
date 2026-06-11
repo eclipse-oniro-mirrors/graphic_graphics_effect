@@ -26,24 +26,22 @@
 namespace OHOS {
 namespace Rosen {
 
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_service/";
-#endif
 
 /**
  * @brief Creates a RuntimeEffect for shader with optional diagnostics tracking.
  *
  * This function wraps Drawing::RuntimeEffect::CreateForShader to provide:
- * - Zero-overhead forwarding when GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is not defined
- * - Runtime-controlled diagnostics when GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined:
- *   diagnostics are disabled by default and enabled via the system property
- *   "persist.sys.graphic.geShaderDiagnosticsEnabled" (set to "1" to enable)
+ * - Runtime-controlled diagnostics: disabled by default, enabled via the system
+ *   property "persist.sys.graphic.geShaderDiagnosticsEnabled" (set to "1" to enable)
+ * - When diagnostics are disabled (default), this function forwards directly to
+ *   Drawing::RuntimeEffect::CreateForShader with minimal overhead (a static bool check).
  *
  * @param shaderSrc The shader source code string
  * @param srcLoc Source location captured at call site (default: GESourceLocation::Current())
  * @return std::shared_ptr<Drawing::RuntimeEffect> The created runtime effect, or nullptr on failure
  *
- * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined AND the runtime property is enabled:
+ * @note When the runtime property is enabled:
  *       1. Compute SHA256 digest of the shader source
  *       2. Atomically write per-hash files using O_CREAT|O_EXCL (no cross-process contention):
  *          - /data/service/el0/render_service/ge_shader_diagnostics.{hash}.csv  (file,function,line,srcLen)
@@ -52,9 +50,9 @@ constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_
  *          Only the first process to encounter a given shader hash records its source
  *          location; subsequent encounters across processes are silently skipped.
  *
- * @note When GE_DIAGNOSTICS_DUMP_SHADER_CREATOR is defined but the runtime property is
- *       disabled (default), this function forwards directly to
- *       Drawing::RuntimeEffect::CreateForShader with no diagnostics overhead.
+ * @note When the runtime property is disabled (default), this function forwards directly to
+ *       Drawing::RuntimeEffect::CreateForShader with no diagnostics overhead beyond a
+ *       static bool check.
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     const std::string& shaderSrc, const GESourceLocation& srcLoc = GESourceLocation::Current());
@@ -72,7 +70,6 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
     const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc = GESourceLocation::Current());
 
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 /**
  * @brief Test-only override to force-enable or force-disable shader diagnostics.
  *
@@ -83,7 +80,6 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
  * @param enabled True to force-enable diagnostics, false to restore runtime-property control.
  */
 GE_EXPORT void GESetShaderDiagnosticsEnabledForTest(bool enabled);
-#endif
 
 } // namespace Rosen
 } // namespace OHOS

@@ -15,38 +15,18 @@
 
 #include "ge_shader_diagnostics.h"
 
-#include <string>
-
-#include "ge_log.h"
-#include "ge_system_properties.h"
-
-#ifdef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 #include <cerrno>
 #include <fcntl.h>
 #include <openssl/sha.h>
+#include <string>
 #include <unistd.h>
 
+#include "ge_log.h"
+#include "ge_system_properties.h"
 #include "securec.h"
-#endif
 
 namespace OHOS {
 namespace Rosen {
-
-#ifndef GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
-
-std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
-    const std::string& shaderSrc, [[maybe_unused]] const GESourceLocation& srcLoc)
-{
-    return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
-}
-
-std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
-    const Drawing::RuntimeEffectOptions& options, [[maybe_unused]] const GESourceLocation& srcLoc)
-{
-    return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
-}
-
-#else // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 namespace {
 
@@ -204,8 +184,6 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
     LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s", srcLoc.FileName(), srcLoc.Line(), hash.c_str());
     return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
 }
-
-#endif // GE_DIAGNOSTICS_DUMP_SHADER_CREATOR
 
 } // namespace Rosen
 } // namespace OHOS
