@@ -36,7 +36,7 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
                max={200.0f, 200.0f, 200.0f})]]
     Vector3f lightDir = Vector3f(0.0f, 0.0f, 0.0f);
     [[ge::prop(min={0.0f, 0.0f},
-               max={200.0f, 200.0f},
+               max={100.0f, 100.0f},
                cast_from="std::pair<float,float>",
                custom="PairToVector2fTransformer")]]
     Vector2f thickParams = Vector2f(1.0f, 1.0f);
