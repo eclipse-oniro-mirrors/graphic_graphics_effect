@@ -121,7 +121,8 @@ static constexpr char SDF_GRAD_PROG[] = R"(
     vec4 main(float2 fragCoord)
     {
         vec3 sdg = sdgRoundedTriangle(fragCoord, vertex0, vertex1, vertex2, radius);
-        float packedDir = EncodeDir(sdg.yz);
+        vec2 centerPos = (vertex0 + vertex1 + vertex2) / 3.0;
+        float packedDir = EncodeDir(fragCoord - centerPos);
         return vec4(sdg.yz, packedDir, sdg.x);
     }
 )";
