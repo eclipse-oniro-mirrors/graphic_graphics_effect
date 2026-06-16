@@ -45,7 +45,28 @@ void GESDFClipShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rect&
     brush.SetBlendMode(Drawing::BlendMode::DST_IN);
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
-    canvas.DrawRect(rect);
+    Drawing::Rect inscribedRect;
+    bool ringDrawValid = shader && params_.shape && params_.shape->GetInscribedRect(inscribedRect);
+    if (ringDrawValid) {
+        Drawing::Region outerRegion;
+        outerRegion.SetRect(Drawing::RectI(
+            floor(rect.GetLeft()),
+            floor(rect.GetTop()),
+            ceil(rect.GetRight()),
+            ceil(rect.GetBottom())));
+        const int innerRegionShrink = 1;
+        Drawing::Region innerRegion;
+        innerRegion.SetRect(Drawing::RectI(
+            ceil(inscribedRect.GetLeft()) + innerRegionShrink,
+            ceil(inscribedRect.GetTop()) + innerRegionShrink,
+            floor(inscribedRect.GetRight()) - innerRegionShrink,
+            floor(inscribedRect.GetBottom())- innerRegionShrink));
+        Drawing::Region ringRegion(outerRegion);
+        ringRegion.Op(innerRegion, Drawing::RegionOp::DIFFERENCE);
+        canvas.DrawRegion(ringRegion);
+    } else {
+        canvas.DrawRect(rect);
+    }
     canvas.DetachBrush();
 }
 

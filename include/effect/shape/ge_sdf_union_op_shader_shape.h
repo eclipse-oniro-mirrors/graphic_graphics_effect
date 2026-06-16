@@ -69,6 +69,7 @@ public:
     }
 
     bool HasType(const GESDFShapeType type) const override;
+    bool GetInscribedRect(Rect& rect) override;
 private:
     GESDFUnionOpShapeParams params_ {};
     std::shared_ptr<ShaderEffect> GenerateUnionOpDrawingShader(std::shared_ptr<ShaderEffect> leftShader,

@@ -82,6 +82,20 @@ HWTEST_F(GESDFShaderShapeTest, GenerateDrawingShaderHasNormal_001, TestSize.Leve
     EXPECT_EQ(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFShaderShapeTest GenerateDrawingShaderHasNormal_001 end";
 }
+
+/**
+ * @tc.name: GetInscribedRectDefaultReturnsFalse
+ * @tc.desc: Verify GetInscribedRect default implementation returns false for non-overriding shapes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShaderShapeTest, GetInscribedRectDefaultReturnsFalse, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFShaderShapeTest GetInscribedRectDefaultReturnsFalse start";
+    TestSDFShaderShape shape(GESDFShapeType::EMPTY);
+    Drawing::Rect rect;
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+    GTEST_LOG_(INFO) << "GESDFShaderShapeTest GetInscribedRectDefaultReturnsFalse end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

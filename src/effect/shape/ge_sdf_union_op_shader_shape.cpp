@@ -349,6 +349,26 @@ bool GESDFUnionOpShaderShape::HasType(const GESDFShapeType type) const
     }
     return false;
 }
+
+bool GESDFUnionOpShaderShape::GetInscribedRect(Rect& rect)
+{
+    Rect leftRect;
+    Rect rightRect;
+    bool leftSupport = params_.left ? params_.left->GetInscribedRect(leftRect) : false;
+    bool rightSupport = params_.right ? params_.right->GetInscribedRect(rightRect) : false;
+    if (!leftSupport && !rightSupport) {
+        return false;
+    }
+
+    // Use the inscribed rect of one shape as the inscribed rect for the union result
+    // Take the union of two inscribed rects should be better
+    if (leftSupport) {
+        rect = leftRect;
+    } else {
+        rect = rightRect;
+    }
+    return true;
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

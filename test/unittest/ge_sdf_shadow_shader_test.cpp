@@ -172,5 +172,45 @@ HWTEST_F(GESDFShadowShaderTest, UpdateRectForElevationShadowTest, TestSize.Level
     EXPECT_EQ(newRect.GetTop(), -764.0f);
     EXPECT_EQ(newRect.GetBottom(), 757.0f);
 }
+
+/**
+ * @tc.name: OnDrawShaderRingDrawRegion
+ * @tc.desc: Verify OnDrawShader takes ring draw path when not filled and shape supports GetInscribedRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShadowShaderTest, OnDrawShaderRingDrawRegion, TestSize.Level1)
+{
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    rectShapeParams.rrect.SetCornerRadius(10.0f, 10.0f);
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
+    Drawing::GESDFShadowShaderParams shadowParams;
+    shadowParams.shape = sdfShape;
+    shadowParams.shadow.radius = 10.0f;
+    shadowParams.shadow.isFilled = false; // !isFilled && shape supports → ring draw path
+    GESDFShadowShader shadowShader(shadowParams);
+    Drawing::Rect rect {1.0f, 1.0f, 200.0f, 200.0f};
+    shadowShader.OnDrawShader(canvas_, rect);
+    EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
+}
+
+/**
+ * @tc.name: OnDrawShaderDrawRectFallback
+ * @tc.desc: Verify OnDrawShader falls back to DrawRect when shadow is filled
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShadowShaderTest, OnDrawShaderDrawRectFallback, TestSize.Level1)
+{
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    rectShapeParams.rrect.SetCornerRadius(10.0f, 10.0f);
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
+    Drawing::GESDFShadowShaderParams shadowParams;
+    shadowParams.shape = sdfShape;
+    shadowParams.shadow.radius = 10.0f;
+    shadowParams.shadow.isFilled = true; // filled → condition fails → else path (DrawRect fallback)
+    GESDFShadowShader shadowShader(shadowParams);
+    Drawing::Rect rect {1.0f, 1.0f, 200.0f, 200.0f};
+    shadowShader.OnDrawShader(canvas_, rect);
+    EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
+}
 } // namespace Rosen
 } // namespace OHOS

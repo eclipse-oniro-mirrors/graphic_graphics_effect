@@ -95,7 +95,28 @@ void GESDFEdgeLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::
     Drawing::Brush brush;
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
-    canvas.DrawRect(rect);
+    Drawing::Rect inscribedRect;
+    if (params_.sdfShape && params_.sdfShape->GetInscribedRect(inscribedRect)) {
+        Drawing::Region outerRegion;
+        outerRegion.SetRect(Drawing::RectI(
+            floor(rect.GetLeft()),
+            floor(rect.GetTop()),
+            ceil(rect.GetRight()),
+            ceil(rect.GetBottom())));
+        const int innerRegionShrink =
+            1 + std::max({params_.maxBorderWidth, params_.innerBorderBloomWidth, params_.minBorderWidth});
+        Drawing::Region innerRegion;
+        innerRegion.SetRect(Drawing::RectI(
+            ceil(inscribedRect.GetLeft()) + innerRegionShrink,
+            ceil(inscribedRect.GetTop()) + innerRegionShrink,
+            floor(inscribedRect.GetRight()) - innerRegionShrink,
+            floor(inscribedRect.GetBottom()) - innerRegionShrink));
+        Drawing::Region ringRegion(outerRegion);
+        ringRegion.Op(innerRegion, Drawing::RegionOp::DIFFERENCE);
+        canvas.DrawRegion(ringRegion);
+    } else {
+        canvas.DrawRect(rect);
+    }
     canvas.DetachBrush();
     canvas.Restore();
 }

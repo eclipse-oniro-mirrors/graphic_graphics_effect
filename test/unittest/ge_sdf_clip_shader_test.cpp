@@ -58,5 +58,37 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
     shader = clipShader.MakeSDFClipShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
 }
+
+/**
+ * @tc.name: OnDrawShaderRingDrawRegion
+ * @tc.desc: Verify OnDrawShader takes ring draw path when shape supports GetInscribedRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFClipShaderTest, OnDrawShaderRingDrawRegion, TestSize.Level1)
+{
+    Drawing::GESDFRRectShapeParams rectShapeParams {{1.0f, 1.0f, 200.0f, 200.0f}};
+    rectShapeParams.rrect.SetCornerRadius(10.0f, 10.0f);
+    auto sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(rectShapeParams);
+    Drawing::GESDFClipShaderParams params;
+    params.shape = sdfShape; // RRect supports GetInscribedRect → ring draw path
+    GESDFClipShader clipShader(params);
+    Drawing::Rect rect {1.0f, 1.0f, 200.0f, 200.0f};
+    clipShader.OnDrawShader(canvas_, rect);
+    EXPECT_NE(clipShader.GetDrawingShader(), nullptr);
+}
+
+/**
+ * @tc.name: OnDrawShaderDrawRectFallback
+ * @tc.desc: Verify OnDrawShader falls back to DrawRect when shape is null or does not support
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFClipShaderTest, OnDrawShaderDrawRectFallback, TestSize.Level1)
+{
+    Drawing::GESDFClipShaderParams params; // shape null → else path (DrawRect fallback)
+    GESDFClipShader clipShader(params);
+    Drawing::Rect rect {1.0f, 1.0f, 200.0f, 200.0f};
+    clipShader.OnDrawShader(canvas_, rect);
+    EXPECT_EQ(clipShader.GetDrawingShader(), nullptr);
+}
 } // namespace Rosen
 } // namespace OHOS

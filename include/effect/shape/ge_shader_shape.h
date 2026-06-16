@@ -35,6 +35,7 @@ public:
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShader(Canvas& canvas, float width, float height);
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(Canvas& canvas, float width, float height);
     virtual void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal = false);
+    virtual bool GetInscribedRect(Rect& rect) {return false;}
 };
 } // namespace Drawing
 } // namespace Rosen
