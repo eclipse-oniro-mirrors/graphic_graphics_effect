@@ -278,23 +278,78 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
     }
 )";
 
+static constexpr char SDF_SMOOTH_UNION_NORMAL_NOLOOP_PROG[] = R"(
+    uniform float spacing;
+    uniform shader left;
+    uniform shader right;
+
+    const float N_SCALE = 2048.0;
+    float EncodeDir(vec2 dir)
+    {
+        float xPos = floor(dir.x + N_SCALE);
+        float yPos = floor(dir.y + N_SCALE);
+        return xPos + (yPos / N_SCALE) / 2.0;
+    }
+
+    vec2 DecodeDir(float z)
+    {
+        float xPos = floor(z);
+        float yPos = (z - xPos) * N_SCALE * 2.0 - N_SCALE;
+        xPos -= N_SCALE;
+        return vec2(xPos, yPos);
+    }
+
+    vec4 sdgSmoothUnion(vec4 d1, vec4 d2, float k)
+    {
+        k *= 4.0;
+        float h = max(k - abs(d1.a - d2.a), 0.0) / (2.0 * k);
+        vec2 centerDir1 = DecodeDir(d1.z);
+        vec2 centerDir2 = DecodeDir(d2.z);
+        vec2 centerDirUnion = mix(centerDir1, centerDir2, (d1.a < d2.a) ? h : 1.0 - h);
+        float encodingZ = EncodeDir(centerDirUnion);
+        return vec4(mix(d1.xy, d2.xy, (d1.a < d2.a) ? h : 1.0 - h), encodingZ, min(d1.a, d2.a) - h * h * k);
+    }
+
+    half4 main(vec2 fragCoord)
+    {
+        vec4 leftShape = left.eval(fragCoord);
+        vec4 rightShape = right.eval(fragCoord);
+        return sdgSmoothUnion(leftShape, rightShape, spacing);
+    }
+)";
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder() const
 {
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfNormalSmoothUnionShaderShapeBuilder = nullptr;
-    if (sdfNormalSmoothUnionShaderShapeBuilder) {
+    thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfNormalSmoothUnionShaderNoLoopShapeBuilder = nullptr;
+    if (HasType(GESDFShapeType::TRIANGLE)) {
+        LOGD("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder triangle effect");
+        if (sdfNormalSmoothUnionShaderShapeBuilder) {
+            return sdfNormalSmoothUnionShaderShapeBuilder;
+        }
+        auto sdfNormalSmoothUnionShaderBuilderEffect =
+            Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_UNION_NORMAL_PROG);
+        if (!sdfNormalSmoothUnionShaderBuilderEffect) {
+            LOGE("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder effect error");
+            return nullptr;
+        }
+        sdfNormalSmoothUnionShaderShapeBuilder =
+            std::make_shared<Drawing::RuntimeShaderBuilder>(sdfNormalSmoothUnionShaderBuilderEffect);
         return sdfNormalSmoothUnionShaderShapeBuilder;
     }
-
-    auto sdfNormalSmoothUnionShaderBuilderEffect =
-        Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_UNION_NORMAL_PROG);
-    if (!sdfNormalSmoothUnionShaderBuilderEffect) {
+    LOGD("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder no loop effect");
+    if (sdfNormalSmoothUnionShaderNoLoopShapeBuilder) {
+        return sdfNormalSmoothUnionShaderNoLoopShapeBuilder;
+    }
+    auto sdfNormalSmoothUnionShaderNoLoopBuilderEffect =
+        Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_UNION_NORMAL_NOLOOP_PROG);
+    if (!sdfNormalSmoothUnionShaderNoLoopBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder effect error");
         return nullptr;
     }
-
-    sdfNormalSmoothUnionShaderShapeBuilder =
-        std::make_shared<Drawing::RuntimeShaderBuilder>(sdfNormalSmoothUnionShaderBuilderEffect);
-    return sdfNormalSmoothUnionShaderShapeBuilder;
+    sdfNormalSmoothUnionShaderNoLoopShapeBuilder =
+        std::make_shared<Drawing::RuntimeShaderBuilder>(sdfNormalSmoothUnionShaderNoLoopBuilderEffect);
+    return sdfNormalSmoothUnionShaderNoLoopShapeBuilder;
 }
 
 std::shared_ptr<ShaderEffect> GESDFUnionOpShaderShape::GenerateUnionShaderEffect(
