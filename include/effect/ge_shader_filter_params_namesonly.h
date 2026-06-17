@@ -547,6 +547,7 @@ constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_BGNEG[] = "FrostedGlassEf
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTANGLES[] = "FrostedGlassEffect_DarkModeEdLightAngles";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARKMODE_EDLIGHTKBS[] = "FrostedGlassEffect_DarkModeEdLightKBS";
 constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_DARK_SCALE[] = "FrostedGlassEffect_DarkScale";
+constexpr char GE_SHADER_FROSTED_GLASS_EFFECT_ENABLE_SDF_CACHE[] = "FrostedGlassEffect_EnableSDFCache";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR[] = "FrostedGlassBlur";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUS[] = "FrostedGlassBlur_Radius";
 constexpr char GE_FILTER_FROSTED_GLASS_BLUR_RADIUSSCALE[] = "FrostedGlassBlur_RadiusScaleK";
