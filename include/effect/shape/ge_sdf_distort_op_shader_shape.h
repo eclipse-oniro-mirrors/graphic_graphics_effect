@@ -53,6 +53,8 @@ public:
     }
 
     bool HasType(const GESDFShapeType type) const override;
+    virtual bool GetInscribedRect(Rect& rect) override;
+
 private:
     std::shared_ptr<ShaderEffect> GenerateDistortOpDrawingShader(std::shared_ptr<ShaderEffect> shapeShader,
         bool hasNormal, float width, float height) const;

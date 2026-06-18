@@ -22,7 +22,13 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+namespace {
 static constexpr float EPSILON = 1e-6f;
+static constexpr int INDEX_LEFT = 0;
+static constexpr int INDEX_RIGHT = 1;
+static constexpr int INDEX_TOP = 2;
+static constexpr int INDEX_BOTTOM = 3;
+}
 
 std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDrawingShader(float width, float height) const
 {
@@ -219,13 +225,14 @@ void GESDFDistortOpShaderShape::ComputeAndSetUniforms(
     builder->SetUniform("k0Base", k0Base);
 
     const int barrelDistortionSize = 4;
-    float barrelDistortion[] = {params_.barrelDistortion[0], params_.barrelDistortion[1],
-        params_.barrelDistortion[2], params_.barrelDistortion[3]};
+    float barrelDistortion[] = {params_.barrelDistortion[INDEX_LEFT], params_.barrelDistortion[INDEX_RIGHT],
+        params_.barrelDistortion[INDEX_TOP], params_.barrelDistortion[INDEX_BOTTOM]};
     builder->SetUniform("barrelDistortion", barrelDistortion, barrelDistortionSize);
 
-    const float distortionEnable = (std::abs(params_.barrelDistortion[0]) > EPSILON ||
-        std::abs(params_.barrelDistortion[1]) > EPSILON || std::abs(params_.barrelDistortion[2]) > EPSILON ||
-        std::abs(params_.barrelDistortion[3]) > EPSILON) ? 1.0f : 0.0f;
+    const float distortionEnable = (std::abs(params_.barrelDistortion[INDEX_LEFT]) > EPSILON ||
+        std::abs(params_.barrelDistortion[INDEX_RIGHT]) > EPSILON ||
+        std::abs(params_.barrelDistortion[INDEX_TOP]) > EPSILON ||
+        std::abs(params_.barrelDistortion[INDEX_BOTTOM]) > EPSILON) ? 1.0f : 0.0f;
     builder->SetUniform("distortionEnable", distortionEnable);
 }
 
@@ -239,6 +246,56 @@ bool GESDFDistortOpShaderShape::HasType(const GESDFShapeType type) const
     }
     return false;
 }
+
+bool GESDFDistortOpShaderShape::GetInscribedRect(Drawing::Rect& rect)
+{
+    if (!params_.shape) {
+        return false;
+    }
+    Drawing::Rect shapeRect;
+    bool support = params_.shape->GetInscribedRect(shapeRect);  // Get base shape inner rect
+    if (!support) {
+        return false;
+    }
+
+    // Calculate inner rect after quadrilateral deformation
+    float left =
+        shapeRect.GetLeft() + std::max(params_.LUCorner.GetX(), params_.LBCorner.GetX()) * shapeRect.GetWidth();
+    float top = shapeRect.GetTop() + std::max(params_.LUCorner.GetY(), params_.RUCorner.GetY()) * shapeRect.GetHeight();
+    float right =
+        shapeRect.GetLeft() + std::min(params_.RUCorner.GetX(), params_.RBCorner.GetX()) * shapeRect.GetWidth();
+    float bottom =
+        shapeRect.GetTop() + std::min(params_.LBCorner.GetY(), params_.RBCorner.GetY()) * shapeRect.GetHeight();
+    float width = std::abs(right - left);
+    float height = std::abs(bottom - top);
+
+    constexpr float halfUV = 0.5f;
+    constexpr float distortScale = 0.25f;
+    constexpr float tuneNum = 4.0f;
+    constexpr float tuneDenomBase = 2.0f;
+
+    // Calculate inner rect after barrel distortion
+    if (params_.barrelDistortion[INDEX_LEFT] < 0) {
+        left += width * (halfUV - distortScale * (tuneNum + std::abs(params_.barrelDistortion[INDEX_LEFT])) /
+            (tuneDenomBase + std::abs(params_.barrelDistortion[INDEX_LEFT])));
+    }
+    if (params_.barrelDistortion[INDEX_RIGHT] < 0) {
+        right -= width * (halfUV - distortScale * (tuneNum + std::abs(params_.barrelDistortion[INDEX_RIGHT])) /
+            (tuneDenomBase + std::abs(params_.barrelDistortion[INDEX_RIGHT])));
+    }
+    if (params_.barrelDistortion[INDEX_TOP] < 0) {
+        top += height * (halfUV - distortScale * (tuneNum + std::abs(params_.barrelDistortion[INDEX_TOP])) /
+            (tuneDenomBase + std::abs(params_.barrelDistortion[INDEX_TOP])));
+    }
+    if (params_.barrelDistortion[INDEX_BOTTOM] < 0) {
+        bottom -= height * (halfUV - distortScale * (tuneNum + std::abs(params_.barrelDistortion[INDEX_BOTTOM])) /
+            (tuneDenomBase + std::abs(params_.barrelDistortion[INDEX_BOTTOM])));
+    }
+
+    rect = Drawing::Rect(ceil(left), ceil(top), floor(right), floor(bottom));
+    return true;
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

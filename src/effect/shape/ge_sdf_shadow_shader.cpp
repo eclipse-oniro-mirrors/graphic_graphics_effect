@@ -82,7 +82,7 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     } else {
         UpdateRectForShadow(newRect);
     }
-    MakeDrawingShader(canvas, newRect, -1.f); // not use progress
+    MakeDrawingShader(canvas, newRect, -1.f);
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -90,7 +90,28 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     Drawing::Brush brush;
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
-    canvas.DrawRect(newRect);
+    Drawing::Rect inscribedRect;
+    bool ringDrawValid = !params_.shadow.isFilled && params_.shape && params_.shape->GetInscribedRect(inscribedRect);
+    if (ringDrawValid) {
+        Drawing::Region outerRegion;
+        outerRegion.SetRect(Drawing::RectI(
+            floor(newRect.GetLeft()),
+            floor(newRect.GetTop()),
+            ceil(newRect.GetRight()),
+            ceil(newRect.GetBottom())));
+        const int innerRegionShrink = 1;
+        Drawing::Region innerRegion;
+        innerRegion.SetRect(Drawing::RectI(
+            ceil(inscribedRect.GetLeft()) + innerRegionShrink,
+            ceil(inscribedRect.GetTop()) + innerRegionShrink,
+            floor(inscribedRect.GetRight()) - innerRegionShrink,
+            floor(inscribedRect.GetBottom())- innerRegionShrink));
+        Drawing::Region ringRegion(outerRegion);
+        ringRegion.Op(innerRegion, Drawing::RegionOp::DIFFERENCE);
+        canvas.DrawRegion(ringRegion);
+    } else {
+        canvas.DrawRect(newRect);
+    }
     canvas.DetachBrush();
 }
 

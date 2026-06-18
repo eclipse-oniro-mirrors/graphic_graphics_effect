@@ -26,6 +26,29 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
+
+// Mock shape that generates valid shaders (delegates to RRect) but returns false from GetInscribedRect
+class MockShapeNoInscribedRect : public Drawing::GESDFShaderShape {
+public:
+    MockShapeNoInscribedRect()
+    {
+        Drawing::GERRect rr {0.f, 0.f, 100.f, 100.f};
+        rr.SetCornerRadius(10.f, 10.f);
+        inner_ = std::make_shared<Drawing::GESDFRRectShaderShape>(Drawing::GESDFRRectShapeParams { rr });
+    }
+    Drawing::GESDFShapeType GetSDFShapeType() const override { return Drawing::GESDFShapeType::RRECT; }
+    bool HasType(const Drawing::GESDFShapeType type) const override { return type == Drawing::GESDFShapeType::RRECT; }
+    std::shared_ptr<Drawing::ShaderEffect> GenerateDrawingShader(
+        Drawing::Canvas& canvas, float w, float h) override { return inner_->GenerateDrawingShader(canvas, w, h); }
+    std::shared_ptr<Drawing::ShaderEffect> GenerateDrawingShaderHasNormal(
+        Drawing::Canvas& canvas, float w, float h) override
+    {
+        return inner_->GenerateDrawingShaderHasNormal(canvas, w, h);
+    }
+private:
+    std::shared_ptr<Drawing::GESDFRRectShaderShape> inner_;
+};
+
 class GESDFEdgeLightShaderTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -202,6 +225,45 @@ HWTEST_F(GESDFEdgeLightShaderTest, GetEffectShaderBuilderTest001, TestSize.Level
     auto shader = std::make_unique<GESDFEdgeLightShader>(params);
     auto builder = shader->GetEffectShaderBuilder(canvas_, rect_);
     EXPECT_NE(builder, nullptr);
+}
+
+/**
+ * @tc.name: OnDrawShaderRingDrawRegion
+ * @tc.desc: Verify OnDrawShader takes ring draw path when shape supports GetInscribedRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightShaderTest, OnDrawShaderRingDrawRegion, TestSize.Level1)
+{
+    ASSERT_NE(sdfShape_, nullptr);
+    ASSERT_NE(lightMask_, nullptr);
+    auto params = MakeParams();
+    params.sdfShape = sdfShape_; // RRect supports GetInscribedRect → ring draw path
+    params.lightMask = lightMask_;
+    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
+    Drawing::Canvas canvas;
+    shader->MakeDrawingShader(canvas, rect_, 0.0f);
+    ASSERT_NE(shader->drShader_, nullptr);
+    shader->OnDrawShader(canvas, rect_);
+    EXPECT_NE(shader->drShader_, nullptr);
+}
+
+/**
+ * @tc.name: OnDrawShaderDrawRectFallback
+ * @tc.desc: Verify OnDrawShader falls back to DrawRect when shape does not support GetInscribedRect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightShaderTest, OnDrawShaderDrawRectFallback, TestSize.Level1)
+{
+    ASSERT_NE(lightMask_, nullptr);
+    auto params = MakeParams();
+    params.sdfShape = std::make_shared<MockShapeNoInscribedRect>(); // GetInscribedRect returns false → else path
+    params.lightMask = lightMask_;
+    auto shader = std::make_unique<GESDFEdgeLightShader>(params);
+    Drawing::Canvas canvas;
+    shader->MakeDrawingShader(canvas, rect_, 0.0f);
+    ASSERT_NE(shader->drShader_, nullptr);
+    shader->OnDrawShader(canvas, rect_);
+    EXPECT_NE(shader->drShader_, nullptr);
 }
 } // namespace Rosen
 } // namespace OHOS
