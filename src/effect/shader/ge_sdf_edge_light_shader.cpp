@@ -51,16 +51,13 @@ constexpr char SHADER[] = R"(
 
     float EdgeLightFakeBloom(float intensity, float d)
     {
-        float bloomBorder = 1.0 - step(outerBorderBloomWidth, d);
-        bloomBorder *= step(-innerBorderBloomWidth, d);
-
         float edgeThickness = smoothstep(0.0, 1.0, intensity) * borderWidthDelta + minBorderWidth;
         float thinBorder = 1.0 - smoothstep(0.0, edgeThickness, abs(d));
 
         float bloomGate = smoothstep(bloomIntensityCutoff, 1.0, intensity);
         float bloomPart = 0.0;
-        if (enableBloom > 0.0 && bloomGate > 0.0 && bloomBorder > 0.0) {
-            bloomPart = bloomGate * bloomBorder * BloomMultiplierFromDist(d);
+        if (enableBloom > 0.0 && bloomGate > 0.0) {
+            bloomPart = bloomGate * BloomMultiplierFromDist(d);
         }
 
         float b = intensity * maxIntensity * (thinBorder + bloomPart);
@@ -70,6 +67,9 @@ constexpr char SHADER[] = R"(
     half4 main(vec2 fragCoord)
     {
         float lightMaskValue = lightMaskShader.eval(fragCoord).r;
+        if (lightMaskValue < 1e-5) {
+            return vec4(0.0);
+        }
         vec4 sdfSample = sdfShader.eval(fragCoord);
         float alpha = EdgeLightFakeBloom(lightMaskValue, sdfSample.a);
         return half4(lightColor * alpha, alpha);
