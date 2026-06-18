@@ -84,7 +84,7 @@ protected:
     Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;
     std::shared_ptr<Drawing::ShaderEffect> drShader_ = nullptr;
-    std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
+    mutable std::shared_ptr<std::any> cacheAnyPtr_ = nullptr;
 
 private:
     bool TryDrawShaderWithPen(Drawing::Canvas& canvas, const Drawing::Rect& rect);

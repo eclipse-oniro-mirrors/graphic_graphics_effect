@@ -144,4 +144,5 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
     Vector2f darkModeEdLightAngles = Vector2f(30.0f, 30.0f);
     [[ge::prop(min=0.0f, max=1.0f)]]
     float darkScale = 0.0f;
+    bool enableSDFCache = true;
 };

@@ -19,6 +19,7 @@
 #ifdef NOT_BUILD_FOR_OHOS_SDK
 #include "ge_system_properties.h"
 #include "hitrace_meter.h"
+#include "securec.h"
 
 namespace OHOS::Rosen {
 
@@ -37,14 +38,9 @@ namespace OHOS::Rosen {
                         nullptr
 
 #define GE_TRACE_NAME_FMT(fmt, ...)                                                                                   \
-    do {                                                                                                              \
-        static bool debugTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0); \
-        if (UNLIKELY(debugTraceEnable)) {                                                                             \
-            std::string name { "GE#" };                                                                               \
-            name.append(fmt);                                                                                         \
-            HITRACE_METER_FMT(HITRACE_TAG_GRAPHIC_AGP, name.c_str(), ##__VA_ARGS__);                                  \
-        }                                                                                                             \
-    } while (0)
+    static bool debugFmtTraceEnable = (OHOS::system::GetIntParameter("persist.sys.graphic.openDebugTrace", 0) != 0);  \
+    auto optionalFmtTrace = (UNLIKELY(debugFmtTraceEnable)) ?                                                         \
+        std::make_unique<RSOptionalFmtTrace>(fmt, ##__VA_ARGS__) :  nullptr
 
 class GEOptionalTrace {
 public:
@@ -58,6 +54,33 @@ public:
     ~GEOptionalTrace()
     {
         FinishTrace(HITRACE_TAG_GRAPHIC_AGP | HITRACE_TAG_COMMERCIAL);
+    }
+};
+
+class RSOptionalFmtTrace {
+public:
+    RSOptionalFmtTrace(const char* fmt, ...)
+    {
+        const int maxSize = 256;
+        va_list vaList;
+        char buf[maxSize];
+        va_start(vaList, fmt);
+        int result = vsnprintf_s(buf, sizeof(buf), sizeof(buf) - 1, fmt, vaList);
+        va_end(vaList);
+
+        if (result < 0) {
+            std::string traceStr(buf, maxSize - 1);
+            const char* errorSuffix = "#length > 256, error";
+            traceStr += errorSuffix;
+            StartTrace(HITRACE_TAG_GRAPHIC_AGP, traceStr.c_str());
+            return;
+        }
+
+        StartTrace(HITRACE_TAG_GRAPHIC_AGP, buf);
+    }
+    ~RSOptionalFmtTrace()
+    {
+        FinishTrace(HITRACE_TAG_GRAPHIC_AGP); // 256 Maximum length of a character string to be printed
     }
 };
 } // namespace OHOS::Rosen
