@@ -30,8 +30,6 @@ namespace Rosen {
 
 namespace {
 
-constexpr const char* PROPERTY_SHADER_DIAGNOSTICS_ENABLED = "persist.sys.graphic.geShaderDiagnosticsEnabled";
-
 bool g_shaderDiagnosticsForceEnabledForTest = false;
 
 static bool IsShaderDiagnosticsEnabled()
@@ -40,6 +38,7 @@ static bool IsShaderDiagnosticsEnabled()
         return true;
     }
 #ifdef GE_OHOS
+    constexpr const char* PROPERTY_SHADER_DIAGNOSTICS_ENABLED = "persist.sys.graphic.geShaderDiagnosticsEnabled";
     static bool enabled =
         (std::atoi(GESystemProperties::GetEventProperty(PROPERTY_SHADER_DIAGNOSTICS_ENABLED).c_str()) != 0);
     return enabled;
