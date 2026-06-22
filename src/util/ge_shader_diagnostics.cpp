@@ -23,7 +23,6 @@
 
 #include "ge_log.h"
 #include "ge_system_properties.h"
-#include "securec.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -31,6 +30,12 @@ namespace Rosen {
 namespace {
 
 bool g_shaderDiagnosticsForceEnabledForTest = false;
+constexpr int DIAGNOSTICS_FILE_MODE = 0644;     // -rw-r--r--
+constexpr unsigned int BITS_PER_HEX_NIBBLE = 4; // high nibble shift for hex encoding
+constexpr unsigned char HEX_NIBBLE_MASK = 0x0f; // low nibble mask for hex encoding
+constexpr int HEX_CHARS_PER_BYTE = 2;           // two hex chars per digest byte
+constexpr size_t CSV_QUOTE_COUNT = 2;           // wrapping quotes in CSV escaping
+constexpr int OPENSSL_SUCCESS = 1;              // OpenSSL SHA funcs return 1 on success, 0 on failure
 
 static bool IsShaderDiagnosticsEnabled()
 {
@@ -51,15 +56,17 @@ std::string ComputeSHA256(const std::string& src)
 {
     unsigned char digest[SHA256_DIGEST_LENGTH];
     SHA256_CTX ctx;
-    SHA256_Init(&ctx);
-    SHA256_Update(&ctx, src.data(), src.size());
-    SHA256_Final(digest, &ctx);
+    if (SHA256_Init(&ctx) != OPENSSL_SUCCESS || SHA256_Update(&ctx, src.data(), src.size()) != OPENSSL_SUCCESS ||
+        SHA256_Final(digest, &ctx) != OPENSSL_SUCCESS) {
+        LOGE("GEShaderDiagnostics: SHA256 computation failed");
+        return "";
+    }
     static const char hexTable[] = "0123456789abcdef";
     std::string result;
-    result.reserve(SHA256_DIGEST_LENGTH * 2);
+    result.reserve(SHA256_DIGEST_LENGTH * HEX_CHARS_PER_BYTE);
     for (unsigned char b : digest) {
-        result.push_back(hexTable[b >> 4]);
-        result.push_back(hexTable[b & 0x0f]);
+        result.push_back(hexTable[b >> BITS_PER_HEX_NIBBLE]);
+        result.push_back(hexTable[b & HEX_NIBBLE_MASK]);
     }
     return result;
 }
@@ -69,7 +76,7 @@ std::string FormatCsvField(const std::string& field)
     if (field.find(',') != std::string::npos || field.find('"') != std::string::npos ||
         field.find('\n') != std::string::npos || field.find('\r') != std::string::npos) {
         std::string escaped;
-        escaped.reserve(field.size() + 2);
+        escaped.reserve(field.size() + CSV_QUOTE_COUNT);
         escaped.push_back('"');
         for (char c : field) {
             if (c == '"') {
@@ -90,12 +97,17 @@ std::string FormatCsvField(const std::string& field)
  * "skip" case for duplicate shaders across processes.
  * Logs and returns false on other I/O errors.
  *
- * Note: fsync() is intentionally omitted — diagnostics data is non-critical
- * and does not need crash durability guarantees.
+ * Durability: fsync() is intentionally omitted — diagnostics files are
+ * regenerable (O_EXCL recreates on next shader compile if lost).
+ *
+ * Safety: all unlink() calls occur while the fd is still open. O_EXCL guarantees
+ * we created the file, so unlink() only removes our own file. The close()-failure
+ * path does NOT unlink: the fd is already closed (TOCTOU window), and collection
+ * tools are expected to handle occasionally-broken diagnostics files.
  */
 bool AtomicWriteFile(const char* path, const void* data, size_t len)
 {
-    int fd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
+    int fd = open(path, O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, DIAGNOSTICS_FILE_MODE);
     if (fd < 0) {
         if (errno == EEXIST) {
             return false;
@@ -107,46 +119,45 @@ bool AtomicWriteFile(const char* path, const void* data, size_t len)
     size_t written = 0;
     while (written < len) {
         ssize_t n = write(fd, buf + written, len - written);
-        if (n <= 0) {
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
             int savedErrno = errno;
-            close(fd);
             unlink(path);
+            close(fd);
             LOGE("GEShaderDiagnostics: write(%{public}s) failed: errno=%{public}d", path, savedErrno);
             return false;
         }
+        if (n == 0) {
+            break;
+        }
         written += static_cast<size_t>(n);
     }
-    close(fd);
+    if (written < len) {
+        unlink(path);
+        close(fd);
+        return false;
+    }
+    if (close(fd) < 0) {
+        LOGE("GEShaderDiagnostics: close(%{public}s) failed: errno=%{public}d", path, errno);
+        return false;
+    }
     return true;
 }
 
 bool DumpDiagnostics(const std::string& hash, const GESourceLocation& srcLoc, size_t srcLen)
 {
-    char csvBuf[512];
-    int len = snprintf_s(csvBuf, sizeof(csvBuf), sizeof(csvBuf) - 1, "%s,%s,%u,%zu",
-        FormatCsvField(srcLoc.FileName()).c_str(), FormatCsvField(srcLoc.FunctionName()).c_str(), srcLoc.Line(),
-        srcLen);
-    if (len <= 0) {
-        return false;
-    }
-    char csvPath[256];
-    int pathLen = snprintf_s(csvPath, sizeof(csvPath), sizeof(csvPath) - 1, "%sge_shader_diagnostics.%s.csv",
-        GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
-    if (pathLen <= 0) {
-        return false;
-    }
-    return AtomicWriteFile(csvPath, csvBuf, static_cast<size_t>(len));
+    std::string csv = FormatCsvField(srcLoc.FileName()) + "," + FormatCsvField(srcLoc.FunctionName()) + "," +
+                      std::to_string(srcLoc.Line()) + "," + std::to_string(srcLen);
+    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    return AtomicWriteFile(csvPath.c_str(), csv.data(), csv.size());
 }
 
-void DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
+bool DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
 {
-    char skslPath[256];
-    int pathLen = snprintf_s(skslPath, sizeof(skslPath), sizeof(skslPath) - 1, "%sge_shader_diagnostics.%s.sksl",
-        GE_SHADER_DIAGNOSTICS_OUT_DIR, hash.c_str());
-    if (pathLen <= 0) {
-        return;
-    }
-    AtomicWriteFile(skslPath, shaderSrc.data(), shaderSrc.size());
+    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
+    return AtomicWriteFile(skslPath.c_str(), shaderSrc.data(), shaderSrc.size());
 }
 
 } // anonymous namespace
@@ -163,8 +174,11 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
         return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
     }
     std::string hash = ComputeSHA256(shaderSrc);
-    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
-        DumpSkslSource(hash, shaderSrc);
+    if (hash.empty()) {
+        return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
+    }
+    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length()) && !DumpSkslSource(hash, shaderSrc)) {
+        LOGE("GEShaderDiagnostics: sksl write failed, orphan csv may exist: hash=%{public}s", hash.c_str());
     }
     LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s", srcLoc.FileName(), srcLoc.Line(), hash.c_str());
     return Drawing::RuntimeEffect::CreateForShader(shaderSrc);
@@ -177,12 +191,14 @@ std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
         return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
     }
     std::string hash = ComputeSHA256(shaderSrc);
-    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length())) {
-        DumpSkslSource(hash, shaderSrc);
+    if (hash.empty()) {
+        return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
+    }
+    if (DumpDiagnostics(hash, srcLoc, shaderSrc.length()) && !DumpSkslSource(hash, shaderSrc)) {
+        LOGE("GEShaderDiagnostics: sksl write failed, orphan csv may exist: hash=%{public}s", hash.c_str());
     }
     LOGD("GEShaderDiagnostics: %{public}s:%{public}u hash=%{public}s", srcLoc.FileName(), srcLoc.Line(), hash.c_str());
     return Drawing::RuntimeEffect::CreateForShader(shaderSrc, options);
 }
-
 } // namespace Rosen
 } // namespace OHOS
