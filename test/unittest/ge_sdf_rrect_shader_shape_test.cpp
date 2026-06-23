@@ -471,9 +471,9 @@ HWTEST_F(GESDFRRectShaderShapeTest, GetInscribedRectWithCorners, TestSize.Level1
     EXPECT_FLOAT_EQ(rect.left_, 20.25f);
     EXPECT_FLOAT_EQ(rect.right_, 189.75f);
 
-    param.rrect = {10.0f, 20.0f, 10.0f, 100.0f};
+    shape.params_.rrect = {10.0f, 20.0f, 0.0f, 100.0f};
     EXPECT_FALSE(shape.GetInscribedRect(rect));
-    param.rrect = {10.0f, 20.0f, 200.0f, 20.0f};
+    shape.params_.rrect = {10.0f, 20.0f, 200.0f, 0.0f};
     EXPECT_FALSE(shape.GetInscribedRect(rect));
 
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GetInscribedRectWithCorners end";
