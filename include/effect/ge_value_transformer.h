@@ -68,8 +68,8 @@ struct ClampFallbackTransformer {
         float dx = std::clamp(value.first, MIN_V, MAX_V);
         float dy = std::clamp(value.second, MIN_V, MAX_V);
         if (std::abs(dx) < EPS && std::abs(dy) < EPS) {
-            dx = 1.0f;
-            dy = 0.0f;
+            dx = 0.0f;
+            dy = -1.0f;
         }
         out = Vector2f(dx, dy);
         return true;
