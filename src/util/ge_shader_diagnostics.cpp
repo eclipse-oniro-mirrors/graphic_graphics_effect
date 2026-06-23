@@ -107,7 +107,7 @@ std::string FormatCsvField(const std::string& field)
  */
 bool AtomicWriteFile(const char* path, const void* data, size_t len)
 {
-    int fd = open(path, O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, DIAGNOSTICS_FILE_MODE);
+    int fd = open(path, O_CREAT | O_EXCL | O_WRONLY, DIAGNOSTICS_FILE_MODE);
     if (fd < 0) {
         if (errno == EEXIST) {
             return false;
