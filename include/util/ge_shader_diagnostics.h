@@ -39,7 +39,9 @@ constexpr const char* GE_SHADER_DIAGNOSTICS_OUT_DIR = "/data/service/el0/render_
  *
  * @param shaderSrc The shader source code string
  * @param srcLoc Source location captured at call site (default: GESourceLocation::Current())
- * @return std::shared_ptr<Drawing::RuntimeEffect> The created runtime effect, or nullptr on failure
+ * @return std::shared_ptr<Drawing::RuntimeEffect> Whatever the upstream
+ *         Drawing::RuntimeEffect::CreateForShader returns. This wrapper adds no
+ *         semantics of its own — it only optionally writes diagnostics files.
  *
  * @note When the runtime property is enabled:
  *       1. Compute SHA256 digest of the shader source
@@ -65,7 +67,9 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
  * @param shaderSrc The shader source code string
  * @param options RuntimeEffectOptions (forceNoInline, useAF, useHighpLocalCoords)
  * @param srcLoc Source location captured at call site (default: GESourceLocation::Current())
- * @return std::shared_ptr<Drawing::RuntimeEffect> The created runtime effect, or nullptr on failure
+ * @return std::shared_ptr<Drawing::RuntimeEffect> Whatever the upstream
+ *         Drawing::RuntimeEffect::CreateForShader returns. This wrapper adds no
+ *         semantics of its own — it only optionally writes diagnostics files.
  */
 GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(const std::string& shaderSrc,
     const Drawing::RuntimeEffectOptions& options, const GESourceLocation& srcLoc = GESourceLocation::Current());
@@ -73,13 +77,25 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
 /**
  * @brief Test-only override to force-enable or force-disable shader diagnostics.
  *
- * This function bypasses the runtime property check, allowing unit tests to
- * verify diagnostics behavior regardless of the system property state.
- * Must be restored to false after each test to avoid leaking state.
+ * This bypasses the runtime property check, allowing unit tests to verify
+ * diagnostics behavior regardless of the system property state.
+ * - enabled=true forces diagnostics on.
+ * - enabled=false forces diagnostics off (does NOT fall back to the property).
+ * Must be cleared via GEClearShaderDiagnosticsOverrideForTest after each test to
+ * avoid leaking state.
  *
- * @param enabled True to force-enable diagnostics, false to restore runtime-property control.
+ * @param enabled True to force-enable diagnostics, false to force-disable diagnostics.
  */
 GE_EXPORT void GESetShaderDiagnosticsEnabledForTest(bool enabled);
+
+/**
+ * @brief Test-only: clear the override set by GESetShaderDiagnosticsEnabledForTest.
+ *
+ * After this call, diagnostics are governed solely by the runtime property
+ * "persist.sys.graphic.geShaderDiagnosticsEnabled". Tests that force-disabled
+ * diagnostics must clear the override to restore runtime-property control.
+ */
+GE_EXPORT void GEClearShaderDiagnosticsOverrideForTest();
 
 } // namespace Rosen
 } // namespace OHOS

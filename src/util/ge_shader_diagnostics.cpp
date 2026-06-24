@@ -29,7 +29,13 @@ namespace Rosen {
 
 namespace {
 
-bool g_shaderDiagnosticsForceEnabledForTest = false;
+enum class DiagnosticsOverride {
+    NONE,      // governed by runtime property
+    FORCE_ON,  // test forces diagnostics on
+    FORCE_OFF, // test forces diagnostics off
+};
+
+DiagnosticsOverride g_shaderDiagnosticsOverride = DiagnosticsOverride::NONE;
 constexpr int DIAGNOSTICS_FILE_MODE = 0644;     // -rw-r--r--
 constexpr unsigned int BITS_PER_HEX_NIBBLE = 4; // high nibble shift for hex encoding
 constexpr unsigned char HEX_NIBBLE_MASK = 0x0f; // low nibble mask for hex encoding
@@ -39,8 +45,13 @@ constexpr int OPENSSL_SUCCESS = 1;              // OpenSSL SHA funcs return 1 on
 
 static bool IsShaderDiagnosticsEnabled()
 {
-    if (g_shaderDiagnosticsForceEnabledForTest) {
-        return true;
+    switch (g_shaderDiagnosticsOverride) {
+        case DiagnosticsOverride::FORCE_ON:
+            return true;
+        case DiagnosticsOverride::FORCE_OFF:
+            return false;
+        case DiagnosticsOverride::NONE:
+            break;
     }
 #ifdef GE_OHOS
     constexpr const char* PROPERTY_SHADER_DIAGNOSTICS_ENABLED = "persist.sys.graphic.geShaderDiagnosticsEnabled";
@@ -164,7 +175,12 @@ bool DumpSkslSource(const std::string& hash, const std::string& shaderSrc)
 
 void GESetShaderDiagnosticsEnabledForTest(bool enabled)
 {
-    g_shaderDiagnosticsForceEnabledForTest = enabled;
+    g_shaderDiagnosticsOverride = enabled ? DiagnosticsOverride::FORCE_ON : DiagnosticsOverride::FORCE_OFF;
+}
+
+void GEClearShaderDiagnosticsOverrideForTest()
+{
+    g_shaderDiagnosticsOverride = DiagnosticsOverride::NONE;
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader(
