@@ -230,7 +230,7 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
     {
         float xPos = floor(dir.x + N_SCALE);
         float yPos = floor(dir.y + N_SCALE);
-        return xPos + (yPos / N_SCALE) * 0.5;
+        return xPos + (yPos / N_SCALE) / 2.0;
     }
 
     vec2 DecodeDir(float z)
@@ -288,7 +288,7 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_NOLOOP_PROG[] = R"(
     {
         float xPos = floor(dir.x + N_SCALE);
         float yPos = floor(dir.y + N_SCALE);
-        return xPos + (yPos / N_SCALE) / 2.0;
+        return xPos + (yPos / N_SCALE) * 0.5;
     }
 
     vec2 DecodeDir(float z)
