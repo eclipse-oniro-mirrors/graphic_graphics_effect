@@ -137,9 +137,9 @@ HWTEST_F(GEShaderDiagnosticsTest, CreateForShader_ValidMinimalSkSL, TestSize.Lev
 {
     auto result = GECreateRuntimeEffectForShader(SKSL_MINIMAL);
     ASSERT_NE(result, nullptr);
-    // Sanity: the fixture constant is itself a non-empty shader body.
-    EXPECT_FALSE(SKSL_MINIMAL.empty());
-    // The wrapper must return the upstream RuntimeEffect type, not a derived one.
+    // Wrapper must return the same nullness as the upstream call (passthrough contract).
+    auto upstream = Drawing::RuntimeEffect::CreateForShader(SKSL_MINIMAL);
+    EXPECT_EQ(static_cast<bool>(result), static_cast<bool>(upstream));
     EXPECT_NE(result->GetDrawingType(), Drawing::DrawingType::NO_DRAW);
 }
 
@@ -169,8 +169,9 @@ HWTEST_F(GEShaderDiagnosticsTest, CreateForShader_DefaultSourceLocation, TestSiz
     // Relying on the implicit GESourceLocation::Current() default argument.
     auto result = GECreateRuntimeEffectForShader(SKSL_MINIMAL);
     ASSERT_NE(result, nullptr);
-    EXPECT_FALSE(SKSL_MINIMAL.empty());
-    // Confirm the default-constructed effect reports the common drawing type.
+    // Wrapper must return the same nullness as the upstream call (passthrough contract).
+    auto upstream = Drawing::RuntimeEffect::CreateForShader(SKSL_MINIMAL);
+    EXPECT_EQ(static_cast<bool>(result), static_cast<bool>(upstream));
     EXPECT_EQ(result->GetDrawingType(), Drawing::DrawingType::COMMON);
 }
 
@@ -202,9 +203,9 @@ HWTEST_F(GEShaderDiagnosticsTest, CreateForShaderWithOptions_ValidMinimalSkSL, T
     Drawing::RuntimeEffectOptions options;
     auto result = GECreateRuntimeEffectForShader(SKSL_MINIMAL, options);
     ASSERT_NE(result, nullptr);
-    // The static shader source must be unchanged after compilation.
-    EXPECT_FALSE(SKSL_MINIMAL.empty());
-    // The default options leave all compile-affecting flags disabled.
+    // Wrapper must return the same nullness as the upstream call (passthrough contract).
+    auto upstream = Drawing::RuntimeEffect::CreateForShader(SKSL_MINIMAL, options);
+    EXPECT_EQ(static_cast<bool>(result), static_cast<bool>(upstream));
     EXPECT_FALSE(options.useAF);
 }
 
