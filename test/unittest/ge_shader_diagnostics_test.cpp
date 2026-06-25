@@ -396,16 +396,26 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_FirstWriterWins, TestSize.Level1)
     std::string hash = ComputeTestSHA256(SKSL_MINIMAL);
     CleanupDiagnosticsFiles(hash);
 
-    GECreateRuntimeEffectForShader(SKSL_MINIMAL);
+    // First call from a distinctive source location (line 1111).
+    auto locA = GESourceLocation::Current("FirstWriterWins_A", "fnA", 1111, 0);
+    GECreateRuntimeEffectForShader(SKSL_MINIMAL, locA);
 
     std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
     std::string firstCsvContent = ReadFileContent(csvPath);
+    ASSERT_FALSE(firstCsvContent.empty());
+    // The first writer's line number must be in the CSV.
+    EXPECT_NE(firstCsvContent.find("1111"), std::string::npos);
 
-    // Second call — files already exist, should not overwrite
-    GECreateRuntimeEffectForShader(SKSL_MINIMAL);
+    // Second call from a different source location (line 2222).
+    // O_EXCL must reject the open — the first CSV must be preserved unchanged.
+    auto locB = GESourceLocation::Current("FirstWriterWins_B", "fnB", 2222, 0);
+    GECreateRuntimeEffectForShader(SKSL_MINIMAL, locB);
     std::string secondCsvContent = ReadFileContent(csvPath);
 
+    // If O_EXCL failed and the file was overwritten, secondCsvContent would contain
+    // "2222" and differ from firstCsvContent. This assertion is now meaningful.
     EXPECT_EQ(firstCsvContent, secondCsvContent);
+    EXPECT_EQ(secondCsvContent.find("2222"), std::string::npos);
 
     CleanupDiagnosticsFiles(hash);
 }
