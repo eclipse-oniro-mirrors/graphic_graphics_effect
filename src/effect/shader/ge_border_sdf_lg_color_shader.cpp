@@ -17,7 +17,7 @@
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
-
+#include "ge_shader_diagnostics.h"
 namespace OHOS {
 namespace Rosen {
 GEBorderSDFLGColorShader::GEBorderSDFLGColorShader() {}
@@ -30,7 +30,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFLGColorShader::GetEffect()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> lgColorEffect = nullptr;
     if (!lgColorEffect) {
-        lgColorEffect = Drawing::RuntimeEffect::CreateForShader(lgColorShaderCode_);
+        lgColorEffect = GECreateRuntimeEffectForShader(lgColorShaderCode_);
     }
     return lgColorEffect;
 }

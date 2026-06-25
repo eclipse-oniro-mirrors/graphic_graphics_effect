@@ -18,6 +18,7 @@
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 // Additional includes for complex masks:
 // #include <chrono>
@@ -98,7 +99,7 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetShaderBuilder() const
     )";
 
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
+        GECreateRuntimeEffectForShader(s_prog$EFFECT_NAME);
 
     if (s_effect == nullptr) {
         LOGE("$CLASS_NAME::GetShaderBuilder effect error");
@@ -120,7 +121,7 @@ std::shared_ptr<RuntimeShaderBuilder> $CLASS_NAME::GetNormalShaderBuilder() cons
     //     }
     // )";
     // static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-    //     Drawing::RuntimeEffect::CreateForShader(s_progNormal$EFFECT_NAME);
+    //     GECreateRuntimeEffectForShader(s_progNormal$EFFECT_NAME);
     // if (s_effect == nullptr) {
     //     LOGE("$CLASS_NAME::GetNormalShaderBuilder effect error");
     //     return nullptr;

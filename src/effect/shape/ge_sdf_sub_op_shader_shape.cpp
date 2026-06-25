@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -129,7 +130,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFSubOpShaderShape::GetSDFSubO
         }
     )";
 
-    auto sdfSubOpShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfSubOpShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfSubOpShaderBuilderEffect) {
         LOGE("GESDFSubOpShaderShape::GetSDFSubOpBuilder effect error");
         return nullptr;
@@ -221,7 +222,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFSmoothSubOpShaderShape::GetS
         }
 
         auto sdfNormalSmoothSubOpShaderBuilderEffect =
-            Drawing::RuntimeEffect::CreateForShader(SDF_NORMAL_SMOOTH_SUB_OP_PROG);
+            GECreateRuntimeEffectForShader(SDF_NORMAL_SMOOTH_SUB_OP_PROG);
         if (!sdfNormalSmoothSubOpShaderBuilderEffect) {
             LOGE("GESDFSmoothSubOpShaderShape::GetSDFSmoothSubOpBuilder normal effect error");
             return nullptr;
@@ -237,7 +238,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFSmoothSubOpShaderShape::GetS
         return sdfSmoothSubOpShaderShapeBuilder;
     }
 
-    auto sdfSmoothSubOpShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_SUB_OP_PROG);
+    auto sdfSmoothSubOpShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_SMOOTH_SUB_OP_PROG);
     if (!sdfSmoothSubOpShaderBuilderEffect) {
         LOGE("GESDFSmoothSubOpShaderShape::GetSDFSmoothSubOpBuilder effect error");
         return nullptr;
