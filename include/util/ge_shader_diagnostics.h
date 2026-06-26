@@ -77,25 +77,31 @@ GE_EXPORT std::shared_ptr<Drawing::RuntimeEffect> GECreateRuntimeEffectForShader
 /**
  * @brief Test-only override to force-enable or force-disable shader diagnostics.
  *
- * This bypasses the runtime property check, allowing unit tests to verify
- * diagnostics behavior regardless of the system property state.
- * - enabled=true forces diagnostics on.
- * - enabled=false forces diagnostics off (does NOT fall back to the property).
+ * @warning UNIT TEST ONLY. Do not call from production code. The override state is
+ * a process-global mutable variable with no synchronization — safe only because
+ * the unit test runner is single-threaded. Adding locks to protect it in production
+ * would waste performance on a path that must stay cheap.
+ *
+ * Bypasses the runtime property check:
+ * - enabled=true  → diagnostics forced on.
+ * - enabled=false → diagnostics forced off (does NOT fall back to the property).
  * Must be cleared via GEClearShaderDiagnosticsOverrideForTest after each test to
- * avoid leaking state.
+ * avoid leaking state into subsequent tests.
  *
  * @param enabled True to force-enable diagnostics, false to force-disable diagnostics.
  */
-GE_EXPORT void GESetShaderDiagnosticsEnabledForTest(bool enabled);
+void GESetShaderDiagnosticsEnabledForTest(bool enabled);
 
 /**
  * @brief Test-only: clear the override set by GESetShaderDiagnosticsEnabledForTest.
+ *
+ * @warning UNIT TEST ONLY. See GESetShaderDiagnosticsEnabledForTest for rationale.
  *
  * After this call, diagnostics are governed solely by the runtime property
  * "persist.sys.graphic.geShaderDiagnosticsEnabled". Tests that force-disabled
  * diagnostics must clear the override to restore runtime-property control.
  */
-GE_EXPORT void GEClearShaderDiagnosticsOverrideForTest();
+void GEClearShaderDiagnosticsOverrideForTest();
 
 } // namespace Rosen
 } // namespace OHOS

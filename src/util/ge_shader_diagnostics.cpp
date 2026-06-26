@@ -42,6 +42,9 @@ constexpr unsigned char HEX_NIBBLE_MASK = 0x0f; // low nibble mask for hex encod
 constexpr int HEX_CHARS_PER_BYTE = 2;           // two hex chars per digest byte
 constexpr size_t CSV_QUOTE_COUNT = 2;           // wrapping quotes in CSV escaping
 constexpr int OPENSSL_SUCCESS = 1;              // OpenSSL SHA funcs return 1 on success, 0 on failure
+// Largest shader source in the repo is ~15KB; 128KB is a generous safety cap that
+// rejects pathological inputs without truncating any real shader.
+constexpr size_t MAX_DIAGNOSTICS_WRITE_SIZE = 128 * 1024;
 
 static bool IsShaderDiagnosticsEnabled()
 {
@@ -106,7 +109,8 @@ std::string FormatCsvField(const std::string& field)
  * Returns true if the file was newly created and written.
  * Returns false if the file already existed (EEXIST) — this is the expected
  * "skip" case for duplicate shaders across processes.
- * Logs and returns false on other I/O errors.
+ * Logs and returns false on other I/O errors, or if len exceeds
+ * MAX_DIAGNOSTICS_WRITE_SIZE (guards against pathological inputs).
  *
  * Durability: fsync() is intentionally omitted — diagnostics files are
  * regenerable (O_EXCL recreates on next shader compile if lost).
@@ -118,6 +122,11 @@ std::string FormatCsvField(const std::string& field)
  */
 bool AtomicWriteFile(const char* path, const void* data, size_t len)
 {
+    if (len > MAX_DIAGNOSTICS_WRITE_SIZE) {
+        LOGE("GEShaderDiagnostics: write rejected, size=%{public}zu exceeds cap=%{public}zu, path=%{public}s", len,
+            MAX_DIAGNOSTICS_WRITE_SIZE, path);
+        return false;
+    }
     int fd = open(path, O_CREAT | O_EXCL | O_WRONLY, DIAGNOSTICS_FILE_MODE);
     if (fd < 0) {
         if (errno == EEXIST) {

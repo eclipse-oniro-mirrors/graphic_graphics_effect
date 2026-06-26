@@ -52,6 +52,10 @@ public:
     static std::string ComputeTestSHA256(const std::string& src);
     void CleanupDiagnosticsFiles(const std::string& hash);
     static std::string ReadFileContent(const std::string& path);
+    // Returns true if the file at path exists (resolves the open/close/fd pattern).
+    static bool FileExists(const std::string& path);
+    // Builds a diagnostics file path: GE_SHADER_DIAGNOSTICS_OUT_DIR + prefix + hash + suffix
+    static std::string DiagPath(const std::string& hash, const std::string& suffix);
 };
 
 void GEShaderDiagnosticsTest::SetUpTestCase(void) {}
@@ -84,8 +88,8 @@ std::string GEShaderDiagnosticsTest::ComputeTestSHA256(const std::string& src)
 
 void GEShaderDiagnosticsTest::CleanupDiagnosticsFiles(const std::string& hash)
 {
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
+    std::string csvPath = DiagPath(hash, ".csv");
+    std::string skslPath = DiagPath(hash, ".sksl");
     unlink(csvPath.c_str());
     unlink(skslPath.c_str());
 }
@@ -104,6 +108,16 @@ std::string GEShaderDiagnosticsTest::ReadFileContent(const std::string& path)
     }
     close(fd);
     return content;
+}
+
+bool GEShaderDiagnosticsTest::FileExists(const std::string& path)
+{
+    return access(path.c_str(), F_OK) == 0;
+}
+
+std::string GEShaderDiagnosticsTest::DiagPath(const std::string& hash, const std::string& suffix)
+{
+    return std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + suffix;
 }
 
 // ============================================================================
@@ -259,20 +273,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_RuntimeDisabled_NoFileCreation, Te
 
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
-
-    int csvFd = open(csvPath.c_str(), O_RDONLY);
-    EXPECT_LT(csvFd, 0); // File should NOT exist
-    if (csvFd >= 0) {
-        close(csvFd);
-    }
-
-    int skslFd = open(skslPath.c_str(), O_RDONLY);
-    EXPECT_LT(skslFd, 0); // File should NOT exist
-    if (skslFd >= 0) {
-        close(skslFd);
-    }
+    EXPECT_FALSE(FileExists(DiagPath(hash, ".csv")));  // File should NOT exist
+    EXPECT_FALSE(FileExists(DiagPath(hash, ".sksl"))); // File should NOT exist
 
     CleanupDiagnosticsFiles(hash);
 }
@@ -293,20 +295,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_RuntimeDisabled_OptionsOverload_No
     Drawing::RuntimeEffectOptions options;
     GECreateRuntimeEffectForShader(SKSL_MINIMAL, options);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
-
-    int csvFd = open(csvPath.c_str(), O_RDONLY);
-    EXPECT_LT(csvFd, 0);
-    if (csvFd >= 0) {
-        close(csvFd);
-    }
-
-    int skslFd = open(skslPath.c_str(), O_RDONLY);
-    EXPECT_LT(skslFd, 0);
-    if (skslFd >= 0) {
-        close(skslFd);
-    }
+    EXPECT_FALSE(FileExists(DiagPath(hash, ".csv")));
+    EXPECT_FALSE(FileExists(DiagPath(hash, ".sksl")));
 
     CleanupDiagnosticsFiles(hash);
 }
@@ -323,20 +313,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_FileCreation, TestSize.Level1)
 
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
-
-    int csvFd = open(csvPath.c_str(), O_RDONLY);
-    EXPECT_GE(csvFd, 0);
-    if (csvFd >= 0) {
-        close(csvFd);
-    }
-
-    int skslFd = open(skslPath.c_str(), O_RDONLY);
-    EXPECT_GE(skslFd, 0);
-    if (skslFd >= 0) {
-        close(skslFd);
-    }
+    EXPECT_TRUE(FileExists(DiagPath(hash, ".csv")));
+    EXPECT_TRUE(FileExists(DiagPath(hash, ".sksl")));
 
     CleanupDiagnosticsFiles(hash);
 }
@@ -354,8 +332,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_CsvContent, TestSize.Level1)
     auto srcLoc = GESourceLocation::Current();
     GECreateRuntimeEffectForShader(SKSL_RED, srcLoc);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string csvContent = ReadFileContent(csvPath);
+    std::string csvContent = ReadFileContent(DiagPath(hash, ".csv"));
     EXPECT_FALSE(csvContent.empty());
 
     // CSV format: file,function,line,srcLen
@@ -380,8 +357,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_SkslContent, TestSize.Level1)
 
     GECreateRuntimeEffectForShader(SKSL_PASSTHROUGH);
 
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
-    std::string skslContent = ReadFileContent(skslPath);
+    std::string skslContent = ReadFileContent(DiagPath(hash, ".sksl"));
     EXPECT_EQ(skslContent, SKSL_PASSTHROUGH);
 
     CleanupDiagnosticsFiles(hash);
@@ -401,7 +377,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_FirstWriterWins, TestSize.Level1)
     auto locA = GESourceLocation::Current("FirstWriterWins_A", "fnA", 1111, 0);
     GECreateRuntimeEffectForShader(SKSL_MINIMAL, locA);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
+    std::string csvPath = DiagPath(hash, ".csv");
     std::string firstCsvContent = ReadFileContent(csvPath);
     ASSERT_FALSE(firstCsvContent.empty());
     // The first writer's line number must be in the CSV.
@@ -435,8 +411,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_CsvEscape_SpecialChars, TestSize.L
     auto srcLoc = GESourceLocation::Current("path,file.csv", R"(func"tion)", 0, 0);
     GECreateRuntimeEffectForShader(escShader, srcLoc);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string csvContent = ReadFileContent(csvPath);
+    std::string csvContent = ReadFileContent(DiagPath(hash, ".csv"));
     EXPECT_FALSE(csvContent.empty());
     // Quoted and doubled-quote: "path,file.csv","func""tion",
     EXPECT_NE(csvContent.find("\"path,file.csv\""), std::string::npos);
@@ -459,8 +434,7 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_CsvEscape_NewlineChar, TestSize.Le
     auto srcLoc = GESourceLocation::Current("multi\nline.cpp", "fn", 0, 0);
     GECreateRuntimeEffectForShader(nlShader, srcLoc);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string csvContent = ReadFileContent(csvPath);
+    std::string csvContent = ReadFileContent(DiagPath(hash, ".csv"));
     EXPECT_FALSE(csvContent.empty());
     // Newline triggers escape wrapping: "multi\nline.cpp",
     EXPECT_NE(csvContent.find("\"multi\nline.cpp\""), std::string::npos);
@@ -483,17 +457,17 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_OrphanCsvOnSkslExists, TestSize.Le
     GECreateRuntimeEffectForShader(orphanShader);
 
     // Remove only the csv, leaving the sksl in place
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
+    std::string csvPath = DiagPath(hash, ".csv");
+    std::string skslPath = DiagPath(hash, ".sksl");
     ASSERT_EQ(unlink(csvPath.c_str()), 0);
-    EXPECT_EQ(access(skslPath.c_str(), F_OK), 0);
+    EXPECT_TRUE(FileExists(skslPath));
 
     // Second call: csv O_CREAT|O_EXCL succeeds (true), sksl O_CREAT|O_EXCL hits EEXIST (false)
     // → DumpDiagnostics true && !DumpSkslSource(false) → LOGE orphan-csv path
     GECreateRuntimeEffectForShader(orphanShader);
 
     // CSV was re-created by the second call
-    EXPECT_EQ(access(csvPath.c_str(), F_OK), 0);
+    EXPECT_TRUE(FileExists(csvPath));
     // SKSL remains the first-call content, unchanged
     EXPECT_EQ(ReadFileContent(skslPath), orphanShader);
 
@@ -517,19 +491,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_DifferentHash, TestSize.Level1)
     GECreateRuntimeEffectForShader(SKSL_MINIMAL);
     GECreateRuntimeEffectForShader(SKSL_RED);
 
-    std::string csvPath1 = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash1 + ".csv";
-    std::string csvPath2 = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash2 + ".csv";
-
-    int fd1 = open(csvPath1.c_str(), O_RDONLY);
-    int fd2 = open(csvPath2.c_str(), O_RDONLY);
-    EXPECT_GE(fd1, 0);
-    EXPECT_GE(fd2, 0);
-    if (fd1 >= 0) {
-        close(fd1);
-    }
-    if (fd2 >= 0) {
-        close(fd2);
-    }
+    EXPECT_TRUE(FileExists(DiagPath(hash1, ".csv")));
+    EXPECT_TRUE(FileExists(DiagPath(hash2, ".csv")));
 
     CleanupDiagnosticsFiles(hash1);
     CleanupDiagnosticsFiles(hash2);
@@ -548,20 +511,8 @@ HWTEST_F(GEShaderDiagnosticsTest, Diagnostics_OptionsOverloadFileCreation, TestS
     Drawing::RuntimeEffectOptions options;
     GECreateRuntimeEffectForShader(SKSL_MINIMAL, options);
 
-    std::string csvPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".csv";
-    std::string skslPath = std::string(GE_SHADER_DIAGNOSTICS_OUT_DIR) + "ge_shader_diagnostics." + hash + ".sksl";
-
-    int csvFd = open(csvPath.c_str(), O_RDONLY);
-    EXPECT_GE(csvFd, 0);
-    if (csvFd >= 0) {
-        close(csvFd);
-    }
-
-    int skslFd = open(skslPath.c_str(), O_RDONLY);
-    EXPECT_GE(skslFd, 0);
-    if (skslFd >= 0) {
-        close(skslFd);
-    }
+    EXPECT_TRUE(FileExists(DiagPath(hash, ".csv")));
+    EXPECT_TRUE(FileExists(DiagPath(hash, ".sksl")));
 
     CleanupDiagnosticsFiles(hash);
 }

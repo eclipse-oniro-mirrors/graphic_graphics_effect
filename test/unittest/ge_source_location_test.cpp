@@ -89,8 +89,6 @@ HWTEST_F(GESourceLocationTest, AccessorMethodsTest, TestSize.Level1)
         EXPECT_GT(loc.Line(), 0u);
         EXPECT_GT(loc.Column(), 0u);
     }
-
-    EXPECT_GE(loc.Column(), 0u);
 }
 
 /**
