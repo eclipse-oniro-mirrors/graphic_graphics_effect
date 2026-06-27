@@ -14,6 +14,7 @@
  */
 #include "ge_log.h"
 #include "ge_aurora_noise_shader.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
@@ -149,7 +150,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
                 return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3))); // scale to [-1,1]
             }
         )";
-        auroraNoiseShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        auroraNoiseShaderEffect_ = GECreateRuntimeEffectForShader(prog);
     }
 
     if (auroraNoiseShaderEffect_ == nullptr) {
@@ -203,7 +204,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
                 return col / totalWeight;
             }
         )";
-        auroraNoiseVerticalBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        auroraNoiseVerticalBlurShaderEffect_ = GECreateRuntimeEffectForShader(prog);
     }
 
     if (auroraNoiseVerticalBlurShaderEffect_ == nullptr) {
@@ -229,7 +230,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAuroraNoiseShader::GetAuroraNoi
                 return verticalBlurTexture.eval(fragCoord / downSampleFactor);
             }
         )";
-        auroraNoiseUpSamplingShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        auroraNoiseUpSamplingShaderEffect_ = GECreateRuntimeEffectForShader(prog);
     }
 
     if (auroraNoiseUpSamplingShaderEffect_ == nullptr) {

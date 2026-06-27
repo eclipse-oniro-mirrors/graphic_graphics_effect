@@ -18,6 +18,7 @@
 #include <typeinfo>
 #include "ge_log.h"
 #include "effect/runtime_effect.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -91,7 +92,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDispersionShaderFilter::GetDispersionE
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_dispersionShader = nullptr;
     if (g_dispersionShader == nullptr) {
-        g_dispersionShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDispersion);
+        g_dispersionShader = GECreateRuntimeEffectForShader(g_shaderStringDispersion);
     }
     return g_dispersionShader;
 }

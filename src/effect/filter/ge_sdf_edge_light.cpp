@@ -20,6 +20,7 @@
 #include "ge_log.h"
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_ripple_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS::Rosen {
 namespace {
@@ -45,7 +46,7 @@ std::shared_ptr<Drawing::Image> GenerateSDFFromShape(Drawing::Canvas& canvas,
             return (inputShader.eval(fragCoord) + 63.5) / 127.5;
         }
     )";
-    static auto passThroughEffect = Drawing::RuntimeEffect::CreateForShader(passThrough);
+    static auto passThroughEffect = GECreateRuntimeEffectForShader(passThrough);
 
     Drawing::RuntimeShaderBuilder builder(passThroughEffect);
     builder.SetChild("inputShader", shader);
@@ -204,7 +205,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeImageMerger(
             return vec4(imageColor.rgb + composeImageColor.rgb, imageColor.a);
         }
     )";
-    static auto effectShader = Drawing::RuntimeEffect::CreateForShader(shadeCode);
+    static auto effectShader = GECreateRuntimeEffectForShader(shadeCode);
     if (!effectShader) {
         return nullptr;
     }
@@ -224,7 +225,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeImageMerger(
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(float imageWidth, float imageHeight)
 {
-    static auto effectShader = Drawing::RuntimeEffect::CreateForShader(SHADER);
+    static auto effectShader = GECreateRuntimeEffectForShader(SHADER);
     if (!effectShader) {
         LOGE("MakeEffectShader::RuntimeShader effect error\n");
         return nullptr;

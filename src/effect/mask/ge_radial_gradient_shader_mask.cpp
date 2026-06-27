@@ -17,6 +17,7 @@
 
 #include "ge_log.h"
 #include "ge_radial_gradient_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -112,7 +113,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
         }
     )";
 
-    auto radialGradientShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto radialGradientShaderMaskEffect = GECreateRuntimeEffectForShader(prog);
     if (!radialGradientShaderMaskEffect) {
         LOGE("GERadialGradientShaderMask::GetRadialGradientShaderMaskBuilder effect error");
         return nullptr;
@@ -211,7 +212,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GERadialGradientShaderMask::GetRa
         }
     )";
 
-    auto radialGradientShaderMaskNormalEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto radialGradientShaderMaskNormalEffect = GECreateRuntimeEffectForShader(prog);
     if (!radialGradientShaderMaskNormalEffect) {
         LOGE("GERadialGradientShaderMask::GetRadialGradientNormalMaskBuilder effect error");
         return nullptr;

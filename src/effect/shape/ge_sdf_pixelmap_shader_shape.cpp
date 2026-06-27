@@ -16,7 +16,7 @@
 #include "ge_sdf_pixelmap_shader_shape.h"
 
 #include "ge_log.h"
-
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -99,7 +99,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
         }
     )";
 
-    auto sdfPixelmapShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfPixelmapShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfPixelmapShaderBuilderEffect) {
         LOGE("GESDFPixelmapShaderShape::GetSDFPixelmapShaderShapeBuilder effect error");
         return nullptr;
@@ -146,7 +146,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFPixelmapShaderShape::GetSDFP
         }
     )";
 
-    auto sdfPixelmapShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfPixelmapShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfPixelmapShaderBuilderEffect) {
         LOGE("GESDFPixelmapShaderShape::GetSDFPixelmapNormalShaderShapeBuilder effect error");
         return nullptr;

@@ -25,6 +25,7 @@
           "hitrace",
           "hilog",
           "init",
+          "openssl",
           "skia",
           "libxml2"
         ]

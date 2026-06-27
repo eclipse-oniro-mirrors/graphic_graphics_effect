@@ -19,6 +19,7 @@
 #include <vector>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "ge_tone_mapping_helper.h"
 
@@ -192,7 +193,7 @@ bool GEEdgeLightShaderFilter::InitConvertFragShaderEffect()
         return true;
     }
 
-    g_convertShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringConvertFrag);
+    g_convertShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringConvertFrag);
     if (g_convertShaderEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_convertShaderEffect create failed.");
         return false;
@@ -207,7 +208,7 @@ bool GEEdgeLightShaderFilter::InitDetectFragShaderEffect()
         return true;
     }
 
-    g_detectShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDetectFrag);
+    g_detectShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDetectFrag);
     if (g_detectShaderEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_detectShaderEffect create failed.");
         return false;
@@ -222,7 +223,7 @@ bool GEEdgeLightShaderFilter::InitGaussShaderEffect()
         return true;
     }
 
-    g_gaussShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringGaussianFrag);
+    g_gaussShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringGaussianFrag);
     if (g_gaussShaderEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
         return false;
@@ -237,7 +238,7 @@ bool GEEdgeLightShaderFilter::InitCompositeShaderEffect()
         return true;
     }
 
-    g_compShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringCompositeFrag);
+    g_compShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringCompositeFrag);
     if (g_compShaderEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_compShaderEffect create failed.");
         return false;
@@ -252,7 +253,7 @@ bool GEEdgeLightShaderFilter::InitMaskShaderEffect()
         return true;
     }
 
-    g_addMaskEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringAddMask);
+    g_addMaskEffect = GECreateRuntimeEffectForShader(g_shaderStringAddMask);
     if (g_addMaskEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_addMaskEffect create failed.");
         return false;
@@ -267,7 +268,7 @@ bool GEEdgeLightShaderFilter::InitMergeImageShaderEffect()
         return true;
     }
 
-    g_alphaShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringAlphaGradient);
+    g_alphaShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringAlphaGradient);
     if (g_alphaShaderEffect == nullptr) {
         LOGE("GEEdgeLightShaderFilter::RuntimeShader g_alphaShaderEffect create failed.");
         return false;

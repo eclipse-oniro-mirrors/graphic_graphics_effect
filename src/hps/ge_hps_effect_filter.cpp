@@ -24,6 +24,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_linear_gradient_blur_shader_filter.h"
 #include "ge_pixel_map_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -617,7 +618,7 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
                 return finalColor;
             }
             )");
-            return Drawing::RuntimeEffect::CreateForShader(mixClampString);
+            return GECreateRuntimeEffectForShader(mixClampString);
         }();
         return s_clampUpEffect;
     }
@@ -638,7 +639,7 @@ std::shared_ptr<Drawing::RuntimeEffect> HpsEffectFilter::GetUpscaleEffect() cons
             return finalColor;
         }
         )");
-        return Drawing::RuntimeEffect::CreateForShader(mixString);
+        return GECreateRuntimeEffectForShader(mixString);
     }();
     return s_upscaleEffect;
 }

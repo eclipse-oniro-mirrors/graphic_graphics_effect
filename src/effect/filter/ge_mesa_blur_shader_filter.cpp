@@ -16,6 +16,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
 
@@ -717,7 +718,7 @@ bool GEMESABlurShaderFilter::InitBlurEffect()
         }
     )");
 
-    g_blurEffect = Drawing::RuntimeEffect::CreateForShader(blurStringMESA);
+    g_blurEffect = GECreateRuntimeEffectForShader(blurStringMESA);
     if (g_blurEffect == nullptr) {
         LOGE("GEMESABlurShaderFilter::RuntimeShader blurEffect create failed");
         return false;
@@ -744,7 +745,7 @@ bool GEMESABlurShaderFilter::InitDirectionBlurEffect()
         }
     )");
 
-    g_directionBlurEffect = Drawing::RuntimeEffect::CreateForShader(directionBlurStringMESA);
+    g_directionBlurEffect = GECreateRuntimeEffectForShader(directionBlurStringMESA);
     if (g_directionBlurEffect == nullptr) {
         LOGE("GEMESABlurShaderFilter::RuntimeShader directionBlurEffect create failed");
         return false;
@@ -777,7 +778,7 @@ bool GEMESABlurShaderFilter::InitMixEffect()
         }
     )");
 
-    g_mixEffect = Drawing::RuntimeEffect::CreateForShader(mixStringMESA);
+    g_mixEffect = GECreateRuntimeEffectForShader(mixStringMESA);
     if (g_mixEffect == nullptr) {
         LOGE("GEMESABlurShaderFilter::RuntimeShader mixEffect create failed");
         return false;
@@ -798,7 +799,7 @@ bool GEMESABlurShaderFilter::InitSimpleFilter()
             return imageInput.eval(xy);
         }
     )");
-    g_simpleFilter = Drawing::RuntimeEffect::CreateForShader(simpleShader);
+    g_simpleFilter = GECreateRuntimeEffectForShader(simpleShader);
     if (g_simpleFilter == nullptr) {
         LOGE("GEMESABlurShaderFilter::RuntimeShader simpleFilter create failed");
         return false;
@@ -838,7 +839,7 @@ bool GEMESABlurShaderFilter::InitGreyAdjustmentEffect()
         }
     )");
     if (g_greyAdjustEffect == nullptr) {
-        g_greyAdjustEffect = Drawing::RuntimeEffect::CreateForShader(greyXShader);
+        g_greyAdjustEffect = GECreateRuntimeEffectForShader(greyXShader);
         if (g_greyAdjustEffect == nullptr) {
             LOGE("GEMESABlurShaderFilter::RuntimeShader greyAdjustEffect create failed");
             return false;

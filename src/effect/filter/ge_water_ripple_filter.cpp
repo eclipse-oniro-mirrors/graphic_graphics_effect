@@ -17,6 +17,7 @@
  
 #include "ge_log.h"
 #include "ge_water_ripple_filter.h"
+#include "ge_shader_diagnostics.h"
  
 namespace OHOS {
 namespace Rosen {
@@ -111,8 +112,8 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
     static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSM = nullptr;
     if (g_waterRippleEffectSM == nullptr) {
         g_waterRippleEffectSM = (rippleMode == SMALL2MEDIUM_SEND) ?
-            Drawing::RuntimeEffect::CreateForShader(shaderStringSMsend) :
-            Drawing::RuntimeEffect::CreateForShader(shaderStringSMrecv);
+            GECreateRuntimeEffectForShader(shaderStringSMsend) :
+            GECreateRuntimeEffectForShader(shaderStringSMrecv);
     }
     return g_waterRippleEffectSM;
 }
@@ -121,7 +122,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSS = nullptr;
     if (g_waterRippleEffectSS == nullptr) {
-        g_waterRippleEffectSS = Drawing::RuntimeEffect::CreateForShader(shaderStringSSmutual);
+        g_waterRippleEffectSS = GECreateRuntimeEffectForShader(shaderStringSSmutual);
     }
     return g_waterRippleEffectSS;
 }
@@ -130,7 +131,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectMR = nullptr;
     if (g_waterRippleEffectMR == nullptr) {
-        g_waterRippleEffectMR = Drawing::RuntimeEffect::CreateForShader(shaderStringMiniRecv);
+        g_waterRippleEffectMR = GECreateRuntimeEffectForShader(shaderStringMiniRecv);
     }
     return g_waterRippleEffectMR;
 }

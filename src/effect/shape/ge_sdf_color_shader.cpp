@@ -17,7 +17,7 @@
  
 #include "ge_log.h"
 #include "ge_sdf_color_shader.h"
- 
+#include "ge_shader_diagnostics.h"
 namespace OHOS {
 namespace Rosen {
 
@@ -83,7 +83,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFColorShader::GetSDFColorEffect()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfColorShader = nullptr;
     if (sdfColorShader == nullptr) {
-        sdfColorShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+        sdfColorShader = GECreateRuntimeEffectForShader(shaderCode_);
     }
     return sdfColorShader;
 }

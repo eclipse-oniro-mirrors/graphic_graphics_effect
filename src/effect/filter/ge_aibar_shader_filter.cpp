@@ -17,6 +17,7 @@
 #include <unordered_map>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "include/core/SkTileMode.h"
 #include "include/effects/SkImageFilters.h"
 #include "src/core/SkOpts.h"
@@ -96,7 +97,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAIBarShaderFilter::MakeBinariza
     )";
 
     if (binarizationShaderEffect_ == nullptr) {
-        binarizationShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        binarizationShaderEffect_ = GECreateRuntimeEffectForShader(prog);
         if (binarizationShaderEffect_ == nullptr) {
             LOGE("MakeBinarizationShader::RuntimeShader effect error\n");
             return nullptr;

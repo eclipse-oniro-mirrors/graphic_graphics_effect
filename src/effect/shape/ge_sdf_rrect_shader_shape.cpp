@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -314,7 +315,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetUniform
         return uniformSdfRRectShaderShapeBuilder;
     }
 
-    auto uniformSdfRRectShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(UNIFORM_RRECT_SHADER_PROG);
+    auto uniformSdfRRectShaderBuilderEffect = GECreateRuntimeEffectForShader(UNIFORM_RRECT_SHADER_PROG);
     if (!uniformSdfRRectShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetUniformSDFRRectShaderShapeBuilder effect error");
         return nullptr;
@@ -332,7 +333,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetUniform
         return uniformSdfRRectNormalShaderShapeBuilder;
     }
 
-    auto uniformSdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(UNIFORM_SDF_GRAD_PROG);
+    auto uniformSdfRRectNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(UNIFORM_SDF_GRAD_PROG);
     if (!uniformSdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetUniformSDFRRectNormalShapeBuilder effect error");
         return nullptr;
@@ -350,7 +351,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectShaderShapeBuilder;
     }
 
-    auto sdfRRectShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(RRECT_SHADER_PROG);
+    auto sdfRRectShaderBuilderEffect = GECreateRuntimeEffectForShader(RRECT_SHADER_PROG);
     if (!sdfRRectShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetSDFRRectShaderShapeBuilder effect error");
         return nullptr;
@@ -367,7 +368,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectNormalShaderShapeBuilder;
     }
 
-    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfRRectNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_GRAD_PROG);
     if (!sdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GettSDFRRectNormalShapeBuilder effect error");
         return nullptr;

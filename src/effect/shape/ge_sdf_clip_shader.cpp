@@ -18,6 +18,7 @@
 #include "ge_log.h"
 #include "ge_sdf_clip_shader.h"
 #include "ge_sdf_shader_shape.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -116,7 +117,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFClipShader::GetSDFClipEffect()
     Drawing::RuntimeEffectOptions reo;
     reo.useHighpLocalCoords = true;
     if (sdfClipShader == nullptr) {
-        sdfClipShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_, reo);
+        sdfClipShader = GECreateRuntimeEffectForShader(shaderCode_, reo);
     }
     return sdfClipShader;
 }

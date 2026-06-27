@@ -14,6 +14,7 @@
  */
 #include "ge_log.h"
 #include "ge_border_light_shader.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_visual_effect_impl.h"
 
 namespace OHOS {
@@ -166,7 +167,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEBorderLightShader::GetBorderLig
                 return half4(shinningColor.xyz * lightColor.w, shinningColor.w) * clamp(lightIntensity, 0.0, 1.0);
             }
         )";
-        borderLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        borderLightShaderEffect_ = GECreateRuntimeEffectForShader(prog);
     }
 
     if (borderLightShaderEffect_ == nullptr) {

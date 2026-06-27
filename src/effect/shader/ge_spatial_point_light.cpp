@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_visual_effect_impl.h"
 
 #undef LOG_TAG
@@ -93,7 +94,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
     if (shaderBuilder) {
         return shaderBuilder;
     }
-    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_NO_MASK, g_highpUVOption);
+    auto effect = GECreateRuntimeEffectForShader(PROG_NO_MASK, g_highpUVOption);
     if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderNoMask effect is nullptr.");
         return nullptr;
@@ -109,7 +110,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpa
     if (shaderBuilder) {
         return shaderBuilder;
     }
-    auto effect = Drawing::RuntimeEffect::CreateForShader(PROG_WITH_MASK, g_highpUVOption);
+    auto effect = GECreateRuntimeEffectForShader(PROG_WITH_MASK, g_highpUVOption);
     if (effect == nullptr) {
         GE_LOGE("GetSpatialPointLightBuilderWithMask effect is nullptr.");
         return nullptr;

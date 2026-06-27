@@ -16,7 +16,7 @@
 #include "ge_sdf_union_op_shader_shape.h"
 
 #include "ge_log.h"
-
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -109,7 +109,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFUn
         }
     )";
 
-    auto sdfUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfUnionShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFUnionBuilder effect error");
         return nullptr;
@@ -146,7 +146,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFSm
         }
     )";
 
-    auto sdfSmoothUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfSmoothUnionShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfSmoothUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFSmoothUnionBuilder effect error");
         return nullptr;
@@ -286,7 +286,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFNo
     }
 
     auto sdfNormalSmoothUnionShaderBuilderEffect =
-        Drawing::RuntimeEffect::CreateForShader(SDF_SMOOTH_UNION_NORMAL_PROG);
+        GECreateRuntimeEffectForShader(SDF_SMOOTH_UNION_NORMAL_PROG);
     if (!sdfNormalSmoothUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFNormalSmoothUnionBuilder effect error");
         return nullptr;

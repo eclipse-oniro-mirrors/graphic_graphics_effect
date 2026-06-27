@@ -17,6 +17,7 @@
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -29,7 +30,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBorderSDFShader::GetEffect()
     if (params_.style == 0) {
         thread_local std::shared_ptr<Drawing::RuntimeEffect> borderSdfSolidEffect = nullptr;
         if (!borderSdfSolidEffect) {
-            borderSdfSolidEffect = Drawing::RuntimeEffect::CreateForShader(borderShaderCode_);
+            borderSdfSolidEffect = GECreateRuntimeEffectForShader(borderShaderCode_);
         }
         return borderSdfSolidEffect;
     }

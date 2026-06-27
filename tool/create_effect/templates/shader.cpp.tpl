@@ -18,6 +18,7 @@
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 // Additional includes for complex shaders:
 // #include <chrono>
@@ -48,7 +49,7 @@ std::shared_ptr<Drawing::RuntimeEffect> $CLASS_NAME::GetEffect()
     )";
 
     static const std::shared_ptr<Drawing::RuntimeEffect> s_effect =
-        Drawing::RuntimeEffect::CreateForShader(s_prog$EFFECT_NAME);
+        GECreateRuntimeEffectForShader(s_prog$EFFECT_NAME);
 
     if (s_effect == nullptr) {
         GE_LOGE("$CLASS_NAME::GetEffect effect is nullptr.");

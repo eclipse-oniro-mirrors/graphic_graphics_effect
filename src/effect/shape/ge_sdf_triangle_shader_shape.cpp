@@ -14,6 +14,7 @@
  */
 
 #include "ge_sdf_triangle_shader_shape.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_log.h"
 #include "ge_trace.h"
 
@@ -233,7 +234,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTriangleShaderShape::GetSDFT
         }
     )";
 
-    auto sdfTriangleShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfTriangleShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfTriangleShaderBuilderEffect) {
         LOGE("GESDFTriangleShaderShape::GetSDFTriangleShaderShapeBuilder effect error");
         return nullptr;
@@ -250,7 +251,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTriangleShaderShape::GetSDFT
         return sdfTriangleNormalShaderShapeBuilder;
     }
 
-    auto sdfTriangleNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfTriangleNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_GRAD_PROG);
     if (!sdfTriangleNormalShaderBuilderEffect) {
         LOGE("GESDFTriangleShaderShape::GetSDFTriangleNormalShapeBuilder effect error");
         return nullptr;

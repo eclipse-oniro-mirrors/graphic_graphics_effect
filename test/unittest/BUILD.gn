@@ -143,8 +143,10 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/effect/shape/ge_sdf_shadow_shader.cpp",
     "${graphics_effect_root}/src/effect_cfg/ge_frosted_glass_effect_cfg.cpp",
     "${graphics_effect_root}/src/effect_cfg/ge_xml_parser_base.cpp",
+    "${graphics_effect_root}/src/util/ge_shader_diagnostics.cpp",
     "${graphics_effect_root}/src/util/ge_system_properties.cpp",
     "${graphics_effect_root}/src/util/ge_tone_mapping_helper.cpp",
+    "${graphics_effect_root}/src/util/ge_transform_helper.cpp",
     "${graphics_effect_root}/src/ext/ge_external_dynamic_loader.cpp",
     "${graphics_effect_root}/src/ext/gex_marshalling_helper.cpp",
   ]
@@ -177,6 +179,8 @@ ohos_source_set("graphics_effect_test_src") {
   if (ge_is_ohos || ge_is_linux) {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
+
+  external_deps += [ "openssl:libcrypto_shared" ]
 
   part_name = "graphics_effect"
   subsystem_name = "graphic"
@@ -246,6 +250,8 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_shader_test.cpp",
     "ge_sound_wave_filter_test.cpp",
     "ge_spatial_glass_effect_test.cpp",
+    "ge_shader_diagnostics_test.cpp",
+    "ge_source_location_test.cpp",
     "ge_system_properties_test.cpp",
     "ge_tone_mapping_helper_test.cpp",
     "ge_variable_radius_blur_shader_filter_test.cpp",
@@ -295,7 +301,10 @@ ohos_unittest("GraphicsEffectTest") {
     "hilog:libhilog",
     "graphic_2d:librender_service_base",
     "libxml2:libxml2",
+    "openssl:libcrypto_shared",
   ]
+
+  defines = []
 
   part_name = "graphics_effect"
   subsystem_name = "graphic"

@@ -17,6 +17,7 @@
  
 #include "ge_log.h"
 #include "ge_sdf_shadow_shader.h"
+#include "ge_shader_diagnostics.h"
 #include "common/rs_common_def.h"
 
 namespace OHOS {
@@ -164,7 +165,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetSDFShadowEffect()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfShadowShader = nullptr;
     if (sdfShadowShader == nullptr) {
-        sdfShadowShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+        sdfShadowShader = GECreateRuntimeEffectForShader(shaderCode_);
     }
     return sdfShadowShader;
 }
@@ -199,7 +200,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetElevationShadowEff
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> elevationShadowShader = nullptr;
     if (elevationShadowShader == nullptr) {
-        elevationShadowShader = Drawing::RuntimeEffect::CreateForShader(elevationShaderCode_);
+        elevationShadowShader = GECreateRuntimeEffectForShader(elevationShaderCode_);
     }
     return elevationShadowShader;
 }

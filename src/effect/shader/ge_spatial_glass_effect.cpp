@@ -18,6 +18,7 @@
 #include <cmath>
 #include "ge_log.h"
 #include "ge_visual_effect_impl.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_sdf_rrect_shader_shape.h"
 
 namespace OHOS {
@@ -84,7 +85,7 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_spatialGlassShader
 bool GESpatialGlassEffect::InitSpatialGlassEffect()
 {
     if (g_spatialGlassShaderEffect == nullptr) {
-        g_spatialGlassShaderEffect = Drawing::RuntimeEffect::CreateForShader(MAIN_SHADER_PROG);
+        g_spatialGlassShaderEffect = GECreateRuntimeEffectForShader(MAIN_SHADER_PROG);
         if (g_spatialGlassShaderEffect == nullptr) {
             GE_LOGE("InitSpatialGlassEffect::RuntimeShader effect error\n");
             return false;

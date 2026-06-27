@@ -16,6 +16,7 @@
 #include <chrono>
 #include "ge_log.h"
 #include "ge_frame_gradient_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -261,7 +262,7 @@ void GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect() const
         return;
     }
 
-    frameGradientMaskShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(maskString);
+    frameGradientMaskShaderEffect_ = GECreateRuntimeEffectForShader(maskString);
     if (frameGradientMaskShaderEffect_ == nullptr) {
         GE_LOGE("GEFrameGradientShaderMask::MakeFrameGradientMaskShaderEffect error");
     }

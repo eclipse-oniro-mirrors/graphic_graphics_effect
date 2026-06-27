@@ -15,6 +15,7 @@
 #include "ge_circle_flowlight_effect.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_visual_effect_impl.h"
 
 #include <cmath>
@@ -247,7 +248,7 @@ void GECircleFlowlightEffect::MakeCircleFlowlightEffect()
     if (g_circleFlowlightEffect != nullptr) {
         return;
     }
-    g_circleFlowlightEffect = Drawing::RuntimeEffect::CreateForShader(CIRCLE_FLOWLIGHT_SHADER);
+    g_circleFlowlightEffect = GECreateRuntimeEffectForShader(CIRCLE_FLOWLIGHT_SHADER);
     if (g_circleFlowlightEffect == nullptr) {
         LOGE("GECircleFlowlightEffect::RuntimeShader circleFlowlightEffect create failed");
     }
@@ -258,8 +259,7 @@ void GECircleFlowlightEffect::MakeCircleFlowlightEffectWithMask()
     if (g_circleFlowlightEffectWithMask != nullptr) {
         return;
     }
-    g_circleFlowlightEffectWithMask =
-        Drawing::RuntimeEffect::CreateForShader(CIRCLE_FLOWLIGHT_SHADER_WITH_MASK);
+    g_circleFlowlightEffectWithMask = GECreateRuntimeEffectForShader(CIRCLE_FLOWLIGHT_SHADER_WITH_MASK);
     if (g_circleFlowlightEffectWithMask == nullptr) {
         LOGE("GECircleFlowlightEffect::RuntimeShader circleFlowlightEffectWithMask create failed");
     }
