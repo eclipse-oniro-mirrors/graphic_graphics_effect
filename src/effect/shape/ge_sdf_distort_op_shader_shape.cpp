@@ -154,7 +154,9 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFDistortOpShaderShape::GetSDF
         return sdfDistortShaderShapeBuilder;
     }
 
-    auto sdfDistortShaderBuilderEffect = GECreateRuntimeEffectForShader(SHADER);
+    Drawing::RuntimeEffectOptions reo;
+    reo.useHighpLocalCoords = true;
+    auto sdfDistortShaderBuilderEffect = GECreateRuntimeEffectForShader(SHADER, reo);
     if (!sdfDistortShaderBuilderEffect) {
         LOGE("GESDFDistortOpShaderShape::GetSDFDistortBuilder effect error");
         return nullptr;
