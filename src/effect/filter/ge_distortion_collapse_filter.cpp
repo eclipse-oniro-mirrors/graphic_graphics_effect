@@ -16,6 +16,7 @@
 #include "ge_distortion_collapse_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS::Rosen {
 namespace {
@@ -145,7 +146,7 @@ std::shared_ptr<Drawing::Image> GEDistortionCollapseFilter::OnProcessImage(Drawi
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDistortionCollapseFilter::MakeEffectShader(
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    static auto effectShader = Drawing::RuntimeEffect::CreateForShader(SHADER);
+    static auto effectShader = GECreateRuntimeEffectForShader(SHADER);
     if (!effectShader) {
         LOGE("MakeEffectShader::RuntimeShader effect error\n");
         return nullptr;

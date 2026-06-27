@@ -14,6 +14,7 @@
  */
 #include <algorithm>
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_wavy_ripple_light_shader.h"
 
 namespace OHOS {
@@ -94,7 +95,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEWavyRippleLightShader::GetWavyR
                 return vec4(color, mask);
             }
         )";
-        wavyRippleLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        wavyRippleLightShaderEffect_ = GECreateRuntimeEffectForShader(prog);
     }
 
     if (wavyRippleLightShaderEffect_ == nullptr) {

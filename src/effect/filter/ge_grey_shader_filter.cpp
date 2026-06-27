@@ -18,6 +18,7 @@
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -115,7 +116,7 @@ bool GEGreyShaderFilter::InitGreyAdjustmentEffect()
             return vec4(color, 1.0);
         }
     )");
-    g_greyAdjustEffect = Drawing::RuntimeEffect::CreateForShader(GreyGradationString);
+    g_greyAdjustEffect = GECreateRuntimeEffectForShader(GreyGradationString);
     if (g_greyAdjustEffect == nullptr) {
         LOGE("GEGreyShaderFilter::InitGreyAdjustmentEffect blurEffect create failed");
         return false;

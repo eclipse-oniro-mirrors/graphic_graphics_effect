@@ -450,6 +450,34 @@ HWTEST_F(GESDFRRectShaderShapeTest, ResolveUniformRadius_001, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest ResolveUniformRadius_001 end";
 }
 
+/**
+ * @tc.name: GetInscribedRectWithCorners
+ * @tc.desc: Verify GetInscribedRect returns true and computes inscribed rect from corner radii
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, GetInscribedRectWithCorners, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GetInscribedRectWithCorners start";
+    GESDFRRectShapeParams param;
+    param.rrect = {10.0f, 20.0f, 200.0f, 100.0f};
+    param.rrect.radius_[GERRect::TOP_LEFT] = Vector2f(20.0f, 15.0f);
+    param.rrect.radius_[GERRect::TOP_RIGHT] = Vector2f(0.0f, 10.0f);
+    param.rrect.radius_[GERRect::BOTTOM_RIGHT] = Vector2f(40.0f, 20.0f);
+    param.rrect.radius_[GERRect::BOTTOM_LEFT] = Vector2f(0.0f, 25.0f);
+
+    GESDFRRectShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
+    EXPECT_FLOAT_EQ(rect.left_, 20.25f);
+    EXPECT_FLOAT_EQ(rect.right_, 189.75f);
+
+    shape.params_.rrect = {10.0f, 20.0f, 0.0f, 100.0f};
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+    shape.params_.rrect = {10.0f, 20.0f, 200.0f, 0.0f};
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GetInscribedRectWithCorners end";
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

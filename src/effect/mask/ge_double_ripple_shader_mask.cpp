@@ -15,6 +15,7 @@
 
 #include <chrono>
 #include "ge_double_ripple_shader_mask.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -131,7 +132,7 @@ static constexpr char prog[] = R"(
         }
     )";
 
-    auto rippleShaderMaskEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto rippleShaderMaskEffect = GECreateRuntimeEffectForShader(prog);
     if (!rippleShaderMaskEffect) {
         return nullptr;
     }
@@ -253,7 +254,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDoubleRippleShaderMask::GetDoub
         }
     )";
 
-    auto rippleShaderMaskNormalEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto rippleShaderMaskNormalEffect = GECreateRuntimeEffectForShader(prog);
     if (!rippleShaderMaskNormalEffect) {
         LOGE("GEDoubleRippleShaderMask::GetRippleShaderNormalMaskBuilder effect error");
         return nullptr;

@@ -34,6 +34,8 @@ namespace Rosen {
 namespace Drawing {
 constexpr size_t POINT_NUM = 12; // 12 bezierWarp control points
 constexpr float MAX_CURVE_X = 1.70000000;   // MAX rounded area of a unit rrect
+constexpr float CIRCLE_EXPANSION_FACTOR = 1.01f;
+constexpr float CIRCLE_PIXEL_TOLERANCE = 1.f;
 
 enum class DrawingPaintType { NONE, BRUSH, PEN, PAINT, BRUSH_PEN };
 
@@ -101,24 +103,32 @@ public:
         return supportHeadroom_;
     }
 
-    // refer to skia-SkContinuousRRect.cpp
+    // refer to the function BackendGpu::GetG2Type in BackendGpu.cpp
     static inline bool CanBeContinuous(const std::shared_ptr<GESDFRRectShapeParams>& params)
     {
         if (!params->rrect.HasUniformCornerRadii() || !params->rrect.HasCircularCornerRadii()) {
             return false;
         }
         float commonRadius = params->rrect.GetCommonRadiusX();
-        float extendsRadius = commonRadius * MAX_CURVE_X;
-        if (extendsRadius <= fmin(params->rrect.width_, params->rrect.height_) * 0.5f) {
-            return true;
-        } else if (ROSEN_EQ(commonRadius, params->rrect.height_ * 0.5f) &&
-                   (extendsRadius < params->rrect.width_ * 0.5f)) {
-            return true;
-        } else if (ROSEN_EQ(commonRadius, params->rrect.width_ * 0.5f) &&
-                   (extendsRadius < params->rrect.height_ * 0.5f)) {
-            return true;
+
+        // Exclude radius <= 0
+        if (commonRadius < 0.0001f) {
+            return false;
         }
-        return false;
+
+        // Exclude circle
+        auto maxWH = std::max(params->rrect.width_, params->rrect.height_);
+        if (ROSEN_GE(2 * commonRadius * CIRCLE_EXPANSION_FACTOR, maxWH) ||
+                ROSEN_GE(2 * commonRadius + CIRCLE_PIXEL_TOLERANCE, maxWH)) {
+            return false;
+        }
+
+        // Clamp the radius of capsule
+        auto minWH = std::min(params->rrect.width_, params->rrect.height_);
+        if (ROSEN_GE(commonRadius, minWH * 0.5f)) {
+            params->rrect.SetCornerRadius(minWH * 0.5f, minWH * 0.5f);
+        }
+        return true;
     }
 
     const std::shared_ptr<Drawing::GEShaderMask> GenerateShaderMask() const;

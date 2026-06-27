@@ -17,7 +17,8 @@
  
 #include "ge_log.h"
 #include "ge_displacement_distort_shader_filter.h"
- 
+#include "ge_shader_diagnostics.h"
+
 namespace OHOS {
 namespace Rosen {
 
@@ -82,8 +83,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDisplacementDistortFilter::GetDisplace
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_displacementdistortShader = nullptr;
     if (g_displacementdistortShader == nullptr) {
-        g_displacementdistortShader =
-            Drawing::RuntimeEffect::CreateForShader(shaderStringDisplacementDistort);
+        g_displacementdistortShader = GECreateRuntimeEffectForShader(shaderStringDisplacementDistort);
     }
     return g_displacementdistortShader;
 }

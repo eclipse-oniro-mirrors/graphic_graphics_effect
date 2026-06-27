@@ -60,6 +60,8 @@ public:
         return type == GESDFShapeType::RRECT;
     }
 
+    bool GetInscribedRect(Rect& rect) override;
+
 private:
     using CornerRadii = std::array<Vector2f, GERRect::CORNER_COUNT>;
 

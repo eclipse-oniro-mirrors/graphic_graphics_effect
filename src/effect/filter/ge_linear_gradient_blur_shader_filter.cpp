@@ -15,6 +15,7 @@
 #include "ge_linear_gradient_blur_shader_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 
 namespace OHOS {
@@ -325,7 +326,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GELinearGradientBlurShaderFilter:
                 return vec4(color, 1.0);
             }
         )";
-        maskBlurShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        maskBlurShaderEffect_ = GECreateRuntimeEffectForShader(prog);
         if (maskBlurShaderEffect_ == nullptr) {
             return nullptr;
         }

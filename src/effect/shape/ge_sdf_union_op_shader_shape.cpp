@@ -16,7 +16,7 @@
 #include "ge_sdf_union_op_shader_shape.h"
 
 #include "ge_log.h"
-
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -109,7 +109,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFUn
         }
     )";
 
-    auto sdfUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfUnionShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFUnionBuilder effect error");
         return nullptr;
@@ -146,7 +146,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFUnionOpShaderShape::GetSDFSm
         }
     )";
 
-    auto sdfSmoothUnionShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfSmoothUnionShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfSmoothUnionShaderBuilderEffect) {
         LOGE("GESDFUnionOpShaderShape::GetSDFSmoothUnionBuilder effect error");
         return nullptr;
@@ -403,6 +403,26 @@ bool GESDFUnionOpShaderShape::HasType(const GESDFShapeType type) const
         return true;
     }
     return false;
+}
+
+bool GESDFUnionOpShaderShape::GetInscribedRect(Rect& rect)
+{
+    Rect leftRect;
+    Rect rightRect;
+    bool leftSupport = params_.left ? params_.left->GetInscribedRect(leftRect) : false;
+    bool rightSupport = params_.right ? params_.right->GetInscribedRect(rightRect) : false;
+    if (!leftSupport && !rightSupport) {
+        return false;
+    }
+
+    // Use the inscribed rect of one shape as the inscribed rect for the union result
+    // Take the union of two inscribed rects should be better
+    if (leftSupport) {
+        rect = leftRect;
+    } else {
+        rect = rightRect;
+    }
+    return true;
 }
 } // namespace Drawing
 } // namespace Rosen

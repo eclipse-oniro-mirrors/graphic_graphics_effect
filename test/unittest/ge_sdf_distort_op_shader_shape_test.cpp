@@ -25,6 +25,13 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
+// Mock shape that inherits default GetInscribedRect (returns false)
+class MockUnsupportedInscribedRectShape : public GESDFShaderShape {
+public:
+    GESDFShapeType GetSDFShapeType() const override { return GESDFShapeType::EMPTY; }
+    bool HasType(const GESDFShapeType type) const override { return type == GESDFShapeType::EMPTY; }
+};
+
 class GESDFDistortOpShaderShapeTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -334,6 +341,68 @@ HWTEST_F(GESDFDistortOpShaderShapeTest, GenerateDrawingShader_005, TestSize.Leve
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
     EXPECT_NE(shader, nullptr);
     GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest GenerateDrawingShader_005 end";
+}
+
+/**
+ * @tc.name: GetInscribedRectNullShape
+ * @tc.desc: Verify GetInscribedRect returns false when shape is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFDistortOpShaderShapeTest, GetInscribedRectNullShape, TestSize.Level1)
+{
+    GESDFDistortOpShapeParams param;
+    param.shape = nullptr; // null shape → B1 true path
+    GESDFDistortOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+}
+
+/**
+ * @tc.name: GetInscribedRectUnsupportedShape
+ * @tc.desc: Verify GetInscribedRect returns false when shape does not support inscribed rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFDistortOpShaderShapeTest, GetInscribedRectUnsupportedShape, TestSize.Level1)
+{
+    GESDFDistortOpShapeParams param;
+    param.shape = std::make_shared<MockUnsupportedInscribedRectShape>(); // non-null, GetInscribedRect=false → B2 true
+    GESDFDistortOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+}
+
+/**
+ * @tc.name: GetInscribedRectNegativeBarrelDistortion
+ * @tc.desc: Verify GetInscribedRect handles all four negative barrel distortion branches
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFDistortOpShaderShapeTest, GetInscribedRectNegativeBarrelDistortion, TestSize.Level1)
+{
+    GESDFDistortOpShapeParams param;
+    param.shape = CreateTestShape();
+    param.barrelDistortion = Vector4f(-1.0f, -1.0f, -1.0f, -1.0f); // all < 0 → B3-B6 true paths
+    GESDFDistortOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
+}
+
+/**
+ * @tc.name: GetInscribedRectNonNegativeBarrelDistortion
+ * @tc.desc: Verify GetInscribedRect handles non-negative barrel distortion (else paths for B3-B6)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFDistortOpShaderShapeTest, GetInscribedRectNonNegativeBarrelDistortion, TestSize.Level1)
+{
+    GESDFDistortOpShapeParams param;
+    param.shape = CreateTestShape();
+    param.barrelDistortion = Vector4f(0.0f, 0.0f, 0.0f, 0.0f); // all >= 0 → B3-B6 else paths
+    param.LUCorner = Drawing::Point(0.0f, 0.0f);
+    param.RUCorner = Drawing::Point(1.0f, 0.0f);
+    param.RBCorner = Drawing::Point(1.0f, 1.0f);
+    param.LBCorner = Drawing::Point(0.0f, 1.0f);
+    GESDFDistortOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
 }
 
 } // namespace Drawing

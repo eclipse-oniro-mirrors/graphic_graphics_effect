@@ -18,6 +18,7 @@
 #include <algorithm>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -58,7 +59,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GetResampleShaderEffect()
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_resampleShader = nullptr;
     if (g_resampleShader == nullptr) {
-        g_resampleShader = Drawing::RuntimeEffect::CreateForShader(g_shaderStringResample);
+        g_resampleShader = GECreateRuntimeEffectForShader(g_shaderStringResample);
     }
     return g_resampleShader;
 }
@@ -304,7 +305,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetBlurShaderEf
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_blurShader = nullptr;
     if (g_blurShader == nullptr) {
-        g_blurShader = Drawing::RuntimeEffect::CreateForShader(shaderStringGaussianBlur);
+        g_blurShader = GECreateRuntimeEffectForShader(shaderStringGaussianBlur);
     }
     return g_blurShader;
 }
@@ -313,7 +314,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetMaskMixShade
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_maskMixShader = nullptr;
     if (g_maskMixShader == nullptr) {
-        g_maskMixShader = Drawing::RuntimeEffect::CreateForShader(shaderStringMaskMix);
+        g_maskMixShader = GECreateRuntimeEffectForShader(shaderStringMaskMix);
     }
     return g_maskMixShader;
 }

@@ -16,6 +16,7 @@
 #include "ge_sdf_from_image_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "src/core/SkOpts.h"
 #include "ge_mesa_blur_shader_filter.h"
@@ -81,7 +82,7 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::FakeBlur(Drawing::Canvas &
 {
     GE_TRACE_NAME_FMT("GESDFFromImageFilter::FakeBlur Run FakeBlur function.");
     if (!g_sampleShaderEffect) {
-        g_sampleShaderEffect = Drawing::RuntimeEffect::CreateForShader(BOX_BLUR_PROG);
+        g_sampleShaderEffect = GECreateRuntimeEffectForShader(BOX_BLUR_PROG);
         if (g_sampleShaderEffect == nullptr) {
             GE_LOGE("GEEdgeLightShaderFilter::RuntimeShader g_gaussShaderEffect create failed.");
             return nullptr;
@@ -219,7 +220,7 @@ bool GESDFFromImageFilter::InitJFAPrepareEffect()
         }
     )");
 
-    g_JFAPrepareEffect = Drawing::RuntimeEffect::CreateForShader(shaderString);
+    g_JFAPrepareEffect = GECreateRuntimeEffectForShader(shaderString);
     if (g_JFAPrepareEffect == nullptr) {
         GE_LOGE("GESDFFromImageFilter::InitJFAPrepareEffect failed");
         return false;
@@ -283,7 +284,7 @@ bool GESDFFromImageFilter::InitJfaIterationEffect()
         return true;
     }
 
-    g_jfaIterationEffect = Drawing::RuntimeEffect::CreateForShader(JFA_ITERATION_PROG);
+    g_jfaIterationEffect = GECreateRuntimeEffectForShader(JFA_ITERATION_PROG);
     if (g_jfaIterationEffect == nullptr) {
         GE_LOGE("GESDFFromImageFilter::InitJfaIterationEffect failed");
         return false;
@@ -315,7 +316,7 @@ bool GESDFFromImageFilter::InitJfaProcessResultEffect()
         }
     )");
 
-    g_jfaProcessResultEffect = Drawing::RuntimeEffect::CreateForShader(shaderString);
+    g_jfaProcessResultEffect = GECreateRuntimeEffectForShader(shaderString);
     if (g_jfaProcessResultEffect == nullptr) {
         GE_LOGE("GESDFFromImageFilter::InitJfaProcessResultEffect failed");
         return false;
@@ -365,7 +366,7 @@ bool GESDFFromImageFilter::InitFillDerivEffect()
         }
     )");
 
-    g_sdfFillDerivEffect = Drawing::RuntimeEffect::CreateForShader(shaderString);
+    g_sdfFillDerivEffect = GECreateRuntimeEffectForShader(shaderString);
     if (g_sdfFillDerivEffect == nullptr) {
         GE_LOGE("GESDFFromImageFilter::InitFillDerivEffect failed");
         return false;

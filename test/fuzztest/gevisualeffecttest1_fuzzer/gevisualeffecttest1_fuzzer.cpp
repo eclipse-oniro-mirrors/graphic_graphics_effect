@@ -13,11 +13,15 @@
  * limitations under the License.
  */
 
+#include <array>
 #include <cstring>
 #include <memory>
+#include <utility>
+#include <vector>
 #include "gevisualeffecttest1_fuzzer.h"
 #include "ge_visual_effect.h"
 #include "ge_shader_filter_params.h"
+#include "image/image.h"
 #include <fuzzer/FuzzedDataProvider.h>
 
 namespace OHOS {
@@ -26,6 +30,7 @@ namespace Drawing {
 
 namespace {
 constexpr uint8_t FUZZER_TEST_CASE_COUNT = 29;
+constexpr size_t FRACTION_STOPS_MAX = 4;
 
 enum TestCaseIndex {
     TEST_CASE_KAWASE_BLUR = 0,
@@ -319,6 +324,12 @@ void FuzzTestWaveGradientMask(FuzzedDataProvider& fdp)
 void FuzzTestLinearGradientMask(FuzzedDataProvider& fdp)
 {
     auto effect = std::make_shared<GEVisualEffect>(GE_MASK_LINEAR_GRADIENT);
+    size_t stopCount = fdp.ConsumeIntegral<uint8_t>() % FRACTION_STOPS_MAX;
+    std::vector<std::pair<float, float>> fractionStops;
+    for (size_t i = 0; i <= stopCount; i++) {
+        fractionStops.emplace_back(fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>());
+    }
+    effect->SetParam(GE_MASK_LINEAR_GRADIENT_FRACTION_STOPS, fractionStops);
     effect->GetName();
     effect->GetImpl();
 }
@@ -326,6 +337,8 @@ void FuzzTestLinearGradientMask(FuzzedDataProvider& fdp)
 void FuzzTestImageMask(FuzzedDataProvider& fdp)
 {
     auto effect = std::make_shared<GEVisualEffect>(GE_MASK_IMAGE);
+    std::shared_ptr<Drawing::Image> image = fdp.ConsumeBool() ? std::make_shared<Drawing::Image>() : nullptr;
+    effect->SetParam(GE_MASK_IMAGE_IMAGE, image);
     effect->GetName();
     effect->GetImpl();
 }
@@ -333,6 +346,17 @@ void FuzzTestImageMask(FuzzedDataProvider& fdp)
 void FuzzTestPixelMapMask(FuzzedDataProvider& fdp)
 {
     auto effect = std::make_shared<GEVisualEffect>(GE_MASK_PIXEL_MAP);
+    std::shared_ptr<Drawing::Image> image = fdp.ConsumeBool() ? std::make_shared<Drawing::Image>() : nullptr;
+    effect->SetParam(GE_MASK_PIXEL_MAP_PIXEL_MAP, image);
+    Vector4f src(fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>());
+    effect->SetParam(GE_MASK_PIXEL_MAP_SRC, src);
+    Vector4f dst(fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>());
+    effect->SetParam(GE_MASK_PIXEL_MAP_DST, dst);
+    Vector4f fillColor(fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>(),
+        fdp.ConsumeFloatingPoint<float>(), fdp.ConsumeFloatingPoint<float>());
+    effect->SetParam(GE_MASK_PIXEL_MAP_FILL_COLOR, fillColor);
     effect->GetName();
     effect->GetImpl();
 }
@@ -348,6 +372,12 @@ void FuzzTestLightCave(FuzzedDataProvider& fdp)
 void FuzzTestBezierWarp(FuzzedDataProvider& fdp)
 {
     auto effect = std::make_shared<GEVisualEffect>(GE_FILTER_BEZIER_WARP);
+    std::array<Drawing::Point, POINT_NUM> destinationPatch;
+    for (size_t i = 0; i < POINT_NUM; i++) {
+        destinationPatch[i] = Drawing::Point(fdp.ConsumeFloatingPoint<float>(),
+            fdp.ConsumeFloatingPoint<float>());
+    }
+    effect->SetParam(GE_FILTER_BEZIER_WARP_DESTINATION_PATCH, destinationPatch);
     effect->GetName();
     effect->GetImpl();
 }

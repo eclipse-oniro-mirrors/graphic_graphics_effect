@@ -18,6 +18,7 @@
 #include <sstream>
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -314,7 +315,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetUniform
         return uniformSdfRRectShaderShapeBuilder;
     }
 
-    auto uniformSdfRRectShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(UNIFORM_RRECT_SHADER_PROG);
+    auto uniformSdfRRectShaderBuilderEffect = GECreateRuntimeEffectForShader(UNIFORM_RRECT_SHADER_PROG);
     if (!uniformSdfRRectShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetUniformSDFRRectShaderShapeBuilder effect error");
         return nullptr;
@@ -332,7 +333,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetUniform
         return uniformSdfRRectNormalShaderShapeBuilder;
     }
 
-    auto uniformSdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(UNIFORM_SDF_GRAD_PROG);
+    auto uniformSdfRRectNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(UNIFORM_SDF_GRAD_PROG);
     if (!uniformSdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetUniformSDFRRectNormalShapeBuilder effect error");
         return nullptr;
@@ -350,7 +351,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectShaderShapeBuilder;
     }
 
-    auto sdfRRectShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(RRECT_SHADER_PROG);
+    auto sdfRRectShaderBuilderEffect = GECreateRuntimeEffectForShader(RRECT_SHADER_PROG);
     if (!sdfRRectShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GetSDFRRectShaderShapeBuilder effect error");
         return nullptr;
@@ -367,7 +368,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFRRectShaderShape::GetSDFRRec
         return sdfRRectNormalShaderShapeBuilder;
     }
 
-    auto sdfRRectNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfRRectNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_GRAD_PROG);
     if (!sdfRRectNormalShaderBuilderEffect) {
         LOGE("GESDFRRectShaderShape::GettSDFRRectNormalShapeBuilder effect error");
         return nullptr;
@@ -421,6 +422,44 @@ bool GESDFRRectShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY, Ve
     outX = rect.left_ + rect.width_ * 0.5f;
     outY = rect.top_ + rect.height_ * 0.5f;
     shapeHalfSize  = Vector2f(rect.width_ * 0.5f, rect.height_ * 0.5f);
+    return true;
+}
+
+bool GESDFRRectShaderShape::GetInscribedRect(Rect& rect)
+{
+    const GERRect& rrect = GetRRect();
+    if (rrect.width_ < MIN_SIZE || rrect.height_ < MIN_SIZE) {
+        return false;
+    }
+
+    float halfWidth = rrect.width_ * HALF + EXTEND;
+    float halfHeight = rrect.height_ * HALF + EXTEND;
+
+    // Calculate maxz radius for all 4 corners
+    CornerRadii radii {};
+    if (UseUniformRadiusFastPath()) {
+        float radius = ResolveUniformRadius(halfWidth, halfHeight);
+        for (auto& item : radii) {
+            item = Vector2f(radius, radius);
+        }
+    } else {
+        radii = ResolveCornerRadii(halfWidth, halfHeight);
+    }
+
+    float leftMaxRadiusX = std::max(radii[GERRect::TOP_LEFT].x_, radii[GERRect::BOTTOM_LEFT].x_);
+    float rightMaxRadiusX = std::max(radii[GERRect::TOP_RIGHT].x_, radii[GERRect::BOTTOM_RIGHT].x_);
+    float topMaxRadiusY = std::max(radii[GERRect::TOP_LEFT].y_, radii[GERRect::TOP_RIGHT].y_);
+    float bottomMaxRadiusY = std::max(radii[GERRect::BOTTOM_LEFT].y_, radii[GERRect::BOTTOM_RIGHT].y_);
+
+    // Calculate inscribed rect, use larger shrink value 0.5 * r instead of exact value (1-sqrt(2)/2) * r for safety
+    rect.left_ = rrect.left_ + 0.5f * leftMaxRadiusX;
+    rect.top_ = rrect.top_ + 0.5f * topMaxRadiusY;
+    rect.right_ = rrect.left_ + rrect.width_ - 0.5f * rightMaxRadiusX;
+    rect.bottom_ = rrect.top_ + rrect.height_ - 0.5f * bottomMaxRadiusY;
+
+    if (rect.left_ >= rect.right_ || rect.top_ >= rect.bottom_) {
+        return false;
+    }
     return true;
 }
 } // Drawing

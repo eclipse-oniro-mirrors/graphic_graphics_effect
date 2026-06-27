@@ -30,6 +30,7 @@
 #include "ge_kawase_blur_shader_filter.h"
 #include "ge_mesa_blur_shader_filter.h"
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #ifdef GE_OHOS
 #include "ge_system_properties.h"
 #endif
@@ -732,7 +733,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     thread_local std::shared_ptr<Drawing::RuntimeEffect> precalculationShaderForMoreCurves = nullptr;
 
     if (precalculationShaderForMoreCurves == nullptr) {
-        precalculationShaderForMoreCurves = Drawing::RuntimeEffect::CreateForShader(PRECALCULATIONFORMORECURVES_PROG);
+        precalculationShaderForMoreCurves = GECreateRuntimeEffectForShader(PRECALCULATIONFORMORECURVES_PROG);
     }
 
     if (precalculationShaderForMoreCurves == nullptr) {
@@ -747,7 +748,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     thread_local std::shared_ptr<Drawing::RuntimeEffect> convertShader = nullptr;
 
     if (convertShader == nullptr) {
-        convertShader = Drawing::RuntimeEffect::CreateForShader(CONVERT_IMG_PROG);
+        convertShader = GECreateRuntimeEffectForShader(CONVERT_IMG_PROG);
     }
 
     if (convertShader == nullptr) {
@@ -762,7 +763,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
     thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfMaskShader = nullptr;
 
     if (sdfMaskShader == nullptr) {
-        sdfMaskShader = Drawing::RuntimeEffect::CreateForShader(SDF_MASK_PROG);
+        sdfMaskShader = GECreateRuntimeEffectForShader(SDF_MASK_PROG);
     }
 
     if (sdfMaskShader == nullptr) {
@@ -1062,7 +1063,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEContourDiagonalFlowLightShader:
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> contourDiagonalFlowLightShaderEffect_ = nullptr;
     if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
-        contourDiagonalFlowLightShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(FLOW_LIGHT_PROG);
+        contourDiagonalFlowLightShaderEffect_ = GECreateRuntimeEffectForShader(FLOW_LIGHT_PROG);
     }
 
     if (contourDiagonalFlowLightShaderEffect_ == nullptr) {
@@ -1350,7 +1351,7 @@ std::shared_ptr<Drawing::Image> GEContourDiagonalFlowLightShader::BlendImg(Drawi
     }
     thread_local std::shared_ptr<Drawing::RuntimeEffect> blendShaderEffect_ = nullptr;
     if (blendShaderEffect_ == nullptr) {
-        blendShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(BLEND_IMG_PROG);
+        blendShaderEffect_ = GECreateRuntimeEffectForShader(BLEND_IMG_PROG);
     }
     if (blendShaderEffect_ == nullptr) {
         GE_LOGE("GEContourDiagonalFlowLightShader contourDiagonalFlowLightShaderEffect_ is nullptr.");

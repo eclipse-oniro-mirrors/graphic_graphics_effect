@@ -50,11 +50,11 @@ public:
     virtual std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(Canvas& canvas,
         float width, float height) override;
     virtual void Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal) override {}
-
     virtual bool TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const;
     virtual GESDFShapeType GetSDFShapeType() const = 0;
     virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);
+    virtual bool GetInscribedRect(Rect& rect) override {return false;}
 };
 } // Drawing
 } // namespace Rosen

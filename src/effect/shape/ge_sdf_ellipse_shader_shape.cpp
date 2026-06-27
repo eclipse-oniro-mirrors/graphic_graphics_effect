@@ -16,6 +16,7 @@
 #include "ge_sdf_ellipse_shader_shape.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -137,7 +138,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEllipseShaderShape::GetSDFEl
         }
     )";
 
-    auto sdfEllipseShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+    auto sdfEllipseShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
     if (!sdfEllipseShaderBuilderEffect) {
         LOGE("GESDFEllipseShaderShape::GetSDFEllipseShaderShapeBuilder effect error");
         return nullptr;
@@ -154,7 +155,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEllipseShaderShape::GetSDFEl
         return sdfEllipseNormalShaderShapeBuilder;
     }
 
-    auto sdfEllipseNormalShaderBuilderEffect = Drawing::RuntimeEffect::CreateForShader(SDF_GRAD_PROG);
+    auto sdfEllipseNormalShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_GRAD_PROG);
     if (!sdfEllipseNormalShaderBuilderEffect) {
         LOGE("GESDFEllipseShaderShape::GetSDFEllipseNormalShapeBuilder effect error");
         return nullptr;

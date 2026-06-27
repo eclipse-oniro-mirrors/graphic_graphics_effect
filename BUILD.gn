@@ -162,6 +162,7 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/shape/ge_sdf_clip_shader.cpp",
     "src/effect/shape/ge_sdf_color_shader.cpp",
     "src/effect/shape/ge_sdf_shadow_shader.cpp",
+    "src/util/ge_shader_diagnostics.cpp",
     "src/util/ge_system_properties.cpp",
     "src/util/ge_tone_mapping_helper.cpp",
     "src/util/ge_transform_helper.cpp",
@@ -215,6 +216,8 @@ ohos_source_set("graphics_effect_src") {
   if (ge_is_ohos || ge_is_linux) {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
+
+  external_deps += [ "openssl:libcrypto_shared" ]
 
   output_name = "graphics_effect"
   part_name = "graphics_effect"

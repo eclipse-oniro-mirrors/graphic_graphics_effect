@@ -480,6 +480,71 @@ HWTEST_F(GESDFUnionOpShaderShapeTest, GenerateSmoothUnionShaderEffect_002, TestS
     GTEST_LOG_(INFO) << "GESDFUnionOpShaderShapeTest GenerateSmoothUnionShaderEffect_002 end";
 }
 
+/**
+ * @tc.name: GetInscribedRectBothNull
+ * @tc.desc: Verify GetInscribedRect returns false when both left and right shapes are null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFUnionOpShaderShapeTest, GetInscribedRectBothNull, TestSize.Level1)
+{
+    GESDFUnionOpShapeParams param;
+    param.left = nullptr;  // B7 null path
+    param.right = nullptr; // B8 null path → !leftSupport && !rightSupport → B9
+    GESDFUnionOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_FALSE(shape.GetInscribedRect(rect));
+}
+
+/**
+ * @tc.name: GetInscribedRectBothSupport
+ * @tc.desc: Verify GetInscribedRect unions both rects when both shapes support inscribed rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFUnionOpShaderShapeTest, GetInscribedRectBothSupport, TestSize.Level1)
+{
+    GESDFUnionOpShapeParams param;
+    param.left = CreateTestShape();  // B7 non-null path → leftSupport=true
+    param.right = CreateTestShape(); // B8 non-null path → rightSupport=true → B10
+    param.op = GESDFUnionOp::UNION;
+    GESDFUnionOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
+    EXPECT_FLOAT_EQ(rect.GetLeft(), 5.25f);  // min of both inscribed rects' left
+    EXPECT_FLOAT_EQ(rect.GetRight(), 94.75f); // max of both inscribed rects' right
+}
+
+/**
+ * @tc.name: GetInscribedRectLeftOnlySupport
+ * @tc.desc: Verify GetInscribedRect uses left rect when only left shape supports inscribed rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFUnionOpShaderShapeTest, GetInscribedRectLeftOnlySupport, TestSize.Level1)
+{
+    GESDFUnionOpShapeParams param;
+    param.left = CreateTestShape();  // B7 non-null path → leftSupport=true
+    param.right = nullptr;           // B8 null path → rightSupport=false → B11
+    param.op = GESDFUnionOp::UNION;
+    GESDFUnionOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
+}
+
+/**
+ * @tc.name: GetInscribedRectRightOnlySupport
+ * @tc.desc: Verify GetInscribedRect uses right rect when only right shape supports inscribed rect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFUnionOpShaderShapeTest, GetInscribedRectRightOnlySupport, TestSize.Level1)
+{
+    GESDFUnionOpShapeParams param;
+    param.left = nullptr;            // B7 null path → leftSupport=false
+    param.right = CreateTestShape(); // B8 non-null path → rightSupport=true → B12
+    param.op = GESDFUnionOp::UNION;
+    GESDFUnionOpShaderShape shape(param);
+    Drawing::Rect rect;
+    EXPECT_TRUE(shape.GetInscribedRect(rect));
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

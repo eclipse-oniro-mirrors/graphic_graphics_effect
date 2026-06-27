@@ -19,6 +19,7 @@
 #include <chrono>
  
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_tone_mapping_helper.h"
  
 namespace OHOS {
@@ -142,7 +143,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_soundWaveShader = nullptr;
     if (g_soundWaveShader == nullptr) {
-        g_soundWaveShader = Drawing::RuntimeEffect::CreateForShader(shaderStringSoundWave);
+        g_soundWaveShader = GECreateRuntimeEffectForShader(shaderStringSoundWave);
     }
     return g_soundWaveShader;
 }

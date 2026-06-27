@@ -16,6 +16,7 @@
 #include "ge_color_gradient_shader_filter.h"
 
 #include "ge_log.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
 #include "ge_tone_mapping_helper.h"
 
@@ -225,7 +226,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
             }
         )";
 
-        g_colorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(prog);
+        g_colorGradientShaderEffect_ = GECreateRuntimeEffectForShader(prog);
         if (g_colorGradientShaderEffect_ == nullptr) {
             LOGD("GEColorGradientShaderFilter::MakeColorGradientBuilder effect error\n");
             return nullptr;
@@ -321,7 +322,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEColorGradientShaderFilter::Make
             }
         )";
 
-        g_maskColorGradientShaderEffect_ = Drawing::RuntimeEffect::CreateForShader(withMaskProg);
+        g_maskColorGradientShaderEffect_ = GECreateRuntimeEffectForShader(withMaskProg);
         if (g_maskColorGradientShaderEffect_ == nullptr) {
             LOGD("GEColorGradientShaderFilter::MakeMaskColorGradientBuilder effect error\n");
             return nullptr;

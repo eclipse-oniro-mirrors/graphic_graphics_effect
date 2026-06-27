@@ -17,6 +17,7 @@
  
 #include "ge_log.h"
 #include "ge_sdf_shadow_shader.h"
+#include "ge_shader_diagnostics.h"
 #include "common/rs_common_def.h"
 
 namespace OHOS {
@@ -82,7 +83,7 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     } else {
         UpdateRectForShadow(newRect);
     }
-    MakeDrawingShader(canvas, newRect, -1.f); // not use progress
+    MakeDrawingShader(canvas, newRect, -1.f);
     auto shader = GetDrawingShader();
     if (shader == nullptr) {
         return;
@@ -90,7 +91,28 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     Drawing::Brush brush;
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
-    canvas.DrawRect(newRect);
+    Drawing::Rect inscribedRect;
+    bool ringDrawValid = !params_.shadow.isFilled && params_.shape && params_.shape->GetInscribedRect(inscribedRect);
+    if (ringDrawValid) {
+        Drawing::Region outerRegion;
+        outerRegion.SetRect(Drawing::RectI(
+            floor(newRect.GetLeft()),
+            floor(newRect.GetTop()),
+            ceil(newRect.GetRight()),
+            ceil(newRect.GetBottom())));
+        const int innerRegionShrink = 1;
+        Drawing::Region innerRegion;
+        innerRegion.SetRect(Drawing::RectI(
+            ceil(inscribedRect.GetLeft()) + innerRegionShrink,
+            ceil(inscribedRect.GetTop()) + innerRegionShrink,
+            floor(inscribedRect.GetRight()) - innerRegionShrink,
+            floor(inscribedRect.GetBottom())- innerRegionShrink));
+        Drawing::Region ringRegion(outerRegion);
+        ringRegion.Op(innerRegion, Drawing::RegionOp::DIFFERENCE);
+        canvas.DrawRegion(ringRegion);
+    } else {
+        canvas.DrawRect(newRect);
+    }
     canvas.DetachBrush();
 }
 
@@ -143,7 +165,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetSDFShadowEffect()
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> sdfShadowShader = nullptr;
     if (sdfShadowShader == nullptr) {
-        sdfShadowShader = Drawing::RuntimeEffect::CreateForShader(shaderCode_);
+        sdfShadowShader = GECreateRuntimeEffectForShader(shaderCode_);
     }
     return sdfShadowShader;
 }
@@ -178,7 +200,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetElevationShadowEff
 {
     thread_local std::shared_ptr<Drawing::RuntimeEffect> elevationShadowShader = nullptr;
     if (elevationShadowShader == nullptr) {
-        elevationShadowShader = Drawing::RuntimeEffect::CreateForShader(elevationShaderCode_);
+        elevationShadowShader = GECreateRuntimeEffectForShader(elevationShaderCode_);
     }
     return elevationShadowShader;
 }
