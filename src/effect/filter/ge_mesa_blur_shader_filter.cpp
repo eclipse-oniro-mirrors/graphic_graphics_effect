@@ -52,11 +52,11 @@ static const std::array BLUR_RADIUS = {
     100,    // 100: BLUR_RADIUS_2
     200     // 200: BLUR_RADIUS_3
 };
-static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_directionBlurEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_mixEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
-static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_blurEffect;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_directionBlurEffect;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_mixEffect;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
+static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
 
 static const std::vector<std::vector<float>> offsetTableFourPasses = {
     /*
