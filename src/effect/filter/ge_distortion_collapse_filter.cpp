@@ -146,7 +146,9 @@ std::shared_ptr<Drawing::Image> GEDistortionCollapseFilter::OnProcessImage(Drawi
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEDistortionCollapseFilter::MakeEffectShader(
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    static auto effectShader = GECreateRuntimeEffectForShader(SHADER);
+    Drawing::RuntimeEffectOptions reo;
+    reo.useHighpLocalCoords = true;
+    static auto effectShader = GECreateRuntimeEffectForShader(SHADER, reo);
     if (!effectShader) {
         LOGE("MakeEffectShader::RuntimeShader effect error\n");
         return nullptr;
