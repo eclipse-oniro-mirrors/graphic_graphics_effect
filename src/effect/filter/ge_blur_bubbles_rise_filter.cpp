@@ -277,11 +277,16 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
         return image;
     }
 
+    auto maskImageInfo = maskImage->GetImageInfo();
+    auto maskResolutionX = static_cast<float>(maskImageInfo.GetWidth());
+    auto maskResolutionY = static_cast<float>(maskImageInfo.GetHeight());
+
     Drawing::RuntimeShaderBuilder mixBuilder(mixEffect);
     mixBuilder.SetChild("blur_tex", blurredShader);
     mixBuilder.SetChild("original_tex", sourceShader);
     mixBuilder.SetChild("blur_mask", maskShader);
     mixBuilder.SetUniform("iResolution", context.width, context.height);
+    mixBuilder.SetUniform("maskResolution", maskResolutionX, maskResolutionY);
     mixBuilder.SetUniform("mixStrength", mixStrength_);
     mixBuilder.SetUniform("progress", progress_ * timeScale_);
 

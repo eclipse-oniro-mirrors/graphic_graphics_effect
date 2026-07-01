@@ -100,15 +100,16 @@ private:
         uniform shader original_tex;
         uniform shader blur_mask;
         uniform half2 iResolution;
+        uniform half2 maskResolution;
         uniform half mixStrength;
         uniform half progress;
 
         half4 main(float2 fragCoord)
         {
             half2 uv = fragCoord.xy / iResolution;
-            half2 maskUV = uv - half2(0.0, progress * 0.07);
+            half2 maskUV = uv + half2(0.0, progress * 0.07);
 
-            half4 maskColor = blur_mask.eval(maskUV * iResolution);
+            half4 maskColor = blur_mask.eval(maskUV * maskResolution);
             half maskValue = maskColor.r;
 
             half blend = clamp(maskValue * mixStrength, 0.0, 1.0);

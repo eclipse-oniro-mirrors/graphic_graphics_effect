@@ -65,7 +65,8 @@ private:
 
         half random(half2 st)
         {
-            return fract(sin(dot(st, half2(12.9898, 78.233))) * 43758.5453);
+            st = half2(0.3183099, 0.3678794) * st + half2(0.25, 0.5);
+            return fract(16.0 * fract(st.x * st.y * (st.x + st.y)));
         }
 
         half2 randomGrad(half2 p)
