@@ -63,11 +63,6 @@ private:
         uniform half blurIntensity;
         uniform half horizontal;
 
-        half gaussian(half x, half sigma)
-        {
-            return exp(-(x * x) / (2.0 * sigma * sigma));
-        }
-
         half4 main(float2 fragCoord)
         {
             half2 uv = fragCoord.xy / iResolution;
@@ -75,6 +70,8 @@ private:
             half2 direction = (horizontal > 0.5) ? half2(1.0, 0.0) : half2(0.0, 1.0);
 
             half sigma = max(0.35, blurIntensity * 0.5);
+            half negInvSigmaSq2 = -1.0 / (sigma * sigma * 2.0); // Pre-calculate Gaussian formula constant part
+
             half4 centerColor = image.eval(uv * iResolution);
             half3 color = centerColor.rgb;
             half totalWeight = 1.0;
@@ -83,9 +80,13 @@ private:
             for (int i = 1; i <= MAX_SAMPLES; ++i) {
                 half fi = half(i);
                 half sampleMask = step(fi, blurIntensity + 0.5);
-                half weight = gaussian(fi, sigma) * sampleMask;
-                half2 offset = direction * texelSize * fi;
 
+                // Optimization: Inline Gaussian calculation to avoid function call overhead
+                half weight = exp(fi * fi * negInvSigmaSq2) * sampleMask;
+
+                if (weight < 0.001) continue; // Skip samples with very small weights
+
+                half2 offset = direction * texelSize * fi;
                 color += image.eval((uv + offset) * iResolution).rgb * weight;
                 color += image.eval((uv - offset) * iResolution).rgb * weight;
                 totalWeight += 2.0 * weight;

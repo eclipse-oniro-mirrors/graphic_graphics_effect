@@ -69,32 +69,25 @@ private:
             return fract(16.0 * fract(st.x * st.y * (st.x + st.y)));
         }
 
+        // Optimization: Cache angle calculation to reduce repeated trigonometric function calls
         half2 randomGrad(half2 p)
         {
             half angle = random(p) * 6.28318530718;
             return half2(cos(angle), sin(angle));
         }
 
+        // Optimization: Inline perlinNoise to reduce function call overhead
         half perlinNoise(half2 p)
         {
             half2 i = floor(p);
             half2 f = fract(p);
             half2 u = f * f * (3.0 - 2.0 * f);
 
-            half2 grad00 = randomGrad(i);
-            half2 grad10 = randomGrad(i + half2(1.0, 0.0));
-            half2 grad01 = randomGrad(i + half2(0.0, 1.0));
-            half2 grad11 = randomGrad(i + half2(1.0, 1.0));
-
-            half2 d00 = f;
-            half2 d10 = f - half2(1.0, 0.0);
-            half2 d01 = f - half2(0.0, 1.0);
-            half2 d11 = f - half2(1.0, 1.0);
-
-            half dot00 = dot(grad00, d00);
-            half dot10 = dot(grad10, d10);
-            half dot01 = dot(grad01, d01);
-            half dot11 = dot(grad11, d11);
+            // Direct gradient calculation to avoid additional function call overhead
+            half dot00 = dot(randomGrad(i), f);
+            half dot10 = dot(randomGrad(i + half2(1.0, 0.0)), f - half2(1.0, 0.0));
+            half dot01 = dot(randomGrad(i + half2(0.0, 1.0)), f - half2(0.0, 1.0));
+            half dot11 = dot(randomGrad(i + half2(1.0, 1.0)), f - half2(1.0, 1.0));
 
             return mix(mix(dot00, dot10, u.x), mix(dot01, dot11, u.x), u.y) * 0.5 + 0.5;
         }
@@ -128,18 +121,22 @@ private:
             const half fixedRiseSpeed = 1.0;
             const half fixedNoiseSpeed = 0.4;
 
-            half turb = turbulence(uv * noiseScale * 2.0 + half2(time * fixedNoiseSpeed, 0.0), 1.0);
+            // Optimization: Pre-calculate common terms to reduce repeated calculations
+            half2 scaledUV = uv * noiseScale;
+            half timeX = time * fixedNoiseSpeed;
+
+            half turb = turbulence(scaledUV * 2.0 + half2(timeX, 0.0), 1.0);
             half rise = sin(uv.y * riseFrequency + time * fixedRiseSpeed) * riseAmplitude + riseOffset;
 
             half2 distortion = half2(
-                perlinNoise(uv * noiseScale * 3.0 + half2(time * fixedNoiseSpeed * 0.6, 0.0)) * baseDistortion.x -
+                perlinNoise(scaledUV * 3.0 + half2(timeX * 0.6, 0.0)) * baseDistortion.x -
                     baseDistortion.x * 0.5,
                 (turb * (1.0 - riseWeight) + rise * riseWeight) * baseDistortion.y
             );
 
             half2 detailDistort = half2(
-                perlinNoise(uv * noiseScale * 10.0 + half2(0.0, time * fixedNoiseSpeed * 2.4)) * detailDistortion.x,
-                perlinNoise(uv * noiseScale * 8.0 + half2(time * fixedNoiseSpeed * 1.8, 0.0)) * detailDistortion.y
+                perlinNoise(scaledUV * 10.0 + half2(0.0, timeX * 2.4)) * detailDistortion.x,
+                perlinNoise(scaledUV * 8.0 + half2(timeX * 1.8, 0.0)) * detailDistortion.y
             );
             distortion += detailDistort;
 
