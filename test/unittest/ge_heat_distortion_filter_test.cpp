@@ -235,10 +235,15 @@ HWTEST_F(GEHeatDistortionFilterTest, CheckHeatDistortionParams002, TestSize.Leve
     params.progress = 0.0f;
 
     auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    EXPECT_EQ(filter->intensity_, 0.0f);
+    EXPECT_EQ(filter->noiseScale_, 2.0f);
+    EXPECT_EQ(filter->riseWeight_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+
     filter->CheckHeatDistortionParams();
 
     EXPECT_EQ(filter->intensity_, 0.0f);
-    EXPECT_EQ(filter->noiseScale_, 0.1f);
+    EXPECT_EQ(filter->noiseScale_, 2.0f);
     EXPECT_EQ(filter->riseWeight_, 1.0f);
     EXPECT_EQ(filter->progress_, 0.0f);
 }

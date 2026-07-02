@@ -175,7 +175,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, CheckBlurBubblesRiseParams002, TestSize.Le
 
     auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
     EXPECT_EQ(filter->blurIntensity_, 0.0f);
-    EXPECT_EQ(filter->mixStrength_, 0.0f);
+    EXPECT_EQ(filter->mixStrength_, 2.0f);
     EXPECT_EQ(filter->progress_, 0.0f);
 
     filter->CheckBlurBubblesRiseParams();
