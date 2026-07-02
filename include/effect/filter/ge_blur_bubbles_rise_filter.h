@@ -70,7 +70,7 @@ private:
             half2 direction = (horizontal > 0.5) ? half2(1.0, 0.0) : half2(0.0, 1.0);
 
             half sigma = max(0.35, blurIntensity * 0.5);
-            half negInvSigmaSq2 = -1.0 / (sigma * sigma * 2.0); // Pre-calculate Gaussian formula constant part
+            half negInvSigmaSq2 = -1.0 / (sigma * sigma * 2.0);
 
             half4 centerColor = image.eval(uv * iResolution);
             half3 color = centerColor.rgb;
@@ -81,10 +81,9 @@ private:
                 half fi = half(i);
                 half sampleMask = step(fi, blurIntensity + 0.5);
 
-                // Optimization: Inline Gaussian calculation to avoid function call overhead
                 half weight = exp(fi * fi * negInvSigmaSq2) * sampleMask;
 
-                if (weight < 0.001) continue; // Skip samples with very small weights
+                if (weight < 0.001) continue;
 
                 half2 offset = direction * texelSize * fi;
                 color += image.eval((uv + offset) * iResolution).rgb * weight;

@@ -96,7 +96,7 @@ private:
         {
             half value = 0.0;
             half amp = 1.0;
-            const int turbulenceOctaves = 2; // Reduced from 4 to 2 for major performance improvement
+            const int turbulenceOctaves = 2;
             const half turbulenceGain = 0.5;
             const half turbulenceLacunarity = 2.0;
 
@@ -121,27 +121,25 @@ private:
             const half fixedRiseSpeed = 1.0;
             const half fixedNoiseSpeed = 0.4;
 
-            // Optimization: Pre-calculate common terms and reduce noise calculations
             half2 scaledUV = uv * noiseScale;
             half timeX = time * fixedNoiseSpeed;
 
-            // Major optimization: Reduce turbulence complexity from 4 to 2 octaves
             half turb = turbulence(scaledUV * 2.0 + half2(timeX, 0.0), 1.0);
 
-            // Simple rise calculation
-            half rise = sin(uv.y * riseFrequency + time * fixedRiseSpeed) * riseAmplitude + riseOffset;
+            half risePhase = uv.y * riseFrequency + time * fixedRiseSpeed;
+            half rise = sin(risePhase) * riseAmplitude + riseOffset;
 
-            // Base distortion - most important visual layer
+            half baseNoise = perlinNoise(scaledUV * 3.0 + half2(timeX * 0.6, 0.0));
+            half verticalFactor = turb * (1.0 - riseWeight) + rise * riseWeight;
             half2 distortion = half2(
-                perlinNoise(scaledUV * 3.0 + half2(timeX * 0.6, 0.0)) * baseDistortion.x -
-                    baseDistortion.x * 0.5,
-                (turb * (1.0 - riseWeight) + rise * riseWeight) * baseDistortion.y
+                (baseNoise - 0.5) * baseDistortion.x,
+                verticalFactor * baseDistortion.y
             );
 
-            // Detail distortion - simplified to single perlinNoise call for better performance
+            half detailNoise = perlinNoise(scaledUV * 9.0 + half2(timeX * 1.8, timeX * 1.2));
             half2 detailDistort = half2(
-                perlinNoise(scaledUV * 10.0 + half2(0.0, timeX * 2.0)) * detailDistortion.x,
-                perlinNoise(scaledUV * 8.0 + half2(timeX * 1.5, 0.0)) * detailDistortion.y
+                detailNoise * detailDistortion.x,
+                detailNoise * detailDistortion.y
             );
             distortion += detailDistort;
 
