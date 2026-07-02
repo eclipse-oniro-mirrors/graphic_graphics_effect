@@ -178,6 +178,7 @@ ohos_source_set("graphics_effect_src") {
       "//foundation/graphic/graphic_2d/rosen/modules/2d_graphics:2d_graphics",
       "//third_party/bounds_checking_function:libsec_static",
       "//third_party/skia:skia_$target_os",
+      "//third_party/openssl:libcrypto_static"
     ]
     external_deps += [ "hilog:libhilog" ]
   } else {
@@ -185,6 +186,7 @@ ohos_source_set("graphics_effect_src") {
       "bounds_checking_function:libsec_shared",
       "graphic_2d:2d_graphics",
       "hilog:libhilog",
+      "openssl:libcrypto_shared"
     ]
   }
 
@@ -216,8 +218,6 @@ ohos_source_set("graphics_effect_src") {
   if (ge_is_ohos || ge_is_linux) {
     defines += [ "GE_PLATFORM_UNIX" ]
   }
-
-  external_deps += [ "openssl:libcrypto_shared" ]
 
   output_name = "graphics_effect"
   part_name = "graphics_effect"
