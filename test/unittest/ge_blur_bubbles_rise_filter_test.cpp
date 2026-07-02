@@ -162,6 +162,50 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithDifferentProgress, TestS
 }
 
 /**
+ * @tc.name: OnProcessImageWithInvalidMaskImage
+ * @tc.desc: Verify behavior when mask image has zero width
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithInvalidMaskImage, TestSize.Level1)
+{
+    Drawing::Bitmap maskBmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    maskBmp.Build(0, 50, format);  // Create bitmap with zero width
+    auto maskImage = maskBmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.maskImage = maskImage;
+    params.blurIntensity = 0.8f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, image_);  // Should return original image due to invalid mask
+}
+
+/**
+ * @tc.name: OnProcessImageWithInvalidMaskHeight
+ * @tc.desc: Verify behavior when mask image has zero height
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithInvalidMaskHeight, TestSize.Level1)
+{
+    Drawing::Bitmap maskBmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    maskBmp.Build(50, 0, format);  // Create bitmap with zero height
+    auto maskImage = maskBmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.maskImage = maskImage;
+    params.blurIntensity = 0.8f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, image_);  // Should return original image due to invalid mask
+}
+
+/**
  * @tc.name: CheckBlurBubblesRiseParams002
  * @tc.desc: Verify parameter clamping with minimum and maximum values
  * @tc.type: FUNC
