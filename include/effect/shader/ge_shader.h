@@ -80,6 +80,10 @@ protected:
      * @note If the returned value is empty or invalid, no subtraction should be applied.
      */
     virtual Drawing::Rect GetSubtractedRect(float width, float height) const { return Drawing::Rect(); }
+
+    virtual std::shared_ptr<Drawing::ShaderEffect> MakeSDFShaderWithCache(
+        std::shared_ptr<Drawing::GESDFShaderShape> sdfShape, Drawing::Canvas& canvas, const Drawing::Rect& rect,
+        bool hasNormal = true) const;
     uint32_t hash_ = 0;
     Drawing::CanvasInfo canvasInfo_;
     float supportHeadroom_ = 0.0f;

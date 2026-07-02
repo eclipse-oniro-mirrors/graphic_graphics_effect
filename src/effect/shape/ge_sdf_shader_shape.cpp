@@ -14,17 +14,31 @@
  */
 
 #include "ge_sdf_shader_shape.h"
+
+#include "draw/surface.h"
 #include "ge_sdf_pixelmap_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
 #include "ge_sdf_sub_op_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
-
+#include "ge_shader_diagnostics.h"
 #include "ge_log.h"
 
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
+namespace {
+static constexpr char SHAPE_SDF_PROG[] = R"(
+    uniform shader sdfNormalImg;
+    vec4 main(vec2 fragCoord)
+    {
+        vec4 c1 = sdfNormalImg.eval(fragCoord).rgba;
+        return c1;
+    }
+)";
+
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_shapeSDFShaderEffect = nullptr;
+}
 
 std::shared_ptr<ShaderEffect> GESDFShaderShape::GenerateDrawingShader(float width, float height) const
 {
@@ -86,6 +100,37 @@ bool GESDFShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY, Vector2
 {
     LOGE("GESDFShaderShape::TryGetCenterAndHalfSize error");
     return false;
+}
+
+std::shared_ptr<Drawing::Image> GESDFShaderShape::MakeSDFImage(Canvas& canvas,
+    float width, float height, bool hasNormal)
+{
+    if (g_shapeSDFShaderEffect == nullptr) {
+        Drawing::RuntimeEffectOptions reo{};
+        reo.needDrawingslToSksl = false;
+        reo.useHighpLocalCoords = true;
+        g_shapeSDFShaderEffect = GECreateRuntimeEffectForShader(SHAPE_SDF_PROG, reo);
+    }
+    if (g_shapeSDFShaderEffect == nullptr) {
+        GE_LOGE("GESDFShaderShape::MakeSDFImage create runtime error");
+        return nullptr;
+    }
+    auto shader = hasNormal ? GenerateDrawingShaderHasNormal(canvas, width, height) :
+        GenerateDrawingShader(canvas, width, height);
+    if (shader == nullptr) {
+        GE_LOGE("GESDFShaderShape::MakeSDFImage create shader error");
+        return nullptr;
+    }
+    auto builder = std::make_shared<Drawing::RuntimeShaderBuilder>(g_shapeSDFShaderEffect);
+    builder->SetChild("sdfNormalImg", shader);
+    auto canvasSurface = canvas.GetSurface();
+    std::shared_ptr<Drawing::ColorSpace> colorSpace = canvasSurface ?
+        canvasSurface->GetImageInfo().GetColorSpace() : nullptr;
+    Drawing::Matrix makeMatrix;
+    Drawing::ImageInfo imageInfo(width, height, Drawing::ColorType::COLORTYPE_RGBA_F16,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE, colorSpace);
+    auto context = canvas.GetGPUContext().get();
+    return context ? builder->MakeImage(context, &(makeMatrix), imageInfo, false) : nullptr;
 }
 } // Drawing
 } // namespace Rosen

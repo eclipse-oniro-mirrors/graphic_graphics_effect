@@ -143,6 +143,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/effect/shape/ge_sdf_shadow_shader.cpp",
     "${graphics_effect_root}/src/effect_cfg/ge_frosted_glass_effect_cfg.cpp",
     "${graphics_effect_root}/src/effect_cfg/ge_xml_parser_base.cpp",
+    "${graphics_effect_root}/src/util/ge_cache_helper.cpp",
     "${graphics_effect_root}/src/util/ge_shader_diagnostics.cpp",
     "${graphics_effect_root}/src/util/ge_system_properties.cpp",
     "${graphics_effect_root}/src/util/ge_tone_mapping_helper.cpp",
@@ -199,6 +200,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_border_sdf_lg_color_shader_test.cpp",
     "ge_border_sdf_shader_test.cpp",
     "ge_cache_provider_test.cpp",
+    "ge_cache_helper_test.cpp",
     "ge_circle_flowlight_effect_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
     "ge_content_light_shader_filter_test.cpp",
@@ -305,6 +307,10 @@ ohos_unittest("GraphicsEffectTest") {
   ]
 
   defines = []
+  if (current_os == "ohos") {
+    defines += [ "GE_OHOS" ]
+    external_deps += [ "init:libbegetutil" ]
+  }
 
   part_name = "graphics_effect"
   subsystem_name = "graphic"

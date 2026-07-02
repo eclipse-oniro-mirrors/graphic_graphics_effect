@@ -162,6 +162,7 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/shape/ge_sdf_clip_shader.cpp",
     "src/effect/shape/ge_sdf_color_shader.cpp",
     "src/effect/shape/ge_sdf_shadow_shader.cpp",
+    "src/util/ge_cache_helper.cpp",
     "src/util/ge_shader_diagnostics.cpp",
     "src/util/ge_system_properties.cpp",
     "src/util/ge_tone_mapping_helper.cpp",
