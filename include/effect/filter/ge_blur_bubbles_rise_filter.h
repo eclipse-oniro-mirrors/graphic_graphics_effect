@@ -55,7 +55,7 @@ private:
     float progress_ = 0.0f;
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
 
-    const float timeScale_ = 10.0f;
+    const float timeScale_ = 25.0f;
 
     inline static const std::string shaderStringGaussianBlur = R"(
         uniform shader image;

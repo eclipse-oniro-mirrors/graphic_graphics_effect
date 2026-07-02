@@ -50,7 +50,7 @@ private:
     float riseWeight_ = 0.2f;
     float progress_ = 0.0f;
 
-    const float timeScale_ = 10.0f;
+    const float timeScale_ = 25.0f;
     const float intensityScale_ = 3.0f;
 
     inline static const std::string shaderStringHeatDistortion = R"(
