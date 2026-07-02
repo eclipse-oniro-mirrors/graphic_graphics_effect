@@ -137,5 +137,111 @@ HWTEST_F(GEHeatDistortionFilterTest, Type001, TestSize.Level2)
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_HEAT_DISTORTION);
 }
 
+/**
+ * @tc.name: OnProcessImageWithDifferentNoiseScale
+ * @tc.desc: Verify behavior with different noise scale values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentNoiseScale, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.noiseScale = 0.1f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithMaxNoiseScale
+ * @tc.desc: Verify behavior with maximum noise scale
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithMaxNoiseScale, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.noiseScale = 2.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentRiseWeight
+ * @tc.desc: Verify behavior with different rise weight values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentRiseWeight, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.riseWeight = 0.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithMaxRiseWeight
+ * @tc.desc: Verify behavior with maximum rise weight
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithMaxRiseWeight, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.riseWeight = 1.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentProgress
+ * @tc.desc: Verify behavior with different progress values after optimization
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentProgress, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.progress = 0.5f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithFullProgress
+ * @tc.desc: Verify behavior with full progress
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithFullProgress, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.progress = 1.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: CheckHeatDistortionParams002
+ * @tc.desc: Verify parameter clamping with edge values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, CheckHeatDistortionParams002, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.0f;
+    params.noiseScale = 2.0f;
+    params.riseWeight = 1.0f;
+    params.progress = 0.0f;
+
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    filter->CheckHeatDistortionParams();
+
+    EXPECT_EQ(filter->intensity_, 0.0f);
+    EXPECT_EQ(filter->noiseScale_, 0.1f);
+    EXPECT_EQ(filter->riseWeight_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+}
+
 } // namespace Rosen
 } // namespace OHOS

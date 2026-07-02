@@ -118,5 +118,72 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, Type001, TestSize.Level2)
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_BLUR_BUBBLES_RISE);
 }
 
+/**
+ * @tc.name: OnProcessImageWithLowBlurIntensity
+ * @tc.desc: Verify behavior with low blur intensity that triggers early termination
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithLowBlurIntensity, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.3f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, image_);
+}
+
+/**
+ * @tc.name: OnProcessImageWithHighBlurIntensity
+ * @tc.desc: Verify behavior with high blur intensity that completes full loop
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithHighBlurIntensity, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 1.0f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentProgress
+ * @tc.desc: Verify behavior with different progress values after timeScale change
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithDifferentProgress, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.progress = 0.5f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: CheckBlurBubblesRiseParams002
+ * @tc.desc: Verify parameter clamping with minimum and maximum values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, CheckBlurBubblesRiseParams002, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.0f;
+    params.mixStrength = 2.0f;
+    params.progress = 0.0f;
+
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    EXPECT_EQ(filter->blurIntensity_, 0.0f);
+    EXPECT_EQ(filter->mixStrength_, 0.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+
+    filter->CheckBlurBubblesRiseParams();
+
+    EXPECT_EQ(filter->blurIntensity_, 0.0f);
+    EXPECT_EQ(filter->mixStrength_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+}
+
 } // namespace Rosen
 } // namespace OHOS
