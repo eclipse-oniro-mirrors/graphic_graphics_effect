@@ -83,7 +83,7 @@ private:
 
                 half weight = exp(fi * fi * negInvSigmaSq2) * sampleMask;
 
-                if (weight < 0.001) continue;
+                if (weight < 0.001) break;
 
                 half2 offset = direction * texelSize * fi;
                 color += image.eval((uv + offset) * iResolution).rgb * weight;
@@ -100,7 +100,7 @@ private:
         uniform shader original_tex;
         uniform shader blur_mask;
         uniform half2 iResolution;
-        uniform half2 maskResolution;
+        uniform float2 maskResolution;
         uniform half mixStrength;
         uniform half progress;
 

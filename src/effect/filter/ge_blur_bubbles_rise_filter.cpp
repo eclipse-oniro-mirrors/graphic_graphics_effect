@@ -278,6 +278,11 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
     }
 
     auto maskImageInfo = maskImage->GetImageInfo();
+    if (maskImageInfo.GetWidth() == 0 || maskImageInfo.GetHeight() == 0) {
+        LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image info invalid");
+        return image;
+    }
+
     auto maskResolutionX = static_cast<float>(maskImageInfo.GetWidth());
     auto maskResolutionY = static_cast<float>(maskImageInfo.GetHeight());
 
