@@ -160,6 +160,10 @@ static const std::string SDF_PROPAGATION_SHADER = R"(
     vec4 main(vec2 fragCoord) {
         float mask = u_maskTex.eval(fragCoord).r;
         float currentSdf = u_sdfTex.eval(fragCoord).r;
+        // Use the sign of the mask outside the curve
+        if (mask < EPSILON_1E_MINUS_3) {
+            return vec4(vec3(abs(currentSdf)), 1.0);
+        }
         if (mask < 1.0) {
             return vec4(vec3(currentSdf), 1.0);
         }
@@ -189,6 +193,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     uniform float segmentIndex[MAX_CURVES_IN_GRID];
     uniform shader u_prevD;
     uniform float u_isFirstBatch;
+    uniform vec2 u_validRange;
 
     const float INF_1E4 = 1e4;
     const float SQRT3 = 1.7320508;
@@ -203,6 +208,11 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
 
     bool isDistinct(vec2 p1, vec2 p2) {
         return length(p1 - p2) > 1e-4;
+    }
+
+    float distanceToAABBSq(vec2 p, vec2 minP, vec2 maxP) {
+        vec2 d = max(minP - p, max(p - maxP, vec2(0.0)));
+        return dot(d, d);
     }
 
     float sdSegmentSigned(vec2 p, vec2 a, vec2 b) {
@@ -222,10 +232,11 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
     float sdfBezierStable(vec2 p, vec2 v0, vec2 v1, vec2 v2)
     {
         vec2 a = v1 - v0;
-        vec2 b = v0 - 2.0 * v1 + v2;
-        if (dot(b, b) < EPSILON_1E_MINUS_8) {
+        float area2 = abs(cro(a, v2 - v0));
+        if (area2 < CORNER_TYPE_EPS) {
             return sdSegmentSigned(p, v0, v2);
         }
+        vec2 b = v0 - 2.0 * v1 + v2;
 
         // Solving cubic equations
         vec2 c = a * 2.0;
@@ -320,7 +331,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
 
         vec2 p1, p2, p3;
         bool isCorner = false;
-        bool isshare1 = false;
+        bool isShare1 = false;
 
         if (share1) {
             p2 = c1_2;
@@ -330,9 +341,9 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
                 p3 = isDistinct(c2_0, c2_1) ? c2_1 : c2_2;
                 isCorner = true;
             }
-            isshare1 = true;
+            isShare1 = true;
         }
-        if (!isshare1 && share2) {
+        if (!isShare1 && share2) {
             p2 = c2_2;
             float distToCorner = length(p - p2);
             if (absD1 >= distToCorner - 1e-3 && absD2 >= distToCorner - 1e-3) {
@@ -358,10 +369,11 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
 
     void FindTwoClosestCurves(vec2 p, out float d1, out float d2,
         out vec2 c1_0, out vec2 c1_1, out vec2 c1_2,
-        out vec2 c2_0, out vec2 c2_1, out vec2 c2_2)
+        out vec2 c2_0, out vec2 c2_1, out vec2 c2_2, out float closestIdx)
     {
         d1 = INF_1E4;
         d2 = INF_1E4;
+        closestIdx = -1.0;
         c1_0 = vec2(0.0);
         c1_1 = vec2(0.0);
         c1_2 = vec2(0.0);
@@ -377,6 +389,15 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
             vec2 B = controlPoints[i * 3 + 1];
             vec2 C = controlPoints[i * 3 + 2];
 
+            vec2 minP = min(min(A, B), C);
+            vec2 maxP = max(max(A, B), C);
+            float aabbDistSq = distanceToAABBSq(p, minP, maxP);
+
+            // Skip if the AABB distance is greater than the second smallest distance
+            if (aabbDistSq > abs(d2)) {
+                continue;
+            }
+
             float d = sdfBezierStable(p, A, B, C);
             float absD = abs(d);
             bool isd1 = false;
@@ -385,6 +406,7 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
                 d2 = d1; c2_0 = c1_0; c2_1 = c1_1; c2_2 = c1_2;
                 d1 = d;  c1_0 = A;    c1_1 = B;    c1_2 = C;
                 isd1 = true;
+                closestIdx = float(i);
             }
             if (!isd1 && absD < abs(d2)) {
                 d2 = d;  c2_0 = A;    c2_1 = B;    c2_2 = C;
@@ -402,11 +424,15 @@ static const std::string PRECALCULATION_FOR_SDF_SHADER = R"(
         float d2;
         vec2 c1[3];
         vec2 c2[3];
-        FindTwoClosestCurves(ndc, d1, d2, c1[0], c1[1], c1[2], c2[0], c2[1], c2[2]);
+        float closestIdx;
+        FindTwoClosestCurves(ndc, d1, d2, c1[0], c1[1], c1[2], c2[0], c2[1], c2[2], closestIdx);
         d1 = sqrt(abs(d1)) * sign(d1);
         d2 = sqrt(abs(d2)) * sign(d2);
 
         float currentD = calculateMinimumWithCorrectSign(ndc, d1, d2, c1[0], c1[1], c1[2], c2[0], c2[1], c2[2]);
+        if (closestIdx > -0.1 && (closestIdx < u_validRange.x - 0.1 || closestIdx > u_validRange.y + 0.1)) {
+            currentD = 1e4;
+        }
 
         if (u_isFirstBatch > 0.0) {
             return vec4(vec3(currentD), 1.0);
@@ -575,7 +601,6 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::RunSDFPropagation");
 
     if (numPasses_ <= 0) {
-        LOGE("GESDFPathShaderShape::RunSDFPropagation skiped numPasses_<=0");
         return sdfTex;
     }
 
@@ -618,7 +643,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
 }
 
 std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
-    Canvas& canvas, std::shared_ptr<Image> sdfTex, int width, int height, std::shared_ptr<Image> pathImage)
+    Canvas& canvas, std::shared_ptr<Image> sdfTex, int width, int height)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::ComputeDistanceField");
     auto gpuContext = canvas.GetGPUContext();
@@ -633,13 +658,6 @@ std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
     auto normalBuilder = MakeNormalShaderBuilder();
     if (!normalBuilder) {
         LOGE("GESDFPathShaderShape::ComputeDistanceField effect create failed");
-        return nullptr;
-    }
-
-    auto pathShader = ShaderEffect::CreateImageShader(*pathImage, TileMode::CLAMP,
-        TileMode::CLAMP, nearest, Matrix());
-    if (!pathShader) {
-        LOGE("GESDFPathShaderShape::GenerateSeedTextureNew failed to create pathImage Shader");
         return nullptr;
     }
 
@@ -706,7 +724,7 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
     offscreenCanvas_->DetachBrush();
 }
 
-void GESDFPathShaderShape::AutoGridPartition(float width, float height, float maxThickness)
+void GESDFPathShaderShape::AutoGridPartition(float width, float height, const std::vector<Vector2f>& pixelControlPoints)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::AutoGridPartition");
     if (width < MIN_SCALE_CLAMP || height < MIN_SCALE_CLAMP) {
@@ -714,10 +732,12 @@ void GESDFPathShaderShape::AutoGridPartition(float width, float height, float ma
         return;
     }
     curvesInGrid_.clear();
+    allGridsCovered_ = true;
+    maxEmptyGridShortSide_ = 0.0f;
 
     std::vector<Box4f> curveBBoxes;
     Box4f canvasBBox;
-    ComputeAllCurveBoundingBoxes(width, height, maxThickness, canvasBBox, curveBBoxes);
+    ComputeAllCurveBoundingBoxes(width, height, pixelControlPoints, canvasBBox, curveBBoxes);
 
     std::queue<Grid> workQueue;
     InitializeWorkQueue(canvasBBox, curveBBoxes, workQueue);
@@ -773,69 +793,65 @@ void GESDFPathShaderShape::SplitGrid(
         }
         if (!child.curveIndices.empty()) {
             workQueue.push(child);
+        } else {
+            allGridsCovered_ = false;
+            float side = std::min(quad[XMAX_I] - quad[XMIN_I],
+                                  quad[YMAX_I] - quad[YMIN_I]);
+            if (side > maxEmptyGridShortSide_ && side < canvasMinSide_ * 0.25f) { // 0.25: Corresponds to 2 partitions
+                maxEmptyGridShortSide_ = side;
+            }
         }
     }
 }
 
-void GESDFPathShaderShape::ComputeAllCurveBoundingBoxes(
-    float width, float height, float maxThickness, Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes)
+void GESDFPathShaderShape::ComputeAllCurveBoundingBoxes(float width, float height,
+    const std::vector<Vector2f>& pixelControlPoints, Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::ComputeAllCurveBoundingBoxes");
     curveBBoxes.clear();
     curveBBoxes.reserve(numCurves_);
     canvasBBox = { width, 0.0f, height, 0.0f };
+    float maxThickness = 0.05f / NDC_MULTIPLIER * height; // 0.05f: Expanding the bounding box in NDC space
     for (size_t i = 0; i < numCurves_; ++i) {
-        Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, width, height);
+        Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, pixelControlPoints, width, height);
         curveBBoxes.push_back(bbox);
         canvasBBox[XMIN_I] = std::min(bbox[XMIN_I], canvasBBox[XMIN_I]);
         canvasBBox[XMAX_I] = std::max(bbox[XMAX_I], canvasBBox[XMAX_I]);
         canvasBBox[YMIN_I] = std::min(bbox[YMIN_I], canvasBBox[YMIN_I]);
         canvasBBox[YMAX_I] = std::max(bbox[YMAX_I], canvasBBox[YMAX_I]);
     }
+    float canvasW = canvasBBox[XMAX_I] - canvasBBox[XMIN_I];
+    float canvasH = canvasBBox[YMAX_I] - canvasBBox[YMIN_I];
+    canvasMinSide_ = std::min(canvasW, canvasH);
+
+    const float expandPixels = 10.0f * params_.scale.y_; // 10.0:Expand the overall bbox ensures enough pixels outside
+    canvasBBox[XMIN_I] = std::max(canvasBBox[XMIN_I] - expandPixels, 0.0f);
+    canvasBBox[XMAX_I] = std::min(canvasBBox[XMAX_I] + expandPixels, width);
+    canvasBBox[YMIN_I] = std::max(canvasBBox[YMIN_I] - expandPixels, 0.0f);
+    canvasBBox[YMAX_I] = std::min(canvasBBox[YMAX_I] + expandPixels, height);
 }
 
-Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, float width, float height)
+Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float maxThickness,
+    const std::vector<Vector2f>& pixelControlPoints, float width, float height)
 {
-    size_t baseIdx = curveIndex * 6;
+    size_t baseIdx = curveIndex * 3; // 3:Three control points of a quadratic curve
+    Vector2f A = pixelControlPoints[baseIdx]; // startPoint
+    Vector2f B = pixelControlPoints[baseIdx + 1]; // controlPoint
+    Vector2f C = pixelControlPoints[baseIdx + 2]; // endPoint
 
-    float x0 = controlPoints_[baseIdx];     // startPoint x
-    float y0 = controlPoints_[baseIdx + 1]; // startPoint y
-    float cx = controlPoints_[baseIdx + 2]; // controlPoint x
-    float cy = controlPoints_[baseIdx + 3]; // controlPoint y
-    float x1 = controlPoints_[baseIdx + 4]; // endPoint x
-    float y1 = controlPoints_[baseIdx + 5]; // endPoint y
-    float minX = std::min({ x0, cx, x1 }) - maxThickness;
-    float maxX = std::max({ x0, cx, x1 }) + maxThickness;
-    float minY = std::min({ y0, cy, y1 }) - maxThickness;
-    float maxY = std::max({ y0, cy, y1 }) + maxThickness;
-    // map ndc to [0, 1]
-    float aspect;
-    if (height < 0.001f || width < 0.001f) { // 0.001f is the minimum value
-        aspect = 1.0; // 1.0f: default aspect ratio when width or height is zero
-    } else {
-        aspect = width / height;
-    }
-
-    minX = std::floor((minX / aspect + NDC_OFFSET) / NDC_MULTIPLIER * width);
-    maxX = std::ceil((maxX / aspect + NDC_OFFSET) / NDC_MULTIPLIER * width);
-    minY = std::floor((minY + NDC_OFFSET) / NDC_MULTIPLIER * height);
-    maxY = std::ceil((maxY + NDC_OFFSET) / NDC_MULTIPLIER * height);
-
-    minX = std::max(minX, 0.0f);
-    maxX = std::min(maxX, width);
-    minY = std::max(minY, 0.0f);
-    maxY = std::min(maxY, height);
+    float minX = std::max(std::floor(std::min({A[0], B[0], C[0]}) - maxThickness), 0.0f);
+    float maxX = std::min(std::ceil(std::max({A[0], B[0], C[0]}) + maxThickness), width);
+    float minY = std::max(std::floor(std::min({A[1], B[1], C[1]}) - maxThickness), 0.0f);
+    float maxY = std::min(std::ceil(std::max({A[1], B[1], C[1]}) + maxThickness), height);
     return { minX, maxX, minY, maxY };
 }
 
 void GESDFPathShaderShape::InitializeWorkQueue(
     const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue)
 {
-    std::vector<uint32_t> initialCurves;
+    std::vector<uint32_t> initialCurves(numCurves_);
     for (size_t i = 0; i < numCurves_; ++i) {
-        if (IntersectBBox(canvasBBox, curveBBoxes[i])) {
-            initialCurves.push_back(i);
-        }
+        initialCurves[i] = i;
     }
     workQueue.push({ canvasBBox, initialCurves });
 }
@@ -907,7 +923,8 @@ std::vector<Vector2f> GESDFPathShaderShape::ProcessCurveSegments(const std::vect
 }
 
 void GESDFPathShaderShape::ProcessSingleBatch(Drawing::RuntimeShaderBuilder& builder, size_t gridIndex, size_t batch,
-    std::shared_ptr<Drawing::Image>& prevSdf, std::shared_ptr<Drawing::ShaderEffect>& prevShader)
+    size_t start, size_t end, float vStart, float vEnd, std::shared_ptr<Drawing::Image>& prevSdf,
+    std::shared_ptr<Drawing::ShaderEffect>& prevShader)
 {
     const auto& grid = curvesInGrid_[gridIndex];
     const auto& allCurves = grid.first;
@@ -915,27 +932,22 @@ void GESDFPathShaderShape::ProcessSingleBatch(Drawing::RuntimeShaderBuilder& bui
     const Box4f area = grid.second.bbox;
     const Drawing::Rect rectN(area[XMIN_I], area[YMIN_I], area[XMAX_I], area[YMAX_I]);
 
-    const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
-    const size_t totalCurves = allCurves.size() / CURVE_FLOAT_COUNT;
-    const size_t start = batch * curvesPerBatch;
-    const size_t end = std::min(start + curvesPerBatch, totalCurves);
-
     std::vector<float> batchCurves;
     std::vector<float> batchSegments;
-    batchCurves.reserve(curvesPerBatch * CURVE_FLOAT_COUNT);
-    batchSegments.reserve(curvesPerBatch);
-    for (size_t j = start; j < end; j++) {
-        size_t base = j * CURVE_FLOAT_COUNT;
-        batchCurves.insert(batchCurves.end(), allCurves.begin() + base, allCurves.begin() + base + CURVE_FLOAT_COUNT);
-        batchSegments.push_back(allSegments[j]);
-    }
-    batchCurves.resize(curvesPerBatch * CURVE_FLOAT_COUNT, -2.0f); // -2.0f: not included in the NDC space
-    batchSegments.resize(curvesPerBatch, -1.0f); // -1.0f: invalid negative curve index
+    batchCurves.reserve(MAX_CURVES_SUBMIT_PER_GRID * CURVE_FLOAT_COUNT);
+    batchSegments.reserve(MAX_CURVES_SUBMIT_PER_GRID);
+
+    size_t base = start * CURVE_FLOAT_COUNT;
+    batchCurves.insert(batchCurves.end(), allCurves.begin() + base, allCurves.begin() + end * CURVE_FLOAT_COUNT);
+    batchSegments.insert(batchSegments.end(), allSegments.begin() + start, allSegments.begin() + end);
+
+    batchCurves.resize(MAX_CURVES_SUBMIT_PER_GRID * CURVE_FLOAT_COUNT, -2.0f); // -2.0f: not included in the NDC space
+    batchSegments.resize(MAX_CURVES_SUBMIT_PER_GRID, -1.0f); // -1.0f: invalid negative curve index
 
     builder.SetUniform("controlPoints", batchCurves.data(), batchCurves.size());
     builder.SetUniform("segmentIndex", batchSegments.data(), batchSegments.size());
     builder.SetUniform("u_isFirstBatch", (batch == 0) ? 1.0f : 0.0f);
-    // Note: u_prevD is not sampled when u_isFirstBatch == 1.0f, no need to set for batch 0
+    builder.SetUniform("u_validRange", vStart, vEnd);
 
     SamplingOptions nearest(FilterMode::LINEAR, MipmapMode::LINEAR);
     if (batch > 0) {
@@ -977,18 +989,22 @@ void GESDFPathShaderShape::RenderGridsToSurface(const Drawing::Rect& targetRect)
 
     builder->SetUniform("iResolution", targetRect.GetWidth(), targetRect.GetHeight());
     builder->SetUniform("u_curveCount", static_cast<float>(numCurves_));
-    SamplingOptions nearest(FilterMode::LINEAR, MipmapMode::LINEAR);
     std::shared_ptr<Drawing::Image> prevSdf = nullptr;
     std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
     for (size_t i = 0; i < curvesInGrid_.size(); i++) {
-        if (curvesInGrid_[i].first.size() > 0) {
-            const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
-            const size_t totalCurves = curvesInGrid_[i].first.size() / CURVE_FLOAT_COUNT;
-            const size_t numBatches = (totalCurves + curvesPerBatch - 1) / curvesPerBatch;
-
-            for (size_t batch = 0; batch < numBatches; batch++) {
-                ProcessSingleBatch(*builder, i, batch, prevSdf, prevShader);
-            }
+        size_t totalCurves = curvesInGrid_[i].first.size() / CURVE_FLOAT_COUNT;
+        if (totalCurves == 0) continue;
+        const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
+        const size_t step = curvesPerBatch > 2 ? curvesPerBatch - 2 : 1; // 2-curve overlap between adjacent batches
+        size_t start = 0;
+        size_t batch = 0;
+        while (start < totalCurves) {
+            size_t end = std::min(start + curvesPerBatch, totalCurves);
+            float validStart = (batch == 0) ? 0.0f : 1.0f;
+            float validEnd = (end == totalCurves) ? (end - start - 1.0f) : (curvesPerBatch - 2.0f);
+            ProcessSingleBatch(*builder, i, batch++, start, end, validStart, validEnd, prevSdf, prevShader);
+            if (end == totalCurves) break;
+            start += step;
         }
     }
 }
@@ -1065,13 +1081,32 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
         width = originalW * scaleX;
         height = originalH * scaleY;
     }
-    if (height > (width * 6.0f)) { // 6.0f: Large aspect ratio difference
-        scaleY *= (width * 6.0f) / height; // 6.0f: Reduce aspect ratio differences
+    if (height > (width * 3.0f)) { // 3.0f: Large aspect ratio difference
+        scaleY *= (width * 3.0f) / height; // 3.0f: Reduce aspect ratio differences
     }
 
     scaleX = std::max(scaleX, MIN_SCALE_CLAMP);
     scaleY = std::max(scaleY, MIN_SCALE_CLAMP);
     scale = Vector2f(scaleX, scaleY);
+}
+
+void GESDFPathShaderShape::UpdateNumPasses(float height)
+{
+    if (height < 150.f) { // 150.0:Add iterative correction When the component is small
+        numPasses_ = 1;
+        return;
+    }
+    if (allGridsCovered_) {
+        numPasses_ = 0; // perform 0 iterations If all the grids have curves passing
+        return;
+    }
+    float requiredStep = maxEmptyGridShortSide_ * 0.5f;
+    if (requiredStep < 1.0f) {
+        requiredStep = 1.0f;
+    }
+    requiredStep = std::clamp(requiredStep, 1.0f, 32.0f); // 32.0:max step for JFA
+    int passCount = static_cast<int>(std::floor(std::log2(requiredStep))) + 1;
+    numPasses_ = static_cast<size_t>(std::clamp(passCount, 1, 6)); // at least 1 times, at most 6 times
 }
 
 void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool hasNormal)
@@ -1086,12 +1121,6 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     float height = 0.0f;
     Drawing::Path path = PreparePathForRendering(rect, width, height);
 
-    std::shared_ptr<Image> pathImage = DrawPathToImage(canvas, width, height, path);
-    if (pathImage == nullptr) {
-        LOGE("GESDFPathShaderShape::Preprocess: Failed to draw the paths");
-        return;
-    }
-
     std::vector<std::vector<Vector2f>> paramsCoef = GetCurveByPath(path);
     std::vector<Vector2f> pixelControlPoints = ProcessCurveSegments(paramsCoef);
     if (pixelControlPoints.empty()) {
@@ -1103,7 +1132,7 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     ConvertPointsToFloats(ndcControlPoints, controlPoints_);
     pointCnt_ = controlPoints_.size();
 
-    AutoGridPartition(width, height, 0.05f); // 0.05f is the max thickne of grid size
+    AutoGridPartition(width, height, pixelControlPoints);
     if (curvesInGrid_.empty()) {
         LOGE("GESDFPathShaderShape::Preprocess: AutoGridPartition failed.");
         return;
@@ -1118,11 +1147,21 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
 
     RenderGridsToSurface(targetRect);
 
+    UpdateNumPasses(height);
+    std::shared_ptr<Image> pathImage = nullptr;
+    if (numPasses_ > 0) {
+        pathImage = DrawPathToImage(canvas, static_cast<int>(width), static_cast<int>(height), path);
+        if (pathImage == nullptr) {
+            LOGE("GESDFPathShaderShape::Preprocess: Failed to draw the paths");
+            return;
+        }
+    }
+    
     std::shared_ptr<Image> propagatedSdf = RunSDFPropagation(canvas, offscreenSurface_->GetImageSnapshot(),
         pathImage, static_cast<int>(width), static_cast<int>(height));
 
     disResult_ =
-        ComputeDistanceField(canvas, propagatedSdf, static_cast<int>(width), static_cast<int>(height), pathImage);
+        ComputeDistanceField(canvas, propagatedSdf, static_cast<int>(width), static_cast<int>(height));
     if (!disResult_) {
         LOGE("GESDFPathShaderShape::Preprocess ComputeDistanceField failed");
         return;

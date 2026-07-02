@@ -576,8 +576,16 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
     std::shared_ptr<Drawing::Image> prevSdf = nullptr;
     std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
 
+    constexpr size_t CURVE_FLOAT_COUNT = 6;
+    size_t gridIndex = 0;
+    size_t batch = 0;
+    size_t start = 0;
+    size_t end = shape.curvesInGrid_[gridIndex].first.size() / CURVE_FLOAT_COUNT;
+    float vStart = 0.0f;
+    float vEnd = static_cast<float>(end - start - 1);
+
     // Should not crash with empty curves
-    shape.ProcessSingleBatch(*builder, 0, 0, prevSdf, prevShader);
+    shape.ProcessSingleBatch(*builder, gridIndex, batch, start, end, vStart, vEnd, prevSdf, prevShader);
     EXPECT_EQ(prevSdf, nullptr);
     EXPECT_EQ(prevShader, nullptr);
 }
@@ -824,6 +832,226 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleNormalRange_001, TestSize.Level1)
     shape.UpdateScale(scale, rect);
     EXPECT_EQ(scale.x_, 0.5f);
     EXPECT_EQ(scale.y_, 0.5f);
+}
+
+/**
+ * @tc.name: UpdateNumPasses_001
+ * @tc.desc: Verify small size branch has highest priority: height < 150 forces 1 pass, even all grids covered
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    param.path.MoveTo(10.0f, 20.0f);
+    param.path.LineTo(100.0f, 200.0f);
+    GESDFPathShaderShape shape(param);
+
+    shape.allGridsCovered_ = true;
+    shape.maxEmptyGridShortSide_ = 128.0f;
+    shape.UpdateNumPasses(149.9f);
+    EXPECT_EQ(shape.numPasses_, 1);
+}
+
+/**
+ * @tc.name: UpdateNumPasses_002
+ * @tc.desc: Verify all-grids-covered branch returns 0 passes when height >= 150
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_002, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    param.path.MoveTo(10.0f, 20.0f);
+    param.path.LineTo(100.0f, 200.0f);
+    GESDFPathShaderShape shape(param);
+
+    shape.allGridsCovered_ = true;
+    shape.maxEmptyGridShortSide_ = 0.0f;
+    shape.UpdateNumPasses(150.0f);
+    EXPECT_EQ(shape.numPasses_, 0);
+}
+
+/**
+ * @tc.name: UpdateNumPasses_003
+ * @tc.desc: Verify lower clamp: tiny empty grid clamps requiredStep to 1.0f, returns 1 pass
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_003, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    param.path.MoveTo(10.0f, 20.0f);
+    param.path.LineTo(100.0f, 200.0f);
+    GESDFPathShaderShape shape(param);
+
+    shape.allGridsCovered_ = false;
+    shape.maxEmptyGridShortSide_ = 0.5f;
+    shape.UpdateNumPasses(300.0f);
+    EXPECT_EQ(shape.numPasses_, 1);
+}
+
+/**
+ * @tc.name: UpdateNumPasses_004
+ * @tc.desc: Verify normal calculation logic with medium empty grid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_004, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    param.path.MoveTo(10.0f, 20.0f);
+    param.path.LineTo(100.0f, 200.0f);
+    GESDFPathShaderShape shape(param);
+
+    shape.allGridsCovered_ = false;
+    shape.maxEmptyGridShortSide_ = 8.0f; // step=4 -> log2(4)+1 = 3
+    shape.UpdateNumPasses(300.0f);
+    EXPECT_EQ(shape.numPasses_, 3);
+}
+
+/**
+ * @tc.name: UpdateNumPasses_005
+ * @tc.desc: Verify upper clamp: large empty grid clamps step to 32.0f, hits max 6 passes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_005, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    param.path.MoveTo(10.0f, 20.0f);
+    param.path.LineTo(100.0f, 200.0f);
+    GESDFPathShaderShape shape(param);
+
+    shape.allGridsCovered_ = false;
+    shape.maxEmptyGridShortSide_ = 128.0f; // step clamped to 32 -> log2(32)+1 = 6
+    shape.UpdateNumPasses(500.0f);
+    EXPECT_EQ(shape.numPasses_, 6);
+}
+
+/**
+ * @tc.name: SplitGrid_EmptyGridStats_001
+ * @tc.desc: Verify empty subgrid branch in SplitGrid: allGridsCovered_ set to false, maxEmptyGridShortSide_ updated
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, SplitGrid_EmptyGridStats_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    // Rectangular outline with enough segments to trigger multiple quadtree splits, inner area is empty
+    for (int i = 0; i < 10; ++i) {
+        path.MoveTo(50.0f + i * 30.0f, 50.0f);
+        path.LineTo(50.0f + (i + 1) * 30.0f, 50.0f);
+    }
+    for (int i = 0; i < 10; ++i) {
+        path.MoveTo(350.0f, 50.0f + i * 30.0f);
+        path.LineTo(350.0f, 50.0f + (i + 1) * 30.0f);
+    }
+    for (int i = 0; i < 10; ++i) {
+        path.MoveTo(350.0f - i * 30.0f, 350.0f);
+        path.LineTo(350.0f - (i + 1) * 30.0f, 350.0f);
+    }
+    for (int i = 0; i < 10; ++i) {
+        path.MoveTo(50.0f, 350.0f - i * 30.0f);
+        path.LineTo(50.0f, 350.0f - (i + 1) * 30.0f);
+    }
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 400.0f, 400.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+
+    EXPECT_FALSE(shape.allGridsCovered_);
+    EXPECT_GT(shape.maxEmptyGridShortSide_, 0.0f);
+}
+
+/**
+ * @tc.name: RenderGridsToSurface_EmptyGridSkip_001
+ * @tc.desc: Verify grid with zero curves is skipped during rendering, no crash and internal state remains valid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RenderGridsToSurface_EmptyGridSkip_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 200.0f, 200.0f);
+    shape.Preprocess(*canvas_, rect, false);
+
+    // Precondition: valid grids exist before inserting empty grid
+    size_t originalGridCount = shape.curvesInGrid_.size();
+    ASSERT_GT(originalGridCount, 0u);
+
+    // Insert an empty grid with zero curves to trigger the skip branch
+    Grid emptyGrid;
+    emptyGrid.bbox = { 0.0f, 100.0f, 0.0f, 100.0f };
+    shape.curvesInGrid_.emplace_back(std::vector<float>{}, emptyGrid);
+    shape.segmentIndex_.emplace_back(std::vector<float>{});
+
+    // Verify test precondition: the inserted grid truly has zero curves
+    constexpr size_t CURVE_FLOAT_COUNT = 6;
+    size_t emptyGridCurveCount = shape.curvesInGrid_.back().first.size() / CURVE_FLOAT_COUNT;
+    EXPECT_EQ(emptyGridCurveCount, 0u);
+    EXPECT_EQ(shape.curvesInGrid_.size(), originalGridCount + 1);
+
+    // Execute rendering: empty grid should hit the `totalCurves == 0 continue` branch
+    shape.RenderGridsToSurface(rect);
+
+    // Post-condition: grid data remains intact, no corruption caused by empty grid handling
+    EXPECT_EQ(shape.curvesInGrid_.size(), originalGridCount + 1);
+    EXPECT_FALSE(shape.curvesInGrid_.front().first.empty());
+}
+
+/**
+ * @tc.name: RenderGridsToSurface_BatchOverlapLoop_001
+ * @tc.desc: Verify overlapping batch loop: while body, start+=step and end==totalCurves break branches
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RenderGridsToSurface_BatchOverlapLoop_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    // 30 line segments packed within 50px range, stays in single grid (below MIN_GRID_SIZE)
+    for (int i = 0; i < 30; ++i) {
+        path.MoveTo(10.0f, 10.0f + static_cast<float>(i));
+        path.LineTo(40.0f, 10.0f + static_cast<float>(i));
+    }
+    param.path = path;
+    param.scale = Vector2f(1.0f, 1.0f);
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 200.0f, 200.0f);
+    shape.Preprocess(*canvas_, rect, false);
+
+    constexpr size_t CURVE_FLOAT_COUNT = 6;
+    ASSERT_FALSE(shape.curvesInGrid_.empty());
+    size_t totalCurves = shape.curvesInGrid_[0].first.size() / CURVE_FLOAT_COUNT;
+    EXPECT_GT(totalCurves, 20u);
+
+    shape.RenderGridsToSurface(rect);
+    SUCCEED();
+}
+
+/**
+ * @tc.name: DrawPathToImage_NullOnZeroSize_001
+ * @tc.desc: Verify DrawPathToImage returns nullptr on invalid dimensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, DrawPathToImage_NullOnZeroSize_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 10.0f);
+    path.LineTo(50.0f, 50.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    auto result = shape.DrawPathToImage(*canvas_, 0, 0, path);
+    EXPECT_EQ(result, nullptr);
+
+    auto result2 = shape.DrawPathToImage(*canvas_, -10, 100, path);
+    EXPECT_EQ(result2, nullptr);
 }
 
 } // namespace Drawing

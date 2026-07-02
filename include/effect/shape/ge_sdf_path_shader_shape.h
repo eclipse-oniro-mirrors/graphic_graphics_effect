@@ -89,8 +89,7 @@ private:
     std::shared_ptr<Image> RunJFAIterates(Canvas& canvas, std::shared_ptr<Image> seedTex, int width, int height);
     std::shared_ptr<Image> RunSDFPropagation(
         Canvas& canvas, std::shared_ptr<Image> sdfTex, std::shared_ptr<Image> maskTex, int width, int height);
-    std::shared_ptr<Image> ComputeDistanceField(
-        Canvas& canvas, std::shared_ptr<Image> jfaTex, int width, int height, std::shared_ptr<Image> pathImage);
+    std::shared_ptr<Image> ComputeDistanceField(Canvas& canvas, std::shared_ptr<Image> jfaTex, int width, int height);
 
     std::shared_ptr<Image> GenerateSeedTexture(Canvas& canvas, int width, int height,
         const std::vector<std::vector<Vector2f>>& paramsCoef, std::shared_ptr<Image>& pathImage);
@@ -101,18 +100,21 @@ private:
     std::vector<Vector2f> ProcessCurveSegments(const std::vector<std::vector<Vector2f>>& paramsCoef);
     void RenderGridsToSurface(const Drawing::Rect& targetRect);
     void ProcessSingleBatch(Drawing::RuntimeShaderBuilder& builder, size_t gridIndex, size_t batch,
-        std::shared_ptr<Drawing::Image>& prevSdf, std::shared_ptr<Drawing::ShaderEffect>& prevShader);
+    size_t start, size_t end, float vStart, float vEnd, std::shared_ptr<Drawing::Image>& prevSdf,
+    std::shared_ptr<Drawing::ShaderEffect>& prevShader);
 
     // ========== Quadtree grid partition ==========
-    void AutoGridPartition(float width, float height, float maxThickness);
+    void AutoGridPartition(float width, float height, const std::vector<Vector2f>& pixelControlPoints);
     void SplitGrid(
         const Grid& current, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue, float minGridSize);
-    void ComputeAllCurveBoundingBoxes(
-        float width, float height, float maxThickness, Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
-    std::array<float, 4> ComputeCurveBoundingBox(size_t curveIndex, float maxThickness, float width, float height);
+    void ComputeAllCurveBoundingBoxes(float width, float height, const std::vector<Vector2f>& pixelControlPoints,
+        Box4f& canvasBBox, std::vector<Box4f>& curveBBoxes);
+    std::array<float, 4> ComputeCurveBoundingBox(size_t curveIndex, float maxThickness,
+        const std::vector<Vector2f>& pixelControlPoints, float width, float height);
     void InitializeWorkQueue(
         const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue);
     void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes);
+    void UpdateNumPasses(float height);
 
     // ========== Quadtree grid partition ==========
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
@@ -134,11 +136,14 @@ private:
     // Grid partition data storage
     std::vector<std::pair<std::vector<float>, Grid>> curvesInGrid_;
     std::vector<std::vector<float>> segmentIndex_;
-    std::vector<float> controlPoints_; // 全局NDC控制点
+    std::vector<float> controlPoints_;
     std::shared_ptr<Drawing::Surface> offscreenSurface_ = nullptr;
     std::shared_ptr<Drawing::Canvas> offscreenCanvas_ = nullptr;
     uint32_t numCurves_ = 0;
     uint32_t pointCnt_ = 0;
+    bool allGridsCovered_ = false;
+    float canvasMinSide_ = 0.0f;
+    float maxEmptyGridShortSide_ = 0.0f;
 };
 } // namespace Drawing
 } // namespace Rosen
