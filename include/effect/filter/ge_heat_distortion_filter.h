@@ -69,21 +69,18 @@ private:
             return fract(16.0 * fract(st.x * st.y * (st.x + st.y)));
         }
 
-        // Optimization: Reduce function call overhead by inlining angle generation
         half2 randomGrad(half2 p)
         {
             half angle = random(p) * 6.28318530718;
             return half2(cos(angle), sin(angle));
         }
 
-        // Optimization: Inline perlinNoise to reduce function call overhead
         half perlinNoise(half2 p)
         {
             half2 i = floor(p);
             half2 f = fract(p);
             half2 u = f * f * (3.0 - 2.0 * f);
 
-            // Direct gradient calculation to avoid additional function call overhead
             half dot00 = dot(randomGrad(i), f);
             half dot10 = dot(randomGrad(i + half2(1.0, 0.0)), f - half2(1.0, 0.0));
             half dot01 = dot(randomGrad(i + half2(0.0, 1.0)), f - half2(0.0, 1.0));
