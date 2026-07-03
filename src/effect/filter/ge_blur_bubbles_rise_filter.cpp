@@ -57,7 +57,7 @@ std::shared_ptr<Drawing::Image> MakeRuntimeImage(Drawing::RuntimeShaderBuilder& 
 
 std::shared_ptr<Drawing::RuntimeEffect> GetResampleShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_resampleShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_resampleShader = nullptr;
     if (g_resampleShader == nullptr) {
         LOGI("GetResampleShaderEffect creating resample shader effect");
         g_resampleShader = GECreateRuntimeEffectForShader(g_shaderStringResample);
@@ -317,7 +317,7 @@ void GEBlurBubblesRiseFilter::CheckBlurBubblesRiseParams()
 
 std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetBlurShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_blurShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_blurShader = nullptr;
     if (g_blurShader == nullptr) {
         LOGI("GEBlurBubblesRiseFilter::GetBlurShaderEffect creating blur shader effect");
         g_blurShader = GECreateRuntimeEffectForShader(shaderStringGaussianBlur);
@@ -330,7 +330,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetBlurShaderEf
 
 std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetMaskMixShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_maskMixShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_maskMixShader = nullptr;
     if (g_maskMixShader == nullptr) {
         LOGI("GEBlurBubblesRiseFilter::GetMaskMixShaderEffect creating mask mix shader effect");
         g_maskMixShader = GECreateRuntimeEffectForShader(shaderStringMaskMix);

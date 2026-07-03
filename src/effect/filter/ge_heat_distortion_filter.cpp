@@ -89,7 +89,7 @@ void GEHeatDistortionFilter::CheckHeatDistortionParams()
 
 std::shared_ptr<Drawing::RuntimeEffect> GEHeatDistortionFilter::GetHeatDistortionEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_heatDistortionShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_heatDistortionShader = nullptr;
     if (g_heatDistortionShader == nullptr) {
         LOGI("GEHeatDistortionFilter::GetHeatDistortionEffect creating shader effect");
         g_heatDistortionShader = GECreateRuntimeEffectForShader(shaderStringHeatDistortion);
