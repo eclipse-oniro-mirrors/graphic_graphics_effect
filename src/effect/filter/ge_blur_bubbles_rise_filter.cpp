@@ -281,6 +281,10 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
         return image;
     }
 
+    if (maskImage == nullptr) {
+        LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image is null");
+        return image;
+    }
     auto maskImageInfo = maskImage->GetImageInfo();
     if (maskImageInfo.GetWidth() == 0 || maskImageInfo.GetHeight() == 0) {
         LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image info invalid");
