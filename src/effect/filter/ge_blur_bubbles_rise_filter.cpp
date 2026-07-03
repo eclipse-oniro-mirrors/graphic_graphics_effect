@@ -70,7 +70,7 @@ bool PrepareProcessContext(const std::shared_ptr<Drawing::Image>& image, const D
     context.matrix = canvasMatrix;
     context.matrix.PostTranslate(-tranX, -tranY);
     if (!context.matrix.Invert(context.invertMatrix)) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage invert matrix failed");
+        LOGE("GEBlurBubblesRiseFilter::PrepareProcessContext invert matrix failed");
         return false;
     }
 
@@ -128,14 +128,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
 
     auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, context.matrix, params.imageInfo);
     if (downsampledImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample image build failed");
         return nullptr;
     }
 
     auto downsampledShader = BuildImageShader(downsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         context);
     if (downsampledShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
     }
     return downsampledShader;
 }
@@ -153,13 +153,13 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderX.SetUniform("horizontal", 1.0f);
     auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, context.matrix, params.imageInfo);
     if (blurredImageX == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur X image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X image build failed");
         return nullptr;
     }
 
     auto blurXShader = BuildImageShader(blurredImageX, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
     if (blurXShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur X shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X shader create failed");
         return nullptr;
     }
 
@@ -170,7 +170,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderY.SetUniform("horizontal", 0.0f);
     auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, context.matrix, params.imageInfo);
     if (blurredImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur Y image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur Y image build failed");
     }
     return blurredImage;
 }
@@ -184,7 +184,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     auto downsampledBlurredShader = BuildImageShader(downsampledBlurredImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
     if (downsampledBlurredShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample blurred shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
         return nullptr;
     }
 
@@ -194,14 +194,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     upsampleBuilder.SetUniform("dstResolution", context.width, context.height);
     auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, context.matrix, context.imageInfo);
     if (upsampledImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage upsample image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader upsample image build failed");
         return nullptr;
     }
 
     auto blurredShader = BuildImageShader(upsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         context);
     if (blurredShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blurred shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader blurred shader create failed");
     }
     return blurredShader;
 }
@@ -213,7 +213,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildBlurredShader(Drawing::Canvas& canva
 {
     auto resampleEffect = GetResampleShaderEffect();
     if (resampleEffect == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage resample effect create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildBlurredShader resample effect create failed");
         return nullptr;
     }
     auto params = BuildDownsampleParams(context, blurIntensity);
