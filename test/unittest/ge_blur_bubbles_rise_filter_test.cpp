@@ -185,5 +185,80 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, CheckBlurBubblesRiseParams002, TestSize.Le
     EXPECT_EQ(filter->progress_, 0.0f);
 }
 
+/**
+ * @tc.name: ShaderEffectCachingMechanism
+ * @tc.desc: Verify shader effect caching mechanism works correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectCachingMechanism, TestSize.Level2)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    auto filter1 = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto filter2 = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // 验证不同filter实例返回相同的shader effect（静态缓存）
+    auto blurShader1 = filter1->GetBlurShaderEffect();
+    auto blurShader2 = filter2->GetBlurShaderEffect();
+    EXPECT_NE(blurShader1, nullptr);
+    EXPECT_NE(blurShader2, nullptr);
+    EXPECT_EQ(blurShader1, blurShader2);
+
+    auto maskMixShader1 = filter1->GetMaskMixShaderEffect();
+    auto maskMixShader2 = filter2->GetMaskMixShaderEffect();
+    EXPECT_NE(maskMixShader1, nullptr);
+    EXPECT_NE(maskMixShader2, nullptr);
+    EXPECT_EQ(maskMixShader1, maskMixShader2);
+}
+
+/**
+ * @tc.name: ShaderEffectMultiCallConsistency
+ * @tc.desc: Verify multiple calls to shader effect functions return consistent results
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectMultiCallConsistency, TestSize.Level2)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // 验证多次调用返回相同的shader effect
+    auto blurShader1 = filter->GetBlurShaderEffect();
+    auto blurShader2 = filter->GetBlurShaderEffect();
+    auto blurShader3 = filter->GetBlurShaderEffect();
+    EXPECT_NE(blurShader1, nullptr);
+    EXPECT_EQ(blurShader1, blurShader2);
+    EXPECT_EQ(blurShader2, blurShader3);
+
+    auto maskMixShader1 = filter->GetMaskMixShaderEffect();
+    auto maskMixShader2 = filter->GetMaskMixShaderEffect();
+    EXPECT_NE(maskMixShader1, nullptr);
+    EXPECT_EQ(maskMixShader1, maskMixShader2);
+}
+
+/**
+ * @tc.name: ShaderEffectInActualProcessing
+ * @tc.desc: Verify shader effects work correctly in actual image processing
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectInActualProcessing, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.8f;
+    params.mixStrength = 0.5f;
+    params.progress = 0.7f;
+
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // 验证shader effect创建成功
+    auto blurShader = filter->GetBlurShaderEffect();
+    auto maskMixShader = filter->GetMaskMixShaderEffect();
+    EXPECT_NE(blurShader, nullptr);
+    EXPECT_NE(maskMixShader, nullptr);
+
+    // 验证shader effect在实际处理中有效
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_NE(result, image_); // 应该返回处理后的图像，不是原图
+}
+
 } // namespace Rosen
 } // namespace OHOS
