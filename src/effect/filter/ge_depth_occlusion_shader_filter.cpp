@@ -17,7 +17,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 
 #include "ge_log.h"
-
+#include "ge_shader_diagnostic.h"
 #undef LOG_TAG
 #define LOG_TAG "GEDepthOcclusionShaderFilter"
 
@@ -34,7 +34,7 @@ inline static const std::string g_shaderStringDepthOcclusion = R"(
     uniform shader image;
     uniform shader mask;
 
-    half4 main(float2 fragCoord)
+    half4 main(vec2 fragCoord)
     {
         half smoothAlpha = mask.eval(fragCoord).a;
         half4 imageColor = image.eval(fragCoord).rgba;
@@ -49,7 +49,7 @@ inline static const std::string g_shaderStringDepthOcclusionMask = R"(
     uniform half near;
     uniform half far;
 
-    half4 main(float2 fragCoord)
+    half4 main(vec2 fragCoord)
     {
         half sceneDisp = depthMap.eval(fragCoord).r;
         half sceneDepth = 1.0 / sceneDisp;
@@ -72,7 +72,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDepthOcclusionShaderFilter::MakeDepthO
         return depthOcclusionShaderEffect;
     }
 
-    depthOcclusionShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDepthOcclusion);
+    depthOcclusionShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDepthOcclusion);
     if (depthOcclusionShaderEffect == nullptr) {
         LOGE("MakeDepthOcclusionShaderEffect: depthOcclusionShaderEffect create failed.");
         return nullptr;
@@ -88,7 +88,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDepthOcclusionShaderFilter::MakeDepthO
         return depthOcclusionMaskShaderEffect;
     }
 
-    depthOcclusionMaskShaderEffect = Drawing::RuntimeEffect::CreateForShader(g_shaderStringDepthOcclusionMask);
+    depthOcclusionMaskShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDepthOcclusionMask);
     if (depthOcclusionMaskShaderEffect == nullptr) {
         LOGE("MakeDepthOcclusionMaskShaderEffect: depthOcclusionMaskShaderEffect create failed.");
         return nullptr;
@@ -184,9 +184,9 @@ std::shared_ptr<Drawing::Image> GEDepthOcclusionShaderFilter::OnProcessImage(Dra
         return GetOutputOnFailure(image);
     }
 
-    Drawing::GEMESABlurShaderFilterParams blurImgParams{};
-    blurImgParams.radius = MASK_BLUR_RADIUS;
-    auto mesaBlurFilter = std::make_shared<GEMESABlurShaderFilter>(blurImgParams);
+    Drawing::GEMESABlurShaderFilterParams blurImgParas{};
+    blurImgParas.radius = MASK_BLUR_RADIUS;
+    auto mesaBlurFilter = std::make_shared<GEMESABlurShaderFilter>(blurImgParas);
     maskImage = mesaBlurFilter->OnProcessImage(canvas, maskImage, imageRect, imageRect);
     if (!maskImage) {
         return GetOutputOnFailure(image);

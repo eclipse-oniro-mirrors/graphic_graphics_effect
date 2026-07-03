@@ -22,7 +22,7 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
-namespace GraphicsEffectEngine{
+namespace GraphicsEffectEngine {
 
 class GEDepthOcclusionShaderFilterTest : public testing::Test {
 public:
@@ -53,7 +53,7 @@ void GEDepthOcclusionShaderFilterTest::SetUp()
     Rosen::Drawing::Bitmap bmp;
     Rosen::Drawing::BitmapFormat format { Rosen::Drawing::COLORTYPE_RGBA_8888, Rosen::Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, format);
-    bmp.ClearWithColor(Rosen::Drawing::Color::COLOR_BLACK);
+    bmp.ClearWithColor(Rosen::Drawing::Color::COLOR_BLUE);
     image_ = bmp.MakeImage();
     bmp.Build(0, 0, format);
     imageEmpty_ = bmp.MakeImage();
@@ -197,7 +197,7 @@ HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageWithDepthMapTest, TestS
 /**
  * @tc.name: OnProcessImageWithReverseTest
  * @tc.desc: GEDepthOcclusionShaderFilterTest.OnProcessImageWithReverseTest
- * @tc.type: FUNC
+ * @tc.type:: FUNC
  */
 HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageWithReverseTest, TestSize.Level1)
 {
@@ -223,7 +223,7 @@ HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageWithReverseTest, TestSi
  */
 HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageOnGPUTest, TestSize.Level1)
 {
-    ASSERT_NEQ(canvasGpu_, nullptr);
+    ASSERT_NE(canvasGpu_, nullptr);
     Rosen::Drawing::Bitmap depthBmp;
     Rosen::Drawing::BitmapFormat format { Rosen::Drawing::COLORTYPE_RGBA_8888, Rosen::Drawing::ALPHATYPE_PREMUL };
     depthBmp.Build(dst_.GetWidth(), dst_.GetHeight(), format);
@@ -242,7 +242,7 @@ HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageOnGPUTest, TestSize.Lev
     auto depthOcclusionShaderFilter = CreateDepthOcclusionShaderFilter(params);
     ASSERT_NE(depthOcclusionShaderFilter, nullptr);
 
-    EXPECT_EQ(depthOcclusionShaderFilter->OnProcessImage(*canvasGpu_, image_, src_, dst_), nullptr);
+    ASSERT_NE(depthOcclusionShaderFilter->OnProcessImage(*canvasGpu_, image_, src_, dst_), nullptr);
 }
 
 } // namespace GraphicsEffectEngine
