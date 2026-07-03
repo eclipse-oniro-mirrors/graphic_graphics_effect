@@ -671,7 +671,14 @@ constexpr char GE_SHADER_SDF_CLIP_SHAPE[] = "SDFClip_Shape";
 constexpr char GE_SHADER_SDF_COLOR[] = "SDFColor";
 constexpr char GE_SHADER_SDF_COLOR_SHAPE[] = "SDFColor_Shape";
 constexpr char GE_SHADER_SDF_COLOR_COLOR[] = "SDFColor_Color";
-
+constexpr char GE_FILTER_DEPTH_OCCLUSION[] = "DepthOcclusion";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_DEPTH_PLANE[] = "DepthOcclusion_DepthPlane";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_DEPTH_MAP[] = "DepthOcclusion_DepthMap";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_MATRIX[] = "DepthOcclusion_Matrix";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_WEIGHT[] = "DepthOcclusion_OcclusionWeight";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_NEAR[] = "DepthOcclusion_OcclusionNear";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_FAR[] = "DepthOcclusion_OcclusionFar";
+constexpr char GE_FILTER_DEPTH_OCCLUSION_IS_REVERSE[] = "DepthOcclusion_IsReverse";
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

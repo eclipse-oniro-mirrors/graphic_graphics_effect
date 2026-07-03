@@ -135,7 +135,7 @@ static std::unordered_map<char, AddCurveSegment> addCurveSegmentMap_ = {
         } },
     { 'Z', // Z M is the end of a path
         [](std::vector<std::vector<Vector2f>>& result, std::vector<float>& numbers,
-               Vector2f& currentPos) { LOGI("AddCurveSegment: Z a path ends"); } }
+               Vector2f& currentPos) { LOGD("AddCurveSegment: Z a path ends"); } }
 };
 } // namespace
 
