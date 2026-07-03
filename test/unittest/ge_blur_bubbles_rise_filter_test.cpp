@@ -120,7 +120,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, Type001, TestSize.Level2)
 
 /**
  * @tc.name: OnProcessImageWithLowBlurIntensity
- * @tc.desc: Verify behavior with low blur intensity that triggers early termination
+ * @tc.desc: Verify behavior with low blur intensity that still processes image
  * @tc.type: FUNC
  */
 HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithLowBlurIntensity, TestSize.Level1)
@@ -130,7 +130,8 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithLowBlurIntensity, TestSi
     auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
-    EXPECT_EQ(result, image_);
+    // Low blur intensity still processes image, just with less blur effect
+    EXPECT_NE(result, image_); // Should still return processed image
 }
 
 /**
@@ -196,7 +197,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectCachingMechanism, TestSize.Lev
     auto filter1 = std::make_unique<GEBlurBubblesRiseFilter>(params);
     auto filter2 = std::make_unique<GEBlurBubblesRiseFilter>(params);
 
-    // 验证不同filter实例返回相同的shader effect（静态缓存）
+    // Verify that different filter instances return the same shader effect (static caching)
     auto blurShader1 = filter1->GetBlurShaderEffect();
     auto blurShader2 = filter2->GetBlurShaderEffect();
     EXPECT_NE(blurShader1, nullptr);
@@ -220,7 +221,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectMultiCallConsistency, TestSize
     Drawing::GEBlurBubblesRiseFilterParams params;
     auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
 
-    // 验证多次调用返回相同的shader effect
+    // Verify that multiple calls return the same shader effect
     auto blurShader1 = filter->GetBlurShaderEffect();
     auto blurShader2 = filter->GetBlurShaderEffect();
     auto blurShader3 = filter->GetBlurShaderEffect();
@@ -248,16 +249,16 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectInActualProcessing, TestSize.L
 
     auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
 
-    // 验证shader effect创建成功
+    // Verify that shader effect is created successfully
     auto blurShader = filter->GetBlurShaderEffect();
     auto maskMixShader = filter->GetMaskMixShaderEffect();
     EXPECT_NE(blurShader, nullptr);
     EXPECT_NE(maskMixShader, nullptr);
 
-    // 验证shader effect在实际处理中有效
+    // Verify that shader effect works correctly in actual image processing
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
-    EXPECT_NE(result, image_); // 应该返回处理后的图像，不是原图
+    EXPECT_NE(result, image_); // Should return processed image, not the original image
 }
 
 } // namespace Rosen

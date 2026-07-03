@@ -259,7 +259,7 @@ HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectCachingMechanism,
     auto filter1 = std::make_unique<GEHeatDistortionFilter>(params);
     auto filter2 = std::make_unique<GEHeatDistortionFilter>(params);
 
-    // 验证不同filter实例返回相同的shader effect（静态缓存）
+    // Verify that different filter instances return the same shader effect (static caching)
     auto shaderEffect1 = filter1->GetHeatDistortionEffect();
     auto shaderEffect2 = filter2->GetHeatDistortionEffect();
     EXPECT_NE(shaderEffect1, nullptr);
@@ -277,7 +277,7 @@ HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectMultiCallConsiste
     Drawing::GEHeatDistortionFilterParams params;
     auto filter = std::make_unique<GEHeatDistortionFilter>(params);
 
-    // 验证多次调用返回相同的shader effect
+    // Verify that multiple calls return the same shader effect
     auto shaderEffect1 = filter->GetHeatDistortionEffect();
     auto shaderEffect2 = filter->GetHeatDistortionEffect();
     auto shaderEffect3 = filter->GetHeatDistortionEffect();
@@ -301,11 +301,11 @@ HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectInActualProcessin
 
     auto filter = std::make_unique<GEHeatDistortionFilter>(params);
 
-    // 验证shader effect创建成功
+    // Verify that shader effect is created successfully
     auto shaderEffect = filter->GetHeatDistortionEffect();
     EXPECT_NE(shaderEffect, nullptr);
 
-    // 验证shader effect在实际处理中有效
+    // Verify that shader effect works correctly in actual image processing
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
