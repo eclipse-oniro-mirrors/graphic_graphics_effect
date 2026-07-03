@@ -195,7 +195,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectCachingMechanism, TestSize.Lev
     auto filter1 = std::make_unique<GEBlurBubblesRiseFilter>(params);
     auto filter2 = std::make_unique<GEBlurBubblesRiseFilter>(params);
 
-    // Verify that different filter instances return the same shader effect (static caching)
+    // Verify that different filter instances return the same shader effect (thread_local caching)
     auto blurShader1 = filter1->GetBlurShaderEffect();
     auto blurShader2 = filter2->GetBlurShaderEffect();
     EXPECT_NE(blurShader1, nullptr);

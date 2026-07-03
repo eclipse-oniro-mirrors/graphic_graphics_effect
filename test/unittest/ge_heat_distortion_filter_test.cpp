@@ -259,7 +259,7 @@ HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectCachingMechanism,
     auto filter1 = std::make_unique<GEHeatDistortionFilter>(params);
     auto filter2 = std::make_unique<GEHeatDistortionFilter>(params);
 
-    // Verify that different filter instances return the same shader effect (static caching)
+    // Verify that different filter instances return the same shader effect (thread_local caching)
     auto shaderEffect1 = filter1->GetHeatDistortionEffect();
     auto shaderEffect2 = filter2->GetHeatDistortionEffect();
     EXPECT_NE(shaderEffect1, nullptr);
