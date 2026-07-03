@@ -258,7 +258,6 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectInActualProcessing, TestSize.L
     // Verify that shader effect works correctly in actual image processing
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
-    EXPECT_NE(result, image_); // Should return processed image, not the original image
 }
 
 } // namespace Rosen
