@@ -91,7 +91,11 @@ std::shared_ptr<Drawing::RuntimeEffect> GEHeatDistortionFilter::GetHeatDistortio
 {
     static std::shared_ptr<Drawing::RuntimeEffect> g_heatDistortionShader = nullptr;
     if (g_heatDistortionShader == nullptr) {
+        LOGI("GEHeatDistortionFilter::GetHeatDistortionEffect creating shader effect");
         g_heatDistortionShader = GECreateRuntimeEffectForShader(shaderStringHeatDistortion);
+        if (g_heatDistortionShader == nullptr) {
+            LOGE("GEHeatDistortionFilter::GetHeatDistortionEffect create shader effect failed");
+        }
     }
     return g_heatDistortionShader;
 }
