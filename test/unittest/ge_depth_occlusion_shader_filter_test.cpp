@@ -87,7 +87,8 @@ std::shared_ptr<Drawing::Surface> GEDepthOcclusionShaderFilterTest::CreateSurfac
     return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
 }
 
-std::shared_ptr<GEDepthOcclusionShaderFilter> CreateDepthOcclusionShaderFilter(Drawing::GEDepthOcclusionShaderFilterParams params)
+std::shared_ptr<GEDepthOcclusionShaderFilter> CreateDepthOcclusionShaderFilter(
+    Drawing::GEDepthOcclusionShaderFilterParams params)
 {
     return std::make_shared<GEDepthOcclusionShaderFilter>(params);
 }
