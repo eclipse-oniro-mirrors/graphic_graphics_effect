@@ -274,7 +274,7 @@ std::shared_ptr<ShaderEffect> GESDFTriangleShaderShape::GenerateShaderEffect(
         (params_.vertex2.x_ - params_.vertex0.x_) * (params_.vertex1.y_ - params_.vertex0.y_);
     triangleArea = triangleArea > 0 ? triangleArea : -triangleArea;
     if (triangleArea < 0.0001f) {
-        LOGE("GESDFTriangleShaderShape::GenerateShaderEffect invalid triangle area");
+        LOGD("GESDFTriangleShaderShape::GenerateShaderEffect invalid triangle area");
         return nullptr;
     }
     builder->SetUniform("vertex0", params_.vertex0.x_, params_.vertex0.y_);
