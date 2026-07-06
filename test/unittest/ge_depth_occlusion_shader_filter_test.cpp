@@ -198,7 +198,7 @@ HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageWithDepthMapTest, TestS
 /**
  * @tc.name: OnProcessImageWithReverseTest
  * @tc.desc: GEDepthOcclusionShaderFilterTest.OnProcessImageWithReverseTest
- * @tc.type:: FUNC
+ * @tc.type: FUNC
  */
 HWTEST_F(GEDepthOcclusionShaderFilterTest, OnProcessImageWithReverseTest, TestSize.Level1)
 {
