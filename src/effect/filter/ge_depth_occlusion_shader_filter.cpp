@@ -17,7 +17,7 @@
 #include "ge_mesa_blur_shader_filter.h"
 
 #include "ge_log.h"
-#include "ge_shader_diagnostic.h"
+#include "ge_shader_diagnostics.h"
 #undef LOG_TAG
 #define LOG_TAG "GEDepthOcclusionShaderFilter"
 
