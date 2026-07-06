@@ -118,5 +118,145 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, Type001, TestSize.Level2)
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_BLUR_BUBBLES_RISE);
 }
 
+/**
+ * @tc.name: OnProcessImageWithLowBlurIntensity
+ * @tc.desc: Verify behavior with low blur intensity that still processes image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithLowBlurIntensity, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.3f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithHighBlurIntensity
+ * @tc.desc: Verify behavior with high blur intensity that completes full loop
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithHighBlurIntensity, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 1.0f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentProgress
+ * @tc.desc: Verify behavior with different progress values after timeScale change
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithDifferentProgress, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.progress = 0.5f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: CheckBlurBubblesRiseParams002
+ * @tc.desc: Verify parameter clamping with minimum and maximum values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, CheckBlurBubblesRiseParams002, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.0f;
+    params.mixStrength = 2.0f;
+    params.progress = 0.0f;
+
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    EXPECT_EQ(filter->blurIntensity_, 0.0f);
+    EXPECT_EQ(filter->mixStrength_, 2.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+
+    filter->CheckBlurBubblesRiseParams();
+
+    EXPECT_EQ(filter->blurIntensity_, 0.0f);
+    EXPECT_EQ(filter->mixStrength_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+}
+
+/**
+ * @tc.name: ShaderEffectCachingMechanism
+ * @tc.desc: Verify shader effect caching mechanism works correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectCachingMechanism, TestSize.Level2)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    auto filter1 = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto filter2 = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // Verify that different filter instances return the same shader effect (thread_local caching)
+    auto blurShader1 = filter1->GetBlurShaderEffect();
+    auto blurShader2 = filter2->GetBlurShaderEffect();
+    EXPECT_NE(blurShader1, nullptr);
+    EXPECT_NE(blurShader2, nullptr);
+    EXPECT_EQ(blurShader1, blurShader2);
+
+    auto maskMixShader1 = filter1->GetMaskMixShaderEffect();
+    auto maskMixShader2 = filter2->GetMaskMixShaderEffect();
+    EXPECT_NE(maskMixShader1, nullptr);
+    EXPECT_NE(maskMixShader2, nullptr);
+    EXPECT_EQ(maskMixShader1, maskMixShader2);
+}
+
+/**
+ * @tc.name: ShaderEffectMultiCallConsistency
+ * @tc.desc: Verify multiple calls to shader effect functions return consistent results
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectMultiCallConsistency, TestSize.Level2)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // Verify that multiple calls return the same shader effect
+    auto blurShader1 = filter->GetBlurShaderEffect();
+    auto blurShader2 = filter->GetBlurShaderEffect();
+    auto blurShader3 = filter->GetBlurShaderEffect();
+    EXPECT_NE(blurShader1, nullptr);
+    EXPECT_EQ(blurShader1, blurShader2);
+    EXPECT_EQ(blurShader2, blurShader3);
+
+    auto maskMixShader1 = filter->GetMaskMixShaderEffect();
+    auto maskMixShader2 = filter->GetMaskMixShaderEffect();
+    EXPECT_NE(maskMixShader1, nullptr);
+    EXPECT_EQ(maskMixShader1, maskMixShader2);
+}
+
+/**
+ * @tc.name: ShaderEffectInActualProcessing
+ * @tc.desc: Verify shader effects work correctly in actual image processing
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectInActualProcessing, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.8f;
+    params.mixStrength = 0.5f;
+    params.progress = 0.7f;
+
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // Verify that shader effect is created successfully
+    auto blurShader = filter->GetBlurShaderEffect();
+    auto maskMixShader = filter->GetMaskMixShaderEffect();
+    EXPECT_NE(blurShader, nullptr);
+    EXPECT_NE(maskMixShader, nullptr);
+
+    // Verify that shader effect works correctly in actual image processing
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
 } // namespace Rosen
 } // namespace OHOS

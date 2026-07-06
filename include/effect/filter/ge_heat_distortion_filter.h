@@ -50,7 +50,7 @@ private:
     float riseWeight_ = 0.2f;
     float progress_ = 0.0f;
 
-    const float timeScale_ = 10.0f;
+    const float timeScale_ = 25.0f;
     const float intensityScale_ = 3.0f;
 
     inline static const std::string shaderStringHeatDistortion = R"(
@@ -65,7 +65,8 @@ private:
 
         half random(half2 st)
         {
-            return fract(sin(dot(st, half2(12.9898, 78.233))) * 43758.5453);
+            st = half2(0.3183099, 0.3678794) * st + half2(0.25, 0.5);
+            return fract(16.0 * fract(st.x * st.y * (st.x + st.y)));
         }
 
         half2 randomGrad(half2 p)
@@ -80,20 +81,10 @@ private:
             half2 f = fract(p);
             half2 u = f * f * (3.0 - 2.0 * f);
 
-            half2 grad00 = randomGrad(i);
-            half2 grad10 = randomGrad(i + half2(1.0, 0.0));
-            half2 grad01 = randomGrad(i + half2(0.0, 1.0));
-            half2 grad11 = randomGrad(i + half2(1.0, 1.0));
-
-            half2 d00 = f;
-            half2 d10 = f - half2(1.0, 0.0);
-            half2 d01 = f - half2(0.0, 1.0);
-            half2 d11 = f - half2(1.0, 1.0);
-
-            half dot00 = dot(grad00, d00);
-            half dot10 = dot(grad10, d10);
-            half dot01 = dot(grad01, d01);
-            half dot11 = dot(grad11, d11);
+            half dot00 = dot(randomGrad(i), f);
+            half dot10 = dot(randomGrad(i + half2(1.0, 0.0)), f - half2(1.0, 0.0));
+            half dot01 = dot(randomGrad(i + half2(0.0, 1.0)), f - half2(0.0, 1.0));
+            half dot11 = dot(randomGrad(i + half2(1.0, 1.0)), f - half2(1.0, 1.0));
 
             return mix(mix(dot00, dot10, u.x), mix(dot01, dot11, u.x), u.y) * 0.5 + 0.5;
         }
@@ -102,7 +93,7 @@ private:
         {
             half value = 0.0;
             half amp = 1.0;
-            const int turbulenceOctaves = 4;
+            const int turbulenceOctaves = 2;
             const half turbulenceGain = 0.5;
             const half turbulenceLacunarity = 2.0;
 
@@ -127,18 +118,25 @@ private:
             const half fixedRiseSpeed = 1.0;
             const half fixedNoiseSpeed = 0.4;
 
-            half turb = turbulence(uv * noiseScale * 2.0 + half2(time * fixedNoiseSpeed, 0.0), 1.0);
-            half rise = sin(uv.y * riseFrequency + time * fixedRiseSpeed) * riseAmplitude + riseOffset;
+            half2 scaledUV = uv * noiseScale;
+            half timeX = time * fixedNoiseSpeed;
 
+            half turb = turbulence(scaledUV * 2.0 + half2(timeX, 0.0), 1.0);
+
+            half risePhase = uv.y * riseFrequency + time * fixedRiseSpeed;
+            half rise = sin(risePhase) * riseAmplitude + riseOffset;
+
+            half baseNoise = perlinNoise(scaledUV * 3.0 + half2(timeX * 0.6, 0.0));
+            half verticalFactor = turb * (1.0 - riseWeight) + rise * riseWeight;
             half2 distortion = half2(
-                perlinNoise(uv * noiseScale * 3.0 + half2(time * fixedNoiseSpeed * 0.6, 0.0)) * baseDistortion.x -
-                    baseDistortion.x * 0.5,
-                (turb * (1.0 - riseWeight) + rise * riseWeight) * baseDistortion.y
+                (baseNoise - 0.5) * baseDistortion.x,
+                verticalFactor * baseDistortion.y
             );
 
+            half detailNoise = perlinNoise(scaledUV * 9.0 + half2(timeX * 1.8, timeX * 1.2));
             half2 detailDistort = half2(
-                perlinNoise(uv * noiseScale * 10.0 + half2(0.0, time * fixedNoiseSpeed * 2.4)) * detailDistortion.x,
-                perlinNoise(uv * noiseScale * 8.0 + half2(time * fixedNoiseSpeed * 1.8, 0.0)) * detailDistortion.y
+                detailNoise * detailDistortion.x,
+                detailNoise * detailDistortion.y
             );
             distortion += detailDistort;
 
