@@ -80,6 +80,13 @@ void ConvertPointsToFloats(const std::vector<Vector2f>& in, std::vector<float>& 
     }
 }
 
+Drawing::ImageInfo MakeOffscreenImageInfo(Drawing::Canvas& canvas, const Drawing::Rect& rect)
+{
+    auto* canvasSurface = canvas.GetSurface();
+    auto colorSpace = canvasSurface ? canvasSurface->GetImageInfo().GetColorSpace() : nullptr;
+    return {rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE, colorSpace};
+}
+
 using AddCurveSegment =
     std::function<void(std::vector<std::vector<Vector2f>>& result, std::vector<float>& numbers, Vector2f& currentPos)>;
 static std::unordered_map<char, AddCurveSegment> addCurveSegmentMap_ = {
@@ -679,7 +686,7 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         GE_LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas rect is nullptr.");
         return;
     }
-    Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    auto imageInfo = MakeOffscreenImageInfo(canvas, rect);
     offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), false, imageInfo);
     if (!offscreenSurface_) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenSurface is invalid");
@@ -1016,10 +1023,11 @@ std::shared_ptr<Image> GESDFPathShaderShape::DrawPathToImage(
         LOGE("GESDFPathShaderShape::DrawPathToImage error, width or height is invalid");
         return nullptr;
     }
-
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::DrawPathToImage");
+    auto canvasSurface = canvas.GetSurface();
+    auto colorSpace = canvasSurface ? canvasSurface->GetImageInfo().GetColorSpace() : nullptr;
     Drawing::ImageInfo imageInfo = Drawing::ImageInfo { width, height, Drawing::ColorType::COLORTYPE_RGBA_F16,
-        Drawing::AlphaType::ALPHATYPE_PREMUL };
+        Drawing::AlphaType::ALPHATYPE_PREMUL, colorSpace };
     std::shared_ptr<Drawing::Surface> surface =
         Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), false, imageInfo);
     if (!surface) {
