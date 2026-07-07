@@ -304,6 +304,8 @@ ohos_unittest("GraphicsEffectTest") {
     "graphic_2d:librender_service_base",
     "libxml2:libxml2",
     "openssl:libcrypto_shared",
+    "egl:libEGL",
+    "opengles:libGLES",
   ]
 
   defines = []

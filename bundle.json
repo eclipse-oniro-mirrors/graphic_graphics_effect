@@ -27,7 +27,9 @@
           "init",
           "openssl",
           "skia",
-          "libxml2"
+          "libxml2",
+          "egl",
+          "opengles"
         ]
       },
       "build": {
