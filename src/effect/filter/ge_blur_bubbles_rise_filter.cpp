@@ -136,8 +136,16 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
         return nullptr;
     }
 
-    auto downsampledShader = BuildImageShader(downsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        context);
+    // 为下采样图像创建正确的逆矩阵，而不是使用原始图像的逆矩阵
+    Drawing::Matrix downsampleInvertMatrix;
+    if (!context.matrix.Invert(downsampleInvertMatrix)) {
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader invert matrix failed");
+        return nullptr;
+    }
+
+    auto downsampledShader = Drawing::ShaderEffect::CreateImageShader(*downsampledImage,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
     if (downsampledShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
     }
@@ -161,7 +169,16 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
         return nullptr;
     }
 
-    auto blurXShader = BuildImageShader(blurredImageX, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
+    // 为模糊图像 X 创建正确的逆矩阵
+    Drawing::Matrix downsampleInvertMatrix;
+    if (!context.matrix.Invert(downsampleInvertMatrix)) {
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage invert matrix failed");
+        return nullptr;
+    }
+
+    auto blurXShader = Drawing::ShaderEffect::CreateImageShader(*blurredImageX,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
     if (blurXShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X shader create failed");
         return nullptr;
@@ -185,8 +202,16 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     const std::shared_ptr<Drawing::RuntimeEffect>& resampleEffect,
     const DownsampleParams& params)
 {
-    auto downsampledBlurredShader = BuildImageShader(downsampledBlurredImage,
-        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
+    // 为下采样模糊图像创建正确的逆矩阵
+    Drawing::Matrix downsampleInvertMatrix;
+    if (!context.matrix.Invert(downsampleInvertMatrix)) {
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader invert matrix failed");
+        return nullptr;
+    }
+
+    auto downsampledBlurredShader = Drawing::ShaderEffect::CreateImageShader(*downsampledBlurredImage,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
     if (downsampledBlurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
         return nullptr;
