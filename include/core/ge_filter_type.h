@@ -39,6 +39,7 @@ enum class GEFilterType : int32_t {
     GAMMA_CORRECTION,
     WATER_GLASS,
     REEDED_GLASS,
+    DEPTH_OCCLUSION,
     // Mask
     RIPPLE_MASK,
     DOUBLE_RIPPLE_MASK,

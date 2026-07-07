@@ -23,6 +23,7 @@
 #include "effect/filter/ge_blur_shader_filter.h"
 #include "effect/filter/ge_color_gradient_shader_filter.h"
 #include "effect/filter/ge_content_light_shader_filter.h"
+#include "effect/filter/ge_depth_occlusion_shader_filter.h"
 #include "effect/filter/ge_direction_light_shader_filter.h"
 #include "effect/filter/ge_dispersion_shader_filter.h"
 #include "effect/filter/ge_displacement_distort_shader_filter.h"
@@ -101,6 +102,7 @@ GE_FACTORY_REGISTER(GEBlurBubblesRiseFilter)
 GE_FACTORY_REGISTER(GEBlurShaderFilter)
 GE_FACTORY_REGISTER(GEColorGradientShaderFilter)
 GE_FACTORY_REGISTER(GEContentLightFilter)
+GE_FACTORY_REGISTER(GEDepthOcclusionShaderFilter)
 GE_FACTORY_REGISTER(GEDirectionLightShaderFilter)
 GE_FACTORY_REGISTER(GEDisplacementDistortFilter)
 GE_FACTORY_REGISTER(GEDistortionCollapseFilter)
