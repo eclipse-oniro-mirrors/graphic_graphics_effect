@@ -194,6 +194,8 @@ class CppParser:
     def _consume(self) -> Token:
         """Consume and return current token."""
         token = self._peek()
+        if token is None:
+            return None
         self.pos += 1
         return token
 
