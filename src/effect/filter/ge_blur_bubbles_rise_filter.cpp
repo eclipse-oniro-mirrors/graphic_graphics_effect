@@ -121,31 +121,36 @@ DownsampleParams BuildDownsampleParams(const BlurBubblesRiseProcessContext& cont
 
 std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& canvas,
     const BlurBubblesRiseProcessContext& context,
-    const std::shared_ptr<Drawing::ShaderEffect>& sourceShader,
+    const std::shared_ptr<Drawing::Image>& sourceImage,
     const std::shared_ptr<Drawing::RuntimeEffect>& resampleEffect,
     const DownsampleParams& params)
 {
+    // 为下采样创建正确的sourceShader，使用单位矩阵而不是context.invertMatrix
+    Drawing::Matrix unitMatrix;
+    auto sourceShader = Drawing::ShaderEffect::CreateImageShader(*sourceImage,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
+    if (sourceShader == nullptr) {
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader source shader create failed");
+        return nullptr;
+    }
+
     Drawing::RuntimeShaderBuilder downsampleBuilder(resampleEffect);
     downsampleBuilder.SetChild("image", sourceShader);
     downsampleBuilder.SetUniform("srcResolution", context.width, context.height);
     downsampleBuilder.SetUniform("dstResolution", params.widthF, params.heightF);
 
-    auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, context.matrix, params.imageInfo);
+    // 使用单位矩阵而不是context.matrix，确保fragCoord是像素坐标
+    auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, unitMatrix, params.imageInfo);
     if (downsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample image build failed");
         return nullptr;
     }
 
-    // 为下采样图像创建正确的逆矩阵，而不是使用原始图像的逆矩阵
-    Drawing::Matrix downsampleInvertMatrix;
-    if (!context.matrix.Invert(downsampleInvertMatrix)) {
-        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader invert matrix failed");
-        return nullptr;
-    }
-
+    // 为下采样图像创建正确的shader，使用单位矩阵
     auto downsampledShader = Drawing::ShaderEffect::CreateImageShader(*downsampledImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
     if (downsampledShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
     }
@@ -158,27 +163,22 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     const std::shared_ptr<Drawing::RuntimeEffect>& blurEffect,
     const DownsampleParams& params)
 {
+    Drawing::Matrix unitMatrix;
     Drawing::RuntimeShaderBuilder blurBuilderX(blurEffect);
     blurBuilderX.SetChild("image", downsampledShader);
     blurBuilderX.SetUniform("iResolution", params.widthF, params.heightF);
     blurBuilderX.SetUniform("blurIntensity", params.blurIntensity * BLUR_INTENSITY_SCALE_FACTOR);
     blurBuilderX.SetUniform("horizontal", 1.0f);
-    auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, context.matrix, params.imageInfo);
+    auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, unitMatrix, params.imageInfo);
     if (blurredImageX == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X image build failed");
         return nullptr;
     }
 
-    // 为模糊图像 X 创建正确的逆矩阵
-    Drawing::Matrix downsampleInvertMatrix;
-    if (!context.matrix.Invert(downsampleInvertMatrix)) {
-        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage invert matrix failed");
-        return nullptr;
-    }
-
+    // 为模糊图像 X 创建shader，使用单位矩阵
     auto blurXShader = Drawing::ShaderEffect::CreateImageShader(*blurredImageX,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
     if (blurXShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X shader create failed");
         return nullptr;
@@ -189,7 +189,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderY.SetUniform("iResolution", params.widthF, params.heightF);
     blurBuilderY.SetUniform("blurIntensity", params.blurIntensity * BLUR_INTENSITY_SCALE_FACTOR);
     blurBuilderY.SetUniform("horizontal", 0.0f);
-    auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, context.matrix, params.imageInfo);
+    auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, unitMatrix, params.imageInfo);
     if (blurredImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur Y image build failed");
     }
@@ -202,16 +202,11 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     const std::shared_ptr<Drawing::RuntimeEffect>& resampleEffect,
     const DownsampleParams& params)
 {
-    // 为下采样模糊图像创建正确的逆矩阵
-    Drawing::Matrix downsampleInvertMatrix;
-    if (!context.matrix.Invert(downsampleInvertMatrix)) {
-        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader invert matrix failed");
-        return nullptr;
-    }
-
+    Drawing::Matrix unitMatrix;
+    // 为下采样模糊图像创建shader，使用单位矩阵
     auto downsampledBlurredShader = Drawing::ShaderEffect::CreateImageShader(*downsampledBlurredImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), downsampleInvertMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
     if (downsampledBlurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
         return nullptr;
@@ -221,14 +216,17 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     upsampleBuilder.SetChild("image", downsampledBlurredShader);
     upsampleBuilder.SetUniform("srcResolution", params.widthF, params.heightF);
     upsampleBuilder.SetUniform("dstResolution", context.width, context.height);
-    auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, context.matrix, context.imageInfo);
+    // 使用单位矩阵确保上采样时坐标正确
+    auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, unitMatrix, context.imageInfo);
     if (upsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader upsample image build failed");
         return nullptr;
     }
 
-    auto blurredShader = BuildImageShader(upsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        context);
+    // 为最终的上采样图像创建shader，使用context.invertMatrix以匹配原始图像空间
+    auto blurredShader = Drawing::ShaderEffect::CreateImageShader(*upsampledImage,
+        Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), context.invertMatrix);
     if (blurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader blurred shader create failed");
     }
@@ -237,7 +235,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
 
 std::shared_ptr<Drawing::ShaderEffect> BuildBlurredShader(Drawing::Canvas& canvas,
     const BlurBubblesRiseProcessContext& context,
-    const std::shared_ptr<Drawing::ShaderEffect>& sourceShader,
+    const std::shared_ptr<Drawing::Image>& sourceImage,
     const std::shared_ptr<Drawing::RuntimeEffect>& blurEffect, float blurIntensity)
 {
     auto resampleEffect = GetResampleShaderEffect();
@@ -246,7 +244,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildBlurredShader(Drawing::Canvas& canva
         return nullptr;
     }
     auto params = BuildDownsampleParams(context, blurIntensity);
-    auto downsampledShader = BuildDownsampledShader(canvas, context, sourceShader, resampleEffect, params);
+    auto downsampledShader = BuildDownsampledShader(canvas, context, sourceImage, resampleEffect, params);
     if (downsampledShader == nullptr) {
         return nullptr;
     }
@@ -294,7 +292,7 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
 
     CheckBlurBubblesRiseParams();
 
-    auto blurredShader = BuildBlurredShader(canvas, context, sourceShader, blurEffect, blurIntensity_);
+    auto blurredShader = BuildBlurredShader(canvas, context, image, blurEffect, blurIntensity_);
     if (blurredShader == nullptr) {
         return image;
     }
