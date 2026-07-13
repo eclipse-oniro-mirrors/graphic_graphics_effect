@@ -267,7 +267,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithMinimalResolution, TestS
 {
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(2, 2, format);  // 最小分辨率，下采样到1x1
+    bmp.Build(2, 2, format);  // Minimum resolution, downsample to 1x1
     bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
     auto image = bmp.MakeImage();
 
@@ -287,7 +287,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithSmallResolution, TestSiz
 {
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(4, 4, format);  // 小分辨率，下采样到2x2
+    bmp.Build(4, 4, format);  // Small resolution, downsample to 2x2
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto image = bmp.MakeImage();
 
@@ -307,7 +307,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithOddResolution, TestSize.
 {
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(51, 51, format);  // 奇数分辨率，下采样到25.5 -> 25
+    bmp.Build(51, 51, format);  // Odd resolution, downsample to 25.5 -> 25
     bmp.ClearWithColor(Drawing::Color::COLOR_GREEN);
     auto image = bmp.MakeImage();
 
@@ -327,7 +327,7 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithRectangularResolution, T
 {
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(100, 50, format);  // 矩形分辨率，下采样到50x25
+    bmp.Build(100, 50, format);  // Rectangular resolution, downsample to 50x25
     bmp.ClearWithColor(Drawing::Color::COLOR_YELLOW);
     auto image = bmp.MakeImage();
 
@@ -352,11 +352,11 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, DownsamplePipelineMatrixConsistency, TestS
 
     auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
 
-    // 验证正常图像处理流程
+    // Verify normal image processing workflow
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 
-    // 验证结果图像信息与输入图像一致
+    // Verify result image info is consistent with input image
     if (result != nullptr) {
         auto resultInfo = result->GetImageInfo();
         auto originalInfo = image_->GetImageInfo();

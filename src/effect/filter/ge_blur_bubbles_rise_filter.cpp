@@ -130,7 +130,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
         return nullptr;
     }
 
-    // 为下采样创建正确的sourceShader，使用单位矩阵而不是context.invertMatrix
+    // Create correct sourceShader for downsampling using unit matrix instead of context.invertMatrix
     Drawing::Matrix unitMatrix;
     auto sourceShader = Drawing::ShaderEffect::CreateImageShader(*sourceImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
@@ -145,14 +145,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     downsampleBuilder.SetUniform("srcResolution", context.width, context.height);
     downsampleBuilder.SetUniform("dstResolution", params.widthF, params.heightF);
 
-    // 使用单位矩阵而不是context.matrix，确保fragCoord是像素坐标
+    // Use unit matrix instead of context.matrix to ensure fragCoord is pixel coordinate
     auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, unitMatrix, params.imageInfo);
     if (downsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample image build failed");
         return nullptr;
     }
 
-    // 为下采样图像创建正确的shader，使用单位矩阵
+    // Create correct shader for downsampled image using unit matrix
     auto downsampledShader = Drawing::ShaderEffect::CreateImageShader(*downsampledImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
@@ -181,7 +181,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
         return nullptr;
     }
 
-    // 为模糊图像 X 创建shader，使用单位矩阵
+    // Create shader for blurred image X using unit matrix
     auto blurXShader = Drawing::ShaderEffect::CreateImageShader(*blurredImageX,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
@@ -215,7 +215,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     }
 
     Drawing::Matrix unitMatrix;
-    // 为下采样模糊图像创建shader，使用单位矩阵
+    // Create shader for downsampled blurred image using unit matrix
     auto downsampledBlurredShader = Drawing::ShaderEffect::CreateImageShader(*downsampledBlurredImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
@@ -228,14 +228,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     upsampleBuilder.SetChild("image", downsampledBlurredShader);
     upsampleBuilder.SetUniform("srcResolution", params.widthF, params.heightF);
     upsampleBuilder.SetUniform("dstResolution", context.width, context.height);
-    // 使用单位矩阵确保上采样时坐标正确
+    // Use unit matrix to ensure coordinates are correct during upsampling
     auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, unitMatrix, context.imageInfo);
     if (upsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader upsample image build failed");
         return nullptr;
     }
 
-    // 为最终的上采样图像创建shader，使用context.invertMatrix以匹配原始图像空间
+    // Create shader for final upsampled image using context.invertMatrix to match original image space
     auto blurredShader = Drawing::ShaderEffect::CreateImageShader(*upsampledImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), context.invertMatrix);
