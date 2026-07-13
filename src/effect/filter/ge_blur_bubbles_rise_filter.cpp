@@ -125,6 +125,11 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     const std::shared_ptr<Drawing::RuntimeEffect>& resampleEffect,
     const DownsampleParams& params)
 {
+    if (sourceImage == nullptr) {
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader source image is null");
+        return nullptr;
+    }
+
     // 为下采样创建正确的sourceShader，使用单位矩阵而不是context.invertMatrix
     Drawing::Matrix unitMatrix;
     auto sourceShader = Drawing::ShaderEffect::CreateImageShader(*sourceImage,
@@ -153,6 +158,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
     if (downsampledShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
+        return nullptr;
     }
     return downsampledShader;
 }
@@ -192,6 +198,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, unitMatrix, params.imageInfo);
     if (blurredImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur Y image build failed");
+        return nullptr;
     }
     return blurredImage;
 }
@@ -202,6 +209,11 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     const std::shared_ptr<Drawing::RuntimeEffect>& resampleEffect,
     const DownsampleParams& params)
 {
+    if (downsampledBlurredImage == nullptr) {
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsampledBlurredImage is null");
+        return nullptr;
+    }
+
     Drawing::Matrix unitMatrix;
     // 为下采样模糊图像创建shader，使用单位矩阵
     auto downsampledBlurredShader = Drawing::ShaderEffect::CreateImageShader(*downsampledBlurredImage,
@@ -229,6 +241,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), context.invertMatrix);
     if (blurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader blurred shader create failed");
+        return nullptr;
     }
     return blurredShader;
 }
