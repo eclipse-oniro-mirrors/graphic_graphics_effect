@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <stack>
 #include <string>
@@ -490,6 +491,22 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalShaderEffect
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_sdfPropEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_clearInfEffect = nullptr;
 
+static std::optional<double> convertStringToDouble(const std::string& str)
+{
+    char* end = nullptr;
+    errno = 0;
+    double val = strtod(str.c_str(), &end);
+    if (end == str) {
+        LOGE("Conversion failed: No valid number.");
+        return std::nullopt;
+    }
+    if (errno == ERANGE) {
+        LOGE("Conversion overflow or underflow.");
+        return std::nullopt;
+    }
+    return val;
+}
+
 static std::vector<float> parseNumbers(const std::string& s, size_t& i)
 {
     std::vector<float> result;
@@ -524,7 +541,11 @@ static std::vector<float> parseNumbers(const std::string& s, size_t& i)
         }
 
         // converting numbers
-        double val = std::stod(s.substr(start, i - start));
+        auto optVal = convertStringToDouble(s.substr(start, i - start));
+        if (!optVal.has_value()) {
+            break;
+        }
+        double val = optVal.value();
         result.push_back(static_cast<float>(val));
     }
     return result;
@@ -609,6 +630,11 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
 
     if (numPasses_ <= 0) {
         return sdfTex;
+    }
+
+    if (!sdfTex) {
+        LOGE("GESDFPathShaderShape::RunSDFPropagation sdfTex is null");
+        return nullptr;
     }
 
     auto gpuContext = canvas.GetGPUContext();

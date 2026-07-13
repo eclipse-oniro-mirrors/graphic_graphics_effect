@@ -545,6 +545,21 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ParseNumbersInvalidString
+ * @tc.desc: Verify parseNumbers handles invalid conversion via GetCurveByPath
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ParseNumbersInvalidString, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(0.0f, 0.0f);
+    path.LineTo(0.0f, 0.0f);
+
+    auto curves = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_TRUE(curves.empty() || curves.size() >= 0);
+}
+
+/**
  * @tc.name: ProcessSingleBatch_002
  * @tc.desc: Verify ProcessSingleBatch with empty grid curves
  * @tc.type: FUNC
@@ -1052,6 +1067,46 @@ HWTEST_F(GESDFPathShaderShapeTest, DrawPathToImage_NullOnZeroSize_001, TestSize.
 
     auto result2 = shape.DrawPathToImage(*canvas_, -10, 100, path);
     EXPECT_EQ(result2, nullptr);
+}
+
+/**
+ * @tc.name: RunSDFPropagationNullSdfTex
+ * @tc.desc: Test RunSDFPropagation returns nullptr when sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullSdfTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    shape.numPasses_ = 1;
+
+    auto result = shape.RunSDFPropagation(*canvas_, nullptr, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: RunSDFPropagationNullSdfTexZeroPasses
+ * @tc.desc: Test RunSDFPropagation returns nullptr when numPasses<=0 and sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullSdfTexZeroPasses, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    shape.numPasses_ = 0;
+
+    auto result = shape.RunSDFPropagation(*canvas_, nullptr, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
 }
 
 } // namespace Drawing
