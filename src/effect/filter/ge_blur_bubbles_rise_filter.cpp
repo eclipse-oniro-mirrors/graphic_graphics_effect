@@ -145,6 +145,12 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     downsampleBuilder.SetUniform("srcResolution", context.width, context.height);
     downsampleBuilder.SetUniform("dstResolution", params.widthF, params.heightF);
 
+    // Validate params.imageInfo before using it
+    if (params.imageInfo.GetWidth() < 1e-6 || params.imageInfo.GetHeight() < 1e-6) {
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader params.imageInfo is invalid");
+        return nullptr;
+    }
+
     // Use unit matrix instead of context.matrix to ensure fragCoord is pixel coordinate
     auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, unitMatrix, params.imageInfo);
     if (downsampledImage == nullptr) {
@@ -169,6 +175,12 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     const std::shared_ptr<Drawing::RuntimeEffect>& blurEffect,
     const DownsampleParams& params)
 {
+    // Validate params.imageInfo before using it
+    if (params.imageInfo.GetWidth() < 1e-6 || params.imageInfo.GetHeight() < 1e-6) {
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage params.imageInfo is invalid");
+        return nullptr;
+    }
+
     Drawing::Matrix unitMatrix;
     Drawing::RuntimeShaderBuilder blurBuilderX(blurEffect);
     blurBuilderX.SetChild("image", downsampledShader);
@@ -221,6 +233,12 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
     if (downsampledBlurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
+        return nullptr;
+    }
+
+    // Validate context.imageInfo before using it
+    if (context.imageInfo.GetWidth() < 1e-6 || context.imageInfo.GetHeight() < 1e-6) {
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader context.imageInfo is invalid");
         return nullptr;
     }
 
@@ -322,7 +340,7 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
         return image;
     }
     auto maskImageInfo = maskImage->GetImageInfo();
-    if (maskImageInfo.GetWidth() == 0 || maskImageInfo.GetHeight() == 0) {
+    if (maskImageInfo.GetWidth() < 1e-6 || maskImageInfo.GetHeight() < 1e-6) {
         LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image info invalid");
         return image;
     }
@@ -338,6 +356,12 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
     mixBuilder.SetUniform("maskResolution", maskResolutionX, maskResolutionY);
     mixBuilder.SetUniform("mixStrength", mixStrength_);
     mixBuilder.SetUniform("progress", progress_ * timeScale_);
+
+    // Validate context.imageInfo before using it in final output
+    if (context.imageInfo.GetWidth() < 1e-6 || context.imageInfo.GetHeight() < 1e-6) {
+        LOGE("GEBlurBubblesRiseFilter::OnProcessImage context.imageInfo is invalid");
+        return image;
+    }
 
     auto outputImage = MakeRuntimeImage(mixBuilder, canvas, context.matrix, context.imageInfo);
     if (outputImage == nullptr) {
