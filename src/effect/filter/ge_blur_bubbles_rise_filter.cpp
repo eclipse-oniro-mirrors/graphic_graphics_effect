@@ -25,6 +25,11 @@ namespace Rosen {
 
 namespace {
 constexpr float BLUR_INTENSITY_SCALE_FACTOR = 10.0f;
+
+// Unit matrix constant for internal image processing pipeline
+// Used to ensure coordinate consistency during downsampling/upsampling operations
+const Drawing::Matrix UNIT_MATRIX = Drawing::Matrix(); // Default constructor creates identity matrix
+
 struct BlurBubblesRiseProcessContext {
     Drawing::Matrix matrix;
     Drawing::Matrix invertMatrix;
@@ -131,10 +136,9 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     }
 
     // Create correct sourceShader for downsampling using unit matrix instead of context.invertMatrix
-    Drawing::Matrix unitMatrix;
     auto sourceShader = Drawing::ShaderEffect::CreateImageShader(*sourceImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), UNIT_MATRIX);
     if (sourceShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader source shader create failed");
         return nullptr;
@@ -152,7 +156,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     }
 
     // Use unit matrix instead of context.matrix to ensure fragCoord is pixel coordinate
-    auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, unitMatrix, params.imageInfo);
+    auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, UNIT_MATRIX, params.imageInfo);
     if (downsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample image build failed");
         return nullptr;
@@ -161,7 +165,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
     // Create correct shader for downsampled image using unit matrix
     auto downsampledShader = Drawing::ShaderEffect::CreateImageShader(*downsampledImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), UNIT_MATRIX);
     if (downsampledShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
         return nullptr;
@@ -181,13 +185,12 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
         return nullptr;
     }
 
-    Drawing::Matrix unitMatrix;
     Drawing::RuntimeShaderBuilder blurBuilderX(blurEffect);
     blurBuilderX.SetChild("image", downsampledShader);
     blurBuilderX.SetUniform("iResolution", params.widthF, params.heightF);
     blurBuilderX.SetUniform("blurIntensity", params.blurIntensity * BLUR_INTENSITY_SCALE_FACTOR);
     blurBuilderX.SetUniform("horizontal", 1.0f);
-    auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, unitMatrix, params.imageInfo);
+    auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, UNIT_MATRIX, params.imageInfo);
     if (blurredImageX == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X image build failed");
         return nullptr;
@@ -196,7 +199,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     // Create shader for blurred image X using unit matrix
     auto blurXShader = Drawing::ShaderEffect::CreateImageShader(*blurredImageX,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), UNIT_MATRIX);
     if (blurXShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X shader create failed");
         return nullptr;
@@ -207,7 +210,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderY.SetUniform("iResolution", params.widthF, params.heightF);
     blurBuilderY.SetUniform("blurIntensity", params.blurIntensity * BLUR_INTENSITY_SCALE_FACTOR);
     blurBuilderY.SetUniform("horizontal", 0.0f);
-    auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, unitMatrix, params.imageInfo);
+    auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, UNIT_MATRIX, params.imageInfo);
     if (blurredImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur Y image build failed");
         return nullptr;
@@ -226,11 +229,10 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
         return nullptr;
     }
 
-    Drawing::Matrix unitMatrix;
     // Create shader for downsampled blurred image using unit matrix
     auto downsampledBlurredShader = Drawing::ShaderEffect::CreateImageShader(*downsampledBlurredImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), unitMatrix);
+        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), UNIT_MATRIX);
     if (downsampledBlurredShader == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
         return nullptr;
@@ -247,7 +249,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     upsampleBuilder.SetUniform("srcResolution", params.widthF, params.heightF);
     upsampleBuilder.SetUniform("dstResolution", context.width, context.height);
     // Use unit matrix to ensure coordinates are correct during upsampling
-    auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, unitMatrix, context.imageInfo);
+    auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, UNIT_MATRIX, context.imageInfo);
     if (upsampledImage == nullptr) {
         LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader upsample image build failed");
         return nullptr;
