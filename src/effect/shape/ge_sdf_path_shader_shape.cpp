@@ -47,6 +47,8 @@ constexpr float MIN_SCALE_CLAMP = 0.001f;
 constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate conversion
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
 constexpr float MIDPOINT_FACTOR = 0.5f;     // factor for calculating midpoint
+constexpr float MAX_ASPECT = 3.0f;          // Large aspect ratio difference
+constexpr float ALIGN_STEP = 8.0f;          // ceil the width and height of the downsampled components
 
 bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
@@ -916,6 +918,13 @@ Drawing::Path GESDFPathShaderShape::PreparePathForRendering(const Drawing::Rect&
     UpdateScale(params_.scale, rect);
     width = rect.GetWidth() * params_.scale.x_;
     height = rect.GetHeight() * params_.scale.y_;
+    // Add width and height alignment operations to avoid jitter caused by partition calculations
+    if (height > width * MAX_ASPECT && rect.GetWidth() > 0.0f && rect.GetHeight() > 0.0f) {
+        width = std::ceil(width / ALIGN_STEP) * ALIGN_STEP;
+        height = std::ceil(height / ALIGN_STEP) * ALIGN_STEP;
+        params_.scale.x_ = width / rect.GetWidth();
+        params_.scale.y_ = height / rect.GetHeight();
+    }
 
     Drawing::Matrix matrix;
     matrix.SetScale(params_.scale.x_, params_.scale.y_);
@@ -1115,8 +1124,14 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
         width = originalW * scaleX;
         height = originalH * scaleY;
     }
-    if (height > (width * 3.0f)) { // 3.0f: Large aspect ratio difference
-        scaleY *= (width * 3.0f) / height; // 3.0f: Reduce aspect ratio differences
+    // Switch to isotropic downsampling when aspect ratio exceeds limit to prevent abnormal sdf scaling.
+    constexpr float MIN_SCALE_FLOOR = 0.4f; // 0.4f: Maximum downsampling level
+    if (height > width * MAX_ASPECT) {
+        // The calculated target scale is always smaller than the original scale within this branch
+        float targetScale = scaleY * (width * MAX_ASPECT) / height;
+        targetScale = std::max(targetScale, MIN_SCALE_FLOOR);
+        scaleX = targetScale;
+        scaleY = targetScale;
     }
 
     scaleX = std::max(scaleX, MIN_SCALE_CLAMP);

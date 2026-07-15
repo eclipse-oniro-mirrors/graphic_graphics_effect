@@ -758,6 +758,57 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleClampMinScale_001, TestSize.Level1
 }
 
 /**
+ * @tc.name: UpdateScaleExtremeAspect_001
+ * @tc.desc: Verify scale clamped to 0.4 floor when aspect ratio is extremely large
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleExtremeAspect_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(50.0f, 100.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Vector2f scale(1.0f, 1.0f);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 1200.0f); // 12:1 aspect ratio
+
+    shape.UpdateScale(scale, rect);
+    EXPECT_FLOAT_EQ(scale.x_, scale.y_);
+    EXPECT_FLOAT_EQ(scale.x_, 0.4f);
+}
+
+/**
+ * @tc.name: PreparePathAlignAndAspectFloor_001
+ * @tc.desc: Verify 8px alignment logic and above-floor aspect scaling when aspect ratio is moderately above 3:1
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, PreparePathAlignAndAspectFloor_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+    param.scale = Vector2f(0.8f, 0.8f);
+
+    GESDFPathShaderShape shape(param);
+    // 200x700 = 3.5:1 aspect, triggers both aspect scaling and 8px alignment
+    Drawing::Rect rect(0.0f, 0.0f, 200.0f, 700.0f);
+
+    shape.Preprocess(*canvas_, rect, false);
+    EXPECT_GT(shape.params_.scale.x_, 0.4f);
+    EXPECT_NEAR(shape.params_.scale.x_, 0.72f, 0.001f);
+
+    float scaledW = shape.params_.scale.x_ * rect.GetWidth();
+    float scaledH = shape.params_.scale.y_ * rect.GetHeight();
+    EXPECT_EQ(static_cast<int>(std::round(scaledW)) % 8, 0);
+    EXPECT_EQ(static_cast<int>(std::round(scaledH)) % 8, 0);
+    EXPECT_NEAR(scaledW, 144.0f, 0.01f);
+}
+
+/**
  * @tc.name: ClearTemp_001
  * @tc.desc: Verify ClearTemp clears internal temporary state after Preprocess
  * @tc.type: FUNC
