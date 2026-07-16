@@ -258,5 +258,112 @@ HWTEST_F(GEBlurBubblesRiseFilterTest, ShaderEffectInActualProcessing, TestSize.L
     EXPECT_NE(result, nullptr);
 }
 
+/**
+ * @tc.name: OnProcessImageWithMinimalResolution
+ * @tc.desc: Verify behavior with minimal image resolution for downsample pipeline
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithMinimalResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(2, 2, format);  // Minimum resolution, downsample to 1x1
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.5f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithSmallResolution
+ * @tc.desc: Verify behavior with small image resolution for downsample pipeline
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithSmallResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(4, 4, format);  // Small resolution, downsample to 2x2
+    bmp.ClearWithColor(Drawing::Color::COLOR_RED);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.6f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithOddResolution
+ * @tc.desc: Verify behavior with odd resolution for downsample pipeline
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithOddResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(51, 51, format);  // Odd resolution, downsample to 25.5 -> 25
+    bmp.ClearWithColor(Drawing::Color::COLOR_GREEN);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.4f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithRectangularResolution
+ * @tc.desc: Verify behavior with rectangular (non-square) resolution
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, OnProcessImageWithRectangularResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(100, 50, format);  // Rectangular resolution, downsample to 50x25
+    bmp.ClearWithColor(Drawing::Color::COLOR_YELLOW);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.3f;
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: DownsamplePipelineMatrixConsistency
+ * @tc.desc: Verify matrix transformation consistency in downsample/upsample pipeline
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurBubblesRiseFilterTest, DownsamplePipelineMatrixConsistency, TestSize.Level1)
+{
+    Drawing::GEBlurBubblesRiseFilterParams params;
+    params.blurIntensity = 0.7f;
+    params.mixStrength = 0.6f;
+    params.progress = 0.5f;
+
+    auto filter = std::make_unique<GEBlurBubblesRiseFilter>(params);
+
+    // Verify normal image processing workflow
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+
+    // Verify result image info is consistent with input image
+    if (result != nullptr) {
+        auto resultInfo = result->GetImageInfo();
+        auto originalInfo = image_->GetImageInfo();
+        EXPECT_EQ(resultInfo.GetWidth(), originalInfo.GetWidth());
+        EXPECT_EQ(resultInfo.GetHeight(), originalInfo.GetHeight());
+    }
+}
+
 } // namespace Rosen
 } // namespace OHOS
