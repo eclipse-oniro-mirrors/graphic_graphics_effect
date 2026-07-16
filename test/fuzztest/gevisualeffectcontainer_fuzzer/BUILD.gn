@@ -47,6 +47,7 @@ ohos_fuzztest("GEVisualEffectContainerFuzzTest") {
   external_deps = [
     "bounds_checking_function:libsec_shared",
     "graphic_2d:2d_graphics",
+    "hilog:libhilog",
   ]
 
   part_name = "graphics_effect"
