@@ -20,7 +20,6 @@
 #include "draw/color.h"
 #include "ge_common.h"
 #include "ge_shader_filter_params.h"
-#include "parcel.h"
 #include "utils/point.h"
 #include "utils/rect.h"
 
@@ -30,9 +29,6 @@ namespace Rosen {
 struct RotateEffectParams {
     Drawing::DotMatrixDirection pathDirection_ = Drawing::DotMatrixDirection::TOP_LEFT;
     std::vector<Drawing::Color> effectColors_;
-
-    bool Marshalling(Parcel& parcel);
-    bool Unmarshalling(Parcel& parcel);
 };
 
 struct RippleEffectParams {
@@ -41,9 +37,6 @@ struct RippleEffectParams {
     std::vector<Drawing::Point> startPoints_;
     float pathWidth_ = 0.;
     bool inverseEffect_ = false;
-
-    bool Marshalling(Parcel& parcel);
-    bool Unmarshalling(Parcel& parcel);
 };
 
 struct DotMatrixNormalParams {
@@ -51,9 +44,6 @@ struct DotMatrixNormalParams {
     float dotSpacing_ = 0.f;
     float dotRadius_ = 0.f;
     Drawing::Color bgColor_;
-
-    bool Marshalling(Parcel& parcel);
-    bool Unmarshalling(Parcel& parcel);
 };
 
 struct GE_EXPORT DotMatrixShaderParams {
@@ -61,9 +51,6 @@ struct GE_EXPORT DotMatrixShaderParams {
     DotMatrixNormalParams normalParams_;
     RotateEffectParams rotateEffectParams_;
     RippleEffectParams rippleEffectParams_;
-
-    bool Marshalling(Parcel& parcel);
-    bool Unmarshalling(Parcel& parcel);
 };
 
 } // namespace Rosen
