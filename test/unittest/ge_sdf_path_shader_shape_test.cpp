@@ -299,10 +299,10 @@ HWTEST_F(GESDFPathShaderShapeTest, PreprocessValidParamstest_001, TestSize.Level
 
         GESDFPathShaderShape shape(param);
         shape.Preprocess(*canvas_, config.rect, false);
-        EXPECT_EQ(shape.disResult_, nullptr);
+        EXPECT_NE(shape.disResult_, nullptr);
 
         auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
-        EXPECT_EQ(shader, nullptr);
+        EXPECT_NE(shader, nullptr);
     }
 }
 
@@ -433,7 +433,7 @@ HWTEST_F(GESDFPathShaderShapeTest, Preprocess_002, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, true);
-    EXPECT_EQ(shape.disResult_, nullptr);
+    EXPECT_NE(shape.disResult_, nullptr);
 }
 
 /**
@@ -488,7 +488,7 @@ HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartition_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
 }
 
 /**
@@ -511,7 +511,7 @@ HWTEST_F(GESDFPathShaderShapeTest, SplitGrid_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 300.0f, 300.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_NE(shape.numCurves_, 20);
+    EXPECT_EQ(shape.numCurves_, 20);
 }
 
 /**
@@ -786,7 +786,7 @@ HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartitionAsymmetric_001, TestSize.Lev
     Drawing::Rect rect(0.0f, 0.0f, 120.0f, 400.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
 }
 
 /**
@@ -809,7 +809,7 @@ HWTEST_F(GESDFPathShaderShapeTest, SplitGridNarrowWidth_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 500.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
 }
 
 /**
