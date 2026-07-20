@@ -1952,8 +1952,7 @@ GE_PARAMS_FIELD_ACCESSOR(GEFrostedGlassEffectParams, darkModeEdLightAngles,
     FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES, FrostedGlassEffect_DarkModeEdLightAngles);
 GE_PARAMS_FIELD_ACCESSOR(
     GEFrostedGlassEffectParams, darkScale, FROSTED_GLASS_EFFECT_DARK_SCALE, FrostedGlassEffect_DarkScale);
-GE_PARAMS_FIELD_ACCESSOR(
-    GEFrostedGlassEffectParams, enableSDFCache, FROSTED_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
+GE_PARAMS_FIELD_ACCESSOR(GEFrostedGlassEffectParams, enableSDFCache, FROSTED_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
     FrostedGlassEffect_EnableSDFCache);
 GE_PARAMS_FIELD_ACCESSOR(
     GEFrostedGlassShaderFilterParams, blurParams, FROSTED_GLASS_BLUR_PARAMS, FrostedGlass_BlurParams);

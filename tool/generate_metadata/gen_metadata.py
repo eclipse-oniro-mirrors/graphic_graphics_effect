@@ -645,7 +645,7 @@ def generate_set_params_member_overloads_impl(structs: List[StructInfo], type_al
             output.append(f"        GE_VALIDATE_AND_SET({tag_name})")
 
         output.append("        default:")
-        output.append(f'            GE_LOGE("SetParamsMemberByTag<{field_type}>: No matching case for tag %u (filter type %u, params type %u)",')
+        output.append(f'            GE_LOGE("SetParamsMemberByTag<{field_type}>: No matching case for tag %{{public}}u (filter type %{{public}}u, params type %{{public}}u)",')
         output.append("                static_cast<uint32_t>(tag),")
         output.append("                static_cast<uint32_t>(expectedFilterType),")
         output.append("                static_cast<uint32_t>(params.GetType()));")
@@ -1098,12 +1098,16 @@ def generate_convert_constraint(tag: str, cast_from: str, custom: Optional[str])
         return f"GE_PARAMS_CONSTRAINT_CONVERT_CAST_FROM({tag}, ESCAPE({cast_from}));"
 
 
-def generate_constraint_metadata(field_info: FieldInfo, tag: str, prop_attr_index: int = 0) -> str:
+def generate_constraint_metadata(
+    field_info: FieldInfo, tag: str, prop_attr_index: int = 0, type_aliases: Optional[Dict[str, str]] = None
+) -> str:
     """Generate constraint metadata for a field with prop attributes."""
     if not field_info.prop_attributes:
         return ""
 
-    field_type = field_info.type
+    if type_aliases is None:
+        type_aliases = {}
+    field_type = normalize_type(field_info.type, type_aliases)
     output = []
 
     # Use the specified prop attribute for constraint metadata
@@ -1415,7 +1419,7 @@ CONSTRAINT_MACRO_UNDEF = r'''
 '''
 
 
-def generate_constraints(structs: List[StructInfo]):
+def generate_constraints(structs: List[StructInfo], type_aliases: Optional[Dict[str, str]] = None) -> str:
     """Generate constraint macros and metadata"""
     output = []
     # Generate constraint specialization macros
@@ -1425,7 +1429,7 @@ def generate_constraints(structs: List[StructInfo]):
     for struct in structs:
         for field in struct.fields:
             for tag_info in iterate_field_tags(struct, field):
-                metadata = generate_constraint_metadata(field, tag_info.tag_name, tag_info.prop_attr_index)
+                metadata = generate_constraint_metadata(field, tag_info.tag_name, tag_info.prop_attr_index, type_aliases)
                 if metadata:
                     output.append(metadata)
 
@@ -1486,7 +1490,7 @@ def generate_header(structs: List[StructInfo], type_aliases: Dict[str, str], blo
     output.append(VALUE_TRANSFORMER_TEMPLATE)
 
     # Generate constraint specializations
-    output.append(generate_constraints(structs))
+    output.append(generate_constraints(structs, type_aliases))
 
     # Generate GEFilterParamsTypeInfo specializations
     output.append(generate_filter_params_type_info(structs))
