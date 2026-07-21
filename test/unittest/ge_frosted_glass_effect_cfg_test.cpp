@@ -32,6 +32,7 @@ class GEFrostedGlassEffectCfgTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
+    bool CheckFileGraphicConfig();
     void SetUp() override;
     void TearDown() override;
 };
@@ -46,7 +47,7 @@ void GEFrostedGlassEffectCfgTest::TearDownTestCase(void)
     xmlCleanupParser();
 }
 
-void GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig()
+bool GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig()
 {
     std::string pathProd = "/sys_prod/etc/graphic/graphic_config.xml";
     std::string pathSys = "/system/variant/phone/base/etc/graphic/graphic_config.xml";
