@@ -137,5 +137,178 @@ HWTEST_F(GEHeatDistortionFilterTest, Type001, TestSize.Level2)
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_HEAT_DISTORTION);
 }
 
+/**
+ * @tc.name: OnProcessImageWithDifferentNoiseScale
+ * @tc.desc: Verify behavior with different noise scale values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentNoiseScale, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.noiseScale = 0.1f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithMaxNoiseScale
+ * @tc.desc: Verify behavior with maximum noise scale
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithMaxNoiseScale, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.noiseScale = 2.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentRiseWeight
+ * @tc.desc: Verify behavior with different rise weight values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentRiseWeight, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.riseWeight = 0.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithMaxRiseWeight
+ * @tc.desc: Verify behavior with maximum rise weight
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithMaxRiseWeight, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.riseWeight = 1.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithDifferentProgress
+ * @tc.desc: Verify behavior with different progress values after optimization
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithDifferentProgress, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.progress = 0.5f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithFullProgress
+ * @tc.desc: Verify behavior with full progress
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithFullProgress, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.progress = 1.0f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: CheckHeatDistortionParams002
+ * @tc.desc: Verify parameter clamping with edge values
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, CheckHeatDistortionParams002, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.0f;
+    params.noiseScale = 2.0f;
+    params.riseWeight = 1.0f;
+    params.progress = 0.0f;
+
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    EXPECT_EQ(filter->intensity_, 0.0f);
+    EXPECT_EQ(filter->noiseScale_, 2.0f);
+    EXPECT_EQ(filter->riseWeight_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+
+    filter->CheckHeatDistortionParams();
+
+    EXPECT_EQ(filter->intensity_, 0.0f);
+    EXPECT_EQ(filter->noiseScale_, 2.0f);
+    EXPECT_EQ(filter->riseWeight_, 1.0f);
+    EXPECT_EQ(filter->progress_, 0.0f);
+}
+
+/**
+ * @tc.name: HeatDistortionShaderEffectCachingMechanism
+ * @tc.desc: Verify heat distortion shader effect caching mechanism works correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectCachingMechanism, TestSize.Level2)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    auto filter1 = std::make_unique<GEHeatDistortionFilter>(params);
+    auto filter2 = std::make_unique<GEHeatDistortionFilter>(params);
+
+    // Verify that different filter instances return the same shader effect (thread_local caching)
+    auto shaderEffect1 = filter1->GetHeatDistortionEffect();
+    auto shaderEffect2 = filter2->GetHeatDistortionEffect();
+    EXPECT_NE(shaderEffect1, nullptr);
+    EXPECT_NE(shaderEffect2, nullptr);
+    EXPECT_EQ(shaderEffect1, shaderEffect2);
+}
+
+/**
+ * @tc.name: HeatDistortionShaderEffectMultiCallConsistency
+ * @tc.desc: Verify multiple calls to heat distortion shader effect function return consistent results
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectMultiCallConsistency, TestSize.Level2)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+
+    // Verify that multiple calls return the same shader effect
+    auto shaderEffect1 = filter->GetHeatDistortionEffect();
+    auto shaderEffect2 = filter->GetHeatDistortionEffect();
+    auto shaderEffect3 = filter->GetHeatDistortionEffect();
+    EXPECT_NE(shaderEffect1, nullptr);
+    EXPECT_EQ(shaderEffect1, shaderEffect2);
+    EXPECT_EQ(shaderEffect2, shaderEffect3);
+}
+
+/**
+ * @tc.name: HeatDistortionShaderEffectInActualProcessing
+ * @tc.desc: Verify heat distortion shader effect works correctly in actual image processing
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectInActualProcessing, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.8f;
+    params.noiseScale = 1.5f;
+    params.riseWeight = 0.6f;
+    params.progress = 0.7f;
+
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+
+    // Verify that shader effect is created successfully
+    auto shaderEffect = filter->GetHeatDistortionEffect();
+    EXPECT_NE(shaderEffect, nullptr);
+
+    // Verify that shader effect works correctly in actual image processing
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
 } // namespace Rosen
 } // namespace OHOS

@@ -57,9 +57,13 @@ std::shared_ptr<Drawing::Image> MakeRuntimeImage(Drawing::RuntimeShaderBuilder& 
 
 std::shared_ptr<Drawing::RuntimeEffect> GetResampleShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_resampleShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_resampleShader = nullptr;
     if (g_resampleShader == nullptr) {
+        LOGD("GetResampleShaderEffect creating resample shader effect");
         g_resampleShader = GECreateRuntimeEffectForShader(g_shaderStringResample);
+        if (g_resampleShader == nullptr) {
+            LOGE("GetResampleShaderEffect create resample shader effect failed");
+        }
     }
     return g_resampleShader;
 }
@@ -70,7 +74,7 @@ bool PrepareProcessContext(const std::shared_ptr<Drawing::Image>& image, const D
     context.matrix = canvasMatrix;
     context.matrix.PostTranslate(-tranX, -tranY);
     if (!context.matrix.Invert(context.invertMatrix)) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage invert matrix failed");
+        LOGE("GEBlurBubblesRiseFilter::PrepareProcessContext invert matrix failed");
         return false;
     }
 
@@ -128,14 +132,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildDownsampledShader(Drawing::Canvas& c
 
     auto downsampledImage = MakeRuntimeImage(downsampleBuilder, canvas, context.matrix, params.imageInfo);
     if (downsampledImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample image build failed");
         return nullptr;
     }
 
     auto downsampledShader = BuildImageShader(downsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         context);
     if (downsampledShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildDownsampledShader downsample shader create failed");
     }
     return downsampledShader;
 }
@@ -153,13 +157,13 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderX.SetUniform("horizontal", 1.0f);
     auto blurredImageX = MakeRuntimeImage(blurBuilderX, canvas, context.matrix, params.imageInfo);
     if (blurredImageX == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur X image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X image build failed");
         return nullptr;
     }
 
     auto blurXShader = BuildImageShader(blurredImageX, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
     if (blurXShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur X shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur X shader create failed");
         return nullptr;
     }
 
@@ -170,7 +174,7 @@ std::shared_ptr<Drawing::Image> BuildHalfResBlurredImage(Drawing::Canvas& canvas
     blurBuilderY.SetUniform("horizontal", 0.0f);
     auto blurredImage = MakeRuntimeImage(blurBuilderY, canvas, context.matrix, params.imageInfo);
     if (blurredImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blur Y image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildHalfResBlurredImage blur Y image build failed");
     }
     return blurredImage;
 }
@@ -184,7 +188,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     auto downsampledBlurredShader = BuildImageShader(downsampledBlurredImage,
         Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, context);
     if (downsampledBlurredShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage downsample blurred shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader downsample blurred shader create failed");
         return nullptr;
     }
 
@@ -194,14 +198,14 @@ std::shared_ptr<Drawing::ShaderEffect> BuildUpsampledBlurredShader(Drawing::Canv
     upsampleBuilder.SetUniform("dstResolution", context.width, context.height);
     auto upsampledImage = MakeRuntimeImage(upsampleBuilder, canvas, context.matrix, context.imageInfo);
     if (upsampledImage == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage upsample image build failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader upsample image build failed");
         return nullptr;
     }
 
     auto blurredShader = BuildImageShader(upsampledImage, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
         context);
     if (blurredShader == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage blurred shader create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildUpsampledBlurredShader blurred shader create failed");
     }
     return blurredShader;
 }
@@ -213,7 +217,7 @@ std::shared_ptr<Drawing::ShaderEffect> BuildBlurredShader(Drawing::Canvas& canva
 {
     auto resampleEffect = GetResampleShaderEffect();
     if (resampleEffect == nullptr) {
-        LOGE("GEBlurBubblesRiseFilter::OnProcessImage resample effect create failed");
+        LOGE("GEBlurBubblesRiseFilter::BuildBlurredShader resample effect create failed");
         return nullptr;
     }
     auto params = BuildDownsampleParams(context, blurIntensity);
@@ -277,11 +281,25 @@ std::shared_ptr<Drawing::Image> GEBlurBubblesRiseFilter::OnProcessImage(Drawing:
         return image;
     }
 
+    if (maskImage == nullptr) {
+        LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image is null");
+        return image;
+    }
+    auto maskImageInfo = maskImage->GetImageInfo();
+    if (maskImageInfo.GetWidth() == 0 || maskImageInfo.GetHeight() == 0) {
+        LOGE("GEBlurBubblesRiseFilter::OnProcessImage mask image info invalid");
+        return image;
+    }
+
+    auto maskResolutionX = static_cast<float>(maskImageInfo.GetWidth());
+    auto maskResolutionY = static_cast<float>(maskImageInfo.GetHeight());
+
     Drawing::RuntimeShaderBuilder mixBuilder(mixEffect);
     mixBuilder.SetChild("blur_tex", blurredShader);
     mixBuilder.SetChild("original_tex", sourceShader);
     mixBuilder.SetChild("blur_mask", maskShader);
     mixBuilder.SetUniform("iResolution", context.width, context.height);
+    mixBuilder.SetUniform("maskResolution", maskResolutionX, maskResolutionY);
     mixBuilder.SetUniform("mixStrength", mixStrength_);
     mixBuilder.SetUniform("progress", progress_ * timeScale_);
 
@@ -303,18 +321,26 @@ void GEBlurBubblesRiseFilter::CheckBlurBubblesRiseParams()
 
 std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetBlurShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_blurShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_blurShader = nullptr;
     if (g_blurShader == nullptr) {
+        LOGD("GEBlurBubblesRiseFilter::GetBlurShaderEffect creating blur shader effect");
         g_blurShader = GECreateRuntimeEffectForShader(shaderStringGaussianBlur);
+        if (g_blurShader == nullptr) {
+            LOGE("GEBlurBubblesRiseFilter::GetBlurShaderEffect create blur shader effect failed");
+        }
     }
     return g_blurShader;
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GEBlurBubblesRiseFilter::GetMaskMixShaderEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_maskMixShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_maskMixShader = nullptr;
     if (g_maskMixShader == nullptr) {
+        LOGD("GEBlurBubblesRiseFilter::GetMaskMixShaderEffect creating mask mix shader effect");
         g_maskMixShader = GECreateRuntimeEffectForShader(shaderStringMaskMix);
+        if (g_maskMixShader == nullptr) {
+            LOGE("GEBlurBubblesRiseFilter::GetMaskMixShaderEffect create mask mix shader effect failed");
+        }
     }
     return g_maskMixShader;
 }

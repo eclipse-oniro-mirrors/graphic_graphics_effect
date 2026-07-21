@@ -55,18 +55,13 @@ private:
     float progress_ = 0.0f;
     std::shared_ptr<Drawing::Image> maskImage_ = nullptr;
 
-    const float timeScale_ = 10.0f;
+    const float timeScale_ = 25.0f;
 
     inline static const std::string shaderStringGaussianBlur = R"(
         uniform shader image;
         uniform half2 iResolution;
         uniform half blurIntensity;
         uniform half horizontal;
-
-        half gaussian(half x, half sigma)
-        {
-            return exp(-(x * x) / (2.0 * sigma * sigma));
-        }
 
         half4 main(float2 fragCoord)
         {
@@ -75,6 +70,8 @@ private:
             half2 direction = (horizontal > 0.5) ? half2(1.0, 0.0) : half2(0.0, 1.0);
 
             half sigma = max(0.35, blurIntensity * 0.5);
+            half negInvSigmaSq2 = -1.0 / (sigma * sigma * 2.0);
+
             half4 centerColor = image.eval(uv * iResolution);
             half3 color = centerColor.rgb;
             half totalWeight = 1.0;
@@ -83,9 +80,12 @@ private:
             for (int i = 1; i <= MAX_SAMPLES; ++i) {
                 half fi = half(i);
                 half sampleMask = step(fi, blurIntensity + 0.5);
-                half weight = gaussian(fi, sigma) * sampleMask;
-                half2 offset = direction * texelSize * fi;
 
+                half weight = exp(fi * fi * negInvSigmaSq2) * sampleMask;
+
+                if (weight < 0.001) break;
+
+                half2 offset = direction * texelSize * fi;
                 color += image.eval((uv + offset) * iResolution).rgb * weight;
                 color += image.eval((uv - offset) * iResolution).rgb * weight;
                 totalWeight += 2.0 * weight;
@@ -100,15 +100,16 @@ private:
         uniform shader original_tex;
         uniform shader blur_mask;
         uniform half2 iResolution;
+        uniform float2 maskResolution;
         uniform half mixStrength;
         uniform half progress;
 
         half4 main(float2 fragCoord)
         {
             half2 uv = fragCoord.xy / iResolution;
-            half2 maskUV = uv - half2(0.0, progress * 0.07);
+            half2 maskUV = uv + half2(0.0, progress * 0.07);
 
-            half4 maskColor = blur_mask.eval(maskUV * iResolution);
+            half4 maskColor = blur_mask.eval(maskUV * maskResolution);
             half maskValue = maskColor.r;
 
             half blend = clamp(maskValue * mixStrength, 0.0, 1.0);
