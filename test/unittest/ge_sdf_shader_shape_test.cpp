@@ -14,7 +14,10 @@
  */
 
 #include <gtest/gtest.h>
+#include "ge_cache_helper.h"
+#include "ge_sdf_rrect_shader_shape.h"
 #include "ge_sdf_shader_shape.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -47,13 +50,46 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    Drawing::Canvas canvas_;
+    Drawing::Rect rect_ = {};
+    Drawing::ImageInfo imageInfo_ = {};
 };
 
 void GESDFShaderShapeTest::SetUpTestCase(void) {}
 void GESDFShaderShapeTest::TearDownTestCase(void) {}
 
-void GESDFShaderShapeTest::SetUp() {}
-void GESDFShaderShapeTest::TearDown() {}
+void GESDFShaderShapeTest::TearDown()
+{
+    surface_ = nullptr;
+}
+
+void GESDFShaderShapeTest::SetUp()
+{
+    Drawing::Rect rect {0.0f, 0.0f, 100.0f, 100.0f};
+    rect_ = rect;
+    imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
+    surface_ = CreateSurface();
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(surface_->GetCanvas(), nullptr);
+    canvas_ = *(surface_->GetCanvas());
+}
+
+std::shared_ptr<Drawing::Surface> GESDFShaderShapeTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GESDFShaderShapeTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
+}
 
 /**
  * @tc.name: GenerateDrawingShader_001

@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include "ge_cache_helper.h"
 #include "ge_shader.h"
 #include "ge_log.h"
 #include "draw/canvas.h"
@@ -22,6 +23,9 @@
 #include "draw/color.h"
 #include "draw/path.h"
 #include "ge_shader_filter_params.h"
+#include "ge_sdf_rrect_shader_shape.h"
+#include "ge_sdf_shader_shape.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -36,19 +40,54 @@ public:
     {}
     static void TearDownTestCase()
     {}
-    void SetUp() override
-    {}
-    void TearDown() override
-    {}
-
-    static inline Canvas canvas_;
-    static inline Rect rect_{0.0, 0.0, 100.0, 100.0};
+    void SetUp() override;
+    void TearDown() override;
+    std::shared_ptr<Drawing::Surface> CreateSurface();
+    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
+    Drawing::Canvas canvas_;
+    Drawing::Rect rect_ = {};
+    Drawing::ImageInfo imageInfo_ = {};
 };
 
-using CacheDataType = std::shared_ptr<Image>;
+void GEShaderEffectTest::TearDown()
+{
+    surface_ = nullptr;
+}
+
+void GEShaderEffectTest::SetUp()
+{
+    Drawing::Rect rect {0.0f, 0.0f, 100.0f, 100.0f};
+    rect_ = rect;
+    imageInfo_ = Drawing::ImageInfo {rect.GetWidth(), rect.GetHeight(),
+        Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE};
+    surface_ = CreateSurface();
+    EXPECT_NE(surface_, nullptr);
+    EXPECT_NE(surface_->GetCanvas(), nullptr);
+    canvas_ = *(surface_->GetCanvas());
+}
+
+std::shared_ptr<Drawing::Surface> GEShaderEffectTest::CreateSurface()
+{
+    std::shared_ptr<Drawing::GPUContext> context = nullptr;
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        GTEST_LOG_(INFO) << "GEShaderEffectTest::CreateSurface create gpuContext failed.";
+        return nullptr;
+    }
+    return Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo_);
+}
+
+struct SDFImageCacheTest {
+    uint32_t hash = 0;
+    std::shared_ptr<Drawing::Image> sdfImage = nullptr;
+};
+using CacheDataType = std::shared_ptr<Drawing::Image>;
 class GETestShader : public GEShader {
 public:
-    void MakeDrawingShader(const Rect& rect, float progress) override
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override
     {
         static constexpr char prog[] = R"(
             vec4 main(float2 fragCoord)
@@ -56,13 +95,13 @@ public:
                 return vec4(0.0, 0.0, 0.0, 1.0);
             }
         )";
-        auto testShaderEffect = RuntimeEffect::CreateForShader(prog);
-        auto build = std::make_shared<RuntimeShaderBuilder>(testShaderEffect);
+        auto testShaderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+        auto build = std::make_shared<Drawing::RuntimeShaderBuilder>(testShaderEffect);
         drShader_ = build->MakeShader(nullptr, false);
     }
 
 protected:
-    void Preprocess(Canvas& canvas, const Rect& rect) override
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override
     {
         if (cacheAnyPtr_ == nullptr) {
             CacheDataType cacheData = nullptr;
@@ -71,14 +110,30 @@ protected:
     }
 };
 
+class TestSDFShaderShape : public Drawing::GESDFShaderShape {
+public:
+    explicit TestSDFShaderShape(Drawing::GESDFShapeType type) : type_(type) {}
+
+    Drawing::GESDFShapeType GetSDFShapeType() const override
+    {
+        return type_;
+    }
+    bool HasType(const Drawing::GESDFShapeType type) const override
+    {
+        return true;
+    }
+private:
+    Drawing::GESDFShapeType type_;
+};
+
 class GETestSubstractedShader : public GEShader {
 public:
-    explicit GETestSubstractedShader(const Rect& rect)
+    explicit GETestSubstractedShader(const Drawing::Rect& rect)
     {
         testSubtractedShader = rect;
     }
 
-    void MakeDrawingShader(const Rect& rect, float progress) override
+    void MakeDrawingShader(const Drawing::Rect& rect, float progress) override
     {
         static constexpr char prog[] = R"(
             vec4 main(float2 fragCoord)
@@ -86,8 +141,8 @@ public:
                 return vec4(0.0, 0.0, 0.0, 1.0);
             }
         )";
-        auto testShaderEffect = RuntimeEffect::CreateForShader(prog);
-        auto build = std::make_shared<RuntimeShaderBuilder>(testShaderEffect);
+        auto testShaderEffect = Drawing::RuntimeEffect::CreateForShader(prog);
+        auto build = std::make_shared<Drawing::RuntimeShaderBuilder>(testShaderEffect);
         drShader_ = build->MakeShader(nullptr, false);
     }
 
@@ -96,7 +151,7 @@ public:
 protected:
     Drawing::Rect testSubtractedShader;
 
-    void Preprocess(Canvas& canvas, const Rect& rect) override
+    void Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& rect) override
     {
         if (cacheAnyPtr_ == nullptr) {
             CacheDataType cacheData = nullptr;
@@ -145,6 +200,74 @@ HWTEST_F(GEShaderEffectTest, GEShaderEffectTest_TryDrawShaderWithPen_RenderRectI
     EXPECT_EQ(testShader->Hash(), hash);
     testShader->MakeDrawingShader(rect_, -1.f);
     EXPECT_TRUE(testShader->TryDrawShaderWithPen(canvas_, rect_));
+}
+
+/**
+ * @tc.name: MakeSDFShaderWithCacheNullShape
+ * @tc.desc: Verify MakeSDFShaderWithCache returns nullptr and clears cache when sdfShape is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderEffectTest, MakeSDFShaderWithCacheNullShape, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheNullShape start";
+    auto testShader = std::make_shared<GETestShader>();
+    std::shared_ptr<Drawing::GESDFShaderShape> nullShape = nullptr;
+    auto result = testShader->MakeSDFShaderWithCache(nullShape, canvas_, rect_);
+    EXPECT_EQ(result, nullptr);
+    EXPECT_EQ(testShader->GetCache(), nullptr);
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheNullShape end";
+}
+
+/**
+ * @tc.name: MakeSDFShaderWithCacheHashMismatchNullImage
+ * @tc.desc: Verify MakeSDFShaderWithCache returns nullptr when hash mismatches and MakeSDFImage returns nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderEffectTest, MakeSDFShaderWithCacheHashMismatchNullImage, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheHashMismatchNullImage start";
+    auto testShader = std::make_shared<GETestShader>();
+    auto sdfShape = std::make_shared<TestSDFShaderShape>(Drawing::GESDFShapeType::RRECT);
+    sdfShape->SetHash(42);
+    testShader->SetCache(nullptr);
+    auto result = testShader->MakeSDFShaderWithCache(sdfShape, canvas_, rect_);
+    EXPECT_EQ(result, nullptr);
+    EXPECT_EQ(testShader->GetCache(), nullptr);
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheHashMismatchNullImage end";
+}
+
+/**
+ * @tc.name: MakeSDFShaderWithCacheHashMatchNullImage
+ * @tc.desc: Verify MakeSDFShaderWithCache returns nullptr when hash matches cache but cached image is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderEffectTest, MakeSDFShaderWithCacheHashMatchNullImage, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheHashMatchNullImage start";
+    auto testShader = std::make_shared<GETestShader>();
+    auto sdfShape = std::make_shared<TestSDFShaderShape>(Drawing::GESDFShapeType::RRECT);
+    uint32_t hash = 42;
+    sdfShape->SetHash(hash);
+    SDFImageCacheTest cachData1{hash, nullptr};
+    testShader->SetCache(GECacheHelper::PackCacheAny(std::move(cachData1)));
+    auto result = testShader->MakeSDFShaderWithCache(sdfShape, canvas_, rect_);
+    EXPECT_EQ(result, nullptr);
+    EXPECT_EQ(testShader->GetCache(), nullptr);
+
+    Drawing::GESDFRRectShapeParams param{};
+    param.rrect = {0.0f, 0.0f, 100.0f, 100.0f};
+    param.rrect.SetCornerRadius(10.0f, 10.0f);
+    auto rectShape = std::make_shared<Drawing::GESDFRRectShaderShape>(param);
+    rectShape->SetHash(0);
+    SDFImageCacheTest cachData2{hash, nullptr};
+    testShader->SetCache(GECacheHelper::PackCacheAny(std::move(cachData2)));
+    result = testShader->MakeSDFShaderWithCache(rectShape, canvas_, rect_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_NE(testShader->GetCache(), nullptr);
+    result = testShader->MakeSDFShaderWithCache(rectShape, canvas_, rect_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_NE(testShader->GetCache(), nullptr);
+    GTEST_LOG_(INFO) << "GEShaderEffectTest MakeSDFShaderWithCacheHashMatchNullImage end";
 }
 }
 }

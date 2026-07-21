@@ -55,6 +55,8 @@ public:
     virtual bool HasType(const GESDFShapeType type) const = 0;
     void CopyState(const GESDFShaderShape& shape);
     virtual bool GetInscribedRect(Rect& rect) override {return false;}
+    virtual std::shared_ptr<Drawing::Image> MakeSDFImage(Canvas& canvas, float width, float height,
+        bool hasNormal = true);
 };
 } // Drawing
 } // namespace Rosen
