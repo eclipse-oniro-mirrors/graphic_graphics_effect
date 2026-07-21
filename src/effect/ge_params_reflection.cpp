@@ -1589,8 +1589,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
         default:
-            GE_LOGE("SetParamsMemberByTag<DotMatrixDirection>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
+            GE_LOGE("SetParamsMemberByTag<DotMatrixDirection>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1608,8 +1608,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
         default:
-            GE_LOGE("SetParamsMemberByTag<DotMatrixEffectType>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
+            GE_LOGE("SetParamsMemberByTag<DotMatrixEffectType>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1641,8 +1641,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS10)
         GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_COLORS11)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Color4f>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Drawing::Color4f>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1665,8 +1665,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_MATRIX)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_SNAPSHOT_MATRIX)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Matrix>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Drawing::Matrix>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1684,7 +1684,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_PATH_SHAPE_PATH)
         default:
-            GE_LOGE("SetParamsMemberByTag<Drawing::Path>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Drawing::Path>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1735,8 +1736,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS10)
         GE_VALIDATE_AND_SET(COLOR_GRADIENT_EFFECT_POSITIONS11)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<Drawing::Point>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Drawing::Point>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1754,8 +1755,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(BEZIER_WARP_DESTINATION_PATCH)
         default:
-            GE_LOGE("SetParamsMemberByTag<GEBezierWarpShaderFilterControlPointArray>: No matching case for tag %u "
-                    "(filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<GEBezierWarpShaderFilterControlPointArray>: No matching case for tag "
+                    "%{public}u (filter type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1772,7 +1773,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_RRECT_SHAPE_RRECT)
         default:
-            GE_LOGE("SetParamsMemberByTag<GERRect>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<GERRect>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1790,8 +1792,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_BORDER_BORDER)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<GESDFBorderParams>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<GESDFBorderParams>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1809,8 +1811,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_SHADOW_SHADOW)
         default:
-            GE_LOGE(
-                "SetParamsMemberByTag<GESDFShadowParams>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<GESDFShadowParams>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1828,7 +1830,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
     switch (tag) {
         GE_VALIDATE_AND_SET(SDF_UNION_OP_OP)
         default:
-            GE_LOGE("SetParamsMemberByTag<GESDFUnionOp>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<GESDFUnionOp>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1848,7 +1851,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(PIXEL_MAP_MASK_DST)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_SNAPSHOT_RECT)
         default:
-            GE_LOGE("SetParamsMemberByTag<RectF>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<RectF>: No matching case for tag %{public}u (filter type %{public}u, params "
+                    "type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1914,7 +1918,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(LIGHT_CAVE_POSITION)
         GE_VALIDATE_AND_SET(LIGHT_CAVE_RADIUS_X_Y)
         default:
-            GE_LOGE("SetParamsMemberByTag<Vector2f>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Vector2f>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -1997,7 +2002,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(WAVE_DISTURBANCE_MASK_WAVE_L_W_H)
         GE_VALIDATE_AND_SET(DISTORT_CHROMA_COLOR_STRENGTH)
         default:
-            GE_LOGE("SetParamsMemberByTag<Vector3f>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Vector3f>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2090,7 +2096,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_GRADIENT_BEZIER_CONTROL_POINTS)
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_COLOR)
         default:
-            GE_LOGE("SetParamsMemberByTag<Vector4f>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<Vector4f>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2125,7 +2132,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(VARIABLE_RADIUS_BLUR_APPLY_INSIDE_MASK)
         GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_INVERSE)
         default:
-            GE_LOGE("SetParamsMemberByTag<bool>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<bool>: No matching case for tag %{public}u (filter type %{public}u, params "
+                    "type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2381,7 +2389,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_FEATHERING)
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_PROGRESS)
         default:
-            GE_LOGE("SetParamsMemberByTag<float>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<float>: No matching case for tag %{public}u (filter type %{public}u, params "
+                    "type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2413,7 +2422,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_UNION_MODE)
         default:
-            GE_LOGE("SetParamsMemberByTag<int32_t>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<int32_t>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2564,8 +2574,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(NOISY_FRAME_GRADIENT_MASK_R_RECT_POS)
         GE_VALIDATE_AND_SET(ROUNDED_RECT_FLOWLIGHT_START_END_POSITION)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::pair<float, float>>: No matching case for tag %u (filter type %u, "
-                    "params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::pair<float, float>>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2602,8 +2612,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_SDF_SHAPE)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::GEShaderShape>>: No matching case for tag %u "
-                    "(filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::GEShaderShape>>: No matching case for tag "
+                    "%{public}u (filter type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2639,8 +2649,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(USE_EFFECT_MASK_IMAGE)
         GE_VALIDATE_AND_SET(WATER_DROPLET_TRANSITION_TOP_LAYER)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::Image>>: No matching case for tag %u (filter type "
-                    "%u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<Drawing::Image>>: No matching case for tag %{public}u "
+                    "(filter type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2676,8 +2686,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(DISTORT_CHROMA_TURBULENT_MASK)
         GE_VALIDATE_AND_SET(DISTORT_CHROMA_MASK)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<GEShaderMask>>: No matching case for tag %u (filter type %u, "
-                    "params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::shared_ptr<GEShaderMask>>: No matching case for tag %{public}u (filter "
+                    "type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2697,8 +2707,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(DOT_MATRIX_START_POINTS)
         GE_VALIDATE_AND_SET(HARMONIUM_EFFECT_RIPPLE_POSITION)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<Vector2f>>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::vector<Vector2f>>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2717,8 +2727,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_COLORS)
         GE_VALIDATE_AND_SET(MAP_COLOR_BY_BRIGHTNESS_COLORS)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<Vector4f>>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::vector<Vector4f>>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2741,8 +2751,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_COLORS)
         GE_VALIDATE_AND_SET(RADIAL_GRADIENT_MASK_POSITIONS)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<float>>: No matching case for tag %u (filter type %u, params "
-                    "type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::vector<float>>: No matching case for tag %{public}u (filter type "
+                    "%{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2761,8 +2771,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_FRACTION_STOPS)
         GE_VALIDATE_AND_SET(LINEAR_GRADIENT_MASK_FRACTION_STOPS)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::vector<std::pair<float, float>>>: No matching case for tag %u (filter "
-                    "type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::vector<std::pair<float, float>>>: No matching case for tag %{public}u "
+                    "(filter type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2784,8 +2794,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_DEPTH_IMAGE)
         GE_VALIDATE_AND_SET(USE_EFFECT_MASK_IMAGE)
         default:
-            GE_LOGE("SetParamsMemberByTag<std::weak_ptr<Drawing::Image>>: No matching case for tag %u (filter type %u, "
-                    "params type %u)",
+            GE_LOGE("SetParamsMemberByTag<std::weak_ptr<Drawing::Image>>: No matching case for tag %{public}u (filter "
+                    "type %{public}u, params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
@@ -2808,7 +2818,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(WATER_RIPPLE_WAVE_COUNT)
         GE_VALIDATE_AND_SET(WATER_RIPPLE_RIPPLE_MODE)
         default:
-            GE_LOGE("SetParamsMemberByTag<uint32_t>: No matching case for tag %u (filter type %u, params type %u)",
+            GE_LOGE("SetParamsMemberByTag<uint32_t>: No matching case for tag %{public}u (filter type %{public}u, "
+                    "params type %{public}u)",
                 static_cast<uint32_t>(tag), static_cast<uint32_t>(expectedFilterType),
                 static_cast<uint32_t>(params.GetType()));
             break;
