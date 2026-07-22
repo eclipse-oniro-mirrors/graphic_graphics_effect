@@ -51,8 +51,9 @@ bool GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig()
 {
     std::string pathProd = "/sys_prod/etc/graphic/graphic_config.xml";
     std::string pathSys = "/system/variant/phone/base/etc/graphic/graphic_config.xml";
-
-    return (std::filesystem::exists(pathProd) || std::filesystem::exists(pathSys));
+    bool result = (std::filesystem::exists(pathProd) || std::filesystem::exists(pathSys));
+    GTEST_LOG_(INFO) << "GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig " << result;
+    return result;
 }
 
 void GEFrostedGlassEffectCfgTest::SetUp() {}
