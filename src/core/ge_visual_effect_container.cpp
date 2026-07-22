@@ -85,6 +85,10 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
     std::shared_ptr<Drawing::Image> cachedImage, float left, float top)
 {
     for (auto vef : GetFilters()) {
+        if (vef == nullptr) {
+            LOGD("GERender::GetGEVisualEffect vef is null");
+            continue;
+        }
         auto impl = vef->GetImpl();
         if (vef->GetName() == "HarmoniumEffect") {
             vef->SetParam(GE_SHADER_HARMONIUM_EFFECT_BLURLEFT, left);
@@ -93,7 +97,7 @@ void GEVisualEffectContainer::UpdateCachedBlurImage(Drawing::Canvas* canvas,
                 continue;
             }
             std::shared_ptr<GEHarmoniumEffectShaderParams> params = vef->GetImpl()->GetHarmoniumEffectParams();
-            if (params->useEffectMask != nullptr) {
+            if (params != nullptr && params->useEffectMask != nullptr) {
                 GEUseEffectMaskParams maskParam;
                 maskParam.useEffect = params->useEffectMask->GetUseEffect();
                 maskParam.image = cachedImage;
