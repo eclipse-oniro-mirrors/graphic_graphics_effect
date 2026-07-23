@@ -41,7 +41,16 @@ bool GESystemProperties::GetBoolSystemProperty(const char* name, bool defaultVal
 
 int GESystemProperties::ConvertToInt(const char* originValue, int defaultValue)
 {
-    return originValue == nullptr ? defaultValue : std::atoi(originValue);
+    if (originValue == nullptr) {
+        return defaultValue;
+    }
+    int value = defaultValue;
+    auto result = std::from_chars(originValue, originValue + std::strlen(originValue), value);
+    if (result.ec == std::errc()) {
+        return value;
+    } else {
+        return defaultValue;
+    }
 }
 
 } // namespace Rosen

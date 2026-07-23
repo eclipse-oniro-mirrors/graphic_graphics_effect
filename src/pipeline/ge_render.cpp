@@ -29,10 +29,11 @@ namespace OHOS {
 namespace GraphicsEffectEngine {
 #define PROPERTY_MESA_BLUR_ALL_ENABLED "persist.sys.graphic.kawaseDisable"
 #ifdef GE_OHOS
-bool GERender::isMesablurAllEnable_ = (std::atoi(
-    GESystemProperties::GetEventProperty(PROPERTY_MESA_BLUR_ALL_ENABLED).c_str()));
+std::atomic<bool> GERender::isMesablurAllEnable_(
+    GESystemProperties::ConvertToInt(
+        GESystemProperties::GetEventProperty(PROPERTY_MESA_BLUR_ALL_ENABLED).c_str(), 0) != 0);
 #else
-bool GERender::isMesablurAllEnable_ = false;
+std::atomic<bool> GERender::isMesablurAllEnable_(false);
 #endif
 using namespace Rosen::Drawing;
 
@@ -321,7 +322,9 @@ std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<D
 
 void GERender::SetMesablurAllEnabledByCCM(bool flag)
 {
-    isMesablurAllEnable_ = isMesablurAllEnable_ || flag;
+    if (flag) {
+        isMesablurAllEnable_.load(true);
+    }
 }
 
 bool GERender::IsNeedExpansionFilter()

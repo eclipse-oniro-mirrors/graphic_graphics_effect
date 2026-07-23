@@ -57,6 +57,12 @@ HWTEST_F(GESDFClipShaderTest, MakeSDFClipShaderTest, TestSize.Level1)
     clipShader.SetSDFClipParams(params);
     shader = clipShader.MakeSDFClipShader(canvas_, rect);
     EXPECT_NE(shader, nullptr);
+
+    // canvasInfo_ defaults to 0, so width/height fall back to rect size
+    Drawing::Rect zeroWidth {0.0f, 0.0f, 0.0f, 200.0f};
+    EXPECT_EQ(clipShader.MakeSDFClipShader(canvas_, zeroWidth), nullptr);
+    Drawing::Rect zeroHeight {0.0f, 0.0f, 200.0f, 0.0f};
+    EXPECT_EQ(clipShader.MakeSDFClipShader(canvas_, zeroHeight), nullptr);
 }
 
 /**

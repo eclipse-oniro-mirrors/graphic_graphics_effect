@@ -162,6 +162,23 @@ HWTEST_F(GESDFDistortOpShaderShapeTest, GenerateDrawingShaderHasNormal_002, Test
     GESDFDistortOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShaderHasNormal(100.0f, 100.0f);
     EXPECT_EQ(shader, nullptr);
+
+    // 17 nested distort-op layers exceed MAX_RECURSION_DEPTH(16) -> guard returns nullptr
+    constexpr int NESTED_CHAIN_LEN_HN = 17;
+    std::shared_ptr<GESDFShaderShape> hnInner = CreateTestShape();
+    std::shared_ptr<GESDFDistortOpShaderShape> hnOutermost;
+    for (int i = 0; i < NESTED_CHAIN_LEN_HN; ++i) {
+        GESDFDistortOpShapeParams chainParam;
+        chainParam.shape = hnInner;
+        chainParam.LUCorner = Drawing::Point(0.0f, 0.0f);
+        chainParam.RUCorner = Drawing::Point(1.0f, 0.0f);
+        chainParam.RBCorner = Drawing::Point(1.0f, 1.0f);
+        chainParam.LBCorner = Drawing::Point(0.0f, 1.0f);
+        hnOutermost = std::make_shared<GESDFDistortOpShaderShape>(chainParam);
+        hnInner = hnOutermost;
+    }
+    ASSERT_NE(hnOutermost, nullptr);
+    EXPECT_EQ(hnOutermost->GenerateDrawingShaderHasNormal(100.0f, 100.0f), nullptr);
     GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest GenerateDrawingShaderHasNormal_002 end";
 }
 
@@ -340,6 +357,23 @@ HWTEST_F(GESDFDistortOpShaderShapeTest, GenerateDrawingShader_005, TestSize.Leve
     GESDFDistortOpShaderShape shape(param);
     auto shader = shape.GenerateDrawingShader(100.0f, 100.0f);
     EXPECT_NE(shader, nullptr);
+
+    // 17 nested distort-op layers exceed MAX_RECURSION_DEPTH(16) -> guard returns nullptr
+    constexpr int NESTED_CHAIN_LEN = 17;
+    std::shared_ptr<GESDFShaderShape> inner = CreateTestShape();
+    std::shared_ptr<GESDFDistortOpShaderShape> outermost;
+    for (int i = 0; i < NESTED_CHAIN_LEN; ++i) {
+        GESDFDistortOpShapeParams chainParam;
+        chainParam.shape = inner;
+        chainParam.LUCorner = Drawing::Point(0.0f, 0.0f);
+        chainParam.RUCorner = Drawing::Point(1.0f, 0.0f);
+        chainParam.RBCorner = Drawing::Point(1.0f, 1.0f);
+        chainParam.LBCorner = Drawing::Point(0.0f, 1.0f);
+        outermost = std::make_shared<GESDFDistortOpShaderShape>(chainParam);
+        inner = outermost;
+    }
+    ASSERT_NE(outermost, nullptr);
+    EXPECT_EQ(outermost->GenerateDrawingShader(100.0f, 100.0f), nullptr);
     GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest GenerateDrawingShader_005 end";
 }
 

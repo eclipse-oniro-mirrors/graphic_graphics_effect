@@ -58,6 +58,9 @@ GELinearGradientBlurShaderFilter::GELinearGradientBlurShaderFilter(
 std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::ProcessImageDDGR(
     Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, uint8_t directionBias)
 {
+    if (!image) {
+        return image;
+    }
     auto& para = linearGradientBlurPara_;
     auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth * imageScale_, canvasInfo_.geoHeight * imageScale_);
     uint8_t direction = static_cast<uint8_t>(para->direction_);
@@ -99,7 +102,7 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::OnProcessImage
          canvasInfo_.tranY, (int)isOffscreenCanvas_);
 
     ComputeScale(dst.GetWidth(), dst.GetHeight(), !para->isRadiusGradient_);
-    Drawing::Point pts[2];
+    Drawing::Point pts[2] = {Drawing::Point(0.0f, 0.0f), Drawing::Point(0.0f, 0.0f)};
     uint8_t direction = static_cast<uint8_t>(para->direction_);
     auto clipIPadding = Drawing::Rect(0, 0, canvasInfo_.geoWidth * imageScale_, canvasInfo_.geoHeight * imageScale_);
     bool result = GetGEGradientDirectionPoints(pts, clipIPadding, static_cast<GEGradientDirection>(direction));
@@ -219,6 +222,7 @@ bool GELinearGradientBlurShaderFilter::GetGEGradientDirectionPoints(
             break;
         }
         default: {
+            break;
         }
     }
     return ProcessGradientDirectionPoints(pts, clipBounds, direction);
@@ -249,6 +253,7 @@ bool GELinearGradientBlurShaderFilter::ProcessGradientDirectionPoints(
             break;
         }
         default: {
+            break;
         }
     }
     Drawing::Matrix pointsMat = canvasInfo_.mat;
@@ -275,8 +280,16 @@ std::shared_ptr<Drawing::Image> GELinearGradientBlurShaderFilter::DrawMaskLinear
     if (imageInfo.GetWidth() < 1e-6 || imageInfo.GetHeight() < 1e-6) {
         return image;
     }
+    if (dst.GetWidth() <= 0 || dst.GetHeight() <= 0) {
+        LOGE("GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur invalid dst size");
+        return image;
+    }
     auto srcRect = Drawing::Rect(0, 0, imageInfo.GetWidth(), imageInfo.GetHeight());
     auto blurImage = blurFilter->OnProcessImage(canvas, image, srcRect, dst);
+    if (blurImage == nullptr) {
+        LOGE("GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur blurImage is null");
+        return image;
+    }
 
     Drawing::Matrix matrix;
     Drawing::Matrix inputMatrix;
@@ -310,6 +323,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GELinearGradientBlurShaderFilter:
     std::shared_ptr<Drawing::ShaderEffect> srcImageShader, std::shared_ptr<Drawing::ShaderEffect> blurImageShader,
     std::shared_ptr<Drawing::ShaderEffect> gradientShader)
 {
+    if (!srcImageShader || !blurImageShader || !gradientShader) {
+        LOGE("GELinearGradientBlurShaderFilter::MakeMaskLinearGradientBlurShader shader parameter is null");
+        return nullptr;
+    }
     if (maskBlurShaderEffect_ == nullptr) {
         static const char* prog = R"(
             uniform shader srcImageShader;

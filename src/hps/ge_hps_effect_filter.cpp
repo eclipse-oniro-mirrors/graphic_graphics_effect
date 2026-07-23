@@ -202,7 +202,13 @@ bool IsEffectMaskSupported(
 
 bool HpsEffectFilter::IsEffectSupported(const std::shared_ptr<Drawing::GEVisualEffect>& vef)
 {
+    if (!vef) {
+        return false;
+    }
     auto ve = vef->GetImpl();
+    if (!ve) {
+        return false;
+    }
     auto veType = ve->GetFilterType();
     auto typeIt = g_hpsSupportEffectExtensions.find(veType);
     if (typeIt == g_hpsSupportEffectExtensions.end()) {
@@ -574,6 +580,10 @@ std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GenerateMaskParamete
 std::shared_ptr<Drawing::HpsMaskParameter> HpsEffectFilter::GeneratePixelMapMaskParameter(
     const Drawing::GEPixelMapMaskParams& params)
 {
+    if (params.image == nullptr) {
+        LOGE("HpsEffectFilter::GeneratePixelMapMaskParameter image is null");
+        return nullptr;
+    }
     if (params.dst.GetWidth() == 0 || params.dst.GetHeight() == 0) {
         LOGE("HpsEffectFilter::GeneratePixelMapMaskParameter dst width or height is zero");
         return nullptr;

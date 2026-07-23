@@ -31,6 +31,7 @@ const std::string GRAPHICS_EFFECT_EXT_LIB_PATH = "/system/lib64/libgraphics_effe
 const std::string GRAPHICS_EFFECT_EXT_LIB_PATH = "/system/lib/libgraphics_effect_ext.z.so";
 #endif
 const std::string GRAPHICS_EFFECT_EXT_INREFACE = "CreateGEXObjectByType";
+const std::string GRAPHICS_EFFECT_EXT_DESTROY_INTERFACE = "DestroyGEXObject";
 #endif
 }
 
@@ -47,6 +48,16 @@ GEExternalDynamicLoader::GEExternalDynamicLoader()
     createObjectFunc_ = (CreateGEXObjectByTypeFunc)dlsym(libHandle_, GRAPHICS_EFFECT_EXT_INREFACE.c_str());
     if (!createObjectFunc_) {
         LOGE("GEExternalDynamicLoader CreateObjectFunc is null");
+        dlclose(libHandle_);
+        libHandle_ = nullptr;
+        return;
+    }
+
+    destroyObjectFunc_ = (DestroyGEXObjectFunc)dlsym(libHandle_, GRAPHICS_EFFECT_EXT_DESTROY_INREFACE.c_str());
+    if (!destroyObjectFunc_) {
+        dlclose(libHandle_);
+        libHandle_ = nullptr;
+        LOGE("GEExternalDynamicLoader DestroyObjectFunc is null");
         return;
     }
     LOGI("GEExternalDynamicLoader load success");
@@ -87,6 +98,27 @@ void* GEExternalDynamicLoader::CreateGEXObjectByType(uint32_t type, uint32_t len
     return nullptr;
 #else
     return createObjectFunc_(type, len, param);
+#endif
+}
+
+bool GEExternalDynamicLoader::DestroyGEXObject(void* ptr)
+{
+    if (!destroyObjectFunc_) {
+        LOGD("GEExternalDynamicLoader::DestroyGEXObject interface is null");
+        return false;
+    }
+#ifdef GE_OHOS
+    auto enable = system::GetBoolParameter(GRAPHICS_EFFECT_EXT_ENABLE, true);
+    if (enable) {
+        destroyObjectFunc_(ptr);
+        return true;
+    }
+
+    LOGW("GEExternalDynamicLoader::DestroyGEXObject dynamic load disabled");
+    return false;
+#else
+    destroyObjectFunc_(ptr);
+    return true;
 #endif
 }
 

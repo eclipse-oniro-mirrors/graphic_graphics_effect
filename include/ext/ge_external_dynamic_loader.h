@@ -31,13 +31,17 @@ public:
 
     GE_EXPORT void* CreateGEXObjectByType(uint32_t type, uint32_t len, void* param);
 
+    GE_EXPORT bool DestroyGEXObject(void* obj);
+
 private:
     using CreateGEXObjectByTypeFunc = void* (*)(uint32_t, uint32_t, void*);
+    using DestroyGEXObjectFunc = void (*)(void*);
 
     GEExternalDynamicLoader();
 
     void* libHandle_ = nullptr;
     CreateGEXObjectByTypeFunc createObjectFunc_ = nullptr;
+    DestroyGEXObjectFunc destroyObjectFunc_ = nullptr;
 };
 } // namespace Rosen
 } // namespace OHOS

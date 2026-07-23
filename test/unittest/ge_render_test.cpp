@@ -1632,5 +1632,24 @@ HWTEST_F(GERenderTest, DrawShaderEffect_InvalidBoundsZeroSize, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GERenderTest DrawShaderEffect_InvalidBoundsZeroSize end";
 }
+
+/**
+ * @tc.name: SetMesablurAllEnabledByCCM_FalseAndTrue
+ * @tc.desc: Verify SetMesablurAllEnabledByCCM no-op on false and enables on true
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, SetMesablurAllEnabledByCCM_FalseAndTrue, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest SetMesablurAllEnabledByCCM_FalseAndTrue start";
+
+    bool before = GERender::IsMesablurAllEnabled();
+    GERender::SetMesablurAllEnabledByCCM(false);
+    EXPECT_EQ(GERender::IsMesablurAllEnabled(), before);
+
+    GERender::SetMesablurAllEnabledByCCM(true);
+    EXPECT_TRUE(GERender::IsMesablurAllEnabled());
+
+    GTEST_LOG_(INFO) << "GERenderTest SetMesablurAllEnabledByCCM_FalseAndTrue end";
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

@@ -283,6 +283,11 @@ std::shared_ptr<Drawing::ShaderEffect> GEMESABlurShaderFilter::ApplyFuzedFilter(
     const std::shared_ptr<Drawing::ShaderEffect>& prevShader, const Drawing::ImageInfo& middleInfo,
     const Drawing::ImageInfo& scaledInfo, const Drawing::SamplingOptions& linear, const Drawing::Matrix& matrix) const
 {
+    if (middleInfo.GetWidth() <= 0 || middleInfo.GetHeight() <= 0 ||
+        scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0) {
+        LOGE("GEMESABlurShaderFilter::ApplyFuzedFilter invalid dimensions");
+        return nullptr;
+    }
     std::shared_ptr<Drawing::Image> tmpBlur;
     if (isGreyX_) {
         Drawing::RuntimeShaderBuilder builder(g_greyAdjustEffect);
@@ -366,6 +371,11 @@ std::shared_ptr<Drawing::ShaderEffect> GEMESABlurShaderFilter::DownSampling8X(Dr
     const Drawing::Rect& src, const Drawing::ImageInfo& scaledInfo, const Drawing::ImageInfo& middleInfo,
     const Drawing::SamplingOptions& linear, bool isEasySampling) const
 {
+    if (scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0 ||
+        middleInfo.GetWidth() <= 0 || middleInfo.GetHeight() <= 0) {
+        LOGE("GEMESABlurShaderFilter::DownSampling8X invalid dimensions");
+        return nullptr;
+    }
     std::shared_ptr<Drawing::Image> tmpBlur_pre;
     Drawing::Matrix blurMatrix = BuildMatrix(src, middleInfo, input);
     Drawing::RuntimeShaderBuilder simpleBlurBuilder(g_simpleFilter);
@@ -402,6 +412,12 @@ std::shared_ptr<Drawing::ShaderEffect> GEMESABlurShaderFilter::DownSamplingMoreX
     const Drawing::ImageInfo& scaledInfo, const Drawing::ImageInfo& middleInfo, const Drawing::ImageInfo& middleInfo2,
     const Drawing::SamplingOptions& linear, bool isEasySampling) const
 {
+    if (scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0 ||
+        middleInfo.GetWidth() <= 0 || middleInfo.GetHeight() <= 0 ||
+        middleInfo2.GetWidth() <= 0 || middleInfo2.GetHeight() <= 0) {
+        LOGE("GEMESABlurShaderFilter::DownSamplingMoreX invalid dimensions");
+        return nullptr;
+    }
     std::shared_ptr<Drawing::Image> tmpBlur_pre;
     Drawing::Matrix blurMatrix = BuildMatrix(src, middleInfo, input);
     if (!isEasySampling) {
@@ -440,6 +456,10 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::DownSamplingFuzedBlur(Dr
     const Drawing::ImageInfo& scaledInfo, int& width, int& height,
     const Drawing::SamplingOptions& linear, const NewBlurParams& blur) const
 {
+    if (scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0 || width <= 0 || height <= 0) {
+        LOGE("GEMESABlurShaderFilter::DownSamplingFuzedBlur invalid dimensions");
+        return nullptr;
+    }
     std::shared_ptr<Drawing::ShaderEffect> tmpShader;
     auto originImageInfo = input->GetImageInfo();
     auto middleInfo = Drawing::ImageInfo(std::ceil(width * BLUR_SCALE_1), std::ceil(height * BLUR_SCALE_1),
@@ -472,6 +492,10 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::PingPongBlur(Drawing::Ca
     const std::shared_ptr<Drawing::Image>& image, const std::shared_ptr<Drawing::Image>& input,
     const Drawing::ImageInfo& scaledInfo, const Drawing::SamplingOptions& linear, const NewBlurParams& blur) const
 {
+    if (scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0) {
+        LOGE("GEMESABlurShaderFilter::PingPongBlur invalid scaledInfo dimensions");
+        return nullptr;
+    }
     int stride = 2;     // 2: stride
     auto tmpBlur = image;
     for (auto i = 1; i < blur.numberOfPasses; i++) {
@@ -530,6 +554,10 @@ std::pair<float, float> GEMESABlurShaderFilter::AngleToDirection(float angle)
 std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect &src, const Drawing::Rect &dst)
 {
+    if (image == nullptr) {
+        LOGE("GEMESABlurShaderFilter::OnProcessImageWithoutUpSampling image is nullptr");
+        return image;
+    }
     auto input = image;
     CheckInputImage(canvas, image, input, src);
     NewBlurParams blur;
@@ -577,6 +605,10 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::DownSamplingForEdge(Draw
     auto originImageInfo = input->GetImageInfo();
     auto scaledInfo = Drawing::ImageInfo(std::ceil(width * factor), std::ceil(height * factor),
         originImageInfo.GetColorType(), originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
+    if (scaledInfo.GetWidth() <= 0 || scaledInfo.GetHeight() <= 0) {
+        LOGE("GEMESABlurShaderFilter::DownSamplingForEdge invalid scaledInfo dimensions");
+        return nullptr;
+    }
     const auto& blurMatrix = BuildMatrix(src, scaledInfo, input);
 
     Drawing::RuntimeShaderBuilder simpleBlurBuilder(g_simpleFilter);
@@ -620,7 +652,8 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OnProcessImage(Drawing::
 bool GEMESABlurShaderFilter::IsInputValid(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image>& image,
     const Drawing::Rect& src, const Drawing::Rect& dst)
 {
-    if (!g_blurEffect || !g_mixEffect || !image || !g_simpleFilter || (isGreyX_ && !g_greyAdjustEffect)) {
+    if (!g_blurEffect || !g_mixEffect || !image || !g_simpleFilter || (isGreyX_ && !g_greyAdjustEffect) ||
+        (isDirection_ && !g_directionBlurEffect)) {
         LOGE("GEMESABlurShaderFilter::IsInputValid invalid shader or image");
         return false;
     }
@@ -873,9 +906,13 @@ void GEMESABlurShaderFilter::CheckInputImage(Drawing::Canvas& canvas, const std:
 std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OutputImageWithoutBlur(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst) const
 {
+    if (image == nullptr) {
+        LOGE("GEMESABlurShaderFilter::OutputImageWithoutBlur image is nullptr");
+        return image;
+    }
     auto width = image->GetWidth();
     auto height = image->GetHeight();
-    if (width == 0 || height == 0) {
+    if (width == 0 || height == 0 || dst.GetWidth() <= 0 || dst.GetHeight() <= 0) {
         return image;
     }
 
@@ -895,7 +932,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OutputImageWithoutBlur(D
         builder.SetUniform("coefficient1", greyCoef1_);
         builder.SetUniform("coefficient2", greyCoef2_);
 #ifdef RS_ENABLE_GPU
-        output = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+        output = builder.MakeImage(gpuContext.get(), nullptr, imageInfo, false);
 #else
         output = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
@@ -904,7 +941,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OutputImageWithoutBlur(D
         auto inputShader = Drawing::ShaderEffect::CreateImageShader(*image, tileMode_, tileMode_, linear, inputMatrix);
         builder.SetChild("imageInput", inputShader);
 #ifdef RS_ENABLE_GPU
-        output = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
+        output = builder.MakeImage(gpuContext.get(), nullptr, imageInfo, false);
 #else
         output = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
@@ -921,9 +958,14 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::ScaleAndAddRandomColor(D
     const std::shared_ptr<Drawing::Image>& image, const std::shared_ptr<Drawing::Image>& blurImage,
     const Drawing::Rect& src, const Drawing::Rect& dst, int& width, int& height) const
 {
+    if (image == nullptr || blurImage == nullptr) {
+        LOGE("GEMESABlurShaderFilter::ScaleAndAddRandomColor image or blurImage is nullptr");
+        return blurImage;
+    }
     if (fabs(blurScale_) < 1e-6 || blurImage->GetWidth() < 1e-6 || blurImage->GetHeight() < 1e-6 ||
-        image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
-        LOGE("GEMESABlurShaderFilter::ScaleAndAddRandomColor invalid blurScale is zero.");
+        image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6 ||
+        dst.GetWidth() <= 0 || dst.GetHeight() <= 0 || width <= 0 || height <= 0) {
+        LOGE("GEMESABlurShaderFilter::ScaleAndAddRandomColor invalid blurScale or dimensions.");
         return blurImage;
     }
 

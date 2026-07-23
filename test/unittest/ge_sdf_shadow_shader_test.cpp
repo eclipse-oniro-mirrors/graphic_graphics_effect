@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#include <cmath>
+#include <limits>
+
 #include <gtest/gtest.h>
 
 #include "ge_sdf_shadow_shader.h"
@@ -102,6 +105,34 @@ HWTEST_F(GESDFShadowShaderTest, UpdateRectForShadowTest, TestSize.Level1)
     shadowShader.UpdateRectForShadow(newRect);
     EXPECT_EQ(newRect.GetTop(), -19.0f);
     EXPECT_EQ(newRect.GetBottom(), 12.0f);
+
+    Drawing::GESDFShadowShaderParams invalidShadowParams;
+    invalidShadowParams.shadow.radius = 10.0f;
+    GESDFShadowShader invalidShadowShader(invalidShadowParams);
+    // 10.0f, 10.0f, 1.0f, 1.0f is left top right bottom (left > right, invalid)
+    Drawing::Rect invalidRect { 10.0f, 10.0f, 1.0f, 1.0f };
+    EXPECT_FALSE(invalidRect.IsValid());
+    Drawing::Rect invalidRectCopy = invalidRect;
+    invalidShadowShader.UpdateRectForShadow(invalidRect);
+    EXPECT_EQ(invalidRect.GetLeft(), invalidRectCopy.GetLeft());
+    EXPECT_EQ(invalidRect.GetRight(), invalidRectCopy.GetRight());
+    EXPECT_EQ(invalidRect.GetTop(), invalidRectCopy.GetTop());
+    EXPECT_EQ(invalidRect.GetBottom(), invalidRectCopy.GetBottom());
+
+    // large radius clamped to MAX_SHADOW_RADIUS
+    constexpr float LARGE_RADIUS = 10000.0f; // 10000.0f * 1.5 = 15000 > MAX_SHADOW_RADIUS
+    Drawing::GESDFShadowShaderParams largeShadowParams;
+    largeShadowParams.shadow.radius = LARGE_RADIUS;
+    largeShadowParams.shadow.offsetX = 0.0f;
+    largeShadowParams.shadow.offsetY = 0.0f;
+    GESDFShadowShader largeShadowShader(largeShadowParams);
+    // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
+    Drawing::Rect largeRect { 1.0f, 1.0f, 2.0f, 2.0f };
+    largeShadowShader.UpdateRectForShadow(largeRect);
+    EXPECT_FLOAT_EQ(largeRect.GetLeft(), -9999.0f);
+    EXPECT_FLOAT_EQ(largeRect.GetRight(), 10002.0f);
+    EXPECT_FLOAT_EQ(largeRect.GetTop(), -9999.0f);
+    EXPECT_FLOAT_EQ(largeRect.GetBottom(), 10002.0f);
 }
 
 /**
@@ -171,6 +202,35 @@ HWTEST_F(GESDFShadowShaderTest, UpdateRectForElevationShadowTest, TestSize.Level
     shadowShader.UpdateRectForElevationShadow(newRect);
     EXPECT_EQ(newRect.GetTop(), -764.0f);
     EXPECT_EQ(newRect.GetBottom(), 757.0f);
+
+    Drawing::GESDFShadowShaderParams invalidElevParams;
+    invalidElevParams.shadow.elevation = 300.0f;
+    GESDFShadowShader invalidElevShader(invalidElevParams);
+    // 10.0f, 10.0f, 1.0f, 1.0f is left top right bottom (left > right, invalid)
+    Drawing::Rect invalidElevRect { 10.0f, 10.0f, 1.0f, 1.0f };
+    EXPECT_FALSE(invalidElevRect.IsValid());
+    Drawing::Rect invalidElevCopy = invalidElevRect;
+    invalidElevShader.UpdateRectForElevationShadow(invalidElevRect);
+    EXPECT_EQ(invalidElevRect.GetLeft(), invalidElevCopy.GetLeft());
+    EXPECT_EQ(invalidElevRect.GetRight(), invalidElevCopy.GetRight());
+    EXPECT_EQ(invalidElevRect.GetTop(), invalidElevCopy.GetTop());
+    EXPECT_EQ(invalidElevRect.GetBottom(), invalidElevCopy.GetBottom());
+
+    // large blur clamped to MAX_SHADOW_BLUR (force a blur radius beyond the max directly)
+    Drawing::GESDFShadowShaderParams largeBlurParams;
+    largeBlurParams.shadow.offsetX = 0.0f;
+    largeBlurParams.shadow.offsetY = 0.0f;
+    GESDFShadowShader largeBlurShader(largeBlurParams);
+    constexpr float OVER_MAX_BLUR = 20000.0f;
+    largeBlurShader.ambientBlurRadius_ = OVER_MAX_BLUR;
+    EXPECT_GT(largeBlurShader.ambientBlurRadius_, 10000.0f);
+    // 1.0f, 1.0f, 2.0f, 2.0f is left top right bottom
+    Drawing::Rect largeBlurRect { 1.0f, 1.0f, 2.0f, 2.0f };
+    largeBlurShader.UpdateRectForElevationShadow(largeBlurRect);
+    EXPECT_FLOAT_EQ(largeBlurRect.GetLeft(), -9999.0f);
+    EXPECT_FLOAT_EQ(largeBlurRect.GetRight(), 10002.0f);
+    EXPECT_FLOAT_EQ(largeBlurRect.GetTop(), -9999.0f);
+    EXPECT_FLOAT_EQ(largeBlurRect.GetBottom(), 10002.0f);
 }
 
 /**
@@ -211,6 +271,51 @@ HWTEST_F(GESDFShadowShaderTest, OnDrawShaderDrawRectFallback, TestSize.Level1)
     Drawing::Rect rect {1.0f, 1.0f, 200.0f, 200.0f};
     shadowShader.OnDrawShader(canvas_, rect);
     EXPECT_NE(shadowShader.GetDrawingShader(), nullptr);
+}
+
+/**
+ * @tc.name: ComputeElevationParams_InvalidAndLargeElevation
+ * @tc.desc: Verify ComputeElevationParams clamps NaN/Inf/negative to zero and large to MAX_ELEVATION
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFShadowShaderTest, ComputeElevationParams_InvalidAndLargeElevation, TestSize.Level1)
+{
+    constexpr float ZERO_BLUR = 0.0f;
+    constexpr float MAX_ELEVATION = 10000.0f;
+    constexpr float OVER_MAX_ELEVATION = 20000.0f;
+    Drawing::GESDFShadowShaderParams shadowParams;
+    GESDFShadowShader shadowShader(shadowParams);
+
+    shadowShader.ComputeElevationParams();
+    EXPECT_FLOAT_EQ(shadowShader.ambientBlurRadius_, ZERO_BLUR);
+
+    shadowParams.shadow.elevation = std::numeric_limits<float>::quiet_NaN();
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.ComputeElevationParams();
+    EXPECT_FALSE(std::isnan(shadowShader.ambientBlurRadius_));
+    EXPECT_FLOAT_EQ(shadowShader.ambientBlurRadius_, ZERO_BLUR);
+
+    shadowParams.shadow.elevation = std::numeric_limits<float>::infinity();
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.ComputeElevationParams();
+    EXPECT_FLOAT_EQ(shadowShader.ambientBlurRadius_, ZERO_BLUR);
+
+    shadowParams.shadow.elevation = -10.0f;
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.ComputeElevationParams();
+    EXPECT_FLOAT_EQ(shadowShader.ambientBlurRadius_, ZERO_BLUR);
+
+    shadowParams.shadow.elevation = MAX_ELEVATION;
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.ComputeElevationParams();
+    float atMax = shadowShader.ambientBlurRadius_;
+    EXPECT_FALSE(std::isnan(atMax));
+    EXPECT_GT(atMax, 0.0f);
+
+    shadowParams.shadow.elevation = OVER_MAX_ELEVATION;
+    shadowShader.SetSDFShadowParams(shadowParams);
+    shadowShader.ComputeElevationParams();
+    EXPECT_FLOAT_EQ(shadowShader.ambientBlurRadius_, atMax);
 }
 } // namespace Rosen
 } // namespace OHOS

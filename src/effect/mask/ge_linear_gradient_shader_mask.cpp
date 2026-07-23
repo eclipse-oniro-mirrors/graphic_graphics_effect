@@ -48,6 +48,11 @@ std::shared_ptr<ShaderEffect> GELinearGradientShaderMask::MakeCommonMask(float w
         LOGE("GELinearGradientShaderMask::MakeCommonMask invalid fractionStops size");
         return nullptr;
     }
+    constexpr size_t MAX_FRACTION_STOPS_SIZE = 1000;
+    if (fractionStops_.size() > MAX_FRACTION_STOPS_SIZE) {
+        LOGE("GELinearGradientShaderMask::MakeCommonMask fractionStops size too large");
+        return nullptr;
+    }
 
     uint8_t ColorMax = 255;
     uint8_t ColorMin = 0;

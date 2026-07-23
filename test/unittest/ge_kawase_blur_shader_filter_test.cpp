@@ -167,6 +167,9 @@ HWTEST_F(GEKawaseBlurShaderFilterTest, OnProcessImage_007, TestSize.Level0)
     Drawing::GEKawaseBlurShaderFilterParams params{30}; // 30 blur radius
     auto geKawaseBlurShaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(params);
     EXPECT_EQ(geKawaseBlurShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+
+    Drawing::Rect zeroDst { 0.0f, 0.0f, 0.0f, 0.0f };
+    EXPECT_EQ(geKawaseBlurShaderFilter->OnProcessImage(canvas_, image_, src_, zeroDst), image_);
 }
 
 /**
@@ -637,6 +640,53 @@ HWTEST_F(GEKawaseBlurShaderFilterTest, Type_001, TestSize.Level2)
     auto geKawaseBlurShaderFilter = std::make_shared<GEKawaseBlurShaderFilter>(params);
     EXPECT_EQ(geKawaseBlurShaderFilter->Type(), Drawing::GEFilterType::KAWASE_BLUR);
     EXPECT_EQ(geKawaseBlurShaderFilter->TypeName(), Drawing::GE_FILTER_KAWASE_BLUR);
+}
+
+/**
+ * @tc.name: ApplySimpleFilter_NullPrevShader
+ * @tc.desc: Verify ApplySimpleFilter returns nullptr when prevShader is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEKawaseBlurShaderFilterTest, ApplySimpleFilter_NullPrevShader, TestSize.Level1)
+{
+    Drawing::GEKawaseBlurShaderFilterParams params { 1 };
+    auto filter = std::make_shared<GEKawaseBlurShaderFilter>(params);
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    auto image = bmp.MakeImage();
+    auto originImageInfo = image->GetImageInfo();
+    auto scaledInfo = Drawing::ImageInfo(25, 25, originImageInfo.GetColorType(),
+        originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    auto result = filter->ApplySimpleFilter(canvas_, image, nullptr, scaledInfo, linear);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: ApplySimpleFilter_ValidPrevShader
+ * @tc.desc: Verify ApplySimpleFilter with valid prevShader on CPU canvas
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEKawaseBlurShaderFilterTest, ApplySimpleFilter_ValidPrevShader, TestSize.Level1)
+{
+    Drawing::GEKawaseBlurShaderFilterParams params { 1 };
+    auto filter = std::make_shared<GEKawaseBlurShaderFilter>(params);
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    auto image = bmp.MakeImage();
+    auto originImageInfo = image->GetImageInfo();
+    auto scaledInfo = Drawing::ImageInfo(25, 25, originImageInfo.GetColorType(),
+        originImageInfo.GetAlphaType(), originImageInfo.GetColorSpace());
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    Drawing::Matrix matrix;
+    auto prevShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, linear, matrix);
+    auto result = filter->ApplySimpleFilter(canvas_, image, prevShader, scaledInfo, linear);
+    EXPECT_EQ(result, nullptr);
 }
 
 } // namespace GraphicsEffectEngine

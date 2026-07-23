@@ -78,7 +78,7 @@ private:
 
     std::shared_ptr<GEMagnifierParams> magnifierPara_ = nullptr;
     std::shared_ptr<Drawing::GEShaderShape> sdfShape_ = nullptr;
-    static std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffectWithSDF;
+    static thread_local std::shared_ptr<Drawing::RuntimeEffect> g_magnifierShaderEffectWithSDF;
 };
 
 } // namespace Rosen

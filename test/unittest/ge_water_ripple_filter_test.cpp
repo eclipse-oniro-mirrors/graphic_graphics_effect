@@ -130,5 +130,53 @@ HWTEST_F(GEWaterRippleFilterTest, Type_001, TestSize.Level2)
     EXPECT_EQ(geWaterRippleFilter->TypeName(), Drawing::GE_FILTER_WATER_RIPPLE);
 }
 
+/**
+ * @tc.name: GetWaterRippleEffect_AllModes
+ * @tc.desc: Verify GetWaterRippleEffect returns non-null for all 4 ripple modes
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWaterRippleFilterTest, GetWaterRippleEffect_AllModes, TestSize.Level0)
+{
+    Drawing::GEWaterRippleFilterParams params0 { 0.5f, 2.0f, 0.5f, 0.7f, 0 };
+    auto filter0 = std::make_shared<GEWaterRippleFilter>(params0);
+    EXPECT_NE(filter0->GetWaterRippleEffect(), nullptr);
+
+    Drawing::GEWaterRippleFilterParams params1 { 0.5f, 2.0f, 0.5f, 0.7f, 1 };
+    auto filter1 = std::make_shared<GEWaterRippleFilter>(params1);
+    EXPECT_NE(filter1->GetWaterRippleEffect(), nullptr);
+
+    Drawing::GEWaterRippleFilterParams params2 { 0.5f, 2.0f, 0.5f, 0.7f, 2 };
+    auto filter2 = std::make_shared<GEWaterRippleFilter>(params2);
+    EXPECT_NE(filter2->GetWaterRippleEffect(), nullptr);
+
+    Drawing::GEWaterRippleFilterParams params3 { 0.5f, 2.0f, 0.5f, 0.7f, 3 };
+    auto filter3 = std::make_shared<GEWaterRippleFilter>(params3);
+    EXPECT_NE(filter3->GetWaterRippleEffect(), nullptr);
+}
+
+/**
+ * @tc.name: GetWaterRippleEffect_InvalidMode
+ * @tc.desc: Verify GetWaterRippleEffect returns nullptr for invalid ripple mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWaterRippleFilterTest, GetWaterRippleEffect_InvalidMode, TestSize.Level0)
+{
+    Drawing::GEWaterRippleFilterParams params { 0.5f, 2.0f, 0.5f, 0.7f, 99 };
+    auto filter = std::make_shared<GEWaterRippleFilter>(params);
+    EXPECT_EQ(filter->GetWaterRippleEffect(), nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImage_Mode2
+ * @tc.desc: Verify OnProcessImage with SMALL2SMALL ripple mode
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEWaterRippleFilterTest, OnProcessImage_Mode2, TestSize.Level0)
+{
+    Drawing::GEWaterRippleFilterParams params { 0.5f, 2.0f, 0.5f, 0.7f, 2 };
+    auto filter = std::make_shared<GEWaterRippleFilter>(params);
+    EXPECT_NE(filter->OnProcessImage(canvas_, image_, src_, dst_), nullptr);
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
