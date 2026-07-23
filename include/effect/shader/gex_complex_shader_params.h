@@ -18,7 +18,6 @@
 #include <vector>
 
 #include "ge_common.h"
-#include "parcel.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -44,10 +43,6 @@ enum class GexComplexShaderType: uint32_t {
 struct GE_EXPORT GEXComplexShaderParams {
     GexComplexShaderType type_;
     std::vector<float> params_;
- 
-    bool Marshalling(Parcel& parcel);
-    
-    bool Unmarshalling(Parcel& parcel);
 };
 
 } // namespace Rosen

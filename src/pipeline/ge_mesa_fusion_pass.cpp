@@ -53,6 +53,11 @@ GEFilterComposerPassResult GEMesaFusionPass::Run(std::vector<GEFilterComposable>
         if (iImpl->GetFilterType() == GEFilterType::GREY && jImpl->GetFilterType() == GEFilterType::KAWASE_BLUR) {
             auto&& greyParams = iImpl->GetGreyParams();
             auto&& blurParams = jImpl->GetKawaseParams();
+            if (greyParams == nullptr || blurParams == nullptr) {
+                LOGW("GEMesaFusionPass::Run greyParams or blurParams is null, skip fusion");
+                resultComposables.push_back(composables[i]);
+                continue;
+            }
             resultComposables.push_back(ComposeGreyKawase(greyParams, blurParams));
             i = j; // consumed 2 effects, skip composed j, next loop will be j+1
             composed = true;

@@ -567,6 +567,7 @@ enum class GEParamsMemberTag : uint32_t {
     SPATIAL_GLASS_EFFECT_SNAPSHOT_RECT,
     SPATIAL_GLASS_EFFECT_SNAPSHOT_MATRIX,
     SPATIAL_GLASS_EFFECT_REFRACT_OUT_PX,
+    SPATIAL_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
     SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
     SPATIAL_POINT_LIGHT_LIGHT_POSITION,
     SPATIAL_POINT_LIGHT_ATTENUATION,
@@ -1952,8 +1953,7 @@ GE_PARAMS_FIELD_ACCESSOR(GEFrostedGlassEffectParams, darkModeEdLightAngles,
     FROSTED_GLASS_EFFECT_DARK_MODE_ED_LIGHT_ANGLES, FrostedGlassEffect_DarkModeEdLightAngles);
 GE_PARAMS_FIELD_ACCESSOR(
     GEFrostedGlassEffectParams, darkScale, FROSTED_GLASS_EFFECT_DARK_SCALE, FrostedGlassEffect_DarkScale);
-GE_PARAMS_FIELD_ACCESSOR(
-    GEFrostedGlassEffectParams, enableSDFCache, FROSTED_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
+GE_PARAMS_FIELD_ACCESSOR(GEFrostedGlassEffectParams, enableSDFCache, FROSTED_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
     FrostedGlassEffect_EnableSDFCache);
 GE_PARAMS_FIELD_ACCESSOR(
     GEFrostedGlassShaderFilterParams, blurParams, FROSTED_GLASS_BLUR_PARAMS, FrostedGlass_BlurParams);
@@ -2417,6 +2417,8 @@ GE_PARAMS_FIELD_ACCESSOR(GESpatialGlassEffectParams, snapshotMatrix, SPATIAL_GLA
     SpatialGlassEffect_SnapshotMatrix);
 GE_PARAMS_FIELD_ACCESSOR(
     GESpatialGlassEffectParams, refractOutPx, SPATIAL_GLASS_EFFECT_REFRACT_OUT_PX, SpatialGlassEffect_RefractOutPx);
+GE_PARAMS_FIELD_ACCESSOR(GESpatialGlassEffectParams, enableSDFCache, SPATIAL_GLASS_EFFECT_ENABLE_S_D_F_CACHE,
+    SpatialGlassEffect_EnableSDFCache);
 GE_PARAMS_FIELD_ACCESSOR(GESpatialPointLightShaderParams, lightIntensity, SPATIAL_POINT_LIGHT_LIGHT_INTENSITY,
     SpatialPointLight_LightIntensity);
 GE_PARAMS_FIELD_ACCESSOR(GESpatialPointLightShaderParams, lightPosition, SPATIAL_POINT_LIGHT_LIGHT_POSITION,

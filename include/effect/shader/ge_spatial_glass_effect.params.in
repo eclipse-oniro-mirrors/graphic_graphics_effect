@@ -116,4 +116,5 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     Drawing::Matrix snapshotMatrix; // effect component total matrix
     [[ge::prop(min=-500.0f, max=500.0f)]]
     float refractOutPx = 0.0f; // envlight refraction outward sampling degree
+    bool enableSDFCache = true;
 };

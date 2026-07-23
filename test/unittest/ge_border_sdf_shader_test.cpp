@@ -304,13 +304,13 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest017, TestSize.Level1)
     auto params = GetTestParams();
     auto shader = GEBorderSDFShader(params);
 
-    shader.MakeDrawingShader(Drawing::Rect(0, 0, 50, 50), 0.5f);
+    shader.MakeDrawingShader(canvas_, Drawing::Rect(0, 0, 50, 50), 0.5f);
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 
-    shader.MakeDrawingShader(Drawing::Rect(0, 0, 100, 100), 0.5f);
+    shader.MakeDrawingShader(canvas_, Drawing::Rect(0, 0, 100, 100), 0.5f);
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 
-    shader.MakeDrawingShader(Drawing::Rect(0, 0, 200, 200), 0.5f);
+    shader.MakeDrawingShader(canvas_, Drawing::Rect(0, 0, 200, 200), 0.5f);
     EXPECT_NE(shader.GetDrawingShader(), nullptr);
 }
 

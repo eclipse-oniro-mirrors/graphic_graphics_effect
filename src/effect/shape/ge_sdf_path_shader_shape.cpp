@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <stack>
 #include <string>
@@ -46,6 +47,8 @@ constexpr float MIN_SCALE_CLAMP = 0.001f;
 constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate conversion
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
 constexpr float MIDPOINT_FACTOR = 0.5f;     // factor for calculating midpoint
+constexpr float MAX_ASPECT = 3.0f;          // Large aspect ratio difference
+constexpr float ALIGN_STEP = 8.0f;          // ceil the width and height of the downsampled components
 
 bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
@@ -490,6 +493,22 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalShaderEffect
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_sdfPropEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_clearInfEffect = nullptr;
 
+static std::optional<double> convertStringToDouble(const std::string& str)
+{
+    char* end = nullptr;
+    errno = 0;
+    double val = strtod(str.c_str(), &end);
+    if (end == str) {
+        LOGE("Conversion failed: No valid number.");
+        return std::nullopt;
+    }
+    if (errno == ERANGE) {
+        LOGE("Conversion overflow or underflow.");
+        return std::nullopt;
+    }
+    return val;
+}
+
 static std::vector<float> parseNumbers(const std::string& s, size_t& i)
 {
     std::vector<float> result;
@@ -524,7 +543,11 @@ static std::vector<float> parseNumbers(const std::string& s, size_t& i)
         }
 
         // converting numbers
-        double val = std::stod(s.substr(start, i - start));
+        auto optVal = convertStringToDouble(s.substr(start, i - start));
+        if (!optVal.has_value()) {
+            break;
+        }
+        double val = optVal.value();
         result.push_back(static_cast<float>(val));
     }
     return result;
@@ -616,6 +639,11 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     }
     if (numPasses_ <= 0) {
         return sdfTex;
+    }
+
+    if (!sdfTex) {
+        LOGE("GESDFPathShaderShape::RunSDFPropagation sdfTex is null");
+        return nullptr;
     }
 
     auto gpuContext = canvas.GetGPUContext();
@@ -916,6 +944,13 @@ Drawing::Path GESDFPathShaderShape::PreparePathForRendering(const Drawing::Rect&
     UpdateScale(params_.scale, rect);
     width = rect.GetWidth() * params_.scale.x_;
     height = rect.GetHeight() * params_.scale.y_;
+    // Add width and height alignment operations to avoid jitter caused by partition calculations
+    if (height > width * MAX_ASPECT && rect.GetWidth() > 0.0f && rect.GetHeight() > 0.0f) {
+        width = std::ceil(width / ALIGN_STEP) * ALIGN_STEP;
+        height = std::ceil(height / ALIGN_STEP) * ALIGN_STEP;
+        params_.scale.x_ = width / rect.GetWidth();
+        params_.scale.y_ = height / rect.GetHeight();
+    }
 
     Drawing::Matrix matrix;
     matrix.SetScale(params_.scale.x_, params_.scale.y_);
@@ -1115,8 +1150,14 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
         width = originalW * scaleX;
         height = originalH * scaleY;
     }
-    if (height > (width * 3.0f)) { // 3.0f: Large aspect ratio difference
-        scaleY *= (width * 3.0f) / height; // 3.0f: Reduce aspect ratio differences
+    // Switch to isotropic downsampling when aspect ratio exceeds limit to prevent abnormal sdf scaling.
+    constexpr float MIN_SCALE_FLOOR = 0.4f; // 0.4f: Maximum downsampling level
+    if (height > width * MAX_ASPECT) {
+        // The calculated target scale is always smaller than the original scale within this branch
+        float targetScale = scaleY * (width * MAX_ASPECT) / height;
+        targetScale = std::max(targetScale, MIN_SCALE_FLOOR);
+        scaleX = targetScale;
+        scaleY = targetScale;
     }
 
     scaleX = std::max(scaleX, MIN_SCALE_CLAMP);
