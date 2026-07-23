@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <cstring>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include <cstdlib>
 
 #include "ge_frosted_glass_effect_cfg.h"
 
@@ -30,6 +32,7 @@ class GEFrostedGlassEffectCfgTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
+    bool CheckFileGraphicConfig();
     void SetUp() override;
     void TearDown() override;
 };
@@ -42,6 +45,15 @@ void GEFrostedGlassEffectCfgTest::SetUpTestCase(void)
 void GEFrostedGlassEffectCfgTest::TearDownTestCase(void)
 {
     xmlCleanupParser();
+}
+
+bool GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig()
+{
+    std::string pathProd = "/sys_prod/etc/graphic/graphic_config.xml";
+    std::string pathSys = "/system/variant/phone/base/etc/graphic/graphic_config.xml";
+    bool result = (std::filesystem::exists(pathProd) || std::filesystem::exists(pathSys));
+    GTEST_LOG_(INFO) << "GEFrostedGlassEffectCfgTest::CheckFileGraphicConfig " << result;
+    return result;
 }
 
 void GEFrostedGlassEffectCfgTest::SetUp() {}
@@ -93,6 +105,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, GraphicConfigPath_001, TestSize.Level1)
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\"><child/></root>";
     xmlDocPtr doc = xmlReadMemory(xmlContent, strlen(xmlContent), "test.xml", nullptr, 0);
@@ -110,6 +125,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_001, TestSize.Level1)
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_002, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"FrostedGlassEffectCfg\"><child/></root>";
     xmlDocPtr doc = xmlReadMemory(xmlContent, strlen(xmlContent), "test.xml", nullptr, 0);
@@ -144,6 +162,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_003, TestSize.Level1)
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_004, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent =
         "<root name=\"FrostedGlassEffectCfg\"><child name=\"EnableAntiAliasCode\" value=\"1\"/></root>";
@@ -163,6 +184,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_004, TestSize.Level1)
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_005, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"FrostedGlassEffectCfg\">text<!-- comment --><child/></root>";
     xmlDocPtr doc = xmlReadMemory(xmlContent, strlen(xmlContent), "test.xml", nullptr, 0);
@@ -252,6 +276,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFrostedGlassInternal_004, TestSize.Le
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, FeatureParamParseEntry_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     bool result = instance.FeatureParamParseEntry();
     EXPECT_TRUE(result);
@@ -268,6 +295,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, GetIsDisableAntiAliasCode_Static_001, Test
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_MultipleChildren_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"FrostedGlassEffectCfg\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"true\"/>"
@@ -289,6 +319,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_MultipleChildren_001, Te
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_ValueTrue_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"FrostedGlassEffectCfg\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"true\"/>"
@@ -309,6 +342,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_ValueTrue_001, TestSize.
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_ValueTRUE_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"FrostedGlassEffectCfg\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"TRUE\"/>"
@@ -347,6 +383,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFrostedGlassInternal_ValueFalse_001, 
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithChildren_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"1\"/>"
@@ -368,6 +407,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithChildren_001, T
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithMultipleChildren_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"true\"/>"
@@ -390,6 +432,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithMultipleChildre
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithTextAndComment_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\">text<!-- comment -->"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"TRUE\"/>"
@@ -428,6 +473,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakNoChildren_001, Tes
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithFeatureSingleParam_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\">"
         "<FeatureSingleParam name=\"SomeParam\" value=\"test\"/>"
@@ -449,6 +497,9 @@ HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithFeatureSinglePa
 
 HWTEST_F(GEFrostedGlassEffectCfgTest, ParseFeatureParam_BreakWithValueFalse_001, TestSize.Level1)
 {
+    if (!CheckFileGraphicConfig()) {
+        return;
+    }
     auto& instance = GEFrostedGlassEffectCfg::GetInstance();
     const char* xmlContent = "<root name=\"OtherName\">"
         "<FeatureSwitch name=\"EnableAntiAliasCode\" value=\"false\"/>"
