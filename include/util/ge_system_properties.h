@@ -18,7 +18,8 @@
 #include "ge_common.h"
 
 #include <atomic>
-#include <cstdlib>
+#include <charconv>
+#include <cstring>
 #include <string>
 #include <vector>
 
