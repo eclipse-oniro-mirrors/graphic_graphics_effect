@@ -641,11 +641,6 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
         return sdfTex;
     }
 
-    if (!sdfTex) {
-        LOGE("GESDFPathShaderShape::RunSDFPropagation sdfTex is null");
-        return nullptr;
-    }
-
     auto gpuContext = canvas.GetGPUContext();
     if (!gpuContext) {
         LOGE("GESDFPathShaderShape::RunSDFPropagation no GPU context");
