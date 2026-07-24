@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_linear_gradient_blur_shader_filter.h"
+#include "ge_linear_gradient_shader_mask.h"
 
 #include "draw/color.h"
 #include "image/bitmap.h"
