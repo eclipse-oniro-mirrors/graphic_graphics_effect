@@ -1173,6 +1173,69 @@ HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullSdfTexZeroPasses, TestSi
     EXPECT_EQ(result, nullptr);
 }
 
+/**
+ * @tc.name: RunSDFPropagationNullMaskTex
+ * @tc.desc: Test RunSDFPropagation returns sdfTex when maskTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullMaskTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+ 
+    GESDFPathShaderShape shape(param);
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, fmt);
+    bmp.ClearWithColor(Drawing::Color::COLOR_RED);
+    auto sdfTex = bmp.MakeImage();
+    ASSERT_NE(sdfTex, nullptr);
+ 
+    auto result = shape.RunSDFPropagation(*canvas_, sdfTex, nullptr, 50, 50);
+    EXPECT_EQ(result.get(), sdfTex.get());
+}
+ 
+/**
+ * @tc.name: ComputeDistanceFieldNullSdfTex
+ * @tc.desc: Test ComputeDistanceField returns nullptr when sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ComputeDistanceFieldNullSdfTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+ 
+    GESDFPathShaderShape shape(param);
+    auto result = shape.ComputeDistanceField(*canvas_, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
+}
+ 
+/**
+ * @tc.name: PreprocessOverflowDimensions
+ * @tc.desc: Test Preprocess handles extremely large width/height gracefully
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, PreprocessOverflowDimensions, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+ 
+    GESDFPathShaderShape shape(param);
+    float maxFloat = static_cast<float>(std::numeric_limits<int>::max()) + 1.0f;
+    Drawing::Rect overflowRect(0.0f, 0.0f, maxFloat, 100.0f);
+    shape.Preprocess(*canvas_, overflowRect, false);
+    EXPECT_EQ(shape.disResult_, nullptr);
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
