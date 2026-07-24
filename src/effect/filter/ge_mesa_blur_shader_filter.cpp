@@ -932,7 +932,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OutputImageWithoutBlur(D
         builder.SetUniform("coefficient1", greyCoef1_);
         builder.SetUniform("coefficient2", greyCoef2_);
 #ifdef RS_ENABLE_GPU
-        output = builder.MakeImage(gpuContext.get(), nullptr, imageInfo, false);
+        output = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 #else
         output = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
@@ -941,7 +941,7 @@ std::shared_ptr<Drawing::Image> GEMESABlurShaderFilter::OutputImageWithoutBlur(D
         auto inputShader = Drawing::ShaderEffect::CreateImageShader(*image, tileMode_, tileMode_, linear, inputMatrix);
         builder.SetChild("imageInput", inputShader);
 #ifdef RS_ENABLE_GPU
-        output = builder.MakeImage(gpuContext.get(), nullptr, imageInfo, false);
+        output = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, imageInfo, false);
 #else
         output = builder.MakeImage(nullptr, nullptr, imageInfo, false);
 #endif
