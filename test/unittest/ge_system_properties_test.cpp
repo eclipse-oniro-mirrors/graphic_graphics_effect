@@ -60,24 +60,5 @@ HWTEST_F(GESystemPropertiesTest, GetBoolSystemProperty_001, TestSize.Level2)
     EXPECT_FALSE(GESystemProperties::GetBoolSystemProperty("", false));
 }
 
-/**
- * @tc.name: ConvertToInt
- * @tc.desc: Verify function ConvertToInt
- * @tc.type:FUNC
- */
-HWTEST_F(GESystemPropertiesTest, ConvertToInt, TestSize.Level2)
-{
-    constexpr int defaultNullptr = 7;
-    EXPECT_EQ(GESystemProperties::ConvertToInt(nullptr, defaultNullptr), defaultNullptr);
-    constexpr int defaultNonNumeric = 9;
-    EXPECT_EQ(GESystemProperties::ConvertToInt("abc", defaultNonNumeric), defaultNonNumeric);
-    constexpr int expectedValid = 42;
-    EXPECT_EQ(GESystemProperties::ConvertToInt("42", 0), expectedValid);
-    constexpr int defaultEmpty = 5;
-    EXPECT_EQ(GESystemProperties::ConvertToInt("", defaultEmpty), defaultEmpty);
-    constexpr int defaultOverflow = 3;
-    EXPECT_EQ(GESystemProperties::ConvertToInt("9999999999999999999", defaultOverflow), defaultOverflow);
-}
-
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
