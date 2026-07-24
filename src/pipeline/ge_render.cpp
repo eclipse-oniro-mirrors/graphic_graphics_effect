@@ -323,7 +323,7 @@ std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<D
 void GERender::SetMesablurAllEnabledByCCM(bool flag)
 {
     if (flag) {
-        isMesablurAllEnable_.load(true);
+        isMesablurAllEnable_.store(true);
     }
 }
 
