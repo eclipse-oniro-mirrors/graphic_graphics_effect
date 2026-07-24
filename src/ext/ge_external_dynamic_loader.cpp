@@ -31,7 +31,7 @@ const std::string GRAPHICS_EFFECT_EXT_LIB_PATH = "/system/lib64/libgraphics_effe
 const std::string GRAPHICS_EFFECT_EXT_LIB_PATH = "/system/lib/libgraphics_effect_ext.z.so";
 #endif
 const std::string GRAPHICS_EFFECT_EXT_INREFACE = "CreateGEXObjectByType";
-const std::string GRAPHICS_EFFECT_EXT_DESTROY_INTERFACE = "DestroyGEXObject";
+const std::string GRAPHICS_EFFECT_EXT_DESTROY_INREFACE = "DestroyGEXObject";
 #endif
 }
 
