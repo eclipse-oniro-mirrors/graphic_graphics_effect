@@ -75,6 +75,8 @@ HWTEST_F(GESystemPropertiesTest, ConvertToInt, TestSize.Level2)
     EXPECT_EQ(GESystemProperties::ConvertToInt("42", 0), expectedValid);
     constexpr int defaultEmpty = 5;
     EXPECT_EQ(GESystemProperties::ConvertToInt("", defaultEmpty), defaultEmpty);
+    constexpr int defaultOverflow = 3;
+    EXPECT_EQ(GESystemProperties::ConvertToInt("9999999999999999999", defaultOverflow), defaultOverflow);
 }
 
 } // namespace GraphicsEffectEngine
