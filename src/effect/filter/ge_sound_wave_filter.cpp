@@ -141,7 +141,7 @@ void GESoundWaveFilter::CheckSoundWaveColor4f(Drawing::Color4f& color)
 
 std::shared_ptr<Drawing::RuntimeEffect> GESoundWaveFilter::GetSoundWaveEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_soundWaveShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_soundWaveShader = nullptr;
     if (g_soundWaveShader == nullptr) {
         g_soundWaveShader = GECreateRuntimeEffectForShader(shaderStringSoundWave);
     }

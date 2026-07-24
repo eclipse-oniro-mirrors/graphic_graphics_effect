@@ -199,6 +199,11 @@ HWTEST_F(GEAIBarShaderFilterTest, OnProcessImage_008, TestSize.Level0)
         std::make_unique<GEAIBarShaderFilter>(geAIBarShaderFilterParams);
     EXPECT_EQ(geAIBarShaderFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
 
+    // 0.2, 0.8, 0.5, 0.5, 1.0 valid AI bar params: low, high, threshold, opacity, saturation
+    Drawing::GEAIBarShaderFilterParams cpuParams { 0.2, 0.8, 0.5, 0.5, 1.0 };
+    auto cpuFilter = std::make_unique<GEAIBarShaderFilter>(cpuParams);
+    EXPECT_EQ(cpuFilter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+
     GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest OnProcessImage_008 end";
 }
 
@@ -237,6 +242,35 @@ HWTEST_F(GEAIBarShaderFilterTest, Type_001, TestSize.Level3)
     EXPECT_EQ(geAIBarShaderFilter->TypeName(), Drawing::GE_FILTER_AI_BAR);
 
     GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest Type_001 end";
+}
+
+/**
+ * @tc.name: MakeBinarizationShaderNullShader
+ * @tc.desc: Verify MakeBinarizationShader returns nullptr when imageShader is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEAIBarShaderFilterTest, MakeBinarizationShaderNullShader, TestSize.Level0)
+{
+    Drawing::GEAIBarShaderFilterParams params { 0.0, 0.0, 0.0, 0.0, 0.0 };
+    auto filter = std::make_unique<GEAIBarShaderFilter>(params);
+
+    EXPECT_EQ(filter->MakeBinarizationShader(1.0f, 1.0f, nullptr), nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImage_009
+ * @tc.desc: Verify OnProcessImage returns original image when gpuContext is null on CPU canvas
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEAIBarShaderFilterTest, OnProcessImage_009, TestSize.Level0)
+{
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest OnProcessImage_009 start";
+
+    Drawing::GEAIBarShaderFilterParams params { 0.2, 0.8, 0.5, 0.5, 1.0 };
+    auto filter = std::make_unique<GEAIBarShaderFilter>(params);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+
+    GTEST_LOG_(INFO) << "GEAIBarShaderFilterTest OnProcessImage_009 end";
 }
 
 } // namespace Rosen

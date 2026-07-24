@@ -14,7 +14,8 @@
  */
  
 #include <chrono>
- 
+#include <cmath>
+
 #include "ge_log.h"
 #include "ge_sdf_shadow_shader.h"
 #include "ge_shader_diagnostics.h"
@@ -52,11 +53,18 @@ void GESDFShadowShader::MakeDrawingShader(Drawing::Canvas& canvas, const Drawing
 
 void GESDFShadowShader::UpdateRectForShadow(Drawing::Rect& rect)
 {
+    if (!rect.IsValid()) {
+        return;
+    }
     float radius = std::max(params_.shadow.radius * RADIUS_FACTOR, SDF_SHADOW_MIN_THRESHOLD);
+    constexpr float MAX_SHADOW_RADIUS = 10000.0f;
+    if (radius > MAX_SHADOW_RADIUS) {
+        radius = MAX_SHADOW_RADIUS;
+    }
     float offsetLeft = params_.shadow.offsetX - radius;
     float offsetTop = params_.shadow.offsetY - radius;
     float offsetRight = params_.shadow.offsetX + radius;
-    float offsetBottom =  params_.shadow.offsetY + radius;
+    float offsetBottom = params_.shadow.offsetY + radius;
     if (ROSEN_LNE(offsetLeft, 0.0f)) {
         rect.SetLeft(rect.GetLeft() + offsetLeft);
     }
@@ -173,6 +181,15 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetSDFShadowEffect()
 void GESDFShadowShader::ComputeElevationParams()
 {
     float elevation = params_.shadow.elevation;
+    //上层调用存在防御性负值判断，实际<=0情况不会走到这里
+    if (std::isnan(elevation) || std::isinf(elevation) || elevation < 0.0f) {
+        elevation = 0.0f;
+    }
+    //上层调用枚举值对应参数固定设置为几百
+    constexpr float MAX_ELEVATION = 10000.0f;
+    if (elevation > MAX_ELEVATION) {
+        elevation = MAX_ELEVATION;
+    }
 
     // Ambient shadow params (aligned with Skia)
     // outset = AmbientBlurRadius = min(elevation/2, 150)
@@ -207,7 +224,14 @@ std::shared_ptr<Drawing::RuntimeEffect> GESDFShadowShader::GetElevationShadowEff
 
 void GESDFShadowShader::UpdateRectForElevationShadow(Drawing::Rect& rect)
 {
+    if (!rect.IsValid()) {
+        return;
+    }
     float maxBlur = std::max({ambientBlurRadius_, spotBlurRadius_, SDF_SHADOW_MIN_THRESHOLD});
+    constexpr float MAX_SHADOW_BLUR = 10000.0f;
+    if (maxBlur > MAX_SHADOW_BLUR) {
+        maxBlur = MAX_SHADOW_BLUR;
+    }
     rect.SetLeft(rect.GetLeft() + params_.shadow.offsetX - maxBlur);
     rect.SetTop(rect.GetTop() + params_.shadow.offsetY - maxBlur);
     rect.SetRight(rect.GetRight() + params_.shadow.offsetX + maxBlur);

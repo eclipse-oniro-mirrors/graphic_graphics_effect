@@ -29,12 +29,20 @@ static constexpr int INDEX_LEFT = 0;
 static constexpr int INDEX_RIGHT = 1;
 static constexpr int INDEX_TOP = 2;
 static constexpr int INDEX_BOTTOM = 3;
+static constexpr int MAX_RECURSION_DEPTH = 16;
+thread_local static int g_recursionDepth = 0;
 }
 
 std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDrawingShader(float width, float height) const
 {
     GE_TRACE_NAME_FMT("GESDFDistortOpShaderShape::GenerateDrawingShader, Width: %g, Height: %g", width, height);
+    if (g_recursionDepth >= MAX_RECURSION_DEPTH) {
+        LOGE("GESDFDistortOpShaderShape::GenerateDrawingShader recursion depth exceeded");
+        return nullptr;
+    }
+    ++g_recursionDepth;
     auto shapeShader = params_.shape ? params_.shape->GenerateDrawingShader(width, height) : nullptr;
+    --g_recursionDepth;
     if (!shapeShader) {
         return nullptr;
     }
@@ -45,7 +53,13 @@ std::shared_ptr<ShaderEffect> GESDFDistortOpShaderShape::GenerateDrawingShaderHa
 {
     GE_TRACE_NAME_FMT("GESDFDistortOpShaderShape::GenerateDrawingShaderHasNormal, Width: %g, Height: %g",
         width, height);
+    if (g_recursionDepth >= MAX_RECURSION_DEPTH) {
+        LOGE("GESDFDistortOpShaderShape::GenerateDrawingShaderHasNormal recursion depth exceeded");
+        return nullptr;
+    }
+    ++g_recursionDepth;
     auto shapeShader = params_.shape ? params_.shape->GenerateDrawingShaderHasNormal(width, height) : nullptr;
+    --g_recursionDepth;
     if (!shapeShader) {
         return nullptr;
     }

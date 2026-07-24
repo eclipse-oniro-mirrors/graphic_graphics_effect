@@ -90,7 +90,7 @@ std::shared_ptr<Drawing::Image> GEDispersionShaderFilter::OnProcessImage(Drawing
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDispersionShaderFilter::GetDispersionEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_dispersionShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_dispersionShader = nullptr;
     if (g_dispersionShader == nullptr) {
         g_dispersionShader = GECreateRuntimeEffectForShader(g_shaderStringDispersion);
     }

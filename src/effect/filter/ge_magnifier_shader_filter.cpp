@@ -143,7 +143,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
 )";
 } // namespace
 
-std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffectWithSDF = nullptr;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> GEMagnifierShaderFilter::g_magnifierShaderEffectWithSDF = nullptr;
 
 GEMagnifierShaderFilter::GEMagnifierShaderFilter(const Drawing::GEMagnifierShaderFilterParams& params)
 {

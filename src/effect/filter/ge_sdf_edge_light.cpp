@@ -249,6 +249,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLight::MakeEffectShader(
     builder->SetChild("blurredSdfImageShader", Drawing::ShaderEffect::CreateImageShader(
         *blurredSdfImage_, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, sampling, matrix));
     auto lightMaskShader = lightMask_->GenerateDrawingShader(imageWidth, imageHeight);
+    if (lightMaskShader == nullptr) {
+        LOGE("GESDFEdgeLight::MakeEffectShader lightMaskShader is null");
+        return nullptr;
+    }
     builder->SetChild("lightMaskShader", lightMaskShader);
 
     builder->SetUniform("spreadFactor", sdfSpreadFactor_);

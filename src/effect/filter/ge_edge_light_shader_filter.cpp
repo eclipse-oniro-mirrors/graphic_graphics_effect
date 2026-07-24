@@ -454,6 +454,9 @@ std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::GaussianBlur(Drawing::C
 std::shared_ptr<Drawing::Image> GEEdgeLightShaderFilter::MergeImage(Drawing::Canvas &canvas,
     const std::shared_ptr<Drawing::Image> image, const std::shared_ptr<Drawing::Image> compositeImage)
 {
+    if (compositeImage == nullptr) {
+        return image;
+    }
     // check image width and height in IsInputImageValid;
     auto imageInfo = image->GetImageInfo();
     float imageWidth = imageInfo.GetWidth();

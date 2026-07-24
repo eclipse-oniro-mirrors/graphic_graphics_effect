@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_linear_gradient_blur_shader_filter.h"
+#include "ge_linear_gradient_shader_mask.h"
 
 #include "draw/color.h"
 #include "image/bitmap.h"
@@ -27,6 +28,17 @@ namespace OHOS {
 namespace GraphicsEffectEngine {
 
 using namespace Rosen;
+
+namespace {
+class GENullShaderFilter : public GEShaderFilter {
+public:
+    std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas&,
+        const std::shared_ptr<Drawing::Image>, const Drawing::Rect&, const Drawing::Rect&) override
+    {
+        return nullptr;
+    }
+};
+}
 
 class GELinearGradientBlurShaderFilterTest : public testing::Test {
 public:
@@ -141,6 +153,22 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, OnProcessImage_001, TestSize.Leve
 
     std::shared_ptr<Drawing::Image> image = nullptr;
     EXPECT_EQ(filter->OnProcessImage(canvas_, image, src_, dst_), image);
+
+    // empty fractionStops -> constructor guard clears fractionStops_
+    Drawing::GELinearGradientBlurShaderFilterParams emptyParams{1.f, {}, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto emptyFilter = std::make_shared<GELinearGradientBlurShaderFilter>(emptyParams);
+    ASSERT_TRUE(emptyFilter->linearGradientBlurPara_ != nullptr);
+    EXPECT_TRUE(emptyFilter->linearGradientBlurPara_->fractionStops_.empty());
+
+    // fractionStops size > MAX(100) -> constructor guard clears fractionStops_
+    constexpr size_t EXCEED_STOPS_SIZE = 101;
+    std::vector<std::pair<float, float>> stops(EXCEED_STOPS_SIZE, {0.1f, 0.1f});
+    Drawing::GELinearGradientBlurShaderFilterParams overParams{1.f, stops, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto overFilter = std::make_shared<GELinearGradientBlurShaderFilter>(overParams);
+    ASSERT_TRUE(overFilter->linearGradientBlurPara_ != nullptr);
+    EXPECT_TRUE(overFilter->linearGradientBlurPara_->fractionStops_.empty());
 }
 
 /**
@@ -557,6 +585,100 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, Type_001, TestSize.Level1)
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::LINEAR_GRADIENT_BLUR);
     EXPECT_EQ(filter->TypeName(), Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
+}
+
+/**
+ * @tc.name: DrawMaskLinearGradientBlurInvalidDst
+ * @tc.desc: Verify DrawMaskLinearGradientBlur returns original image when dst size is not positive or blur is null
+ * @tc.type:FUNC
+ */
+HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMaskLinearGradientBlurInvalidDst, TestSize.Level0)
+{
+    ASSERT_NE(image_, nullptr);
+    Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto blurFilter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
+    std::shared_ptr<GEShaderFilter> filter = blurFilter;
+ 
+    Drawing::Rect zeroWidthDst {0.0f, 0.0f, 0.0f, 200.0f};
+    auto out = GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur(
+        image_, canvas_, filter, nullptr, zeroWidthDst);
+    EXPECT_EQ(out.get(), image_.get());
+ 
+    Drawing::Rect zeroHeightDst {0.0f, 0.0f, 200.0f, 0.0f};
+    out = GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur(
+        image_, canvas_, filter, nullptr, zeroHeightDst);
+    EXPECT_EQ(out.get(), image_.get());
+ 
+    auto nullBlur = std::make_shared<GENullShaderFilter>();
+    std::shared_ptr<GEShaderFilter> nullFilter = nullBlur;
+    Drawing::Rect dst {0.0f, 0.0f, 100.0f, 100.0f};
+    out = GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur(
+        image_, canvas_, nullFilter, nullptr, dst);
+    EXPECT_EQ(out.get(), image_.get());
+}
+ 
+/**
+ * @tc.name: ProcessImageDDGR_NullImage
+ * @tc.desc: Verify ProcessImageDDGR returns input when image is nullptr
+ * @tc.type:FUNC
+ */
+HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR_NullImage, TestSize.Level1)
+{
+    Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+ 
+    std::shared_ptr<Drawing::Image> nullImage = nullptr;
+    EXPECT_EQ(filter->ProcessImageDDGR(canvas_, nullImage, 0), nullImage);
+}
+ 
+/**
+ * @tc.name: MakeMaskLinearGradientBlurShader_NullShaders
+ * @tc.desc: Verify MakeMaskLinearGradientBlurShader returns nullptr when any shader parameter is null
+ * @tc.type:FUNC
+ */
+HWTEST_F(GELinearGradientBlurShaderFilterTest, MakeMaskLinearGradientBlurShader_NullShaders, TestSize.Level1)
+{
+    Drawing::GELinearGradientBlurShaderFilterParams params{1.f, {{0.1f, 0.1f}}, 1, 1.f, 1.f,
+        Drawing::Matrix(), 1.f, 1.f, true, false};
+    auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+ 
+    auto result = filter->MakeMaskLinearGradientBlurShader(nullptr, nullptr, nullptr);
+    EXPECT_EQ(result, nullptr);
+}
+ 
+/**
+ * @tc.name: LinearGradientShaderMask_InvalidFractionStops
+ * @tc.desc: Verify GELinearGradientShaderMask returns nullptr for empty or over-limit fractionStops
+ * @tc.type:FUNC
+ */
+HWTEST_F(GELinearGradientBlurShaderFilterTest, LinearGradientShaderMask_InvalidFractionStops, TestSize.Level1)
+{
+    Drawing::GELinearGradientShaderMaskParams emptyParam;
+    emptyParam.fractionStops = {};
+    emptyParam.startPosition = Drawing::Point(0.0f, 0.0f);
+    emptyParam.endPosition = Drawing::Point(100.0f, 0.0f);
+    Drawing::GELinearGradientShaderMask emptyMask(emptyParam);
+    EXPECT_EQ(emptyMask.GenerateDrawingShader(100.0f, 100.0f), nullptr);
+ 
+    constexpr size_t OVER_LIMIT_SIZE = 1001;
+    std::vector<std::pair<float, float>> overStops(OVER_LIMIT_SIZE, {0.5f, 0.5f});
+    Drawing::GELinearGradientShaderMaskParams overParam;
+    overParam.fractionStops = overStops;
+    overParam.startPosition = Drawing::Point(0.0f, 0.0f);
+    overParam.endPosition = Drawing::Point(100.0f, 0.0f);
+    Drawing::GELinearGradientShaderMask overMask(overParam);
+    EXPECT_EQ(overMask.GenerateDrawingShader(100.0f, 100.0f), nullptr);
+ 
+    Drawing::GELinearGradientShaderMaskParams validParam;
+    validParam.fractionStops = {{0.0f, 0.0f}, {1.0f, 1.0f}};
+    validParam.startPosition = Drawing::Point(0.0f, 0.0f);
+    validParam.endPosition = Drawing::Point(100.0f, 0.0f);
+    Drawing::GELinearGradientShaderMask validMask(validParam);
+    EXPECT_NE(validMask.GenerateDrawingShader(100.0f, 100.0f), nullptr);
 }
 
 } // namespace GraphicsEffectEngine

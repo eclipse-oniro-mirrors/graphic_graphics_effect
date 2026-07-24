@@ -89,5 +89,25 @@ HWTEST_F(GEShaderFilterTest, SetShaderFilterCanvasinfo_001, TestSize.Level0)
     GTEST_LOG_(INFO) << "GEShaderFilterTest SetShaderFilterCanvasinfo_001 end";
 }
 
+/**
+ * @tc.name: ProcessImageAndDrawImageInvalidDst
+ * @tc.desc: Verify ProcessImage/DrawImage return early when dst dimensions are invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEShaderFilterTest, ProcessImageAndDrawImageInvalidDst, TestSize.Level0)
+{
+    std::vector<float> colors = { 1.0f, 0.0f, 0.0f, 1.0f };
+    std::vector<float> positions = { 1.0f, 1.0f };
+    std::vector<float> strengths = { 0.5f };
+    Drawing::GEColorGradientShaderFilterParams params { colors, positions, strengths, nullptr };
+    auto filter = std::make_unique<GEColorGradientShaderFilter>(params);
+
+    Drawing::Rect zeroDst { 0.0f, 0.0f, 0.0f, 0.0f };
+    EXPECT_EQ(filter->ProcessImage(canvas_, image_, src_, zeroDst), image_);
+
+    Drawing::Brush brush;
+    EXPECT_FALSE(filter->DrawImage(canvas_, image_, src_, zeroDst, brush));
+}
+
 } // namespace Rosen
 } // namespace OHOS
