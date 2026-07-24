@@ -559,21 +559,21 @@ HWTEST_F(GEHpsEffectFilterTest, IsMaskParameterChanged_003, TestSize.Level0)
 }
 
 /**
-@tc.name: GeneratePixelMapMaskParameter_NullImage
-@tc.desc: Verify GeneratePixelMapMaskParameter returns nullptr when image is null
-@tc.type: FUNC
-*/
+ * @tc.name: GeneratePixelMapMaskParameter_NullImage
+ * @tc.desc: Verify GeneratePixelMapMaskParameter returns nullptr when image is null
+ * @tc.type: FUNC
+ */
 HWTEST_F(GEHpsEffectFilterTest, GeneratePixelMapMaskParameter_NullImage, TestSize.Level1)
 {
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GeneratePixelMapMaskParameter_NullImage start";
-
+ 
     auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
-    ASSERT_TRUE(hpsEffectFilter != nullptr);</hpseffectfilter>
-
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+ 
     Drawing::GEPixelMapMaskParams params;
     EXPECT_EQ(params.image, nullptr);
     EXPECT_EQ(hpsEffectFilter->GeneratePixelMapMaskParameter(params), nullptr);
-
+ 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GeneratePixelMapMaskParameter_NullImage end";
 }
 
