@@ -77,7 +77,7 @@ protected:
      *                     4 5 6
      *                     7 8 9
      * Where region 5 (the center) is subtracted, others preserved.
-     * @note If the returned value is empty or invalid, no subtraction should be applied.
+     * @note If the returned value is empty or invalid, no subtraction will be applied.
      */
     virtual Drawing::Rect GetSubtractedRect(float width, float height) const { return Drawing::Rect(); }
     uint32_t hash_ = 0;
