@@ -44,6 +44,7 @@ namespace {
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor;
+            fragColor *= smoothstep(0.01, 0.04, fragColor);
             return fragColor;
         }
     )";
@@ -60,14 +61,12 @@ namespace {
         half4 main(vec2 fragCoord)
         {
             half4 normalMap = mask.eval(fragCoord);
-            if (normalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
-                return vec4(0.0);
-            }
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
             vec3 halfwayDir = normalize(lightDirection);
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
+            fragColor *= smoothstep(0.01, 0.04, fragColor);
             return fragColor;
         }
     )";
