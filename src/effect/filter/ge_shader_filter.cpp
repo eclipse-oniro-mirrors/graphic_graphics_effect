@@ -23,9 +23,6 @@ std::shared_ptr<Drawing::Image> GEShaderFilter::ProcessImage(Drawing::Canvas& ca
 {
     GE_TRACE_NAME_FMT("GEShaderFilter::ProcessImage, Type: %s, dst Rect Width: %g, Height: %g",
         TypeName().data(), dst.GetWidth(), dst.GetHeight());
-    if (dst.GetWidth() <= 0 || dst.GetHeight() <= 0) {
-        return image;
-    }
     return OnProcessImage(canvas, image, src, dst);
 }
 
@@ -34,9 +31,6 @@ bool GEShaderFilter::DrawImage(Drawing::Canvas& canvas, const std::shared_ptr<Dr
 {
     GE_TRACE_NAME_FMT("GEShaderFilter::DrawImage, Type: %s, dst Rect Width: %g, Height: %g",
         TypeName().data(), dst.GetWidth(), dst.GetHeight());
-    if (dst.GetWidth() <= 0 || dst.GetHeight() <= 0) {
-        return false;
-    }
     return OnDrawImage(canvas, image, src, dst, brush);
 }
 
