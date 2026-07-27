@@ -169,6 +169,13 @@ enum class GEParamsMemberTag : uint32_t {
     CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_RADIUS,
     CONTOUR_DIAGONAL_FLOW_LIGHT_LIGHT_WEIGHT,
     CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_WEIGHT,
+    DEPTH_OCCLUSION_DEPTH_PLANE,
+    DEPTH_OCCLUSION_MATRIX,
+    DEPTH_OCCLUSION_DEPTH_MAP,
+    DEPTH_OCCLUSION_WEIGHT,
+    DEPTH_OCCLUSION_NEAR,
+    DEPTH_OCCLUSION_FAR,
+    DEPTH_OCCLUSION_IS_REVERSE,
     DIRECTION_LIGHT_MASK,
     DIRECTION_LIGHT_MASK_FACTOR,
     DIRECTION_LIGHT_LIGHT_DIRECTION,
@@ -1501,6 +1508,7 @@ GE_PARAMS_TYPE_INFO(GECircleFlowlightEffectParams, CIRCLE_FLOWLIGHT, CircleFlowl
 GE_PARAMS_TYPE_INFO(GEColorGradientShaderFilterParams, COLOR_GRADIENT, ColorGradient);
 GE_PARAMS_TYPE_INFO(GEContentLightFilterParams, CONTENT_LIGHT, ContentLight);
 GE_PARAMS_TYPE_INFO(GEContentDiagonalFlowLightShaderParams, CONTOUR_DIAGONAL_FLOW_LIGHT, ContourDiagonalFlowLight);
+GE_PARAMS_TYPE_INFO(GEDepthOcclusionShaderFilterParams, DEPTH_OCCLUSION, DepthOcclusion);
 GE_PARAMS_TYPE_INFO(GEDirectionLightShaderFilterParams, DIRECTION_LIGHT, DirectionLight);
 GE_PARAMS_TYPE_INFO(GEDispersionShaderFilterParams, DISPERSION, Dispersion);
 GE_PARAMS_TYPE_INFO(GEDisplacementDistortFilterParams, DISPLACEMENT_DISTORT_FILTER, DispDistort);
@@ -1767,6 +1775,17 @@ GE_PARAMS_FIELD_ACCESSOR(GEContentDiagonalFlowLightShaderParams, lightWeight_, C
     ContourDiagonalFlowLight_LightWeight);
 GE_PARAMS_FIELD_ACCESSOR(GEContentDiagonalFlowLightShaderParams, haloWeight_, CONTOUR_DIAGONAL_FLOW_LIGHT_HALO_WEIGHT,
     ContourDiagonalFlowLight_HaloWeight);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEDepthOcclusionShaderFilterParams, depthPlane, DEPTH_OCCLUSION_DEPTH_PLANE, DepthOcclusion_DepthPlane);
+GE_PARAMS_FIELD_ACCESSOR(GEDepthOcclusionShaderFilterParams, matrix, DEPTH_OCCLUSION_MATRIX, DepthOcclusion_Matrix);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEDepthOcclusionShaderFilterParams, depthMap, DEPTH_OCCLUSION_DEPTH_MAP, DepthOcclusion_DepthMap);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEDepthOcclusionShaderFilterParams, weight, DEPTH_OCCLUSION_WEIGHT, DepthOcclusion_OcclusionWeight);
+GE_PARAMS_FIELD_ACCESSOR(GEDepthOcclusionShaderFilterParams, near, DEPTH_OCCLUSION_NEAR, DepthOcclusion_OcclusionNear);
+GE_PARAMS_FIELD_ACCESSOR(GEDepthOcclusionShaderFilterParams, far, DEPTH_OCCLUSION_FAR, DepthOcclusion_OcclusionFar);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEDepthOcclusionShaderFilterParams, isReverse, DEPTH_OCCLUSION_IS_REVERSE, DepthOcclusion_IsReverse);
 GE_PARAMS_FIELD_ACCESSOR(GEDirectionLightShaderFilterParams, mask, DIRECTION_LIGHT_MASK, DirectionLight_Mask);
 GE_PARAMS_FIELD_ACCESSOR(
     GEDirectionLightShaderFilterParams, maskFactor, DIRECTION_LIGHT_MASK_FACTOR, DirectionLight_Factor);

@@ -54,6 +54,7 @@ namespace Drawing {
 #include "effect/filter/ge_blur_shader_filter.params.in"
 #include "effect/filter/ge_color_gradient_shader_filter.params.in"
 #include "effect/filter/ge_content_light_shader_filter.params.in"
+#include "effect/filter/ge_depth_occlusion_shader_filter.params.in"
 #include "effect/filter/ge_direction_light_shader_filter.params.in"
 #include "effect/filter/ge_dispersion_shader_filter.params.in"
 #include "effect/filter/ge_displacement_distort_shader_filter.params.in"
