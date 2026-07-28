@@ -28,6 +28,8 @@ namespace Rosen {
 namespace {
     constexpr int32_t COLOR_CHANNEL = 4;
     constexpr int32_t POSITION_DIMENSION = 3;
+    constexpr float FADE_EDGE_LOW = 0.01f;
+    constexpr float FADE_EDGE_HIGH = 0.04f;
 
     // Shader without mask - full screen effect
     static constexpr char PROG_NO_MASK[] = R"(
@@ -36,6 +38,8 @@ namespace {
         uniform half4 lightColor;
         uniform half lightIntensity;
         uniform half attenuation;
+        uniform float fadeEdgeLow;
+        uniform float fadeEdgeHigh;
 
         half4 main(vec2 fragCoord)
         {
@@ -44,6 +48,7 @@ namespace {
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor;
+            fragColor *= smoothstep(fadeEdgeLow, fadeEdgeHigh, fragColor);
             return fragColor;
         }
     )";
@@ -55,19 +60,19 @@ namespace {
         uniform half4 lightColor;
         uniform half lightIntensity;
         uniform half attenuation;
+        uniform float fadeEdgeLow;
+        uniform float fadeEdgeHigh;
         uniform shader mask;
 
         half4 main(vec2 fragCoord)
         {
             half4 normalMap = mask.eval(fragCoord);
-            if (normalMap.r <= 1e-4) { //minEpsilon in half is 2^-14
-                return vec4(0.0);
-            }
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
             vec3 halfwayDir = normalize(lightDirection);
             float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
             vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
+            fragColor *= smoothstep(fadeEdgeLow, fadeEdgeHigh, fragColor);
             return fragColor;
         }
     )";
@@ -148,6 +153,8 @@ std::shared_ptr<Drawing::ShaderEffect> GESpatialPointLightShader::MakeSpatialPoi
     builder->SetUniform("lightIntensity", pointLightParams_.lightIntensity);
     float clampedAttenuation = std::max(0.001f, pointLightParams_.attenuation);
     builder->SetUniform("attenuation", clampedAttenuation);
+    builder->SetUniform("fadeEdgeLow", FADE_EDGE_LOW);
+    builder->SetUniform("fadeEdgeHigh", FADE_EDGE_HIGH);
 
     // Only set mask child when mask exists
     if (pointLightParams_.mask != nullptr) {
