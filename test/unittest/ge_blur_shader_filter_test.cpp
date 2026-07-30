@@ -310,5 +310,22 @@ HWTEST_F(GEBlurShaderFilterTest, ProcessImageWithMesa_MakeSurfaceFail_001, TestS
     auto result = filter->ProcessImageWithMesa(*canvas_, image_, src_, -100);
     EXPECT_EQ(result, image_);
 }
+
+/**
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify OnProcessImage rejects a negative extension
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBlurShaderFilterTest, OnProcessImage_004, TestSize.Level1)
+{
+    Drawing::GEBlurShaderFilterParams params;
+    params.radiusX = -1.0f;
+    params.expandDrawRegion = true;
+    auto filter = std::make_shared<GEBlurShaderFilter>(params);
+
+    auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
+    EXPECT_EQ(result, image_);
+}
+
 } // namespace Rosen
 } // namespace OHOS

@@ -253,6 +253,10 @@ std::shared_ptr<Drawing::Image> GEMotionBlurShaderFilter::CreateUpscaledImage(Dr
     brush.SetBlendMode(Drawing::BlendMode::SRC);
 
     auto offscreenCanvas = offscreenSurface->GetCanvas();
+    if (offscreenCanvas == nullptr) {
+        LOGE("GEMotionBlurShaderFilter::CreateUpscaledImage offscreenCanvas is nullptr");
+        return nullptr;
+    }
     offscreenCanvas->DrawBackground(brush);
 
     return offscreenSurface->GetImageSnapshot();

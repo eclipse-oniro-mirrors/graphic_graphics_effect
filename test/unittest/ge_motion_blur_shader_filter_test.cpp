@@ -18,6 +18,7 @@
 #include "ge_motion_blur_shader_filter.h"
 
 #include "draw/color.h"
+#include "draw/surface.h"
 #include "image/bitmap.h"
 
 using namespace testing;
@@ -25,6 +26,20 @@ using namespace testing::ext;
 
 namespace OHOS {
 namespace Rosen {
+namespace {
+class MotionBlurTestCanvas final : public Drawing::Canvas {
+public:
+    explicit MotionBlurTestCanvas(Drawing::Surface* surface) : surface_(surface) {}
+
+    Drawing::Surface* GetSurface() const override
+    {
+        return surface_;
+    }
+
+private:
+    Drawing::Surface* surface_ = nullptr;
+};
+} // namespace
 
 class GEMotionBlurShaderFilterTest : public testing::Test {
 public:
@@ -230,6 +245,23 @@ HWTEST_F(GEMotionBlurShaderFilterTest, OnProcessImage_003, TestSize.Level1)
     auto filter = std::make_shared<GEMotionBlurShaderFilter>(params);
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(result, image_);
+}
+
+/**
+ * @tc.name: CreateUpscaledImageWithValidCanvas
+ * @tc.desc: Verify CreateUpscaledImage uses a valid offscreen canvas
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMotionBlurShaderFilterTest, CreateUpscaledImageWithValidCanvas, TestSize.Level1)
+{
+    auto surface = Drawing::Surface::MakeRasterN32Premul(imageWidth_, imageHeight_);
+    ASSERT_NE(surface, nullptr);
+    MotionBlurTestCanvas canvas(surface.get());
+    Drawing::GEMotionBlurShaderFilterParams params;
+    auto filter = std::make_shared<GEMotionBlurShaderFilter>(params);
+
+    auto result = filter->CreateUpscaledImage(canvas, image_);
+    EXPECT_NE(result, nullptr);
 }
 
 } // namespace Rosen
