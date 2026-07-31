@@ -144,6 +144,7 @@ Parameters: definition (`.params.in`) → generation (`gen_metadata.py`) → run
 - ⚠️ **Ask first:**
   - Before changing core interfaces (`IGEFilterType`, `GEVisualEffect`, `GERender`)
   - Before modifying `graphic_config.xml` parsing logic
+  - Before changing IPC/Parcel deserialization or `GEExternalDynamicLoader` (`dlopen`/`void*` cast) — security-sensitive boundaries
 
 - 🚫 **Never:**
   - Manually edit `ge_params_reflection.h/cpp` or `ge_effects_params.h` (auto-generated)
@@ -159,3 +160,4 @@ Parameters: definition (`.params.in`) → generation (`gen_metadata.py`) → run
 - **C++ conventions** → [docs/cpp_guidelines.md](docs/cpp_guidelines.md) + [docs/cpp_domain_guidelines.md](docs/cpp_domain_guidelines.md)
 - **Upstream Drawing API** → [docs/drawing_api_contracts.md](docs/drawing_api_contracts.md)
 - **Writing tests** → [docs/testing_guide.md](docs/testing_guide.md) + `test/unittest/`
+- **External interface boundaries** → [docs/external_interface_boundaries.md](docs/external_interface_boundaries.md)

@@ -13,6 +13,7 @@ For general C++ conventions, see [cpp_guidelines.md](cpp_guidelines.md). For ups
 | Write error log messages | [Log Accuracy](#log-accuracy) |
 | Propagate color space to offscreen | [Color Space Propagation](#color-space-propagation) |
 | Invalidate cache on failure | [Stale Cache on Failure](#stale-cache-on-failure) |
+| Range-check deserialized enums | [IPC Enum Validation](#ipc-enum-validation) |
 
 ---
 
@@ -88,3 +89,29 @@ if (cacheImg) {
     LOGE("...cache build failed, will retry next frame");
 }
 ```
+
+---
+
+## IPC Enum Validation
+
+**Range-check enums deserialized from `Parcel`.** Casting a raw `uint32_t` to an enum without bounds checking allows out-of-range values to slip through and desync the Parcel cursor (ES.49 — use a named cast, validate before use). Validate the value is within `[enum::first, enum::MAX)` before use.
+
+```cpp
+// 🚫 no range check — cursor desyncs on invalid input
+uint32_t typeVal;
+parcel.ReadUint32(typeVal);
+auto type = static_cast<GEMyType>(typeVal);  // may be out of range
+```
+
+```cpp
+// ✅ validate range before cast
+uint32_t typeVal;
+if (!parcel.ReadUint32(typeVal)) { return false; }
+if (typeVal >= static_cast<uint32_t>(GEMyType::MAX)) {
+    LOGE("...invalid enum value");
+    return false;
+}
+auto type = static_cast<GEMyType>(typeVal);
+```
+
+Also use the correct `static_cast<uint32_t>` (not `int32_t`) when comparing against `uint32_t` — signed/unsigned mismatch can produce wrong results because negative signed values convert to large unsigned values.

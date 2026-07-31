@@ -17,7 +17,6 @@ Aligned with [C++ Core Guidelines](https://raw.githubusercontent.com/isocpp/CppC
 | Make local variables `const` | [Const-Correctness](#const-correctness) | Con.1 |
 | Declare overrides without `virtual` | [Override Without `virtual`](#override-without-virtual) | C.128 |
 | Share flags across threads | [Thread-Safe Flags](#thread-safe-flags) | CP.2 |
-| Range-check deserialized enums | [IPC Enum Validation](#ipc-enum-validation) | ES.49 |
 | Use typed enums over string tags | [Strongly Typed Params](#strongly-typed-params) | I.4 |
 
 ---
@@ -132,32 +131,6 @@ bool IsFeatureEnabled() { return isFeatureEnabled_.load(); }
 // 🚫 data race
 static bool isFeatureEnabled_;
 ```
-
----
-
-## IPC Enum Validation
-
-**Range-check enums deserialized from `Parcel`.** Casting a raw `uint32_t` to an enum without bounds checking allows out-of-range values to slip through and desync the Parcel cursor (ES.49 — use a named cast, validate before use). Validate the value is within `[enum::first, enum::MAX)` before use.
-
-```cpp
-// 🚫 no range check — cursor desyncs on invalid input
-uint32_t typeVal;
-parcel.ReadUint32(typeVal);
-auto type = static_cast<GEMyType>(typeVal);  // may be out of range
-```
-
-```cpp
-// ✅ validate range before cast
-uint32_t typeVal;
-if (!parcel.ReadUint32(typeVal)) { return false; }
-if (typeVal >= static_cast<uint32_t>(GEMyType::MAX)) {
-    LOGE("...invalid enum value");
-    return false;
-}
-auto type = static_cast<GEMyType>(typeVal);
-```
-
-Also use the correct `static_cast<uint32_t>` (not `int32_t`) when comparing against `uint32_t` — signed/unsigned mismatch can produce wrong results because negative signed values convert to large unsigned values.
 
 ---
 
