@@ -25,7 +25,6 @@ namespace FrostedGlass {
 GE_EXPORT void InterpolateAdaptiveParams(Drawing::GEFrostedGlassShaderFilterParams& params);
 }
 
-class GEMESABlurShaderFilter;
 class GE_EXPORT GEFrostedGlassShaderFilter : public GEShaderFilter {
 public:
     GEFrostedGlassShaderFilter(const Drawing::GEFrostedGlassShaderFilterParams& params);
@@ -40,25 +39,14 @@ public:
 
     bool InitFrostedGlassEffect();
     std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeFrostedGlassShader(
-        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> largeRBlurShader,
-        std::shared_ptr<Drawing::ShaderEffect> smallRBlurShader,
-        std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader, float imageWidth, float imageHeight);
+        std::shared_ptr<Drawing::ShaderEffect> imageShader, std::shared_ptr<Drawing::ShaderEffect> sdfNormalShader);
 
 private:
-    std::shared_ptr<Drawing::ShaderEffect> CreateLargeRadiusBlurShader(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
-        const Drawing::Matrix& invertMatrix);
-    std::shared_ptr<Drawing::ShaderEffect> CreateSmallRadiusBlurShader(Drawing::Canvas& canvas,
-        const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
-        const Drawing::Matrix& invertMatrix);
-    std::shared_ptr<Drawing::Image> MakeSmallRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
-        const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
-    std::shared_ptr<Drawing::Image> MakeLargeRadiusBlurImg(Drawing::Canvas& canvas, const Drawing::Rect& src,
-        const Drawing::Rect& dst, std::shared_ptr<Drawing::Image> image);
-    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(Drawing::Canvas& canvas,
-        float width, float height) const;
-    bool PrepareDrawing(Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src,
-        const Drawing::Rect& dst, Drawing::Matrix& outMatrix,
+    std::shared_ptr<Drawing::ShaderEffect> MakeSDFNormalShader(const Drawing::Rect& dst) const;
+    Drawing::Matrix GetSampleMatrix();
+    std::shared_ptr<Drawing::Image> GetOriginImage(
+        Drawing::Canvas& canvas, const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src);
+    bool PrepareDrawing(const std::shared_ptr<Drawing::Image> image, Drawing::Matrix& outMatrix,
         std::shared_ptr<Drawing::RuntimeShaderBuilder>& outBuilder);
 
     Drawing::GEFrostedGlassShaderFilterParams frostedGlassParams_;
