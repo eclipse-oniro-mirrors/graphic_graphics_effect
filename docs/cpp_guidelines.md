@@ -157,7 +157,7 @@ if (typeVal >= static_cast<uint32_t>(GEMyType::MAX)) {
 auto type = static_cast<GEMyType>(typeVal);
 ```
 
-Also use the correct `static_cast<uint32_t>` (not `int32_t`) when comparing against `uint32_t` — signed/unsigned mismatch silently inverts the comparison.
+Also use the correct `static_cast<uint32_t>` (not `int32_t`) when comparing against `uint32_t` — signed/unsigned mismatch can produce wrong results because negative signed values convert to large unsigned values.
 
 ---
 

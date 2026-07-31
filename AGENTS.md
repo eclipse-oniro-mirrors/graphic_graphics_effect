@@ -65,7 +65,7 @@ python tool/create_effect/create_effect.py <name> <type>
 ### Complete New Effect Workflow
 
 1. **Scaffold**: `python tool/create_effect/create_effect.py <name> <type>` (generates `.params.in`, `.h`, `.cpp` stubs)
-2. **Register**: Add enum value to `ge_filter_type.h`
+2. **Register**: Add enum value to `ge_filter_type.h` (in `include/core/` — holds all effect type enums, not just filters)
 3. **Define parameters**: Edit the generated `.params.in` file
 4. **Generate metadata**: `python tool/generate_metadata/gen_metadata.py`
 5. **Generate effects header**: `python tool/generate_metadata/gen_effect_header.py`
@@ -103,7 +103,7 @@ The codebase follows a modular, layered architecture. → [Full architecture det
 
 ## Effect Development
 
-Shaders are written inline as GLSL/SkSL strings in C++ source files. Key patterns:
+Shaders are written inline as SkSL strings in C++ source files. Key patterns:
 
 1. **RuntimeEffect creation**: Use `GECreateRuntimeEffectForShader` (GE wrapper, see [Drawing API Contracts](docs/drawing_api_contracts.md#runtimeeffectcreateforshader)) for shader compilation
 2. **Shader parameters**: Set via `RuntimeShaderBuilder` uniform binding

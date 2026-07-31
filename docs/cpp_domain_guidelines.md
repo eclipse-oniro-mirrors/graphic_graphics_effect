@@ -53,15 +53,14 @@ LOGE("GEMyFilter::OnProcessImage invert matrix failed"); // should be BuildDowns
 ```cpp
 // 🚫 hardcoded color space, drops source color space
 Drawing::ImageInfo imageInfo(width, height, Drawing::COLORTYPE_RGBA_F16, Drawing::ALPHATYPE_PREMUL);
-auto surface = Drawing::Surface::MakeRenderTarget(ctx, false, imageInfo);
+auto surface = Drawing::Surface::MakeRenderTarget(gpuCtx.get(), false, imageInfo);
 ```
 
 ```cpp
 // ✅ propagate canvas surface color space
 auto* canvasSurface = canvas.GetSurface();
 auto colorSpace = canvasSurface ? canvasSurface->GetImageInfo().GetColorSpace() : nullptr;
-Drawing::ImageInfo imageInfo(width, height, Drawing::COLORTYPE_RGBA_F16, Drawing::ALPHATYPE_PREMUL, colorSpace);
-auto surface = Drawing::Surface::MakeRenderTarget(ctx, false, imageInfo);
+auto surface = Drawing::Surface::MakeRenderTarget(gpuCtx.get(), false, imageInfo);
 ```
 
 ---
