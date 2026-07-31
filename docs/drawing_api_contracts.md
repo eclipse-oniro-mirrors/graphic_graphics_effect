@@ -62,11 +62,11 @@ The effect is immutable once created — cache it and reuse.
 
 ## RuntimeShaderBuilder::MakeImage
 
-**Signature**: `std::shared_ptr<Image> MakeImage(GPUContext* grContext, const Matrix* localMatrix, ImageInfo resultInfo, bool mipmapped)`
+**Signature**: `std::shared_ptr<Image> MakeImage(GPUContext* gpuContext, const Matrix* localMatrix, ImageInfo resultInfo, bool mipmapped)`
 
-**Returns `nullptr`** when `grContext` is null or when GPU surface creation fails. There is no CPU/raster fallback — a null GPU context produces no image.
+**Returns `nullptr`** when `gpuContext` is null or when GPU surface creation fails. There is no CPU/raster fallback — a null GPU context produces no image.
 
-**Implication**: Passing null `grContext` is safe (no crash), but produces no image. Always check the return value.
+**Implication**: Passing null `gpuContext` is safe (no crash), but produces no image. Always check the return value.
 
 ```cpp
 // ✅ check the return value

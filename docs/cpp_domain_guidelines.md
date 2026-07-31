@@ -1,6 +1,6 @@
 # C++ Domain-Specific Guidelines
 
-GE-specific patterns from bug-fix history. Load only the section matching your task.
+GE-specific patterns for effect implementation. Load only the section matching your task.
 
 For general C++ conventions, see [cpp_guidelines.md](cpp_guidelines.md). For upstream Drawing API behavior, see [drawing_api_contracts.md](drawing_api_contracts.md).
 
