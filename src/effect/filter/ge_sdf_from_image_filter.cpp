@@ -27,12 +27,12 @@ namespace Rosen {
 namespace {
 constexpr int MAX_SPREAD_FACTOR = 4096;
 constexpr int TWO = 2;
-} // namespace
 
-static std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_jfaProcessResultEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_sdfFillDerivEffect;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> g_jfaProcessResultEffect;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> g_sdfFillDerivEffect;
+} // namespace
 
 GESDFFromImageFilter::GESDFFromImageFilter(const Drawing::GESDFFromImageFilterParams& params)
     : spreadFactor_(params.spreadFactor), generateDerivs_(params.generateDerivs)
