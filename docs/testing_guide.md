@@ -156,7 +156,7 @@ void MyEffectFuzz(FuzzedDataProvider& fdp)
 
 ## Accessing Private Members
 
-Tests compile with `-Dprivate=public -Dprotected=public` (see AGENTS.md → Test Organization), which rewrites access specifiers so tests can reach private members — don't add `friend` declarations or public accessors just for tests. **Prefer testing through the public API** — only access internals when there's no observable behavior to assert otherwise.
+Tests compile with `-Dprivate=public -Dprotected=public` (see AGENTS.md → Test Organization), which rewrites access specifiers so tests can reach private members — don't add `friend` declarations or public accessors just for tests. **Prefer testing through the public API** — only access internals when the public API doesn't expose enough to assert the behavior you need.
 
 ---
 

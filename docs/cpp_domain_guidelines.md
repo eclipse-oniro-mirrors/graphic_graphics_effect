@@ -48,7 +48,7 @@ LOGE("GEMyFilter::OnProcessImage invert matrix failed"); // should be BuildDowns
 
 ## Color Space Propagation
 
-**Propagate the canvas's color space to offscreen surfaces.** Constructing `ImageInfo` without the source canvas's color space causes HDR/EDR content to render with missing thickness or wrong colors — the GPU composites the offscreen result back with a mismatched color space.
+**Propagate the canvas's color space to offscreen surfaces.** Constructing `ImageInfo` without the source canvas's color space causes HDR/EDR content to render with wrong colors or missing brightness range — the GPU composites the offscreen result back with a mismatched color space.
 
 ```cpp
 // 🚫 hardcoded color space, drops source color space
@@ -59,6 +59,7 @@ auto surface = Drawing::Surface::MakeRenderTarget(ctx, false, imageInfo);
 ```cpp
 // ✅ propagate canvas surface color space
 auto* canvasSurface = canvas.GetSurface();
+auto colorSpace = canvasSurface ? canvasSurface->GetImageInfo().GetColorSpace() : nullptr;
 Drawing::ImageInfo imageInfo(width, height, Drawing::COLORTYPE_RGBA_F16, Drawing::ALPHATYPE_PREMUL, colorSpace);
 auto surface = Drawing::Surface::MakeRenderTarget(ctx, false, imageInfo);
 ```

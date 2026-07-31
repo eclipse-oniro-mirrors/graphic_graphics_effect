@@ -26,10 +26,10 @@ Aligned with [C++ Core Guidelines](https://raw.githubusercontent.com/isocpp/CppC
 
 Cached `RuntimeEffect` objects appear in two scopes — the fix differs per scope:
 
-**Function-level `static`:** Two patterns — direct init is safe, lazy init is not.
+**Function-level `static`:** Two patterns — direct init is thread-safe; lazy init is a data race unless guarded.
 
 - **Direct init** (`static auto x = MakeEffect(...)`): magic statics guarantee one-time thread-safe initialization; subsequent reads are safe. ✅
-- **Lazy init** (`static shared_ptr x = nullptr; if (x == nullptr) x = MakeEffect(...)`): the check-then-assign is a data race (CP.2, CP.110 — don't hand-roll double-checked locking). Use `thread_local`, or restructure to direct init if the shader string is a compile-time constant.
+- **Lazy init** (`static shared_ptr x = nullptr; if (x == nullptr) x = MakeEffect(...)`): the check-then-assign is a data race (CP.2, CP.110 — don't hand-roll double-checked locking). Fix with `thread_local`, or restructure to direct init if the shader string is a compile-time constant.
 
 ```cpp
 std::shared_ptr<Drawing::RuntimeEffect> GetEffect()
@@ -79,7 +79,7 @@ Not all APIs need pre-checks — distinguish two cases:
 - **Deref crash**: `gpuCtx.get()->SomeMethod()` or `*ptr` on a null `shared_ptr` is UB — the dereference itself is the problem, not the `.get()` call. Check before deref. Example: `canvas.GetGPUContext()` returns a `shared_ptr` that may be null on CPU-only paths (see [Drawing API Contracts](drawing_api_contracts.md#canvasgetgpucontext)).
 - **Safe null return**: some APIs accept null internally and return `nullptr` themselves. Check the **return value**, not the input. Example: `builder->MakeImage(gpuCtx.get(), ...)` — passing null `gpuCtx` is safe, but the result must be checked (see [Drawing API Contracts](drawing_api_contracts.md#runtimeshaderbuildermakeimage)).
 
-Also check: `Surface::MakeRenderTarget()` return — returns `nullptr` on failure without crashing. `CreateImageShader()` always returns a valid `shared_ptr` but the internal shader may be null if the image is invalid; validate the image before calling (see [Drawing API Contracts](drawing_api_contracts.md#shadereffectcreateimageshader)).
+Also check: `Surface::MakeRenderTarget()` return — returns `nullptr` on failure without crashing. `CreateImageShader()` always returns a non-null `shared_ptr` but the internal shader may be null if the image is invalid; validate the image before calling (see [Drawing API Contracts](drawing_api_contracts.md#shadereffectcreateimageshader)).
 
 ---
 
@@ -187,14 +187,12 @@ auto inputShader = Drawing::ShaderEffect::CreateImageShader(*image, ...);
 
 ```cpp
 // ✅ override alone — compiler checks base match, intent is clear
-std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+void OnParamsChanged(const Drawing::GEFilterParams& params) override;
 ```
 
 ```cpp
 // 🚫 redundant — virtual + override together
-virtual std::shared_ptr<Drawing::Image> OnProcessImage(Drawing::Canvas& canvas,
-    const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst) override;
+virtual void OnParamsChanged(const Drawing::GEFilterParams& params) override;
 ```
 
 In the base class (first declaration), use `virtual` alone. In derived classes, use `override` (or `final` if sealed) alone.

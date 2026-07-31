@@ -24,7 +24,7 @@ These are **upstream contracts**, not GE conventions. When in doubt, read the up
 
 **May return a null `shared_ptr`** — notably on CPU-only render paths where no GPU context is available.
 
-**Implication**: Always null-check before passing `.get()` to downstream APIs. All downstream APIs (`MakeImage`, `MakeRenderTarget`) handle null safely by returning `nullptr`, but a null result means no GPU work was done.
+**Implication**: Null-check when you need GPU work to proceed. All downstream APIs (`MakeImage`, `MakeRenderTarget`) handle null safely by returning `nullptr`, but a null result means no GPU work was done.
 
 ```cpp
 auto gpuCtx = canvas.GetGPUContext();
@@ -38,7 +38,7 @@ if (gpuCtx == nullptr) { LOGE("...gpuContext is null"); return image; }
 
 **Signature**: `static std::shared_ptr<RuntimeEffect> CreateForShader(const std::string& sl, const RuntimeEffectOptions& options)` (overload without `options` also available)
 
-**Always returns a valid `shared_ptr`**, but the effect may fail to compile (syntax error, unsupported feature). A failed effect produces no output when used — verify by checking that downstream operations (`RuntimeShaderBuilder`, `MakeImage`) succeed.
+**Always returns a non-null `shared_ptr`**, but the effect may fail to compile (syntax error, unsupported feature). A failed effect produces no output when used — verify by checking that downstream operations (`RuntimeShaderBuilder`, `MakeImage`) succeed.
 
 **In GE, use `GECreateRuntimeEffectForShader` instead of the raw upstream API.** The wrapper (`include/util/ge_shader_diagnostics.h`) forwards directly to `CreateForShader` with negligible overhead, but optionally records shader source + call site for diagnostics when the runtime property `persist.sys.graphic.geShaderDiagnosticsEnabled` is enabled.
 
@@ -80,7 +80,7 @@ if (result == nullptr) { LOGE("...MakeImage failed"); return image; }
 
 **Signature**: `std::shared_ptr<ShaderEffect> CreateImageShader(const Image& image, TileMode xTile, TileMode yTile, const SamplingOptions& sampling, const Matrix& matrix)`
 
-**Always returns a valid `shared_ptr`**, but the internal shader may be null if the image is invalid. The null manifests later at draw time. Validate the image before calling.
+**Always returns a non-null `shared_ptr`**, but the internal shader may be null if the image is invalid. The null manifests later at draw time. Validate the image before calling.
 
 ```cpp
 // ✅ validate image first, then use

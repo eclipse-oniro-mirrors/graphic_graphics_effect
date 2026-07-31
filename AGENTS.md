@@ -105,7 +105,7 @@ The codebase follows a modular, layered architecture. → [Full architecture det
 
 Shaders are written inline as GLSL/SkSL strings in C++ source files. Key patterns:
 
-1. **RuntimeEffect creation**: Use `Drawing::RuntimeEffect` for shader compilation
+1. **RuntimeEffect creation**: Use `GECreateRuntimeEffectForShader` (GE wrapper, see [Drawing API Contracts](docs/drawing_api_contracts.md#runtimeeffectcreateforshader)) for shader compilation
 2. **Shader parameters**: Set via `RuntimeShaderBuilder` uniform binding
 3. **Image inputs**: Pass as shader children via `RuntimeShaderBuilder`
 4. **Output**: Shaders generate `Drawing::Image` or draw to `Drawing::Canvas`
