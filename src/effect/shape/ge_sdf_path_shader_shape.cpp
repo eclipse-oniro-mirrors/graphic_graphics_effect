@@ -634,7 +634,7 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
         return nullptr;
     }
     if (!maskTex) {
-        LOGE("GESDFPathShaderShape::RunSDFPropagation maskTex is null");
+        LOGD("GESDFPathShaderShape::RunSDFPropagation maskTex is null");
         return sdfTex;
     }
     if (numPasses_ <= 0) {
@@ -863,7 +863,7 @@ void GESDFPathShaderShape::ComputeAllCurveBoundingBoxes(float width, float heigh
     curveBBoxes.clear();
     curveBBoxes.reserve(numCurves_);
     canvasBBox = { width, 0.0f, height, 0.0f };
-    float maxThickness = 0.05f / NDC_MULTIPLIER * height; // 0.05f: Expanding the bounding box in NDC space
+    float maxThickness = 12.0f; // 12.0f : Expanding the bounding box in NDC space
     for (size_t i = 0; i < numCurves_; ++i) {
         Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, pixelControlPoints, width, height);
         curveBBoxes.push_back(bbox);
@@ -875,12 +875,6 @@ void GESDFPathShaderShape::ComputeAllCurveBoundingBoxes(float width, float heigh
     float canvasW = canvasBBox[XMAX_I] - canvasBBox[XMIN_I];
     float canvasH = canvasBBox[YMAX_I] - canvasBBox[YMIN_I];
     canvasMinSide_ = std::min(canvasW, canvasH);
-
-    const float expandPixels = 10.0f * params_.scale.y_; // 10.0:Expand the overall bbox ensures enough pixels outside
-    canvasBBox[XMIN_I] = std::max(canvasBBox[XMIN_I] - expandPixels, 0.0f);
-    canvasBBox[XMAX_I] = std::min(canvasBBox[XMAX_I] + expandPixels, width);
-    canvasBBox[YMIN_I] = std::max(canvasBBox[YMIN_I] - expandPixels, 0.0f);
-    canvasBBox[YMAX_I] = std::min(canvasBBox[YMAX_I] + expandPixels, height);
 }
 
 Box4f GESDFPathShaderShape::ComputeCurveBoundingBox(size_t curveIndex, float maxThickness,
@@ -1149,7 +1143,7 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
     constexpr float MIN_SCALE_FLOOR = 0.4f; // 0.4f: Maximum downsampling level
     if (height > width * MAX_ASPECT) {
         // The calculated target scale is always smaller than the original scale within this branch
-        float targetScale = scaleY * (width * MAX_ASPECT) / height;
+        float targetScale = width * MAX_ASPECT / height * scaleY;
         targetScale = std::max(targetScale, MIN_SCALE_FLOOR);
         scaleX = targetScale;
         scaleY = targetScale;
