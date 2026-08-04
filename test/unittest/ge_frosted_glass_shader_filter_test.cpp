@@ -130,11 +130,11 @@ Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakePa
 }
 
 /**
- * @tc.name: OnProcessImage_InvalidInputs
- * @tc.desc: Verify OnProcessImage returns nullptr when input image is invalid (nullptr or zero dimension).
+ * @tc.name: OnProcessImage_CPUInvalidInputs
+ * @tc.desc: Verify OnProcessImage returns nullptr when input image is invalid (nullptr or zero dimension) on CPU.
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_InvalidInputs, TestSize.Level0)
+HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_CPUInvalidInputs, TestSize.Level0)
 {
     auto params = MakeParams();
     auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
@@ -303,11 +303,11 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, Constructor_StoresParams, TestSize.Leve
 }
 
 /**
- * @tc.name: OnDrawImage_NullInput
- * @tc.desc: OnDrawImage returns false when the input image is nullptr.
+ * @tc.name: OnDrawImage_CPUNullInput
+ * @tc.desc: OnDrawImage returns false when the input image is nullptr on CPU.
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_NullInput, TestSize.Level0)
+HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_CPUNullInput, TestSize.Level0)
 {
     auto params = MakeParams();
     auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
@@ -403,11 +403,11 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, PrepareDrawing_WithSDFShape, TestSize.L
 }
 
 /**
- * @tc.name: OnProcessImage_WithSDFShape
- * @tc.desc: With SDF shape set, PrepareDrawing succeeds; OnProcessImage reaches builder->MakeImage.
+ * @tc.name: OnProcessImage_CPUWithSDFShape
+ * @tc.desc: With SDF shape set, PrepareDrawing succeeds; OnProcessImage reaches builder->MakeImage on CPU.
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_WithSDFShape, TestSize.Level0)
+HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_CPUWithSDFShape, TestSize.Level0)
 {
     auto params = MakeParams();
     Drawing::GESDFRRectShapeParams sdfParam;
@@ -429,11 +429,11 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, OnProcessImage_WithSDFShape, TestSize.L
 }
 
 /**
- * @tc.name: OnDrawImage_WithSDFShape
- * @tc.desc: OnDrawImage with valid image + SDF shape draws and returns true.
+ * @tc.name: OnDrawImage_CPUWithSDFShape
+ * @tc.desc: OnDrawImage with valid image + SDF shape draws and returns true on CPU.
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_WithSDFShape, TestSize.Level0)
+HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_CPUWithSDFShape, TestSize.Level0)
 {
     auto params = MakeParams();
     Drawing::GESDFRRectShapeParams sdfParam;
@@ -454,11 +454,11 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_WithSDFShape, TestSize.Leve
 }
 
 /**
- * @tc.name: OnDrawImage_PrepareFails
- * @tc.desc: OnDrawImage without SDF shape returns false (PrepareDrawing fails).
+ * @tc.name: OnDrawImage_CPUPrepareFails
+ * @tc.desc: OnDrawImage without SDF shape returns false (PrepareDrawing fails) on CPU.
  * @tc.type: FUNC
  */
-HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_PrepareFails, TestSize.Level0)
+HWTEST_F(GEFrostedGlassShaderFilterTest, OnDrawImage_CPUPrepareFails, TestSize.Level0)
 {
     auto params = MakeParams(); // no sdfShape
     auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
