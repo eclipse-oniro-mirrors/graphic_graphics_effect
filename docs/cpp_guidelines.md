@@ -183,7 +183,7 @@ ve->SetParam(GEParamsMemberTag::KAWASE_BLUR_RADIUS, 5);
 
 ```cpp
 // 🚫 string-based — runtime lookup, typo silently fails
-ve->SetParam("KAWASE_BLUR_RADIU", 5);  // no error, no effect
+ve->SetParam("KAWASE_BLUR_RADIUS", 5);  // no error, no effect
 ```
 
 The string-based overload exists for dynamic/scripting callers, but always prefer the tag-based API when the tag is known at compile time. See `tool/generate_metadata/README.md` for `.params.in` syntax that generates the `GEParamsMemberTag` enum.
