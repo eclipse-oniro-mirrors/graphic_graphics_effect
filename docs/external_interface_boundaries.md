@@ -44,13 +44,13 @@ From past incident experience, the main risks when modifying external-facing cod
 | IPC enum/type desync | `SetParam` tag → enum lookup, `CreateGEXObjectByType` type | Unrecognized tags return `INVALID`; factory path range-checks against `MAX_EFFECTS`; direct path does **not** validate | [IPC Enum Validation](cpp_domain_guidelines.md#ipc-enum-validation) |
 | NaN/Inf in shader uniforms | `SetParam` float values → params struct → `SetUniform` | `.params.in` `min`/`max` uses `std::clamp`, but NaN/Inf bypass `<`/`>` comparisons — clamp silently passes them through. If GE receives untrusted floats, check for NaN/Inf before `SetUniform` — but prefer catching these at the NAPI/SDK entry point | — |
 | Null dereference | `shared_ptr<Image>`/`shared_ptr<PixelMap>` from `SetParam`, `GetGPUContext()` on CPU-only paths | Null-check at the boundary before deref; `CreateImageShader` takes `const Image&` (reference), so the null risk is at the dereference-before-call site, not inside the API; `MakeImage`, `MakeRenderTarget` handle null safely | [Null Safety](cpp_guidelines.md#null-safety) |
-| `static RuntimeEffect` cache race | Function-level `static` with manual null-check lazy init (e.g., `ge_kawase_blur_shader_filter.cpp`, `ge_direction_light_shader_filter.cpp`) — the check-then-assign is a data race | Prefer C++11 magic statics (direct init) or `thread_local` (as `ge_blur_bubbles_rise_filter.cpp` does); file-scope `static` init is also safe | [Static & Thread Safety](cpp_guidelines.md#static--thread-safety) |
+| `static RuntimeEffect` cache race | Function-level `static` with manual null-check lazy init — the check-then-assign is a data race | Prefer C++11 magic statics (direct init) or `thread_local`; file-scope `static` init is also safe | [Static & Thread Safety](cpp_guidelines.md#static--thread-safety) |
 
 **Defense layering**: Not all checks need to be in GE. Some validation is better placed at upstream layers — and already exists there:
-- **NAPI binding** (`graphic_2d`'s `filter_napi.cpp`): basic range checks like `scale >= 0`, `dBright >= 0 && dBright <= 1`, capacity overflow checks
-- **Effect chain** (`graphic_2d`'s `effect_image_chain.cpp`): `radius < 0.0f` rejection, `maskRadiusX <= 0` rejection, dimension checks before calling GE
-- **ace_engine** (`rosen_render_context.cpp`): `degree < 0` normalization, `fractials < 0.0f` rejection; `rosen_render_context_multi_thread.cpp`: blur parameter normalization before dispatching to GE
-- **IPC deserialization** (`graphic_2d`'s `rs_render_*_base.cpp`): `EFFECT_COUNT_LIMIT` loop bounds, `RSNGEffectType` map lookup
+- **NAPI binding** (`graphic_2d`): basic range checks on user-facing parameters (radius, brightness, scale) before reaching GE
+- **Effect chain** (`graphic_2d`): rejection of negative/zero radii and dimensions before calling GE
+- **ace_engine**: parameter normalization (e.g., negative degree wrapping) before dispatching to GE
+- **IPC deserialization** (`graphic_2d`): effect count limits and enum map lookups before reaching GE
 
 GE should focus on checks that protect its own invariants (shader safety, null safety, thread safety), not repeat guards already enforced upstream.
 
@@ -63,7 +63,7 @@ External app processes construct `Parcel` data that reaches GE through `graphic_
 **What GE controls**: `GEVisualEffectImpl::SetParam` — the sink. String tags are converted to `GEParamsMemberTag` via `GEParamsMemberTagFromString` (an `unordered_map` lookup). Unrecognized tags return `INVALID` and are ignored. Values pass through `SetParamsMemberByTag`, which applies `.params.in`-defined `min`/`max` constraints via `std::clamp` before storing — but not all params have these constraints defined.
 
 **What GE does NOT control** (all in `graphic_2d`, not this repo):
-- The `Unmarshalling` loop and `EFFECT_COUNT_LIMIT` (defined in `render_service_base`'s `rs_render_effect_template.h`) — the caller's responsibility to cap chain length
+- The `Unmarshalling` loop and `EFFECT_COUNT_LIMIT` (defined in `graphic_2d`'s `render_service_base`) — the caller's responsibility to cap chain length
 - The `static_cast<RSNGEffectType>` from raw `int16_t` — the caller's enum, not `GEFilterType`
 - The `RSNGRenderEffectHelper::CreateGEVisualEffect(type)` bridge that maps `RSNGEffectType` → effect name string → `GEVisualEffect` constructor
 
@@ -82,11 +82,11 @@ There are two call paths:
 
 1. **Factory path** (`GEEffectFactory` via `RegisterExternalEffect`): `type` is a compile-time `GEFilterType` template parameter. `GEEffectFactory::Create` validates the type against `MAX_EFFECTS` (range check) before dispatching. The `void*` return is cast to `IGEFilterType*` and wrapped in `shared_ptr`.
 
-2. **Direct path** (`graphic_2d`'s `effect_image_chain.cpp` calls `CreateGEXObjectByType` directly): `type` is `uint32_t` passed by the caller. `CreateGEXObjectByType` does **not** validate or cast `type` — it passes it through to the external `.so` as-is. The caller does the `static_cast` to `GEShaderFilter*`.
+2. **Direct path** (`graphic_2d` calls `CreateGEXObjectByType` directly): `type` is `uint32_t` passed by the caller. `CreateGEXObjectByType` does **not** validate or cast `type` — it passes it through to the external `.so` as-is. The caller does the `static_cast` to `GEShaderFilter*`.
 
 **Boundaries**:
 - The `.so` path is a fixed system location — not writable by normal apps
-- `param` is `void*` — the external .so receives it and interprets the layout. GE's CFI cross-DSO protection checks vtable types but not object layout match
+- `param` is `void*` — the external .so receives it and interprets the layout. CFI cross-DSO is enabled in the build, but it does not validate object layout — the `.so` must interpret the `void*` correctly
 - System property `rosen.graphic.gex.enable` (default: true) controls whether external loading is active
 
 **When modifying `GEExternalDynamicLoader`**:
@@ -98,13 +98,13 @@ There are two call paths:
 
 ## XML Configuration Parsing
 
-`GEXmlParserBase` parses `graphic_config.xml` using libxml2 (`xmlParseFile`). The parsed values affect `GEFrostedGlassEffectCfg` (currently only the `isDisableAntiAliasCode` boolean flag).
+`GEXmlParserBase` parses `graphic_config.xml` using libxml2 (`xmlParseFile`). The parsed values affect `GEFrostedGlassEffectCfg` (the `isDisableAntiAliasCode` boolean flag).
 
 **Boundaries**:
 - Config file is searched in system variant directories: `/system/variant/{phone,tablet,pc,watch,tv,car,smarthomehost}/base/` + `etc/graphic/graphic_config.xml`
 - A product config path `/sys_prod/` + `etc/graphic/graphic_config.xml` is also searched
 - Requires root/privileged access to modify these files
-- libxml2 is used via `xmlParseFile` with no explicit entity resolution configuration — `xmlParseFile` defaults process entities; if modifying the parser, explicitly disable entity processing (`XML_PARSE_NOENT`)
+- libxml2 is used via `xmlParseFile` with default settings — entity substitution is not enabled by default; do **not** add `XML_PARSE_NOENT` (which enables entity substitution and introduces XXE risk) when modifying the parser
 
 **When modifying XML parsing**:
 - Don't change the file path search logic to include non-system directories
