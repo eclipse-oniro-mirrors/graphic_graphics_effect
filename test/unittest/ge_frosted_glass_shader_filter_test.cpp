@@ -15,13 +15,13 @@
 
 #include <gtest/gtest.h>
 
-#include "ge_frosted_glass_shader_filter.h"
-
-#include "draw/color.h"
 #include "draw/canvas.h"
-#include "image/bitmap.h"
-#include "image/image.h"
+#include "draw/color.h"
+#include "ge_frosted_glass_shader_filter.h"
 #include "ge_sdf_rrect_shader_shape.h"
+#include "image/bitmap.h"
+
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -40,8 +40,7 @@ public:
     static void TearDownTestCase();
     void SetUp() override;
     void TearDown() override;
-
-    static inline Drawing::Canvas canvas_;          // CPU canvas (no GPU context)
+    static inline Drawing::Canvas canvas_; // CPU canvas (no GPU context)
     std::shared_ptr<Drawing::Image> image_ { nullptr };
 
     // 1.0f, 1.0f, 2.0f, 2.0f → left, top, right, bottom
@@ -75,92 +74,34 @@ void GEFrostedGlassShaderFilterTest::TearDown()
 Drawing::GEFrostedGlassShaderFilterParams GEFrostedGlassShaderFilterTest::MakeParams()
 {
     Drawing::GEFrostedGlassShaderFilterParams p; // Default parameters
-    p.weightsEmboss = {1.0f, 1.0f};
-    p.weightsEdl = {1.0f, 1.0f};
-    p.refractParams = {0.5f, 0.5f, 1.0f};
-    p.bgRates = {-0.00003f, 1.2f};
-    p.bgKBS = {0.010834f, 0.007349f, 1.2f};
-    p.bgPos = {0.3f, 0.5f, 1.0f};
-    p.bgNeg = {0.5f, 0.5f, 1.0f};
- 
-    p.sdParams = {0.0f, 2.0f, 0.0f};
-    p.sdRates = {0.0f, 0.0f};
-    p.sdKBS = {-0.02f, 2.0f, 4.62f};
-    p.sdPos = {1.0f, 1.5f, 2.0f};
-    p.sdNeg = {1.7f, 3.0f, 1.0f};
- 
-    p.envLightParams = {0.8f, 0.2745f, 2.0f};
-    p.envLightRates = {0.0f, 0.0f};
-    p.envLightKBS = {0.8f, 0.2745f, 2.0f};
-    p.envLightPos = {1.0f, 1.5f, 2.0f};
-    p.envLightNeg = {1.7f, 3.0f, 1.0f};
- 
-    p.edLightParams = {2.0f, -1.0f};
-    p.edLightAngles = {30.0f, 30.0f};
-    p.edLightDir = {-1.0f, 1.0f};
-    p.edLightRates = {0.0f, 0.0f};
-    p.edLightKBS = {0.6027f, 0.64f, 2.0f};
-    p.edLightPos = {1.0f, 1.5f, 2.0f};
-    p.edLightNeg = {1.7f, 3.0f, 1.0f};
+    p.weightsEmboss = { 1.0f, 1.0f };
+ 	p.weightsEdl = { 1.0f, 1.0f };
+ 	p.refractParams = { 0.5f, 0.5f, 1.0f };
+ 	p.bgRates = { -0.00003f, 1.2f };
+ 	p.bgKBS = { 0.010834f, 0.007349f, 1.2f };
+ 	p.bgPos = { 0.3f, 0.5f, 1.0f };
+ 	p.bgNeg = { 0.5f, 0.5f, 1.0f };
+ 	
+ 	p.sdParams = { 0.0f, 2.0f, 0.0f };
+ 	p.sdRates = { 0.0f, 0.0f };
+ 	p.sdKBS = { -0.02f, 2.0f, 4.62f };
+ 	p.sdPos = { 1.0f, 1.5f, 2.0f };
+ 	p.sdNeg = { 1.7f, 3.0f, 1.0f };
+ 	
+ 	p.envLightParams = { 0.8f, 0.2745f, 2.0f };
+ 	p.envLightRates = { 0.0f, 0.0f };
+ 	p.envLightKBS = { 0.8f, 0.2745f, 2.0f };
+ 	p.envLightPos = { 1.0f, 1.5f, 2.0f };
+ 	p.envLightNeg = { 1.7f, 3.0f, 1.0f };
+ 	
+ 	p.edLightParams = { 2.0f, -1.0f };
+ 	p.edLightAngles = { 30.0f, 30.0f };
+ 	p.edLightDir = { -1.0f, 1.0f };
+ 	p.edLightRates = { 0.0f, 0.0f };
+ 	p.edLightKBS = { 0.6027f, 0.64f, 2.0f };
+ 	p.edLightPos = { 1.0f, 1.5f, 2.0f };
+ 	p.edLightNeg = { 1.7f, 3.0f, 1.0f };
     return p;
-}
-
-/**
- * @tc.name: MakeLargeRadiusBlurImg_InvalidInputs
- * @tc.desc: Verify MakeLargeRadiusBlurImg return nullptr when input image is invalid (nullptr).
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, MakeLargeRadiusBlurImg_InvalidInputs, TestSize.Level0)
-{
-    auto params = MakeParams();
-    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
-
-    // Case: image == nullptr
-    EXPECT_EQ(filter->MakeLargeRadiusBlurImg(canvas_, src_, dst_, nullptr), nullptr);
-}
-
-/**
- * @tc.name: MakeSmallRadiusBlurImg_InvalidInputs
- * @tc.desc: Verify MakeSmallRadiusBlurImg return nullptr when input image is invalid (nullptr).
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSmallRadiusBlurImg_InvalidInputs, TestSize.Level0)
-{
-    auto params = MakeParams();
-    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
-
-    // Case: image == nullptr
-    EXPECT_EQ(filter->MakeSmallRadiusBlurImg(canvas_, src_, dst_, nullptr), nullptr);
-}
-
-/**
- * @tc.name: CreateLargeRadiusBlurShader_InvalidInputs
- * @tc.desc: Verify CreateLargeRadiusBlurShader return nullptr when input image is invalid (nullptr).
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, CreateLargeRadiusBlurShader_InvalidInputs, TestSize.Level0)
-{
-    auto params = MakeParams();
-    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
-    Drawing::Matrix invertMatrix;
-
-    // Case 1: image == nullptr caused largeRBlurImg == nullptr
-    EXPECT_EQ(filter->CreateLargeRadiusBlurShader(canvas_, nullptr, src_, dst_, invertMatrix), nullptr);
-}
-
-/**
- * @tc.name: CreateSmallRadiusBlurShader_InvalidInputs
- * @tc.desc: Verify CreateSmallRadiusBlurShader return nullptr when input image is invalid (nullptr).
- * @tc.type: FUNC
- */
-HWTEST_F(GEFrostedGlassShaderFilterTest, CreateSmallRadiusBlurShader_InvalidInputs, TestSize.Level0)
-{
-    auto params = MakeParams();
-    auto filter = std::make_unique<GEFrostedGlassShaderFilter>(params);
-    Drawing::Matrix invertMatrix;
-
-    // Case 1: image == nullptr caused largeRBlurImg == nullptr
-    EXPECT_EQ(filter->CreateSmallRadiusBlurShader(canvas_, nullptr, src_, dst_, invertMatrix), nullptr);
 }
 
 /**
@@ -240,22 +181,14 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
 
-    // Create three tiny images from bitmaps to be used as child shaders
+    // Create a tiny image to use as the image child shader
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
 
     Drawing::Bitmap bmpImg;
     bmpImg.Build(NUM_2, NUM_2, fmt);
     bmpImg.ClearWithColor(Drawing::Color::COLOR_WHITE);
-    Drawing::Bitmap bmpBig;
-    bmpBig.Build(NUM_2, NUM_2, fmt);
-    bmpBig.ClearWithColor(Drawing::Color::COLOR_GREEN);
-    Drawing::Bitmap bmpSml;
-    bmpSml.Build(NUM_2, NUM_2, fmt);
-    bmpSml.ClearWithColor(Drawing::Color::COLOR_RED);
 
     auto imgShaderImg = bmpImg.MakeImage();
-    auto imgShaderBig = bmpBig.MakeImage();
-    auto imgShaderSml = bmpSml.MakeImage();
 
     ASSERT_NE(imgShaderImg, nullptr);
     ASSERT_NE(imgShaderBig, nullptr);
@@ -263,30 +196,17 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeFrostedGlassShader_Smoke, TestSize.
 
     // Build child ShaderEffects with identity matrix
     Drawing::Matrix m = canvasInfo_.mat;
-    auto childImage = Drawing::ShaderEffect::CreateImageShader(
-        *imgShaderImg, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
-    auto childBig = Drawing::ShaderEffect::CreateImageShader(
-        *imgShaderBig, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
-    auto childSml = Drawing::ShaderEffect::CreateImageShader(
-        *imgShaderSml, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP,
-        Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
+    auto childImage = Drawing::ShaderEffect::CreateImageShader(*imgShaderImg, Drawing::TileMode::CLAMP,
+        Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), m);
     Drawing::GESDFRRectShapeParams shapeParam;
     shapeParam.rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
     shapeParam.rrect.SetCornerRadius(10.0f, 10.0f);
     auto shape = std::make_shared<Drawing::GESDFRRectShaderShape>(shapeParam);
     filter.frostedGlassParams_.sdfShape = shape;
-    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f));
     ASSERT_NE(childImage, nullptr);
-    ASSERT_NE(childBig, nullptr);
-    ASSERT_NE(childSml, nullptr);
     ASSERT_NE(sdfNormalShader, nullptr);
-
-    auto builder = filter.MakeFrostedGlassShader(
-        childImage, childBig, childSml, sdfNormalShader,
-        static_cast<float>(imgShaderImg->GetWidth()),
-        static_cast<float>(imgShaderImg->GetHeight()));
+    auto builder = filter.MakeFrostedGlassShader(childImage, sdfNormalShader);
     EXPECT_NE(builder, nullptr);
 }
 
@@ -300,7 +220,7 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSDFNormalShader_WO_SDFShape, TestSi
     auto params = MakeParams();
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f));
     EXPECT_EQ(sdfNormalShader, nullptr);
 }
 
@@ -313,12 +233,12 @@ HWTEST_F(GEFrostedGlassShaderFilterTest, MakeSDFNormalShader_W_SDFShape, TestSiz
 {
     auto params = MakeParams();
     Drawing::GESDFRRectShapeParams sdfParam;
-    sdfParam.rrect = {0.0f, 0.0f, 100.0f, 100.0f};
+    sdfParam.rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
     sdfParam.rrect.SetCornerRadius(10.0f, 10.0f);
     params.sdfShape = std::make_shared<Drawing::GESDFRRectShaderShape>(sdfParam);
     GEFrostedGlassShaderFilter filter(params);
     ASSERT_TRUE(filter.InitFrostedGlassEffect());
-    auto sdfNormalShader = filter.MakeSDFNormalShader(canvas_, 100.0f, 100.0f);
+    auto sdfNormalShader = filter.MakeSDFNormalShader(Drawing::Rect(0.0f, 0.0f, 100.0f, 100.0f));
     EXPECT_NE(sdfNormalShader, nullptr);
 }
 
