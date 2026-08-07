@@ -1188,7 +1188,7 @@ HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullMaskTex, TestSize.Level1
 
     GESDFPathShaderShape shape(param);
     Drawing::Bitmap bmp;
-   Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(50, 50, fmt);
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto sdfTex = bmp.MakeImage();
