@@ -142,7 +142,7 @@ HWTEST_F(GEWaterRippleFilterTest, GetWaterRippleEffect_AllModes, TestSize.Level0
     EXPECT_NE(filter0->GetWaterRippleEffect(), nullptr);
 
     Drawing::GEWaterRippleFilterParams params1 { 0.5f, 2.0f, 0.5f, 0.7f, 1 };
-   auto filter1 = std::make_shared<GEWaterRippleFilter>(params1);
+    auto filter1 = std::make_shared<GEWaterRippleFilter>(params1);
     EXPECT_NE(filter1->GetWaterRippleEffect(), nullptr);
 
     Drawing::GEWaterRippleFilterParams params2 { 0.5f, 2.0f, 0.5f, 0.7f, 2 };
