@@ -1216,7 +1216,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ComputeDistanceFieldNullSdfTex, TestSize.Leve
     EXPECT_EQ(result, nullptr);
 }
 
-+/**
+/**
  * @tc.name: PreprocessOverflowDimensions
  * @tc.desc: Test Preprocess handles extremely large width/height gracefully
  * @tc.type: FUNC
