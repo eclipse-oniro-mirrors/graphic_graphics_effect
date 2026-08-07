@@ -310,5 +310,97 @@ HWTEST_F(GEHeatDistortionFilterTest, HeatDistortionShaderEffectInActualProcessin
     EXPECT_NE(result, nullptr);
 }
 
+/**
+ * @tc.name: OnProcessImageWithMinimalResolution
+ * @tc.desc: Verify behavior with minimal image resolution
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithMinimalResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(2, 2, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_BLUE);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.5f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithRectangularResolution
+ * @tc.desc: Verify behavior with rectangular (non-square) resolution
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithRectangularResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(100, 50, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_RED);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.6f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithOddResolution
+ * @tc.desc: Verify behavior with odd resolution dimensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithOddResolution, TestSize.Level1)
+{
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(51, 51, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_GREEN);
+    auto image = bmp.MakeImage();
+
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.4f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithHighIntensity
+ * @tc.desc: Verify behavior with high intensity value
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithHighIntensity, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 1.0f;
+    params.noiseScale = 2.0f;
+    params.riseWeight = 0.8f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImageWithLowIntensity
+ * @tc.desc: Verify behavior with low intensity value
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHeatDistortionFilterTest, OnProcessImageWithLowIntensity, TestSize.Level1)
+{
+    Drawing::GEHeatDistortionFilterParams params;
+    params.intensity = 0.1f;
+    params.noiseScale = 0.5f;
+    params.riseWeight = 0.2f;
+    auto filter = std::make_unique<GEHeatDistortionFilter>(params);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
 } // namespace Rosen
 } // namespace OHOS

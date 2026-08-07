@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include "draw/surface.h"
 #include "ge_log.h"
@@ -92,7 +93,16 @@ std::shared_ptr<Drawing::Image> GEBlurShaderFilter::OnProcessImage(Drawing::Canv
         return mesaFilter.OnProcessImage(canvas, image, srcRect, dstRect);
     }
 
-    int extension = static_cast<int>(std::min(std::ceil(blurParams_.radiusX * 3), static_cast<float>(INT_MAX)));
+    const double extensionValue = std::ceil(static_cast<double>(blurParams_.radiusX) * 3.0);
+    if (extensionValue < 0.0) {
+        GE_LOGE("GEBlurShaderFilter::OnProcessImage radius is out of range");
+        return image;
+    }
+    const int maxDimension = std::max(image->GetWidth(), image->GetHeight());
+    // ProcessImageWithMesa expands each image dimension by extension * 2. Clamp the extension before converting
+    // it to int to prevent overflow in the multiplication and addition.
+    const double maxExtension = static_cast<double>((std::numeric_limits<int>::max() - maxDimension) / 2);
+    const int extension = static_cast<int>(std::min(extensionValue, maxExtension));
     return ProcessImageWithMesa(canvas, image, srcRect, extension);
 }
 } // namespace Rosen
