@@ -16,6 +16,7 @@
 #ifndef GRAPHICS_EFFECT_GE_RENDER_H
 #define GRAPHICS_EFFECT_GE_RENDER_H
 
+#include <atomic>
 #include <memory>
 
 #include "ge_cache_provider.h"
@@ -166,7 +167,7 @@ public:
     }
 
     static void SetMesablurAllEnabledByCCM(bool flag);
-    static bool IsMesablurAllEnabled() { return isMesablurAllEnable_; }
+    static bool IsMesablurAllEnabled() { return isMesablurAllEnable_.load(); }
 
 private:
     // Return type of ProcessShaderFilter() and DrawShaderFilter() indicates the applied target for visualEffect.
@@ -226,7 +227,7 @@ private:
     std::vector<std::shared_ptr<GEShaderFilter>> GenerateShaderFilters(
         const Drawing::GEVisualEffectContainer& veContainer);
 
-    static bool isMesablurAllEnable_;
+    static std::atomic<bool> isMesablurAllEnable_;
 
     bool isNeedExpansionFilter_ = false;
     Drawing::Rect expansionRect_ {};

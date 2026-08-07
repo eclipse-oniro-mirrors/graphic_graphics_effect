@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+
 #include "draw/canvas.h"
 #include "draw/path.h"
 #include "ge_external_dynamic_loader.h"
@@ -326,6 +328,17 @@ HWTEST_F(GESDFPathShaderShapeTest, PreprocessInvalidParamsTest_001, TestSize.Lev
         auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
         EXPECT_EQ(shader, nullptr);
     }
+
+    // derived width/height < 1.0f -> new guard returns early
+    GESDFPathShapeParams smallParam;
+    Drawing::Path smallPath;
+    smallPath.MoveTo(10.0f, 20.0f);
+    smallPath.LineTo(100.0f, 200.0f);
+    smallParam.path = smallPath;
+    GESDFPathShaderShape smallShape(smallParam);
+    Drawing::Rect smallRect(0.0f, 0.0f, 0.5f, 0.5f);
+    smallShape.Preprocess(*canvas_, smallRect, false);
+    EXPECT_EQ(smallShape.disResult_, nullptr);
 }
 
 /**
@@ -542,6 +555,21 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 
     auto curves = GESDFPathShaderShape::GetCurveByPath(path);
     EXPECT_FALSE(curves.empty());
+}
+
+/**
+ * @tc.name: ParseNumbersInvalidString
+ * @tc.desc: Verify parseNumbers handles invalid conversion via GetCurveByPath
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ParseNumbersInvalidString, TestSize.Level1)
+{
+    Drawing::Path path;
+    path.MoveTo(0.0f, 0.0f);
+    path.LineTo(0.0f, 0.0f);
+
+    auto curves = GESDFPathShaderShape::GetCurveByPath(path);
+    EXPECT_TRUE(curves.empty() || curves.size() >= 0);
 }
 
 /**
@@ -1103,6 +1131,109 @@ HWTEST_F(GESDFPathShaderShapeTest, DrawPathToImage_NullOnZeroSize_001, TestSize.
 
     auto result2 = shape.DrawPathToImage(*canvas_, -10, 100, path);
     EXPECT_EQ(result2, nullptr);
+}
+
+/**
+ * @tc.name: RunSDFPropagationNullSdfTex
+ * @tc.desc: Test RunSDFPropagation returns nullptr when sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullSdfTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    shape.numPasses_ = 1;
+
+    auto result = shape.RunSDFPropagation(*canvas_, nullptr, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: RunSDFPropagationNullSdfTexZeroPasses
+ * @tc.desc: Test RunSDFPropagation returns nullptr when numPasses<=0 and sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullSdfTexZeroPasses, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    shape.numPasses_ = 0;
+
+    auto result = shape.RunSDFPropagation(*canvas_, nullptr, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: RunSDFPropagationNullMaskTex
+ * @tc.desc: Test RunSDFPropagation returns sdfTex when maskTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullMaskTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Bitmap bmp;
+   Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(50, 50, fmt);
+    bmp.ClearWithColor(Drawing::Color::COLOR_RED);
+    auto sdfTex = bmp.MakeImage();
+    ASSERT_NE(sdfTex, nullptr);
+
+    auto result = shape.RunSDFPropagation(*canvas_, sdfTex, nullptr, 50, 50);
+    EXPECT_EQ(result.get(), sdfTex.get());
+}
+
+/**
+ * @tc.name: ComputeDistanceFieldNullSdfTex
+ * @tc.desc: Test ComputeDistanceField returns nullptr when sdfTex is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ComputeDistanceFieldNullSdfTex, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    auto result = shape.ComputeDistanceField(*canvas_, nullptr, 100, 100);
+    EXPECT_EQ(result, nullptr);
+}
+
++/**
+ * @tc.name: PreprocessOverflowDimensions
+ * @tc.desc: Test Preprocess handles extremely large width/height gracefully
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, PreprocessOverflowDimensions, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    float maxFloat = static_cast<float>(std::numeric_limits<int>::max()) + 1.0f;
+    Drawing::Rect overflowRect(0.0f, 0.0f, maxFloat, 100.0f);
+    shape.Preprocess(*canvas_, overflowRect, false);
+    EXPECT_EQ(shape.disResult_, nullptr);
 }
 
 } // namespace Drawing

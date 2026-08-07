@@ -87,10 +87,14 @@ std::shared_ptr<Drawing::ShaderEffect> GESDFClipShader::MakeSDFClipShader(Drawin
         GE_LOGE("GESDFClipShader::MakeSDFClipShader mask is invalid.");
         return nullptr;
     }
+    float width = canvasInfo_.geoWidth > 0 ? canvasInfo_.geoWidth : rect.GetWidth();
+    float height = canvasInfo_.geoHeight > 0 ? canvasInfo_.geoHeight : rect.GetHeight();
+    if (width < 1e-6 || height < 1e-6) {
+        GE_LOGE("GESDFClipShader::MakeSDFClipShader invalid size");
+        return nullptr;
+    }
     GE_TRACE_NAME_FMT("GESDFClipShader::GetSDFClipEffect, normal type");
-    auto sdfShader = params_.shape->GenerateDrawingShader(canvas,
-        canvasInfo_.geoWidth != 0 ? canvasInfo_.geoWidth : rect.GetWidth(),
-        canvasInfo_.geoHeight != 0 ? canvasInfo_.geoHeight : rect.GetHeight());
+    auto sdfShader = params_.shape->GenerateDrawingShader(canvas, width, height);
     if (sdfShader == nullptr) {
         GE_LOGE("GESDFClipShader: failed generate GESDFClipShader.");
         return nullptr;

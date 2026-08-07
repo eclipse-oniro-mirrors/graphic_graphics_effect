@@ -92,7 +92,7 @@ std::shared_ptr<Drawing::Image> GEBlurShaderFilter::OnProcessImage(Drawing::Canv
         return mesaFilter.OnProcessImage(canvas, image, srcRect, dstRect);
     }
 
-    int extension = static_cast<int>(std::ceil(blurParams_.radiusX * 3));
+    int extension = static_cast<int>(std::min(std::ceil(blurParams_.radiusX * 3), static_cast<float>(INT_MAX)));
     return ProcessImageWithMesa(canvas, image, srcRect, extension);
 }
 } // namespace Rosen

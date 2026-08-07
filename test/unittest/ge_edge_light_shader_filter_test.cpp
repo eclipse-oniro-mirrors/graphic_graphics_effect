@@ -157,6 +157,8 @@ HWTEST_F(GEEdgeLightShaderFilterTest, SubFunctionTest, TestSize.Level1)
     EXPECT_NE(edgeLightShaderFilter->GaussianBlur(canvas_, image_), image_);
     edgeLightShaderFilter->mask_ = CreateEdgeLightRippleShaderMask();
     EXPECT_NE(edgeLightShaderFilter->MergeImage(canvas_, image_, imageComposite_), image_);
+
+    EXPECT_EQ(edgeLightShaderFilter->MergeImage(canvas_, image_, nullptr), image_);
 }
 
 /**

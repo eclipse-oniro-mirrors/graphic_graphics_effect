@@ -372,6 +372,62 @@ HWTEST_F(GEFilterComposerTest, MesaFusionPassRunOddSize, TestSize.Level1)
 }
 
 /**
+ * @tc.name: MesaFusionPassSkipFusionNullBlurParams
+ * @tc.desc: Test GEMesaFusionPass skips fusion when blurParams is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, MesaFusionPassSkipFusionNullBlurParams, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassSkipFusionNullBlurParams start";
+
+    GEMesaFusionPass pass;
+
+    auto greyEffect = CreateGreyEffect();
+    auto kawaseEffect = CreateKawaseBlurEffect();
+    kawaseEffect->GetImpl()->params_.reset();
+
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(greyEffect);
+    composables.push_back(kawaseEffect);
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+    ASSERT_EQ(composables.size(), 2);
+    EXPECT_EQ(composables[0].GetEffect(), greyEffect);
+    EXPECT_EQ(composables[1].GetEffect(), kawaseEffect);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassSkipFusionNullBlurParams end";
+}
+
+/**
+ * @tc.name: MesaFusionPassSkipFusionNullGreyParams
+ * @tc.desc: Test GEMesaFusionPass skips fusion when greyParams is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEFilterComposerTest, MesaFusionPassSkipFusionNullGreyParams, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassSkipFusionNullGreyParams start";
+
+    GEMesaFusionPass pass;
+
+    auto greyEffect = CreateGreyEffect();
+    greyEffect->GetImpl()->params_.reset();
+    auto kawaseEffect = CreateKawaseBlurEffect();
+
+    std::vector<GEFilterComposable> composables;
+    composables.push_back(greyEffect);
+    composables.push_back(kawaseEffect);
+
+    auto result = pass.Run(composables);
+    EXPECT_FALSE(result.changed);
+    ASSERT_EQ(composables.size(), 2);
+    EXPECT_EQ(composables[0].GetEffect(), greyEffect);
+    EXPECT_EQ(composables[1].GetEffect(), kawaseEffect);
+
+    GTEST_LOG_(INFO) << "GEFilterComposerTest MesaFusionPassSkipFusionNullGreyParams end";
+}
+
+/**
  * @tc.name: GEFilterComposerRunNoPasses
  * @tc.desc: Test GEFilterComposer Run function with no passes
  * @tc.type: FUNC

@@ -109,18 +109,22 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
 
 std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffectSM(const int rippleMode)
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSM = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSM = nullptr;
     if (g_waterRippleEffectSM == nullptr) {
         g_waterRippleEffectSM = (rippleMode == SMALL2MEDIUM_SEND) ?
             GECreateRuntimeEffectForShader(shaderStringSMsend) :
             GECreateRuntimeEffectForShader(shaderStringSMrecv);
+        if (g_waterRippleEffectSM == nullptr) {
+            LOGE("GEWaterRippleFilter::GetWaterRippleEffectSM CreateForShader failed");
+            return nullptr;
+        }
     }
     return g_waterRippleEffectSM;
 }
 
 std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffectSS()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSS = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectSS = nullptr;
     if (g_waterRippleEffectSS == nullptr) {
         g_waterRippleEffectSS = GECreateRuntimeEffectForShader(shaderStringSSmutual);
     }
@@ -129,7 +133,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffec
 
 std::shared_ptr<Drawing::RuntimeEffect> GEWaterRippleFilter::GetWaterRippleEffectMR()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectMR = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_waterRippleEffectMR = nullptr;
     if (g_waterRippleEffectMR == nullptr) {
         g_waterRippleEffectMR = GECreateRuntimeEffectForShader(shaderStringMiniRecv);
     }

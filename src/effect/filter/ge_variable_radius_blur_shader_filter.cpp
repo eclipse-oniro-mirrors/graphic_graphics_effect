@@ -239,6 +239,10 @@ std::shared_ptr<Drawing::Image> GEVariableRadiusBlurShaderFilter::DrawBoxLinearG
     Drawing::Matrix invBlurMatrix;
     auto blurShader = Drawing::ShaderEffect::CreateImageShader(
         *tmpBlur4, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, linear, invBlurMatrix);
+    if (blurShader == nullptr) {
+        LOGE("GEVariableRadiusBlurShaderFilter::DrawBoxLinearGradientBlur blurShader is null");
+        return image;
+    }
     Drawing::RuntimeShaderBuilder builder(textureShaderEffect_);
     builder.SetChild("imageInput", blurShader);
     auto imageInfo = Drawing::ImageInfo(dst.GetWidth(), dst.GetHeight(), image->GetImageInfo().GetColorType(),

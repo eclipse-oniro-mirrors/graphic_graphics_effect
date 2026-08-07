@@ -146,5 +146,40 @@ HWTEST_F(GEVariableRadiusBlurShaderFilterTest, TypeTest001, TestSize.Level1)
     EXPECT_EQ(variableRadiusBlurShaderFilter->TypeName(), Drawing::GE_FILTER_VARIABLE_RADIUS_BLUR);
 }
 
+/**
+ * @tc.name: DrawBoxLinearGradientBlur_NullBlurShader
+ * @tc.desc: Verify DrawBoxLinearGradientBlur returns original image when blurShader is nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVariableRadiusBlurShaderFilterTest, DrawBoxLinearGradientBlur_NullBlurShader, TestSize.Level1)
+{
+    Drawing::GEVariableRadiusBlurShaderFilterParams params = {
+        CreateRippleShaderMask(), 100.0f};
+    auto filter = CreateVariableRadiusBlurShaderFilter(params);
+    ASSERT_NE(filter, nullptr);
+    Drawing::Bitmap bmp;
+    Rosen::Drawing::BitmapFormat format { Rosen::Drawing::COLORTYPE_RGBA_8888, Rosen::Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(0, 0, format);
+    auto emptyImage = bmp.MakeImage();
+    Drawing::Rect dst { 0.0f, 0.0f, 0.0f, 0.0f };
+    auto maskShader = filter->params_.mask->GenerateDrawingShader(0, 0);
+    auto result = filter->DrawBoxLinearGradientBlur(emptyImage, canvas_, 10.0f, maskShader, dst);
+    EXPECT_EQ(result, emptyImage);
+}
+
+/**
+ * @tc.name: ProcessImage_ZeroRadius
+ * @tc.desc: Verify OnProcessImage returns original image when blur radius is zero
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVariableRadiusBlurShaderFilterTest, ProcessImage_ZeroRadius, TestSize.Level1)
+{
+    Drawing::GEVariableRadiusBlurShaderFilterParams params = {
+        CreateRippleShaderMask(), 0.0f};
+    auto filter = CreateVariableRadiusBlurShaderFilter(params);
+    ASSERT_NE(filter, nullptr);
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+}
+
 }  // namespace Rosen
 }  // namespace OHOS

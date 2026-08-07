@@ -299,7 +299,12 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Dra
     lightingBuilder->SetUniform("lightIntensity", params_.lightIntensity);
 
 #ifdef RS_ENABLE_GPU
-    auto lightingImage = lightingBuilder->MakeImage(canvas.GetGPUContext().get(), &imageMatrix, imageInfo, false);
+    auto gpuContext = canvas.GetGPUContext();
+    if (gpuContext == nullptr) {
+        LOGE("GEDirectionLightShaderFilter::OnProcessImage gpuContext is null");
+        return image;
+    }
+    auto lightingImage = lightingBuilder->MakeImage(gpuContext.get(), &imageMatrix, imageInfo, false);
 #else
     auto lightingImage = lightingBuilder->MakeImage(nullptr, &imageMatrix, imageInfo, false);
 #endif
@@ -312,7 +317,7 @@ std::shared_ptr<Drawing::Image> GEDirectionLightShaderFilter::OnProcessImage(Dra
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetNormalMaskEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_normalMaskShaderEffect = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalMaskShaderEffect = nullptr;
     if (g_normalMaskShaderEffect == nullptr) {
         g_normalMaskShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringNormalMask);
     }
@@ -321,7 +326,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetNormalM
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetDirectionLightEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightShaderEffect = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightShaderEffect = nullptr;
     if (g_directionLightShaderEffect == nullptr) {
         g_directionLightShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDirectionLight);
     }
@@ -330,7 +335,7 @@ std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetDirecti
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDirectionLightShaderFilter::GetDirectionLightNoNormalEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightNoNormalShaderEffect = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_directionLightNoNormalShaderEffect = nullptr;
     if (g_directionLightNoNormalShaderEffect == nullptr) {
         g_directionLightNoNormalShaderEffect = GECreateRuntimeEffectForShader(g_shaderStringDirectionLightNoNormal);
     }

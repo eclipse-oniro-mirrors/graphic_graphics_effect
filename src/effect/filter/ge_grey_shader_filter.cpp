@@ -32,7 +32,7 @@ GEGreyShaderFilter::GEGreyShaderFilter(const Drawing::GEGreyShaderFilterParams& 
     }
 }
 
-static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_greyAdjustEffect;
 
 std::shared_ptr<Drawing::Image> GEGreyShaderFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)

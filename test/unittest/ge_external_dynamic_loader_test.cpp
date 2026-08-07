@@ -85,7 +85,51 @@ HWTEST_F(GEExternalDynamicLoaderTest, DynamicLoader_Test_001, TestSize.Level1)
 
         GTEST_LOG_(INFO) << "GEExternalDynamicLoaderTest DynamicLoaderTest001 end";
     }
+
+    if (testLoader_->destroyObjectFunc_ == nullptr) {
+        EXPECT_FALSE(testLoader_->DestroyGEXObject(nullptr));
+        int dummy = 0;
+        EXPECT_FALSE(testLoader_->DestroyGEXObject(static_cast<void*>(&dummy)));
+    } else {
+        EXPECT_TRUE(testLoader_->DestroyGEXObject(nullptr));
+    }
+}
+
+/**
+ * @tc.name: CreateGEXObjectByType_NullFunc
+ * @tc.desc: Verify CreateGEXObjectByType returns nullptr when createObjectFunc_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEExternalDynamicLoaderTest, CreateGEXObjectByType_NullFunc, TestSize.Level1)
+{
+    if (testLoader_->createObjectFunc_ == nullptr) {
+        EXPECT_EQ(testLoader_->CreateGEXObjectByType(0, 0, nullptr), nullptr);
+    }
+}
+
+/**
+ * @tc.name: DestroyGEXObject_NullFunc
+ * @tc.desc: Verify DestroyGEXObject returns false when destroyObjectFunc_ is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEExternalDynamicLoaderTest, DestroyGEXObject_NullFunc, TestSize.Level1)
+{
+    if (testLoader_->destroyObjectFunc_ == nullptr) {
+        EXPECT_FALSE(testLoader_->DestroyGEXObject(nullptr));
+    }
+}
+
+/**
+ * @tc.name: GetInstance_Singleton
+ * @tc.desc: Verify GetInstance returns the same singleton instance
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEExternalDynamicLoaderTest, GetInstance_Singleton, TestSize.Level1)
+{
+    auto& instance1 = GEExternalDynamicLoader::GetInstance();
+    auto& instance2 = GEExternalDynamicLoader::GetInstance();
+    EXPECT_EQ(&instance1, &instance2);
 }
 
 } // namespace Rosen
-} // namespace OHOS
+} // namespace OHOS

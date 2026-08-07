@@ -56,7 +56,12 @@ std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::OnProcessImage(Drawing::Can
         return image;
     }
 #ifdef RS_ENABLE_GPU
-    auto invertedImage = builder->MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
+    auto gpuContext = canvas.GetGPUContext();
+    if (gpuContext == nullptr) {
+        LOGE("GEAIBarShaderFilter::OnProcessImage gpuContext is null");
+        return image;
+    }
+    auto invertedImage = builder->MakeImage(gpuContext.get(), nullptr, image->GetImageInfo(), false);
 #else
     auto invertedImage = builder->MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
@@ -71,7 +76,11 @@ std::shared_ptr<Drawing::Image> GEAIBarShaderFilter::OnProcessImage(Drawing::Can
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GEAIBarShaderFilter::MakeBinarizationShader(
     float imageWidth, float imageHeight, std::shared_ptr<Drawing::ShaderEffect> imageShader)
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> binarizationShaderEffect_;
+    if (imageShader == nullptr) {
+        LOGE("GEAIBarShaderFilter::MakeBinarizationShader imageShader is null");
+        return nullptr;
+    }
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> binarizationShaderEffect_;
 
     // coefficient of saturation borrowed from
     // the saturate filter in RSProperties::GenerateColorFilter()

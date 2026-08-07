@@ -30,7 +30,8 @@ std::shared_ptr<GEXFlowLightSweepShader> GEXFlowLightSweepShader::CreateDynamicI
         GE_LOGE("GEXFlowLightSweepShader::CreateDynamicImpl create object failed.");
         return nullptr;
     }
-    std::shared_ptr<GEXFlowLightSweepShader> dmShader(static_cast<GEXFlowLightSweepShader*>(impl));
+    std::shared_ptr<GEXFlowLightSweepShader> dmShader(static_cast<GEXFlowLightSweepShader*>(impl),
+        [](GEXFlowLightSweepShader* p) { GEExternalDynamicLoader::GetInstance().DestroyGEXObject(p); });
     return dmShader;
 }
 
