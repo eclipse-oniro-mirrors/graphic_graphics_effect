@@ -218,7 +218,7 @@ class GEParamsMemberHelper {
 
     // Type-safe setter (supports cast_from overloads)
     template<typename T>
-    static void SetParamsMemberByTag(GEParamsParams& params, GEParamsMemberTag tag, const T& value);
+    static void SetParamsMemberByTag(GEFilterParams& params, GEParamsMemberTag tag, const T& value);
 };
 ```
 

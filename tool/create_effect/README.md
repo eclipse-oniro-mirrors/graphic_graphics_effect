@@ -91,7 +91,7 @@ python tool/generate_metadata/gen_metadata.py
 | `filter` | `GEShaderFilter` | `Rosen` | `GE{Name}ShaderFilter` | Blur, color, distortion |
 | `mask` | `GEShaderMask` | `Drawing` | `GE{Name}ShaderMask` | Gradient/image masks |
 | `shader` | `GEShader` | `Rosen` | `GE{Name}Shader` | Lighting, material effects |
-| `shape` | `GESDFShaderShape` | `Drawing` | `GE{Name}SDFShaderShape` | SDF borders/shadows/clips |
+| `shape` | `GESDFShaderShape` | `Drawing` | `GE{Name}ShaderShape` | SDF borders/shadows/clips |
 
 ---
 
@@ -129,7 +129,7 @@ src/effect/{type}/ge_{name}_{suffix}.{ext}
 | `filter` | `shader_filter` |
 | `mask` | `shader_mask` |
 | `shader` | `shader` |
-| `shape` | `sdf_shader_shape` |
+| `shape` | `shader_shape` |
 
 ### File Contents
 

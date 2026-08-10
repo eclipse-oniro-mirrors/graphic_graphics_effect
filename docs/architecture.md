@@ -22,7 +22,7 @@ The codebase follows a modular, layered architecture:
 - **GEFilterComposer** (`ge_filter_composer.h`) - Multi-pass effect composition system
 - **Rendering Passes**:
   - `GEDirectDrawOnCanvasPass` - Direct drawing to canvas
-  - `GEHPSBuildPass`, `GEHPSUpscalePass` - HPS-specific passes
+  - `GEHpsBuildPass`, `GEHpsUpscalePass` - HPS-specific passes
   - `GEMesaFusionPass` - Mesa fusion rendering strategy
   - `GEFilterComposerPass` - Generic filter composition pass
 - **Caching**:
@@ -70,7 +70,7 @@ Shape-based effects including SDF (Signed Distance Field) system:
   - `GESDFPixelmapShaderShape` - Pixelmap-based shapes
   - `GESDFTransformShaderShape` - Transformable SDF shapes
   - `GESDFUnionOpShaderShape` - Union operation for combining shapes
-- **SDF Effects**:
+- **SDF Effects** (extend `GEShader`, consume SDF shapes as shader children):
   - `GESDFBorderShader` - SDF-based borders
   - `GESDFColorShader` - SDF-based coloring
   - `GESDFClipShader` - SDF-based clipping
