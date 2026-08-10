@@ -42,6 +42,14 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     Vector2f thickParams = Vector2f(1.0f, 1.0f);
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f glassBaseColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    [[ge::prop(cast_from="float", custom="MaterialColorBlendModeTransformer")]]
+    MaterialColorBlendMode colorBlendMode = MaterialColorBlendMode::LINEAR_MIX;
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float vibrancyStrength = 0.0f;
+    [[ge::prop(min={-1.0f, -1.0f, -1.0f},max={1.0f, 1.0f, 1.0f})]]
+    Vector3f lumaParams = Vector3f(0.6628f, 0.3137f, 0.1538f);
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float materialColorFraction = 1.0f;
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f fresnelEnvColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     [[ge::prop(min={-200.0f, -200.0f},
@@ -105,6 +113,19 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     [[ge::prop(min={-20.0f, -20.0f, -20.0f},
                max={20.0f, 20.0f, 20.0f})]]
     Vector3f sdNeg = Vector3f(0.5f, 0.5f, 1.0f);
+    [[ge::prop(min={-20.0f, -20.0f},
+               max={20.0f, 20.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f edLightRates = Vector2f(0.0f, 0.0f);
+    [[ge:;prop(min={-20.0f, 20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
+    Vector3f edLightKBS = Vector3f(1.0f, 0.3268f, 1.2f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
+    [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
+    Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
+    [[ge::prop(min=0.0f, max=2.0f)]]
+    float antiAliasing = 0.5f;
     [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
     // Adapt effect component

@@ -131,6 +131,25 @@ struct ContourDiagonalFlowLimitContourCapacityTransformer {
     }
 };
 
+struct MaterialColorBlendModeTransformer {
+    static bool Transform(float value, MaterialColorBlendMode& out)
+    {
+        enum class ColorBlendModeParam { LINEAR_MIX = 0, TINTED_GLASS };
+        ColorBlendModeParam modeParam = static_cast<ColorBlendModeParam>(value);
+        switch (modeParam) {
+            case ColorBlendModeParam::LINEAR_MIX:
+                out = MaterialColorBlendMode::LINEAR_MIX;
+                return true;
+            case ColorBlendModeParam::TINTED_GLASS:
+                out = MaterialColorBlendMode::TINTED_GLASS;
+                return true;
+            default:
+                out = MaterialColorBlendMode::LINEAR_MIX;
+                return true;
+        }
+    }
+};
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

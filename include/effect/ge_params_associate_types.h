@@ -102,6 +102,12 @@ struct GERRect {
     }
 };
 
+enum class MaterialColorBlendMode {
+    LINEAR_MIX,
+    TINTED_GLASS,
+    MAX = TINTED_GLASS
+}
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
