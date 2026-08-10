@@ -118,7 +118,7 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
                cast_from="std::pair<float,float>",
                custom="PairToVector2fTransformer")]]
     Vector2f edLightRates = Vector2f(0.0f, 0.0f);
-    [[ge:;prop(min={-20.0f, 20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
+    [[ge::prop(min={-20.0f, 20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightKBS = Vector3f(1.0f, 0.3268f, 1.2f);
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
