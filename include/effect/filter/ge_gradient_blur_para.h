@@ -44,6 +44,10 @@ public:
         const GEGradientDirection direction, const bool maskLinearBlurEnabled)
         : blurRadius_(blurRadius), fractionStops_(fractionStops), direction_(direction)
     {
+        constexpr size_t MAX_FRACTION_STOPS_SIZE = 1000;
+        if (fractionStops_.empty() || fractionStops_.size() > MAX_FRACTION_STOPS_SIZE) {
+            fractionStops_.clear();
+        }
         if (maskLinearBlurEnabled) {
             auto kawaseParams = std::make_shared<Drawing::GEKawaseBlurShaderFilterParams>();
             kawaseParams->radius = blurRadius_ / 2; // 2: experience factor

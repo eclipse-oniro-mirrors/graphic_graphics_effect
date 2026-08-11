@@ -18,6 +18,7 @@
 #include "draw/canvas.h"
 #include "draw/color.h"
 #include "ge_double_ripple_shader_mask.h"
+#include "ge_radial_gradient_shader_mask.h"
 #include "image/bitmap.h"
 #include "image/image.h"
 #include "ge_sdf_edge_light.h"
@@ -185,6 +186,28 @@ HWTEST_F(GESDFEdgeLightTest, ParameterVariations_Smoke, TestSize.Level0)
     auto filter2 = std::make_unique<GESDFEdgeLight>(params2);
     auto out2 = filter2->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_EQ(out2.get(), image_.get());
+}
+
+/**
+ * @tc.name: MakeEffectShader_LightMaskShaderNull
+ * @tc.desc: Verify OnProcessImage returns original image when lightMask GenerateDrawingShader returns nullptr
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFEdgeLightTest, MakeEffectShader_LightMaskShaderNull, TestSize.Level0)
+{
+    ASSERT_NE(image_, nullptr);
+    ASSERT_NE(sdfImage_, nullptr);
+    auto params = MakeParams();
+    params.sdfImage = sdfImage_;
+    Drawing::GERadialGradientShaderMaskParams mp;
+    mp.center_ = {0.5f, 0.5f};
+    mp.radiusX_ = 0.5f;
+    mp.radiusY_ = 0.5f;
+    auto mask = std::make_shared<Drawing::GERadialGradientShaderMask>(mp);
+    params.lightMask = mask;
+    auto filter = std::make_unique<GESDFEdgeLight>(params);
+    auto out = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(out.get(), image_.get());
 }
 
 } // namespace Rosen

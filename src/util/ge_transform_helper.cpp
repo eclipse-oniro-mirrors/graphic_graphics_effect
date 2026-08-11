@@ -97,6 +97,10 @@ std::array<float, 16> PerspectiveTransformCalculator::ComputeVPMatrix(const Draw
 
 std::array<float, 9> PerspectiveTransformCalculator::QuaternionToRotationMatrix(const Quaternion &quaternion)
 {
+    if (quaternion.IsNaN() || quaternion.IsInfinite()) {
+        GE_LOGE("QuaternionToRotationMatrix: invalid quaternion (NaN/Inf/Zero).");
+        return {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+    }
     std::array<float, 9> rotationMatrix = {};
     float qx = quaternion.x_;
     float qy = quaternion.y_;

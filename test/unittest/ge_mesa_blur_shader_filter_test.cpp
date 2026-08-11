@@ -265,6 +265,13 @@ HWTEST_F(GEMESABlurShaderFilterTest, ScaleAndAddRandomColor_001, TestSize.Level1
     Drawing::GEMESABlurShaderFilterParams params2 {88, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
     auto filter2 = std::make_shared<GEMESABlurShaderFilter>(params2);
     EXPECT_NE(filter2->ScaleAndAddRandomColor(canvas_, image_, imageBlur, src_, dst_, width, height), image_);
+
+    std::shared_ptr<Drawing::Image> nullImage { nullptr };
+    EXPECT_EQ(filter->ScaleAndAddRandomColor(canvas_, nullImage, imageBlur, src_, dst_, width, height), imageBlur);
+    std::shared_ptr<Drawing::Image> nullBlur { nullptr };
+    EXPECT_EQ(filter->ScaleAndAddRandomColor(canvas_, image_, nullBlur, src_, dst_, width, height), nullBlur);
+    Drawing::Rect zeroDst { 0.0f, 0.0f, 0.0f, 0.0f };
+    EXPECT_EQ(filter->ScaleAndAddRandomColor(canvas_, image_, imageBlur, src_, zeroDst, width, height), imageBlur);
 }
 
 /**
@@ -314,5 +321,122 @@ HWTEST_F(GEMESABlurShaderFilterTest, DirectionBlur_001, TestSize.Level1)
     auto image = geMESABlurShaderFilter->OnProcessImage(*canvasGpu_, image_, src_, dst_);
     EXPECT_NE(image, image_);
 }
+
+/**
+ * @tc.name: OutputImageWithoutBlurNullAndInvalidDst
+ * @tc.desc: Verify OutputImageWithoutBlur returns input on null image / invalid dst
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, OutputImageWithoutBlurNullAndInvalidDst, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    std::shared_ptr<Drawing::Image> image = nullptr;
+    EXPECT_EQ(filter->OutputImageWithoutBlur(canvas_, image, src_, dst_), image);
+
+    Drawing::Rect zeroDst { 0.0f, 0.0f, 0.0f, 0.0f };
+    EXPECT_EQ(filter->OutputImageWithoutBlur(canvas_, image_, src_, zeroDst), image_);
+}
+
+/**
+ * @tc.name: OnProcessImageWithoutUpSamplingNullImage
+ * @tc.desc: Verify OnProcessImageWithoutUpSampling returns input when image is nullptr
+ * @tc.type:FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, OnProcessImageWithoutUpSamplingNullImage, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    std::shared_ptr<Drawing::Image> image = nullptr;
+    EXPECT_EQ(filter->OnProcessImageWithoutUpSampling(canvas_, image, src_, dst_), image);
+}
+
+/**
+ * @tc.name: DownSampling8X_InvalidDimensions
+ * @tc.desc: Verify DownSampling8X returns nullptr when dimensions are invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, DownSampling8X_InvalidDimensions, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    Drawing::RuntimeShaderBuilder blurBuilder(nullptr);
+    Drawing::ImageInfo zeroInfo(0, 0, Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    auto result = filter->DownSampling8X(canvas_, blurBuilder, image_, src_, zeroInfo, zeroInfo, linear, false);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: DownSamplingMoreX_InvalidDimensions
+ * @tc.desc: Verify DownSamplingMoreX returns nullptr when dimensions are invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, DownSamplingMoreX_InvalidDimensions, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    Drawing::RuntimeShaderBuilder blurBuilder(nullptr);
+    Drawing::ImageInfo zeroInfo(0, 0, Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    auto result = filter->DownSamplingMoreX(canvas_, blurBuilder, image_, src_, zeroInfo, zeroInfo, zeroInfo, linear, false);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: DownSamplingFuzedBlur_InvalidDimensions
+ * @tc.desc: Verify DownSamplingFuzedBlur returns nullptr when dimensions are invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, DownSamplingFuzedBlur_InvalidDimensions, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    Drawing::RuntimeShaderBuilder blurBuilder(nullptr);
+    Drawing::ImageInfo zeroInfo(0, 0, Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    GEMESABlurShaderFilter::NewBlurParams blur;
+    int width = 0;
+    int height = 0;
+    auto result = filter->DownSamplingFuzedBlur(canvas_, blurBuilder, image_, src_, zeroInfo, width, height, linear, blur);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: PingPongBlur_InvalidDimensions
+ * @tc.desc: Verify PingPongBlur returns nullptr when scaledInfo dimensions are invalid
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, PingPongBlur_InvalidDimensions, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    Drawing::RuntimeShaderBuilder blurBuilder(nullptr);
+    Drawing::RuntimeShaderBuilder simpleBuilder(nullptr);
+    Drawing::ImageInfo zeroInfo(0, 0, Drawing::ColorType::COLORTYPE_RGBA_8888, Drawing::AlphaType::ALPHATYPE_OPAQUE);
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    GEMESABlurShaderFilter::NewBlurParams blur;
+    auto result = filter->PingPongBlur(canvas_, blurBuilder, simpleBuilder, image_, image_, zeroInfo, linear, blur);
+    EXPECT_EQ(result, nullptr);
+}
+
+/**
+ * @tc.name: DownSamplingForEdge_InvalidDimensions
+ * @tc.desc: Verify DownSamplingForEdge returns nullptr when factor is zero causing invalid dimensions
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEMESABlurShaderFilterTest, DownSamplingForEdge_InvalidDimensions, TestSize.Level1)
+{
+    Drawing::GEMESABlurShaderFilterParams params {1, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0, 0.f, 0.f};
+    auto filter = std::make_shared<GEMESABlurShaderFilter>(params);
+    Drawing::SamplingOptions linear(Drawing::FilterMode::LINEAR, Drawing::MipmapMode::NONE);
+    auto result = filter->DownSamplingForEdge(canvas_, image_, src_, linear, 0.0f);
+    EXPECT_EQ(result, nullptr);
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

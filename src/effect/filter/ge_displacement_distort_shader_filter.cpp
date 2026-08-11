@@ -81,7 +81,7 @@ std::shared_ptr<Drawing::Image> GEDisplacementDistortFilter::OnProcessImage(Draw
 
 std::shared_ptr<Drawing::RuntimeEffect> GEDisplacementDistortFilter::GetDisplacementDistortEffect()
 {
-    static std::shared_ptr<Drawing::RuntimeEffect> g_displacementdistortShader = nullptr;
+    thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_displacementdistortShader = nullptr;
     if (g_displacementdistortShader == nullptr) {
         g_displacementdistortShader = GECreateRuntimeEffectForShader(shaderStringDisplacementDistort);
     }

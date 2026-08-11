@@ -237,8 +237,18 @@ std::shared_ptr<ShaderEffect> GERadialGradientShaderMask::GenerateShaderEffect(f
     if (colorSize <= 0 || colorSize > SIZE_ARRAY || colorSize != positionSize || width < 0.01f || height < 0.01f) {
         return nullptr;
     }
+    constexpr float MAX_RESOLUTION = 100000.0f;
+    if (width > MAX_RESOLUTION || height > MAX_RESOLUTION) {
+        LOGE("GERadialGradientShaderMask::GenerateShaderEffect resolution too large");
+        return nullptr;
+    }
     // if radius <= 0, no need to draw. 0.001f is the min value
     if (param_.radiusX_ < 0.001f || param_.radiusY_ < 0.001f) {
+        return nullptr;
+    }
+    constexpr float MAX_RADIUS = 10000.0f;
+    if (param_.radiusX_ > MAX_RADIUS || param_.radiusY_ > MAX_RADIUS) {
+        LOGE("GERadialGradientShaderMask::GenerateShaderEffect radius too large");
         return nullptr;
     }
 

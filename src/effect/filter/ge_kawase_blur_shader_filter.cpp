@@ -37,10 +37,10 @@ constexpr int32_t MAX_PASSES_LARGE_RADIUS = 7; // Maximum number of render passe
 constexpr float DILATED_CONVOLUTION_LARGE_RADIUS = 4.6f;
 // To avoid downscaling artifacts, interpolate the blurred fbo with the full composited image, up to this radius
 constexpr float MAX_CROSS_FADE_RADIUS = 10.0f;
-static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_mixEffect;
-static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffectAf;
-static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffect;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_mixEffect;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_blurEffectAf;
+thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_simpleFilter;
 
 } // namespace
 
@@ -174,6 +174,11 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::OnProcessImage(Drawing
         return image;
     }
 
+    if (dst.GetWidth() <= 0 || dst.GetHeight() <= 0) {
+        LOGE("GEKawaseBlurShaderFilter::OnProcessImage invalid dst dimensions");
+        return image;
+    }
+
     auto input = image;
     CheckInputImage(canvas, image, input, src);
     ComputeRadiusAndScale(radius_);
@@ -199,6 +204,10 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::OnProcessImage(Drawing
     Drawing::RuntimeShaderBuilder blurBuilder(isUsingAF ? g_blurEffectAf : g_blurEffect);
     if (GetBlurExtraFilterEnabled() && g_simpleFilter) {
         tmpShader = ApplySimpleFilter(canvas, input, tmpShader, scaledInfo, linear);
+        if (tmpShader == nullptr) {
+            LOGE("GEKawaseBlurShaderFilter::ApplySimpleFilter failed");
+            return image;
+        }
     }
     blurBuilder.SetChild("imageInput", tmpShader);
 

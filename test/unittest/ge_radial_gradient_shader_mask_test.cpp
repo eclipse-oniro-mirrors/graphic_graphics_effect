@@ -219,6 +219,34 @@ HWTEST_F(GERadialGradientShaderMaskTest, GenerateShaderEffect_002, TestSize.Leve
     auto shader8 = mask8.GenerateDrawingShader(100.0f, 100.0f); // 100.0f means the width and height of image.
     EXPECT_EQ(shader8, nullptr);
 
+    // width or height > MAX_RESOLUTION(100000) -> new guard returns nullptr
+    constexpr float MAX_RESOLUTION = 100000.0f;
+    GERadialGradientShaderMaskParams resParam;
+    resParam.center_ = {0.5f, 0.5f};
+    resParam.radiusX_ = 1.0f;
+    resParam.radiusY_ = 1.0f;
+    resParam.colors_ = {0.0f, 1.0f};
+    resParam.positions_ = {0.0f, 1.0f};
+    GERadialGradientShaderMask resMask(resParam);
+    EXPECT_EQ(resMask.GenerateDrawingShader(MAX_RESOLUTION + 1.0f, 100.0f), nullptr);
+    EXPECT_EQ(resMask.GenerateDrawingShader(100.0f, MAX_RESOLUTION + 1.0f), nullptr);
+
+    // radiusX_ or radiusY_ > MAX_RADIUS(10000) -> new guard returns nullptr
+    constexpr float MAX_RADIUS = 10000.0f;
+    GERadialGradientShaderMaskParams radParamX;
+    radParamX.center_ = {0.5f, 0.5f};
+    radParamX.colors_ = {0.0f, 1.0f};
+    radParamX.positions_ = {0.0f, 1.0f};
+    radParamX.radiusX_ = MAX_RADIUS + 1.0f;
+    radParamX.radiusY_ = 1.0f;
+    GERadialGradientShaderMask radMaskX(radParamX);
+    EXPECT_EQ(radMaskX.GenerateDrawingShader(100.0f, 100.0f), nullptr);
+    GERadialGradientShaderMaskParams radParamY = radParamX;
+    radParamY.radiusX_ = 1.0f;
+    radParamY.radiusY_ = MAX_RADIUS + 1.0f;
+    GERadialGradientShaderMask radMaskY(radParamY);
+    EXPECT_EQ(radMaskY.GenerateDrawingShader(100.0f, 100.0f), nullptr);
+
     GTEST_LOG_(INFO) << "GERadialGradientShaderMaskTest GenerateShaderEffect_002 end";
 }
 

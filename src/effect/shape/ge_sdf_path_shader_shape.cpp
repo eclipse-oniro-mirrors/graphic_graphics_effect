@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <limits>
 #include <stack>
 #include <string>
@@ -485,6 +486,22 @@ thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_normalShaderEffect
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_sdfPropEffect_ = nullptr;
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_clearInfEffect = nullptr;
 
+static std::optional<double> convertStringToDouble(const std::string& str)
+{
+    char* end = nullptr;
+    errno = 0;
+    double val = strtod(str.c_str(), &end);
+    if (end == str) {
+        LOGE("Conversion failed: No valid number.");
+        return std::nullopt;
+    }
+    if (errno == ERANGE) {
+        LOGE("Conversion overflow or underflow.");
+        return std::nullopt;
+    }
+    return val;
+}
+
 static std::vector<float> parseNumbers(const std::string& s, size_t& i)
 {
     std::vector<float> result;
@@ -519,7 +536,11 @@ static std::vector<float> parseNumbers(const std::string& s, size_t& i)
         }
 
         // converting numbers
-        double val = std::stod(s.substr(start, i - start));
+        auto optVal = convertStringToDouble(s.substr(start, i - start));
+        if (!optVal.has_value()) {
+            break;
+        }
+        double val = optVal.value();
         result.push_back(static_cast<float>(val));
     }
     return result;
@@ -601,9 +622,21 @@ std::shared_ptr<Image> GESDFPathShaderShape::RunSDFPropagation(
     Canvas& canvas, std::shared_ptr<Image> sdfTex, std::shared_ptr<Image> maskTex, int width, int height)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::RunSDFPropagation");
-
+    if (!sdfTex) {
+        LOGE("GESDFPathShaderShape::ComputeDistanceField sdfTex is null");
+        return nullptr;
+    }
+    if (!maskTex) {
+        LOGE("GESDFPathShaderShape::ComputeDistanceField maskTex is null");
+        return sdfTex;
+    }
     if (numPasses_ <= 0) {
         return sdfTex;
+    }
+
+    if (!sdfTex) {
+        LOGE("GESDFPathShaderShape::RunSDFPropagation sdfTex is null");
+        return nullptr;
     }
 
     auto gpuContext = canvas.GetGPUContext();
@@ -648,6 +681,10 @@ std::shared_ptr<Image> GESDFPathShaderShape::ComputeDistanceField(
     Canvas& canvas, std::shared_ptr<Image> sdfTex, int width, int height)
 {
     GE_TRACE_NAME_FMT("GESDFPathShaderShape::ComputeDistanceField");
+    if (!sdfTex) {
+        LOGE("GESDFPathShaderShape::ComputeDistanceField sdfTex is null");
+        return nullptr;
+    }
     auto gpuContext = canvas.GetGPUContext();
     if (!gpuContext) {
         LOGE("GESDFPathShaderShape::ComputeDistanceField no GPU context");
@@ -681,8 +718,18 @@ void GESDFPathShaderShape::CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const
         GE_LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas rect is nullptr.");
         return;
     }
+    if (rect.GetWidth() > static_cast<float>(std::numeric_limits<int>::max()) ||
+        rect.GetHeight() > static_cast<float>(std::numeric_limits<int>::max())) {
+        LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas invalid rect dimensions");
+        return;
+    }
+    auto gpuContext = canvas.GetGPUContext();
+    if (!gpuContext) {
+        LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas GPU context is null");
+        return;
+    }
     Drawing::ImageInfo imageInfo(rect.GetWidth(), rect.GetHeight(), RGBA_F16, Drawing::AlphaType::ALPHATYPE_OPAQUE);
-    offscreenSurface_ = Drawing::Surface::MakeRenderTarget(canvas.GetGPUContext().get(), false, imageInfo);
+    offscreenSurface_ = Drawing::Surface::MakeRenderTarget(gpuContext.get(), false, imageInfo);
     if (!offscreenSurface_) {
         LOGE("GESDFPathShaderShape::CreateSurfaceAndCanvas offscreenSurface is invalid");
         return;
@@ -734,6 +781,7 @@ void GESDFPathShaderShape::AutoGridPartition(float width, float height, const st
         return;
     }
     curvesInGrid_.clear();
+    segmentIndex_.clear();
     allGridsCovered_ = true;
     maxEmptyGridShortSide_ = 0.0f;
 
@@ -866,7 +914,11 @@ void GESDFPathShaderShape::ProcessFinalGrid(Grid& current, const std::vector<Box
     std::vector<float> inOrderSeg;
     for (size_t idx : processedGrid.curveIndices) {
         size_t baseIdx = idx * CURVE_FLOAT_COUNT;
- 
+        if (baseIdx + CURVE_FLOAT_COUNT - 1 > controlPoints_.size()) {
+            LOGE("GESDFPathShaderShape::ProcessFinalGrid index out of bounds");
+            continue;
+        }
+
         gridCurves.push_back(controlPoints_[baseIdx]);     // startPoint.x
         gridCurves.push_back(controlPoints_[baseIdx + 1]); // 1: startPoint.y
         gridCurves.push_back(controlPoints_[baseIdx + 2]); // 2: controlPoint.x
@@ -1135,6 +1187,12 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     float width = 0.0f;
     float height = 0.0f;
     Drawing::Path path = PreparePathForRendering(rect, width, height);
+    if (width < 1.0f || height < 1.0f ||
+        width > static_cast<float>(std::numeric_limits<int>::max()) ||
+        height > static_cast<float>(std::numeric_limits<int>::max())) {
+        LOGE("GESDFPathShaderShape::Preprocess: invalid width/height");
+        return;
+    }
 
     std::vector<std::vector<Vector2f>> paramsCoef = GetCurveByPath(path);
     std::vector<Vector2f> pixelControlPoints = ProcessCurveSegments(paramsCoef);
@@ -1144,6 +1202,10 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     }
     // Convert Pixel To NDC
     std::vector<Vector2f> ndcControlPoints = ConvertPixelToNDC(pixelControlPoints, width, height);
+    if (ndcControlPoints.empty()) {
+        LOGE("GESDFPathShaderShape::Preprocess: ConvertPixelToNDC failed: invalid width/height");
+        return;
+    }
     ConvertPointsToFloats(ndcControlPoints, controlPoints_);
     pointCnt_ = controlPoints_.size();
 
@@ -1174,6 +1236,10 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
     
     std::shared_ptr<Image> propagatedSdf = RunSDFPropagation(canvas, offscreenSurface_->GetImageSnapshot(),
         pathImage, static_cast<int>(width), static_cast<int>(height));
+    if (!propagatedSdf) {
+        LOGE("GESDFPathShaderShape::Preprocess: RunSDFPropagation returned null");
+        return;
+    }
 
     disResult_ =
         ComputeDistanceField(canvas, propagatedSdf, static_cast<int>(width), static_cast<int>(height));
