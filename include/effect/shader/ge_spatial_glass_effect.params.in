@@ -121,7 +121,7 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     [[ge::prop(min={-20.0f, -20.0f, 0.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightKBS = Vector3f(1.0f, 0.3268f, 1.2f);
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
-    Vector3f edLightPos = Vector3f(1.f, 1.5f, 2.0f);
+    Vector3f edLightPos = Vector3f(1.0f, 1.5f, 2.0f);
     [[ge::prop(min={-20.0f, -20.0f, -20.0f}, max={20.0f, 20.0f, 20.0f})]]
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     [[ge::prop(min=0.0f, max=2.0f)]]
