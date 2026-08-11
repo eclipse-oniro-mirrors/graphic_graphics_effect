@@ -31,9 +31,9 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     Vector3f cameraPosition = Vector3f(0.0f, 0.0f, 0.0f);
     [[ge::prop(min={-200.0f, -200.0f, -200.0f},
                max={200.0f, 200.0f, 200.0f})]]
-    Vector3f cameraIntrinsics = Vector3f(0.0f, 0.0f, 0.0f);
-    [[ge::prop(min={-200.0f, -200.0f, -200.0f},
-               max={200.0f, 200.0f, 200.0f})]]
+    Vector2f cameraIntrinsics = Vector2f(0.0f, 0.0f);
+    [[ge::prop(min={-200.0f, -200.0f},
+               max={200.0f, 200.0f})]]
     Vector3f lightDir = Vector3f(0.0f, 0.0f, 0.0f);
     [[ge::prop(min={0.0f, 0.0f},
                max={100.0f, 100.0f},
