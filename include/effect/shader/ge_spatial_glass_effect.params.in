@@ -42,7 +42,7 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     Vector2f thickParams = Vector2f(1.0f, 1.0f);
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f glassBaseColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    [[ge::prop(cast_from="float", custom="MaterialColorBlendModeTransformer")]]
+    [[ge::prop(cast_from="int", custom="MaterialColorBlendModeTransformer")]]
     MaterialColorBlendMode colorBlendMode = MaterialColorBlendMode::LINEAR_MIX;
     [[ge::prop(min=0.0f, max=1.0f)]]
     float vibrancyStrength = 0.0f;

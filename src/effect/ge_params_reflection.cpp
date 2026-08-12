@@ -126,10 +126,8 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
-#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \
-    {                                                                                               \
-        std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \
-    }
+#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
+    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
 
 #define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
 
@@ -909,10 +907,7 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
 GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
-#define GE_STRING_TO_TAG_ENTRY(Tag)                                                 \
-    {                                                                               \
-        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag \
-    }
+#define GE_STRING_TO_TAG_ENTRY(Tag) { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }
 
 #define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag }
 
@@ -2276,7 +2271,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_MAX_COLOR)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_BG_ALPHA)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_REFRACT_OUT_PX)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_COLOR_BLEND_MODE)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_VIBRANCY_STRENGTH)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_MATERIAL_COLOR_FRACTION)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_DARK_SCALE)
@@ -2284,7 +2278,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(FROSTED_GLASS_BG_ALPHA)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_DARK_SCALE)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_BASE_MATERIAL_TYPE)
-        GE_VALIDATE_AND_SET(FROSTED_GLASS_COLOR_BLEND_MODE)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_VIBRANCY_STRENGTH)
         GE_VALIDATE_AND_SET(FROSTED_GLASS_MATERIAL_COLOR_FRACTION)
         GE_VALIDATE_AND_SET(GASIFY_BLUR_PROGRESS)
@@ -2383,7 +2376,6 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_PROGRESS_A)
         GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_PROGRESS_B)
         GE_VALIDATE_AND_SET(SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA)
-        GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_COLOR_BLEND_MODE)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_VIBRANCY_STRENGTH)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_MATERIAL_COLOR_FRACTION)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_ANTI_ALIASING)
@@ -2481,6 +2473,8 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(BORDER_SDF_SHADER_STYLE)
         GE_VALIDATE_AND_SET(DOT_MATRIX_PATH_DIRECTION)
         GE_VALIDATE_AND_SET(DOT_MATRIX_EFFECT_TYPE)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_EFFECT_COLOR_BLEND_MODE)
+        GE_VALIDATE_AND_SET(FROSTED_GLASS_COLOR_BLEND_MODE)
         GE_VALIDATE_AND_SET(KAWASE_BLUR_RADIUS)
         GE_VALIDATE_AND_SET(LINEAR_GRADIENT_BLUR_DIRECTION)
         GE_VALIDATE_AND_SET(MAGNIFIER_ROTATE_DEGREE)
@@ -2493,6 +2487,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(PARTICLE_ABLATION_TURB_AMP)
         GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_UNION_MODE)
+        GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_COLOR_BLEND_MODE)
         default:
             GE_LOGE("SetParamsMemberByTag<int32_t>: No matching case for tag %{public}u (filter type %{public}u, "
                     "params type %{public}u)",
