@@ -132,7 +132,7 @@ struct ContourDiagonalFlowLimitContourCapacityTransformer {
 };
 
 struct MaterialColorBlendModeTransformer {
-    static bool Transform(float value, MaterialColorBlendMode& out)
+    static bool Transform(int value, MaterialColorBlendMode& out)
     {
         enum class ColorBlendModeParam { LINEAR_MIX = 0, TINTED_GLASS };
         ColorBlendModeParam modeParam = static_cast<ColorBlendModeParam>(value);
