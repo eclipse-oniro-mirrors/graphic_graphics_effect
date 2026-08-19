@@ -16,7 +16,7 @@
 #include <gtest/gtest.h>
 #include <memory>
 
-#include "ge_effects_params.h"
+#include "ge_filter_params.h"
 #include "ge_params_reflection.h"
 
 using namespace testing;
