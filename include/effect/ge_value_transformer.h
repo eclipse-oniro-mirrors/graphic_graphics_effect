@@ -135,9 +135,9 @@ struct MaterialColorBlendModeTransformer {
     static bool Transform(int value, MaterialColorBlendMode& out)
     {
         auto mode = static_cast<MaterialColorBlendMode>(value);
-        switch (modeParam) {
-            case ColorBlendModeParam::LINEAR_MIX:
-            case ColorBlendModeParam::TINTED_GLASS:
+        switch (mode) {
+            case MaterialColorBlendMode::LINEAR_MIX:
+            case MaterialColorBlendMode::TINTED_GLASS:
                 out = mode;
                 return true;
             default:
