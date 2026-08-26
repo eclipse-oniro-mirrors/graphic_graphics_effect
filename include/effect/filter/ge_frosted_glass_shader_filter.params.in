@@ -50,6 +50,7 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     [[ge::prop(min=0.0f, max=1.0f)]]
     float bgAlpha = 1.0f;
     // Refraction params
+    [[ge::prop(min={-1.0f, 0.0f, 0.0f}, max={1.0f, 10.0f, 1.0f})]]
     Vector3f refractParams = Vector3f(0.0f, 0.0f, 0.0f);
     // Inner shadow parameters
     [[ge::prop(min={-500.0f, 0.0f, 1.0f}, max={500.0f, 250.0f, 250.0f})]]
@@ -138,4 +139,12 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     float baseMaterialType = 0.0f;
     [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
     Vector4f materialColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    [[ge::prop(cast_from="int", custom="MaterialColorBlendModeTransformer")]]
+    MaterialColorBlendMode colorBlendMode = MaterialColorBlendMode::LINEAR_MIX;
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float vibrancyStrength = 0.0f;
+    [[ge::prop(min={-1.0f, -1.0f, -1.0f}, max={1.0f, 1.0f, 1.0f})]]
+    Vector3f lumaParams = Vector3f(0.6628f, 0.3137f, 0.1538f);
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float materialColorFraction = 0.0f; 
 };
