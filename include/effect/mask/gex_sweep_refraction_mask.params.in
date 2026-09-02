@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=SWEEP_REFRACTION_MASK, name="SweepRefractionMask")]] GEXSweepRefractionMaskParams {
+    float maskRadius = 0.0f;
+    float edgeThickness = 300.0f;
+    float refractAmount = 0.3f;
+    float rippleWidth = 0.4f;
+    float sweepOffset = 0.0f;
+    float chromaDelta = 0.08f;
+    int32_t shapeType = 0; // 0=rounded rect, 1=ellipse
+    float cornerRadius = 0.16f; // corner radius / component height ratio, 0.16=default UV
+    float prismWidth = 1.0f; // prism width / component width ratio, 1.0=fill component
+    float prismHeight = 1.0f; // prism height / component height ratio, 1.0=fill component
+    float sweepCenterX = 0.0f; // sweep center X in UV [0,1], 0.0=left
+    float sweepCenterY = 0.0f; // sweep center Y in UV [0,1], 0.0=top
+};
