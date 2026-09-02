@@ -56,6 +56,8 @@
 #include "effect/mask/ge_use_effect_shader_mask.h"
 #include "effect/mask/ge_wave_disturb_shader_mask.h"
 #include "effect/mask/ge_wave_gradient_shader_mask.h"
+#include "effect/mask/ge_fractal_glass_shader_mask.h"
+#include "effect/mask/ge_binocular_shader_mask.h"
 #include "effect/shader/ge_aurora_noise_shader.h"
 #include "effect/shader/ge_border_light_shader.h"
 #include "effect/shader/ge_border_sdf_lg_color_shader.h"
@@ -115,6 +117,8 @@ GE_FACTORY_REGISTER(GEMotionBlurShaderFilter)
 GE_FACTORY_REGISTER(GESDFFromImageFilter)
 GE_FACTORY_REGISTER(GESDFEdgeLight)
 GE_FACTORY_REGISTER(GESoundWaveFilter)
+GE_FACTORY_REGISTER_EXTERNAL(SPIN_BLUR, ::OHOS::Rosen::Drawing::GESpinBlurShaderFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(HALO_BLOOM, ::OHOS::Rosen::Drawing::GEHaloBloomShaderFilterParams)
 GE_FACTORY_REGISTER(GEWaterRippleFilter)
 
 // 1.2 Dynamically loaded effects
@@ -257,12 +261,16 @@ GE_FACTORY_REGISTER_MASK(GEPixelMapShaderMask)
 GE_FACTORY_REGISTER_MASK(GERadialGradientShaderMask)
 GE_FACTORY_REGISTER_MASK(GERippleShaderMask)
 GE_FACTORY_REGISTER_MASK(GEUseEffectShaderMask)
+GE_FACTORY_REGISTER_EXTERNAL(WARPED_RING, ::OHOS::Rosen::Drawing::GEWarpedRingShaderMaskParams)
 GE_FACTORY_REGISTER_MASK(GEWaveDisturbanceShaderMask)
 GE_FACTORY_REGISTER_MASK(GEWaveGradientShaderMask)
+GE_FACTORY_REGISTER_MASK(GEFractalGlassShaderMask)
+GE_FACTORY_REGISTER_MASK(GEBinocularShaderMask)
 
 // 3.2 Dynamically loaded effects
 GE_FACTORY_REGISTER_EXTERNAL(DUPOLI_NOISE_MASK, ::OHOS::Rosen::Drawing::GEXDupoliNoiseMaskParams)
 GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::GEXNoisyFrameGradientMaskParams)
+GE_FACTORY_REGISTER_EXTERNAL(SWEEP_REFRACTION_MASK, ::OHOS::Rosen::Drawing::GEXSweepRefractionMaskParams)
 
 
 /*

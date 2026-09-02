@@ -150,6 +150,8 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/mask/ge_wave_gradient_shader_mask.cpp",
     "src/effect/mask/ge_wave_disturb_shader_mask.cpp",
     "src/effect/shape/ge_sdf_distort_op_shader_shape.cpp",
+    "src/effect/mask/ge_fractal_glass_shader_mask.cpp",
+    "src/effect/mask/ge_binocular_shader_mask.cpp",
     "src/effect/shape/ge_sdf_shader_shape.cpp",
     "src/effect/shape/ge_sdf_ellipse_shader_shape.cpp",
     "src/effect/shape/ge_sdf_rrect_shader_shape.cpp",
