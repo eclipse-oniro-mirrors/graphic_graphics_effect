@@ -1089,7 +1089,8 @@ std::shared_ptr<Image> GESDFPathShaderShape::DrawPathToImage(
         return nullptr;
     }
     Drawing::Brush brush;
-    brush.SetColor(Color::COLOR_RED);
+    Drawing::Color4f redColor = {1.0f, 0.0f, 0.0f, 1.0f};
+    brush.SetColor(redColor, colorSpace);
     brush.SetAntiAlias(true);
     canvas1->AttachBrush(brush);
     canvas1->DrawPath(path);
@@ -1154,14 +1155,10 @@ void GESDFPathShaderShape::UpdateScale(Vector2f& scale, const Drawing::Rect& rec
     scale = Vector2f(scaleX, scaleY);
 }
 
-void GESDFPathShaderShape::UpdateNumPasses(float height)
+void GESDFPathShaderShape::UpdateNumPasses()
 {
-    if (height < 150.f) { // 150.0:Add iterative correction When the component is small
-        numPasses_ = 1;
-        return;
-    }
     if (allGridsCovered_) {
-        numPasses_ = 0; // perform 0 iterations If all the grids have curves passing
+        numPasses_ = 1; // perform 1 iteration If all the grids have curves passing
         return;
     }
     float requiredStep = maxEmptyGridShortSide_ * 0.5f;
@@ -1221,7 +1218,7 @@ void GESDFPathShaderShape::Preprocess(Canvas& canvas, const Rect& rect, bool has
 
     RenderGridsToSurface(targetRect);
 
-    UpdateNumPasses(height);
+    UpdateNumPasses();
     std::shared_ptr<Image> pathImage = nullptr;
     if (numPasses_ > 0) {
         pathImage = DrawPathToImage(canvas, static_cast<int>(width), static_cast<int>(height), path);

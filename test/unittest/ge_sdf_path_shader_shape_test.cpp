@@ -915,7 +915,7 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateScaleNormalRange_001, TestSize.Level1)
 
 /**
  * @tc.name: UpdateNumPasses_001
- * @tc.desc: Verify small size branch has highest priority: height < 150 forces 1 pass, even all grids covered
+ * @tc.desc: Verify allGridsCovered_ branch returns 1 pass as minimum guarantee
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_001, TestSize.Level1)
@@ -927,13 +927,13 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_001, TestSize.Level1)
 
     shape.allGridsCovered_ = true;
     shape.maxEmptyGridShortSide_ = 128.0f;
-    shape.UpdateNumPasses(149.9f);
+    shape.UpdateNumPasses();
     EXPECT_EQ(shape.numPasses_, 1);
 }
 
 /**
  * @tc.name: UpdateNumPasses_002
- * @tc.desc: Verify all-grids-covered branch returns 0 passes when height >= 150
+ * @tc.desc: Verify allGridsCovered_ branch returns 1 pass even with zero empty grid side
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_002, TestSize.Level1)
@@ -945,8 +945,8 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_002, TestSize.Level1)
 
     shape.allGridsCovered_ = true;
     shape.maxEmptyGridShortSide_ = 0.0f;
-    shape.UpdateNumPasses(150.0f);
-    EXPECT_EQ(shape.numPasses_, 0);
+    shape.UpdateNumPasses();
+    EXPECT_EQ(shape.numPasses_, 1);
 }
 
 /**
@@ -963,7 +963,7 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_003, TestSize.Level1)
 
     shape.allGridsCovered_ = false;
     shape.maxEmptyGridShortSide_ = 0.5f;
-    shape.UpdateNumPasses(300.0f);
+    shape.UpdateNumPasses();
     EXPECT_EQ(shape.numPasses_, 1);
 }
 
@@ -981,7 +981,7 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_004, TestSize.Level1)
 
     shape.allGridsCovered_ = false;
     shape.maxEmptyGridShortSide_ = 8.0f; // step=4 -> log2(4)+1 = 3
-    shape.UpdateNumPasses(300.0f);
+    shape.UpdateNumPasses();
     EXPECT_EQ(shape.numPasses_, 3);
 }
 
@@ -999,7 +999,7 @@ HWTEST_F(GESDFPathShaderShapeTest, UpdateNumPasses_005, TestSize.Level1)
 
     shape.allGridsCovered_ = false;
     shape.maxEmptyGridShortSide_ = 128.0f; // step clamped to 32 -> log2(32)+1 = 6
-    shape.UpdateNumPasses(500.0f);
+    shape.UpdateNumPasses();
     EXPECT_EQ(shape.numPasses_, 6);
 }
 

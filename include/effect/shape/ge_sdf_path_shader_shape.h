@@ -114,7 +114,7 @@ private:
     void InitializeWorkQueue(
         const Box4f& canvasBBox, const std::vector<Box4f>& curveBBoxes, std::queue<Grid>& workQueue);
     void ProcessFinalGrid(Grid& current, const std::vector<Box4f>& curveBBoxes);
-    void UpdateNumPasses(float height);
+    void UpdateNumPasses();
 
     // ========== Quadtree grid partition ==========
     void CreateSurfaceAndCanvas(Drawing::Canvas& canvas, const Drawing::Rect& rect);
