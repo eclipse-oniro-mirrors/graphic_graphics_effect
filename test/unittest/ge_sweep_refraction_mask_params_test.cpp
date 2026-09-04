@@ -15,7 +15,7 @@
 #include <gtest/gtest.h>
 
 #include "ge_shader_filter_params.h"
-#include "ge_params_reflection.h"
+#include "ge_visual_effect_impl.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -45,34 +45,30 @@ void GESweepRefractionMaskParamsTest::TearDown() {}
  */
 HWTEST_F(GESweepRefractionMaskParamsTest, ParamsDefaultValues_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsDefaultValues_001 start";
     GEXSweepRefractionMaskParams param;
-    EXPECT_FLOAT_EQ(param.maskRadius_, 0.0f);
-    EXPECT_FLOAT_EQ(param.edgeThickness_, 300.0f);
-    EXPECT_FLOAT_EQ(param.refractAmount_, 0.3f);
-    EXPECT_FLOAT_EQ(param.rippleWidth_, 0.4f);
-    EXPECT_FLOAT_EQ(param.sweepOffset_, 0.0f);
-    EXPECT_FLOAT_EQ(param.chromaDelta_, 0.08f);
-    EXPECT_EQ(param.shapeType_, 0);
-    EXPECT_FLOAT_EQ(param.cornerRadius_, 0.16f);
-    EXPECT_FLOAT_EQ(param.prismWidth_, 1.0f);
-    EXPECT_FLOAT_EQ(param.prismHeight_, 1.0f);
-    EXPECT_FLOAT_EQ(param.sweepCenterX_, 0.0f);
-    EXPECT_FLOAT_EQ(param.sweepCenterY_, 0.0f);
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsDefaultValues_001 end";
+    EXPECT_FLOAT_EQ(param.maskRadius, 0.0f);
+    EXPECT_FLOAT_EQ(param.edgeThickness, 300.0f);
+    EXPECT_FLOAT_EQ(param.refractAmount, 0.3f);
+    EXPECT_FLOAT_EQ(param.rippleWidth, 0.4f);
+    EXPECT_FLOAT_EQ(param.sweepOffset, 0.0f);
+    EXPECT_FLOAT_EQ(param.chromaDelta, 0.08f);
+    EXPECT_EQ(param.shapeType, 0);
+    EXPECT_FLOAT_EQ(param.cornerRadius, 0.16f);
+    EXPECT_FLOAT_EQ(param.prismWidth, 1.0f);
+    EXPECT_FLOAT_EQ(param.prismHeight, 1.0f);
+    EXPECT_FLOAT_EQ(param.sweepCenterX, 0.0f);
+    EXPECT_FLOAT_EQ(param.sweepCenterY, 0.0f);
 }
 
 /**
  * @tc.name: ParamsReflection_001
- * @tc.desc: Verify GEParamsReflection for SWEEP_REFRACTION_MASK parameters
+ * @tc.desc: Verify GEParamsBuilder for SWEEP_REFRACTION_MASK filter type
  * @tc.type: FUNC
  */
 HWTEST_F(GESweepRefractionMaskParamsTest, ParamsReflection_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsReflection_001 start";
-    auto filterType = GEGetFilterType(GEFilterType::SWEEP_REFRACTION_MASK);
+    auto filterType = GEParamsBuilder::GetFilterTypeFromString("SweepRefractionMask");
     EXPECT_EQ(filterType, GEFilterType::SWEEP_REFRACTION_MASK);
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsReflection_001 end";
 }
 
 /**
@@ -82,85 +78,84 @@ HWTEST_F(GESweepRefractionMaskParamsTest, ParamsReflection_001, TestSize.Level1)
  */
 HWTEST_F(GESweepRefractionMaskParamsTest, ParamsReflection_002, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsReflection_002 start";
     // Verify key parameter names are recognized
-    auto maskRadiusTag = GEStringToTag("SweepRefractionMaskMaskRadius");
-    EXPECT_NE(maskRadiusTag, static_cast<uint32_t>(-1));
+    auto maskRadiusTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_MaskRadius");
+    EXPECT_NE(maskRadiusTag, GEParamsMemberTag::INVALID);
 
-    auto edgeThicknessTag = GEStringToTag("SweepRefractionMaskEdgeThickness");
-    EXPECT_NE(edgeThicknessTag, static_cast<uint32_t>(-1));
+    auto edgeThicknessTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_EdgeThickness");
+    EXPECT_NE(edgeThicknessTag, GEParamsMemberTag::INVALID);
 
-    auto refractAmountTag = GEStringToTag("SweepRefractionMaskRefractAmount");
-    EXPECT_NE(refractAmountTag, static_cast<uint32_t>(-1));
+    auto refractAmountTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_RefractAmount");
+    EXPECT_NE(refractAmountTag, GEParamsMemberTag::INVALID);
 
-    auto rippleWidthTag = GEStringToTag("SweepRefractionMaskRippleWidth");
-    EXPECT_NE(rippleWidthTag, static_cast<uint32_t>(-1));
+    auto rippleWidthTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_RippleWidth");
+    EXPECT_NE(rippleWidthTag, GEParamsMemberTag::INVALID);
 
-    auto sweepOffsetTag = GEStringToTag("SweepRefractionMaskSweepOffset");
-    EXPECT_NE(sweepOffsetTag, static_cast<uint32_t>(-1));
+    auto sweepOffsetTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_SweepOffset");
+    EXPECT_NE(sweepOffsetTag, GEParamsMemberTag::INVALID);
 
-    auto chromaDeltaTag = GEStringToTag("SweepRefractionMaskChromaDelta");
-    EXPECT_NE(chromaDeltaTag, static_cast<uint32_t>(-1));
+    auto chromaDeltaTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_ChromaDelta");
+    EXPECT_NE(chromaDeltaTag, GEParamsMemberTag::INVALID);
 
-    auto shapeTypeTag = GEStringToTag("SweepRefractionMaskShapeType");
-    EXPECT_NE(shapeTypeTag, static_cast<uint32_t>(-1));
+    auto shapeTypeTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_ShapeType");
+    EXPECT_NE(shapeTypeTag, GEParamsMemberTag::INVALID);
 
-    auto cornerRadiusTag = GEStringToTag("SweepRefractionMaskCornerRadius");
-    EXPECT_NE(cornerRadiusTag, static_cast<uint32_t>(-1));
+    auto cornerRadiusTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_CornerRadius");
+    EXPECT_NE(cornerRadiusTag, GEParamsMemberTag::INVALID);
 
-    auto prismWidthTag = GEStringToTag("SweepRefractionMaskPrismWidth");
-    EXPECT_NE(prismWidthTag, static_cast<uint32_t>(-1));
+    auto prismWidthTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_PrismWidth");
+    EXPECT_NE(prismWidthTag, GEParamsMemberTag::INVALID);
 
-    auto prismHeightTag = GEStringToTag("SweepRefractionMaskPrismHeight");
-    EXPECT_NE(prismHeightTag, static_cast<uint32_t>(-1));
+    auto prismHeightTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_PrismHeight");
+    EXPECT_NE(prismHeightTag, GEParamsMemberTag::INVALID);
 
-    auto sweepCenterXTag = GEStringToTag("SweepRefractionMaskSweepCenterX");
-    EXPECT_NE(sweepCenterXTag, static_cast<uint32_t>(-1));
+    auto sweepCenterXTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_SweepCenterX");
+    EXPECT_NE(sweepCenterXTag, GEParamsMemberTag::INVALID);
 
-    auto sweepCenterYTag = GEStringToTag("SweepRefractionMaskSweepCenterY");
-    EXPECT_NE(sweepCenterYTag, static_cast<uint32_t>(-1));
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ParamsReflection_002 end";
+    auto sweepCenterYTag = GEParamsMemberHelper::GEParamsMemberTagFromString("SweepRefractionMask_SweepCenterY");
+    EXPECT_NE(sweepCenterYTag, GEParamsMemberTag::INVALID);
 }
 
 /**
  * @tc.name: ValidateAndSet_001
- * @tc.desc: Verify GEValidateAndSet for SWEEP_REFRACTION_MASK parameters
+ * @tc.desc: Verify GEVisualEffectImpl SetParam for SWEEP_REFRACTION_MASK parameters
  * @tc.type: FUNC
  */
 HWTEST_F(GESweepRefractionMaskParamsTest, ValidateAndSet_001, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ValidateAndSet_001 started";
-    GEXSweepRefractionMaskParams param;
-    auto visualEffect = std::make_shared<GEVisualEffect>("SweepRefractionMask");
+    GEVisualEffectImpl sweepRefraction("SweepRefractionMask");
 
     // Test setting maskRadius
-    bool ret = GEValidateAndSet("SweepRefractionMaskMaskRadius", 1.5f, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_MASK_RADIUS, 1.5f);
 
     // Test setting shapeType
-    ret = GEValidateAndSet("SweepRefractionMaskShapeType", 1, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_SHAPE_TYPE, 1);
 
     // Test setting cornerRadius
-    ret = GEValidateAndSet("SweepRefractionMaskCornerRadius", 16.0f, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_CORNER_RADIUS, 16.0f);
 
     // Test setting prismWidth
-    ret = GEValidateAndSet("SweepRefractionMaskPrismWidth", 360.0f, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_PRISM_WIDTH, 360.0f);
 
     // Test setting prismHeight
-    ret = GEValidateAndSet("SweepRefractionMaskPrismHeight", 140.0f, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_PRISM_HEIGHT, 140.0f);
 
     // Test setting sweepCenterX
-    ret = GEValidateAndSet("SweepRefractionMaskSweepCenterX", 0.5f, visualEffect);
-    EXPECT_TRUE(ret);
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_SWEEP_CENTER_X, 0.5f);
 
     // Test setting sweepCenterY
-    ret = GEValidateAndSet("SweepRefractionMaskSweepCenterY", 0.5f, visualEffect);
-    EXPECT_TRUE(ret);
-    GTEST_LOG_(INFO) << "GESweepRefractionMaskParamsTest ValidateAndSet_001 end";
+    sweepRefraction.SetParam(GE_SHADER_SWEEP_REFRACTION_MASK_SWEEP_CENTER_Y, 0.5f);
+
+    auto params = sweepRefraction.GetParams<GEXSweepRefractionMaskParams>();
+    ASSERT_NE(params, nullptr);
+    EXPECT_EQ(sweepRefraction.GetFilterType(), GEFilterType::SWEEP_REFRACTION_MASK);
+    EXPECT_FLOAT_EQ(params->maskRadius, 1.5f);
+    EXPECT_EQ(params->shapeType, 1);
+    EXPECT_FLOAT_EQ(params->cornerRadius, 16.0f);
+    EXPECT_FLOAT_EQ(params->prismWidth, 360.0f);
+    EXPECT_FLOAT_EQ(params->prismHeight, 140.0f);
+    EXPECT_FLOAT_EQ(params->sweepCenterX, 0.5f);
+    EXPECT_FLOAT_EQ(params->sweepCenterY, 0.5f);
 }
 
 } // namespace Drawing
