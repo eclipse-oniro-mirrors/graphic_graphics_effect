@@ -17,5 +17,6 @@ struct [[ge::params(type=SPIN_BLUR, name="SpinBlur")]] GESpinBlurShaderFilterPar
     [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f center = Vector2f(0.5f, 0.5f);
     float angle = 0.0f;
+    [[ge::prop(min=0, max=128)]]
     int32_t samples = 32;
 };
