@@ -1,0 +1,54 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=GLASS_EFFECT, name="GlassEffect")]] GEXGlassEffectParams {
+    [[ge::prop(min={0.0f, 0.0f}, max={1.0f, 1.0f})]]
+    std::pair<float, float> sphereCenter = {0.5f, 0.5f};
+    [[ge::prop(min=0.0, max=1.0)]]
+    float sphereRadius = 1.f;
+    [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
+    Vector4f averageBgColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    [[ge::prop(min=0.0, max=1.0)]]
+    float opacity = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float shapeScale = 0.f;
+    [[ge::prop(min=-1.0, max=1.0)]]
+    float shadowOffset = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float shadowRadius = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float shadowEdgeSoftness = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float shadowOpacity = 0.f;
+    [[ge::prop(min=-1.0, max=1.0)]]
+    float causticOffset = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float causticRadius = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float causticEdgeSoftness = 0.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float causticOpacity = 0.f;
+    [[ge::prop(min={0.0f, 0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f, 1.0f})]]
+    Vector4f contentTintColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+    [[ge::prop(min=0.0, max=1.0)]]
+    float contentScale = 1.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float contentSaturation = 1.f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float contentDispersion = 0.f;
+    std::shared_ptr<GEShaderMask> shapeMask = nullptr;
+    std::shared_ptr<GEShaderMask> contentMask = nullptr;
+    std::shared_ptr<Drawing::Image> reflectionImage = nullptr;
+};
