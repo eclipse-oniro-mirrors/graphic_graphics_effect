@@ -46,6 +46,7 @@ public:
 private:
     void CheckSoundWaveParams();
     void CheckSoundWaveColor4f(Drawing::Color4f& color);
+    void ComputeAndSetUniforms(Drawing::RuntimeShaderBuilder& builder);
     std::shared_ptr<Drawing::RuntimeEffect> GetSoundWaveEffect();
     // sound wave
     Drawing::Color4f colorA_ = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -61,6 +62,11 @@ private:
     float shockWaveProgressB_ = 0.0f;
     float shockWaveTotalAlpha_ = 1.0f;
 
+    // circle light
+    Vector2f circleCenter_ = Vector2f(0.0f, 0.0f);
+    float circleRadius_ = 0.0f;
+    float lightIntensity_ = 1.0f;
+
     inline static const std::string shaderStringSoundWave = R"(
         uniform shader image;
         uniform half2 iResolution;
@@ -68,14 +74,17 @@ private:
         uniform half3 colorB;
         uniform half3 colorC;
         uniform half colorProgress;
-        uniform half soundIntensity;
         uniform half shockWaveAlphaA;
         uniform half shockWaveAlphaB;
         uniform half shockWaveProgressA;
         uniform half shockWaveProgressB;
         uniform half shockWaveTotalAlpha;
-
-        const half circleRadius = 0.125;
+        uniform half barPosition;
+        uniform half2 circlePosition;
+        uniform half circleRadius;
+        uniform half lightIntensity;
+        uniform half waveHeight;
+        uniform half smoothUnionThreshold;
 
         half smin(half a, half b, half k)
         {
@@ -121,13 +130,6 @@ private:
  
         half soundWaveLightEffects(half2 centeredUVs)
         {
-            // Control the height of the circle
-            half circleHeight = mix(-0.4, 0.03, soundIntensity);
-
-            half smoothUnionThreshold = mix(0.0657, 0.09, soundIntensity);
-            half2 circlePosition = half2(0.0, circleHeight);
-
-            half barPosition = mix(0.09, 0.0, soundIntensity);
             half circleSDF = length(centeredUVs - circlePosition) - circleRadius;
             centeredUVs.y += barPosition;
 
@@ -135,6 +137,8 @@ private:
             half smoothUnionDistance = smin(circleSDF, centeredUVs.y, smoothUnionThreshold);
 
             half horizontalGradient = smoothstep(0.75, 0.0, abs(centeredUVs.x));
+            half t = smoothstep(0.03, 0.1, circlePosition.y);
+            horizontalGradient = mix(horizontalGradient, 1.0, t);
             half smoothGap = mix(0.08, 0.1085, horizontalGradient);
             half smoothUnion = smoothstep(smoothGap, -0.035, mix(0.0, 0.66, smoothUnionDistance));
 
@@ -173,14 +177,14 @@ private:
             }
 
             // Sound wave Effect
-            if (centeredUVs.y < 0.214 * soundIntensity + 0.0776) {
+            if (centeredUVs.y < waveHeight) {
                 additionalColorStrength += soundWaveLightEffects(centeredUVs);
             }
 
             half3 finalColor = image.eval(half2(uv.x, 1.0 - uv.y) * iResolution.xy).rgb;
             half3 centerColor = additionalColorStrength > 0.0 ?
                                 colorWheel(centeredUVs, colorProgress) : half3(0.0);
-            finalColor += centerColor * additionalColorStrength;
+            finalColor += centerColor * additionalColorStrength * lightIntensity;
 
             return half4(finalColor, 1.0);
         }

@@ -40,13 +40,14 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
       shockWaveProgressA_(params.shockWaveProgressA), shockWaveProgressB_(params.shockWaveProgressB),
-      shockWaveTotalAlpha_(params.shockWaveTotalAlpha)
+      shockWaveTotalAlpha_(params.shockWaveTotalAlpha), circleCenter_(params.circleCenter),
+      circleRadius_(params.circleRadius), lightIntensity_(params.lightIntensity)
 {
     colorA_ = params.colorA;
     colorB_ = params.colorB;
     colorC_ = params.colorC;
 }
- 
+
 std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
@@ -77,30 +78,59 @@ std::shared_ptr<Drawing::Image> GESoundWaveFilter::OnProcessImage(Drawing::Canva
     }
 
     CheckSoundWaveParams();
-    float colorA[COLOR_CHANNEL] = {colorA_.redF_, colorA_.greenF_, colorA_.blueF_};
-    float colorB[COLOR_CHANNEL] = {colorB_.redF_, colorB_.greenF_, colorB_.blueF_};
-    float colorC[COLOR_CHANNEL] = {colorC_.redF_, colorC_.greenF_, colorC_.blueF_};
-
     Drawing::RuntimeShaderBuilder builder(soundWaveShader);
     builder.SetChild("image", shader);
-    builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
-    builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
-    builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
-    builder.SetUniform("colorC", colorC, COLOR_CHANNEL);
-    builder.SetUniform("colorProgress", colorProgress_);
-    builder.SetUniform("soundIntensity", soundIntensity_);
-    builder.SetUniform("shockWaveAlphaA", shockWaveAlphaA_);
-    builder.SetUniform("shockWaveAlphaB", shockWaveAlphaB_);
-    builder.SetUniform("shockWaveProgressA", shockWaveProgressA_);
-    builder.SetUniform("shockWaveProgressB", shockWaveProgressB_);
-    builder.SetUniform("shockWaveTotalAlpha", shockWaveTotalAlpha_);
- 
+    ComputeAndSetUniforms(builder);
+
     auto invertedImage = builder.MakeImage(canvas.GetGPUContext().get(), &(matrix), imageInfo, false);
     if (invertedImage == nullptr) {
         LOGE("GESoundWaveFilter::OnProcessImage make image failed");
         return image;
     }
     return invertedImage;
+}
+
+void GESoundWaveFilter::ComputeAndSetUniforms(Drawing::RuntimeShaderBuilder& builder)
+{
+    // circle light mode
+    float barPosition = 0.5f - soundIntensity_;
+    float waveHeight = 0.5f;
+    float smoothUnionThreshold = 0.09f;
+    Vector2f circlePosition = circleCenter_;
+    float circleRadius = circleRadius_;
+    float lightIntensity = lightIntensity_;
+
+    // circleRadius == 0 is a sentinel: fall back to the original soundIntensity-driven layout.
+    if (circleRadius == 0.0f) {
+        float circleHeight = -0.4f + 0.43f * soundIntensity_; // mix(-0.4, 0.03, soundIntensity)
+        circlePosition = Vector2f(0.0f, circleHeight);
+        barPosition = 0.09f - 0.09f * soundIntensity_; // mix(0.09, 0.0, soundIntensity)
+        lightIntensity = 1.0f;
+        circleRadius = 0.125f;
+        waveHeight = 0.214f * soundIntensity_ + 0.0776f;
+        smoothUnionThreshold = 0.0657f + (0.09f - 0.0657f) * soundIntensity_; // mix(0.0657, 0.09, soundIntensity)
+    }
+
+    float colorA[COLOR_CHANNEL] = {colorA_.redF_, colorA_.greenF_, colorA_.blueF_};
+    float colorB[COLOR_CHANNEL] = {colorB_.redF_, colorB_.greenF_, colorB_.blueF_};
+    float colorC[COLOR_CHANNEL] = {colorC_.redF_, colorC_.greenF_, colorC_.blueF_};
+
+    builder.SetUniform("iResolution", canvasInfo_.geoWidth, canvasInfo_.geoHeight);
+    builder.SetUniform("colorA", colorA, COLOR_CHANNEL);
+    builder.SetUniform("colorB", colorB, COLOR_CHANNEL);
+    builder.SetUniform("colorC", colorC, COLOR_CHANNEL);
+    builder.SetUniform("colorProgress", colorProgress_);
+    builder.SetUniform("shockWaveAlphaA", shockWaveAlphaA_);
+    builder.SetUniform("shockWaveAlphaB", shockWaveAlphaB_);
+    builder.SetUniform("shockWaveProgressA", shockWaveProgressA_);
+    builder.SetUniform("shockWaveProgressB", shockWaveProgressB_);
+    builder.SetUniform("shockWaveTotalAlpha", shockWaveTotalAlpha_);
+    builder.SetUniform("barPosition", barPosition);
+    builder.SetUniform("circlePosition", circlePosition.x_, circlePosition.y_);
+    builder.SetUniform("circleRadius", circleRadius);
+    builder.SetUniform("lightIntensity", lightIntensity);
+    builder.SetUniform("waveHeight", waveHeight);
+    builder.SetUniform("smoothUnionThreshold", smoothUnionThreshold);
 }
 
 void GESoundWaveFilter::Preprocess(Drawing::Canvas& canvas, const Drawing::Rect& src, const Drawing::Rect& dst)
