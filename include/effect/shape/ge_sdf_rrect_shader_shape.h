@@ -36,6 +36,8 @@ public:
 
     DECLARE_GEFILTER_TYPEFUNC(GESDFRRectShaderShape, Drawing::GESDFRRectShapeParams);
 
+    static bool CanBeContinuous(const std::shared_ptr<GESDFRRectShapeParams>& params);
+
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
     GESDFShapeType GetSDFShapeType() const override

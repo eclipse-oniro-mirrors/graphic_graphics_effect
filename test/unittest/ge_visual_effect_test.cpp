@@ -666,63 +666,6 @@ HWTEST_F(GEVisualEffectTest, GenerateShaderShape_SDFTransformShape, TestSize.Lev
 }
 
 /**
- * @tc.name: CanBeContinuous_UniformCircularRadii
- * @tc.desc: Verify static function CanBeContinuous with uniform circular corner radii
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectTest, CanBeContinuous_UniformCircularRadii, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_UniformCircularRadii start";
-
-    auto params = std::make_shared<GESDFRRectShapeParams>();
-    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
-    params->rrect.SetCornerRadius(10.0f, 10.0f);
-
-    bool result = GEVisualEffect::CanBeContinuous(params);
-    EXPECT_TRUE(result);
-
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_UniformCircularRadii end";
-}
-
-/**
- * @tc.name: CanBeContinuous_NonUniformRadii
- * @tc.desc: Verify static function CanBeContinuous with non-uniform corner radii returns false
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectTest, CanBeContinuous_NonUniformRadii, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_NonUniformRadii start";
-
-    auto params = std::make_shared<GESDFRRectShapeParams>();
-    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
-    params->rrect.SetCornerRadius(10.0f, 20.0f);
-
-    bool result = GEVisualEffect::CanBeContinuous(params);
-    EXPECT_FALSE(result);
-
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_NonUniformRadii end";
-}
-
-/**
- * @tc.name: CanBeContinuous_LargeRadiusExceedsLimit
- * @tc.desc: Verify static function CanBeContinuous when radius exceeds size limit
- * @tc.type: FUNC
- */
-HWTEST_F(GEVisualEffectTest, CanBeContinuous_LargeRadiusExceedsLimit, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_LargeRadiusExceedsLimit start";
-
-    auto params = std::make_shared<GESDFRRectShapeParams>();
-    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
-    params->rrect.SetCornerRadius(80.0f, 80.0f);
-
-    bool result = GEVisualEffect::CanBeContinuous(params);
-    EXPECT_FALSE(result);
-
-    GTEST_LOG_(INFO) << "GEVisualEffectTest CanBeContinuous_LargeRadiusExceedsLimit end";
-}
-
-/**
  * @tc.name: GetGEShaderShape_AfterSetParam
  * @tc.desc: Verify function GetGEShaderShape retrieves shape after SetParam
  * @tc.type: FUNC

@@ -307,7 +307,7 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
         if (FactoryCheckNullptr(params.get(), "SDF_RRECT_SHAPE GetParams")) {
             return nullptr;
         }
-        if (!::OHOS::Rosen::Drawing::GEVisualEffect::CanBeContinuous(params)) {
+        if (!::OHOS::Rosen::Drawing::GESDFRRectShaderShape::CanBeContinuous(params)) {
             return std::make_shared<::OHOS::Rosen::Drawing::GESDFRRectShaderShape>(*params);
         }
         auto object = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
