@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ge_sound_wave_filter.h"
-
 #include "draw/color.h"
+#include "ge_sound_wave_filter.h"
 #include "image/bitmap.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -267,6 +267,46 @@ HWTEST_F(GESoundWaveFilterTest, NonSentinelPath, TestSize.Level1)
     EXPECT_FLOAT_EQ(filter->lightIntensity_, 3.0f);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest NonSentinelPath end";
+}
+
+/**
+ * @tc.name: OnProcessImageSuccess
+ * @tc.desc: Verify OnProcessImage success path on a GPU canvas (MakeImage returns a new image)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, OnProcessImageSuccess, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImageSuccess start";
+
+    // GPU-backed canvas so builder.MakeImage succeeds, covering the success return path.
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    auto context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        return; // GPU context unavailable in this environment
+    }
+    Drawing::ImageInfo imageInfo { 50, 50, Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE };
+    auto surface = Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo);
+    if (surface == nullptr) {
+        return; // GPU surface unavailable in this environment
+    }
+    auto gpuCanvas = surface->GetCanvas();
+    ASSERT_NE(gpuCanvas, nullptr);
+
+    Drawing::GESoundWaveFilterParams params;
+    auto filter = std::make_unique<GESoundWaveFilter>(params);
+    Drawing::CanvasInfo ci;
+    ci.geoWidth = 50.0f;
+    ci.geoHeight = 50.0f;
+    filter->SetShaderFilterCanvasinfo(ci);
+
+    auto result = filter->OnProcessImage(*gpuCanvas, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_NE(result.get(), image_.get());
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImageSuccess end";
 }
 
 } // namespace Rosen
