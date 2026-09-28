@@ -54,6 +54,7 @@ enum class GEFilterType : int32_t {
     NOISY_FRAME_GRADIENT_MASK,
     WAVE_DISTURBANCE_MASK,
     SWEEP_REFRACTION_MASK,
+    ATLAS_FRAME_MASK,
     // Shape
     SDF_UNION_OP,
     SDF_RRECT_SHAPE,
@@ -119,6 +120,7 @@ enum class GEFilterType : int32_t {
     WARPED_RING,
     SPIN_BLUR,
     HALO_BLOOM,
+    GLASS_EFFECT,
     MAX,
 };
 
