@@ -21,12 +21,17 @@
 #include "ge_shader_diagnostics.h"
 #include "ge_trace.h"
 
+#include "common/rs_common_def.h"
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 constexpr float HALF = 0.5;
 constexpr float EXTEND = 0.5; // Fixing edge difference between SDF and Skia RRect
 constexpr float MIN_SIZE = 0.0001f;
+constexpr float CIRCLE_EXPANSION_FACTOR = 1.01f;
+constexpr float CIRCLE_PIXEL_TOLERANCE = 1.f;
+constexpr float DIAMETER_FACTOR = 2.0f; // Diameter = 2 * radius
 static constexpr char SDF_GRAD_PROG[] = R"(
     uniform vec2 centerPos;
     uniform vec2 halfSize;
@@ -234,6 +239,33 @@ std::string RadiiToString(const Vector2f* radii)
     return ss.str();
 }
 } // namespace
+
+bool GESDFRRectShaderShape::CanBeContinuous(const std::shared_ptr<GESDFRRectShapeParams>& params)
+{
+    if (!params->rrect.HasUniformCornerRadii() || !params->rrect.HasCircularCornerRadii()) {
+        return false;
+    }
+    // Exclude radius <= 0
+    float commonRadius = params->rrect.GetCommonRadiusX();
+    if (commonRadius < MIN_SIZE) {
+        return false;
+    }
+
+    // Exclude circle
+    auto maxWH = std::max(params->rrect.width_, params->rrect.height_);
+    float diameter = DIAMETER_FACTOR * commonRadius;
+    if (ROSEN_GE(diameter * CIRCLE_EXPANSION_FACTOR, maxWH) ||
+            ROSEN_GE(diameter + CIRCLE_PIXEL_TOLERANCE, maxWH)) {
+        return false;
+    }
+
+    // Clamp the radius of capsule
+    auto minWH = std::min(params->rrect.width_, params->rrect.height_);
+    if (ROSEN_GE(commonRadius, minWH * 0.5f)) {
+        params->rrect.SetCornerRadius(minWH * 0.5f, minWH * 0.5f);
+    }
+    return true;
+}
 
 std::shared_ptr<ShaderEffect> GESDFRRectShaderShape::GenerateDrawingShader(float width, float height) const
 {

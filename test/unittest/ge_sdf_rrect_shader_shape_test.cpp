@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <memory>
 
 #include "ge_sdf_rrect_shader_shape.h"
 
@@ -603,6 +604,141 @@ HWTEST_F(GESDFRRectShaderShapeTest, GetInscribedRectWithCorners, TestSize.Level1
     EXPECT_FALSE(shape.GetInscribedRect(rect));
 
     GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest GetInscribedRectWithCorners end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_UniformCircularRadii
+ * @tc.desc: Verify CanBeContinuous returns true for uniform circular corner radii
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_UniformCircularRadii, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_UniformCircularRadii start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(10.0f, 10.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_TRUE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_UniformCircularRadii end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_NonUniformRadii
+ * @tc.desc: Verify CanBeContinuous returns false for non-circular (elliptical) corner radii
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_NonUniformRadii, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_NonUniformRadii start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(10.0f, 20.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_NonUniformRadii end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_LargeRadiusExceedsLimit
+ * @tc.desc: Verify CanBeContinuous returns false when the radius turns the rect into a circle
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_LargeRadiusExceedsLimit, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_LargeRadiusExceedsLimit start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(80.0f, 80.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_LargeRadiusExceedsLimit end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_ZeroRadius
+ * @tc.desc: Verify CanBeContinuous returns false when the corner radius is not positive
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_ZeroRadius, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_ZeroRadius start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(0.0f, 0.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_ZeroRadius end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_NonUniformCornerRadii
+ * @tc.desc: Verify CanBeContinuous returns false for non-uniform corner radii even if circular
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_NonUniformCornerRadii, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_NonUniformCornerRadii start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(10.0f, 10.0f);
+    params->rrect.radius_[GERRect::BOTTOM_LEFT] = Vector2f(15.0f, 15.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_NonUniformCornerRadii end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_CircleByPixelTolerance
+ * @tc.desc: Verify CanBeContinuous returns false when the radius is excluded by the pixel tolerance
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_CircleByPixelTolerance, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_CircleByPixelTolerance start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 100.0f };
+    params->rrect.SetCornerRadius(49.5f, 49.5f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_FALSE(result);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_CircleByPixelTolerance end";
+}
+
+/**
+ * @tc.name: CanBeContinuous_CapsuleRadiusClamped
+ * @tc.desc: Verify CanBeContinuous clamps the capsule radius to half of the min side and returns true
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFRRectShaderShapeTest, CanBeContinuous_CapsuleRadiusClamped, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_CapsuleRadiusClamped start";
+
+    auto params = std::make_shared<GESDFRRectShapeParams>();
+    params->rrect = { 0.0f, 0.0f, 100.0f, 50.0f };
+    params->rrect.SetCornerRadius(26.0f, 26.0f);
+
+    bool result = GESDFRRectShaderShape::CanBeContinuous(params);
+    EXPECT_TRUE(result);
+    EXPECT_FLOAT_EQ(params->rrect.GetCommonRadiusX(), 25.0f);
+
+    GTEST_LOG_(INFO) << "GESDFRRectShaderShapeTest CanBeContinuous_CapsuleRadiusClamped end";
 }
 } // namespace Drawing
 } // namespace Rosen
