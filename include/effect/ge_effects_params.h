@@ -58,6 +58,7 @@ namespace Drawing {
 #include "effect/filter/ge_direction_light_shader_filter.params.in"
 #include "effect/filter/ge_dispersion_shader_filter.params.in"
 #include "effect/filter/ge_displacement_distort_shader_filter.params.in"
+#include "effect/filter/ge_distort_light_filter.params.in"
 #include "effect/filter/ge_distortion_collapse_filter.params.in"
 #include "effect/filter/ge_edge_light_shader_filter.params.in"
 #include "effect/filter/ge_frosted_glass_blur_shader_filter.params.in"

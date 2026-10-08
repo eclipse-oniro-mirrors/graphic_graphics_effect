@@ -121,6 +121,7 @@ enum class GEFilterType : int32_t {
     SPIN_BLUR,
     HALO_BLOOM,
     GLASS_EFFECT,
+    DISTORT_LIGHT,
     MAX,
 };
 
