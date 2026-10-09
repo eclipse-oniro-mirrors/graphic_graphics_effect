@@ -87,7 +87,7 @@ std::shared_ptr<Drawing::Image> GEDistortLightFilter::MakeDistortLightImage(Draw
     builder.SetChild("maskShader", maskShader);
     builder.SetUniform("lightFactor", lightFactor_);
     builder.SetUniform("highLightFactor", highLightFactor_);
-    builder.SetUniform("highLightThreshold", highLightWidth_);
+    builder.SetUniform("highLightThreshold", 1.0f - highLightWidth_);
     builder.SetUniform("highLightSoft", highLightSoft_);
     builder.SetUniformVec4("highLightColor", highLightColor_.redF_, highLightColor_.greenF_, highLightColor_.blueF_,
         highLightColor_.alphaF_);

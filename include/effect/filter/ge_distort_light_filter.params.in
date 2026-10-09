@@ -16,10 +16,14 @@
 struct [[ge::params(type = DISTORT_LIGHT, name = "DistortLight")]] GEDistortLightFilterParams
 {
     std::shared_ptr<GEShaderMask> distortMask = nullptr;
-    [[ge::prop(min = 0.0, max = 1.0)]] float lightFactor = 0.5f;
-    [[ge::prop(min = 0.0, max = 1.0)]] float highLightFactor = 1.0f;
-    [[ge::prop(min = 0.0, max = 1.0)]] float highLightWidth = 0.2f;
-    [[ge::prop(min = 0.0, max = 1.0)]] float highLightSoft = 0.1f;
+    [[ge::prop(min = 0.0, max = 1.0)]]
+    float lightFactor = 0.5f;
+    [[ge::prop(min = 0.0, max = 1.0)]]
+    float highLightFactor = 1.0f;
+    [[ge::prop(min = 0.0, max = 1.0)]]
+    float highLightWidth = 0.2f;
+    [[ge::prop(min = 0.0, max = 1.0)]]
+    float highLightSoft = 0.1f;
     [[ge::prop(cast_from = "Vector4f", custom = "Vector4fToColor4fTransformer")]]
     Drawing::Color4f highLightColor = {1.0f, 1.0f, 1.0f, 1.0f};
 };
