@@ -208,49 +208,54 @@ HWTEST_F(GESoundWaveFilterTest, Type_001, TestSize.Level2)
 }
 
 /**
- * @tc.name: SentinelPath
- * @tc.desc: Verify sentinel path: circleRadius == 0 keeps members intact across repeated uniform binding
+ * @tc.name: ModeDefaultPath
+ * @tc.desc: Verify lightMode == 0 keeps the legacy layout regardless of circle params
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, SentinelPath, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, ModeDefaultPath, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest SentinelPath start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeDefaultPath start";
 
     Drawing::GESoundWaveFilterParams params;
     params.soundIntensity = 0.5f;
-    params.circleRadius = 0.0f; // sentinel: fall back to the soundIntensity-driven layout
+    params.lightMode = 0;       // legacy soundIntensity-driven layout
+    params.circleRadius = 0.3f; // ignored in legacy mode: mode, not radius, selects the layout
+    params.circleCenter = Vector2f(0.2f, -0.1f);
+    params.lightIntensity = 3.0f;
     auto filter = std::make_unique<GESoundWaveFilter>(params);
 
-    // The sentinel is resolved into local uniforms inside ComputeAndSetUniforms.
+    // The legacy layout is resolved into local uniforms inside ComputeAndSetUniforms.
     auto effect = filter->GetSoundWaveEffect();
     ASSERT_NE(effect, nullptr);
     Drawing::RuntimeShaderBuilder builder(effect);
     filter->ComputeAndSetUniforms(builder);
 
     // Derived uniforms live in locals; members keep the constructor state.
-    EXPECT_FLOAT_EQ(filter->circleRadius_, 0.0f);
-    EXPECT_FLOAT_EQ(filter->circleCenter_.x_, 0.0f);
-    EXPECT_FLOAT_EQ(filter->circleCenter_.y_, 0.0f);
-    EXPECT_FLOAT_EQ(filter->lightIntensity_, 1.0f);
+    EXPECT_EQ(filter->lightMode_, 0);
+    EXPECT_FLOAT_EQ(filter->circleRadius_, 0.3f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.x_, 0.2f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.y_, -0.1f);
+    EXPECT_FLOAT_EQ(filter->lightIntensity_, 3.0f);
 
-    // Binding is idempotent: repeated calls leave the sentinel member intact.
+    // Binding is idempotent: repeated calls leave the members intact.
     filter->ComputeAndSetUniforms(builder);
-    EXPECT_FLOAT_EQ(filter->circleRadius_, 0.0f);
+    EXPECT_EQ(filter->lightMode_, 0);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest SentinelPath end";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeDefaultPath end";
 }
 
 /**
- * @tc.name: NonSentinelPath
- * @tc.desc: Verify non-sentinel path: uniform binding leaves circle members read-only
+ * @tc.name: ModeCircleLightPath
+ * @tc.desc: Verify lightMode == 1 uses circle params as-is across repeated uniform binding
  * @tc.type: FUNC
  */
-HWTEST_F(GESoundWaveFilterTest, NonSentinelPath, TestSize.Level1)
+HWTEST_F(GESoundWaveFilterTest, ModeCircleLightPath, TestSize.Level1)
 {
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest NonSentinelPath start";
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightPath start";
 
     Drawing::GESoundWaveFilterParams params;
     params.soundIntensity = 0.4f;
+    params.lightMode = 1; // circle light mode
     params.circleRadius = 0.3f;
     params.circleCenter = Vector2f(0.2f, -0.1f);
     params.lightIntensity = 3.0f;
@@ -261,12 +266,17 @@ HWTEST_F(GESoundWaveFilterTest, NonSentinelPath, TestSize.Level1)
     Drawing::RuntimeShaderBuilder builder(effect);
     filter->ComputeAndSetUniforms(builder);
 
+    // Circle members are used as-is: uniform binding leaves them read-only.
+    EXPECT_EQ(filter->lightMode_, 1);
     EXPECT_FLOAT_EQ(filter->circleRadius_, 0.3f);
     EXPECT_FLOAT_EQ(filter->circleCenter_.x_, 0.2f);
     EXPECT_FLOAT_EQ(filter->circleCenter_.y_, -0.1f);
     EXPECT_FLOAT_EQ(filter->lightIntensity_, 3.0f);
 
-    GTEST_LOG_(INFO) << "GESoundWaveFilterTest NonSentinelPath end";
+    filter->ComputeAndSetUniforms(builder);
+    EXPECT_EQ(filter->lightMode_, 1);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightPath end";
 }
 
 /**

@@ -39,6 +39,8 @@ struct [[ge::params(type=SOUND_WAVE, name="SoundWave")]] GESoundWaveFilterParams
     float shockWaveTotalAlpha = 1.0f;
 
     // circle light
+    [[ge::prop("SoundWave_LightMode")]]
+    int lightMode = 0;
     [[ge::prop(name="SoundWave_CircleCenter",
                min={-1.0f, -0.5f},
                max={1.0f, 0.5f},

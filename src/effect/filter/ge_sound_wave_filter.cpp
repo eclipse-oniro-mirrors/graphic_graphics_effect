@@ -40,8 +40,8 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
     : colorProgress_(params.colorProgress), soundIntensity_(params.soundIntensity),
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
       shockWaveProgressA_(params.shockWaveProgressA), shockWaveProgressB_(params.shockWaveProgressB),
-      shockWaveTotalAlpha_(params.shockWaveTotalAlpha), circleCenter_(params.circleCenter),
-      circleRadius_(params.circleRadius), lightIntensity_(params.lightIntensity)
+      shockWaveTotalAlpha_(params.shockWaveTotalAlpha), lightMode_(params.lightMode),
+      circleCenter_(params.circleCenter), circleRadius_(params.circleRadius), lightIntensity_(params.lightIntensity)
 {
     colorA_ = params.colorA;
     colorB_ = params.colorB;
@@ -100,8 +100,8 @@ void GESoundWaveFilter::ComputeAndSetUniforms(Drawing::RuntimeShaderBuilder& bui
     float circleRadius = circleRadius_;
     float lightIntensity = lightIntensity_;
 
-    // circleRadius == 0 is a sentinel: fall back to the original soundIntensity-driven layout.
-    if (circleRadius == 0.0f) {
+    // lightMode == 0 keeps the original soundIntensity-driven layout for backward compatibility.
+    if (lightMode_ == 0) {
         float circleHeight = -0.4f + 0.43f * soundIntensity_; // mix(-0.4, 0.03, soundIntensity)
         circlePosition = Vector2f(0.0f, circleHeight);
         barPosition = 0.09f - 0.09f * soundIntensity_; // mix(0.09, 0.0, soundIntensity)

@@ -557,6 +557,7 @@ enum class GEParamsMemberTag : uint32_t {
     SOUND_WAVE_SHOCK_WAVE_PROGRESS_A,
     SOUND_WAVE_SHOCK_WAVE_PROGRESS_B,
     SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA,
+    SOUND_WAVE_LIGHT_MODE,
     SOUND_WAVE_CIRCLE_CENTER,
     SOUND_WAVE_CIRCLE_RADIUS,
     SOUND_WAVE_LIGHT_INTENSITY,
@@ -2498,6 +2499,7 @@ GE_PARAMS_FIELD_ACCESSOR(
     GESoundWaveFilterParams, shockWaveProgressB, SOUND_WAVE_SHOCK_WAVE_PROGRESS_B, SoundWave_ProgressB);
 GE_PARAMS_FIELD_ACCESSOR(
     GESoundWaveFilterParams, shockWaveTotalAlpha, SOUND_WAVE_SHOCK_WAVE_TOTAL_ALPHA, SoundWave_TotalAlpha);
+GE_PARAMS_FIELD_ACCESSOR(GESoundWaveFilterParams, lightMode, SOUND_WAVE_LIGHT_MODE, SoundWave_LightMode);
 GE_PARAMS_FIELD_ACCESSOR(GESoundWaveFilterParams, circleCenter, SOUND_WAVE_CIRCLE_CENTER, SoundWave_CircleCenter);
 GE_PARAMS_FIELD_ACCESSOR(GESoundWaveFilterParams, circleRadius, SOUND_WAVE_CIRCLE_RADIUS, SoundWave_CircleRadius);
 GE_PARAMS_FIELD_ACCESSOR(GESoundWaveFilterParams, lightIntensity, SOUND_WAVE_LIGHT_INTENSITY, SoundWave_LightIntensity);

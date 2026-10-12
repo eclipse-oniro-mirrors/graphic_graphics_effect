@@ -63,7 +63,8 @@ private:
     float shockWaveTotalAlpha_ = 1.0f;
 
     // circle light
-    Vector2f circleCenter_ = Vector2f(0.0f, 0.0f);
+    int lightMode_ = 0;
+    Vector2f circleCenter_;
     float circleRadius_ = 0.0f;
     float lightIntensity_ = 1.0f;
 
