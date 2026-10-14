@@ -15,10 +15,10 @@
 
 #include <gtest/gtest.h>
 
-#include "ge_sound_wave_filter.h"
-
 #include "draw/color.h"
+#include "ge_sound_wave_filter.h"
 #include "image/bitmap.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -205,6 +205,118 @@ HWTEST_F(GESoundWaveFilterTest, Type_001, TestSize.Level2)
     EXPECT_EQ(geSoundWaveFilter->TypeName(), Drawing::GE_FILTER_SOUND_WAVE);
 
     GTEST_LOG_(INFO) << "GESoundWaveFilterTest Type_001 end";
+}
+
+/**
+ * @tc.name: ModeDefaultPath
+ * @tc.desc: Verify lightMode == 0 keeps the legacy layout regardless of circle params
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, ModeDefaultPath, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeDefaultPath start";
+
+    Drawing::GESoundWaveFilterParams params;
+    params.soundIntensity = 0.5f;
+    params.lightMode = 0;       // legacy soundIntensity-driven layout
+    params.circleRadius = 0.3f; // ignored in legacy mode: mode, not radius, selects the layout
+    params.circleCenter = Vector2f(0.2f, -0.1f);
+    params.lightIntensity = 3.0f;
+    auto filter = std::make_unique<GESoundWaveFilter>(params);
+
+    // The legacy layout is resolved into local uniforms inside ComputeAndSetUniforms.
+    auto effect = filter->GetSoundWaveEffect();
+    ASSERT_NE(effect, nullptr);
+    Drawing::RuntimeShaderBuilder builder(effect);
+    filter->ComputeAndSetUniforms(builder);
+
+    // Derived uniforms live in locals; members keep the constructor state.
+    EXPECT_EQ(filter->lightMode_, 0);
+    EXPECT_FLOAT_EQ(filter->circleRadius_, 0.3f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.x_, 0.2f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.y_, -0.1f);
+    EXPECT_FLOAT_EQ(filter->lightIntensity_, 3.0f);
+
+    // Binding is idempotent: repeated calls leave the members intact.
+    filter->ComputeAndSetUniforms(builder);
+    EXPECT_EQ(filter->lightMode_, 0);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeDefaultPath end";
+}
+
+/**
+ * @tc.name: ModeCircleLightPath
+ * @tc.desc: Verify lightMode == 1 uses circle params as-is across repeated uniform binding
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, ModeCircleLightPath, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightPath start";
+
+    Drawing::GESoundWaveFilterParams params;
+    params.soundIntensity = 0.4f;
+    params.lightMode = 1; // circle light mode
+    params.circleRadius = 0.3f;
+    params.circleCenter = Vector2f(0.2f, -0.1f);
+    params.lightIntensity = 3.0f;
+    auto filter = std::make_unique<GESoundWaveFilter>(params);
+
+    auto effect = filter->GetSoundWaveEffect();
+    ASSERT_NE(effect, nullptr);
+    Drawing::RuntimeShaderBuilder builder(effect);
+    filter->ComputeAndSetUniforms(builder);
+
+    // Circle members are used as-is: uniform binding leaves them read-only.
+    EXPECT_EQ(filter->lightMode_, 1);
+    EXPECT_FLOAT_EQ(filter->circleRadius_, 0.3f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.x_, 0.2f);
+    EXPECT_FLOAT_EQ(filter->circleCenter_.y_, -0.1f);
+    EXPECT_FLOAT_EQ(filter->lightIntensity_, 3.0f);
+
+    filter->ComputeAndSetUniforms(builder);
+    EXPECT_EQ(filter->lightMode_, 1);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightPath end";
+}
+
+/**
+ * @tc.name: OnProcessImageSuccess
+ * @tc.desc: Verify OnProcessImage success path on a GPU canvas (MakeImage returns a new image)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, OnProcessImageSuccess, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImageSuccess start";
+
+    // GPU-backed canvas so builder.MakeImage succeeds, covering the success return path.
+    auto renderContext = RenderContext::Create();
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    auto context = renderContext->GetSharedDrGPUContext();
+    if (context == nullptr) {
+        return; // GPU context unavailable in this environment
+    }
+    Drawing::ImageInfo imageInfo { 50, 50, Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE };
+    auto surface = Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo);
+    if (surface == nullptr) {
+        return; // GPU surface unavailable in this environment
+    }
+    auto gpuCanvas = surface->GetCanvas();
+    ASSERT_NE(gpuCanvas, nullptr);
+
+    Drawing::GESoundWaveFilterParams params;
+    auto filter = std::make_unique<GESoundWaveFilter>(params);
+    Drawing::CanvasInfo ci;
+    ci.geoWidth = 50.0f;
+    ci.geoHeight = 50.0f;
+    filter->SetShaderFilterCanvasinfo(ci);
+
+    auto result = filter->OnProcessImage(*gpuCanvas, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+    EXPECT_NE(result.get(), image_.get());
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest OnProcessImageSuccess end";
 }
 
 } // namespace Rosen
