@@ -1651,5 +1651,65 @@ HWTEST_F(GERenderTest, SetMesablurAllEnabledByCCM_FalseAndTrue, TestSize.Level1)
 
     GTEST_LOG_(INFO) << "GERenderTest SetMesablurAllEnabledByCCM_FalseAndTrue end";
 }
+
+HWTEST_F(GERenderTest, DrawShaderEffectBinarization, TestSize.Level1)
+{
+    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
+    ASSERT_TRUE(container != nullptr);
+    auto ve = std::make_shared<Drawing::GEVisualEffect>("Binarization", Drawing::DrawingPaintType::BRUSH);
+    ASSERT_TRUE(ve != nullptr);
+    ve->SetParam("Binarization_Low", 0.2f);
+    ve->SetParam("Binarization_High", 0.8f);
+    ve->SetParam("Binarization_Threshold", 0.5f);
+    ve->SetParam("Binarization_ThresholdRange", 0.1f);
+    container->AddToChainedFilter(ve);
+    Drawing::Rect bounds(0, 0, 100, 100);
+    auto render = std::make_shared<GERender>();
+    ASSERT_TRUE(render != nullptr);
+    render->DrawShaderEffect(*canvas_, *container, bounds);
+}
+
+HWTEST_F(GERenderTest, DrawShaderEffectLightUpEffect, TestSize.Level1)
+{
+    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
+    ASSERT_TRUE(container != nullptr);
+    auto ve = std::make_shared<Drawing::GEVisualEffect>("LightUpEffect", Drawing::DrawingPaintType::BRUSH);
+    ASSERT_TRUE(ve != nullptr);
+    ve->SetParam("LightUpEffect_Value", 0.5f);
+    container->AddToChainedFilter(ve);
+    Drawing::Rect bounds(0, 0, 100, 100);
+    auto render = std::make_shared<GERender>();
+    ASSERT_TRUE(render != nullptr);
+    render->DrawShaderEffect(*canvas_, *container, bounds);
+}
+
+HWTEST_F(GERenderTest, DrawShaderEffectDynamicDim, TestSize.Level1)
+{
+    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
+    ASSERT_TRUE(container != nullptr);
+    auto ve = std::make_shared<Drawing::GEVisualEffect>("DynamicDim", Drawing::DrawingPaintType::BRUSH);
+    ASSERT_TRUE(ve != nullptr);
+    ve->SetParam("DynamicDim_Value", 0.3f);
+    container->AddToChainedFilter(ve);
+    Drawing::Rect bounds(0, 0, 100, 100);
+    auto render = std::make_shared<GERender>();
+    ASSERT_TRUE(render != nullptr);
+    render->DrawShaderEffect(*canvas_, *container, bounds);
+}
+
+HWTEST_F(GERenderTest, GenerateShaderFilterBinarization, TestSize.Level1)
+{
+    auto ve = std::make_shared<Drawing::GEVisualEffect>("Binarization", Drawing::DrawingPaintType::BRUSH);
+    ASSERT_TRUE(ve != nullptr);
+    ve->SetParam("Binarization_Low", 0.2f);
+    ve->SetParam("Binarization_High", 0.8f);
+    ve->SetParam("Binarization_Threshold", 0.5f);
+    ve->SetParam("Binarization_ThresholdRange", 0.1f);
+    auto render = std::make_shared<GERender>();
+    ASSERT_TRUE(render != nullptr);
+    auto filter = render->GenerateShaderFilter(ve->GetImpl());
+    ASSERT_NE(filter, nullptr);
+    EXPECT_EQ(filter->Type(), Drawing::GEFilterType::BINARIZATION);
+}
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

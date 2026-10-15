@@ -19,6 +19,7 @@
 #include "core/ge_visual_effect_impl.h"
 #include "effect/filter/ge_aibar_shader_filter.h"
 #include "effect/filter/ge_bezier_warp_shader_filter.h"
+#include "effect/filter/ge_binarization_shader_filter.h"
 #include "effect/filter/ge_blur_bubbles_rise_filter.h"
 #include "effect/filter/ge_blur_shader_filter.h"
 #include "effect/filter/ge_color_gradient_shader_filter.h"
@@ -29,6 +30,7 @@
 #include "effect/filter/ge_displacement_distort_shader_filter.h"
 #include "effect/filter/ge_distort_light_filter.h"
 #include "effect/filter/ge_distortion_collapse_filter.h"
+#include "effect/filter/ge_dynamic_dim_shader_filter.h"
 #include "effect/filter/ge_edge_light_shader_filter.h"
 #include "effect/filter/ge_frosted_glass_blur_shader_filter.h"
 #include "effect/filter/ge_frosted_glass_shader_filter.h"
@@ -36,6 +38,7 @@
 #include "effect/filter/ge_grid_warp_shader_filter.h"
 #include "effect/filter/ge_heat_distortion_filter.h"
 #include "effect/filter/ge_kawase_blur_shader_filter.h"
+#include "effect/filter/ge_light_up_effect_shader_filter.h"
 #include "effect/filter/ge_linear_gradient_blur_shader_filter.h"
 #include "effect/filter/ge_magnifier_shader_filter.h"
 #include "effect/filter/ge_mask_transition_shader_filter.h"
@@ -101,6 +104,7 @@ namespace {
  */
 GE_FACTORY_REGISTER(GEAIBarShaderFilter)
 GE_FACTORY_REGISTER(GEBezierWarpShaderFilter)
+GE_FACTORY_REGISTER(GEBinarizationShaderFilter)
 GE_FACTORY_REGISTER(GEBlurBubblesRiseFilter)
 GE_FACTORY_REGISTER(GEBlurShaderFilter)
 GE_FACTORY_REGISTER(GEColorGradientShaderFilter)
@@ -110,9 +114,11 @@ GE_FACTORY_REGISTER(GEDirectionLightShaderFilter)
 GE_FACTORY_REGISTER(GEDisplacementDistortFilter)
 GE_FACTORY_REGISTER(GEDistortLightFilter)
 GE_FACTORY_REGISTER(GEDistortionCollapseFilter)
+GE_FACTORY_REGISTER(GEDynamicDimShaderFilter)
 GE_FACTORY_REGISTER(GEGridWarpShaderFilter)
 GE_FACTORY_REGISTER(GEGreyShaderFilter)
 GE_FACTORY_REGISTER(GEHeatDistortionFilter)
+GE_FACTORY_REGISTER(GELightUpEffectShaderFilter)
 GE_FACTORY_REGISTER(GEMagnifierShaderFilter)
 GE_FACTORY_REGISTER(GEMaskTransitionShaderFilter)
 GE_FACTORY_REGISTER(GEMotionBlurShaderFilter)

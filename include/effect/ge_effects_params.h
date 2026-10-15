@@ -50,6 +50,7 @@ namespace Drawing {
 // Parameter structure definitions
 #include "effect/filter/ge_aibar_shader_filter.params.in"
 #include "effect/filter/ge_bezier_warp_shader_filter.params.in"
+#include "effect/filter/ge_binarization_shader_filter.params.in"
 #include "effect/filter/ge_blur_bubbles_rise_filter.params.in"
 #include "effect/filter/ge_blur_shader_filter.params.in"
 #include "effect/filter/ge_color_gradient_shader_filter.params.in"
@@ -60,6 +61,7 @@ namespace Drawing {
 #include "effect/filter/ge_displacement_distort_shader_filter.params.in"
 #include "effect/filter/ge_distort_light_filter.params.in"
 #include "effect/filter/ge_distortion_collapse_filter.params.in"
+#include "effect/filter/ge_dynamic_dim_shader_filter.params.in"
 #include "effect/filter/ge_edge_light_shader_filter.params.in"
 #include "effect/filter/ge_frosted_glass_blur_shader_filter.params.in"
 #include "effect/filter/ge_frosted_glass_shader_filter.params.in"
@@ -71,6 +73,7 @@ namespace Drawing {
 #include "effect/filter/ge_halo_bloom_shader_filter.params.in"
 #include "effect/filter/ge_heat_distortion_filter.params.in"
 #include "effect/filter/ge_kawase_blur_shader_filter.params.in"
+#include "effect/filter/ge_light_up_effect_shader_filter.params.in"
 #include "effect/filter/ge_linear_gradient_blur_shader_filter.params.in"
 #include "effect/filter/ge_magnifier_shader_filter.params.in"
 #include "effect/filter/ge_map_color_by_brightness_filter.params.in"

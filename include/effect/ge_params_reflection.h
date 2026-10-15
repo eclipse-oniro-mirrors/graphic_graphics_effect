@@ -101,6 +101,10 @@ enum class GEParamsMemberTag : uint32_t {
     BEZIER_WARP_DESTINATION_PATCH9,
     BEZIER_WARP_DESTINATION_PATCH10,
     BEZIER_WARP_DESTINATION_PATCH11,
+    BINARIZATION_LOW,
+    BINARIZATION_HIGH,
+    BINARIZATION_THRESHOLD,
+    BINARIZATION_THRESHOLD_RANGE,
     BINOCULAR_MASK_RADIUS_X,
     BINOCULAR_MASK_RADIUS_Y,
     BINOCULAR_MASK_GAP,
@@ -222,6 +226,7 @@ enum class GEParamsMemberTag : uint32_t {
     DOUBLE_RIPPLE_MASK_WIDTH,
     DOUBLE_RIPPLE_MASK_TURBULENCE,
     DOUBLE_RIPPLE_MASK_HALO_THICKNESS,
+    DYNAMIC_DIM_VALUE,
     EDGE_LIGHT_ALPHA,
     EDGE_LIGHT_BLOOM,
     EDGE_LIGHT_COLOR,
@@ -407,6 +412,7 @@ enum class GEParamsMemberTag : uint32_t {
     HEAT_DISTORTION_PROGRESS,
     IMAGE_MASK_IMAGE,
     KAWASE_BLUR_RADIUS,
+    LIGHT_UP_EFFECT_VALUE,
     LINEAR_GRADIENT_BLUR_BLUR_RADIUS,
     LINEAR_GRADIENT_BLUR_FRACTION_STOPS,
     LINEAR_GRADIENT_BLUR_DIRECTION,
@@ -1738,6 +1744,7 @@ struct GEFilterParamsTypeInfo {
 GE_PARAMS_TYPE_INFO(GEAIBarShaderFilterParams, AIBAR, AIBAR);
 GE_PARAMS_TYPE_INFO(GEAuroraNoiseShaderParams, AURORA_NOISE, AuroraNoise);
 GE_PARAMS_TYPE_INFO(GEBezierWarpShaderFilterParams, BEZIER_WARP, BezierWarp);
+GE_PARAMS_TYPE_INFO(GEBinarizationShaderFilterParams, BINARIZATION, Binarization);
 GE_PARAMS_TYPE_INFO(GEBinocularMaskParams, BINOCULAR_MASK, BinocularMask);
 GE_PARAMS_TYPE_INFO(GEBlurBubblesRiseFilterParams, BLUR_BUBBLES_RISE, BlurBubblesRise);
 GE_PARAMS_TYPE_INFO(GEBlurShaderFilterParams, BLUR, Blur);
@@ -1756,6 +1763,7 @@ GE_PARAMS_TYPE_INFO(GEDistortLightFilterParams, DISTORT_LIGHT, DistortLight);
 GE_PARAMS_TYPE_INFO(GEDistortionCollapseFilterParams, DISTORTION_COLLAPSE, DistortionCollapse);
 GE_PARAMS_TYPE_INFO(GEDotMatrixShaderParams, DOT_MATRIX, DotMatrixShader);
 GE_PARAMS_TYPE_INFO(GEDoubleRippleShaderMaskParams, DOUBLE_RIPPLE_MASK, DoubleRippleMask);
+GE_PARAMS_TYPE_INFO(GEDynamicDimShaderFilterParams, DYNAMIC_DIM, DynamicDim);
 GE_PARAMS_TYPE_INFO(GEEdgeLightShaderFilterParams, EDGE_LIGHT, EdgeLight);
 GE_PARAMS_TYPE_INFO(GEFractalGlassMaskParams, FRACTAL_GLASS_MASK, FractalGlassMask);
 GE_PARAMS_TYPE_INFO(GEFrameGradientMaskParams, FRAME_GRADIENT_MASK, FrameGradientMask);
@@ -1772,6 +1780,7 @@ GE_PARAMS_TYPE_INFO(GEHarmoniumEffectShaderParams, HARMONIUM_EFFECT, HarmoniumEf
 GE_PARAMS_TYPE_INFO(GEHeatDistortionFilterParams, HEAT_DISTORTION, HeatDistortion);
 GE_PARAMS_TYPE_INFO(GEImageMaskParams, IMAGE_MASK, ImageMask);
 GE_PARAMS_TYPE_INFO(GEKawaseBlurShaderFilterParams, KAWASE_BLUR, KAWASE_BLUR);
+GE_PARAMS_TYPE_INFO(GELightUpEffectShaderFilterParams, LIGHT_UP_EFFECT, LightUpEffect);
 GE_PARAMS_TYPE_INFO(GELinearGradientBlurShaderFilterParams, LINEAR_GRADIENT_BLUR, LINEAR_GRADIENT_BLUR);
 GE_PARAMS_TYPE_INFO(GELinearGradientShaderMaskParams, LINEAR_GRADIENT_MASK, MaskLinearGradient);
 GE_PARAMS_TYPE_INFO(GEMagnifierShaderFilterParams, MAGNIFIER, Magnifier);
@@ -1918,6 +1927,11 @@ GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(
     GEBezierWarpShaderFilterParams, destinationPatch, 10, BEZIER_WARP_DESTINATION_PATCH10, BezierWarp_ControlPoint10);
 GE_PARAMS_ARRAY_ELEMENT_ACCESSOR(
     GEBezierWarpShaderFilterParams, destinationPatch, 11, BEZIER_WARP_DESTINATION_PATCH11, BezierWarp_ControlPoint11);
+GE_PARAMS_FIELD_ACCESSOR(GEBinarizationShaderFilterParams, low, BINARIZATION_LOW, Binarization_Low);
+GE_PARAMS_FIELD_ACCESSOR(GEBinarizationShaderFilterParams, high, BINARIZATION_HIGH, Binarization_High);
+GE_PARAMS_FIELD_ACCESSOR(GEBinarizationShaderFilterParams, threshold, BINARIZATION_THRESHOLD, Binarization_Threshold);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEBinarizationShaderFilterParams, thresholdRange, BINARIZATION_THRESHOLD_RANGE, Binarization_ThresholdRange);
 GE_PARAMS_FIELD_ACCESSOR(GEBinocularMaskParams, radiusX_, BINOCULAR_MASK_RADIUS_X, BinocularMask_RadiusX);
 GE_PARAMS_FIELD_ACCESSOR(GEBinocularMaskParams, radiusY_, BINOCULAR_MASK_RADIUS_Y, BinocularMask_RadiusY);
 GE_PARAMS_FIELD_ACCESSOR(GEBinocularMaskParams, gap_, BINOCULAR_MASK_GAP, BinocularMask_Gap);
@@ -2102,6 +2116,7 @@ GE_PARAMS_FIELD_ACCESSOR(
     GEDoubleRippleShaderMaskParams, turbulence_, DOUBLE_RIPPLE_MASK_TURBULENCE, DoubleRippleMask_Turbulence);
 GE_PARAMS_FIELD_ACCESSOR(
     GEDoubleRippleShaderMaskParams, haloThickness_, DOUBLE_RIPPLE_MASK_HALO_THICKNESS, DoubleRippleMask_HaloThickness);
+GE_PARAMS_FIELD_ACCESSOR(GEDynamicDimShaderFilterParams, value, DYNAMIC_DIM_VALUE, DynamicDim_Value);
 GE_PARAMS_FIELD_ACCESSOR(GEEdgeLightShaderFilterParams, alpha, EDGE_LIGHT_ALPHA, EdgeLight_Alpha);
 GE_PARAMS_FIELD_ACCESSOR(GEEdgeLightShaderFilterParams, bloom, EDGE_LIGHT_BLOOM, EdgeLight_Bloom);
 GE_PARAMS_FIELD_ACCESSOR(GEEdgeLightShaderFilterParams, color, EDGE_LIGHT_COLOR, EdgeLight_Color);
@@ -2416,6 +2431,7 @@ GE_PARAMS_FIELD_ACCESSOR(
 GE_PARAMS_FIELD_ACCESSOR(GEHeatDistortionFilterParams, progress, HEAT_DISTORTION_PROGRESS, HeatDistortion_Progress);
 GE_PARAMS_FIELD_ACCESSOR(GEImageMaskParams, image, IMAGE_MASK_IMAGE, ImageMask_Image);
 GE_PARAMS_FIELD_ACCESSOR(GEKawaseBlurShaderFilterParams, radius, KAWASE_BLUR_RADIUS, KAWASE_BLUR_RADIUS);
+GE_PARAMS_FIELD_ACCESSOR(GELightUpEffectShaderFilterParams, value, LIGHT_UP_EFFECT_VALUE, LightUpEffect_Value);
 GE_PARAMS_FIELD_ACCESSOR(
     GELinearGradientBlurShaderFilterParams, blurRadius, LINEAR_GRADIENT_BLUR_BLUR_RADIUS, BLURRADIUS);
 GE_PARAMS_FIELD_ACCESSOR(

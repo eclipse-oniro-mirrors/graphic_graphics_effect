@@ -253,6 +253,9 @@ public:
     GE_DECLARE_MAKE_GET_PARAMS(SpatialGlassEffectParams, GESpatialGlassEffectParams)
     GE_DECLARE_MAKE_GET_PARAMS(MotionBlurParams, GEMotionBlurShaderFilterParams)
     GE_DECLARE_MAKE_GET_PARAMS(BlurShaderParams, GEBlurShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(BinarizationParams, GEBinarizationShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(LightUpEffectParams, GELightUpEffectShaderFilterParams)
+    GE_DECLARE_MAKE_GET_PARAMS(DynamicDimParams, GEDynamicDimShaderFilterParams)
 #undef GE_DECLARE_MAKE_GET_PARAMS
 
     // ========================================================================
