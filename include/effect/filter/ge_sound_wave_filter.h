@@ -67,6 +67,7 @@ private:
     Vector2f circleCenter_;
     float circleRadius_ = 0.0f;
     float lightIntensity_ = 1.0f;
+    float smoothUnionThreshold_ = 0.09f;
 
     inline static const std::string shaderStringSoundWave = R"(
         uniform shader image;

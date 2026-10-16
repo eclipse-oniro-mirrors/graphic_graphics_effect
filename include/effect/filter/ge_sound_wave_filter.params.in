@@ -51,4 +51,7 @@ struct [[ge::params(type=SOUND_WAVE, name="SoundWave")]] GESoundWaveFilterParams
     float circleRadius = 0.0f;
     [[ge::prop(name="SoundWave_LightIntensity", min=0.0, max=10.0)]]
     float lightIntensity = 1.0f;
+    // ignored in lightMode 0; default keeps lightMode 1 backward compatible
+    [[ge::prop(min=0.0, max=0.2)]]
+    float smoothUnionThreshold = 0.09f;
 };
