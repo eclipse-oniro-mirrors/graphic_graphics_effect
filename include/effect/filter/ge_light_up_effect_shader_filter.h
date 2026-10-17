@@ -37,8 +37,6 @@ public:
 private:
     bool InitLightUpEffect();
     float value_;
-    // std::shared_ptr<Drawing::RuntimeShaderBuilder> MakeLightUpShader(
-    //     float imageWidth, float imageHeight, std::shared_ptr<Drawing::ShaderEffect> imageShader);
 };
 } // namespace Rosen
 } // namespace OHOS

@@ -208,6 +208,7 @@ ohos_unittest("GraphicsEffectTest") {
     "ge_cache_helper_test.cpp",
     "ge_circle_flowlight_effect_test.cpp",
     "ge_color_gradient_shader_filter_test.cpp",
+    "ge_color_shader_filter_test.cpp",
     "ge_content_light_shader_filter_test.cpp",
     "ge_contour_diagonal_flow_light_shader_test.cpp",
     "ge_depth_occlusion_shader_filter_test.cpp",
