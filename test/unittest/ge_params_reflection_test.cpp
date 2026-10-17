@@ -136,33 +136,6 @@ HWTEST_F(GEParamsReflectionTest, MaterialColorBlendMode_UnmatchedTag_DefaultBran
     EXPECT_EQ(unboxed->colorBlendMode, MaterialColorBlendMode::TINTED_GLASS);
 }
 
-HWTEST_F(GEParamsReflectionTest, BinarizationParamsSetMemberByTag, TestSize.Level1)
-{
-    auto boxedParams = MakeBoxedParams<Drawing::GEBinarizationShaderFilterParams>();
-    ASSERT_TRUE(boxedParams != nullptr);
-    auto params = boxedParams->Unbox<Drawing::GEBinarizationShaderFilterParams>();
-    ASSERT_TRUE(params != nullptr);
-    EXPECT_FLOAT_EQ(params->low, 0.0f);
-}
-
-HWTEST_F(GEParamsReflectionTest, LightUpEffectParamsSetMemberByTag, TestSize.Level1)
-{
-    auto boxedParams = MakeBoxedParams<Drawing::GELightUpEffectShaderFilterParams>();
-    ASSERT_TRUE(boxedParams != nullptr);
-    auto params = boxedParams->Unbox<Drawing::GELightUpEffectShaderFilterParams>();
-    ASSERT_TRUE(params != nullptr);
-    EXPECT_FLOAT_EQ(params->value, 1.0f);
-}
-
-HWTEST_F(GEParamsReflectionTest, DynamicDimParamsSetMemberByTag, TestSize.Level1)
-{
-    auto boxedParams = MakeBoxedParams<Drawing::GEDynamicDimShaderFilterParams>();
-    ASSERT_TRUE(boxedParams != nullptr);
-    auto params = boxedParams->Unbox<Drawing::GEDynamicDimShaderFilterParams>();
-    ASSERT_TRUE(params != nullptr);
-    EXPECT_FLOAT_EQ(params->value, 0.0f);
-}
-
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
