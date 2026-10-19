@@ -14,12 +14,12 @@
  */
 
 struct [[ge::params(type=BINARIZATION, name="Binarization")]] GEBinarizationShaderFilterParams {
-    [[ge::prop("Binarization_Low")]]
+    [[ge::prop]]
     float low = 0.0f;
-    [[ge::prop("Binarization_High")]]
+    [[ge::prop]]
     float high = 0.0f;
-    [[ge::prop("Binarization_Threshold")]]
+    [[ge::prop]]
     float threshold = 0.0f;
-    [[ge::prop("Binarization_ThresholdRange")]]
+    [[ge::prop]]
     float thresholdRange = 0.0f;
 };
