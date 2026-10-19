@@ -126,6 +126,11 @@ struct [[ge::params(type=SPATIAL_GLASS_EFFECT, name="SpatialGlassEffect")]] GESp
     Vector3f edLightNeg = Vector3f(1.7f, 3.0f, 1.0f);
     [[ge::prop(min=0.0f, max=2.0f)]]
     float antiAliasing = 0.5f;
+    [[ge::prop(min={-20.0f, 1.0f},
+               max={-1.0f, 20.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f antiAliasing2d = Vector2f(-1.0f, 1.0f);
     [[ge::prop(cast_from="std::shared_ptr<GEShaderShape>")]]
     std::shared_ptr<Drawing::GESDFShaderShape> sdfShape;
     // Adapt effect component

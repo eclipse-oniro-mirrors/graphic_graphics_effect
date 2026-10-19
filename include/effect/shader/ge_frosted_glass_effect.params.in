@@ -24,6 +24,11 @@ struct [[ge::params(type=FROSTED_GLASS_EFFECT, name="FrostedGlassEffect")]] GEFr
                cast_from="std::pair<float,float>",
                custom="PairToVector2fTransformer")]]
     Vector2f weightsEdl = Vector2f(1.0f, 1.0f); // (envLight, sd)
+    [[ge::prop(min={0.0f, 0.0f},
+               max={10.0f, 1.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f weightPow = Vector2f(2.0f, 0.2f); // (pow exp, min value)
     [[ge::prop(min={-20.0f, 1.0f},
                max={-1.0f, 20.0f},
                cast_from="std::pair<float,float>",
