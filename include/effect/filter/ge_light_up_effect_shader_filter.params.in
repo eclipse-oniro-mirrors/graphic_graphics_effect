@@ -14,6 +14,5 @@
  */
 
 struct [[ge::params(type=LIGHT_UP_EFFECT, name="LightUpEffect")]] GELightUpEffectShaderFilterParams {
-    [[ge::prop]]
     float value = 1.0f;
 };
