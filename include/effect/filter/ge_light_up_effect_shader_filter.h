@@ -36,7 +36,7 @@ public:
 
 private:
     bool InitLightUpEffect();
-    float value_;
+    float value_ = 1.0f;
 };
 } // namespace Rosen
 } // namespace OHOS

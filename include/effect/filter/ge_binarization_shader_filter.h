@@ -36,10 +36,10 @@ public:
 
 private:
     bool InitBinarizationEffect();
-    float low_;
-    float high_;
-    float threshold_;
-    float thresholdRange_;
+    float low_ = 0.0f;
+    float high_ = 0.0f;
+    float threshold_ = 0.0f;
+    float thresholdRange_ = 0.0f;
 };
 } // namespace Rosen
 } // namespace OHOS
