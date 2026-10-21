@@ -280,6 +280,44 @@ HWTEST_F(GESoundWaveFilterTest, ModeCircleLightPath, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ModeCircleLightLayoutParams
+ * @tc.desc: Verify lightMode 1 smoothUnionThreshold: default keeps legacy hardcoded value, custom value stored
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESoundWaveFilterTest, ModeCircleLightLayoutParams, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightLayoutParams start";
+
+    // Default-constructed params keep the legacy mode-1 hardcoded threshold (0.09).
+    // This is the value used when callers never set the param (e.g. RS side has no
+    // matching property tag yet, so nothing overrides the struct default).
+    Drawing::GESoundWaveFilterParams defaults;
+    auto defaultFilter = std::make_unique<GESoundWaveFilter>(defaults);
+    EXPECT_FLOAT_EQ(defaultFilter->smoothUnionThreshold_, 0.09f);
+
+    // Custom threshold is stored as-is: 0 is a legal explicit value and is respected
+    // (GE cannot distinguish "unset" from "explicitly 0" - RS side must default its
+    // property to 0.09 when adding the tag, since all properties are always sent).
+    Drawing::GESoundWaveFilterParams params;
+    params.lightMode = 1;
+    params.soundIntensity = 0.5f;
+    params.smoothUnionThreshold = 0.0657f; // matches mode 0 at soundIntensity = 0
+    auto filter = std::make_unique<GESoundWaveFilter>(params);
+
+    auto effect = filter->GetSoundWaveEffect();
+    ASSERT_NE(effect, nullptr);
+    Drawing::RuntimeShaderBuilder builder(effect);
+    filter->ComputeAndSetUniforms(builder);
+    EXPECT_FLOAT_EQ(filter->smoothUnionThreshold_, 0.0657f);
+
+    // Binding is idempotent: repeated calls leave the member intact.
+    filter->ComputeAndSetUniforms(builder);
+    EXPECT_FLOAT_EQ(filter->smoothUnionThreshold_, 0.0657f);
+
+    GTEST_LOG_(INFO) << "GESoundWaveFilterTest ModeCircleLightLayoutParams end";
+}
+
+/**
  * @tc.name: OnProcessImageSuccess
  * @tc.desc: Verify OnProcessImage success path on a GPU canvas (MakeImage returns a new image)
  * @tc.type: FUNC

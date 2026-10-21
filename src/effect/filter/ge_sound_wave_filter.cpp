@@ -41,7 +41,8 @@ GESoundWaveFilter::GESoundWaveFilter(const Drawing::GESoundWaveFilterParams& par
       shockWaveAlphaA_(params.shockWaveAlphaA), shockWaveAlphaB_(params.shockWaveAlphaB),
       shockWaveProgressA_(params.shockWaveProgressA), shockWaveProgressB_(params.shockWaveProgressB),
       shockWaveTotalAlpha_(params.shockWaveTotalAlpha), lightMode_(params.lightMode),
-      circleCenter_(params.circleCenter), circleRadius_(params.circleRadius), lightIntensity_(params.lightIntensity)
+      circleCenter_(params.circleCenter), circleRadius_(params.circleRadius), lightIntensity_(params.lightIntensity),
+      smoothUnionThreshold_(params.smoothUnionThreshold)
 {
     colorA_ = params.colorA;
     colorB_ = params.colorB;
@@ -95,7 +96,7 @@ void GESoundWaveFilter::ComputeAndSetUniforms(Drawing::RuntimeShaderBuilder& bui
     // circle light mode
     float barPosition = 0.5f - soundIntensity_;
     float waveHeight = 0.5f;
-    float smoothUnionThreshold = 0.09f;
+    float smoothUnionThreshold = smoothUnionThreshold_;
     Vector2f circlePosition = circleCenter_;
     float circleRadius = circleRadius_;
     float lightIntensity = lightIntensity_;
