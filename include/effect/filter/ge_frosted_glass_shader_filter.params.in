@@ -146,5 +146,10 @@ struct [[ge::params(type=FROSTED_GLASS, name="FrostedGlass")]] GEFrostedGlassSha
     [[ge::prop(min={-1.0f, -1.0f, -1.0f}, max={1.0f, 1.0f, 1.0f})]]
     Vector3f lumaParams = Vector3f(0.6628f, 0.3137f, 0.1538f);
     [[ge::prop(min=0.0f, max=1.0f)]]
-    float materialColorFraction = 0.0f; 
+    float materialColorFraction = 0.0f;
+    [[ge::prop(min={-20.0f, 1.0f},
+               max={-10.0f, 20.0f},
+               cast_from="std::pair<float,float>",
+               custom="PairToVector2fTransformer")]]
+    Vector2f antiAlias = Vector2f(-1.0f, 1.0f);
 };

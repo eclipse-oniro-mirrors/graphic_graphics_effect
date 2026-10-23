@@ -80,28 +80,27 @@ void GESDFTransformShaderShape::Preprocess(Canvas& canvas, const Rect& rect, boo
     }
 }
 
+constexpr char SDF_TRANSFORM_PROG[] = R"(
+    uniform shader shapeShader;
+    uniform float3x3 transformMatrix;
+
+    half4 main(vec2 fragCoord) {
+        vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
+        vec2 perspectiveCoord = transformedCoord.xy;
+        if (abs(transformedCoord.z) > 0.00001) {
+            perspectiveCoord = transformedCoord.xy / transformedCoord.z;
+        }
+        return shapeShader.eval(perspectiveCoord);
+    }
+)";
+
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder() const
 {
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> sdfTransformShaderShapeBuilder = nullptr;
     if (sdfTransformShaderShapeBuilder) {
         return sdfTransformShaderShapeBuilder;
     }
-
-    static constexpr char prog[] = R"(
-        uniform shader shapeShader;
-        uniform float3x3 transformMatrix;
-
-        half4 main(vec2 fragCoord) {
-            vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
-            vec2 perspectiveCoord = transformedCoord.xy;
-            if (abs(transformedCoord.z) > 0.00001) {
-                perspectiveCoord = transformedCoord.xy / transformedCoord.z;
-            }
-            return shapeShader.eval(perspectiveCoord);
-        }
-    )";
-
-    auto sdfTransformShaderBuilderEffect = GECreateRuntimeEffectForShader(prog);
+    auto sdfTransformShaderBuilderEffect = GECreateRuntimeEffectForShader(SDF_TRANSFORM_PROG);
     if (!sdfTransformShaderBuilderEffect) {
         LOGE("GESDFTransformShaderShape::GetSDFTransformShaderShapeBuilder effect error");
         return nullptr;
@@ -118,22 +117,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFTransformShaderShape::GetSDF
     if (sdfTransformShaderHasNormalShapeBuilder) {
         return sdfTransformShaderHasNormalShapeBuilder;
     }
-
-    static constexpr char prog[] = R"(
-        uniform shader shapeShader;
-        uniform float3x3 transformMatrix;
-
-        half4 main(vec2 fragCoord) {
-            vec3 transformedCoord = transformMatrix * vec3(fragCoord, 1.0);
-            vec2 perspectiveCoord = transformedCoord.xy;
-            if (abs(transformedCoord.z) > 0.00001) {
-                perspectiveCoord = transformedCoord.xy / transformedCoord.z;
-            }
-            return shapeShader.eval(perspectiveCoord);
-        }
-    )";
-
-    auto sdfTransformShaderHasNormalBuilderEffect = GECreateRuntimeEffectForShader(prog);
+    auto sdfTransformShaderHasNormalBuilderEffect = GECreateRuntimeEffectForShader(SDF_TRANSFORM_PROG);
     if (!sdfTransformShaderHasNormalBuilderEffect) {
         LOGE("GESDFTransformShaderShape::sdfTransformShaderHasNormalShapeBuilder effect error");
         return nullptr;
