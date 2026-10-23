@@ -18,6 +18,9 @@
 
 #include "ge_filter_params.h"
 #include "ge_params_reflection.h"
+#include "ge_binarization_shader_filter.h"
+#include "ge_light_up_effect_shader_filter.h"
+#include "ge_dynamic_dim_shader_filter.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -134,6 +137,60 @@ HWTEST_F(GEParamsReflectionTest, MaterialColorBlendMode_UnmatchedTag_DefaultBran
     auto unboxed = GEFilterParams::Unbox<GEFrostedGlassEffectParams>(*boxed);
     ASSERT_NE(unboxed.get(), nullptr);
     EXPECT_EQ(unboxed->colorBlendMode, MaterialColorBlendMode::TINTED_GLASS);
+}
+
+/**
+ * @tc.name: BinarizationParamsBoxed
+ * @tc.desc: Verify Binarization params can be boxed and unboxed
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEParamsReflectionTest, BinarizationParamsBoxed, TestSize.Level0)
+{
+    auto params = std::make_shared<GEBinarizationShaderFilterParams>();
+    params->low = 0.1f;
+    params->high = 0.9f;
+    params->threshold = 0.5f;
+    params->thresholdRange = 0.1f;
+    auto boxed = GEFilterParams::Box(params);
+    ASSERT_NE(boxed.get(), nullptr);
+    auto unboxed = GEFilterParams::Unbox<GEBinarizationShaderFilterParams>(*boxed);
+    ASSERT_NE(unboxed.get(), nullptr);
+    EXPECT_FLOAT_EQ(unboxed->low, 0.1f);
+    EXPECT_FLOAT_EQ(unboxed->high, 0.9f);
+    EXPECT_FLOAT_EQ(unboxed->threshold, 0.5f);
+    EXPECT_FLOAT_EQ(unboxed->thresholdRange, 0.1f);
+}
+
+/**
+ * @tc.name: LightUpEffectParamsBoxed
+ * @tc.desc: Verify LightUpEffect params can be boxed and unboxed
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEParamsReflectionTest, LightUpEffectParamsBoxed, TestSize.Level0)
+{
+    auto params = std::make_shared<GELightUpEffectShaderFilterParams>();
+    params->value = 0.7f;
+    auto boxed = GEFilterParams::Box(params);
+    ASSERT_NE(boxed.get(), nullptr);
+    auto unboxed = GEFilterParams::Unbox<GELightUpEffectShaderFilterParams>(*boxed);
+    ASSERT_NE(unboxed.get(), nullptr);
+    EXPECT_FLOAT_EQ(unboxed->value, 0.7f);
+}
+
+/**
+ * @tc.name: DynamicDimParamsBoxed
+ * @tc.desc: Verify DynamicDim params can be boxed and unboxed
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEParamsReflectionTest, DynamicDimParamsBoxed, TestSize.Level0)
+{
+    auto params = std::make_shared<GEDynamicDimShaderFilterParams>();
+    params->value = 0.4f;
+    auto boxed = GEFilterParams::Box(params);
+    ASSERT_NE(boxed.get(), nullptr);
+    auto unboxed = GEFilterParams::Unbox<GEDynamicDimShaderFilterParams>(*boxed);
+    ASSERT_NE(unboxed.get(), nullptr);
+    EXPECT_FLOAT_EQ(unboxed->value, 0.4f);
 }
 
 } // namespace Drawing
