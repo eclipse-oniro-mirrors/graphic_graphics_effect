@@ -74,8 +74,8 @@ void GELightUpEffectShaderFilterTest::SetUp()
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
     bmp.Build(imageWidth_, imageHeight_, format);
-    bmp.Erase(Drawing::Color::COLOR_WHITE);
-    image_ = surface_->MakeImageSnapshot(bmp.GetImageInfo());
+    bmp.ClearWithColor(Drawing::Color::COLOR_WHITE);
+    image_ = bmp.MakeImage();
     ASSERT_NE(image_, nullptr);
 }
 
