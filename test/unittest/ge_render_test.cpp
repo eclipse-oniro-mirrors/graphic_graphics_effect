@@ -1728,7 +1728,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilterBinarization, TestSize.Level1)
     ve->SetParam("Binarization_ThresholdRange", 0.1f);
     auto render = std::make_shared<GERender>();
     ASSERT_NE(render, nullptr);
-    auto filter = render->GenerateShaderFilter(ve->GetImpl());
+    auto filter = render->GenerateShaderFilter(ve);
     ASSERT_NE(filter, nullptr);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::BINARIZATION);
 }
@@ -1745,7 +1745,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilterLightUpEffect, TestSize.Level1)
     ve->SetParam("LightUpEffect_Value", 0.7f);
     auto render = std::make_shared<GERender>();
     ASSERT_NE(render, nullptr);
-    auto filter = render->GenerateShaderFilter(ve->GetImpl());
+    auto filter = render->GenerateShaderFilter(ve);
     ASSERT_NE(filter, nullptr);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::LIGHT_UP_EFFECT);
 }
@@ -1762,7 +1762,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilterDynamicDim, TestSize.Level1)
     ve->SetParam("DynamicDim_Value", 0.4f);
     auto render = std::make_shared<GERender>();
     ASSERT_NE(render, nullptr);
-    auto filter = render->GenerateShaderFilter(ve->GetImpl());
+    auto filter = render->GenerateShaderFilter(ve);
     ASSERT_NE(filter, nullptr);
     EXPECT_EQ(filter->Type(), Drawing::GEFilterType::DYNAMIC_DIM);
 }
