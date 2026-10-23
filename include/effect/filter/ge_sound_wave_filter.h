@@ -90,7 +90,7 @@ private:
 
         half smin(half a, half b, half k)
         {
-            half k6 = k * 6.0;
+            half k6 = max(k * 6.0, 1e-4);
             half h = max(k6 - abs(a - b), 0.0) / k6;
             return min(a, b) - h * h * h * k;
         }
