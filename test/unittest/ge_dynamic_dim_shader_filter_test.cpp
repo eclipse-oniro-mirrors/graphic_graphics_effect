@@ -18,7 +18,6 @@
 #include "ge_dynamic_dim_shader_filter.h"
 
 #include "image/bitmap.h"
-#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -33,50 +32,25 @@ public:
     void SetUp() override;
     void TearDown() override;
 
-    std::shared_ptr<Drawing::Surface> CreateSurface();
-    std::shared_ptr<Drawing::Surface> surface_ = nullptr;
-    std::shared_ptr<Drawing::Canvas> canvas_ = nullptr;
+    static inline Drawing::Canvas canvas_;
     std::shared_ptr<Drawing::Image> image_ { nullptr };
 
     Drawing::Rect src_ { 0.0f, 0.0f, 50.0f, 50.0f };
     Drawing::Rect dst_ { 0.0f, 0.0f, 50.0f, 50.0f };
-
-    const int imageWidth_ = 50;
-    const int imageHeight_ = 50;
 };
 
 void GEDynamicDimShaderFilterTest::SetUpTestCase() {}
 void GEDynamicDimShaderFilterTest::TearDownTestCase() {}
 
-std::shared_ptr<Drawing::Surface> GEDynamicDimShaderFilterTest::CreateSurface()
-{
-    auto renderContext = RenderContext::Create();
-    renderContext->Init();
-    renderContext->SetUpGpuContext();
-    auto gpuContext = renderContext->GetSharedDrGPUContext();
-    if (gpuContext == nullptr) {
-        return nullptr;
-    }
-    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    Drawing::Bitmap bmp;
-    bmp.Build(imageWidth_, imageHeight_, format);
-    auto surface = Drawing::Surface::MakeRenderTarget(gpuContext.get(), false, bmp.GetImageInfo());
-    return surface;
-}
-
 void GEDynamicDimShaderFilterTest::SetUp()
 {
-    surface_ = CreateSurface();
-    ASSERT_NE(surface_, nullptr);
-    canvas_ = surface_->GetCanvas();
-    ASSERT_NE(canvas_, nullptr);
+    canvas_.Restore();
 
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(imageWidth_, imageHeight_, format);
+    bmp.Build(50, 50, format);
     bmp.ClearWithColor(Drawing::Color::COLOR_WHITE);
     image_ = bmp.MakeImage();
-    ASSERT_NE(image_, nullptr);
 }
 
 void GEDynamicDimShaderFilterTest::TearDown() {}
@@ -118,7 +92,7 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_001, TestSize.Level1)
     params.value = 0.3f;
     auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
-    auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
 
@@ -132,7 +106,7 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_002, TestSize.Level1)
     Drawing::GEDynamicDimShaderFilterParams params;
     auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
-    auto result = filter->OnProcessImage(*canvas_, nullptr, src_, dst_);
+    auto result = filter->OnProcessImage(canvas_, nullptr, src_, dst_);
     EXPECT_EQ(result, nullptr);
 }
 
@@ -147,7 +121,7 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_003, TestSize.Level1)
     params.value = 0.0f;
     auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
-    auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
 
