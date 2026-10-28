@@ -1655,70 +1655,10 @@ HWTEST_F(GERenderTest, SetMesablurAllEnabledByCCM_FalseAndTrue, TestSize.Level1)
 
 /**
  * @tc.name: DrawShaderEffectBinarization
- * @tc.desc: Verify DrawShaderEffect with Binarization GEVisualEffect
+ * @tc.desc: Verify GenerateShaderFilter with Binarization GEVisualEffect
  * @tc.type: FUNC
  */
 HWTEST_F(GERenderTest, DrawShaderEffectBinarization, TestSize.Level1)
-{
-    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
-    ASSERT_NE(container, nullptr);
-    auto ve = std::make_shared<Drawing::GEVisualEffect>("Binarization", Drawing::DrawingPaintType::BRUSH);
-    ASSERT_NE(ve, nullptr);
-    ve->SetParam("Binarization_Low", 0.2f);
-    ve->SetParam("Binarization_High", 0.8f);
-    ve->SetParam("Binarization_Threshold", 0.5f);
-    ve->SetParam("Binarization_ThresholdRange", 0.1f);
-    container->AddToChainedFilter(ve);
-    Drawing::Rect bounds(0, 0, 100, 100);
-    auto render = std::make_shared<GERender>();
-    ASSERT_NE(render, nullptr);
-    render->DrawShaderEffect(*canvas_, *container, bounds);
-}
-
-/**
- * @tc.name: DrawShaderEffectLightUpEffect
- * @tc.desc: Verify DrawShaderEffect with LightUpEffect GEVisualEffect
- * @tc.type: FUNC
- */
-HWTEST_F(GERenderTest, DrawShaderEffectLightUpEffect, TestSize.Level1)
-{
-    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
-    ASSERT_NE(container, nullptr);
-    auto ve = std::make_shared<Drawing::GEVisualEffect>("LightUpEffect", Drawing::DrawingPaintType::BRUSH);
-    ASSERT_NE(ve, nullptr);
-    ve->SetParam("LightUpEffect_Value", 0.5f);
-    container->AddToChainedFilter(ve);
-    Drawing::Rect bounds(0, 0, 100, 100);
-    auto render = std::make_shared<GERender>();
-    ASSERT_NE(render, nullptr);
-    render->DrawShaderEffect(*canvas_, *container, bounds);
-}
-
-/**
- * @tc.name: DrawShaderEffectDynamicDim
- * @tc.desc: Verify DrawShaderEffect with DynamicDim GEVisualEffect
- * @tc.type: FUNC
- */
-HWTEST_F(GERenderTest, DrawShaderEffectDynamicDim, TestSize.Level1)
-{
-    auto container = std::make_shared<Drawing::GEVisualEffectContainer>();
-    ASSERT_NE(container, nullptr);
-    auto ve = std::make_shared<Drawing::GEVisualEffect>("DynamicDim", Drawing::DrawingPaintType::BRUSH);
-    ASSERT_NE(ve, nullptr);
-    ve->SetParam("DynamicDim_Value", 0.3f);
-    container->AddToChainedFilter(ve);
-    Drawing::Rect bounds(0, 0, 100, 100);
-    auto render = std::make_shared<GERender>();
-    ASSERT_NE(render, nullptr);
-    render->DrawShaderEffect(*canvas_, *container, bounds);
-}
-
-/**
- * @tc.name: GenerateShaderFilterBinarization
- * @tc.desc: Verify GenerateShaderFilter creates Binarization filter
- * @tc.type: FUNC
- */
-HWTEST_F(GERenderTest, GenerateShaderFilterBinarization, TestSize.Level1)
 {
     auto ve = std::make_shared<Drawing::GEVisualEffect>("Binarization", Drawing::DrawingPaintType::BRUSH);
     ASSERT_NE(ve, nullptr);
@@ -1734,15 +1674,15 @@ HWTEST_F(GERenderTest, GenerateShaderFilterBinarization, TestSize.Level1)
 }
 
 /**
- * @tc.name: GenerateShaderFilterLightUpEffect
- * @tc.desc: Verify GenerateShaderFilter creates LightUpEffect filter
+ * @tc.name: DrawShaderEffectLightUpEffect
+ * @tc.desc: Verify GenerateShaderFilter with LightUpEffect GEVisualEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilterLightUpEffect, TestSize.Level1)
+HWTEST_F(GERenderTest, DrawShaderEffectLightUpEffect, TestSize.Level1)
 {
     auto ve = std::make_shared<Drawing::GEVisualEffect>("LightUpEffect", Drawing::DrawingPaintType::BRUSH);
     ASSERT_NE(ve, nullptr);
-    ve->SetParam("LightUpEffect_Value", 0.7f);
+    ve->SetParam("LightUpEffect_Value", 0.5f);
     auto render = std::make_shared<GERender>();
     ASSERT_NE(render, nullptr);
     auto filter = render->GenerateShaderFilter(ve);
@@ -1751,15 +1691,15 @@ HWTEST_F(GERenderTest, GenerateShaderFilterLightUpEffect, TestSize.Level1)
 }
 
 /**
- * @tc.name: GenerateShaderFilterDynamicDim
- * @tc.desc: Verify GenerateShaderFilter creates DynamicDim filter
+ * @tc.name: DrawShaderEffectDynamicDim
+ * @tc.desc: Verify GenerateShaderFilter with DynamicDim GEVisualEffect
  * @tc.type: FUNC
  */
-HWTEST_F(GERenderTest, GenerateShaderFilterDynamicDim, TestSize.Level1)
+HWTEST_F(GERenderTest, DrawShaderEffectDynamicDim, TestSize.Level1)
 {
     auto ve = std::make_shared<Drawing::GEVisualEffect>("DynamicDim", Drawing::DrawingPaintType::BRUSH);
     ASSERT_NE(ve, nullptr);
-    ve->SetParam("DynamicDim_Value", 0.4f);
+    ve->SetParam("DynamicDim_Value", 0.3f);
     auto render = std::make_shared<GERender>();
     ASSERT_NE(render, nullptr);
     auto filter = render->GenerateShaderFilter(ve);
