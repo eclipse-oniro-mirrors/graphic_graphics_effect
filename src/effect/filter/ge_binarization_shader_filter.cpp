@@ -14,6 +14,9 @@
  */
 #include "ge_binarization_shader_filter.h"
 
+#include <algorithm>
+#include <cmath>
+
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
@@ -40,6 +43,15 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
         LOGE("GEBinarizationShaderFilter::OnProcessImage image is null");
         return image;
     }
+    if (!std::isfinite(low_) || !std::isfinite(high_) ||
+        !std::isfinite(threshold_) || !std::isfinite(thresholdRange_)) {
+        LOGE("GEBinarizationShaderFilter::OnProcessImage param is NaN or Inf");
+        return image;
+    }
+    low_ = std::clamp(low_, 0.0f, 1.0f);
+    high_ = std::clamp(high_, 0.0f, 1.0f);
+    threshold_ = std::clamp(threshold_, 0.0f, 1.0f);
+    thresholdRange_ = std::clamp(thresholdRange_, 0.0f, 1.0f);
     if (!g_binarizationEffect) {
         LOGE("GEBinarizationShaderFilter::binarizationEffect is null");
         return image;

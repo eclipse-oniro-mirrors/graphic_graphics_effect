@@ -125,5 +125,50 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_003, TestSize.Level1)
     EXPECT_NE(result, nullptr);
 }
 
+/**
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify OnProcessImage with out-of-range value (clamped to [0,1])
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_004, TestSize.Level1)
+{
+    Drawing::GEDynamicDimShaderFilterParams params;
+    params.value = -0.5f;
+    auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImage_005
+ * @tc.desc: Verify OnProcessImage with NaN value returns original image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_005, TestSize.Level1)
+{
+    Drawing::GEDynamicDimShaderFilterParams params;
+    params.value = NAN;
+    auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(result, image_);
+}
+
+/**
+ * @tc.name: OnProcessImage_006
+ * @tc.desc: Verify OnProcessImage with Inf value returns original image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_006, TestSize.Level1)
+{
+    Drawing::GEDynamicDimShaderFilterParams params;
+    params.value = INFINITY;
+    auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(result, image_);
+}
+
 } // namespace Rosen
 } // namespace OHOS

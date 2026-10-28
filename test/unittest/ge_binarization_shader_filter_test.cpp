@@ -134,5 +134,59 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_003, TestSize.Level1)
     EXPECT_NE(result, nullptr);
 }
 
+/**
+ * @tc.name: OnProcessImage_004
+ * @tc.desc: Verify OnProcessImage with out-of-range params (clamped to [0,1])
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_004, TestSize.Level1)
+{
+    Drawing::GEBinarizationShaderFilterParams params;
+    params.low = -0.5f;
+    params.high = 1.5f;
+    params.threshold = 2.0f;
+    params.thresholdRange = -1.0f;
+    auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_NE(result, nullptr);
+}
+
+/**
+ * @tc.name: OnProcessImage_005
+ * @tc.desc: Verify OnProcessImage with NaN params returns original image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_005, TestSize.Level1)
+{
+    Drawing::GEBinarizationShaderFilterParams params;
+    params.low = NAN;
+    params.high = 0.9f;
+    params.threshold = 0.5f;
+    params.thresholdRange = 0.1f;
+    auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(result, image_);
+}
+
+/**
+ * @tc.name: OnProcessImage_006
+ * @tc.desc: Verify OnProcessImage with Inf params returns original image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_006, TestSize.Level1)
+{
+    Drawing::GEBinarizationShaderFilterParams params;
+    params.low = 0.1f;
+    params.high = INFINITY;
+    params.threshold = 0.5f;
+    params.thresholdRange = 0.1f;
+    auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
+    ASSERT_NE(filter, nullptr);
+    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+    EXPECT_EQ(result, image_);
+}
+
 } // namespace Rosen
 } // namespace OHOS
