@@ -14,9 +14,7 @@
  */
 #include "ge_binarization_shader_filter.h"
 
-#include <algorithm>
-#include <cmath>
-
+#include "common/rs_common_def.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
@@ -43,15 +41,13 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
         LOGE("GEBinarizationShaderFilter::OnProcessImage image is null");
         return image;
     }
-    if (!std::isfinite(low_) || !std::isfinite(high_) ||
-        !std::isfinite(threshold_) || !std::isfinite(thresholdRange_)) {
-        LOGE("GEBinarizationShaderFilter::OnProcessImage param is NaN or Inf");
+    if (!ROSEN_GE(low_, 0.0f) || !ROSEN_LE(low_, 1.0f) ||
+        !ROSEN_GE(high_, 0.0f) || !ROSEN_LE(high_, 1.0f) ||
+        !ROSEN_GE(threshold_, 0.0f) || !ROSEN_LE(threshold_, 1.0f) ||
+        !ROSEN_GE(thresholdRange_, 0.0f) || !ROSEN_LE(thresholdRange_, 1.0f)) {
+        LOGE("GEBinarizationShaderFilter::OnProcessImage invalid param");
         return image;
     }
-    low_ = std::clamp(low_, 0.0f, 1.0f);
-    high_ = std::clamp(high_, 0.0f, 1.0f);
-    threshold_ = std::clamp(threshold_, 0.0f, 1.0f);
-    thresholdRange_ = std::clamp(thresholdRange_, 0.0f, 1.0f);
     if (!g_binarizationEffect) {
         LOGE("GEBinarizationShaderFilter::binarizationEffect is null");
         return image;

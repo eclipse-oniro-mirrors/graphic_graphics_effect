@@ -127,7 +127,7 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_003, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_004
- * @tc.desc: Verify OnProcessImage with out-of-range value (clamped to [0,1])
+ * @tc.desc: Verify OnProcessImage with out-of-range value returns original image
  * @tc.type: FUNC
  */
 HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_004, TestSize.Level1)
@@ -137,7 +137,7 @@ HWTEST_F(GEDynamicDimShaderFilterTest, OnProcessImage_004, TestSize.Level1)
     auto filter = std::make_shared<GEDynamicDimShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
-    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, image_);
 }
 
 /**

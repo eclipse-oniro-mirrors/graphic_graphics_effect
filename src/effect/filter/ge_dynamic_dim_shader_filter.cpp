@@ -14,9 +14,7 @@
  */
 #include "ge_dynamic_dim_shader_filter.h"
 
-#include <algorithm>
-#include <cmath>
-
+#include "common/rs_common_def.h"
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
 #include "include/core/SkTileMode.h"
@@ -43,11 +41,10 @@ std::shared_ptr<Drawing::Image> GEDynamicDimShaderFilter::OnProcessImage(Drawing
         LOGE("GEDynamicDimShaderFilter::input image is null");
         return image;
     }
-    if (!std::isfinite(value_)) {
-        LOGE("GEDynamicDimShaderFilter::OnProcessImage value is NaN or Inf");
+    if (!ROSEN_GE(value_, 0.0f) || !ROSEN_LNE(value_, 1.0f)) {
+        LOGE("GEDynamicDimShaderFilter::OnProcessImage invalid value");
         return image;
     }
-    value_ = std::clamp(value_, 0.0f, 1.0f);
     if (!g_dynamicDimEffect) {
         LOGE("GEDynamicDimShaderFilter::dynamicDimEffect is null");
         return image;

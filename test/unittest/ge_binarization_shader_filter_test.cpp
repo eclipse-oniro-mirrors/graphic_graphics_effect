@@ -136,7 +136,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_003, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_004
- * @tc.desc: Verify OnProcessImage with out-of-range params (clamped to [0,1])
+ * @tc.desc: Verify OnProcessImage with out-of-range params returns original image
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_004, TestSize.Level1)
@@ -149,7 +149,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_004, TestSize.Level1)
     auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
     auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
-    EXPECT_NE(result, nullptr);
+    EXPECT_EQ(result, image_);
 }
 
 /**

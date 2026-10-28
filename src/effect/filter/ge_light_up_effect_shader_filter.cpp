@@ -14,9 +14,7 @@
  */
 #include "ge_light_up_effect_shader_filter.h"
 
-#include <algorithm>
-#include <cmath>
-
+#include "common/rs_common_def.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
 #include "ge_log.h"
@@ -43,11 +41,10 @@ std::shared_ptr<Drawing::Image> GELightUpEffectShaderFilter::OnProcessImage(Draw
         LOGE("GELightUpEffectShaderFilter::input image is null");
         return image;
     }
-    if (!std::isfinite(value_)) {
-        LOGE("GELightUpEffectShaderFilter::OnProcessImage value is NaN or Inf");
+    if (!ROSEN_GE(value_, 0.0f) || !ROSEN_LNE(value_, 1.0f)) {
+        LOGE("GELightUpEffectShaderFilter::OnProcessImage invalid value");
         return image;
     }
-    value_ = std::clamp(value_, 0.0f, 1.0f);
     if (!g_lightUpEffect) {
         LOGE("GELightUpEffectShaderFilter::lightUpEffect is null");
         return image;
