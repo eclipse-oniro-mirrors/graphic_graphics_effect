@@ -42,7 +42,7 @@ std::shared_ptr<Drawing::Image> GEDynamicDimShaderFilter::OnProcessImage(Drawing
     }
     if (!g_dynamicDimEffect) {
         LOGE("GEDynamicDimShaderFilter::dynamicDimEffect is null");
-        return nullptr;
+        return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_dynamicDimEffect);
     Drawing::Matrix matrix;

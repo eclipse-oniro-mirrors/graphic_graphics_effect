@@ -42,7 +42,7 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
     }
     if (!g_binarizationEffect) {
         LOGE("GEBinarizationShaderFilter::binarizationEffect is null");
-        return nullptr;
+        return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_binarizationEffect);
     Drawing::Matrix matrix;

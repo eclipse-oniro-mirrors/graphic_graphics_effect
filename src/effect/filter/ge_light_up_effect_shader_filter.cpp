@@ -42,7 +42,7 @@ std::shared_ptr<Drawing::Image> GELightUpEffectShaderFilter::OnProcessImage(Draw
     }
     if (!g_lightUpEffect) {
         LOGE("GELightUpEffectShaderFilter::lightUpEffect is null");
-        return nullptr;
+        return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_lightUpEffect);
     Drawing::Matrix matrix;
