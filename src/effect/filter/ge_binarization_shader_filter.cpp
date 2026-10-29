@@ -14,9 +14,9 @@
  */
 #include "ge_binarization_shader_filter.h"
 
-#include "common/rs_common_def.h"
 #include "effect/runtime_effect.h"
 #include "effect/runtime_shader_builder.h"
+#include "ge_common.h"
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
 
@@ -41,10 +41,10 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
         LOGE("GEBinarizationShaderFilter::OnProcessImage image is null");
         return image;
     }
-    if (!ROSEN_GE(low_, 0.0f) || !ROSEN_LE(low_, 1.0f) ||
-        !ROSEN_GE(high_, 0.0f) || !ROSEN_LE(high_, 1.0f) ||
-        !ROSEN_GE(threshold_, 0.0f) || !ROSEN_LE(threshold_, 1.0f) ||
-        !ROSEN_GE(thresholdRange_, 0.0f) || !ROSEN_LE(thresholdRange_, 1.0f)) {
+    if (!GE_GE(low_, 0.0f) || !GE_LE(low_, 1.0f) ||
+        !GE_GE(high_, 0.0f) || !GE_LE(high_, 1.0f) ||
+        !GE_GE(threshold_, 0.0f) || !GE_LE(threshold_, 1.0f) ||
+        !GE_GE(thresholdRange_, 0.0f) || !GE_LE(thresholdRange_, 1.0f)) {
         LOGE("GEBinarizationShaderFilter::OnProcessImage invalid param");
         return image;
     }

@@ -14,7 +14,7 @@
  */
 #include "ge_dynamic_dim_shader_filter.h"
 
-#include "common/rs_common_def.h"
+#include "ge_common.h"
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
 #include "include/core/SkTileMode.h"
@@ -41,7 +41,7 @@ std::shared_ptr<Drawing::Image> GEDynamicDimShaderFilter::OnProcessImage(Drawing
         LOGE("GEDynamicDimShaderFilter::input image is null");
         return image;
     }
-    if (!ROSEN_GE(value_, 0.0f) || !ROSEN_LNE(value_, 1.0f)) {
+    if (!GE_GE(value_, 0.0f) || !GE_LNE(value_, 1.0f)) {
         LOGE("GEDynamicDimShaderFilter::OnProcessImage invalid value");
         return image;
     }

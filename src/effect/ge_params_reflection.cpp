@@ -142,10 +142,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 #define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
     { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
 
-#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias)   \
-    {                                                 \
-#Alias, GEFilterParamsTypeInfo < Struct> ::ID \
-    }
+#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
 
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAIBarShaderFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAuroraNoiseShaderParams),
@@ -1029,10 +1026,7 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
 #define GE_STRING_TO_TAG_ENTRY(Tag) { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }
 
-#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) \
-    {                                      \
-#Alias, GEParamsMemberTag::Tag     \
-    }
+#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag }
 
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_LOW),
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_HIGH),
