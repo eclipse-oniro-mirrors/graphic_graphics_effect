@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "gevisualeffectcontainer_fuzzer.h"
 #include "ge_render.h"
 #include <fuzzer/FuzzedDataProvider.h>
- 
+
 namespace OHOS {
 namespace Rosen {
 namespace Drawing {
- 
+
 namespace {
 constexpr size_t EFFECT_COUNT_MAX = 5;
 constexpr uint8_t FUZZER_TEST_CASE_COUNT = 16;
@@ -55,7 +55,7 @@ enum TestCaseIndex {
     TEST_CASE_FROSTED_GLASS_PARAMS = 15
 };
 }
- 
+
 Drawing::Matrix CreateFuzzedMatrix(FuzzedDataProvider& fdp)
 {
     Drawing::Matrix matrix;
@@ -70,7 +70,7 @@ Drawing::Matrix CreateFuzzedMatrix(FuzzedDataProvider& fdp)
                      fdp.ConsumeFloatingPoint<float>());
     return matrix;
 }
- 
+
 Drawing::RectF CreateFuzzedRectF(FuzzedDataProvider& fdp)
 {
     Drawing::RectF rectF;
@@ -82,7 +82,7 @@ Drawing::RectF CreateFuzzedRectF(FuzzedDataProvider& fdp)
     rectF.SetBottom(rectF.GetTop() + height);
     return rectF;
 }
- 
+
 void GEVisualEffectContainerFuzzTest001(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -95,7 +95,7 @@ void GEVisualEffectContainerFuzzTest001(FuzzedDataProvider& fdp)
     veContainer->AddToChainedFilter(visualEffect);
     veContainer->GetFilters();
 }
- 
+
 void GEVisualEffectContainerFuzzTest002(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -109,7 +109,7 @@ void GEVisualEffectContainerFuzzTest002(FuzzedDataProvider& fdp)
         veContainer->AddToChainedFilter(nullptr);
     }
 }
- 
+
 void GEVisualEffectContainerFuzzTest003(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -124,7 +124,7 @@ void GEVisualEffectContainerFuzzTest003(FuzzedDataProvider& fdp)
     }
     veContainer->GetFilters();
 }
- 
+
 void GEVisualEffectContainerFuzzTest004(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -138,7 +138,7 @@ void GEVisualEffectContainerFuzzTest004(FuzzedDataProvider& fdp)
     veContainer->AddToChainedFilter(visualEffect);
     veContainer->GetFilters();
 }
- 
+
 void GEVisualEffectContainerFuzzTest005(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -156,7 +156,7 @@ void GEVisualEffectContainerFuzzTest005(FuzzedDataProvider& fdp)
     size_t searchIndex = fdp.ConsumeIntegral<uint8_t>() % PREDEFINED_FILTER_NAMES.size();
     auto foundEffect = veContainer->GetGEVisualEffect(PREDEFINED_FILTER_NAMES[searchIndex]);
 }
- 
+
 void GEVisualEffectContainerFuzzTest006(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -177,7 +177,7 @@ void GEVisualEffectContainerFuzzTest006(FuzzedDataProvider& fdp)
     veContainer->SetGeometry(matrix, bound, materialDst, geoWidth, geoHeight);
     veContainer->GetFilters();
 }
- 
+
 void GEVisualEffectContainerFuzzTest007(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -195,7 +195,7 @@ void GEVisualEffectContainerFuzzTest007(FuzzedDataProvider& fdp)
 
     veContainer->UpdateCacheDataFrom(sourceContainer);
 }
- 
+
 void GEVisualEffectContainerFuzzTest008(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -214,7 +214,7 @@ void GEVisualEffectContainerFuzzTest008(FuzzedDataProvider& fdp)
 
     veContainer->GetFilters();
 }
- 
+
 void GEVisualEffectContainerFuzzTest009(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -228,7 +228,7 @@ void GEVisualEffectContainerFuzzTest009(FuzzedDataProvider& fdp)
     float headroom = fdp.ConsumeFloatingPoint<float>();
     veContainer->SetDisplayHeadroom(headroom);
 }
- 
+
 void GEVisualEffectContainerFuzzTest010(FuzzedDataProvider& fdp)
 {
     auto veContainer = std::make_shared<GEVisualEffectContainer>();
@@ -300,11 +300,11 @@ void GEVisualEffectContainerFuzzTest016(FuzzedDataProvider& fdp)
     auto blurImage = std::make_shared<Drawing::Image>();
     veContainer->UpdateFrostedGlassEffectParams(blurImage, fdp.ConsumeFloatingPoint<float>());
 }
- 
+
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
- 
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {

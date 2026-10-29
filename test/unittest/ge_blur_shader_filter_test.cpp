@@ -14,6 +14,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <limits>
 
 #include "ge_blur_shader_filter.h"
 

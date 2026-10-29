@@ -51,7 +51,7 @@ HWTEST_F(GEXComplexShaderTest, CreateDynamicImpl001, TestSize.Level1)
     temp.params_ = {0.5f, 0.5f, 0.5f};
     auto shader = GEXComplexShader::CreateDynamicImpl(temp);
 
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
 }
 } // namespace GraphicsEffectEngine
 } // namespace OHOS

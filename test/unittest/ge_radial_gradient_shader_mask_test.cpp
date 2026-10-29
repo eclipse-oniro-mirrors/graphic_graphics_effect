@@ -230,7 +230,7 @@ HWTEST_F(GERadialGradientShaderMaskTest, GenerateShaderEffect_002, TestSize.Leve
     GERadialGradientShaderMask resMask(resParam);
     EXPECT_EQ(resMask.GenerateDrawingShader(MAX_RESOLUTION + 1.0f, 100.0f), nullptr);
     EXPECT_EQ(resMask.GenerateDrawingShader(100.0f, MAX_RESOLUTION + 1.0f), nullptr);
- 
+
     // radiusX_ or radiusY_ > MAX_RADIUS(10000) -> new guard returns nullptr
     constexpr float MAX_RADIUS = 10000.0f;
     GERadialGradientShaderMaskParams radParamX;

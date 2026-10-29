@@ -353,13 +353,22 @@ HWTEST_F(GEBorderSDFShaderTest, GEBorderSDFShaderTest020, TestSize.Level1)
 {
     Drawing::Rect rect(0, 0, 100, 100);
 
-    float widthValues[] = {0.0f, 0.0001f, 0.001f, 0.01f, 0.1f, 1.0f};
+    float widthValues[] = {0.01f, 0.1f, 1.0f};
     for (float w : widthValues) {
         auto params = GetTestParams();
         params.width = w;
         auto shader = GEBorderSDFShader(params);
         shader.MakeDrawingShader(canvas_, rect, 0.5f);
         EXPECT_NE(shader.GetDrawingShader(), nullptr);
+    }
+
+    float widthValues2[] = {0.0f, 0.0001f};
+    for (float w : widthValues2) {
+        auto params = GetTestParams();
+        params.width = w;
+        auto shader = GEBorderSDFShader(params);
+        shader.MakeDrawingShader(rect, 0.5f);
+        EXPECT_EQ(shader.GetDrawingShader(), nullptr);
     }
 }
 

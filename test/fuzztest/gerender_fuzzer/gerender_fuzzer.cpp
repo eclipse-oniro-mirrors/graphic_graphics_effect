@@ -12,18 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 #include "draw/canvas.h"
 #include "gerender_fuzzer.h"
 #include "ge_render.h"
 #include "ge_hps_effect_filter.h"
 #include <fuzzer/FuzzedDataProvider.h>
- 
+
 namespace OHOS {
 namespace GraphicsEffectEngine {
- 
+
 using namespace Rosen;
- 
+
 namespace {
 constexpr size_t VEC_SIZE_MAX = 4;
 constexpr size_t FILTER_COUNT_MAX = 5;
@@ -42,7 +42,7 @@ enum TestCaseIndex {
     TEST_CASE_RANDOM_FILTERS = 9
 };
 }
- 
+
 Drawing::Matrix CreateFuzzedMatrix(FuzzedDataProvider& fdp)
 {
     Drawing::Matrix matrix;
@@ -57,7 +57,7 @@ Drawing::Matrix CreateFuzzedMatrix(FuzzedDataProvider& fdp)
                      fdp.ConsumeFloatingPoint<float>());
     return matrix;
 }
- 
+
 Drawing::Rect CreateFuzzedRect(FuzzedDataProvider& fdp)
 {
     float left = fdp.ConsumeFloatingPoint<float>();
@@ -66,7 +66,7 @@ Drawing::Rect CreateFuzzedRect(FuzzedDataProvider& fdp)
     float bottom = fdp.ConsumeFloatingPoint<float>();
     return Drawing::Rect(left, top, right, bottom);
 }
- 
+
 void GERenderFuzzTest001(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -84,7 +84,7 @@ void GERenderFuzzTest001(FuzzedDataProvider& fdp)
  
     geRender->DrawImageEffect(canvas, *veContainer, image, src, dst, sampling);
 }
- 
+
 void GERenderFuzzTest002(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -102,7 +102,7 @@ void GERenderFuzzTest002(FuzzedDataProvider& fdp)
  
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 void GERenderFuzzTest003(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -117,7 +117,7 @@ void GERenderFuzzTest003(FuzzedDataProvider& fdp)
     Drawing::SamplingOptions sampling;
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 void GERenderFuzzTest004(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -166,7 +166,7 @@ void GERenderFuzzTest004(FuzzedDataProvider& fdp)
     Drawing::SamplingOptions sampling;
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 void GERenderFuzzTest005(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -198,7 +198,7 @@ void GERenderFuzzTest005(FuzzedDataProvider& fdp)
  
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 void GERenderFuzzTest006(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -234,7 +234,7 @@ void GERenderFuzzTest006(FuzzedDataProvider& fdp)
  
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 void GERenderFuzzTest007(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -250,7 +250,7 @@ void GERenderFuzzTest007(FuzzedDataProvider& fdp)
     Drawing::Rect bounds = CreateFuzzedRect(fdp);
     geRender->DrawShaderEffect(canvas, *veContainer, bounds);
 }
- 
+
 void GERenderFuzzTest008(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -278,7 +278,7 @@ void GERenderFuzzTest008(FuzzedDataProvider& fdp)
  
     geRender->ApplyHpsGEImageEffect(canvas, *veContainer, context, outImage, brush);
 }
- 
+
 void GERenderFuzzTest009(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -306,7 +306,7 @@ void GERenderFuzzTest009(FuzzedDataProvider& fdp)
  
     geRender->ApplyHpsImageEffect(canvas, *veContainer, context, outImage);
 }
- 
+
 void GERenderFuzzTest010(FuzzedDataProvider& fdp)
 {
     auto geRender = std::make_shared<GERender>();
@@ -342,7 +342,7 @@ void GERenderFuzzTest010(FuzzedDataProvider& fdp)
     geRender->DrawImageEffect(canvas, *veContainer, image, src, dst, sampling);
     geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
- 
+
 }  // namespace GraphicsEffectEngine
 }  // namespace OHOS
 

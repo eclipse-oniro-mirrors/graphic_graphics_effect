@@ -65,6 +65,7 @@ public:
     int32_t ParseSysDoc();
     int32_t ParseProdDoc();
     bool ParseFeatureSwitch(std::string val);
+
     std::string ExtractPropertyValue(const std::string &propName, xmlNode &node);
     int32_t GetXmlNodeAsInt(xmlNode &node);
     static bool IsNumber(const std::string& str);
@@ -73,6 +74,7 @@ private:
     int32_t LoadSysConfiguration(const std::string& fileDir);
     void LoadProdConfiguration(const std::string& fileDir);
     bool ParseInternal(xmlNode &node);
+
     xmlDoc *xmlSysDocument_ = nullptr;
     xmlDoc *xmlProdDocument_ = nullptr;
     std::vector<std::string> sysPaths_ = {"/system/variant/phone/base/", "/system/variant/tablet/base/",

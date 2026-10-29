@@ -248,10 +248,10 @@ HWTEST_F(GEMotionBlurShaderFilterTest, OnProcessImage_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: CreateUpscaledImageWithValidCanvas
- * @tc.desc: Verify CreateUpscaledImage uses a valid offscreen canvas
- * @tc.type: FUNC
- */
+* @tc.name: CreateUpscaledImageWithValidCanvas
+* @tc.desc: Verify CreateUpscaledImage uses a valid offscreen canvas
+* @tc.type: FUNC
+*/
 HWTEST_F(GEMotionBlurShaderFilterTest, CreateUpscaledImageWithValidCanvas, TestSize.Level1)
 {
     auto surface = Drawing::Surface::MakeRasterN32Premul(imageWidth_, imageHeight_);
