@@ -35,6 +35,9 @@ public:
     static inline Drawing::Canvas canvas_;
     std::shared_ptr<Drawing::Image> image_ { nullptr };
 
+    static constexpr int32_t IMAGE_WIDTH = 50;
+    static constexpr int32_t IMAGE_HEIGHT = 50;
+
     Drawing::Rect src_ { 0.0f, 0.0f, 50.0f, 50.0f };
     Drawing::Rect dst_ { 0.0f, 0.0f, 50.0f, 50.0f };
 };
@@ -48,7 +51,7 @@ void GELightUpEffectShaderFilterTest::SetUp()
 
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
-    bmp.Build(50, 50, format);
+    bmp.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
     bmp.ClearWithColor(Drawing::Color::COLOR_WHITE);
     image_ = bmp.MakeImage();
 }
