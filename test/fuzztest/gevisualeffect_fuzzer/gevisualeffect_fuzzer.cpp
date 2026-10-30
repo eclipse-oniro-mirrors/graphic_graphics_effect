@@ -194,14 +194,14 @@ void GEVisualEffectFuzzTestVectorColorParams(FuzzedDataProvider& fdp)
     std::string name = fdp.ConsumeRandomLengthString(STR_LEN);
     DrawingPaintType type = static_cast<DrawingPaintType>(fdp.ConsumeIntegral<uint8_t>());
     auto geVisualEffect = std::make_shared<GEVisualEffect>(name, type);
- 
+
     std::string tag = fdp.ConsumeRandomLengthString(STR_LEN);
 
     Vector3f vec3f(fdp.ConsumeFloatingPoint<float>(),
                    fdp.ConsumeFloatingPoint<float>(),
                    fdp.ConsumeFloatingPoint<float>());
     geVisualEffect->SetParam(tag, vec3f);
- 
+
     Vector4f vec4f(fdp.ConsumeFloatingPoint<float>(),
                    fdp.ConsumeFloatingPoint<float>(),
                    fdp.ConsumeFloatingPoint<float>(),
@@ -246,6 +246,7 @@ void GEVisualEffectFuzzTestGetInterfaces(FuzzedDataProvider& fdp)
 } // namespace Rosen
 } // namespace OHOS
 
+/* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
     if (data == nullptr || size == 0) {

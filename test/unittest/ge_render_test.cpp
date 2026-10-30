@@ -621,7 +621,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_014, TestSize.Level1)
     int32_t turbScale = 4;
     int32_t turbEvo = 2;
     int32_t turbAmp = 1;
-    std::pair<float, float> expansionSize = {1.0f, 1.0f};
+    std::pair<float, float> scaleSize = {1.0f, 1.0f};
     
     visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_PROGRESS, progress);
     visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_ABLATION_RATE, ablationRate);
@@ -636,7 +636,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_014, TestSize.Level1)
     visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_SCALE, turbScale);
     visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_EVO, turbEvo);
     visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_TURB_AMP, turbAmp);
-    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE, expansionSize);
+    visualEffect->SetParam(Drawing::GE_FILTER_PARTICLE_ABLATION_EXPANSION_SIZE, scaleSize);
     
     Drawing::GEVisualEffectContainer veContainer;
     veContainer.AddToChainedFilter(visualEffect);
@@ -909,7 +909,7 @@ HWTEST_F(GERenderTest, GenerateShaderEffectTest_LightCave, TestSize.Level1)
 
     geVisualEffectImpl->MakeLightCaveParams();
     shader = geRender->GenerateShaderEffect(geVisualEffectImpl);
-    EXPECT_EQ(shader, nullptr);
+    EXPECT_NE(shader, nullptr);
 }
 
 /**

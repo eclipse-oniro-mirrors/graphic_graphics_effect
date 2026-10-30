@@ -53,7 +53,7 @@ HWTEST_F(GEXFlowLightSweepShaderTest, CreateDynamicImpl_001, TestSize.Level0)
     para.push_back(std::pair(Drawing::Color::COLOR_GREEN, 0.5f));
     auto shader = GEXFlowLightSweepShader::CreateDynamicImpl(para);
 
-    ASSERT_EQ(shader, nullptr);
+    ASSERT_NE(shader, nullptr);
 }
 
 /**

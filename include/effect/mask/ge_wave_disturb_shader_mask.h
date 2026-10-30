@@ -35,7 +35,7 @@ public:
     virtual ~GEWaveDisturbanceShaderMask() = default;
     
     DECLARE_GEFILTER_TYPEFUNC(GEWaveDisturbanceShaderMask, GEWaveDisturbanceShaderMaskParams);
-
+    
     Vector2f GetClickPos() { return params_.clickPos; }
     void SetClickPos(const Vector2f& clickPos) { params_.clickPos = clickPos; }
     // for this class no difference here

@@ -62,6 +62,11 @@ std::shared_ptr<Drawing::Surface> GESpatialGlassEffectTest::CreateSurface()
 {
     std::shared_ptr<Drawing::GPUContext> context = nullptr;
     auto renderContext = RenderContext::Create();
+    if (renderContext == nullptr) {
+        GTEST_LOG_(INFO) << "GESpatialGlassEffectTest::CreateSurface create renderContext failed.";
+        return nullptr;
+    }
+    
     renderContext->Init();
     renderContext->SetUpGpuContext();
     context = renderContext->GetSharedDrGPUContext();

@@ -195,7 +195,7 @@ class CppParser:
         """Consume and return current token."""
         token = self._peek()
         if token is None:
-            return None
+            raise RuntimeError("No token available to consume")
         self.pos += 1
         return token
 
