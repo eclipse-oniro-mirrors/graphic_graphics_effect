@@ -467,7 +467,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiNegativeRadius, TestSize.L
 
 /**
  * @tc.name: ResolveCornerRadiiSingleComponentOverflow
- * @tc.desc: Verify only the overflowing component is clamped, others remain unchanged
+ * @tc.desc: Verify overflowing x radius clamped to masRadius, y is forced to match x (circular)
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiSingleComponentOverflow, TestSize.Level1)
@@ -498,7 +498,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiSingleComponentOverflow, T
 
 /**
  * @tc.name: ResolveCornerRadiiMultiCornerIndependentClamp
- * @tc.desc: Verify each corner is independently clamped to maxRadius without cross-corner scaling
+ * @tc.desc: Verify each corner is independently clamped to maxRadius with y forced to match x (circular)
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiMultiCornerIndependentClamp, TestSize.Level1)

@@ -201,6 +201,8 @@ void GESDFPathShaderShapeTest::SetUp()
     surface_ = CreateSurface();
     if (surface_ != nullptr) {
         canvas_ = surface_->GetCanvas();
+    } else if (canvas_ == nullptr) {
+        canvas_ = std::make_shared<Drawing::Canvas>();
     }
 }
 
@@ -301,10 +303,10 @@ HWTEST_F(GESDFPathShaderShapeTest, PreprocessValidParamstest_001, TestSize.Level
 
         GESDFPathShaderShape shape(param);
         shape.Preprocess(*canvas_, config.rect, false);
-        EXPECT_EQ(shape.disResult_, nullptr);
+        EXPECT_NE(shape.disResult_, nullptr);
 
         auto shader = shape.GenerateDrawingShader(config.rect.GetWidth(), config.rect.GetHeight());
-        EXPECT_EQ(shader, nullptr);
+        EXPECT_NE(shader, nullptr);
     }
 }
 
@@ -446,7 +448,7 @@ HWTEST_F(GESDFPathShaderShapeTest, Preprocess_002, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, true);
-    EXPECT_EQ(shape.disResult_, nullptr);
+    EXPECT_NE(shape.disResult_, nullptr);
 }
 
 /**
@@ -501,7 +503,10 @@ HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartition_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.segmentIndex_.empty());
+    EXPECT_GT(shape.curvesInGrid_.size(), 0);
+    EXPECT_EQ(shape.numCurves_, 2);
 }
 
 /**
@@ -524,7 +529,10 @@ HWTEST_F(GESDFPathShaderShapeTest, SplitGrid_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 300.0f, 300.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_NE(shape.numCurves_, 20);
+    EXPECT_EQ(shape.numCurves_, 20);
+    EXPECT_EQ(shape.controlPoints_.size(), 120);
+    EXPECT_GT(shape.curvesInGrid_.size(), 1);
+    EXPECT_GT(shape.segmentIndex_.size(), 1);
 }
 
 /**
@@ -555,6 +563,56 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 
     auto curves = GESDFPathShaderShape::GetCurveByPath(path);
     EXPECT_FALSE(curves.empty());
+}
+
+/**
+ * @tc.name: ProcessSingleBatch_001
+ * @tc.desc: Verify ProcessSingleBatch with valid single grid ande single batch (first batch)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    path.MoveTo(10.0f, 20.0f);
+    path.LineTo(100.0f, 200.0f);
+    path.QuadTo(150.0f, 250.0f, 200.0f, 300.0f);
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+    shape.Preprocess(*canvas_, rect, false);
+    ASSERT_NE(shape.disResult_, nullptr);
+    ASSERT_FALSE(shape.curvesInGrid_.empty());
+    ASSERT_NE(shape.offscreenCanvas_, nullptr);
+
+    auto builder = shape.MakePrecalcShaderBuilder();
+    ASSERT_NE(builder, nullptr);
+    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
+    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
+
+    constexpr size_t CURVE_FLOAT_COUNT = 6;
+    size_t gridIndex = 0;
+    size_t batch = 0;
+    size_t start = 0;
+    size_t end = shape.curvesInGrid_[gridIndex].first.size() / CURVE_FLOAT_COUNT;
+    float vStart = 0.0f;
+    float vEnd = static_cast<float>(end - start - 1);
+
+    shape.ProcessSingleBatch(*builder, gridIndex, batch, start, end, vStart, vEnd, prevSdf, prevShader);
+
+    // Verify first batch dose not modify previous state
+    EXPECT_EQ(prevSdf, nullptr);
+    EXPECT_EQ(prevShader, nullptr);
+
+    // Verify offscreen surface has valid content
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
+    EXPECT_NE(snapshot, nullptr);
+    EXPECT_GT(snapshot->GetWidth(), 0);
+    EXPECT_GT(snapshot->GetHeight(), 0);
 }
 
 /**
@@ -616,6 +674,68 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
     shape.ProcessSingleBatch(*builder, gridIndex, batch, start, end, vStart, vEnd, prevSdf, prevShader);
     EXPECT_EQ(prevSdf, nullptr);
     EXPECT_EQ(prevShader, nullptr);
+}
+
+/**
+ * @tc.name: ProcessSingleBatch_003
+ * @tc.desc: Verify ProcessSingleBatch with empty grid curves
+ * @tc.type: FUNC
+ */
+HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
+{
+    GESDFPathShapeParams param;
+    Drawing::Path path;
+    // Create path with curves spread across multiple grids
+    for (int i = 0; i < 5; i++) {
+        path.MoveTo(i * 100.0f, 0.0f);
+        path.LineTo(i * 100.0f + 50.0f, 100.0f);
+        path.QuadTo(i * 100.0f + 75.0f, 150.0f, i * 100.0f + 100.0f, 200.0f);
+    }
+    param.path = path;
+
+    GESDFPathShaderShape shape(param);
+    Drawing::Rect rect(0.0f, 0.0f, 600.0f, 300.0f);
+    shape.Preprocess(*canvas_, rect, false);
+    ASSERT_NE(shape.disResult_, nullptr);
+    ASSERT_GT(shape.curvesInGrid_.size(), 1); // Ensure multiple grids
+    ASSERT_NE(shape.offscreenCanvas_, nullptr);
+
+    auto builder = shape.MakePrecalcShaderBuilder();
+    ASSERT_NE(builder, nullptr);
+    builder->SetUniform("iResolution", rect.GetWidth(), rect.GetHeight());
+    builder->SetUniform("u_curveCount", static_cast<float>(shape.numCurves_));
+
+    std::shared_ptr<Drawing::Image> prevSdf = nullptr;
+    std::shared_ptr<Drawing::ShaderEffect> prevShader = nullptr;
+
+    // Process all grids
+    constexpr size_t MAX_CURVES_SUBMIT_PER_GRID = 20;
+    for (size_t gridIndex = 0; gridIndex < shape.curvesInGrid_.size(); ++gridIndex) {
+        const size_t totalCurves = shape.curvesInGrid_[gridIndex].first.size() / 6;
+        const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
+        const size_t step = curvesPerBatch > 2 ? curvesPerBatch - 2 : 1;
+        size_t start = 0;
+        size_t batch = 0;
+        while (start < totalCurves) {
+            size_t end = std::min(start + curvesPerBatch, totalCurves);
+            float validStart = (batch == 0) ? 0.0f : 1.0f;
+            float validEnd = (end == totalCurves) ? (end - start - 1.0f) : (curvesPerBatch - 2.0f);
+            shape.ProcessSingleBatch(*builder, gridIndex, batch, start, end, validStart, validEnd, prevSdf, prevShader);
+            if (batch == 0) {
+                EXPECT_EQ(prevSdf, nullptr);
+                EXPECT_EQ(prevShader, nullptr);
+            } else {
+                EXPECT_NE(prevSdf, nullptr);
+                EXPECT_NE(prevShader, nullptr);
+            }
+            if (end == totalCurves) break;
+            start += step;
+            batch++;
+        }
+    }
+
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
+    EXPECT_NE(snapshot, nullptr);
 }
 
 /**
@@ -865,7 +985,7 @@ HWTEST_F(GESDFPathShaderShapeTest, AutoGridPartitionAsymmetric_001, TestSize.Lev
     Drawing::Rect rect(0.0f, 0.0f, 120.0f, 400.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
 }
 
 /**
@@ -888,7 +1008,7 @@ HWTEST_F(GESDFPathShaderShapeTest, SplitGridNarrowWidth_001, TestSize.Level1)
     Drawing::Rect rect(0.0f, 0.0f, 100.0f, 500.0f);
 
     shape.Preprocess(*canvas_, rect, false);
-    EXPECT_TRUE(shape.curvesInGrid_.empty());
+    EXPECT_FALSE(shape.curvesInGrid_.empty());
 }
 
 /**
@@ -1185,7 +1305,7 @@ HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullMaskTex, TestSize.Level1
     path.MoveTo(10.0f, 20.0f);
     path.LineTo(100.0f, 200.0f);
     param.path = path;
- 
+
     GESDFPathShaderShape shape(param);
     Drawing::Bitmap bmp;
     Drawing::BitmapFormat fmt { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
@@ -1193,11 +1313,11 @@ HWTEST_F(GESDFPathShaderShapeTest, RunSDFPropagationNullMaskTex, TestSize.Level1
     bmp.ClearWithColor(Drawing::Color::COLOR_RED);
     auto sdfTex = bmp.MakeImage();
     ASSERT_NE(sdfTex, nullptr);
- 
+
     auto result = shape.RunSDFPropagation(*canvas_, sdfTex, nullptr, 50, 50);
     EXPECT_EQ(result.get(), sdfTex.get());
 }
- 
+
 /**
  * @tc.name: ComputeDistanceFieldNullSdfTex
  * @tc.desc: Test ComputeDistanceField returns nullptr when sdfTex is null
@@ -1210,7 +1330,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ComputeDistanceFieldNullSdfTex, TestSize.Leve
     path.MoveTo(10.0f, 20.0f);
     path.LineTo(100.0f, 200.0f);
     param.path = path;
- 
+
     GESDFPathShaderShape shape(param);
     auto result = shape.ComputeDistanceField(*canvas_, nullptr, 100, 100);
     EXPECT_EQ(result, nullptr);
@@ -1228,7 +1348,7 @@ HWTEST_F(GESDFPathShaderShapeTest, PreprocessOverflowDimensions, TestSize.Level1
     path.MoveTo(10.0f, 20.0f);
     path.LineTo(100.0f, 200.0f);
     param.path = path;
- 
+
     GESDFPathShaderShape shape(param);
     float maxFloat = static_cast<float>(std::numeric_limits<int>::max()) + 1.0f;
     Drawing::Rect overflowRect(0.0f, 0.0f, maxFloat, 100.0f);

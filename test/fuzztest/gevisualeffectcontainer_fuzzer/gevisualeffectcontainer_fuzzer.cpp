@@ -131,7 +131,7 @@ void GEVisualEffectContainerFuzzTest004(FuzzedDataProvider& fdp)
     size_t nameIndex = fdp.ConsumeIntegral<uint8_t>() % PREDEFINED_FILTER_NAMES.size();
     DrawingPaintType type = static_cast<DrawingPaintType>(fdp.ConsumeIntegral<uint8_t>());
     auto visualEffect = std::make_shared<GEVisualEffect>(PREDEFINED_FILTER_NAMES[nameIndex], type);
-
+ 
     float param1 = fdp.ConsumeFloatingPoint<float>();
     visualEffect->SetParam("radius", param1);
 

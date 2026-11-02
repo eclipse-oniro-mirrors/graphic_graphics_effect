@@ -406,6 +406,7 @@ HWTEST_F(GESDFTransformShaderShapeTest, MatrixBoundaryTest_003, TestSize.Level1)
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest MatrixBoundaryTest_003 end";
 }
 
+
 /**
  * @tc.name: GenerateGravityPullDrawingShader_001
  * @tc.desc: Verify GenerateGravityPullDrawingShader with valid parameters and unionMode=1
@@ -791,7 +792,6 @@ HWTEST_F(GESDFTransformShaderShapeTest, GetGravityPullDrawingShaderBuilder_004, 
     EXPECT_EQ(builder1, builder2);
     GTEST_LOG_(INFO) << "GESDFTransformShaderShapeTest GetGravityPullDrawingShaderBuilder_004 end";
 }
-
 /**
  * @tc.name: GenerateGravityPullDrawingShaderHasNormal_001
  * @tc.desc: Verify GenerateGravityPullDrawingShaderHasNormal with valid parameters and unionMode=1
@@ -1421,6 +1421,10 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_008, TestSize.Le
     bool result = shape.TryGetCenterAndHalfSize(outX, outY, shapeHalfSize);
     
     EXPECT_TRUE(result);
+     // Center (50, 50) scaled by (0.0, 0.0) with pivot (1.0, 1.0)
+    // Formula: (center - pivot) * scale + pivot
+    // X: (50 - 1) * 0.0 + 1 = 1.0
+    // Y: (50 - 1) * 0.0 + 1 = 1.0
     EXPECT_NEAR(outX, 1.0f, 0.1f);
     EXPECT_NEAR(outY, 1.0f, 0.1f);
     EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);
