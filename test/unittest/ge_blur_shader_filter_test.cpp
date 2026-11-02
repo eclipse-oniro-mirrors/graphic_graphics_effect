@@ -327,6 +327,5 @@ HWTEST_F(GEBlurShaderFilterTest, OnProcessImage_004, TestSize.Level1)
     auto result = filter->OnProcessImage(*canvas_, image_, src_, dst_);
     EXPECT_EQ(result, image_);
 }
-
 } // namespace Rosen
 } // namespace OHOS

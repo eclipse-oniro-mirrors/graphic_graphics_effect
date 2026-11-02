@@ -609,7 +609,7 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, DrawMaskLinearGradientBlurInvalid
     out = GELinearGradientBlurShaderFilter::DrawMaskLinearGradientBlur(
         image_, canvas_, filter, nullptr, zeroHeightDst);
     EXPECT_EQ(out.get(), image_.get());
- 
+
     auto nullBlur = std::make_shared<GENullShaderFilter>();
     std::shared_ptr<GEShaderFilter> nullFilter = nullBlur;
     Drawing::Rect dst {0.0f, 0.0f, 100.0f, 100.0f};
@@ -629,7 +629,7 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, ProcessImageDDGR_NullImage, TestS
         Drawing::Matrix(), 1.f, 1.f, true, false};
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
- 
+
     std::shared_ptr<Drawing::Image> nullImage = nullptr;
     EXPECT_EQ(filter->ProcessImageDDGR(canvas_, nullImage, 0), nullImage);
 }
@@ -645,7 +645,7 @@ HWTEST_F(GELinearGradientBlurShaderFilterTest, MakeMaskLinearGradientBlurShader_
         Drawing::Matrix(), 1.f, 1.f, true, false};
     auto filter = std::make_shared<GELinearGradientBlurShaderFilter>(params);
     ASSERT_TRUE(filter != nullptr);
- 
+
     auto result = filter->MakeMaskLinearGradientBlurShader(nullptr, nullptr, nullptr);
     EXPECT_EQ(result, nullptr);
 }
