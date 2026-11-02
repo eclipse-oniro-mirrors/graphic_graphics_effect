@@ -174,7 +174,6 @@ def normalize_type(type_str: str, type_aliases: Dict[str, str]) -> str:
         # After skipping whitespace tuples, remaining tokens are always strings
         if not isinstance(token, str):
             raise RuntimeError("Remaining tokens should always be strings")
-
         # Add token
         result.append(token)
 

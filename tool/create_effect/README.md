@@ -129,7 +129,7 @@ src/effect/{type}/ge_{name}_{suffix}.{ext}
 | `filter` | `shader_filter` |
 | `mask` | `shader_mask` |
 | `shader` | `shader` |
-| `shape` | `sdf_shader_shape` |
+| `shape` | `shader_shape` |
 
 ### File Contents
 

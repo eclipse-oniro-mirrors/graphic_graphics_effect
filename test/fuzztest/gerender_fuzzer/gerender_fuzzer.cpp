@@ -78,10 +78,10 @@ void GERenderFuzzTest001(FuzzedDataProvider& fdp)
     veContainer->AddToChainedFilter(visualEffect);
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     Drawing::SamplingOptions sampling;
- 
+
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
- 
+
     geRender->DrawImageEffect(canvas, *veContainer, image, src, dst, sampling);
 }
 
@@ -96,10 +96,10 @@ void GERenderFuzzTest002(FuzzedDataProvider& fdp)
     veContainer->AddToChainedFilter(visualEffect);
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     Drawing::SamplingOptions sampling;
- 
+
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
- 
+
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
 
@@ -125,12 +125,12 @@ void GERenderFuzzTest004(FuzzedDataProvider& fdp)
     auto visualEffectGrey = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_GREY);
     auto visualEffectAIBar = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_AI_BAR);
     auto visualEffectLinear = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_LINEAR_GRADIENT_BLUR);
- 
+
     float greyCoef1 = fdp.ConsumeFloatingPoint<float>();
     float greyCoef2 = fdp.ConsumeFloatingPoint<float>();
     visualEffectGrey->SetParam("GREY_COEF_1", greyCoef1);
     visualEffectGrey->SetParam("GREY_COEF_2", greyCoef2);
- 
+
     Drawing::Matrix matrix = CreateFuzzedMatrix(fdp);
     std::vector<std::pair<float, float>> fractionStops;
     size_t stopCount = fdp.ConsumeIntegral<uint8_t>() % VEC_SIZE_MAX;
@@ -144,7 +144,7 @@ void GERenderFuzzTest004(FuzzedDataProvider& fdp)
     float tranY = fdp.ConsumeFloatingPoint<float>();
     int32_t direction = fdp.ConsumeIntegral<int32_t>();
     bool isOffscreen = fdp.ConsumeBool();
- 
+
     visualEffectLinear->SetParam("BLURRADIUS", blurRadius);
     visualEffectLinear->SetParam("GEOWIDTH", geoWidth);
     visualEffectLinear->SetParam("GEOHEIGHT", geoHeight);
@@ -154,11 +154,11 @@ void GERenderFuzzTest004(FuzzedDataProvider& fdp)
     visualEffectLinear->SetParam("FRACTIONSTOPS", fractionStops);
     visualEffectLinear->SetParam("DIRECTION", direction);
     visualEffectLinear->SetParam("ISOFFSCREEN", isOffscreen);
- 
+
     veContainer->AddToChainedFilter(visualEffectGrey);
     veContainer->AddToChainedFilter(visualEffectAIBar);
     veContainer->AddToChainedFilter(visualEffectLinear);
- 
+
     Drawing::Canvas canvas;
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     Drawing::Rect src = CreateFuzzedRect(fdp);
@@ -172,7 +172,7 @@ void GERenderFuzzTest005(FuzzedDataProvider& fdp)
     auto geRender = std::make_shared<GERender>();
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     auto visualEffectMagnifier = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MAGNIFIER);
- 
+
     visualEffectMagnifier->SetParam("FACTOR", fdp.ConsumeFloatingPoint<float>());
     visualEffectMagnifier->SetParam("WIDTH", fdp.ConsumeFloatingPoint<float>());
     visualEffectMagnifier->SetParam("HEIGHT", fdp.ConsumeFloatingPoint<float>());
@@ -187,15 +187,15 @@ void GERenderFuzzTest005(FuzzedDataProvider& fdp)
     visualEffectMagnifier->SetParam("OUTERCONTOURCOLOR1", fdp.ConsumeIntegral<uint32_t>());
     visualEffectMagnifier->SetParam("OUTERCONTOURCOLOR2", fdp.ConsumeIntegral<uint32_t>());
     visualEffectMagnifier->SetParam("ROTATEDEGREE", fdp.ConsumeIntegral<int32_t>());
- 
+
     veContainer->AddToChainedFilter(visualEffectMagnifier);
- 
+
     Drawing::Canvas canvas;
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
     Drawing::SamplingOptions sampling;
- 
+
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
 
@@ -205,13 +205,13 @@ void GERenderFuzzTest006(FuzzedDataProvider& fdp)
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
     auto visualEffectWaterRipple = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_WATER_RIPPLE);
     auto visualEffectMesa = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_MESA_BLUR);
- 
+
     visualEffectWaterRipple->SetParam("PROGRESS", fdp.ConsumeFloatingPoint<float>());
     visualEffectWaterRipple->SetParam("WAVE_NUM", fdp.ConsumeIntegral<int32_t>());
     visualEffectWaterRipple->SetParam("RIPPLE_CENTER_X", fdp.ConsumeFloatingPoint<float>());
     visualEffectWaterRipple->SetParam("RIPPLE_CENTER_Y", fdp.ConsumeFloatingPoint<float>());
     visualEffectWaterRipple->SetParam("RIPPLE_MODE", fdp.ConsumeIntegral<int32_t>());
- 
+
     visualEffectMesa->SetParam("MESA_BLUR_RADIUS", fdp.ConsumeIntegral<int32_t>());
     visualEffectMesa->SetParam("MESA_BLUR_GREY_COEF_1", fdp.ConsumeFloatingPoint<float>());
     visualEffectMesa->SetParam("MESA_BLUR_GREY_COEF_2", fdp.ConsumeFloatingPoint<float>());
@@ -222,16 +222,16 @@ void GERenderFuzzTest006(FuzzedDataProvider& fdp)
     visualEffectMesa->SetParam("TILE_MODE", fdp.ConsumeIntegral<int32_t>());
     visualEffectMesa->SetParam("WIDTH", fdp.ConsumeFloatingPoint<float>());
     visualEffectMesa->SetParam("HEIGHT", fdp.ConsumeFloatingPoint<float>());
- 
+
     veContainer->AddToChainedFilter(visualEffectWaterRipple);
     veContainer->AddToChainedFilter(visualEffectMesa);
- 
+
     Drawing::Canvas canvas;
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
     Drawing::SamplingOptions sampling;
- 
+
     auto resImg = geRender->ApplyImageEffect(canvas, *veContainer, {image, src, dst}, sampling);
 }
 
@@ -240,13 +240,13 @@ void GERenderFuzzTest007(FuzzedDataProvider& fdp)
     auto geRender = std::make_shared<GERender>();
     Drawing::Canvas canvas;
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
- 
+
     auto visualEffectBorderLight = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_SHADER_BORDER_LIGHT);
     visualEffectBorderLight->SetParam("BORDER_LIGHT_WIDTH", fdp.ConsumeFloatingPoint<float>());
     visualEffectBorderLight->SetParam("BORDER_LIGHT_RADIUS", fdp.ConsumeFloatingPoint<float>());
- 
+
     veContainer->AddToChainedFilter(visualEffectBorderLight);
- 
+
     Drawing::Rect bounds = CreateFuzzedRect(fdp);
     geRender->DrawShaderEffect(canvas, *veContainer, bounds);
 }
@@ -257,17 +257,17 @@ void GERenderFuzzTest008(FuzzedDataProvider& fdp)
     Drawing::Canvas canvas;
     Drawing::Brush brush;
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
- 
+
     auto visualEffectKawase = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     int32_t radius = fdp.ConsumeIntegral<int32_t>();
     visualEffectKawase->SetParam("KAWASE_BLUR_RADIUS", radius);
     veContainer->AddToChainedFilter(visualEffectKawase);
- 
+
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     std::shared_ptr<Drawing::Image> outImage = nullptr;
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
- 
+
     GERender::HpsGEImageEffectContext context;
     context.image = image;
     context.src = src;
@@ -275,7 +275,7 @@ void GERenderFuzzTest008(FuzzedDataProvider& fdp)
     context.alpha = fdp.ConsumeFloatingPoint<float>();
     context.saturationForHPS = fdp.ConsumeFloatingPoint<float>();
     context.brightnessForHPS = fdp.ConsumeFloatingPoint<float>();
- 
+
     geRender->ApplyHpsGEImageEffect(canvas, *veContainer, context, outImage, brush);
 }
 
@@ -284,18 +284,18 @@ void GERenderFuzzTest009(FuzzedDataProvider& fdp)
     auto geRender = std::make_shared<GERender>();
     Drawing::Canvas canvas;
     auto veContainer = std::make_shared<Drawing::GEVisualEffectContainer>();
- 
+
     auto visualEffectKawase = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
     int32_t radius = fdp.ConsumeIntegral<int32_t>();
     visualEffectKawase->SetParam("KAWASE_BLUR_RADIUS", radius);
     veContainer->AddToChainedFilter(visualEffectKawase);
- 
+
     std::shared_ptr<Drawing::Image> image = std::make_shared<Drawing::Image>();
     std::shared_ptr<Drawing::Image> outImage = nullptr;
- 
+
     Drawing::Rect src = CreateFuzzedRect(fdp);
     Drawing::Rect dst = CreateFuzzedRect(fdp);
- 
+
     GERender::HpsGEImageEffectContext context;
     context.image = image;
     context.src = src;
@@ -303,7 +303,7 @@ void GERenderFuzzTest009(FuzzedDataProvider& fdp)
     context.alpha = fdp.ConsumeFloatingPoint<float>();
     context.saturationForHPS = fdp.ConsumeFloatingPoint<float>();
     context.brightnessForHPS = fdp.ConsumeFloatingPoint<float>();
- 
+
     geRender->ApplyHpsImageEffect(canvas, *veContainer, context, outImage);
 }
 
