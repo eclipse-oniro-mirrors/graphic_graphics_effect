@@ -18,10 +18,10 @@
 #include "draw/canvas.h"
 #include "draw/color.h"
 #include "ge_double_ripple_shader_mask.h"
+#include "ge_radial_gradient_shader_mask.h"
 #include "image/bitmap.h"
 #include "image/image.h"
 #include "ge_sdf_edge_light.h"
-#include "ge_radial_gradient_shader_mask.h"
 
 using namespace testing;
 using namespace testing::ext;
