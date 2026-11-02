@@ -609,7 +609,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
     EXPECT_EQ(prevShader, nullptr);
 
     // Verify offscreen surface has valid content
-    auto snapshot = shape.offscreenCanvas_->GetImageSnapshot();
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
     EXPECT_NE(snapshot, nullptr);
     EXPECT_GT(snapshot->GetWidth(), 0);
     EXPECT_GT(snapshot->GetHeight(), 0);
@@ -734,7 +734,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
         }
     }
 
-    auto snapshot = shape.offscreenCanvas_->GetImageSnapshot();
+    auto snapshot = shape.offscreenSurface_->GetImageSnapshot();
     EXPECT_NE(snapshot, nullptr);
 }
 
