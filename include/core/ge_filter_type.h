@@ -123,6 +123,7 @@ enum class GEFilterType : int32_t {
     GLASS_EFFECT,
     DISTORT_LIGHT,
     COSMOS_RING_SHADOW,
+    COSMOS_RING,
     MAX,
 };
 
