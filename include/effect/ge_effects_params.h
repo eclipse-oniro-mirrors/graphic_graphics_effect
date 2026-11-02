@@ -120,6 +120,7 @@ namespace Drawing {
 #include "effect/shader/gex_aibar_rect_halo_effect.params.in"
 #include "effect/shader/gex_color_gradient_effect.params.in"
 #include "effect/shader/gex_cosmos_ring_effect.params.in"
+#include "effect/shader/gex_cosmos_ring_particle_effect.params.in"
 #include "effect/shader/gex_cosmos_ring_shadow.params.in"
 #include "effect/shader/gex_distort_chroma_effect.params.in"
 #include "effect/shader/gex_glass_effect.params.in"

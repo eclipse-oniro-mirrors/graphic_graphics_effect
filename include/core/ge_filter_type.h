@@ -124,6 +124,7 @@ enum class GEFilterType : int32_t {
     DISTORT_LIGHT,
     COSMOS_RING_SHADOW,
     COSMOS_RING,
+    COSMOS_RING_PARTICLE,
     MAX,
 };
 

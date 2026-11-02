@@ -1,0 +1,55 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=COSMOS_RING_PARTICLE, name="CosmosRingParticle")]] GEXCosmosRingParticleEffectParams {
+    [[ge::prop(min=0.0)]]
+    float particleCount = 150.0f;
+    [[ge::prop(min=0.0)]]
+    float particleSize = 2.072f;
+    [[ge::prop(min=0.0, max=0.15)]]
+    float dispersionStrength = 0.04f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float scale = 0.925f;
+    [[ge::prop(min=-259.0, max=259.0)]]
+    float yPosition = 0.0f;
+    [[ge::prop(min=0.0)]]
+    float innerRadius = 84.175f;
+    [[ge::prop(min=0.0)]]
+    float outerRadius = 102.305f;
+    [[ge::prop(min=0.0)]]
+    float speed = 31.08f;
+    Vector4f midColor = Vector4f(0.1922f, 0.3255f, 0.5961f, 1.0f);
+    [[ge::prop(min=0.0, max=1.0)]]
+    float tintStrength = 0.6f;
+    [[ge::prop(min=0.0)]]
+    float brightness = 1.0f;
+    [[ge::prop(min=0.0)]]
+    float seed = 3.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float birthPeak = 0.3f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float fadeMin = 0.0f;
+    [[ge::prop(min=0.0)]]
+    float fadePower = 2.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float opacity = 1.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float sizeVariation = 0.5f;
+    bool enableCache = false;
+    [[ge::prop(min=1.0)]]
+    float updateInterval = 1.0f;
+    [[ge::prop(min=0.0)]]
+    float progress = 0.0f;
+};
