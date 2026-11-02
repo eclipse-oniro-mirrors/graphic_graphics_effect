@@ -567,7 +567,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 
 /**
  * @tc.name: ProcessSingleBatch_001
- * @tc.desc: Verify ProcessSingleBatch with valid single grid ande single batch (first batch)
+ * @tc.desc: Verify ProcessSingleBatch with single grid ande single batch (first batch)
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
@@ -580,7 +580,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
     param.path = path;
 
     GESDFPathShaderShape shape(param);
-    Drawing::Rect rect(0.0f, 0.0f, 100.0f, 100.0f);
+    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 300.0f);
     shape.Preprocess(*canvas_, rect, false);
     ASSERT_NE(shape.disResult_, nullptr);
     ASSERT_FALSE(shape.curvesInGrid_.empty());
@@ -601,10 +601,10 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
     size_t end = shape.curvesInGrid_[gridIndex].first.size() / CURVE_FLOAT_COUNT;
     float vStart = 0.0f;
     float vEnd = static_cast<float>(end - start - 1);
-
+ 
     shape.ProcessSingleBatch(*builder, gridIndex, batch, start, end, vStart, vEnd, prevSdf, prevShader);
 
-    // Verify first batch dose not modify previous state
+    // Verify first batch does not modify previous state
     EXPECT_EQ(prevSdf, nullptr);
     EXPECT_EQ(prevShader, nullptr);
 
@@ -678,7 +678,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
 
 /**
  * @tc.name: ProcessSingleBatch_003
- * @tc.desc: Verify ProcessSingleBatch with empty grid curves
+ * @tc.desc: Verify ProcessSingleBatch with multiple grid
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
@@ -710,7 +710,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)
 
     // Process all grids
     constexpr size_t MAX_CURVES_SUBMIT_PER_GRID = 20;
-    for (size_t gridIndex = 0; gridIndex < shape.curvesInGrid_.size(); ++gridIndex) {
+    for (size_t gridIndex = 0; gridIndex < shape.curvesInGrid_.size(); gridIndex++) {
         const size_t totalCurves = shape.curvesInGrid_[gridIndex].first.size() / 6;
         const size_t curvesPerBatch = MAX_CURVES_SUBMIT_PER_GRID;
         const size_t step = curvesPerBatch > 2 ? curvesPerBatch - 2 : 1;
@@ -1335,7 +1335,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ComputeDistanceFieldNullSdfTex, TestSize.Leve
     auto result = shape.ComputeDistanceField(*canvas_, nullptr, 100, 100);
     EXPECT_EQ(result, nullptr);
 }
- 
+
 /**
  * @tc.name: PreprocessOverflowDimensions
  * @tc.desc: Test Preprocess handles extremely large width/height gracefully
