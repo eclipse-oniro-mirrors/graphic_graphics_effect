@@ -26,10 +26,7 @@ namespace Rosen {
 GEDynamicDimShaderFilter::GEDynamicDimShaderFilter(const Drawing::GEDynamicDimShaderFilterParams& params)
     : value_(params.value)
 {
-    if (!InitDynamicDimEffect()) {
-        LOGE("GEDynamicDimShaderFilter failed to construct when initializing DynamicDimEffect.");
-        return;
-    }
+    InitDynamicDimEffect();
 }
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_dynamicDimEffect;

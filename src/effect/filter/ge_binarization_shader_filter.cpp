@@ -26,10 +26,7 @@ namespace Rosen {
 GEBinarizationShaderFilter::GEBinarizationShaderFilter(const Drawing::GEBinarizationShaderFilterParams& params)
     : low_(params.low), high_(params.high), threshold_(params.threshold), thresholdRange_(params.thresholdRange)
 {
-    if (!InitBinarizationEffect()) {
-        LOGE("GEBinarizationShaderFilter failed to construct when initializing BinarizationEffect.");
-        return;
-    }
+    InitBinarizationEffect();
 }
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_binarizationEffect;

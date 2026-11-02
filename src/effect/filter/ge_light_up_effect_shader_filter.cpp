@@ -26,10 +26,7 @@ namespace Rosen {
 GELightUpEffectShaderFilter::GELightUpEffectShaderFilter(const Drawing::GELightUpEffectShaderFilterParams& params)
     : value_(params.value)
 {
-    if (!InitLightUpEffect()) {
-        LOGE("GELightUpEffectFilter failed to construct when initializing LightUpEffect.");
-        return;
-    }
+    InitLightUpEffect();
 }
 
 thread_local static std::shared_ptr<Drawing::RuntimeEffect> g_lightUpEffect;
