@@ -18,15 +18,15 @@
 struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingEffectParams {
     [[ge::prop(min=0.0, max=1.0)]]
     float progress = 0.0f;
-    [[ge::prop(min=0.0, max=4096.0)]]
+    [[ge::prop(min=1.0, max=4096.0)]]
     float radius = 150.0f;
-    [[ge::prop(min=0.0, max=1024.0)]]
+    [[ge::prop(min=1.0, max=1024.0)]]
     float width = 40.0f;
     [[ge::prop(min=0.0, max=256.0)]]
     float feather = 5.0f;
-    [[ge::prop(min=0.0, max=200.0)]]
+    [[ge::prop(min=1.0, max=200.0)]]
     float noiseDensity = 50.0f;
-    [[ge::prop(min=1, max=16)]]
+    [[ge::prop(min=1, max=64)]]
     int32_t noisePeriod = 16;
     [[ge::prop(min=0.0, max=1.0)]]
     float noiseContrast = 1.0f;
