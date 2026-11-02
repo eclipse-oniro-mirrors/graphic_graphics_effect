@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-// WARNING: This struct is mirrored from the external GEX implementation.
-// Keep field order/types in sync with GEXCosmosRingEffectParams in the external library.
 struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingEffectParams {
     [[ge::prop(min=0.0, max=1.0)]]
     float progress = 0.0f;
