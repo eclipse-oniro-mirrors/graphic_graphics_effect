@@ -47,9 +47,9 @@ GEExternalDynamicLoader::GEExternalDynamicLoader()
 
     createObjectFunc_ = (CreateGEXObjectByTypeFunc)dlsym(libHandle_, GRAPHICS_EFFECT_EXT_INREFACE.c_str());
     if (!createObjectFunc_) {
-        LOGE("GEExternalDynamicLoader CreateObjectFunc is null");
         dlclose(libHandle_);
         libHandle_ = nullptr;
+        LOGE("GEExternalDynamicLoader CreateObjectFunc is null");
         return;
     }
 
@@ -108,6 +108,7 @@ bool GEExternalDynamicLoader::DestroyGEXObject(void* ptr)
         LOGD("GEExternalDynamicLoader::DestroyGEXObject interface is null");
         return false;
     }
+
     if (ptr == nullptr) {
         return true;
     }

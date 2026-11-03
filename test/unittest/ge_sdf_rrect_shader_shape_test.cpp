@@ -467,7 +467,7 @@ HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiNegativeRadius, TestSize.L
 
 /**
  * @tc.name: ResolveCornerRadiiSingleComponentOverflow
- * @tc.desc: Verify overflowing x radius is clamped to masRadius, y is forced to match x (circular)
+ * @tc.desc: Verify overflowing x radius is clamped to maxRadius, y is forced to match x (circular)
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFRRectShaderShapeTest, ResolveCornerRadiiSingleComponentOverflow, TestSize.Level1)

@@ -1423,8 +1423,8 @@ HWTEST_F(GESDFTransformShaderShapeTest, TryGetCenterAndHalfSize_008, TestSize.Le
     EXPECT_TRUE(result);
      // Center (50, 50) scaled by (0.0, 0.0) with pivot (1.0, 1.0)
     // Formula: (center - pivot) * scale + pivot
-    // X: (50 - 1.0) * 0.0 + 1 = 1.0
-    // Y: (50 - 1.0) * 0.0 + 1 = 1.0
+    // X: (50 - 1.0) * 0.0 + 1.0 = 1.0
+    // Y: (50 - 1.0) * 0.0 + 1.0 = 1.0
     EXPECT_NEAR(outX, 1.0f, 0.1f);
     EXPECT_NEAR(outY, 1.0f, 0.1f);
     EXPECT_FLOAT_EQ(shapeHalfSize[0], 50.0f);

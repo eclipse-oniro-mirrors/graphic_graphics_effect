@@ -40,14 +40,9 @@ void GEXmlParserBase::Clear()
 
 int32_t GEXmlParserBase::LoadGraphicConfiguration(const std::string& fileDir)
 {
-    GE_LOGI("GEXmlParserBase opening xml file");
-    // System base config file read
-    if (LoadSysConfiguration(fileDir) != GE_PARSE_EXEC_SUCCESS) {
-        return GE_PARSE_SYS_FILE_LOAD_FAIL;
-    }
-    // For different feature settings in variant products
+    int32_t ret = LoadSysConfiguration(fileDir);
     LoadProdConfiguration(fileDir);
-    return GE_PARSE_EXEC_SUCCESS;
+    return ret;
 }
 
 int32_t GEXmlParserBase::LoadSysConfiguration(const std::string& fileDir)

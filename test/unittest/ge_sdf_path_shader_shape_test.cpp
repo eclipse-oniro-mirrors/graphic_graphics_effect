@@ -567,7 +567,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ParseNumbers_002, TestSize.Level1)
 
 /**
  * @tc.name: ProcessSingleBatch_001
- * @tc.desc: Verify ProcessSingleBatch with single grid ande single batch (first batch)
+ * @tc.desc: Verify ProcessSingleBatch with single grid and single batch (first batch)
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
@@ -580,7 +580,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_001, TestSize.Level1)
     param.path = path;
 
     GESDFPathShaderShape shape(param);
-    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 300.0f);
+    Drawing::Rect rect(0.0f, 0.0f, 250.0f, 350.0f);
     shape.Preprocess(*canvas_, rect, false);
     ASSERT_NE(shape.disResult_, nullptr);
     ASSERT_FALSE(shape.curvesInGrid_.empty());
@@ -678,7 +678,7 @@ HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_002, TestSize.Level1)
 
 /**
  * @tc.name: ProcessSingleBatch_003
- * @tc.desc: Verify ProcessSingleBatch with multiple grid
+ * @tc.desc: Verify ProcessSingleBatch with multiple grids
  * @tc.type: FUNC
  */
 HWTEST_F(GESDFPathShaderShapeTest, ProcessSingleBatch_003, TestSize.Level1)

@@ -42,15 +42,17 @@ bool GEFrostedGlassEffectCfg::FeatureParamParseEntry()
         GE_LOGE("GEFrostedGlassEffectCfg failed to load xml configuration file");
         return false;
     }
-    return ParseSysDoc() == GE_PARSE_EXEC_SUCCESS && ParseProdDoc() == GE_PARSE_EXEC_SUCCESS;
+    ParseSysDoc();
+    ParseProdDoc();
+    return true;
 }
 
 int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featureMap, xmlNode &node)
 {
-    GE_LOGI("GEFrostedGlassEffectCfg start");
+    GE_LOGI("GEFrostedGlassEffectCfg ParseFeatureParam start");
     xmlNode *currNode = &node;
     for (; currNode; currNode = currNode->next) {
-        if (ExtractPropertyValue("name", *currNode) != "FrostedGlassEffectCfg") {
+        if (ExtractPropertyValue("name", *currNode) == "FrostedGlassEffectCfg") {
             break;
         }
     }
@@ -58,7 +60,6 @@ int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featur
         GE_LOGD("GEFrostedGlassEffectCfg stop parsing, no children nodes");
         return GE_PARSE_GET_CHILD_FAIL;
     }
-
     currNode = currNode->xmlChildrenNode;
     for (; currNode; currNode = currNode->next) {
         if (currNode->type != XML_ELEMENT_NODE) {
@@ -76,15 +77,16 @@ int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featur
 
 int32_t GEFrostedGlassEffectCfg::ParseFrostedGlassInternal(xmlNode &node)
 {
+    GE_LOGD("GEFrostedGlassEffectCfg ParseFrostedGlassInternal start");
     xmlNode *currNode = &node;
     int xmlParamType = GetXmlNodeAsInt(*currNode);
     auto name = ExtractPropertyValue("name", *currNode);
     auto val = ExtractPropertyValue("value", *currNode);
 
     if (xmlParamType == GE_PARSE_XML_FEATURE_SWITCH) {
-        bool isEnabled = ParseFeatureSwitch(val);
+        bool isDisabled = ParseFeatureSwitch(val);
         if (name == "DisableAntiAliasCode") {
-            SetDisableAntiAliasCode(isEnabled);
+            SetDisableAntiAliasCode(isDisabled);
             GE_LOGI("GEFrostedGlassEffectCfg parse FrostedGlassEnabled %{public}d",
                 GetIsDisableAntiAliasCode());
         }
