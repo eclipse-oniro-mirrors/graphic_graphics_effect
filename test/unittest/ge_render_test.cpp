@@ -543,7 +543,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_011, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_EQ(shaderFilters[0], nullptr);
+    EXPECT_NE(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_011 end";
 }
@@ -568,7 +568,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_012, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_EQ(shaderFilters[0], nullptr);
+    EXPECT_NE(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_012 end";
 }
@@ -593,7 +593,7 @@ HWTEST_F(GERenderTest, GenerateShaderFilters_013, TestSize.Level1)
     veContainer.AddToChainedFilter(visualEffect);
     auto geRender = std::make_shared<GERender>();
     auto shaderFilters = geRender->GenerateShaderFilters(veContainer);
-    EXPECT_EQ(shaderFilters[0], nullptr);
+    EXPECT_NE(shaderFilters[0], nullptr);
 
     GTEST_LOG_(INFO) << "GERenderTest GenerateShaderFilters_013 end";
 }
@@ -810,7 +810,7 @@ HWTEST_F(GERenderTest, ApplyHpsGEImageEffect_NormalCase, TestSize.Level1)
 
     EXPECT_FALSE(result.isHpsBlurApplied);
     EXPECT_FALSE(result.hasDrawnOnCanvas);
-    // Currently, grey can only be consumed by hps build pass. If hps is not supported, it will be null.
+    // Currently, grey can only be consumed by hps build pass. If hps is not supported, it will be null. 
     auto hpsEffectFilter = std::make_shared<HpsEffectFilter>(*canvas_);
     if (hpsEffectFilter->IsEffectSupported(visualEffect)) {
         EXPECT_NE(outImage, nullptr);

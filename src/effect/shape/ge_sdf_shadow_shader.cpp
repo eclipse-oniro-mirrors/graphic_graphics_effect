@@ -84,7 +84,7 @@ void GESDFShadowShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Rec
     if (!IsElevationMode() && params_.shadow.radius < 0.0f) {
         return;
     }
-
+    
     Drawing::Rect newRect = rect;
     if (IsElevationMode()) {
         UpdateRectForElevationShadow(newRect);

@@ -254,6 +254,7 @@ HWTEST_F(GESDFDistortOpShaderShapeTest, CopyState_001, TestSize.Level1)
 
     shape1.CopyState(shape2);
     EXPECT_EQ(shape1.GetSDFShape(), nullptr);
+    EXPECT_EQ(shape1.param_.LUCorner, shape2.param_.LUCorner);
     GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest CopyState_001 end";
 }
 

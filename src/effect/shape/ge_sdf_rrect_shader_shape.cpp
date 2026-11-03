@@ -449,7 +449,7 @@ bool GESDFRRectShaderShape::GetInscribedRect(Rect& rect)
     float halfWidth = rrect.width_ * HALF + EXTEND;
     float halfHeight = rrect.height_ * HALF + EXTEND;
 
-    // Calculate maxz radius for all 4 corners
+    // Calculate max radius for all 4 corners
     CornerRadii radii {};
     if (UseUniformRadiusFastPath()) {
         float radius = ResolveUniformRadius(halfWidth, halfHeight);
