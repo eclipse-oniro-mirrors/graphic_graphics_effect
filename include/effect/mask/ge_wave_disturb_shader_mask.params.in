@@ -20,4 +20,6 @@ struct [[ge::params(type=WAVE_DISTURBANCE_MASK, name="WaveDisturbanceMask")]] GE
     [[ge::prop(cast_from="std::pair<float, float>", custom="PairToVector2fTransformer")]]
     Vector2f waveRD = Vector2f(2.5f, 0.7f);
     Vector3f waveLWH = Vector3f(150.f, 0.f, 20.f);
+    float waveUp = 0.2f;
+    float heightRate = 1.0f;
 };

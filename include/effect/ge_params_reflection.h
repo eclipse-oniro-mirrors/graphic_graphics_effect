@@ -656,6 +656,8 @@ enum class GEParamsMemberTag : uint32_t {
     WAVE_DISTURBANCE_MASK_PROGRESS,
     WAVE_DISTURBANCE_MASK_WAVE_R_D,
     WAVE_DISTURBANCE_MASK_WAVE_L_W_H,
+    WAVE_DISTURBANCE_MASK_WAVE_UP,
+    WAVE_DISTURBANCE_MASK_HEIGHT_RATE,
     WAVE_GRADIENT_MASK_CENTER,
     WAVE_GRADIENT_MASK_WIDTH,
     WAVE_GRADIENT_MASK_PROPAGATION_RADIUS,
@@ -2811,6 +2813,10 @@ GE_PARAMS_FIELD_ACCESSOR(
     GEWaveDisturbanceShaderMaskParams, waveRD, WAVE_DISTURBANCE_MASK_WAVE_R_D, WaveDisturbanceMask_WaveRD);
 GE_PARAMS_FIELD_ACCESSOR(
     GEWaveDisturbanceShaderMaskParams, waveLWH, WAVE_DISTURBANCE_MASK_WAVE_L_W_H, WaveDisturbanceMask_WaveLWH);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEWaveDisturbanceShaderMaskParams, waveUp, WAVE_DISTURBANCE_MASK_WAVE_UP, WaveDisturbanceMask_WaveUp);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEWaveDisturbanceShaderMaskParams, heightRate, WAVE_DISTURBANCE_MASK_HEIGHT_RATE, WaveDisturbanceMask_HeightRate);
 GE_PARAMS_FIELD_ACCESSOR(
     GEWaveGradientShaderMaskParams, center_, WAVE_GRADIENT_MASK_CENTER, WaveGradientMask_WaveCenter);
 GE_PARAMS_FIELD_ACCESSOR(GEWaveGradientShaderMaskParams, width_, WAVE_GRADIENT_MASK_WIDTH, WaveGradientMask_WaveWidth);

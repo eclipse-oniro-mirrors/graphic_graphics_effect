@@ -261,6 +261,8 @@ constexpr char GE_MASK_DISTURBANCE_CLICKPOS[] = "WaveDisturbanceMask_ClickPos";
 constexpr char GE_MASK_DISTURBANCE_PROGRESS[] = "WaveDisturbanceMask_Progress";
 constexpr char GE_MASK_DISTURBANCE_WAVERD[] = "WaveDisturbanceMask_WaveRD";
 constexpr char GE_MASK_DISTURBANCE_WAVELWH[] = "WaveDisturbanceMask_WaveLWH";
+constexpr char GE_MASK_DISTURBANCE_WAVEUP[] = "WaveDisturbanceMask_WaveUp";
+constexpr char GE_MASK_DISTURBANCE_HIGHTRATE[] = "WaveDisturbanceMask_HightRate";
 constexpr char GE_FILTER_CONTENT_LIGHT[] = "ContentLight";
 constexpr char GE_FILTER_CONTENT_LIGHT_POSITION[] = "ContentLight_Position";
 constexpr char GE_FILTER_CONTENT_LIGHT_COLOR[] = "ContentLight_Color";
@@ -706,6 +708,14 @@ constexpr char GE_FILTER_DEPTH_OCCLUSION_WEIGHT[] = "DepthOcclusion_OcclusionWei
 constexpr char GE_FILTER_DEPTH_OCCLUSION_NEAR[] = "DepthOcclusion_OcclusionNear";
 constexpr char GE_FILTER_DEPTH_OCCLUSION_FAR[] = "DepthOcclusion_OcclusionFar";
 constexpr char GE_FILTER_DEPTH_OCCLUSION_IS_REVERSE[] = "DepthOcclusion_IsReverse";
+constexpr char GE_SHADER_BORDER_SDF_SHADER[] = "BorderSDFShader";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_COLOR[] = "BorderSDFShader_Color";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_WIDTH[] = "BorderSDFShader_Width";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_IS_OUTLINE[] = "BorderSDFShader_IsOutline";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_STYLE[] = "BorderSDFShader_Style";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_DASH_WIDTH[] = "BorderSDFShader_DashWidth";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_DASH_GAP[] = "BorderSDFShader_DashGap";
+constexpr char GE_SHADER_BORDER_SDF_SHADER_SHAPE[] = "BorderSDFShader_Shape";
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS
