@@ -22,7 +22,8 @@ struct [[ge::params(type = COSMOS_RING_SHADOW, name = "CosmosRingShadow")]] GEXC
         0.0f;
     [[ge::prop(name = "CosmosRingShadow_Softness", min = 0.0f, max = 1.0f)]] float softness = 0.5f;
     [[ge::prop(name = "CosmosRingShadow_ShadowOffset", min = { -4096.0f, -4096.0f },
-        max = { 4096.0f, 4096.0f })]] Vector2f shadowOffset = Vector2f(0.0f, 0.0f);
+        max = { 4096.0f, 4096.0f }, cast_from = "std::pair<float, float>",
+        custom = "PairToVector2fTransformer")]] Vector2f shadowOffset = Vector2f(0.0f, 0.0f);
     [[ge::prop(name = "CosmosRingShadow_ShadowColor", min = { 0.0f, 0.0f, 0.0f, 0.0f },
         max = { 1.0f, 1.0f, 1.0f, 1.0f })]] Vector4f shadowColor = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
 };
