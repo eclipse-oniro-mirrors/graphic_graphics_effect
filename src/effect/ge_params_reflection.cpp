@@ -117,8 +117,8 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
         GE_BUILD_PARAMS_CASE(AIBAR_RECT_HALO, GEXAIBarRectHaloEffectParams)
         GE_BUILD_PARAMS_CASE(ATLAS_FRAME_MASK, GEXAtlasFrameMaskParams)
         GE_BUILD_PARAMS_CASE(COLOR_GRADIENT_EFFECT, GEXColorGradientEffectParams)
-        GE_BUILD_PARAMS_CASE(COSMOS_RING, GEXCosmosRingEffectParams)
-        GE_BUILD_PARAMS_CASE(COSMOS_RING_PARTICLE, GEXCosmosRingParticleEffectParams)
+        GE_BUILD_PARAMS_CASE(COSMOS_RING, GEXCosmosRingParams)
+        GE_BUILD_PARAMS_CASE(COSMOS_RING_PARTICLE, GEXCosmosRingParticleParams)
         GE_BUILD_PARAMS_CASE(COSMOS_RING_SHADOW, GEXCosmosRingShadowParams)
         GE_BUILD_PARAMS_CASE(DISTORT_CHROMA, GEXDistortChromaEffectParams)
         GE_BUILD_PARAMS_CASE(DUPOLI_NOISE_MASK, GEXDupoliNoiseMaskParams)
@@ -229,8 +229,8 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXAIBarRectHaloEffectParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXAtlasFrameMaskParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXColorGradientEffectParams),
-        GE_FILTER_NAME_TO_TYPE_ENTRY(GEXCosmosRingEffectParams),
-        GE_FILTER_NAME_TO_TYPE_ENTRY(GEXCosmosRingParticleEffectParams),
+        GE_FILTER_NAME_TO_TYPE_ENTRY(GEXCosmosRingParams),
+        GE_FILTER_NAME_TO_TYPE_ENTRY(GEXCosmosRingParticleParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXCosmosRingShadowParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXDistortChromaEffectParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEXDupoliNoiseMaskParams),

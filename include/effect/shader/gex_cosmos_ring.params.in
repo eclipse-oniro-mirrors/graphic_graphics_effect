@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingEffectParams {
+struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     [[ge::prop(min=0.0, max=1.0)]]
     float progress = 0.0f;
     [[ge::prop(min=1.0, max=4096.0)]]

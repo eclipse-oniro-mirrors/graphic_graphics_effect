@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=COSMOS_RING_PARTICLE, name="CosmosRingParticle")]] GEXCosmosRingParticleEffectParams {
+struct [[ge::params(type=COSMOS_RING_PARTICLE, name="CosmosRingParticle")]] GEXCosmosRingParticleParams {
     [[ge::prop(min=0.0)]]
     float particleCount = 150.0f;
     [[ge::prop(min=0.0)]]

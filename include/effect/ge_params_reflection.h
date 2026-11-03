@@ -2017,8 +2017,8 @@ GE_PARAMS_TYPE_INFO(GEXAIBarGlowEffectParams, AIBAR_GLOW, AIBarGlow);
 GE_PARAMS_TYPE_INFO(GEXAIBarRectHaloEffectParams, AIBAR_RECT_HALO, AIBarRectHalo);
 GE_PARAMS_TYPE_INFO(GEXAtlasFrameMaskParams, ATLAS_FRAME_MASK, AtlasFrameMask);
 GE_PARAMS_TYPE_INFO(GEXColorGradientEffectParams, COLOR_GRADIENT_EFFECT, ColorGradientEffect);
-GE_PARAMS_TYPE_INFO(GEXCosmosRingEffectParams, COSMOS_RING, CosmosRing);
-GE_PARAMS_TYPE_INFO(GEXCosmosRingParticleEffectParams, COSMOS_RING_PARTICLE, CosmosRingParticle);
+GE_PARAMS_TYPE_INFO(GEXCosmosRingParams, COSMOS_RING, CosmosRing);
+GE_PARAMS_TYPE_INFO(GEXCosmosRingParticleParams, COSMOS_RING_PARTICLE, CosmosRingParticle);
 GE_PARAMS_TYPE_INFO(GEXCosmosRingShadowParams, COSMOS_RING_SHADOW, CosmosRingShadow);
 GE_PARAMS_TYPE_INFO(GEXDistortChromaEffectParams, DISTORT_CHROMA, DistortChroma);
 GE_PARAMS_TYPE_INFO(GEXDupoliNoiseMaskParams, DUPOLI_NOISE_MASK, DupoliNoiseMask);
@@ -3149,136 +3149,121 @@ GE_PARAMS_FIELD_ACCESSOR(
 GE_PARAMS_FIELD_ACCESSOR(GEXColorGradientEffectParams, mask_, COLOR_GRADIENT_EFFECT_MASK, ColorGradientEffect_Mask);
 GE_PARAMS_FIELD_ACCESSOR(
     GEXColorGradientEffectParams, brightness_, COLOR_GRADIENT_EFFECT_BRIGHTNESS, ColorGradientEffect_Brightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, progress, COSMOS_RING_PROGRESS, CosmosRing_Progress);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, radius, COSMOS_RING_RADIUS, CosmosRing_Radius);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, width, COSMOS_RING_WIDTH, CosmosRing_Width);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, feather, COSMOS_RING_FEATHER, CosmosRing_Feather);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, noiseDensity, COSMOS_RING_NOISE_DENSITY, CosmosRing_NoiseDensity);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, noisePeriod, COSMOS_RING_NOISE_PERIOD, CosmosRing_NoisePeriod);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, progress, COSMOS_RING_PROGRESS, CosmosRing_Progress);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, radius, COSMOS_RING_RADIUS, CosmosRing_Radius);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, width, COSMOS_RING_WIDTH, CosmosRing_Width);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, feather, COSMOS_RING_FEATHER, CosmosRing_Feather);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noiseDensity, COSMOS_RING_NOISE_DENSITY, CosmosRing_NoiseDensity);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noisePeriod, COSMOS_RING_NOISE_PERIOD, CosmosRing_NoisePeriod);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noiseContrast, COSMOS_RING_NOISE_CONTRAST, CosmosRing_NoiseContrast);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noise2Density, COSMOS_RING_NOISE2_DENSITY, CosmosRing_Noise2Density);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noise2Period, COSMOS_RING_NOISE2_PERIOD, CosmosRing_Noise2Period);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noise2Contrast, COSMOS_RING_NOISE2_CONTRAST, CosmosRing_Noise2Contrast);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, noiseSeed, COSMOS_RING_NOISE_SEED, CosmosRing_NoiseSeed);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, chromaStrength, COSMOS_RING_CHROMA_STRENGTH, CosmosRing_ChromaStrength);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, darkColor, COSMOS_RING_DARK_COLOR, CosmosRing_DarkColor);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, midColor, COSMOS_RING_MID_COLOR, CosmosRing_MidColor);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, brightColor, COSMOS_RING_BRIGHT_COLOR, CosmosRing_BrightColor);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, darkPosition, COSMOS_RING_DARK_POSITION, CosmosRing_DarkPosition);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, midPosition, COSMOS_RING_MID_POSITION, CosmosRing_MidPosition);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, brightPosition, COSMOS_RING_BRIGHT_POSITION, CosmosRing_BrightPosition);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, chromaRotation, COSMOS_RING_CHROMA_ROTATION, CosmosRing_ChromaRotation);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, noiseContrast, COSMOS_RING_NOISE_CONTRAST, CosmosRing_NoiseContrast);
+    GEXCosmosRingParams, chromaBrightnessStart, COSMOS_RING_CHROMA_BRIGHTNESS_START, CosmosRing_ChromaBrightnessStart);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlEnable, COSMOS_RING_HL_ENABLE, CosmosRing_HlEnable);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlOuterRadius, COSMOS_RING_HL_OUTER_RADIUS, CosmosRing_HlOuterRadius);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlInnerRadius, COSMOS_RING_HL_INNER_RADIUS, CosmosRing_HlInnerRadius);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlOuterWidth, COSMOS_RING_HL_OUTER_WIDTH, CosmosRing_HlOuterWidth);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlInnerWidth, COSMOS_RING_HL_INNER_WIDTH, CosmosRing_HlInnerWidth);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, noise2Density, COSMOS_RING_NOISE2_DENSITY, CosmosRing_Noise2Density);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, noise2Period, COSMOS_RING_NOISE2_PERIOD, CosmosRing_Noise2Period);
+    GEXCosmosRingParams, hlDispersionStrength, COSMOS_RING_HL_DISPERSION_STRENGTH, CosmosRing_HlDispersionStrength);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, noise2Contrast, COSMOS_RING_NOISE2_CONTRAST, CosmosRing_Noise2Contrast);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, noiseSeed, COSMOS_RING_NOISE_SEED, CosmosRing_NoiseSeed);
+    GEXCosmosRingParams, hlP1OuterCenterAngle, COSMOS_RING_HL_P1_OUTER_CENTER_ANGLE, CosmosRing_HlP1OuterCenterAngle);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, chromaStrength, COSMOS_RING_CHROMA_STRENGTH, CosmosRing_ChromaStrength);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, darkColor, COSMOS_RING_DARK_COLOR, CosmosRing_DarkColor);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, midColor, COSMOS_RING_MID_COLOR, CosmosRing_MidColor);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, brightColor, COSMOS_RING_BRIGHT_COLOR, CosmosRing_BrightColor);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, darkPosition, COSMOS_RING_DARK_POSITION, CosmosRing_DarkPosition);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, midPosition, COSMOS_RING_MID_POSITION, CosmosRing_MidPosition);
+    GEXCosmosRingParams, hlP1OuterArcSpan, COSMOS_RING_HL_P1_OUTER_ARC_SPAN, CosmosRing_HlP1OuterArcSpan);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, brightPosition, COSMOS_RING_BRIGHT_POSITION, CosmosRing_BrightPosition);
+    GEXCosmosRingParams, hlP1OuterBrightness, COSMOS_RING_HL_P1_OUTER_BRIGHTNESS, CosmosRing_HlP1OuterBrightness);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, chromaRotation, COSMOS_RING_CHROMA_ROTATION, CosmosRing_ChromaRotation);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, chromaBrightnessStart, COSMOS_RING_CHROMA_BRIGHTNESS_START,
-    CosmosRing_ChromaBrightnessStart);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlEnable, COSMOS_RING_HL_ENABLE, CosmosRing_HlEnable);
+    GEXCosmosRingParams, hlP1OuterDispScales, COSMOS_RING_HL_P1_OUTER_DISP_SCALES, CosmosRing_HlP1OuterDispScales);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlOuterRadius, COSMOS_RING_HL_OUTER_RADIUS, CosmosRing_HlOuterRadius);
+    GEXCosmosRingParams, hlP1InnerCenterAngle, COSMOS_RING_HL_P1_INNER_CENTER_ANGLE, CosmosRing_HlP1InnerCenterAngle);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlInnerRadius, COSMOS_RING_HL_INNER_RADIUS, CosmosRing_HlInnerRadius);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlOuterWidth, COSMOS_RING_HL_OUTER_WIDTH, CosmosRing_HlOuterWidth);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlInnerWidth, COSMOS_RING_HL_INNER_WIDTH, CosmosRing_HlInnerWidth);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlDispersionStrength, COSMOS_RING_HL_DISPERSION_STRENGTH,
-    CosmosRing_HlDispersionStrength);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP1OuterCenterAngle, COSMOS_RING_HL_P1_OUTER_CENTER_ANGLE,
-    CosmosRing_HlP1OuterCenterAngle);
+    GEXCosmosRingParams, hlP1InnerArcSpan, COSMOS_RING_HL_P1_INNER_ARC_SPAN, CosmosRing_HlP1InnerArcSpan);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP1OuterArcSpan, COSMOS_RING_HL_P1_OUTER_ARC_SPAN, CosmosRing_HlP1OuterArcSpan);
+    GEXCosmosRingParams, hlP1InnerBrightness, COSMOS_RING_HL_P1_INNER_BRIGHTNESS, CosmosRing_HlP1InnerBrightness);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP1OuterBrightness, COSMOS_RING_HL_P1_OUTER_BRIGHTNESS, CosmosRing_HlP1OuterBrightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP1OuterDispScales, COSMOS_RING_HL_P1_OUTER_DISP_SCALES,
-    CosmosRing_HlP1OuterDispScales);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP1InnerCenterAngle, COSMOS_RING_HL_P1_INNER_CENTER_ANGLE,
-    CosmosRing_HlP1InnerCenterAngle);
+    GEXCosmosRingParams, hlP1InnerDispScales, COSMOS_RING_HL_P1_INNER_DISP_SCALES, CosmosRing_HlP1InnerDispScales);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP1InnerArcSpan, COSMOS_RING_HL_P1_INNER_ARC_SPAN, CosmosRing_HlP1InnerArcSpan);
+    GEXCosmosRingParams, hlP2OuterCenterAngle, COSMOS_RING_HL_P2_OUTER_CENTER_ANGLE, CosmosRing_HlP2OuterCenterAngle);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP1InnerBrightness, COSMOS_RING_HL_P1_INNER_BRIGHTNESS, CosmosRing_HlP1InnerBrightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP1InnerDispScales, COSMOS_RING_HL_P1_INNER_DISP_SCALES,
-    CosmosRing_HlP1InnerDispScales);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP2OuterCenterAngle, COSMOS_RING_HL_P2_OUTER_CENTER_ANGLE,
-    CosmosRing_HlP2OuterCenterAngle);
+    GEXCosmosRingParams, hlP2OuterArcSpan, COSMOS_RING_HL_P2_OUTER_ARC_SPAN, CosmosRing_HlP2OuterArcSpan);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP2OuterArcSpan, COSMOS_RING_HL_P2_OUTER_ARC_SPAN, CosmosRing_HlP2OuterArcSpan);
+    GEXCosmosRingParams, hlP2OuterBrightness, COSMOS_RING_HL_P2_OUTER_BRIGHTNESS, CosmosRing_HlP2OuterBrightness);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP2OuterBrightness, COSMOS_RING_HL_P2_OUTER_BRIGHTNESS, CosmosRing_HlP2OuterBrightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP2OuterDispScales, COSMOS_RING_HL_P2_OUTER_DISP_SCALES,
-    CosmosRing_HlP2OuterDispScales);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP2InnerCenterAngle, COSMOS_RING_HL_P2_INNER_CENTER_ANGLE,
-    CosmosRing_HlP2InnerCenterAngle);
+    GEXCosmosRingParams, hlP2OuterDispScales, COSMOS_RING_HL_P2_OUTER_DISP_SCALES, CosmosRing_HlP2OuterDispScales);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP2InnerArcSpan, COSMOS_RING_HL_P2_INNER_ARC_SPAN, CosmosRing_HlP2InnerArcSpan);
+    GEXCosmosRingParams, hlP2InnerCenterAngle, COSMOS_RING_HL_P2_INNER_CENTER_ANGLE, CosmosRing_HlP2InnerCenterAngle);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlP2InnerBrightness, COSMOS_RING_HL_P2_INNER_BRIGHTNESS, CosmosRing_HlP2InnerBrightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, hlP2InnerDispScales, COSMOS_RING_HL_P2_INNER_DISP_SCALES,
-    CosmosRing_HlP2InnerDispScales);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, glowStrength, COSMOS_RING_GLOW_STRENGTH, CosmosRing_GlowStrength);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, glowRadius, COSMOS_RING_GLOW_RADIUS, CosmosRing_GlowRadius);
+    GEXCosmosRingParams, hlP2InnerArcSpan, COSMOS_RING_HL_P2_INNER_ARC_SPAN, CosmosRing_HlP2InnerArcSpan);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, glowThreshold, COSMOS_RING_GLOW_THRESHOLD, CosmosRing_GlowThreshold);
+    GEXCosmosRingParams, hlP2InnerBrightness, COSMOS_RING_HL_P2_INNER_BRIGHTNESS, CosmosRing_HlP2InnerBrightness);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, glowIntensity, COSMOS_RING_GLOW_INTENSITY, CosmosRing_GlowIntensity);
+    GEXCosmosRingParams, hlP2InnerDispScales, COSMOS_RING_HL_P2_INNER_DISP_SCALES, CosmosRing_HlP2InnerDispScales);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowStrength, COSMOS_RING_GLOW_STRENGTH, CosmosRing_GlowStrength);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowRadius, COSMOS_RING_GLOW_RADIUS, CosmosRing_GlowRadius);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowThreshold, COSMOS_RING_GLOW_THRESHOLD, CosmosRing_GlowThreshold);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowIntensity, COSMOS_RING_GLOW_INTENSITY, CosmosRing_GlowIntensity);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowSaturation, COSMOS_RING_GLOW_SATURATION, CosmosRing_GlowSaturation);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, glowExposure, COSMOS_RING_GLOW_EXPOSURE, CosmosRing_GlowExposure);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, glowSaturation, COSMOS_RING_GLOW_SATURATION, CosmosRing_GlowSaturation);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingEffectParams, glowExposure, COSMOS_RING_GLOW_EXPOSURE, CosmosRing_GlowExposure);
+    GEXCosmosRingParams, hlRadialFeatherPx, COSMOS_RING_HL_RADIAL_FEATHER_PX, CosmosRing_HlRadialFeatherPx);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlRadialFeatherPx, COSMOS_RING_HL_RADIAL_FEATHER_PX, CosmosRing_HlRadialFeatherPx);
+    GEXCosmosRingParams, hlTangentFeatherDeg, COSMOS_RING_HL_TANGENT_FEATHER_DEG, CosmosRing_HlTangentFeatherDeg);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlTangentFeatherDeg, COSMOS_RING_HL_TANGENT_FEATHER_DEG, CosmosRing_HlTangentFeatherDeg);
+    GEXCosmosRingParams, hlSpindleStrength, COSMOS_RING_HL_SPINDLE_STRENGTH, CosmosRing_HlSpindleStrength);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlSpindlePower, COSMOS_RING_HL_SPINDLE_POWER, CosmosRing_HlSpindlePower);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParams, hlAngularFade, COSMOS_RING_HL_ANGULAR_FADE, CosmosRing_HlAngularFade);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlSpindleStrength, COSMOS_RING_HL_SPINDLE_STRENGTH, CosmosRing_HlSpindleStrength);
+    GEXCosmosRingParams, hlWholeBrightness, COSMOS_RING_HL_WHOLE_BRIGHTNESS, CosmosRing_HlWholeBrightness);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlSpindlePower, COSMOS_RING_HL_SPINDLE_POWER, CosmosRing_HlSpindlePower);
+    GEXCosmosRingParams, hlRotationSpeed, COSMOS_RING_HL_ROTATION_SPEED, CosmosRing_HlRotationSpeed);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlAngularFade, COSMOS_RING_HL_ANGULAR_FADE, CosmosRing_HlAngularFade);
+    GEXCosmosRingParticleParams, particleCount, COSMOS_RING_PARTICLE_PARTICLE_COUNT, CosmosRingParticle_ParticleCount);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlWholeBrightness, COSMOS_RING_HL_WHOLE_BRIGHTNESS, CosmosRing_HlWholeBrightness);
+    GEXCosmosRingParticleParams, particleSize, COSMOS_RING_PARTICLE_PARTICLE_SIZE, CosmosRingParticle_ParticleSize);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleParams, dispersionStrength, COSMOS_RING_PARTICLE_DISPERSION_STRENGTH,
+    CosmosRingParticle_DispersionStrength);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleParams, scale, COSMOS_RING_PARTICLE_SCALE, CosmosRingParticle_Scale);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingEffectParams, hlRotationSpeed, COSMOS_RING_HL_ROTATION_SPEED, CosmosRing_HlRotationSpeed);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, particleCount, COSMOS_RING_PARTICLE_PARTICLE_COUNT,
-    CosmosRingParticle_ParticleCount);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, particleSize, COSMOS_RING_PARTICLE_PARTICLE_SIZE,
-    CosmosRingParticle_ParticleSize);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, dispersionStrength,
-    COSMOS_RING_PARTICLE_DISPERSION_STRENGTH, CosmosRingParticle_DispersionStrength);
+    GEXCosmosRingParticleParams, yPosition, COSMOS_RING_PARTICLE_Y_POSITION, CosmosRingParticle_YPosition);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, scale, COSMOS_RING_PARTICLE_SCALE, CosmosRingParticle_Scale);
+    GEXCosmosRingParticleParams, innerRadius, COSMOS_RING_PARTICLE_INNER_RADIUS, CosmosRingParticle_InnerRadius);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, yPosition, COSMOS_RING_PARTICLE_Y_POSITION, CosmosRingParticle_YPosition);
+    GEXCosmosRingParticleParams, outerRadius, COSMOS_RING_PARTICLE_OUTER_RADIUS, CosmosRingParticle_OuterRadius);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleParams, speed, COSMOS_RING_PARTICLE_SPEED, CosmosRingParticle_Speed);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, innerRadius, COSMOS_RING_PARTICLE_INNER_RADIUS, CosmosRingParticle_InnerRadius);
+    GEXCosmosRingParticleParams, midColor, COSMOS_RING_PARTICLE_MID_COLOR, CosmosRingParticle_MidColor);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, outerRadius, COSMOS_RING_PARTICLE_OUTER_RADIUS, CosmosRingParticle_OuterRadius);
+    GEXCosmosRingParticleParams, tintStrength, COSMOS_RING_PARTICLE_TINT_STRENGTH, CosmosRingParticle_TintStrength);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, speed, COSMOS_RING_PARTICLE_SPEED, CosmosRingParticle_Speed);
+    GEXCosmosRingParticleParams, brightness, COSMOS_RING_PARTICLE_BRIGHTNESS, CosmosRingParticle_Brightness);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleParams, seed, COSMOS_RING_PARTICLE_SEED, CosmosRingParticle_Seed);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, midColor, COSMOS_RING_PARTICLE_MID_COLOR, CosmosRingParticle_MidColor);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, tintStrength, COSMOS_RING_PARTICLE_TINT_STRENGTH,
-    CosmosRingParticle_TintStrength);
+    GEXCosmosRingParticleParams, birthPeak, COSMOS_RING_PARTICLE_BIRTH_PEAK, CosmosRingParticle_BirthPeak);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, brightness, COSMOS_RING_PARTICLE_BRIGHTNESS, CosmosRingParticle_Brightness);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, seed, COSMOS_RING_PARTICLE_SEED, CosmosRingParticle_Seed);
+    GEXCosmosRingParticleParams, fadeMin, COSMOS_RING_PARTICLE_FADE_MIN, CosmosRingParticle_FadeMin);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, birthPeak, COSMOS_RING_PARTICLE_BIRTH_PEAK, CosmosRingParticle_BirthPeak);
+    GEXCosmosRingParticleParams, fadePower, COSMOS_RING_PARTICLE_FADE_POWER, CosmosRingParticle_FadePower);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, fadeMin, COSMOS_RING_PARTICLE_FADE_MIN, CosmosRingParticle_FadeMin);
+    GEXCosmosRingParticleParams, opacity, COSMOS_RING_PARTICLE_OPACITY, CosmosRingParticle_Opacity);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, fadePower, COSMOS_RING_PARTICLE_FADE_POWER, CosmosRingParticle_FadePower);
+    GEXCosmosRingParticleParams, sizeVariation, COSMOS_RING_PARTICLE_SIZE_VARIATION, CosmosRingParticle_SizeVariation);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, opacity, COSMOS_RING_PARTICLE_OPACITY, CosmosRingParticle_Opacity);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, sizeVariation, COSMOS_RING_PARTICLE_SIZE_VARIATION,
-    CosmosRingParticle_SizeVariation);
-GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, enableCache, COSMOS_RING_PARTICLE_ENABLE_CACHE, CosmosRingParticle_EnableCache);
-GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleEffectParams, updateInterval, COSMOS_RING_PARTICLE_UPDATE_INTERVAL,
+    GEXCosmosRingParticleParams, enableCache, COSMOS_RING_PARTICLE_ENABLE_CACHE, CosmosRingParticle_EnableCache);
+GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingParticleParams, updateInterval, COSMOS_RING_PARTICLE_UPDATE_INTERVAL,
     CosmosRingParticle_UpdateInterval);
 GE_PARAMS_FIELD_ACCESSOR(
-    GEXCosmosRingParticleEffectParams, progress, COSMOS_RING_PARTICLE_PROGRESS, CosmosRingParticle_Progress);
+    GEXCosmosRingParticleParams, progress, COSMOS_RING_PARTICLE_PROGRESS, CosmosRingParticle_Progress);
 GE_PARAMS_FIELD_ACCESSOR(GEXCosmosRingShadowParams, shadowRingRadius, COSMOS_RING_SHADOW_SHADOW_RING_RADIUS,
     CosmosRingShadow_ShadowRingRadius);
 GE_PARAMS_FIELD_ACCESSOR(
