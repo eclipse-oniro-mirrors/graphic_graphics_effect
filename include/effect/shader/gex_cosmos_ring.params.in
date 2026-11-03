@@ -141,4 +141,39 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     // 高光旋转速度（度/秒，0=静止，正值顺时针）
     [[ge::prop(min=0.0)]]
     float hlRotationSpeed = 0.0f;
+
+    // --- Particle（粒子）参数 ---
+    bool particleEnable = false;
+    [[ge::prop(min=0.0)]]
+    float particleCount = 150.0f;
+    [[ge::prop(min=0.0)]]
+    float particleSize = 2.072f;
+    [[ge::prop(min=0.0, max=0.15)]]
+    float dispersionStrength = 0.04f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float scale = 0.925f;
+    [[ge::prop(min=-259.0, max=259.0)]]
+    float yPosition = 0.0f;
+    [[ge::prop(min=0.0)]]
+    float innerRadius = 84.175f;
+    [[ge::prop(min=0.0)]]
+    float outerRadius = 102.305f;
+    [[ge::prop(min=0.0)]]
+    float speed = 31.08f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float tintStrength = 0.6f;
+    [[ge::prop(min=0.0)]]
+    float brightness = 1.0f;
+    [[ge::prop(min=0.0)]]
+    float seed = 3.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float birthPeak = 0.3f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float fadeMin = 0.0f;
+    [[ge::prop(min=0.0)]]
+    float fadePower = 2.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float opacity = 1.0f;
+    [[ge::prop(min=0.0, max=1.0)]]
+    float sizeVariation = 0.5f;
 };
