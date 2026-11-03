@@ -35,7 +35,7 @@ void GEXmlParserBase::Clear()
     if (xmlProdDocument_ != nullptr) {
         xmlFreeDoc(xmlProdDocument_);
         xmlProdDocument_ = nullptr;
-    } 
+    }
 }
 
 int32_t GEXmlParserBase::LoadGraphicConfiguration(const std::string& fileDir)
