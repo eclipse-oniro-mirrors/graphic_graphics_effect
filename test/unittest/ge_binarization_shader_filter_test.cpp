@@ -18,6 +18,7 @@
 #include "ge_binarization_shader_filter.h"
 
 #include "image/bitmap.h"
+#include "render_context/render_context.h"
 
 using namespace testing;
 using namespace testing::ext;
@@ -94,6 +95,25 @@ HWTEST_F(GEBinarizationShaderFilterTest, FilterType_001, TestSize.Level1)
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_001, TestSize.Level1)
 {
+    auto renderContext = RenderContext::Create();
+    ASSERT_NE(renderContext, nullptr);
+    renderContext->Init();
+    renderContext->SetUpGpuContext();
+    auto context = renderContext->GetSharedDrGPUContext();
+    ASSERT_NE(context, nullptr);
+    Drawing::ImageInfo imageInfo { IMAGE_WIDTH, IMAGE_HEIGHT, Drawing::ColorType::COLORTYPE_RGBA_8888,
+        Drawing::AlphaType::ALPHATYPE_OPAQUE };
+    auto surface = Drawing::Surface::MakeRenderTarget(context.get(), false, imageInfo);
+    ASSERT_NE(surface, nullptr);
+    auto gpuCanvas = surface->GetCanvas();
+    ASSERT_NE(gpuCanvas, nullptr);
+    Drawing::Bitmap bmp;
+    Drawing::BitmapFormat format { Drawing::COLORTYPE_RGBA_8888, Drawing::ALPHATYPE_PREMUL };
+    bmp.Build(IMAGE_WIDTH, IMAGE_HEIGHT, format);
+    bmp.ClearWithColor(Drawing::Color::COLOR_WHITE);
+    auto gpuImage = bmp.MakeImage();
+    ASSERT_NE(gpuImage, nullptr);
+
     Drawing::GEBinarizationShaderFilterParams params;
     params.low = 0.1f;
     params.high = 0.9f;
@@ -101,7 +121,8 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_001, TestSize.Level1)
     params.thresholdRange = 0.1f;
     auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
-    auto result = filter->OnProcessImage(canvas_, image_, src_, dst_);
+
+    auto result = filter->OnProcessImage(*gpuCanvas, gpuImage, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
 
