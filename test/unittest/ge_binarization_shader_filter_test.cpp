@@ -214,7 +214,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_006, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_007
- * @tc.desc: Verify OnProcessImage with low > 1.0 returns original image
+ * @tc.desc: Verify OnProcessImage with low > 1.0 triggers condition2
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_007, TestSize.Level1)
@@ -232,7 +232,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_007, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_008
- * @tc.desc: Verify OnProcessImage with high < 0.0 returns original image
+ * @tc.desc: Verify OnProcessImage with high < 0.0 triggers condition3
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_008, TestSize.Level1)
@@ -250,7 +250,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_008, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_009
- * @tc.desc: Verify OnProcessImage with threshold < 0.0 returns original image
+ * @tc.desc: Verify OnProcessImage with threshold < 0.0 triggers condition5
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_009, TestSize.Level1)
