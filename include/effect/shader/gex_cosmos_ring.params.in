@@ -16,40 +16,40 @@
 struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     [[ge::prop(min=0.0, max=1.0)]]
     float progress = 0.0f;
-    [[ge::prop(min=1.0, max=4096.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float radius = 150.0f;
-    [[ge::prop(min=1.0, max=1024.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float width = 40.0f;
-    [[ge::prop(min=0.0, max=256.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float feather = 5.0f;
-    [[ge::prop(min=1.0, max=200.0)]]
+    [[ge::prop(min=0.0, max=100.0)]]
     float noiseDensity = 50.0f;
-    [[ge::prop(min=1, max=64)]]
+    [[ge::prop(min=1, max=100)]]
     int32_t noisePeriod = 16;
     [[ge::prop(min=0.0, max=1.0)]]
     float noiseContrast = 1.0f;
-    [[ge::prop(min=1.0, max=200.0)]]
+    [[ge::prop(min=0.0, max=100.0)]]
     float noise2Density = 25.0f;
-    [[ge::prop(min=1, max=64)]]
+    [[ge::prop(min=1, max=100)]]
     int32_t noise2Period = 8;
-    [[ge::prop(min=0.0, max=5.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float noise2Contrast = 1.5f;
 
     // --- 第二层低频流场控制（以下参数均在保持 progress 0/1 及平铺无缝前提下可调） ---
     // 流场频率：每个平铺周期内的整数噪声格数；越小流场越平滑大块，必须为正整数
-    [[ge::prop(min=1, max=64)]]
+    [[ge::prop(min=1, max=100)]]
     int32_t noise2FlowFreq = 4;
     // 域扭曲幅度（基础噪声格数），越大高光越破碎。
-    [[ge::prop(min=0.0, max=5.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float noise2WarpAmount = 1.0f;
     // 轨道初相（单位：圈，内部乘 2π；1 表示一整圈），用于错开多层节奏。
     [[ge::prop(min=0.0, max=1.0)]]
     float noise2OrbitPhase = 0.27f;
     // 扭曲向量各向异性：y 轴（径向）相对 x 轴（角向）的缩放，1=各向同性，>1 更偏径向。
-    [[ge::prop(min=0.0, max=5.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float noise2WarpAniso = 1.2f;
     // 噪声是随机种子（不可动画）：不同的 seed 生成不同的噪声图案
-    [[ge::prop(min=0, max=100000)]]
+    [[ge::prop(min=0, max=100)]]
     int32_t noiseSeed = 0;
     [[ge::prop(min=0.0, max=10.0)]]
     float chromaStrength = 1.7f;
@@ -62,7 +62,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float midPosition = 0.5f;
     [[ge::prop(min=0.0, max=1.0)]]
     float brightPosition = 1.0f;
-    [[ge::prop(min=0.0, max=20.0)]]
+    [[ge::prop(min=0.0, max=360.0)]]
     float chromaRotation = 15.0f;
     [[ge::prop(min=0.0, max=1.0)]]
     float chromaBrightnessStart = 0.12f;
@@ -74,51 +74,51 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlOuterRadius = 165.0f;
     [[ge::prop(name="CosmosRing_HLInnerRadius", min=0.0, max=4096.0)]]
     float hlInnerRadius = 135.0f;
-    [[ge::prop(name="CosmosRing_HLOuterWidth", min=0.0, max=1024.0)]]
+    [[ge::prop(name="CosmosRing_HLOuterWidth", min=0.0, max=4096.0)]]
     float hlOuterWidth = 5.78f;
-    [[ge::prop(name="CosmosRing_HLInnerWidth", min=0.0, max=1024.0)]]
+    [[ge::prop(name="CosmosRing_HLInnerWidth", min=0.0, max=4096.0)]]
     float hlInnerWidth = 5.78f;
     [[ge::prop(name="CosmosRing_HLDispersionStrength", min=0.0, max=10.0)]]
     float hlDispersionStrength = 1.0f;
 
     // --- 第一对外圈 ---
     [[ge::prop(name="CosmosRing_HLP1OuterCenterAngle", min=0.0, max=360.0)]]
-    float hlP1OuterCenterAngle = 160.0f;
+    float hlP1OuterCenterAngle = 0.0f;
     [[ge::prop(name="CosmosRing_HLP1OuterArcSpan", min=0.0, max=360.0)]]
     float hlP1OuterArcSpan = 300.0f;
-    [[ge::prop(name="CosmosRing_HLP1OuterBrightness", min=0.0, max=1.0)]]
+    [[ge::prop(name="CosmosRing_HLP1OuterBrightness", min=0.0, max=10.0)]]
     float hlP1OuterBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP1OuterDispScales")]]
+    [[ge::prop(name="CosmosRing_HLP1OuterDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
     Vector3f hlP1OuterDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- 第一对内圈 ---
-    [[ge::prop(name="CosmosRing_HLP1InnerCenterAngle", min=-360.0, max=360.0)]]
-    float hlP1InnerCenterAngle = -25.0f;
+    [[ge::prop(name="CosmosRing_HLP1InnerCenterAngle", min=0.0, max=360.0)]]
+    float hlP1InnerCenterAngle = 0.0f;
     [[ge::prop(name="CosmosRing_HLP1InnerArcSpan", min=0.0, max=360.0)]]
     float hlP1InnerArcSpan = 300.0f;
-    [[ge::prop(name="CosmosRing_HLP1InnerBrightness", min=0.0, max=1.0)]]
-    float hlP1InnerBrightness = 0.6f;
-    [[ge::prop(name="CosmosRing_HLP1InnerDispScales")]]
+    [[ge::prop(name="CosmosRing_HLP1InnerBrightness", min=0.0, max=10.0)]]
+    float hlP1InnerBrightness = 1.0f;
+    [[ge::prop(name="CosmosRing_HLP1InnerDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
     Vector3f hlP1InnerDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- 第二对外圈 ---
     [[ge::prop(name="CosmosRing_HLP2OuterCenterAngle", min=0.0, max=360.0)]]
-    float hlP2OuterCenterAngle = 160.0f;
+    float hlP2OuterCenterAngle = 0.0f;
     [[ge::prop(name="CosmosRing_HLP2OuterArcSpan", min=0.0, max=360.0)]]
     float hlP2OuterArcSpan = 300.0f;
-    [[ge::prop(name="CosmosRing_HLP2OuterBrightness", min=0.0, max=1.0)]]
-    float hlP2OuterBrightness = 0.0f;
-    [[ge::prop(name="CosmosRing_HLP2OuterDispScales")]]
+    [[ge::prop(name="CosmosRing_HLP2OuterBrightness", min=0.0, max=10.0)]]
+    float hlP2OuterBrightness = 1.0f;
+    [[ge::prop(name="CosmosRing_HLP2OuterDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
     Vector3f hlP2OuterDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- 第二对内圈 ---
-    [[ge::prop(name="CosmosRing_HLP2InnerCenterAngle", min=-360.0, max=360.0)]]
-    float hlP2InnerCenterAngle = -25.0f;
+    [[ge::prop(name="CosmosRing_HLP2InnerCenterAngle", min=0.0, max=360.0)]]
+    float hlP2InnerCenterAngle = 0.0f;
     [[ge::prop(name="CosmosRing_HLP2InnerArcSpan", min=0.0, max=360.0)]]
     float hlP2InnerArcSpan = 300.0f;
-    [[ge::prop(name="CosmosRing_HLP2InnerBrightness", min=0.0, max=1.0)]]
-    float hlP2InnerBrightness = 0.0f;
-    [[ge::prop(name="CosmosRing_HLP2InnerDispScales")]]
+    [[ge::prop(name="CosmosRing_HLP2InnerBrightness", min=0.0, max=10.0)]]
+    float hlP2InnerBrightness = 1.0f;
+    [[ge::prop(name="CosmosRing_HLP2InnerDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
     Vector3f hlP2InnerDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- Glow（辉光）参数 ---
@@ -127,7 +127,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
         cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f glowStrength = Vector2f(0.45f, 0.25f);
     // 辉光半径（近场，远场）
-    [[ge::prop(min={0.0f, 0.0f}, max={512.0f, 512.0f},
+    [[ge::prop(min={0.0f, 0.0f}, max={4096.0f, 4096.0f},
         cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f glowRadius = Vector2f(18.0f, 90.0f);
     // 亮度门限（low、hight），对应 shader 中的ExtractGlowColor 门限范围
@@ -141,11 +141,11 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     [[ge::prop(min=0.0, max=1.0)]]
     float glowSaturation = 0.90f;
     //辉光长尾衰减指数
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float glowExposure = 1.45f;
 
     // --- 形状/羽化/辉光参数（两对共用）---
-    [[ge::prop(name="CosmosRing_HLRadialFeatherPx", min=0.0, max=1024.0)]]
+    [[ge::prop(name="CosmosRing_HLRadialFeatherPx", min=0.0, max=4096.0)]]
     float hlRadialFeatherPx = 8.0f;
     [[ge::prop(name="CosmosRing_HLTangentFeatherDeg", min=0.0, max=360.0)]]
     float hlTangentFeatherDeg = 35.0f;
@@ -155,39 +155,39 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlSpindlePower = 2.0f;
     [[ge::prop(name="CosmosRing_HLAngularFade", min=0.0, max=1.0)]]
     float hlAngularFade = 0.2f;
-    [[ge::prop(name="CosmosRing_HLWholeBrightness", min=0.0)]]
+    [[ge::prop(name="CosmosRing_HLWholeBrightness", min=0.0, max=10.0)]]
     float hlWholeBrightness = 2.26f;
     // 高光旋转速度（度，0=静止，正值顺时针）
-    [[ge::prop(name="CosmosRing_HLRotationAngle", min=0.0)]]
+    [[ge::prop(name="CosmosRing_HLRotationAngle", min=0.0, max=360.0)]]
     float hlRotationAngle = 0.0f;
 
     // --- Particle（粒子）参数 ---
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=1000.0)]]
     float particleCount = 150.0f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float particleSize = 2.072f;
-    [[ge::prop(min=0.0, max=0.15)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float particleDispersionStrength = 0.04f;
     [[ge::prop(min=0.0, max=1.0)]]
     float particleScale = 0.925f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float particleInnerRadius = 84.175f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=4096.0)]]
     float particleOuterRadius = 102.305f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=100.0)]]
     float particlePathLength = 31.08f;
     Vector4f particleMidColor = Vector4f(0.1922f, 0.3255f, 0.5961f, 1.0f);
     [[ge::prop(min=0.0, max=1.0)]]
     float particleTintStrength = 0.6f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float particleBrightness = 1.0f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=100.0)]]
     float particleSeed = 50.0f;
     [[ge::prop(min=0.0, max=1.0)]]
     float particleBirthPeak = 0.3f;
     [[ge::prop(min=0.0, max=1.0)]]
     float particleFadeMin = 0.24f;
-    [[ge::prop(min=0.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float particleFadePower = 3.0f;
     [[ge::prop(min=0.0, max=1.0)]]
     float particleOpacity = 1.0f;
