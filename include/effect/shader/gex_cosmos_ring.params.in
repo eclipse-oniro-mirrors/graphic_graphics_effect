@@ -157,7 +157,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlAngularFade = 0.2f;
     [[ge::prop(name="CosmosRing_HLWholeBrightness", min=0.0, max=10.0)]]
     float hlWholeBrightness = 2.26f;
-    // 高光旋转速度（度，0=静止，正值顺时针）
+    // 高光旋转角度（度，0=静止，正值顺时针）
     [[ge::prop(name="CosmosRing_HLRotationAngle", min=0.0, max=360.0)]]
     float hlRotationAngle = 0.0f;
 
