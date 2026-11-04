@@ -122,9 +122,17 @@ void GEVisualEffectContainer::UpdateFrostedGlassEffectParams(std::shared_ptr<Dra
     float value)
 {
     for (auto vef : GetFilters()) {
+        auto impl = vef->GetImpl();
         if (vef->GetName() == GE_SHADER_FROSTED_GLASS_EFFECT) {
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_REFRACTOUTPX, value);
             vef->SetParam(GE_SHADER_FROSTED_GLASS_EFFECT_BLURIMAGEFOREDGE, blurImageForEdge);
+        }
+        if (impl == nullptr) {
+            continue;
+        }
+        if (impl->GetFilterType() == GEFilterType::SPATIAL_GLASS_EFFECT) {
+            impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_REFRACT_OUT_PX, value);
+            impl->SetParam(GEParamsMemberTag::SPATIAL_GLASS_EFFECT_BLUR_IMAGE_FOR_EDGE, blurImageForEdge);
         }
     }
 }
