@@ -1019,7 +1019,10 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
 #define GE_STRING_TO_TAG_ENTRY(Tag) { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }
 
-#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag }
+#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) \
+    {                                      \
+#Alias, GEParamsMemberTag::Tag     \
+    }
 
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_LOW),
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_HIGH),
