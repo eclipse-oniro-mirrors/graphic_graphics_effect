@@ -34,6 +34,20 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     int32_t noise2Period = 8;
     [[ge::prop(min=0.0, max=5.0)]]
     float noise2Contrast = 1.5f;
+
+    // --- 第二层低频流场控制（以下参数均在保持 progress 0/1 及平铺无缝前提下可调） ---
+    // 流场频率：每个平铺周期内的整数噪声格数；越小流场越平滑大块，必须为正整数
+    [[ge::prop(min=1, max=64)]]
+    int32_t noise2FlowFreq = 4;
+    // 域扭曲幅度（基础噪声格数），越大高光越破碎。
+    [[ge::prop(min=0.0, max=5.0)]]
+    float noise2WarpAmount = 1.2f;
+    // 轨道初相（单位：圈，内部乘 2π；1 表示一整圈），用于错开多层节奏。
+    [[ge::prop(min=0.0, max=1.0)]]
+    float noise2OrbitPhase = 0.0f;
+    // 扭曲向量各向异性：y 轴（径向）相对 x 轴（角向）的缩放，1=各向同性，>1 更偏径向。
+    [[ge::prop(min=0.0, max=5.0)]]
+    float noise2WarpAniso = 1.0f;
     // 噪声是随机种子（不可动画）：不同的 seed 生成不同的噪声图案
     [[ge::prop(min=0, max=100000)]]
     int32_t noiseSeed = 0;
