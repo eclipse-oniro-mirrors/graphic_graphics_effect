@@ -166,7 +166,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float particleCount = 150.0f;
     [[ge::prop(min=0.0, max=4096.0)]]
     float particleSize = 2.072f;
-    [[ge::prop(min=0.0, max=10.0)]]
+    [[ge::prop(min=0.0, max=1.0)]]
     float particleDispersionStrength = 0.04f;
     [[ge::prop(min=0.0, max=1.0)]]
     float particleScale = 0.925f;
