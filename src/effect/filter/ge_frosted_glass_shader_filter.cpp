@@ -180,6 +180,10 @@ bool GEFrostedGlassShaderFilter::OnDrawImage(Drawing::Canvas& canvas, const std:
     canvasMatrix.PostTranslate(-canvasInfo_.materialDst.GetLeft(), -canvasInfo_.materialDst.GetTop());
     canvasMatrix.PostConcat(CreateDestinationTranslateMatrix(dst));
     auto shader = builder->MakeShader(&canvasMatrix, image->IsOpaque());
+    if (shader == nullptr) {
+        GE_LOGE("GEFrostedGlassShaderFilter::OnDrawImage shader is null");
+        return false;
+    }
     brush.SetShaderEffect(shader);
     canvas.AttachBrush(brush);
     canvas.DrawRect(dst);

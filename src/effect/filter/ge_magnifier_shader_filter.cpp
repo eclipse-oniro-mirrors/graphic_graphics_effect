@@ -44,8 +44,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
     const half thickness = 8.0;
     const half baseHeight = 64.0;
 
-    // 常量预计算（编译期计算，无运行时开销）
-    const half thicknessSq = thickness * thickness;
+    // Precompute constants (calulated at compile time, no runtime cost)
     const half invIndex = 1.0 / index;
     const half invIndexSubDisp = 1.0 / (index - dispersion);
     const half invIndexAddDisp = 1.0 / (index + dispersion);
@@ -55,8 +54,8 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
     {
         if (sd >= 0.0) return 0.0;
         if (sd < -thickness) return thickness;
-        half x = thickness + sd;
-        return sqrt(thicknessSq - x * x); // 用预计算平方
+        // Original: sqrt(thicknessSq - (thickness + sd) * (thickness + sd))
+        return sqrt(-sd * (2 * thickness + sd));
     }
 
     half4 bg(half2 uv)
@@ -67,7 +66,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
     half4 getRefractColor(half2 fragCoord, half3 normal, half h)
     {
         half2 res = iResolution.xy;
-        half3 refr = refract(incident, normal, invIndex); // 预计算除法
+        half3 refr = refract(incident, normal, invIndex); // Precompute inverse
         half ndotv = max(dot(incident, refr), minNdotV);
         half refractLen = (h + baseHeight) / ndotv;
 
@@ -98,11 +97,11 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
         half rawDist = sdfResult.w;
         half sd = rawDist * dispScale;
 
-        // 1. 阴影
+        // 1. Shadow
         half shadow = 1.0 - smoothstep(0.0, shadowSize, rawDist);
         half4 fragColor = half4(0.0, 0.0, 0.0, shadow * shadowStrength);
 
-        // 2. 只在内部计算
+        // 2. Only calculate inside the shape
         if (sd < 0.0)
         {
             if (sd < -thickness)
@@ -119,7 +118,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
             half h = height(sd);
             fragColor = getRefractColor(fragCoord, normal, h);
 
-            // 色散只在边缘计算
+            // Calculate dispersion only at the edge
             half edgeFactor = smoothstep(-15.0, 0.0, sd);
             if (edgeFactor > 0.001)
             {
@@ -134,7 +133,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
             fragColor *= shapeMask;
         }
 
-        // 3. 边框
+        // 3. Border
         half border = smoothstep(-borderSize, -borderSize + aa, rawDist) * smoothstep(aa, 0.0, rawDist);
         fragColor = mix(fragColor, half4(borderColor.rgb, 1.0), border * borderColor.a);
 

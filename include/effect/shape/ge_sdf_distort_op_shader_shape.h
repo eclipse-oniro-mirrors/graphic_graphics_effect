@@ -15,9 +15,9 @@
 #ifndef GRAPHICS_EFFECT_GE_SDF_DISTORT_OP_SHAPE_H
 #define GRAPHICS_EFFECT_GE_SDF_DISTORT_OP_SHAPE_H
 
+#include "ge_filter_type_info.h"
 #include "ge_sdf_shader_shape.h"
 #include "ge_shader_filter_params.h"
-#include "core/ge_filter_type_info.h"
 
 namespace OHOS {
 namespace Rosen {

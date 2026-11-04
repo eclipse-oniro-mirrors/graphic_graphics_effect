@@ -48,7 +48,7 @@ constexpr float NDC_MULTIPLIER = 2.0f;      // multiplier for NDC coordinate con
 constexpr float NDC_OFFSET = 1.0f;          // offset for NDC coordinate conversion
 constexpr float MIDPOINT_FACTOR = 0.5f;     // factor for calculating midpoint
 constexpr float MAX_ASPECT = 3.0f;          // Large aspect ratio difference
-constexpr float ALIGN_STEP = 8.0f;          // ceil the width and height of the downsampled components
+constexpr float ALIGN_STEP = 16.0f;          // ceil the width and height of the downsampled components
 
 bool IntersectBBox(const Box4f& a, const Box4f& b)
 {
@@ -863,7 +863,7 @@ void GESDFPathShaderShape::ComputeAllCurveBoundingBoxes(float width, float heigh
     curveBBoxes.clear();
     curveBBoxes.reserve(numCurves_);
     canvasBBox = { width, 0.0f, height, 0.0f };
-    float maxThickness = 12.0f; // 12.0f : Expanding the bounding box in NDC space
+    const float maxThickness = 12.0f; // 12.0f : Expanding the bounding box in NDC space
     for (size_t i = 0; i < numCurves_; ++i) {
         Box4f bbox = ComputeCurveBoundingBox(i, maxThickness, pixelControlPoints, width, height);
         curveBBoxes.push_back(bbox);
