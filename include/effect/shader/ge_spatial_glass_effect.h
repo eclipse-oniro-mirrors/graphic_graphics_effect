@@ -31,6 +31,7 @@ GE_EXPORT void InterpolateAdaptiveParams(Drawing::GESpatialGlassEffectParams& pa
 
 class GESpatialGlassEffect : public GEShader {
 public:
+DECLARE_GEFILTER_TYPEFUNC(GESpatialGlassEffect, Drawing::GESpatialGlassEffectParams);
     GESpatialGlassEffect(const Drawing::GESpatialGlassEffectParams& params);
     ~GESpatialGlassEffect() override = default;
     GESpatialGlassEffect(const GESpatialGlassEffect&) = delete;
