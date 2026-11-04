@@ -49,7 +49,7 @@ bool GEFrostedGlassEffectCfg::FeatureParamParseEntry()
 
 int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featureMap, xmlNode &node)
 {
-    GE_LOGI("GEFrostedGlassEffectCfg ParseFeatureParam start");
+    GE_LOGD("GEFrostedGlassEffectCfg ParseFeatureParam start");
     xmlNode *currNode = &node;
     for (; currNode; currNode = currNode->next) {
         if (ExtractPropertyValue("name", *currNode) == "FrostedGlassEffectCfg") {
@@ -57,7 +57,7 @@ int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featur
         }
     }
     if (currNode == nullptr || currNode->xmlChildrenNode == nullptr) {
-        GE_LOGD("GEFrostedGlassEffectCfg stop parsing, no children nodes");
+        GE_LOGE("GEFrostedGlassEffectCfg stop parsing, no children nodes");
         return GE_PARSE_GET_CHILD_FAIL;
     }
     currNode = currNode->xmlChildrenNode;
@@ -67,7 +67,7 @@ int32_t GEFrostedGlassEffectCfg::ParseFeatureParam(GEFeatureParamMapType &featur
         }
 
         if (ParseFrostedGlassInternal(*currNode) != GE_PARSE_EXEC_SUCCESS) {
-            GE_LOGD("GEFrostedGlassEffectCfg stop parsing, parse internal fail");
+            GE_LOGE("GEFrostedGlassEffectCfg stop parsing, parse internal fail");
             return GE_PARSE_INTERNAL_FAIL;
         }
     }
