@@ -139,7 +139,10 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 #define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
     { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
 
-#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
+#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias)   \
+    {                                                 \
+#Alias, GEFilterParamsTypeInfo < Struct> ::ID \
+    }
 
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAIBarShaderFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAuroraNoiseShaderParams),
