@@ -98,7 +98,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP1InnerArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP1InnerBrightness", min=0.0, max=10.0)]]
     float hlP1InnerBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP1InnerDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP1InnerDispScales")]]
     Vector3f hlP1InnerDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- 第二对外圈 ---
@@ -108,7 +108,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP2OuterArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP2OuterBrightness", min=0.0, max=10.0)]]
     float hlP2OuterBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP2OuterDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP2OuterDispScales")]]
     Vector3f hlP2OuterDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- 第二对内圈 ---
@@ -118,7 +118,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP2InnerArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP2InnerBrightness", min=0.0, max=10.0)]]
     float hlP2InnerBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP2InnerDispScales", min={0.0f, 0.0f, 0.0f}, max={10.0f, 10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP2InnerDispScales")]]
     Vector3f hlP2InnerDispScales = Vector3f(0.8f, 0.0f, 1.4f);
 
     // --- Glow（辉光）参数 ---
@@ -174,7 +174,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float particleInnerRadius = 84.175f;
     [[ge::prop(min=0.0, max=4096.0)]]
     float particleOuterRadius = 102.305f;
-    [[ge::prop(min=0.0, max=100.0)]]
+    [[ge::prop(min=0.0, max=360.0)]]
     float particlePathLength = 31.08f;
     Vector4f particleMidColor = Vector4f(0.1922f, 0.3255f, 0.5961f, 1.0f);
     [[ge::prop(min=0.0, max=1.0)]]
