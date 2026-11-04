@@ -27,10 +27,10 @@ namespace Rosen {
 static constexpr char MAIN_SHADER_PROG[] = R"(
     uniform vec2 iResolution;
     uniform shader baseBlurImg;
-    uniform shader sdfNormalImg;
+    uniform shader sdfImg;
 
     float Get2DSDF(vec2 uv) {
-        return sdfNormalImg.eval(uv).a / iResolution.x;
+        return sdfImg.eval(uv).a / iResolution.x;
     }
 
     half4 main(vec2 fragCoord) {
@@ -111,6 +111,11 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialGlassEffect::MakeSpatial
     if (auto shape = spatialGlassEffectParams_.sdfShape) {
         sdfNormalShader = shape->GenerateDrawingShaderHasNormal(imageWidth, imageHeight);
     } else {
+        GE_LOGE("GESpatialGlassEffect::MakeSpatialGlassShader sdfShape is null");
+        return nullptr;
+    }
+
+    if (sdfNormalShader == nullptr) {
         GE_LOGE("GESpatialGlassEffect::MakeSpatialGlassShader sdfShapeShader is null");
         return nullptr;
     }

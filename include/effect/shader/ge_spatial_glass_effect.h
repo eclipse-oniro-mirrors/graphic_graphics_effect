@@ -39,13 +39,7 @@ public:
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&) = delete;
     GESpatialGlassEffect& operator=(const GESpatialGlassEffect&&) = delete;
 
-    DECLARE_GEFILTER_TYPEFUNC(GESpatialGlassEffect, Drawing::GESpatialGlassEffectParams);
-
-    const std::string& GetDescription() const
-    {
-        static const std::string desc = "GESpatialGlassEffect";
-        return desc;
-    }
+    const std::string GetDescription() const { return "GESpatialGlassEffect"; }
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override;
 
