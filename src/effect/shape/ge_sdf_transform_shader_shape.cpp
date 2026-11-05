@@ -27,11 +27,11 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShader(f
     if (!params_.shape) {
         return nullptr;
     }
-    
+
     if (params_.unionMode == 1) {
         return GenerateGravityPullDrawingShader(width, height);
     }
-    
+
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShader has builder error");
@@ -54,11 +54,11 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateDrawingShaderHa
     if (!params_.shape) {
         return nullptr;
     }
-    
+
     if (params_.unionMode == 1) {
         return GenerateGravityPullDrawingShaderHasNormal(width, height);
     }
-    
+
     std::shared_ptr<Drawing::RuntimeShaderBuilder> builder = GetSDFTransformShaderHasNormalShapeBuilder();
     if (!builder) {
         LOGE("GESDFTransformShaderShape::GenerateDrawingShaderHasNormal has builder error");
@@ -180,10 +180,12 @@ bool GESDFTransformShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY
     if (!params_.shape->TryGetCenterAndHalfSize(childX, childY, childShapeHalfSize)) {
         return false;
     }
-
+    
     std::vector<Point> src = {Point(childX, childY)};
     std::vector<Point> dst(1);
+
     params_.matrix.MapPoints(dst, src, 1);
+
     outX = dst[0].GetX();
     outY = dst[0].GetY();
     shapeHalfSize = childShapeHalfSize;
@@ -373,11 +375,6 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
     GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateGravityPullDrawingShader, Width: %g, Height: %g",
         width, height);
     
-    if (!params_.shape) {
-        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader has empty shape");
-        return nullptr;
-    }
-
     auto baseShapeShader = params_.shape->GenerateDrawingShader(width, height);
     if (!baseShapeShader) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader has empty base shader");
@@ -401,9 +398,9 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
         return nullptr;
     }
 
-    float shapeCenterX = 0.0f;
-    float shapeCenterY = 0.0f;
-    Vector2f shapeHalfSize = Vector2f(0.0f, 0.0f);
+    float shapeCenterX;
+    float shapeCenterY;
+    Vector2f shapeHalfSize;
     if (!TryGetCenterAndHalfSize(shapeCenterX, shapeCenterY, shapeHalfSize)) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
         return nullptr;
@@ -532,12 +529,12 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
         float radiusAlongPull = InfluenceRadiusAlongDir(pullDir, warpRadius);
         float maxWarpScale = min(0.8 * radiusAlongPull, 0.8 * centerDist);
         float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
-        if (abs(warpScale) <= kEpsilon) {
+        if (abs(warpScale) <= 1e-3) {
             return p;
         }
         float falloff = BlendedRationalFalloff(localT);
         vec2 warpOffset = pullDir * (warpScale * falloff);
-        warpOffset = ApplyLongAxisDamping(warpOffset);
+        warpOffset = ApplyLongAxisDamping(warpOffset);F
         return p - warpOffset;
     }
     half4 main(vec2 p)
@@ -569,11 +566,6 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
 {
     GE_TRACE_NAME_FMT("GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal, Width: %g, Height: %g",
         width, height);
-
-    if (!params_.shape) {
-        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal has empty shape");
-        return nullptr;
-    }
     
     auto baseShapeShader = params_.shape->GenerateDrawingShaderHasNormal(width, height);
     if (!baseShapeShader) {
@@ -598,12 +590,11 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
         return nullptr;
     }
 
-    float shapeCenterX = 0.0f;
-    float shapeCenterY = 0.0f;
-    Vector2f shapeHalfSize = Vector2f(0.0f, 0.0f);
+    float shapeCenterX;
+    float shapeCenterY;
+    Vector2f shapeHalfSize;
     if (!TryGetCenterAndHalfSize(shapeCenterX, shapeCenterY, shapeHalfSize)) {
-        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShaderHasNormal get transformed shape center error");
-        return nullptr;
+        LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
     }
 
     float safeSpacing = std::max(params_.spacing, 0.0001f);

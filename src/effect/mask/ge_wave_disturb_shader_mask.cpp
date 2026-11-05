@@ -55,20 +55,20 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
             return - (1. - 0.5 * x2 + (1. / 24.) * x2 * x2);
         }
     }
-    
+
     // distortion for wave
     vec4 main(vec2 fragCoord)
     {
-        if (processTime < le-4) {
+        if (processTime < 1e-4) {
             return vec4(0., 0., 0., 1.);
         }
         float radius = processTime * waveLength;
         vec2 centerVec = fragCoord.xy - clickPos;
         float d = length(centerVec);
         float rl = d - radius; // ring length
-        if (abs(r1) < 2.0 * waveWidth - le-5) {
-            float rateD = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown + le-5) : 1.;
-            float rateU = processTime < waveUp ? (processTime / (waveUp + le-5)) : 1.;
+        if (abs(rl) < 2.0 * waveWidth - 1e-5) {
+            float rateD = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown + 1e-5) : 1.;
+            float rateU = processTime < waveUp ? (processTime / (waveUp + 1e-5)) : 1.;
             float rate = rateD * rateU;
             float height = waveHeight * rate;
             float uniformRl = abs(rl) * PI / 2.0 / waveWidth;

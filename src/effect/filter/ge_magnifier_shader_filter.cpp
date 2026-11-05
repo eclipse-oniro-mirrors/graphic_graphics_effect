@@ -44,7 +44,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
     const half thickness = 8.0;
     const half baseHeight = 64.0;
 
-    // Precompute constants (calulated at compile time, no runtime cost)
+    // Precompute constants (calculated at compile time, no runtime cost)
     const half invIndex = 1.0 / index;
     const half invIndexSubDisp = 1.0 / (index - dispersion);
     const half invIndexAddDisp = 1.0 / (index + dispersion);
@@ -66,7 +66,7 @@ static constexpr char MAGNIFIER_SHADER_WITH_SDF_PROG[] = R"(
     half4 getRefractColor(half2 fragCoord, half3 normal, half h)
     {
         half2 res = iResolution.xy;
-        half3 refr = refract(incident, normal, invIndex); // Precompute inverse
+        half3 refr = refract(incident, normal, invIndex); // Precomputed inverse
         half ndotv = max(dot(incident, refr), minNdotV);
         half refractLen = (h + baseHeight) / ndotv;
 

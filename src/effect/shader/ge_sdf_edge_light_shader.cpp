@@ -73,7 +73,7 @@ constexpr char SHADER[] = R"(
         }
         vec4 sdfSample = sdfShader.eval(fragCoord);
         float alpha = EdgeLightFakeBloom(lightMaskValue, sdfSample.a);
-        return half4(lightColor * alpha, clamp(alpha, 0.0f, 1.0f));
+        return half4(lightColor * alpha, alpha);
     }
 )";
 } // namespace
