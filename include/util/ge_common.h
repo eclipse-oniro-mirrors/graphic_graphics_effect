@@ -30,6 +30,13 @@ namespace Rosen {
 #define GE_IMPORT __attribute__((visibility("default")))
 #endif
 
+struct GEUvTransform {
+    float scaleX = 0.0f;
+    float scaleY = 0.0f;
+    float biasX = 0.0f;
+    float biasY = 0.0f;
+};
+
 template<typename T>
 inline constexpr bool GE_EQ(const T& x, const T& y)
 {

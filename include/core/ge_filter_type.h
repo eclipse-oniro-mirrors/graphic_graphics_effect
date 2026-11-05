@@ -122,6 +122,7 @@ enum class GEFilterType : int32_t {
     HALO_BLOOM,
     GLASS_MARBLE_EFFECT,
     DISTORT_LIGHT,
+    COSMOS_RING,
     COSMOS_RING_SHADOW,
     MAX,
 };
