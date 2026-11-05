@@ -49,7 +49,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     [[ge::prop(min=0.0, max=10.0)]]
     float noise2WarpAniso = 1.2f;
     // Noise seed (not animatable): different seeds produce different noise patterns
-    [[ge::prop(min=0, max=100)]]
+    [[ge::prop(min=0, max=10000)]]
     int32_t noiseSeed = 0;
     [[ge::prop(min=0.0, max=10.0)]]
     float chromaStrength = 1.7f;
@@ -99,7 +99,8 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP1OuterArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP1OuterBrightness", min=0.0, max=10.0)]]
     float hlP1OuterBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP1OuterDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP1OuterDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f},
+        cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f hlP1OuterDispScales = Vector2f(0.8f, 1.4f);
 
     // --- First pair, inner ring ---
@@ -109,7 +110,8 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP1InnerArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP1InnerBrightness", min=0.0, max=10.0)]]
     float hlP1InnerBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP1InnerDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP1InnerDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f},
+        cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f hlP1InnerDispScales = Vector2f(0.8f, 1.4f);
 
     // --- Second pair, outer ring ---
@@ -119,7 +121,8 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP2OuterArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP2OuterBrightness", min=0.0, max=10.0)]]
     float hlP2OuterBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP2OuterDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP2OuterDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f},
+        cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f hlP2OuterDispScales = Vector2f(0.8f, 1.4f);
 
     // --- Second pair, inner ring ---
@@ -129,7 +132,8 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlP2InnerArcSpan = 300.0f;
     [[ge::prop(name="CosmosRing_HLP2InnerBrightness", min=0.0, max=10.0)]]
     float hlP2InnerBrightness = 1.0f;
-    [[ge::prop(name="CosmosRing_HLP2InnerDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f})]]
+    [[ge::prop(name="CosmosRing_HLP2InnerDispScales", min={0.0f, 0.0f}, max={10.0f, 10.0f},
+        cast_from="std::pair<float,float>", custom="PairToVector2fTransformer")]]
     Vector2f hlP2InnerDispScales = Vector2f(0.8f, 1.4f);
 
     // --- Glow parameters ---
