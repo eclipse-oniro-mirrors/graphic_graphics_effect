@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-struct [[ge::params(type=GLASS_EFFECT, name="GlassEffect")]] GEXGlassEffectParams {
+struct [[ge::params(type=GLASS_MARBLE_EFFECT, name="GlassMarbleEffect")]] GEXGlassMarbleEffectParams {
     [[ge::prop(min={0.0f, 0.0f}, max={1.0f, 1.0f})]]
     std::pair<float, float> sphereCenter = {0.5f, 0.5f};
     [[ge::prop(min=0.0, max=1.0)]]
