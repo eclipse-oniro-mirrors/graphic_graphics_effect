@@ -120,7 +120,7 @@ enum class GEFilterType : int32_t {
     WARPED_RING,
     SPIN_BLUR,
     HALO_BLOOM,
-    GLASS_EFFECT,
+    GLASS_MARBLE_EFFECT,
     DISTORT_LIGHT,
     COSMOS_RING_SHADOW,
     MAX,
