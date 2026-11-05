@@ -100,6 +100,7 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
         GE_BUILD_PARAMS_CASE(SDF_SUB_OP_SHAPE, GESDFSubOpShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_TRANSFORM_SHAPE, GESDFTransformShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_TRIANGLE_SHAPE, GESDFTriangleShapeParams)
+        GE_BUILD_PARAMS_CASE(SDF_UBER, GESdfUberShaderShapeParams)
         GE_BUILD_PARAMS_CASE(SDF_UNION_OP, GESDFUnionOpShapeParams)
         GE_BUILD_PARAMS_CASE(SOUND_WAVE, GESoundWaveFilterParams)
         GE_BUILD_PARAMS_CASE(SPATIAL_GLASS_EFFECT, GESpatialGlassEffectParams)
@@ -136,8 +137,10 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
-#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \
-    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }
+#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \
+    {                                                                                               \
+        std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \
+    }
 
 #define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias)   \
     {                                                 \
@@ -209,6 +212,7 @@ GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFSubOpShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFTransformShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFTriangleShapeParams),
+        GE_FILTER_NAME_TO_TYPE_ENTRY(GESdfUberShaderShapeParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESDFUnionOpShapeParams),
         GE_FILTER_NAME_TO_TYPE_ALIAS(GESDFUnionOpShapeParams, SDFSmoothUnionOpShape),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GESoundWaveFilterParams),
@@ -727,6 +731,8 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
         GE_GET_FILTER_TYPE_CASE(SDF_TRIANGLE_SHAPE_VERTEX1, SDF_TRIANGLE_SHAPE)
         GE_GET_FILTER_TYPE_CASE(SDF_TRIANGLE_SHAPE_VERTEX2, SDF_TRIANGLE_SHAPE)
         GE_GET_FILTER_TYPE_CASE(SDF_TRIANGLE_SHAPE_RADIUS, SDF_TRIANGLE_SHAPE)
+        GE_GET_FILTER_TYPE_CASE(SDF_UBER_UBER_TYPE, SDF_UBER)
+        GE_GET_FILTER_TYPE_CASE(SDF_UBER_ROOT_SHAPE, SDF_UBER)
         GE_GET_FILTER_TYPE_CASE(SDF_UNION_OP_SPACING, SDF_UNION_OP)
         GE_GET_FILTER_TYPE_CASE(SDF_UNION_OP_LEFT, SDF_UNION_OP)
         GE_GET_FILTER_TYPE_CASE(SDF_UNION_OP_RIGHT, SDF_UNION_OP)
@@ -1020,7 +1026,10 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
 GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
-#define GE_STRING_TO_TAG_ENTRY(Tag) { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }
+#define GE_STRING_TO_TAG_ENTRY(Tag)                                                 \
+    {                                                                               \
+        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag \
+    }
 
 #define GE_STRING_TO_TAG_ALIAS(Tag, Alias) \
     {                                      \
@@ -1498,6 +1507,8 @@ GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::s
         GE_STRING_TO_TAG_ENTRY(SDF_TRIANGLE_SHAPE_VERTEX1),
         GE_STRING_TO_TAG_ENTRY(SDF_TRIANGLE_SHAPE_VERTEX2),
         GE_STRING_TO_TAG_ENTRY(SDF_TRIANGLE_SHAPE_RADIUS),
+        GE_STRING_TO_TAG_ENTRY(SDF_UBER_UBER_TYPE),
+        GE_STRING_TO_TAG_ENTRY(SDF_UBER_ROOT_SHAPE),
         GE_STRING_TO_TAG_ENTRY(SDF_UNION_OP_SPACING),
         GE_STRING_TO_TAG_ENTRY(SDF_UNION_OP_LEFT),
         GE_STRING_TO_TAG_ALIAS(SDF_UNION_OP_LEFT, SDFSmoothUnionOpShape_ShapeX),
@@ -2771,6 +2782,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(GEFilterParams& params, GEParams
         GE_VALIDATE_AND_SET(PARTICLE_ABLATION_TURB_AMP)
         GE_VALIDATE_AND_SET(SDF_FROM_IMAGE_SPREAD_FACTOR)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_UNION_MODE)
+        GE_VALIDATE_AND_SET(SDF_UBER_UBER_TYPE)
         GE_VALIDATE_AND_SET(SOUND_WAVE_LIGHT_MODE)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_COLOR_BLEND_MODE)
         GE_VALIDATE_AND_SET(SPIN_BLUR_SAMPLES)
@@ -2974,6 +2986,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SDF_SUB_OP_SHAPE_LEFT)
         GE_VALIDATE_AND_SET(SDF_SUB_OP_SHAPE_RIGHT)
         GE_VALIDATE_AND_SET(SDF_TRANSFORM_SHAPE_SHAPE)
+        GE_VALIDATE_AND_SET(SDF_UBER_ROOT_SHAPE)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_LEFT)
         GE_VALIDATE_AND_SET(SDF_UNION_OP_RIGHT)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_SDF_SHAPE)

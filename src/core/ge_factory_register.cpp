@@ -80,12 +80,15 @@
 #include "effect/shape/ge_sdf_empty_shader_shape.h"
 #include "effect/shape/ge_sdf_ellipse_shader_shape.h"
 #include "effect/shape/ge_sdf_path_shader_shape.h"
+#include "effect/shape/ge_sdf_pixelmap_atlas_uber_shape.h"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.h"
 #include "effect/shape/ge_sdf_rrect_shader_shape.h"
 #include "effect/shape/ge_sdf_sub_op_shader_shape.h"
 #include "effect/shape/ge_sdf_shadow_shader.h"
 #include "effect/shape/ge_sdf_transform_shader_shape.h"
 #include "effect/shape/ge_sdf_triangle_shader_shape.h"
+#include "effect/shape/ge_sdf_uber_basic_shape.h"
+#include "effect/shape/ge_sdf_uber_shader_shape.h"
 #include "effect/shape/ge_sdf_union_op_shader_shape.h"
 #include "ext/ge_external_dynamic_loader.h"
 #include "ge_system_properties.h"
@@ -320,6 +323,42 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
         }
         return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
             static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(object));
+    })
+
+// Uniform-kind RRect trees (G1_UNIFORM / G2 / capsules) load the uber object
+// from the GEX so, like SDF_RRECT_SHAPE above.
+GE_FACTORY_REGISTER_CUSTOM(SDF_UBER,
+    [](GEEffectFactory::VisualEffectImplPtr ve) -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
+        if (FactoryCheckNullptr(ve.get(), "SDF_UBER")) {
+            return nullptr;
+        }
+        auto params = ve->template GetParams<::OHOS::Rosen::Drawing::GESdfUberShaderShapeParams>();
+        if (FactoryCheckNullptr(params.get(), "SDF_UBER GetParams")) {
+            return nullptr;
+        }
+        auto uberType = static_cast<::OHOS::Rosen::Drawing::GESDFUberType>(params->uberType);
+        if (uberType == ::OHOS::Rosen::Drawing::GESDFUberType::BASIC_SHAPE_UBER &&
+            ::OHOS::Rosen::Drawing::HasNonG1RRectLeaf(params->rootShape)) {
+            auto object = ::OHOS::Rosen::GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
+                static_cast<uint32_t>(::OHOS::Rosen::Drawing::GEFilterType::SDF_UBER),
+                sizeof(::OHOS::Rosen::Drawing::GESdfUberShaderShapeParams),
+                static_cast<void*>(params.get()));
+            if (object != nullptr) {
+                return std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType>(
+                    static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(object));
+            }
+            GE_LOGD("[GEEffectFactory] SDF_UBER: GEX uber object load fail, using built-in (standard evaluation)");
+        }
+        // Built-in dispatch picks the concrete uber shape from the 2D tree type;
+        // unknown types keep the base class, which fails closed to the inner tree.
+        switch (uberType) {
+            case ::OHOS::Rosen::Drawing::GESDFUberType::PIXELMAP_ATLAS_UBER:
+                return std::make_shared<::OHOS::Rosen::Drawing::GESdfPixelmapAtlasUberShape>(*params);
+            case ::OHOS::Rosen::Drawing::GESDFUberType::BASIC_SHAPE_UBER:
+                return std::make_shared<::OHOS::Rosen::Drawing::GESdfBasicShapeUberShape>(*params);
+            default:
+                return std::make_shared<::OHOS::Rosen::Drawing::GESdfUberShaderShape>(*params);
+        }
     })
 
 } // anonymous namespace

@@ -138,6 +138,7 @@ namespace Drawing {
 #include "effect/shape/ge_sdf_sub_op_shape.params.in"
 #include "effect/shape/ge_sdf_transform_shader_shape.params.in"
 #include "effect/shape/ge_sdf_triangle_shape.params.in"
+#include "effect/shape/ge_sdf_uber_shader_shape.params.in"
 #include "effect/shape/ge_sdf_union_op_shape.params.in"
 #if defined(__clang__)
 #pragma clang diagnostic pop

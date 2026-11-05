@@ -1,0 +1,184 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef GRAPHICS_EFFECT_GE_SDF_UBER_SHADER_SHAPE_H
+#define GRAPHICS_EFFECT_GE_SDF_UBER_SHADER_SHAPE_H
+
+#include <cmath>
+#include <vector>
+
+#include "ge_filter_type_info.h"
+#include "ge_log.h"
+#include "ge_sdf_shader_shape.h"
+#include "ge_shader_filter_params.h"
+
+namespace OHOS {
+namespace Rosen {
+namespace Drawing {
+
+// Uber type computed by 2D-repo tree building; the GE side collapses the
+// wrapped tree into one uber shader, or transparently falls back.
+enum class GESDFUberType : int {
+    NONE = 0,
+    BASIC_SHAPE_UBER = 1,
+    PIXELMAP_ATLAS_UBER = 2,
+};
+
+constexpr int BASIC_SHAPE_LEAF_MIN = 7;
+constexpr int PIXELMAP_UBER_LEAF_MIN = 2;
+constexpr int BASIC_SHAPE_LEAF_MAX = 30;
+constexpr int PIXELMAP_UBER_LEAF_MAX = 6;
+
+// Builder variants are indexed by hasNormal * UBER_VARIANT_NORMAL_OFFSET + isSmoothUnion.
+constexpr int UBER_SHADER_VARIANT_COUNT = 4;
+constexpr int UBER_VARIANT_NORMAL_OFFSET = 2;
+constexpr int UBER_VARIANT_SMOOTH_OFFSET = 1;
+
+// Shared packed-vector offsets; the first slot (0) stays a literal.
+enum GESDFUberOffset : int {
+    UBER_OFFSET_1 = 1,
+    UBER_OFFSET_2 = 2,
+    UBER_OFFSET_3 = 3,
+    UBER_OFFSET_4 = 4,
+    UBER_OFFSET_5 = 5,
+    UBER_OFFSET_6 = 6,
+    UBER_OFFSET_7 = 7,
+};
+
+// Leaf kinds shared by the built-in and GEX basic-shape uber implementations;
+// RRect leaves are refined into these kinds by ClassifyUberRRect.
+enum class GEUberBasicShapeType : int {
+    G1_UNUNIFORM_RRECT = 0, // non-uniform or elliptical per-corner radii: general per-corner path
+    G1_UNIFORM_RRECT = 1,   // uniform circular radii in the G1 mid region (between the G2 bound and the capsule clamp)
+    G2_RRECT = 2,           // minWH >= 2 * UBER_MAX_CURVE_X * radius: continuous-eligible rounded rect
+    V_CAPSULE = 3,          // vertical stadium (radius = width/2, height >= width)
+    H_CAPSULE = 4,          // horizontal stadium (radius = height/2, width > height)
+    TRIANGLE = 5,
+    ELLIPSE = 6,
+};
+
+// Same threshold as the original CanBeContinuous (skia SkContinuousRRect):
+// MAX rounded area of a unit rrect.
+constexpr float UBER_MAX_CURVE_X = 1.7f;
+
+// Matrix mapping top-level (union node) coordinates to the leaf local system.
+struct GESDFUberLeafInfo {
+    Drawing::Matrix parentToLocal = Drawing::Matrix();
+};
+
+// Tree description collected during the walk: op homogeneity and leaf count.
+struct GESDFUberTreeDesc {
+    bool opResolved = false;
+    bool isSmoothUnion = false;
+    float spacing = 0.f;
+    int leafCount = 0;
+};
+
+// A leaf reached during the walk, with its cascade matrix (in tree order).
+struct GESDFUberLeafPos {
+    std::shared_ptr<GESDFShaderShape> leaf;
+    Drawing::Matrix parentToLocal = Drawing::Matrix();
+};
+
+// Base of the uber shape family: try the collapse engine, then transparently
+// fall back to the inner tree; subclasses only override the engine hook.
+class GE_EXPORT GESdfUberShaderShape : public GESDFShaderShape {
+public:
+    using GESDFShaderShape::GenerateDrawingShader;
+    using GESDFShaderShape::GenerateDrawingShaderHasNormal;
+    GESdfUberShaderShape(const GESdfUberShaderShapeParams& params) : params_(params) {}
+    GESdfUberShaderShape(const GESdfUberShaderShape&) = delete;
+    GESdfUberShaderShape& operator=(const GESdfUberShaderShape&) = delete;
+    ~GESdfUberShaderShape() override = default;
+    DECLARE_GEFILTER_TYPEFUNC(GESdfUberShaderShape, Drawing::GESdfUberShaderShapeParams);
+
+    // Walks the inner tree collecting leaves with cascade matrices; false = fall back to cascade.
+    static bool WalkUberLeaves(const std::shared_ptr<GESDFShaderShape>& shape, const Drawing::Matrix& acc,
+        GESDFUberTreeDesc& desc, std::vector<GESDFUberLeafPos>& leaves);
+
+    // Refines an RRect leaf into one of the five uber kinds (original CanBeContinuous semantics;
+    // uniform radii split into G2 / V / H / G1_UNIFORM by the width-height-radius relation).
+    static GEUberBasicShapeType ClassifyUberRRect(const GERRect& rrect);
+
+    std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
+    std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
+
+    GESDFShapeType GetSDFShapeType() const override
+    {
+        return GESDFShapeType::UBER;
+    }
+
+    // Transparent for type queries: delegate to the inner tree.
+    bool HasType(const GESDFShapeType type) const override;
+
+    const std::shared_ptr<GESDFShaderShape>& GetRootShape() const
+    {
+        return params_.rootShape;
+    }
+
+    GESDFUberType GetUberType() const
+    {
+        return static_cast<GESDFUberType>(params_.uberType);
+    }
+
+    void CopyState(const GESdfUberShaderShape& shape)
+    {
+        params_ = shape.params_;
+    }
+
+    // True when the matrix has no perspective components, so the inlined affine
+    // apply (m0..m5 only) is valid; header-inline for GEX reuse without linking GE.
+    static bool IsAffineTransform(const Drawing::Matrix& matrix)
+    {
+        constexpr float AFFINE_EPSILON = 1e-6f;
+        const float persp0 = matrix.Get(Drawing::Matrix::Index::PERSP_0);
+        const float persp1 = matrix.Get(Drawing::Matrix::Index::PERSP_1);
+        const float persp2 = matrix.Get(Drawing::Matrix::Index::PERSP_2);
+        if (std::abs(persp0) > AFFINE_EPSILON || std::abs(persp1) > AFFINE_EPSILON ||
+            std::abs(persp2 - 1.0f) > AFFINE_EPSILON) {
+            GE_LOGD("IsAffineTransform: non-affine transform, persp=(%{public}f, %{public}f, %{public}f)",
+                persp0, persp1, persp2);
+            return false;
+        }
+        return true;
+    }
+
+protected:
+    // Collapse engine hook; the base implementation fails closed, keeping
+    // the transparent inner-tree fallback for any unhandled uber type.
+    virtual std::shared_ptr<ShaderEffect> GenerateUberShader(float width, float height, bool hasNormal) const;
+
+    // Shared leaf-count gate; leafMin defaults to the basic-shape minimum so
+    // existing two-argument callers keep their behavior.
+    static bool IsLeafCountInRange(int count, int leafMax, int leafMin = BASIC_SHAPE_LEAF_MIN)
+    {
+        if (count < leafMin || count > leafMax) {
+            // 2D pre-filters with the same constants, so this is a defensive fallback gate.
+            GE_LOGD("IsLeafCountInRange: leaf count %{public}d out of range [%{public}d, %{public}d]",
+                count, leafMin, leafMax);
+            return false;
+        }
+        return true;
+    }
+
+private:
+    GESdfUberShaderShapeParams params_ {};
+};
+
+} // namespace Drawing
+} // namespace Rosen
+} // namespace OHOS
+
+#endif // GRAPHICS_EFFECT_GE_SDF_UBER_SHADER_SHAPE_H
