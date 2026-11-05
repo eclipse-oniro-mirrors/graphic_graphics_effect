@@ -252,7 +252,6 @@ GE_FACTORY_REGISTER_EXTERNAL_FALLBACK(SPATIAL_GLASS_EFFECT,
     ::OHOS::Rosen::Drawing::GESpatialGlassEffectParams,
     ::OHOS::Rosen::GESpatialGlassEffect)
 
-
 /*
  * 3. Mask effects
  *    3.1 Built-in effects
@@ -276,7 +275,6 @@ GE_FACTORY_REGISTER_EXTERNAL(DUPOLI_NOISE_MASK, ::OHOS::Rosen::Drawing::GEXDupol
 GE_FACTORY_REGISTER_EXTERNAL(NOISY_FRAME_GRADIENT_MASK, ::OHOS::Rosen::Drawing::GEXNoisyFrameGradientMaskParams)
 GE_FACTORY_REGISTER_EXTERNAL(SWEEP_REFRACTION_MASK, ::OHOS::Rosen::Drawing::GEXSweepRefractionMaskParams)
 GE_FACTORY_REGISTER_EXTERNAL(ATLAS_FRAME_MASK, ::OHOS::Rosen::Drawing::GEXAtlasFrameMaskParams)
-
 
 /*
  * 4. Shape effects

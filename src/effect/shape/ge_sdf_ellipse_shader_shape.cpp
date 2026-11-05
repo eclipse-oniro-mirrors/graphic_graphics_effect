@@ -193,7 +193,7 @@ bool GESDFEllipseShaderShape::TryGetCenterAndHalfSize(float& outX, float& outY, 
 {
     outX = params_.center.x_;
     outY = params_.center.y_;
-    shapeHalfSize = Vector2f(params_.width * 0.5f, params_.height * 0.5f);
+    shapeHalfSize = { params_.width / 2.0f, params_.height / 2.0f };
     return true;
 }
 } // namespace Drawing

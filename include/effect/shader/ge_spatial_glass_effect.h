@@ -20,7 +20,6 @@
 #include "effect/runtime_shader_builder.h"
 
 #include "ge_common.h"
-#include "ge_filter_type_info.h"
 #include "ge_shader.h"
 #include "ge_visual_effect.h"
 
@@ -32,6 +31,7 @@ GE_EXPORT void InterpolateAdaptiveParams(Drawing::GESpatialGlassEffectParams& pa
 
 class GESpatialGlassEffect : public GEShader {
 public:
+DECLARE_GEFILTER_TYPEFUNC(GESpatialGlassEffect, Drawing::GESpatialGlassEffectParams);
     GESpatialGlassEffect(const Drawing::GESpatialGlassEffectParams& params);
     ~GESpatialGlassEffect() override = default;
     GESpatialGlassEffect(const GESpatialGlassEffect&) = delete;
