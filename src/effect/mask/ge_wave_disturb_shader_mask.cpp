@@ -33,6 +33,8 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
     uniform float waveWidth;
     uniform float waveHeight;
     uniform float waveDown;
+    uniform float waveUp;
+    uniform float heightRate;
 
     const float PI = 3.14159265358979;
     float FastSin(float x)
@@ -57,12 +59,17 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
     // distortion for wave
     vec4 main(vec2 fragCoord)
     {
+        if (processTime < le-4) {
+            return vec4(0., 0., 0., 1.);
+        }
         float radius = processTime * waveLength;
         vec2 centerVec = fragCoord.xy - clickPos;
         float d = length(centerVec);
         float rl = d - radius; // ring length
-        if (clickPos.x >= 0 && abs(rl) < 2.0 * waveWidth - 1e-5) {
-            float rate = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown + 1e-5) : 1.;
+        if (abs(r1) < 2.0 * waveWidth - le-5) {
+            float rateD = processTime > waveDown ? (1.0 - processTime) / (1.0 - waveDown + le-5) : 1.;
+            float rateU = processTime < waveUp ? (processTime / (waveUp + le-5)) : 1.;
+            float rate = rateD * rateU;
             float height = waveHeight * rate;
             float uniformRl = abs(rl) * PI / 2.0 / waveWidth;
             float tantheta1 = height * FastSin(uniformRl) * PI / waveWidth + 1e-6;
@@ -74,8 +81,8 @@ static constexpr char WAVE_DISTURBANCE_PROG[] = R"(
             float detx = (-height * relativeHeight) / slop;
             detx = rl > 0. ? detx : -detx;
             // move pixel
-            vec2 normal = d > 1e-4 ? normalize(centerVec) : vec2(0., 1.);
-            return vec4(normal * detx, relativeHeight / 2. * rate, 1.);
+            vec2 normal = d > 1e-4 ? normalize(centerVec) : vec2(0.0, 1.0);
+            return vec4(normal * detx, relativeHeight / 2. * rate * heightRate, 1.);
         }
         return vec4(0., 0., 0., 1.);
     }
@@ -97,6 +104,8 @@ std::shared_ptr<ShaderEffect> GEWaveDisturbanceShaderMask::GenerateDrawingShader
     builder->SetUniform("waveHeight", params_.waveLWH[NUM_2]);
     builder->SetUniform("waveDown", params_.waveRD[NUM_1]);
     builder->SetUniform("reflectRatio", params_.waveRD[NUM_0]);
+    builder->SetUniform("waveUp", params_.waveUp);
+    builder->SetUniform("heightRate", params_.heightRate);
     auto disturbanceShader = builder->MakeShader(nullptr, false);
     if (!disturbanceShader) {
         LOGE("GEWaveDisturbanceShaderMask::GenerateDrawingShader effect error");

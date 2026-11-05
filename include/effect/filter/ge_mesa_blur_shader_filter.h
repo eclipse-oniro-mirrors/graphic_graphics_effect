@@ -52,9 +52,9 @@ public:
 
     GE_EXPORT static std::pair<float, float> AngleToDirection(float angle);
 
-    GE_EXPORT void SetIsFrostedGlassBlur(bool isFrostedGlassBlur)
+    GE_EXPORT void NeedReduceFlicker(bool needReduceFlicker)
     {
-        isFrostedGlassBlur_ = isFrostedGlassBlur;
+        needReduceFlicker_ = needReduceFlicker;
     }
 
 protected:
@@ -129,7 +129,7 @@ protected:
     bool isDirection_ = false;
     float angle_ = 0.0f;
     static GE_EXPORT int g_isSimpleX;
-    bool isFrostedGlassBlur_ = false;
+    bool needReduceFlicker_ = false;
 
 private:
     bool InitBlurEffect();

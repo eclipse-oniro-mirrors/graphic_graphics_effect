@@ -119,19 +119,6 @@ void GEContentLightFilter::GenerateContentLightEffect()
             return specularC;
         }
 
-        half4 createContentNormal(half2 pos, half maskAlpha) // pos in [-w, w] x [-1, 1]
-        {
-            if (maskAlpha < 0.01) {
-                return half4(0.0, 0.0, -1.0, -1.0);
-            }
-
-            half R = max(iResolution.x, iResolution.y) * 4. / iResolution.y;
-            half z = sqrt(R * R - pos.x * pos.x - pos.y * pos.y);
-            half3 normal = normalize(half3(pos.x / z, pos.y / z, 0.5));
-
-            return half4(normal, 1.);
-        }
-
         mat3 GetRotationMatrix(half3 rotAngle)
         {
             rotAngle *= 3.1415926 / 180.0;
@@ -151,12 +138,7 @@ void GEContentLightFilter::GenerateContentLightEffect()
             half2 uv, half4 specularColor, half shinning, half3 lightPos, half3 viewPos, mat3 rotM, half maskAlpha)
         {
             half3 fragPos = half3(uv, 0.0);
-            half4 normal = createContentNormal(uv, maskAlpha);
-            if (normal.w < 0.0) {
-                return half4(0.0);
-            }
-            half3 fragNormal = rotM * normal.xyz;
-
+            half3 fragNormal = rotM * vec3(0.0, 0.0, 1.0);
             half4 shinningColor = shinningEffect(fragPos, fragNormal, lightPos, viewPos, specularColor, shinning);
             return shinningColor;
         }

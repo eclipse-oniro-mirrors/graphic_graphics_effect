@@ -134,7 +134,7 @@ std::shared_ptr<Drawing::Image> GEDistortionCollapseFilter::OnProcessImage(Drawi
     outputImageInfo.SetWidth(dst.GetWidth());
     outputImageInfo.SetHeight(dst.GetHeight());
 
-    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), image->GetImageInfo(), false);
+    auto resultImage = builder->MakeImage(canvas.GetGPUContext().get(), &(matrix), outputImageInfo, false);
     if (!resultImage) {
         LOGE("GEDistortionCollapseFilter::OnProcessImage resultImage is null");
         return image;

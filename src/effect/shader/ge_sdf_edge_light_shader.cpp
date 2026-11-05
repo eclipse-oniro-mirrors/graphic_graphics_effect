@@ -88,7 +88,7 @@ void GESDFEdgeLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::
     MakeDrawingShader(canvas, rect, -1.f); // not use progress
     auto shader = GetDrawingShader();
     if (!shader) {
-        LOGE("GESDFEdgeLightShader::OnDrawShader: no shader generated, draw nothing");
+        LOGD("GESDFEdgeLightShader::OnDrawShader: no shader generated, draw nothing");
         return;
     }
     Drawing::Brush brush;
@@ -124,18 +124,18 @@ void GESDFEdgeLightShader::MakeDrawingShader(Drawing::Canvas& canvas, const Draw
     drShader_ = nullptr;
 
     if (!params_.sdfShape) {
-        LOGE("GESDFEdgeLightShader::MakeDrawingShader sdfShape is null");
+        LOGD("GESDFEdgeLightShader::MakeDrawingShader sdfShape is null");
         return;
     }
 
     if (!params_.lightMask) {
-        LOGE("GESDFEdgeLightShader::MakeDrawingShader lightMask is null");
+        LOGD("GESDFEdgeLightShader::MakeDrawingShader lightMask is null");
         return;
     }
 
     auto builder = GetEffectShaderBuilder(canvas, rect);
     if (builder == nullptr) {
-        LOGE("GESDFEdgeLightShader::MakeDrawingShader builder is nullptr");
+        LOGD("GESDFEdgeLightShader::MakeDrawingShader builder is nullptr");
         return;
     }
 
@@ -165,12 +165,12 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESDFEdgeLightShader::GetEffectSh
 
     auto sdfShader = params_.sdfShape->GenerateDrawingShader(canvas, width, height);
     if (sdfShader == nullptr) {
-        LOGE("GESDFEdgeLightShader::GetEffectShaderBuilder sdfShader is nullptr");
+        LOGD("GESDFEdgeLightShader::GetEffectShaderBuilder sdfShader is nullptr");
         return nullptr;
     }
     auto lightMaskShader = params_.lightMask->GenerateDrawingShader(width, height);
     if (lightMaskShader == nullptr) {
-        LOGE("GESDFEdgeLightShader::GetEffectShaderBuilder lightMaskShader is nullptr");
+        LOGD("GESDFEdgeLightShader::GetEffectShaderBuilder lightMaskShader is nullptr");
         return nullptr;
     }
 
