@@ -26,7 +26,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float noiseDensity = 50.0f;
     [[ge::prop(min=1, max=100)]]
     int32_t noisePeriod = 16;
-    [[ge::prop(min=0.0, max=1.0)]]
+    [[ge::prop(min=0.0, max=10.0)]]
     float noiseContrast = 1.0f;
     [[ge::prop(min=0.0, max=100.0)]]
     float noise2Density = 25.0f;
@@ -83,6 +83,14 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlInnerWidth = 5.78f;
     [[ge::prop(name="CosmosRing_HLDispersionStrength", min=0.0, max=10.0)]]
     float hlDispersionStrength = 1.0f;
+
+    // 高光色散曲线三段固定色值（RGB, 无alpha）
+    [[ge::prop(name="CosmosRing_HLCOuter", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
+    Vector3f hlCOuter = Vector3f(0.95f, 0.627f, 0.55f);
+    [[ge::prop(name="CosmosRing_HLCMid", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
+    Vector3f hlCMid = Vector3f(0.322f, 0.816f, 0.490f);
+    [[ge::prop(name="CosmosRing_HLCInner", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
+    Vector3f hlCInner = Vector3f(0.28f, 0.4f, 0.898f);
 
     // --- 第一对外圈 ---
     [[ge::prop(name="CosmosRing_HLP1OuterCenterAngle", min=0.0, max=360.0)]]
