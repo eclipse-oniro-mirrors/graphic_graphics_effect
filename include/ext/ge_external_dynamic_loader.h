@@ -31,7 +31,7 @@ public:
 
     GE_EXPORT void* CreateGEXObjectByType(uint32_t type, uint32_t len, void* param);
 
-    GE_EXPORT bool DestroyGEXObject(void* obj);
+    GE_EXPORT bool DestroyGEXObject(void* ptr);
 
 private:
     using CreateGEXObjectByTypeFunc = void* (*)(uint32_t, uint32_t, void*);

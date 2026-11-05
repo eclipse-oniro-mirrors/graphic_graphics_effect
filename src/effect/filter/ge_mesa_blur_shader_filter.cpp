@@ -518,7 +518,7 @@ Drawing::ImageInfo GEMESABlurShaderFilter::ComputeImageInfo(const Drawing::Image
     int& width, int& height) const
 {
     LOGD("GEMESABlurShaderFilter:: sigma = %{public}f. ", blurRadius_);
-    if (isFrostedGlassBlur_) {
+    if (needReduceFlicker_) {
         if (blurScale_ > BASE_BLUR_SCALE - 1e-4) {
             width = width + width % 2; // 2: To determine whether it is an even number
             height = height + height % 2;
@@ -668,7 +668,7 @@ Drawing::Matrix GEMESABlurShaderFilter::BuildMatrix(
     int scaleWidth = scaledInfo.GetWidth();
     int width = input->GetWidth();
     int height = input->GetHeight();
-    if (isFrostedGlassBlur_) {
+    if (needReduceFlicker_) {
         if (blurScale_ > BASE_BLUR_SCALE - 1e-4) {
             width = width + width % 2; // 2: To determine whether it is an even number
             height = height + height % 2;
