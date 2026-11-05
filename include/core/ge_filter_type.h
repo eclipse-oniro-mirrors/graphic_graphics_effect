@@ -65,7 +65,6 @@ enum class GEFilterType : int32_t {
     SDF_TRANSFORM_SHAPE,
     SDF_DISTORT_OP_SHAPE,
     SDF_EMPTY_SHAPE,
-    SDF_UBER,
     // Shader
     DOT_MATRIX,
     FLOW_LIGHT_SWEEP,
@@ -124,6 +123,7 @@ enum class GEFilterType : int32_t {
     GLASS_MARBLE_EFFECT,
     DISTORT_LIGHT,
     COSMOS_RING_SHADOW,
+    SDF_UBER,
     MAX,
 };
 

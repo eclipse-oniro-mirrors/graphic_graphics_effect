@@ -25,8 +25,6 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// Per-leaf CPU-preprocessed params, packed as p0..p7; RRect uses center/halfSize/radii,
-// triangle uses 3 vertices + radius, ellipse uses center + full size.
 constexpr int BASIC_SHAPE_LEAF_PARAM_COUNT = 8;
 
 struct GESDFBasicShapeUberLeafInfo : public GESDFUberLeafInfo {
@@ -34,12 +32,8 @@ struct GESDFBasicShapeUberLeafInfo : public GESDFUberLeafInfo {
     std::array<float, BASIC_SHAPE_LEAF_PARAM_COUNT> params {};
 };
 
-// True when the tree carries a non-G1-ununiform RRect leaf (G1_UNIFORM / G2 / capsules,
-// the GEX-specialized uniform kinds) and is otherwise uber-collapsible.
 bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root);
 
-// Base-shape uber shape: RRect / Triangle / Ellipse leaves collapse into one
-// shader (pure math, width/height unused), params in vec4 uniform arrays.
 class GE_EXPORT GESdfBasicShapeUberShape : public GESdfUberShaderShape {
 public:
     explicit GESdfBasicShapeUberShape(const GESdfUberShaderShapeParams& params) : GESdfUberShaderShape(params) {}

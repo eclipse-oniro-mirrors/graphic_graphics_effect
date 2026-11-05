@@ -325,8 +325,6 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_RRECT_SHAPE,
             static_cast<::OHOS::Rosen::Drawing::IGEFilterType*>(object));
     })
 
-// Uniform-kind RRect trees (G1_UNIFORM / G2 / capsules) load the uber object
-// from the GEX so, like SDF_RRECT_SHAPE above.
 GE_FACTORY_REGISTER_CUSTOM(SDF_UBER,
     [](GEEffectFactory::VisualEffectImplPtr ve) -> std::shared_ptr<::OHOS::Rosen::Drawing::IGEFilterType> {
         if (FactoryCheckNullptr(ve.get(), "SDF_UBER")) {
@@ -349,8 +347,6 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_UBER,
             }
             GE_LOGD("[GEEffectFactory] SDF_UBER: GEX uber object load fail, using built-in (standard evaluation)");
         }
-        // Built-in dispatch picks the concrete uber shape from the 2D tree type;
-        // unknown types keep the base class, which fails closed to the inner tree.
         switch (uberType) {
             case ::OHOS::Rosen::Drawing::GESDFUberType::PIXELMAP_ATLAS_UBER:
                 return std::make_shared<::OHOS::Rosen::Drawing::GESdfPixelmapAtlasUberShape>(*params);

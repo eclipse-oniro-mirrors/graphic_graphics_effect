@@ -23,8 +23,6 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-// Per-leaf atlas leaf: image plus packed sub-rect offset; the shared atlas keeps
-// 1px padding so LINEAR samples stay on the far-outside SDF value.
 struct GESDFPixelmapUberLeafInfo : public GESDFUberLeafInfo {
     std::shared_ptr<Drawing::Image> image;
     float width = 0.f;
