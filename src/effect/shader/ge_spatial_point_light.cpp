@@ -44,10 +44,11 @@ namespace {
         half4 main(vec2 fragCoord)
         {
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
-            vec3 halfwayDir = normalize(lightDirection);
-            float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
-            vec4 fragColor = spec * lightIntensity * lightColor;
+            vec3 halfwayDir = normalize(lightDirection);
+            float spec = pow(max(halfwayDir.z, 0.0), attenuation);
+
+            half4 fragColor = spec * lightIntensity * lightColor;
             fragColor *= smoothstep(fadeEdgeLow, fadeEdgeHigh, fragColor);
             return fragColor;
         }
@@ -66,12 +67,13 @@ namespace {
 
         half4 main(vec2 fragCoord)
         {
-            half4 normalMap = mask.eval(fragCoord);
+            half maskValue = mask.eval(fragCoord).r;
             vec3 lightDirection = lightPosition - vec3(fragCoord.x, fragCoord.y, 0.0);
-            vec3 halfwayDir = normalize(lightDirection);
-            float spec = pow(max(dot(vec3(0.0, 0.0, 1.0), halfwayDir), 0.0), attenuation);
 
-            vec4 fragColor = spec * lightIntensity * lightColor * normalMap.r;
+            vec3 halfwayDir = normalize(lightDirection);
+            float spec = pow(max(halfwayDir.z, 0.0), attenuation);
+
+            half4 fragColor = spec * lightIntensity * lightColor * maskValue;
             fragColor *= smoothstep(fadeEdgeLow, fadeEdgeHigh, fragColor);
             return fragColor;
         }
