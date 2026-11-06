@@ -398,8 +398,8 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
         return nullptr;
     }
 
-    float shapeCenterX;
-    float shapeCenterY;
+    float shapeCenterX = 0.0f;
+    float shapeCenterY = 0.0f;
     Vector2f shapeHalfSize;
     if (!TryGetCenterAndHalfSize(shapeCenterX, shapeCenterY, shapeHalfSize)) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
@@ -590,8 +590,8 @@ std::shared_ptr<ShaderEffect> GESDFTransformShaderShape::GenerateGravityPullDraw
         return nullptr;
     }
 
-    float shapeCenterX;
-    float shapeCenterY;
+    float shapeCenterX = 0.0f;
+    float shapeCenterY = 0.0f;
     Vector2f shapeHalfSize;
     if (!TryGetCenterAndHalfSize(shapeCenterX, shapeCenterY, shapeHalfSize)) {
         LOGE("GESDFTransformShaderShape::GenerateGravityPullDrawingShader get transformed shape center error");
