@@ -1,0 +1,57 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef GRAPHICS_EFFECT_GE_SDF_UBER_BASICSHAPE_H
+#define GRAPHICS_EFFECT_GE_SDF_UBER_BASICSHAPE_H
+
+#include <array>
+
+#include "ge_sdf_shader_shape.h"
+#include "ge_sdf_uber_shader_shape.h"
+
+namespace OHOS {
+namespace Rosen {
+namespace Drawing {
+
+constexpr int BASIC_SHAPE_LEAF_PARAM_COUNT = 8;
+
+struct GESDFBasicShapeUberLeafInfo : public GESDFUberLeafInfo {
+    GEUberBasicShapeType shapeType = GEUberBasicShapeType::G1_UNUNIFORM_RRECT;
+    std::array<float, BASIC_SHAPE_LEAF_PARAM_COUNT> params {};
+};
+
+bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root);
+
+class GE_EXPORT GESdfBasicShapeUberShape : public GESdfUberShaderShape {
+public:
+    explicit GESdfBasicShapeUberShape(const GESdfUberShaderShapeParams& params) : GESdfUberShaderShape(params) {}
+    ~GESdfBasicShapeUberShape() override = default;
+
+protected:
+    std::shared_ptr<ShaderEffect> GenerateUberShader(float width, float height, bool hasNormal) const override;
+
+private:
+    bool CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
+        std::vector<GESDFBasicShapeUberLeafInfo>& leaves, GESDFUberTreeDesc& desc) const;
+    static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetBuilder(bool hasNormal, bool isSmoothUnion);
+    void PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
+        const std::vector<GESDFBasicShapeUberLeafInfo>& leaves, const GESDFUberTreeDesc& desc) const;
+};
+
+} // Drawing
+} // namespace Rosen
+} // namespace OHOS
+
+#endif // GRAPHICS_EFFECT_GE_SDF_UBER_BASICSHAPE_H

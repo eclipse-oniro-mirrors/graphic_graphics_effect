@@ -20,6 +20,7 @@
 #include "ge_sdf_rrect_shader_shape.h"
 #include "ge_sdf_sub_op_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
+#include "ge_sdf_uber_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
 #include "ge_shader_diagnostics.h"
 #include "ge_log.h"
@@ -93,6 +94,10 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         const auto* pixelmapShape = static_cast<const GESDFPixelmapShaderShape*>(&shape);
         auto* thisPixelmap = static_cast<GESDFPixelmapShaderShape*>(this);
         thisPixelmap->CopyState(*pixelmapShape);
+    } else if (GetSDFShapeType() == GESDFShapeType::UBER) {
+        const auto* uberShape = static_cast<const GESdfUberShaderShape*>(&shape);
+        auto* thisUber = static_cast<GESdfUberShaderShape*>(this);
+        thisUber->CopyState(*uberShape);
     }
 }
 

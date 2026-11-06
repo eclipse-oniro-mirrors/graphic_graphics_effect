@@ -49,6 +49,16 @@ public:
         return params_.matrix;
     }
 
+    const std::shared_ptr<GESDFShaderShape>& GetShape() const
+    {
+        return params_.shape;
+    }
+
+    int GetUnionMode() const
+    {
+        return params_.unionMode;
+    }
+
     void CopyState(const GESDFTransformShaderShape& shape)
     {
         params_ = shape.params_;
