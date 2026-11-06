@@ -304,7 +304,7 @@ std::shared_ptr<Drawing::Image> HpsEffectFilter::GetBlurImageForFrostedGlass(Dra
     for (auto& effectInfo : hpsEffect_) {
         effectInfo->dst = dimensionRect;
     }
-    if (!offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) {
+    if (offscreenCanvas == nullptr || !offscreenCanvas->DrawImageEffectHPS(*image, hpsEffect_)) {
         LOGD("HpsEffectFilter::GetBlurImageForFrostedGlass offscreenCanvas->DrawImageEffectHPS error");
         return nullptr;
     }

@@ -68,6 +68,7 @@
 #include "effect/shader/ge_contour_diagonal_flow_light_shader.h"
 #include "effect/shader/ge_frosted_glass_effect.h"
 #include "effect/shader/ge_particle_circular_halo_shader.h"
+#include "effect/shader/ge_point_light_shader.h"
 #include "effect/shader/ge_sdf_edge_light_shader.h"
 #include "effect/shader/ge_spatial_glass_effect.h"
 #include "effect/shader/ge_spatial_point_light.h"
@@ -225,6 +226,7 @@ GE_FACTORY_REGISTER(GESDFEdgeLightShader)
 GE_FACTORY_REGISTER(GESDFShadowShader)
 GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
 GE_FACTORY_REGISTER(GESpatialPointLightShader)
+GE_FACTORY_REGISTER(GEPointLightShader)
 GE_FACTORY_REGISTER(GEWavyRippleLightShader)
 
 // 2.2 Dynamically loaded effects

@@ -27,6 +27,7 @@ namespace Rosen {
 namespace {
 constexpr int MAX_SPREAD_FACTOR = 4096;
 constexpr int TWO = 2;
+constexpr int MAX_SIZE = 16384; // 16K
 
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
@@ -386,6 +387,10 @@ std::shared_ptr<Drawing::Image> GESDFFromImageFilter::RunJFAPrepareEffect(Drawin
 
     auto outputWidth = std::max(static_cast<int>(std::ceil(dst.GetWidth())), width);
     auto outputHeight = std::max(static_cast<int>(std::ceil(dst.GetHeight())), height);
+    if (outputWidth > MAX_SIZE || outputHeight > MAX_SIZE) {
+        GE_LOGE("GESDFFromImageFilter::RunJFAPrepareEffect check size failed");
+        return nullptr;
+    }
     Drawing::Matrix stretchMatrix = BuildStretchMatrix(src, dst, width, height);
     auto outputImageInfo = Drawing::ImageInfo(
         outputWidth, outputHeight, outputColorType, imageInfo.GetAlphaType(), imageInfo.GetColorSpace());

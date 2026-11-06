@@ -577,5 +577,105 @@ HWTEST_F(GEHpsEffectFilterTest, GeneratePixelMapMaskParameter_NullImage, TestSiz
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GeneratePixelMapMaskParameter_NullImage end";
 }
 
+/**
+ * @tc.name: GetBlurImageForFrostedGlass_NullImageAndEmptyEffects
+ * @tc.desc: Verify GetBlurImageForFrostedGlass returns nullptr when image is null or hpsEffect_ is empty
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHpsEffectFilterTest, GetBlurImageForFrostedGlass_NullImageAndEmptyEffects, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_NullImageAndEmptyEffects start";
+
+    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+
+    // image == nullptr and hpsEffect_ empty -> nullptr
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, nullptr), nullptr);
+
+    // image valid but hpsEffect_ empty -> nullptr
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, image_), nullptr);
+
+    // image nullptr but hpsEffect_ non-empty -> nullptr (image check first)
+    std::shared_ptr<Drawing::HpsEffectParameter> greyPara = std::make_shared<Drawing::HpsGreyParameter>(
+        Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+    hpsEffectFilter->hpsEffect_.push_back(greyPara);
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, nullptr), nullptr);
+
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_NullImageAndEmptyEffects end";
+}
+
+/**
+ * @tc.name: GetBlurImageForFrostedGlass_NoBlurEffect
+ * @tc.desc: Verify GetBlurImageForFrostedGlass returns nullptr when hpsEffect_ has no BLUR effect
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHpsEffectFilterTest, GetBlurImageForFrostedGlass_NoBlurEffect, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_NoBlurEffect start";
+
+    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+
+    // Only a GREY effect, no BLUR effect -> blurParams nullptr -> returns nullptr
+    std::shared_ptr<Drawing::HpsEffectParameter> greyPara = std::make_shared<Drawing::HpsGreyParameter>(
+        Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), 0.0f, 0.0f);
+    hpsEffectFilter->hpsEffect_.push_back(greyPara);
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, image_), nullptr);
+
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_NoBlurEffect end";
+}
+
+/**
+ * @tc.name: GetBlurImageForFrostedGlass_SurfaceNullptr
+ * @tc.desc: Verify GetBlurImageForFrostedGlass returns nullptr when canvas has no surface (offscreen unavailable)
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHpsEffectFilterTest, GetBlurImageForFrostedGlass_SurfaceNullptr, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_SurfaceNullptr start";
+
+    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+
+    // Push a BLUR effect so blurParams will be found; canvas_ has no surface (CPU canvas)
+    // -> surface == nullptr -> offscreenSurface/offscreenCanvas unavailable -> returns nullptr
+    std::shared_ptr<Drawing::HpsBlurEffectParameter> kawaseBlurPara =
+        std::make_shared<Drawing::HpsBlurEffectParameter>(
+            Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f), Drawing::Rect(0.0f, 0.0f, 50.0f, 50.0f),
+            2.0f, 1.0f, 1.0f, nullptr);
+    hpsEffectFilter->hpsEffect_.push_back(kawaseBlurPara);
+
+    // canvas_ is a plain CPU canvas with no surface; surface == nullptr path is exercised
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, image_), nullptr);
+
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_SurfaceNullptr end";
+}
+
+/**
+ * @tc.name: GetBlurImageForFrostedGlass_ZeroDimension
+ * @tc.desc: Verify GetBlurImageForFrostedGlass returns nullptr when image dimensions are zero
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEHpsEffectFilterTest, GetBlurImageForFrostedGlass_ZeroDimension, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_ZeroDimension start";
+
+    auto hpsEffectFilter = std::make_unique<HpsEffectFilter>();
+    ASSERT_TRUE(hpsEffectFilter != nullptr);
+
+    // Push a BLUR effect so the empty-effects guard is bypassed
+    std::shared_ptr<Drawing::HpsBlurEffectParameter> kawaseBlurPara =
+        std::make_shared<Drawing::HpsBlurEffectParameter>(
+            Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f), Drawing::Rect(0.0f, 0.0f, 0.0f, 0.0f),
+            2.0f, 1.0f, 1.0f, nullptr);
+    hpsEffectFilter->hpsEffect_.push_back(kawaseBlurPara);
+
+    // Empty Image has zero width/height -> imageInfo width or height <= 0 -> returns nullptr
+    auto emptyImage = std::make_shared<Drawing::Image>();
+    EXPECT_EQ(hpsEffectFilter->GetBlurImageForFrostedGlass(canvas_, emptyImage), nullptr);
+
+    GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_ZeroDimension end";
+}
+
 } // namespace Rosen
 } // namespace OHOS
