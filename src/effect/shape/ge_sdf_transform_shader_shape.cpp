@@ -534,7 +534,7 @@ static constexpr char GRAVITY_PULL_NORMAL_PROG[] = R"(
         }
         float falloff = BlendedRationalFalloff(localT);
         vec2 warpOffset = pullDir * (warpScale * falloff);
-        warpOffset = ApplyLongAxisDamping(warpOffset);F
+        warpOffset = ApplyLongAxisDamping(warpOffset);
         return p - warpOffset;
     }
     half4 main(vec2 p)
