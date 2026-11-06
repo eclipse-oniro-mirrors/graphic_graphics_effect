@@ -46,6 +46,10 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Ca
     Drawing::Matrix matrix;
     auto shader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    if (shader == nullptr) {
+        LOGE("GEContentLightFilter::OnProcessImage shader is nullptr");
+        return nullptr;
+    }
     auto imageInfo = image->GetImageInfo();
     float height = imageInfo.GetHeight();
     float width = imageInfo.GetWidth();
@@ -54,7 +58,10 @@ std::shared_ptr<Drawing::Image> GEContentLightFilter::OnProcessImage(Drawing::Ca
     }
     ClampLightValue();
     GenerateContentLightEffect();
-
+    if (contentLightShaderEffect_ == nullptr) {
+        LOGE("GEContentLightFilter::OnProcessImage contentLightShaderEffect is nullptr");
+        return nullptr;
+    }
     float lightColor[NUM_4] = {lightColor_[NUM_0], lightColor_[NUM_1], lightColor_[NUM_2], lightColor_[NUM_3]};
     Drawing::RuntimeShaderBuilder builder(contentLightShaderEffect_);
     builder.SetChild("image", shader);
