@@ -676,6 +676,5 @@ HWTEST_F(GEHpsEffectFilterTest, GetBlurImageForFrostedGlass_ZeroDimension, TestS
 
     GTEST_LOG_(INFO) << "GEHpsEffectFilterTest GetBlurImageForFrostedGlass_ZeroDimension end";
 }
-
 } // namespace Rosen
 } // namespace OHOS
