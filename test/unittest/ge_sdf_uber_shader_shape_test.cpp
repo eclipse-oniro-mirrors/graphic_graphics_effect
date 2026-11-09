@@ -20,7 +20,6 @@
 
 #include "draw/color.h"
 #include "ge_sdf_ellipse_shader_shape.h"
-#include "ge_sdf_pixelmap_atlas_uber_shape.h"
 #include "ge_sdf_pixelmap_shader_shape.h"
 #include "ge_sdf_rrect_shader_shape.h"
 #include "ge_sdf_transform_shader_shape.h"
@@ -344,19 +343,19 @@ HWTEST_F(GESDFUberShaderShapeTest, AffineAndLeafRange_001, TestSize.Level1)
     perspective.Set(Drawing::Matrix::Index::PERSP_2, 1.5f);
     EXPECT_FALSE(GESdfUberShaderShape::IsAffineTransform(perspective));
 
-    EXPECT_FALSE(GESdfBasicShapeUberShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN - 1, BASIC_SHAPE_LEAF_MAX,
+    EXPECT_FALSE(GESdfUberBasicShapeShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN - 1, BASIC_SHAPE_LEAF_MAX,
         BASIC_SHAPE_LEAF_MIN));
-    EXPECT_TRUE(GESdfBasicShapeUberShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN, BASIC_SHAPE_LEAF_MAX,
+    EXPECT_TRUE(GESdfUberBasicShapeShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN, BASIC_SHAPE_LEAF_MAX,
         BASIC_SHAPE_LEAF_MIN));
-    EXPECT_FALSE(GESdfBasicShapeUberShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MAX + 1, BASIC_SHAPE_LEAF_MAX,
+    EXPECT_FALSE(GESdfUberBasicShapeShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MAX + 1, BASIC_SHAPE_LEAF_MAX,
         BASIC_SHAPE_LEAF_MIN));
-    EXPECT_FALSE(GESdfBasicShapeUberShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN - 1, BASIC_SHAPE_LEAF_MAX));
+    EXPECT_FALSE(GESdfUberBasicShapeShape::IsLeafCountInRange(BASIC_SHAPE_LEAF_MIN - 1, BASIC_SHAPE_LEAF_MAX));
 
-    EXPECT_FALSE(GESdfPixelmapAtlasUberShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MIN - 1, PIXELMAP_UBER_LEAF_MAX,
+    EXPECT_FALSE(GESdfUberPixelmapAtlasShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MIN - 1, PIXELMAP_UBER_LEAF_MAX,
         PIXELMAP_UBER_LEAF_MIN));
-    EXPECT_TRUE(GESdfPixelmapAtlasUberShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MIN, PIXELMAP_UBER_LEAF_MAX,
+    EXPECT_TRUE(GESdfUberPixelmapAtlasShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MIN, PIXELMAP_UBER_LEAF_MAX,
         PIXELMAP_UBER_LEAF_MIN));
-    EXPECT_FALSE(GESdfPixelmapAtlasUberShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MAX + 1, PIXELMAP_UBER_LEAF_MAX,
+    EXPECT_FALSE(GESdfUberPixelmapAtlasShape::IsLeafCountInRange(PIXELMAP_UBER_LEAF_MAX + 1, PIXELMAP_UBER_LEAF_MAX,
         PIXELMAP_UBER_LEAF_MIN));
 }
 
@@ -401,11 +400,11 @@ HWTEST_F(GESDFUberShaderShapeTest, CopyUberState_ThroughBaseDispatcher, TestSize
         MakeRRect(RECT_SIDE, RECT_SIDE, SMALL_RADIUS), GESDFUberType::BASIC_SHAPE_UBER));
     GESdfUberShaderShapeParams dstParams;
     GESdfUberShaderShape dst(dstParams);
-
+ 
     GESDFShaderShape& baseDst = dst;
     const GESDFShaderShape& baseSrc = src;
     baseDst.CopyState(baseSrc);
-
+ 
     EXPECT_EQ(dst.GetRootShape(), src.GetRootShape());
     EXPECT_EQ(dst.GetUberType(), src.GetUberType());
 }
@@ -419,7 +418,7 @@ HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_001, TestSize.Level1)
 {
     auto leaves = MakeMixedBasicLeaves();
     auto root = MakeUnionTree(leaves);
-    GESdfBasicShapeUberShape shape(MakeUberParams(root, GESDFUberType::BASIC_SHAPE_UBER));
+    GESdfUberBasicShapeShape shape(MakeUberParams(root, GESDFUberType::BASIC_SHAPE_UBER));
 
     std::vector<GESDFBasicShapeUberLeafInfo> infos;
     GESDFUberTreeDesc desc;
@@ -432,7 +431,7 @@ HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_001, TestSize.Level1)
     EXPECT_EQ(infos[5].shapeType, GEUberBasicShapeType::TRIANGLE);
     EXPECT_EQ(infos[6].shapeType, GEUberBasicShapeType::ELLIPSE);
 
-    auto builder = GESdfBasicShapeUberShape::GetBuilder(false, desc.isSmoothUnion);
+    auto builder = GESdfUberBasicShapeShape::GetBuilder(false, desc.isSmoothUnion);
     ASSERT_NE(builder, nullptr);
     shape.PackUniforms(builder, infos, desc);
     desc.isSmoothUnion = true;
@@ -448,7 +447,7 @@ HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_001, TestSize.Level1)
     EXPECT_NE(shape.GenerateDrawingShaderHasNormal(RECT_SIDE, RECT_SIDE), nullptr);
 
     auto smoothRoot = MakeUnionTree(MakeMixedBasicLeaves(), GESDFUnionOp::SMOOTH_UNION, 20.0f);
-    GESdfBasicShapeUberShape smoothShape(MakeUberParams(smoothRoot, GESDFUberType::BASIC_SHAPE_UBER));
+    GESdfUberBasicShapeShape smoothShape(MakeUberParams(smoothRoot, GESDFUberType::BASIC_SHAPE_UBER));
     EXPECT_NE(smoothShape.GenerateDrawingShader(RECT_SIDE, RECT_SIDE), nullptr);
 
     // Negative radius, tall rect and negative triangle radius exercise the CPU pack clamps.
@@ -469,7 +468,7 @@ HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_001, TestSize.Level1)
  */
 HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_002, TestSize.Level1)
 {
-    GESdfBasicShapeUberShape shape(MakeUberParams(nullptr, GESDFUberType::BASIC_SHAPE_UBER));
+    GESdfUberBasicShapeShape shape(MakeUberParams(nullptr, GESDFUberType::BASIC_SHAPE_UBER));
     std::vector<GESDFBasicShapeUberLeafInfo> infos;
     GESDFUberTreeDesc desc;
     EXPECT_TRUE(shape.CollectLeaves(nullptr, infos, desc));
@@ -491,10 +490,10 @@ HWTEST_F(GESDFUberShaderShapeTest, BasicUberShape_002, TestSize.Level1)
     EXPECT_FALSE(shape.CollectLeaves(MakePerspectiveTree(), infos, desc));
 
     EXPECT_EQ(shape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
-    GESdfBasicShapeUberShape tooFewShape(MakeUberParams(
+    GESdfUberBasicShapeShape tooFewShape(MakeUberParams(
         MakeUnionTree(MakeRRectLeaves(BASIC_SHAPE_LEAF_MIN - 1, false)), GESDFUberType::BASIC_SHAPE_UBER));
     EXPECT_EQ(tooFewShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
-    GESdfBasicShapeUberShape tooManyShape(MakeUberParams(
+    GESdfUberBasicShapeShape tooManyShape(MakeUberParams(
         MakeUnionTree(MakeRRectLeaves(BASIC_SHAPE_LEAF_MAX + 1, false)), GESDFUberType::BASIC_SHAPE_UBER));
     EXPECT_EQ(tooManyShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
     EXPECT_EQ(shape.GenerateUberShader(RECT_SIDE, RECT_SIDE, true), nullptr);
@@ -546,12 +545,12 @@ HWTEST_F(GESDFUberShaderShapeTest, GetBuilder_001, TestSize.Level1)
 {
     for (int hasNormal = 0; hasNormal <= 1; ++hasNormal) {
         for (int smooth = 0; smooth <= 1; ++smooth) {
-            auto basicBuilder = GESdfBasicShapeUberShape::GetBuilder(hasNormal != 0, smooth != 0);
+            auto basicBuilder = GESdfUberBasicShapeShape::GetBuilder(hasNormal != 0, smooth != 0);
             ASSERT_NE(basicBuilder, nullptr);
-            EXPECT_EQ(GESdfBasicShapeUberShape::GetBuilder(hasNormal != 0, smooth != 0), basicBuilder);
-            auto atlasBuilder = GESdfPixelmapAtlasUberShape::GetBuilder(hasNormal != 0, smooth != 0);
+            EXPECT_EQ(GESdfUberBasicShapeShape::GetBuilder(hasNormal != 0, smooth != 0), basicBuilder);
+            auto atlasBuilder = GESdfUberPixelmapAtlasShape::GetBuilder(hasNormal != 0, smooth != 0);
             ASSERT_NE(atlasBuilder, nullptr);
-            EXPECT_EQ(GESdfPixelmapAtlasUberShape::GetBuilder(hasNormal != 0, smooth != 0), atlasBuilder);
+            EXPECT_EQ(GESdfUberPixelmapAtlasShape::GetBuilder(hasNormal != 0, smooth != 0), atlasBuilder);
         }
     }
 }
@@ -565,15 +564,15 @@ HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_001, TestSize.Level1)
 {
     auto root = MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MIN,
         static_cast<int>(IMAGE_SIDE), static_cast<int>(IMAGE_SIDE)));
-    GESdfPixelmapAtlasUberShape shape(MakeUberParams(root, GESDFUberType::PIXELMAP_ATLAS_UBER));
+    GESdfUberPixelmapAtlasShape shape(MakeUberParams(root, GESDFUberType::PIXELMAP_ATLAS_UBER));
 
-    std::vector<GESDFPixelmapUberLeafInfo> infos;
+    std::vector<GESDFUberPixelmapLeafInfo> infos;
     GESDFUberTreeDesc desc;
     ASSERT_TRUE(shape.CollectLeaves(root, infos, desc));
     EXPECT_EQ(static_cast<int>(infos.size()), PIXELMAP_UBER_LEAF_MIN);
     EXPECT_FLOAT_EQ(infos[0].width, IMAGE_SIDE);
 
-    auto builder = GESdfPixelmapAtlasUberShape::GetBuilder(false, desc.isSmoothUnion);
+    auto builder = GESdfUberPixelmapAtlasShape::GetBuilder(false, desc.isSmoothUnion);
     ASSERT_NE(builder, nullptr);
     auto atlas = MakeImage(static_cast<int>(IMAGE_SIDE) * PIXELMAP_UBER_LEAF_MIN, static_cast<int>(IMAGE_SIDE));
     ASSERT_NE(atlas, nullptr);
@@ -584,7 +583,7 @@ HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_001, TestSize.Level1)
     shape.PackUniforms(builder, infos, *atlas, offsets, desc, RECT_SIDE, RECT_SIDE);
 
     // Empty packing skips the loop; a positive smooth spacing takes the other std::max edge.
-    std::vector<GESDFPixelmapUberLeafInfo> emptyInfos;
+    std::vector<GESDFUberPixelmapLeafInfo> emptyInfos;
     const std::vector<float> emptyOffsets;
     desc.spacing = 5.0f;
     shape.PackUniforms(builder, emptyInfos, *atlas, emptyOffsets, desc, RECT_SIDE, RECT_SIDE);
@@ -594,7 +593,7 @@ HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_001, TestSize.Level1)
 
     auto smoothRoot = MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MIN,
         static_cast<int>(IMAGE_SIDE), static_cast<int>(IMAGE_SIDE)), GESDFUnionOp::SMOOTH_UNION, 20.0f);
-    GESdfPixelmapAtlasUberShape smoothShape(MakeUberParams(smoothRoot, GESDFUberType::PIXELMAP_ATLAS_UBER));
+    GESdfUberPixelmapAtlasShape smoothShape(MakeUberParams(smoothRoot, GESDFUberType::PIXELMAP_ATLAS_UBER));
     EXPECT_NE(smoothShape.GenerateDrawingShader(RECT_SIDE, RECT_SIDE), nullptr);
 }
 
@@ -605,8 +604,8 @@ HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_001, TestSize.Level1)
  */
 HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_002, TestSize.Level1)
 {
-    GESdfPixelmapAtlasUberShape shape(MakeUberParams(nullptr, GESDFUberType::PIXELMAP_ATLAS_UBER));
-    std::vector<GESDFPixelmapUberLeafInfo> infos;
+    GESdfUberPixelmapAtlasShape shape(MakeUberParams(nullptr, GESDFUberType::PIXELMAP_ATLAS_UBER));
+    std::vector<GESDFUberPixelmapLeafInfo> infos;
     GESDFUberTreeDesc desc;
     EXPECT_TRUE(shape.CollectLeaves(nullptr, infos, desc));
     EXPECT_TRUE(infos.empty());
@@ -618,22 +617,22 @@ HWTEST_F(GESDFUberShaderShapeTest, PixelmapAtlasUberShape_002, TestSize.Level1)
     EXPECT_FALSE(shape.CollectLeaves(MakePerspectiveTree(), infos, desc));
 
     EXPECT_EQ(shape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
-    GESdfPixelmapAtlasUberShape tooFewShape(MakeUberParams(
+    GESdfUberPixelmapAtlasShape tooFewShape(MakeUberParams(
         MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MIN - 1,
             static_cast<int>(IMAGE_SIDE), static_cast<int>(IMAGE_SIDE))), GESDFUberType::PIXELMAP_ATLAS_UBER));
     EXPECT_EQ(tooFewShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
-    GESdfPixelmapAtlasUberShape tooManyShape(MakeUberParams(
+    GESdfUberPixelmapAtlasShape tooManyShape(MakeUberParams(
         MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MAX + 1,
             static_cast<int>(IMAGE_SIDE), static_cast<int>(IMAGE_SIDE))), GESDFUberType::PIXELMAP_ATLAS_UBER));
     EXPECT_EQ(tooManyShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
 
-    GESdfPixelmapAtlasUberShape wideShape(MakeUberParams(
+    GESdfUberPixelmapAtlasShape wideShape(MakeUberParams(
         MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MIN, WIDE_IMAGE_WIDTH, WIDE_IMAGE_HEIGHT)),
         GESDFUberType::PIXELMAP_ATLAS_UBER));
     EXPECT_EQ(wideShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);
 
     // Height-only over-budget: two rows fit the width but exceed ATLAS_MAX_SIZE in height.
-    GESdfPixelmapAtlasUberShape tallShape(MakeUberParams(
+    GESdfUberPixelmapAtlasShape tallShape(MakeUberParams(
         MakeUnionTree(MakePixelmapLeaves(PIXELMAP_UBER_LEAF_MIN, TALL_IMAGE_SIDE, TALL_IMAGE_SIDE)),
         GESDFUberType::PIXELMAP_ATLAS_UBER));
     EXPECT_EQ(tallShape.GenerateUberShader(RECT_SIDE, RECT_SIDE, false), nullptr);

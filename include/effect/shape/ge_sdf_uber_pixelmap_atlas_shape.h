@@ -23,29 +23,27 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-struct GESDFPixelmapUberLeafInfo : public GESDFUberLeafInfo {
+struct GESDFUberPixelmapLeafInfo : public GESDFUberLeafInfo {
     std::shared_ptr<Drawing::Image> image;
     float width = 0.f;
     float height = 0.f;
 };
 
-// Pixelmap-atlas uber shape: all leaf images are shelf-packed into one atlas
-// sampled by a single child shader.
-class GE_EXPORT GESdfPixelmapAtlasUberShape : public GESdfUberShaderShape {
+class GE_EXPORT GESdfUberPixelmapAtlasShape : public GESdfUberShaderShape {
 public:
-    explicit GESdfPixelmapAtlasUberShape(const GESdfUberShaderShapeParams& params)
+    explicit GESdfUberPixelmapAtlasShape(const GESdfUberShaderShapeParams& params)
         : GESdfUberShaderShape(params) {}
-    ~GESdfPixelmapAtlasUberShape() override = default;
+    ~GESdfUberPixelmapAtlasShape() override = default;
 
 protected:
     std::shared_ptr<ShaderEffect> GenerateUberShader(float width, float height, bool hasNormal) const override;
 
 private:
     bool CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
-        std::vector<GESDFPixelmapUberLeafInfo>& leaves, GESDFUberTreeDesc& desc) const;
+        std::vector<GESDFUberPixelmapLeafInfo>& leaves, GESDFUberTreeDesc& desc) const;
     static std::shared_ptr<Drawing::RuntimeShaderBuilder> GetBuilder(bool hasNormal, bool isSmoothUnion);
     void PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
-        const std::vector<GESDFPixelmapUberLeafInfo>& leaves, const Drawing::Image& atlasImage,
+        const std::vector<GESDFUberPixelmapLeafInfo>& leaves, const Drawing::Image& atlasImage,
         const std::vector<float>& offsets, const GESDFUberTreeDesc& desc, float width, float height) const;
 };
 

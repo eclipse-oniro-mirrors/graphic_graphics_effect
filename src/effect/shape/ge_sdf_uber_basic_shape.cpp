@@ -33,7 +33,7 @@ namespace Drawing {
 
 namespace {
 constexpr float HALF = 0.5;
-constexpr float EXTEND = 0.5; // Fixing edge difference between SDF and Skia RRect
+constexpr float EXTEND = 0.5;
 constexpr float MIN_SIZE = 0.0001f;
 constexpr float SPACING_MIN = 0.0001f;
 
@@ -44,8 +44,6 @@ float ClampCornerRadius(float radius, float maxRadius)
     return std::clamp(radius, 0.0f, maxRadius);
 }
 
-// Common uniforms + per-shape SDF math; per-leaf u_matA=(m0..m3),
-// u_matB=(m4,m5,shapeType), u_matC=(p0..p3), u_geo=(p4..p7).
 constexpr char UBER_BASICSHAPE_COMMON_PROG[] = R"(
     uniform float u_count;
     uniform float u_spacing;
@@ -373,8 +371,6 @@ constexpr char UBER_BASICSHAPE_COMMON_PROG[] = R"(
     }
 )";
 
-// All four variants walk the packed leaves [0, count); `count` is a uniform so
-// the loop breaks early instead of always running BASIC_SHAPE_LEAF_MAX times.
 constexpr char UBER_BASICSHAPE_SMOOTH_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -393,8 +389,6 @@ constexpr char UBER_BASICSHAPE_SMOOTH_NORMAL_PROG[] = R"(
     }
 )";
 
-// Plain union, normal version: keep the smaller-SDF leaf's channels, same as
-// the cascaded GESDFUnionOpShaderShape plain-union pass-through.
 constexpr char UBER_BASICSHAPE_UNION_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -413,8 +407,6 @@ constexpr char UBER_BASICSHAPE_UNION_NORMAL_PROG[] = R"(
     }
 )";
 
-// Smooth union, no-normal version: SDF channel only, same math as the
-// cascaded no-normal smooth union on the .a channel.
 constexpr char UBER_BASICSHAPE_SMOOTH_NO_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -433,7 +425,6 @@ constexpr char UBER_BASICSHAPE_SMOOTH_NO_NORMAL_PROG[] = R"(
     }
 )";
 
-// Plain union, no-normal version: SDF channel only.
 constexpr char UBER_BASICSHAPE_UNION_NO_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -461,7 +452,6 @@ bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root)
     }
     GESDFUberTreeDesc desc;
     std::vector<GESDFUberLeafPos> positions;
-    // Skip when not uberable or too small: those trees never reach an uber shader.
     if (!GESdfUberShaderShape::WalkUberLeaves(root, Drawing::Matrix(), desc, positions)) {
         return false;
     }
@@ -488,24 +478,21 @@ bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root)
             case GESDFShapeType::ELLIPSE: {
                 const auto* ellipseShape = static_cast<const GESDFEllipseShaderShape*>(pos.leaf.get());
                 if (ellipseShape->GetWidth() < MIN_SIZE || ellipseShape->GetHeight() < MIN_SIZE) {
-                    // Same degenerate skip as the collector.
                     continue;
                 }
                 ++effectiveCount;
                 break;
             }
             default:
-                // Not a basic-shape tree: cascades anyway, no GEX object needed.
                 return false;
         }
     }
     return hasNonG1 && effectiveCount >= BASIC_SHAPE_LEAF_MIN && effectiveCount <= BASIC_SHAPE_LEAF_MAX;
 }
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfBasicShapeUberShape::GetBuilder(
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfUberBasicShapeShape::GetBuilder(
     bool hasNormal, bool isSmoothUnion)
 {
-    // Variant = hasNormal * 2 + isSmoothUnion.
     thread_local std::array<std::shared_ptr<Drawing::RuntimeShaderBuilder>, UBER_SHADER_VARIANT_COUNT> builders {};
     int index = (hasNormal ? UBER_VARIANT_NORMAL_OFFSET : 0) + (isSmoothUnion ? UBER_VARIANT_SMOOTH_OFFSET : 0);
     if (builders[index]) {
@@ -528,7 +515,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfBasicShapeUberShape::GetBuil
     return builders[index];
 }
 
-bool GESdfBasicShapeUberShape::CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
+bool GESdfUberBasicShapeShape::CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
     std::vector<GESDFBasicShapeUberLeafInfo>& leaves, GESDFUberTreeDesc& desc) const
 {
     std::vector<GESDFUberLeafPos> positions;
@@ -579,7 +566,7 @@ bool GESdfBasicShapeUberShape::CollectLeaves(const std::shared_ptr<GESDFShaderSh
     return true;
 }
 
-void GESdfBasicShapeUberShape::PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
+void GESdfUberBasicShapeShape::PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
     const std::vector<GESDFBasicShapeUberLeafInfo>& leaves, const GESDFUberTreeDesc& desc) const
 {
     int count = static_cast<int>(leaves.size());
@@ -615,7 +602,7 @@ void GESdfBasicShapeUberShape::PackUniforms(const std::shared_ptr<Drawing::Runti
     builder->SetUniform("u_geo", geo.data(), geo.size());
 }
 
-std::shared_ptr<ShaderEffect> GESdfBasicShapeUberShape::GenerateUberShader(
+std::shared_ptr<ShaderEffect> GESdfUberBasicShapeShape::GenerateUberShader(
     float width, float height, bool hasNormal) const
 {
     std::vector<GESDFBasicShapeUberLeafInfo> leaves;
@@ -632,7 +619,7 @@ std::shared_ptr<ShaderEffect> GESdfBasicShapeUberShape::GenerateUberShader(
     if (!builder) {
         return nullptr;
     }
-    GE_TRACE_NAME_FMT("GESdfBasicShapeUberShape pack uniforms, count: %d, smooth: %d, hasNormal: %d",
+    GE_TRACE_NAME_FMT("GESdfUberBasicShapeShape pack uniforms, count: %d, smooth: %d, hasNormal: %d",
         count, static_cast<int>(desc.isSmoothUnion), static_cast<int>(hasNormal));
     PackUniforms(builder, leaves, desc);
     auto uberShader = builder->MakeShader(nullptr, false);

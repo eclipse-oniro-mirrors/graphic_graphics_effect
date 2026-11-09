@@ -147,7 +147,7 @@ ohos_source_set("graphics_effect_test_src") {
     "${graphics_effect_root}/src/effect/shape/ge_sdf_sub_op_shader_shape.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_uber_shader_shape.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_uber_basic_shape.cpp",
-    "${graphics_effect_root}/src/effect/shape/ge_sdf_pixelmap_atlas_uber_shape.cpp",
+    "${graphics_effect_root}/src/effect/shape/ge_sdf_uber_pixelmap_atlas_shape.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_border_shader.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_clip_shader.cpp",
     "${graphics_effect_root}/src/effect/shape/ge_sdf_color_shader.cpp",
