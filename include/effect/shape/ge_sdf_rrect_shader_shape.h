@@ -26,11 +26,40 @@ namespace OHOS {
 namespace Rosen {
 namespace Drawing {
 
-class GE_EXPORT GESDFRRectShaderShape : public GESDFShaderShape {
+class GE_EXPORT GESDFRRectShaderShapeBase : public GESDFShaderShape {
+public:
+    GESDFRRectShaderShapeBase(const GESDFRRectShapeParams& param) : params_(param) {}
+    GESDFRRectShaderShapeBase(const GESDFRRectShaderShapeBase&) = delete;
+    ~GESDFRRectShaderShapeBase() override = default;
+
+    GESDFShapeType GetSDFShapeType() const override
+    {
+        return GESDFShapeType::RRECT;
+    }
+
+    const GERRect& GetRRect() const
+    {
+        return params_.rrect;
+    }
+
+    bool HasType(const GESDFShapeType type) const override
+    {
+        return type == GESDFShapeType::RRECT;
+    }
+    void CopyState(const GESDFRRectShaderShapeBase& shape)
+    {
+        params_ = shape.params_;
+    }
+
+protected:
+    GESDFRRectShapeParams params_ {};
+};
+
+class GE_EXPORT GESDFRRectShaderShape : public GESDFRRectShaderShapeBase {
 public:
     using GESDFShaderShape::GenerateDrawingShader;
     using GESDFShaderShape::GenerateDrawingShaderHasNormal;
-    GESDFRRectShaderShape(const GESDFRRectShapeParams& param) : params_(param) {}
+    GESDFRRectShaderShape(const GESDFRRectShapeParams& param) : GESDFRRectShaderShapeBase(param) {}
     GESDFRRectShaderShape(const GESDFRRectShaderShape&) = delete;
     virtual ~GESDFRRectShaderShape() = default;
 
@@ -40,27 +69,8 @@ public:
 
     std::shared_ptr<ShaderEffect> GenerateDrawingShader(float width, float height) const override;
     std::shared_ptr<ShaderEffect> GenerateDrawingShaderHasNormal(float width, float height) const override;
-    GESDFShapeType GetSDFShapeType() const override
-    {
-        return GESDFShapeType::RRECT;
-    }
 
     bool TryGetCenterAndHalfSize(float& outX, float& outY, Vector2f& shapeHalfSize) const override;
-    
-    const GERRect& GetRRect() const
-    {
-        return params_.rrect;
-    }
-
-    void CopyState(const GESDFRRectShaderShape& shape)
-    {
-        params_ = shape.params_;
-    }
-
-    bool HasType(const GESDFShapeType type) const override
-    {
-        return type == GESDFShapeType::RRECT;
-    }
 
     bool GetInscribedRect(Rect& rect) override;
 
@@ -76,7 +86,6 @@ private:
     std::shared_ptr<Drawing::RuntimeShaderBuilder> GetSDFRRectNormalShapeBuilder() const;
     std::shared_ptr<ShaderEffect> GenerateShaderEffect(
         std::shared_ptr<Drawing::RuntimeShaderBuilder> builder, bool useUniformRadius) const;
-    GESDFRRectShapeParams params_ {};
 };
 } // Drawing
 } // namespace Rosen

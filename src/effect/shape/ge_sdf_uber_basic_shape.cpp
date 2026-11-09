@@ -460,7 +460,7 @@ bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root)
     for (const auto& pos : positions) {
         switch (pos.leaf->GetSDFShapeType()) {
             case GESDFShapeType::RRECT: {
-                const auto* rrectShape = static_cast<const GESDFRRectShaderShape*>(pos.leaf.get());
+                const auto* rrectShape = static_cast<const GESDFRRectShaderShapeBase*>(pos.leaf.get());
                 const GERRect& rrect = rrectShape->GetRRect();
                 if (rrect.width_ < MIN_SIZE || rrect.height_ < MIN_SIZE) {
                     // Degenerate leaves are absorbed by the collector.
@@ -530,7 +530,7 @@ bool GESdfUberBasicShapeShape::CollectLeaves(const std::shared_ptr<GESDFShaderSh
         info.parentToLocal = pos.parentToLocal;
         auto type = pos.leaf->GetSDFShapeType();
         if (type == GESDFShapeType::RRECT) {
-            const auto& rrect = static_cast<const GESDFRRectShaderShape*>(pos.leaf.get())->GetRRect();
+            const auto& rrect = static_cast<const GESDFRRectShaderShapeBase*>(pos.leaf.get())->GetRRect();
             if (rrect.width_ < MIN_SIZE || rrect.height_ < MIN_SIZE) {
                 continue;
             }

@@ -71,8 +71,8 @@ void GESDFShaderShape::CopyState(const GESDFShaderShape& shape)
         return;
     }
     if (GetSDFShapeType() == GESDFShapeType::RRECT) {
-        const auto* rectShape = static_cast<const GESDFRRectShaderShape*>(&shape);
-        auto* thisRect = static_cast<GESDFRRectShaderShape*>(this);
+        const auto* rectShape = static_cast<const GESDFRRectShaderShapeBase*>(&shape);
+        auto* thisRect = static_cast<GESDFRRectShaderShapeBase*>(this);
         thisRect->CopyState(*rectShape);
     } else if (GetSDFShapeType() == GESDFShapeType::UNION_OP) {
         const auto* unionShape = static_cast<const GESDFUnionOpShaderShape*>(&shape);
