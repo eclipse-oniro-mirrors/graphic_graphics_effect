@@ -34,10 +34,10 @@ struct GESDFBasicShapeUberLeafInfo : public GESDFUberLeafInfo {
 
 bool HasNonG1RRectLeaf(const std::shared_ptr<GESDFShaderShape>& root);
 
-class GE_EXPORT GESdfBasicShapeUberShape : public GESdfUberShaderShape {
+class GE_EXPORT GESdfUberBasicShapeShape : public GESdfUberShaderShape {
 public:
-    explicit GESdfBasicShapeUberShape(const GESdfUberShaderShapeParams& params) : GESdfUberShaderShape(params) {}
-    ~GESdfBasicShapeUberShape() override = default;
+    explicit GESdfUberBasicShapeShape(const GESdfUberShaderShapeParams& params) : GESdfUberShaderShape(params) {}
+    ~GESdfUberBasicShapeShape() override = default;
 
 protected:
     std::shared_ptr<ShaderEffect> GenerateUberShader(float width, float height, bool hasNormal) const override;

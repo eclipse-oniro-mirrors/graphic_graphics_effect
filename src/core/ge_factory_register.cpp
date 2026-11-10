@@ -84,7 +84,6 @@
 #include "effect/shape/ge_sdf_empty_shader_shape.h"
 #include "effect/shape/ge_sdf_ellipse_shader_shape.h"
 #include "effect/shape/ge_sdf_path_shader_shape.h"
-#include "effect/shape/ge_sdf_pixelmap_atlas_uber_shape.h"
 #include "effect/shape/ge_sdf_pixelmap_shader_shape.h"
 #include "effect/shape/ge_sdf_rrect_shader_shape.h"
 #include "effect/shape/ge_sdf_sub_op_shader_shape.h"
@@ -92,6 +91,7 @@
 #include "effect/shape/ge_sdf_transform_shader_shape.h"
 #include "effect/shape/ge_sdf_triangle_shader_shape.h"
 #include "effect/shape/ge_sdf_uber_basic_shape.h"
+#include "effect/shape/ge_sdf_uber_pixelmap_atlas_shape.h"
 #include "effect/shape/ge_sdf_uber_shader_shape.h"
 #include "effect/shape/ge_sdf_union_op_shader_shape.h"
 #include "ext/ge_external_dynamic_loader.h"
@@ -358,9 +358,9 @@ GE_FACTORY_REGISTER_CUSTOM(SDF_UBER,
         }
         switch (uberType) {
             case ::OHOS::Rosen::Drawing::GESDFUberType::PIXELMAP_ATLAS_UBER:
-                return std::make_shared<::OHOS::Rosen::Drawing::GESdfPixelmapAtlasUberShape>(*params);
+                return std::make_shared<::OHOS::Rosen::Drawing::GESdfUberPixelmapAtlasShape>(*params);
             case ::OHOS::Rosen::Drawing::GESDFUberType::BASIC_SHAPE_UBER:
-                return std::make_shared<::OHOS::Rosen::Drawing::GESdfBasicShapeUberShape>(*params);
+                return std::make_shared<::OHOS::Rosen::Drawing::GESdfUberBasicShapeShape>(*params);
             default:
                 return std::make_shared<::OHOS::Rosen::Drawing::GESdfUberShaderShape>(*params);
         }

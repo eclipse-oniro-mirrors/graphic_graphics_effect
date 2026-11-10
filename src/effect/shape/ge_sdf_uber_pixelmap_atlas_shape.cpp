@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ge_sdf_pixelmap_atlas_uber_shape.h"
+#include "ge_sdf_uber_pixelmap_atlas_shape.h"
 
 #include <algorithm>
 #include <array>
@@ -36,15 +36,11 @@ namespace {
 constexpr float SPACING_MIN = 0.0001f;
 
 constexpr int VEC4_FLOATS = 4;
-// 1px padding keeps LINEAR border samples inside the atlas background
-// (alpha = 1 -> SDF +64), matching the original CLAMP + SafeFetch semantics.
 constexpr int ATLAS_PADDING = 1;
 constexpr int ATLAS_PADDING_BOTH_SIDES = ATLAS_PADDING * 2;
 constexpr int ATLAS_OFFSET_FLOATS = 2;
 constexpr int ATLAS_MAX_SIZE = 2048;
 
-// Common uniforms + pixelmap remap math; per-leaf u_matA=(m0..m3), u_matB=(m4,m5),
-// u_matC=(sizeW,sizeH), u_geo=(atlasOffsetX,atlasOffsetY).
 constexpr char UBER_PIXELMAP_ATLAS_COMMON_PROG[] = R"(
     uniform float u_spacing;
     uniform vec2 u_centerPos;
@@ -167,7 +163,6 @@ constexpr char UBER_PIXELMAP_ATLAS_UNION_NORMAL_PROG[] = R"(
     }
 )";
 
-// Smooth union, no-normal version: SDF channel only.
 constexpr char UBER_PIXELMAP_ATLAS_SMOOTH_NO_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -193,7 +188,6 @@ constexpr char UBER_PIXELMAP_ATLAS_SMOOTH_NO_NORMAL_PROG[] = R"(
     }
 )";
 
-// Plain union, no-normal version: SDF channel only.
 constexpr char UBER_PIXELMAP_ATLAS_UNION_NO_NORMAL_PROG[] = R"(
     half4 main(vec2 fragCoord)
     {
@@ -221,12 +215,10 @@ constexpr char UBER_PIXELMAP_ATLAS_UNION_NO_NORMAL_PROG[] = R"(
 
 struct PixelmapAtlasEntry {
     std::shared_ptr<Drawing::Image> atlasImage;
-    std::vector<float> offsets; // 2 floats per leaf: sub-image origin in the atlas
+    std::vector<float> offsets; 
 };
 
-// Shelf packing: leaves are placed row by row (row height = tallest image in
-// the row), every sub-image gets 1px padding on each side.
-bool PackAtlasShelf(const std::vector<GESDFPixelmapUberLeafInfo>& leaves, int& atlasWidth, int& atlasHeight,
+bool PackAtlasShelf(const std::vector<GESDFUberPixelmapLeafInfo>& leaves, int& atlasWidth, int& atlasHeight,
     std::vector<std::pair<int, int>>& origins)
 {
     int curX = 0;
@@ -254,9 +246,7 @@ bool PackAtlasShelf(const std::vector<GESDFPixelmapUberLeafInfo>& leaves, int& a
     return atlasWidth <= ATLAS_MAX_SIZE && atlasHeight <= ATLAS_MAX_SIZE;
 }
 
-// Draw every leaf into one offscreen raster atlas; DrawImage normalizes mixed
-// pixel layouts and the white-opaque background decodes to far-outside SDF.
-std::shared_ptr<PixelmapAtlasEntry> BuildPixelmapAtlas(const std::vector<GESDFPixelmapUberLeafInfo>& leaves,
+std::shared_ptr<PixelmapAtlasEntry> BuildPixelmapAtlas(const std::vector<GESDFUberPixelmapLeafInfo>& leaves,
     const std::vector<std::pair<int, int>>& origins, int atlasWidth, int atlasHeight)
 {
     Drawing::ImageInfo atlasInfo(atlasWidth, atlasHeight, Drawing::ColorType::COLORTYPE_RGBA_8888,
@@ -274,21 +264,15 @@ std::shared_ptr<PixelmapAtlasEntry> BuildPixelmapAtlas(const std::vector<GESDFPi
     Drawing::Brush background;
     background.SetColor(Drawing::Color::COLOR_WHITE);
     canvas->DrawBackground(background);
-    // SRC blend replaces the background inside each sub-rect; SRC_OVER would
-    // blend the SDF alpha channel and destroy the data.
     Drawing::Brush imageBlit;
     imageBlit.SetBlendMode(Drawing::BlendMode::SRC);
     canvas->AttachBrush(imageBlit);
     for (size_t i = 0; i < leaves.size(); ++i) {
-        // Integer-origin 1:1 blit: NEAREST keeps the copy exact regardless of
-        // any half-texel sampling convention drift inside the rasterizer.
         canvas->DrawImage(*leaves[i].image, static_cast<Drawing::scalar>(origins[i].first),
             static_cast<Drawing::scalar>(origins[i].second), Drawing::SamplingOptions(Drawing::FilterMode::NEAREST));
     }
     canvas->DetachBrush();
     auto entry = std::make_shared<PixelmapAtlasEntry>();
-    // Raster snapshot: the image shares the surface pixels (copy on write);
-    // the surface is never drawn into again, so it can die with this frame.
     entry->atlasImage = surface->GetImageSnapshot();
     if (!entry->atlasImage) {
         GE_LOGE("BuildPixelmapAtlas: image snapshot fail");
@@ -303,10 +287,9 @@ std::shared_ptr<PixelmapAtlasEntry> BuildPixelmapAtlas(const std::vector<GESDFPi
 }
 } // namespace
 
-std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfPixelmapAtlasUberShape::GetBuilder(
+std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfUberPixelmapAtlasShape::GetBuilder(
     bool hasNormal, bool isSmoothUnion)
 {
-    // Variant = hasNormal * 2 + isSmoothUnion.
     thread_local std::array<std::shared_ptr<Drawing::RuntimeShaderBuilder>, UBER_SHADER_VARIANT_COUNT> builders {};
     int index = (hasNormal ? UBER_VARIANT_NORMAL_OFFSET : 0) + (isSmoothUnion ? UBER_VARIANT_SMOOTH_OFFSET : 0);
     if (builders[index]) {
@@ -329,10 +312,8 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GESdfPixelmapAtlasUberShape::GetB
     return builders[index];
 }
 
-// Walk the flag's inner tree once, then validate every collected leaf is a
-// PixelMap shape with a usable image.
-bool GESdfPixelmapAtlasUberShape::CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
-    std::vector<GESDFPixelmapUberLeafInfo>& leaves, GESDFUberTreeDesc& desc) const
+bool GESdfUberPixelmapAtlasShape::CollectLeaves(const std::shared_ptr<GESDFShaderShape>& root,
+    std::vector<GESDFUberPixelmapLeafInfo>& leaves, GESDFUberTreeDesc& desc) const
 {
     std::vector<GESDFUberLeafPos> positions;
     if (!WalkUberLeaves(root, Drawing::Matrix(), desc, positions)) {
@@ -340,13 +321,10 @@ bool GESdfPixelmapAtlasUberShape::CollectLeaves(const std::shared_ptr<GESDFShade
     }
     for (const auto& pos : positions) {
         const Drawing::Matrix& m = pos.parentToLocal;
-        // Inline affine apply uses m0..m5 only; reject perspective transforms
-        // so the atlas path matches the basic-shape path and falls back.
         if (!IsAffineTransform(m)) {
             return false;
         }
         if (pos.leaf->GetSDFShapeType() != GESDFShapeType::PIXELMAP) {
-            // Design-internal fallback; 2D already classifies mixed trees as OTHER.
             GE_LOGD("CollectLeaves: non-PixelMap leaf, fall back");
             return false;
         }
@@ -356,7 +334,7 @@ bool GESdfPixelmapAtlasUberShape::CollectLeaves(const std::shared_ptr<GESDFShade
             GE_LOGD("CollectLeaves: empty image, fall back");
             return false;
         }
-        GESDFPixelmapUberLeafInfo info;
+        GESDFUberPixelmapLeafInfo info;
         info.parentToLocal = pos.parentToLocal;
         info.image = std::move(image);
         info.width = static_cast<float>(info.image->GetWidth());
@@ -366,8 +344,8 @@ bool GESdfPixelmapAtlasUberShape::CollectLeaves(const std::shared_ptr<GESDFShade
     return true;
 }
 
-void GESdfPixelmapAtlasUberShape::PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
-    const std::vector<GESDFPixelmapUberLeafInfo>& leaves, const Drawing::Image& atlasImage,
+void GESdfUberPixelmapAtlasShape::PackUniforms(const std::shared_ptr<Drawing::RuntimeShaderBuilder>& builder,
+    const std::vector<GESDFUberPixelmapLeafInfo>& leaves, const Drawing::Image& atlasImage,
     const std::vector<float>& offsets, const GESDFUberTreeDesc& desc, float width, float height) const
 {
     constexpr float HALF = 0.5f;
@@ -401,10 +379,10 @@ void GESdfPixelmapAtlasUberShape::PackUniforms(const std::shared_ptr<Drawing::Ru
         Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), Drawing::Matrix()));
 }
 
-std::shared_ptr<ShaderEffect> GESdfPixelmapAtlasUberShape::GenerateUberShader(
+std::shared_ptr<ShaderEffect> GESdfUberPixelmapAtlasShape::GenerateUberShader(
     float width, float height, bool hasNormal) const
 {
-    std::vector<GESDFPixelmapUberLeafInfo> leaves;
+    std::vector<GESDFUberPixelmapLeafInfo> leaves;
     leaves.reserve(PIXELMAP_UBER_LEAF_MAX);
     GESDFUberTreeDesc desc;
     if (!CollectLeaves(GetRootShape(), leaves, desc)) {
@@ -414,13 +392,10 @@ std::shared_ptr<ShaderEffect> GESdfPixelmapAtlasUberShape::GenerateUberShader(
     if (!IsLeafCountInRange(count, PIXELMAP_UBER_LEAF_MAX, PIXELMAP_UBER_LEAF_MIN)) {
         return nullptr;
     }
-    // No cache: the atlas bitmap is rebuilt from the leaf images on every
-    // draw, so packing runs per call while uniforms are repacked as before.
     int atlasWidth = 0;
     int atlasHeight = 0;
     std::vector<std::pair<int, int>> origins;
     if (!PackAtlasShelf(leaves, atlasWidth, atlasHeight, origins)) {
-        // Over-budget trees keep the cascaded rendering; logged per build attempt.
         GE_LOGD("GenerateUberShader: atlas budget exceeded, leaves=%{public}d, "
             "size=%{public}dx%{public}d", count, atlasWidth, atlasHeight);
         return nullptr;
@@ -433,7 +408,7 @@ std::shared_ptr<ShaderEffect> GESdfPixelmapAtlasUberShape::GenerateUberShader(
     if (!builder) {
         return nullptr;
     }
-    GE_TRACE_NAME_FMT("GESdfPixelmapAtlasUberShape pack uniforms, count: %d, smoothUnion: %d, hasNormal: %d",
+    GE_TRACE_NAME_FMT("GESdfUberPixelmapAtlasShape pack uniforms, count: %d, smoothUnion: %d, hasNormal: %d",
         count, static_cast<int>(desc.isSmoothUnion), static_cast<int>(hasNormal));
     PackUniforms(builder, leaves, *entry->atlasImage, entry->offsets, desc, width, height);
     auto uberShader = builder->MakeShader(nullptr, false);

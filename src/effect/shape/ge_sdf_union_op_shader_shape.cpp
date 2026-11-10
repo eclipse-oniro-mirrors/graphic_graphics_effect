@@ -234,7 +234,6 @@ static constexpr char SDF_SMOOTH_UNION_NORMAL_PROG[] = R"(
         float t = (da < db) ? h : 1.0 - h;
         float d = min(da, db) - h * h * k;
         vec2 gSmooth = safeNormalize(mix(g1, g2, t), g1);
-
         float z = mix(d1.z, d2.z, t);
         bool dominantIsLeft = da < db;
         float dDom = dominantIsLeft ? da : db;

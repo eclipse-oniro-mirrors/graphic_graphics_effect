@@ -121,7 +121,6 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_001, TestSize.Level1)
     params.thresholdRange = 0.1f;
     auto filter = std::make_shared<GEBinarizationShaderFilter>(params);
     ASSERT_NE(filter, nullptr);
-
     auto result = filter->OnProcessImage(*gpuCanvas, gpuImage, src_, dst_);
     EXPECT_NE(result, nullptr);
 }
@@ -268,7 +267,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_009, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_010
- * @tc.desc: Verify OnProcessImage with thresholdRange > 1.0 returns original image
+ * @tc.desc: Verify OnProcessImage with thresholdRange > 1.0 triggers condition8
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_010, TestSize.Level1)
