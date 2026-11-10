@@ -334,7 +334,7 @@ static constexpr char GRAVITY_PULL_PROG[] = R"(
         float radiusAlongPull = InfluenceRadiusAlongDir(pullDir, warpRadius);
         float maxWarpScale = min(0.8 * radiusAlongPull, 0.8 * centerDist);
         float warpScale = clamp(rawWarpScale, -maxWarpScale, maxWarpScale);
-        if (abs(warpScale) <= kEpsilon) {
+        if (abs(warpScale) <= 1e-3) {
             return p;
         }
         float falloff = BlendedRationalFalloff(localT);
