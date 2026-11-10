@@ -46,6 +46,7 @@ public:
     {
         return type == GESDFShapeType::RRECT;
     }
+
     void CopyState(const GESDFRRectShaderShapeBase& shape)
     {
         params_ = shape.params_;

@@ -267,7 +267,7 @@ HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_009, TestSize.Level1)
 
 /**
  * @tc.name: OnProcessImage_010
- * @tc.desc: Verify OnProcessImage with thresholdRange > 1.0 returns triggers condition8
+ * @tc.desc: Verify OnProcessImage with thresholdRange > 1.0 triggers condition8
  * @tc.type: FUNC
  */
 HWTEST_F(GEBinarizationShaderFilterTest, OnProcessImage_010, TestSize.Level1)

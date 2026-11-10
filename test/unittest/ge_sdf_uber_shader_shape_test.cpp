@@ -25,6 +25,7 @@
 #include "ge_sdf_transform_shader_shape.h"
 #include "ge_sdf_triangle_shader_shape.h"
 #include "ge_sdf_uber_basic_shape.h"
+#include "ge_sdf_uber_pixelmap_atlas_shape.h"
 #include "ge_sdf_uber_shader_shape.h"
 #include "ge_sdf_union_op_shader_shape.h"
 #include "image/bitmap.h"
