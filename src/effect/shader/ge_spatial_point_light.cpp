@@ -97,6 +97,7 @@ void GESpatialPointLightShader::MakeDrawingShader(const Drawing::Rect& rect, flo
 
 std::shared_ptr<Drawing::RuntimeShaderBuilder> GESpatialPointLightShader::GetSpatialPointLightBuilderNoMask()
 {
+    
     thread_local std::shared_ptr<Drawing::RuntimeShaderBuilder> shaderBuilder;
     if (shaderBuilder) {
         return shaderBuilder;

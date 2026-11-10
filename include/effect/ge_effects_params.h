@@ -115,7 +115,7 @@ namespace Drawing {
 #include "effect/shader/ge_frosted_glass_effect.params.in"
 #include "effect/shader/ge_harmonium_effect_shader.params.in"
 #include "effect/shader/ge_particle_circular_halo_shader.params.in"
-#include "effect/shader/ge_point_light_params.in"
+#include "effect/shader/ge_point_light.params.in"
 #include "effect/shader/ge_sdf_edge_light_effect.params.in"
 #include "effect/shader/ge_spatial_glass_effect.params.in"
 #include "effect/shader/ge_spatial_point_light.params.in"

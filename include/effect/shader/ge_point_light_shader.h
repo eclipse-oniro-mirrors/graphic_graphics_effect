@@ -69,7 +69,7 @@ struct GEPointLightShaderParamsUser {
     std::vector<GEPointLightSourceData> lightSources;
     bool enableEDREffect = false;
     float displayHeadroom = 0.0f;
-    float bloom = 0.0f;
+    float bloom = 0.0f; // not used yet
 };
 
 class GE_EXPORT GEPointLightShader : public GEShader {
@@ -83,6 +83,7 @@ public:
     void MakeDrawingShader(Drawing::Canvas& canvas, const Drawing::Rect& rect, float progress) override {}
 
     const std::string GetDescription() const { return "GEPointLightShader"; }
+
 private:
     GEPointLightShader(const GEPointLightShader&) = delete;
     GEPointLightShader(GEPointLightShader&&) = delete;

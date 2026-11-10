@@ -481,7 +481,7 @@ GEPointLightShaderParamsUser Convert(const Drawing::GEPointLightShaderParams& in
     out.borderWidth = in.illuminatedBorderWidth;
     auto size_light = in.lightIntensities.size();
     if (in.lightColors.size() != size_light || in.lightPositions.size() != size_light) {
-        GE_LOGE("DrawLight mismatch Size: %{public}zu, %{public}zu, %{public}zu", size_light, in.lightColors.size(),
+        GE_LOGE("DrawLight mismatch Size:%{public}zu, %{public}zu %{public}zu", size_light, in.lightColors.size(),
             in.lightPositions.size());
         return out;
     }
@@ -512,6 +512,8 @@ void GEPointLightShader::OnDrawShader(Drawing::Canvas& canvas, const Drawing::Re
 
 void GEPointLightShader::DrawLight(Drawing::Canvas& canvas) const
 {
+    GE_LOGD("DrawLight type:%{public}u lightSize:%{public}zu enableEDR:%{public}d",
+        static_cast<uint32_t>(params_.illuminatedType), params_.lightSources.size(), params_.enableEDREffect);
     if (params_.lightSources.empty()) {
         return;
     }
@@ -775,6 +777,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEPointLightShader::MakeFeatherin
 {
     auto builder = GetFeatheringBorderLightShaderBuilder(lightLength);
     if (!builder) {
+        GE_LOGE("GEPointLightShader::MakeFeatheringBoardLightShaderBuilder effect is null");
         return nullptr;
     }
     float rectWidth = params_.contentRRect.GetRect().GetWidth();
@@ -791,6 +794,7 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEPointLightShader::MakeNormalLig
 {
     auto builder = GetNormalLightShaderBuilder(lightLength);
     if (!builder) {
+        GE_LOGE("GEPointLightShader::GetNormalLightShaderBuilder effect is null");
         return nullptr;
     }
     constexpr float DEFAULT_BUMP_FACTOR = 1.0f;
@@ -824,8 +828,10 @@ std::shared_ptr<Drawing::RuntimeShaderBuilder> GEPointLightShader::MakeNormalLig
 bool GEPointLightShader::DrawSDFContentLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::ShaderEffect>& lightShaderEffect, Drawing::Brush& brush) const
 {
+    GE_LOGD("GEPointLightShader::DrawSDFContentLight");
     auto sdfLightBuilder = GetSDFContentLightShaderBuilder();
     if (!sdfLightBuilder || !lightShaderEffect) {
+        GE_LOGE("GEPointLightShader::DrawSDFContentLight effect is null");
         return false;
     }
     sdfLightBuilder->SetChild("light", lightShaderEffect);
@@ -854,6 +860,7 @@ void GEPointLightShader::DrawContentLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::RuntimeShaderBuilder>& lightBuilder, Drawing::Brush& brush,
     const std::array<float, MAX_LIGHT_SOURCES>& lightIntensityArray) const
 {
+    GE_LOGD("GEPointLightShader::DrawContentLight");
     float contentIntensityCoefficient = params_.illuminatedType == IlluminatedType::NORMAL_BORDER_CONTENT ? 0.5f : 0.3f;
     float specularStrengthArr[MAX_LIGHT_SOURCES] = { 0 };
     for (int i = 0; i < MAX_LIGHT_SOURCES; i++) {
@@ -888,6 +895,7 @@ void GEPointLightShader::DrawSingleContentLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::RuntimeShaderBuilder>& lightBuilder, Drawing::Brush& brush,
     const std::array<float, 1>& lightIntensityArray) const
 {
+    GE_LOGD("GEPointLightShader::DrawSingleContentLight");
     float contentIntensityCoefficient = params_.illuminatedType == IlluminatedType::NORMAL_BORDER_CONTENT ? 0.5f : 0.3f;
     float specularStrengthArr[1] = { 0 };
     specularStrengthArr[0] = lightIntensityArray[0] * contentIntensityCoefficient;
@@ -919,8 +927,10 @@ void GEPointLightShader::DrawSingleContentLight(Drawing::Canvas& canvas,
 bool GEPointLightShader::DrawSDFBorderLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::ShaderEffect>& lightShaderEffect) const
 {
+    GE_LOGD("GEPointLightShader::DrawSDFBorderLight");
     auto sdfLightBuilder = GetSDFBorderLightShaderBuilder();
     if (!sdfLightBuilder || !lightShaderEffect) {
+        GE_LOGE("GEPointLightShader::DrawSDFBorderLight effect is null");
         return false;
     }
     sdfLightBuilder->SetChild("light", lightShaderEffect);
@@ -953,6 +963,7 @@ void GEPointLightShader::DrawBorderLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::RuntimeShaderBuilder>& lightBuilder, Drawing::Pen& pen,
     const std::array<float, MAX_LIGHT_SOURCES>& lightIntensityArray) const
 {
+    GE_LOGD("GEPointLightShader::DrawBorderLight");
     float specularStrengthArr[MAX_LIGHT_SOURCES] = { 0 };
     for (int i = 0; i < MAX_LIGHT_SOURCES; i++) {
         specularStrengthArr[i] = lightIntensityArray[i];
@@ -988,6 +999,7 @@ void GEPointLightShader::DrawSingleBorderLight(Drawing::Canvas& canvas,
     std::shared_ptr<Drawing::RuntimeShaderBuilder>& lightBuilder, Drawing::Pen& pen,
     const std::array<float, 1>& lightIntensityArray) const
 {
+    GE_LOGD("GEPointLightShader::DrawSingleBorderLight");
     float specularStrengthArr[1] = { 0 };
     specularStrengthArr[0] = lightIntensityArray[0];
     lightBuilder->SetUniform("specularStrength", specularStrengthArr, 1);
@@ -1080,6 +1092,7 @@ void GEPointLightShader::DrawSDFContentAndBorderLight(Drawing::Canvas& canvas,
     auto sdfLightBuilder = GetSDFContentAndBorderLightShaderBuilder();
     bool isValidLightShader = sdfLightBuilder && lightShaderEffect && lightShaderEffectContent;
     if (!isValidLightShader) {
+        GE_LOGE("GEPointLightShader::DrawSDFContentAndBorderLight effect is null");
         return;
     }
     sdfLightBuilder->SetChild("lightContent", lightShaderEffectContent);

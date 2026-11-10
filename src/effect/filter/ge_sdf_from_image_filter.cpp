@@ -28,7 +28,6 @@ namespace {
 constexpr int MAX_SPREAD_FACTOR = 4096;
 constexpr int TWO = 2;
 constexpr int MAX_SIZE = 16384; // 16K
-
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_JFAPrepareEffect;
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_jfaIterationEffect;
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_jfaProcessResultEffect;
