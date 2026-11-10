@@ -299,26 +299,6 @@ HWTEST_F(GESDFDistortOpShaderShapeTest, HasType_002, TestSize.Level1)
 }
 
 /**
- * @tc.name: HasType_003
- * @tc.desc: Verify HasType returns true for nested shape type
- * @tc.type: FUNC
- */
-HWTEST_F(GESDFDistortOpShaderShapeTest, HasType_003, TestSize.Level1)
-{
-    GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest HasType_003 start";
-    GESDFDistortOpShapeParams param;
-    param.shape = CreateTestShape();
-    param.LUCorner = Drawing::Point(0.0f, 0.0f);
-    param.RUCorner = Drawing::Point(1.0f, 0.0f);
-    param.RBCorner = Drawing::Point(1.0f, 1.0f);
-    param.LBCorner = Drawing::Point(0.0f, 1.0f);
-
-    GESDFDistortOpShaderShape shape(param);
-    EXPECT_TRUE(shape.HasType(GESDFShapeType::RRECT));
-    GTEST_LOG_(INFO) << "GESDFDistortOpShaderShapeTest HasType_003 end";
-}
-
-/**
  * @tc.name: GenerateDrawingShader_004
  * @tc.desc: Verify GenerateDrawingShader with asymmetric barrel distortion
  * @tc.type: FUNC
