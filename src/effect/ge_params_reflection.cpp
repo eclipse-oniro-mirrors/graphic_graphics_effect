@@ -142,12 +142,13 @@ std::unique_ptr<GEFilterParams> GEParamsBuilder::Build(GEFilterType filterType)
 GEFilterType GEParamsBuilder::GetFilterTypeFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEFilterType> map = {
+    // clang-format off
 #define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \
     {                                                                                               \
         std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \
     }
 
-#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID }
+#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID } // clang-format on
 
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAIBarShaderFilterParams),
         GE_FILTER_NAME_TO_TYPE_ENTRY(GEAuroraNoiseShaderParams),
@@ -1132,12 +1133,13 @@ GEFilterType GEParamsMemberHelper::GetFilterTypeFromTag(GEParamsMemberTag tag)
 GEParamsMemberTag GEParamsMemberHelper::GEParamsMemberTagFromString(const std::string& str)
 {
     static const std::unordered_map<std::string, GEParamsMemberTag> map = {
+    // clang-format off
 #define GE_STRING_TO_TAG_ENTRY(Tag)                                                 \
     {                                                                               \
         GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag \
     }
 
-#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag }
+#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag } // clang-format on
 
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_LOW),
         GE_STRING_TO_TAG_ENTRY(AIBAR_AI_BAR_HIGH),
@@ -3202,6 +3204,7 @@ void GEParamsMemberHelper::SetParamsMemberByTag(
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX1)
         GE_VALIDATE_AND_SET(SDF_TRIANGLE_SHAPE_VERTEX2)
         GE_VALIDATE_AND_SET(SOUND_WAVE_CIRCLE_CENTER)
+        GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_CAMERA_INTRINSICS)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_THICK_PARAMS)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_FRESNEL_ENV_PARAMS)
         GE_VALIDATE_AND_SET(SPATIAL_GLASS_EFFECT_BG_RATES)

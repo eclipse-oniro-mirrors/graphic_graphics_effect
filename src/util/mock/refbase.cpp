@@ -343,7 +343,7 @@ bool RefCounter::AttemptIncStrongRef(const void *objectId, int &outCount)
     }
 
 ATTEMPT_SUCCESS:
-    if (curCount >= INITIAL_PRIMARY_VALUE) {
+    if (curCount == INITIAL_PRIMARY_VALUE) {
         outCount = curCount;
         atomicStrong_.fetch_sub(INITIAL_PRIMARY_VALUE, std::memory_order_release);
         return true;

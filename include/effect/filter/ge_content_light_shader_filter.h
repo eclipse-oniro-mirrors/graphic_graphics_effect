@@ -41,7 +41,6 @@ public:
 
 private:
     void GenerateContentLightEffect();
-    static std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_;
     float ClampValue(float x, float minValue, float maxValue);
     void ClampLightValue();
 

@@ -14,31 +14,36 @@
  */
 
 struct [[ge::params(type=POINT_LIGHT, name="PointLight")]] GEPointLightShaderParams {
-    float lightIntensity = 1.0f;
-    Vector4f lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    Vector4f lightPosition = Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
-    [[ge::prop(name="PointLight_IlluminatedBorderWidth")]]
+    float lightIntensity = 1.0f; // Redundant variable
+    Vector4f lightColor = Vector4f(1.0f, 1.0f, 1.0f, 1.0f); // Redundant variable
+    Vector4f lightPosition = Vector4f(0.0f, 0.0f, 0.0f, 0.0f); // Redundant variable
+    [[ge::prop("PointLight_IlluminatedBorderWidth")]]
     float illuminatedBorderWidth = 0.0f;
-    [[ge::prop(name="PointLight_IlluminatedType")]]
+    [[ge::prop("PointLight_IlluminatedType")]]
     int illuminatedType = 0;
-    [[ge::prop(name="PointLight_Bloom")]]
-    float bloom = 0.0f;
-    [[ge::prop(name="PointLight_LightPositions")]]
+    [[ge::prop("PointLight_Bloom")]]
+    float bloom = 0.0f; // not used yet
+    // Multi-light source array injected by RSNGRenderShaderHelper::SetPointLightData
+    // Each entry: (x, y, z, radius) where xy=position, z=height, w=max lighting radius
+    [[ge::prop("PointLight_LightPositions")]]
     std::vector<Vector4f> lightPositions{};
-    [[ge::prop(name="PointLight_LightColors")]]
+    // Each light source color (r, g, b, a)
+    [[ge::prop("PointLight_LightColors")]]
     std::vector<Vector4f> lightColors{};
-    [[ge::prop(name="PointLight_LightIntensities")]]
+    // Each light source intensity
+    [[ge::prop("PointLight_LightIntensities")]]
     std::vector<float> lightIntensities{};
-    [[ge::prop(name="PointLight_DisplayHeadroom")]]
+    // EDR parameters
+    [[ge::prop("PointLight_DisplayHeadroom")]]
     float displayHeadroom = 1.0f;
-    [[ge::prop(name="PointLight_EnableEDREffect")]]
+    [[ge::prop("PointLight_EnableEDREffect")]]
     bool enableEDREffect = false;
     [[ge::prop(name="PointLight_Shape", cast_from="std::shared_ptr<GEShaderShape>")]]
-    std::shared_ptr<Drawing::GESDFShaderShape> shape;
-    [[ge::prop(name="PointLight_ContentRRect")]]
+    std::shared_ptr<Drawing::GESDFShaderShape> shape; // new
+    [[ge::prop("PointLight_ContentRRect")]]
     GERRect contentRRect;
-    [[ge::prop(name="PointLight_BorderRRect")]]
+    [[ge::prop("PointLight_BorderRRect")]]
     GERRect borderRRect;
-    [[ge::prop(name="PointLight_DrawRect")]]
+    [[ge::prop("PointLight_DrawRect")]]
     Vector4f drawRect;
 };
