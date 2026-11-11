@@ -1120,6 +1120,5 @@ void GEPointLightShader::DrawSDFContentAndBorderLight(Drawing::Canvas& canvas,
         canvas.DetachBrush();
     }
 }
-
 } // namespace Rosen
 } // namespace OHOS

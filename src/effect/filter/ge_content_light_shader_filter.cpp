@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Rosen {
-
+namespace {
 constexpr size_t NUM_0 = 0;
 constexpr size_t NUM_1 = 1;
 constexpr size_t NUM_2 = 2;
@@ -28,7 +28,8 @@ constexpr size_t NUM_4 = 4;
 constexpr float MIN_LIGHT_POSITION = -10.0f;
 constexpr float MAX_LIGHT_POSITION = 10.0f;
 
-std::shared_ptr<Drawing::RuntimeEffect> GEContentLightFilter::contentLightShaderEffect_ = nullptr;
+thread_local std::shared_ptr<Drawing::RuntimeEffect> contentLightShaderEffect_ = nullptr;
+} // namespace
 
 GEContentLightFilter::GEContentLightFilter(const Drawing::GEContentLightFilterParams& params)
     : lightPosition_(params.position), lightColor_(params.color), lightIntensity_(params.intensity),

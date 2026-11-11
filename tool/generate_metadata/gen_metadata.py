@@ -841,14 +841,18 @@ def generate_string_to_enum_mapping_impl(structs: List[StructInfo]) -> str:
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEParamsMemberTag> map = {")
 
+    # clang-format reflows these definitions differently on every pass, so freeze
+    # them in place.
+    output.append("    // clang-format off")
     # Helper macro for reducing repetition - uses GEParamsFieldAccessor::name
-    output.append("#define GE_STRING_TO_TAG_ENTRY(Tag) \\")
-    output.append("    { GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag }")
+    output.append("#define GE_STRING_TO_TAG_ENTRY(Tag)                                                 \\")
+    output.append("    {                                                                               \\")
+    output.append("        GEParamsFieldAccessor<GEParamsMemberTag::Tag>::name, GEParamsMemberTag::Tag \\")
+    output.append("    }")
     output.append("")
 
     # Helper macro for alias entries
-    output.append("#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) \\")
-    output.append("    { #Alias, GEParamsMemberTag::Tag }")
+    output.append("#define GE_STRING_TO_TAG_ALIAS(Tag, Alias) { #Alias, GEParamsMemberTag::Tag } // clang-format on")
     output.append("")
 
     for struct in structs:
@@ -932,14 +936,20 @@ def generate_filter_type_from_string_impl(structs: List[StructInfo]) -> str:
     output.append("{")
     output.append("    static const std::unordered_map<std::string, GEFilterType> map = {")
 
+    # clang-format reflows these definitions differently on every pass, so freeze
+    # them in place.
+    output.append("    // clang-format off")
     # Helper macro for primary filter name - uses GEFilterParamsTypeInfo::FilterName
-    output.append("#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct) \\")
-    output.append("    { std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID }")
+    output.append("#define GE_FILTER_NAME_TO_TYPE_ENTRY(Struct)                                                        \\")
+    output.append("    {                                                                                               \\")
+    output.append("        std::string(GEFilterParamsTypeInfo<Struct>::FilterName), GEFilterParamsTypeInfo<Struct>::ID \\")
+    output.append("    }")
     output.append("")
 
     # Helper macro for alias entries (struct-level alias from [[ge::params(..., alias="...")]])
-    output.append("#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) \\")
-    output.append("    { #Alias, GEFilterParamsTypeInfo<Struct>::ID }")
+    output.append(
+        "#define GE_FILTER_NAME_TO_TYPE_ALIAS(Struct, Alias) { #Alias, GEFilterParamsTypeInfo<Struct>::ID } // clang-format on"
+    )
     output.append("")
 
     for struct in structs:
