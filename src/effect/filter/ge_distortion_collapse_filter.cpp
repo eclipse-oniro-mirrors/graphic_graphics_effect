@@ -128,7 +128,6 @@ std::shared_ptr<Drawing::Image> GEDistortionCollapseFilter::OnProcessImage(Drawi
     auto outputImageInfo = image->GetImageInfo();
 
     Drawing::Matrix matrix;
-    matrix.PreScale(src.GetWidth() / dst.GetWidth(), src.GetHeight() / dst.GetHeight());
     matrix.PreTranslate(src.GetLeft() - dst.GetLeft(), src.GetTop() - dst.GetTop());
 
     outputImageInfo.SetWidth(dst.GetWidth());
