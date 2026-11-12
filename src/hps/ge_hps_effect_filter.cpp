@@ -15,6 +15,8 @@
 
 #include "ge_hps_effect_filter.h"
 
+#include <cmath>
+
 #include "draw/surface.h"
 #include "ge_system_properties.h"
 #include "ge_aibar_shader_filter.h"
@@ -92,8 +94,8 @@ std::array<float, Drawing::MATRIX_3X3_SIZE> GetTransformMatrix(
     matrix.PostTranslate(-canvasInfo.tranX, -canvasInfo.tranY);
     if (image != nullptr) {
         auto imageInfo = image->GetImageInfo();
-        if (abs(canvasInfo.geoWidth - imageInfo.GetWidth()) > 1e-6 ||
-            abs(canvasInfo.geoHeight - imageInfo.GetHeight()) > 1e-6) {
+        if (std::abs(canvasInfo.geoWidth - imageInfo.GetWidth()) > 1e-6 ||
+            std::abs(canvasInfo.geoHeight - imageInfo.GetHeight()) > 1e-6) {
             // width or height not equal, needs mat to scale width and height
             float sx = 1.0f;
             float sy = 1.0f;
@@ -514,7 +516,7 @@ std::shared_ptr<Drawing::HpsEffectParameter> HpsEffectFilter::GenerateGradientBl
     }
 
     auto imageInfo = image->GetImageInfo();
-    if (abs(geoWidth - imageInfo.GetWidth()) > 1e-3 || abs(geoHeight - imageInfo.GetHeight()) > 1e-3) {
+    if (std::abs(geoWidth - imageInfo.GetWidth()) > 1e-3 || std::abs(geoHeight - imageInfo.GetHeight()) > 1e-3) {
         // width or height not equal, needs mat to scale width and height
         float sx = 1.0;
         float sy = 1.0;

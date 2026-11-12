@@ -15,6 +15,8 @@
 
 #include "ge_kawase_blur_shader_filter.h"
 
+#include <cmath>
+
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
 #include "ge_system_properties.h"
@@ -477,7 +479,7 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::ScaleAndAddRandomColor
     const std::shared_ptr<Drawing::Image>& image, const std::shared_ptr<Drawing::Image>& blurImage,
     const Drawing::Rect& src, const Drawing::Rect& dst, int& width, int& height) const
 {
-    if (abs(blurScale_) < 1e-6 || blurImage == nullptr || blurImage->GetWidth() < 1e-6 ||
+    if (std::abs(blurScale_) < 1e-6 || blurImage == nullptr || blurImage->GetWidth() < 1e-6 ||
         blurImage->GetHeight() < 1e-6 || image->GetWidth() < 1e-6 || image->GetHeight() < 1e-6) {
         LOGE("GEKawaseBlurShaderFilter::blurScale is zero.");
         return blurImage;
@@ -500,7 +502,7 @@ std::shared_ptr<Drawing::Image> GEKawaseBlurShaderFilter::ScaleAndAddRandomColor
     auto mixShader = Drawing::ShaderEffect::CreateImageShader(
         *image, Drawing::TileMode::CLAMP, Drawing::TileMode::CLAMP, linear, inputMatrix);
     mixBuilder.SetChild("originalInput", mixShader);
-    float mixFactor = (abs(MAX_CROSS_FADE_RADIUS) <= 1e-6) ? 1.f : (blurRadius_ / MAX_CROSS_FADE_RADIUS);
+    float mixFactor = (std::abs(MAX_CROSS_FADE_RADIUS) <= 1e-6) ? 1.f : (blurRadius_ / MAX_CROSS_FADE_RADIUS);
     mixBuilder.SetUniform("mixFactor", std::min(1.0f, mixFactor));
 
     mixBuilder.SetUniform("inColorFactor", factor_);
