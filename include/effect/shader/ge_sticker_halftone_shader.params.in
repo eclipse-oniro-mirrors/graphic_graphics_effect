@@ -1,0 +1,39 @@
+/*
+ * Copyright (c) 2026 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+struct [[ge::params(type=STICKER_HALFTONE, name="StickerHalftone")]] GEStickerHalftoneShaderParams {
+    std::shared_ptr<Drawing::Image> sticker_;
+    [[ge::prop(min=3.0f)]]
+    float gridSize_ = 0.0f;
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float maxRadiusRatio_ = 1.0f;
+    [[ge::prop(min=0.0f)]]
+    float lumCoeff_ = 0.0f;
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float colorWidthRatio_ = 0.5f;
+    [[ge::prop(min=0.0f, max=1.0f)]]
+    float saturation_ = 1.0f;
+    [[ge::prop(min=0.0f)]]
+    float smoothness_ = 0.0f;
+    float angle_ = 0.0f;
+    [[ge::prop(min=0.0f)]]
+    float outlinePx_ = 0.0f;
+    [[ge::prop(min=0.0f)]]
+    float shadowDistance_ = 0.0f;
+    Vector2f lightDir_ = Vector2f(0.0f, 0.0f);
+    Vector4f elevationShadowColor_ = Vector4f(0.0f, 0.0f, 0.0f, 26.0f / 255.0f);
+    [[ge::prop(min=0.0f)]]
+    float elevationShadowRadius_ = 0.0f;
+};

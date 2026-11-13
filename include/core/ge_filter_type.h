@@ -129,6 +129,8 @@ enum class GEFilterType : int32_t {
     BINARIZATION,
     LIGHT_UP_EFFECT,
     DYNAMIC_DIM,
+    STICKER_HALFTONE,
+    STICKER_OUTLINE,
     MAX,
 };
 
