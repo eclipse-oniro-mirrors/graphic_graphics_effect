@@ -35,11 +35,11 @@ struct [[ge::params(type=POINT_LIGHT, name="PointLight")]] GEPointLightShaderPar
     std::vector<float> lightIntensities{};
     // EDR parameters
     [[ge::prop("PointLight_DisplayHeadroom")]]
-    float displayHeadroom = 1.0f;
+    float displayHeadroom = 0.0f;
     [[ge::prop("PointLight_EnableEDREffect")]]
     bool enableEDREffect = false;
     [[ge::prop(name="PointLight_Shape", cast_from="std::shared_ptr<GEShaderShape>")]]
-    std::shared_ptr<Drawing::GESDFShaderShape> shape; // new
+    std::shared_ptr<GESDFShaderShape> shape; // new
     [[ge::prop("PointLight_ContentRRect")]]
     GERRect contentRRect;
     [[ge::prop("PointLight_BorderRRect")]]
