@@ -70,8 +70,9 @@ bool GEDynamicDimShaderFilter::InitDynamicDimEffect()
         return true;
     }
     static std::string dynamicDimString(R"(
-        uniform shader imageShader;
         uniform half dynamicDimDeg;
+        uniform shader imageShader;
+
         vec3 rgb2hsv(in vec3 c)
         {
             vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
@@ -86,11 +87,11 @@ bool GEDynamicDimShaderFilter::InitDynamicDimEffect()
             vec3 rgb = clamp(abs(mod(c.x * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
             return c.z * mix(vec3(1.0), rgb, c.y);
         }
-
-        half4 main(float2 coord) {
+        half4 main(float2 coord)
+        {
             vec3 hsv = rgb2hsv(imageShader.eval(coord).rgb);
-            float value = max(0.8, dynamicDimDeg);
-            hsv.y = hsv.y * (1.75 - value * 0.75);
+            float value = max(0.8, dynamicDimDeg); // 0.8 is min saturation ratio.
+            hsv.y = hsv.y * (1.75 - value * 0.75); // saturation value [1.0 , 1.15].
             hsv.z = min(hsv.z * dynamicDimDeg, 1.0);
             return vec4(hsv2rgb(hsv), 1.0);
         }

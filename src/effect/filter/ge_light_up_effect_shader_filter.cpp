@@ -70,8 +70,8 @@ bool GELightUpEffectShaderFilter::InitLightUpEffect()
         return true;
     }
     static std::string lightUpString(R"(
-        uniform shader imageShader;
         uniform float lightUpDeg;
+        uniform shader imageShader;
         vec3 rgb2hsv(in vec3 c)
         {
             vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
