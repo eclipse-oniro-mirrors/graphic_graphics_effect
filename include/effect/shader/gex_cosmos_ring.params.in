@@ -19,7 +19,7 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     // Ring rotation in whole turns, multiplied by 2*pi internally; positive is clockwise.
     // Not animatable: integer count of turns in [0, 10]
     [[ge::prop(name="CosmosRing_RotationTurns", min=0, max=10)]]
-    int32_t rotationTurns = 0;
+    int32_t rotationTurns = 1;
     [[ge::prop(min=1.0, max=4096.0)]]
     float radius = 150.0f;
     [[ge::prop(min=1.0, max=4096.0)]]
