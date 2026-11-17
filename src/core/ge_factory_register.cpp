@@ -75,6 +75,8 @@
 #include "effect/shader/ge_sdf_edge_light_shader.h"
 #include "effect/shader/ge_spatial_glass_effect.h"
 #include "effect/shader/ge_spatial_point_light.h"
+#include "effect/shader/ge_sticker_halftone_shader.h"
+#include "effect/shader/ge_sticker_outline_shader.h"
 #include "effect/shader/ge_wavy_ripple_light_shader.h"
 #include "effect/shader/gex_dot_matrix_shader_params.h"
 #include "effect/shape/ge_sdf_border_shader.h"
@@ -237,6 +239,8 @@ GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
 GE_FACTORY_REGISTER(GESpatialPointLightShader)
 GE_FACTORY_REGISTER(GEPointLightShader)
 GE_FACTORY_REGISTER(GEWavyRippleLightShader)
+GE_FACTORY_REGISTER(GEStickerHalftoneShader)
+GE_FACTORY_REGISTER(GEStickerOutlineShader)
 
 // 2.2 Dynamically loaded effects
 GE_FACTORY_REGISTER_EXTERNAL(AIBAR_GLOW, ::OHOS::Rosen::Drawing::GEXAIBarGlowEffectParams)

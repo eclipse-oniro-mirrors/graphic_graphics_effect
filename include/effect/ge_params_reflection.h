@@ -2095,6 +2095,8 @@ GE_PARAMS_TYPE_INFO(GESDFTriangleShapeParams, SDF_TRIANGLE_SHAPE, SDFTriangleSha
 GE_PARAMS_TYPE_INFO(GESdfUberShaderShapeParams, SDF_UBER, SdfUber);
 GE_PARAMS_TYPE_INFO(GESDFUnionOpShapeParams, SDF_UNION_OP, SDFUnionOpShape);
 GE_PARAMS_TYPE_INFO(GESoundWaveFilterParams, SOUND_WAVE, SoundWave);
+GE_PARAMS_TYPE_INFO(GEStickerHalftoneShaderParams, STICKER_HALFTONE, StickerHalftone);
+GE_PARAMS_TYPE_INFO(GEStickerOutlineShaderParams, STICKER_OUTLINE, StickerOutline);
 GE_PARAMS_TYPE_INFO(GESpatialGlassEffectParams, SPATIAL_GLASS_EFFECT, SpatialGlassEffect);
 GE_PARAMS_TYPE_INFO(GESpatialPointLightShaderParams, SPATIAL_POINT_LIGHT, SpatialPointLight);
 GE_PARAMS_TYPE_INFO(GESpinBlurShaderFilterParams, SPIN_BLUR, SpinBlur);
