@@ -868,6 +868,9 @@ enum class GEParamsMemberTag : uint32_t {
     DUPOLI_NOISE_MASK_PROGRESS,
     DUPOLI_NOISE_MASK_GRANULARITY,
     DUPOLI_NOISE_MASK_VERTICAL_MOVE_DISTANCE,
+    FLOW_LIGHT_SWEEP_EFFECT_COLORS,
+    FLOW_LIGHT_SWEEP_EFFECT_STOPS,
+    FLOW_LIGHT_SWEEP_PROGRESS,
     GLASS_MARBLE_EFFECT_SPHERE_CENTER,
     GLASS_MARBLE_EFFECT_SPHERE_RADIUS,
     GLASS_MARBLE_EFFECT_AVERAGE_BG_COLOR,
@@ -2114,6 +2117,7 @@ GE_PARAMS_TYPE_INFO(GEXCosmosRingParams, COSMOS_RING, CosmosRing);
 GE_PARAMS_TYPE_INFO(GEXCosmosRingShadowParams, COSMOS_RING_SHADOW, CosmosRingShadow);
 GE_PARAMS_TYPE_INFO(GEXDistortChromaEffectParams, DISTORT_CHROMA, DistortChroma);
 GE_PARAMS_TYPE_INFO(GEXDupoliNoiseMaskParams, DUPOLI_NOISE_MASK, DupoliNoiseMask);
+GE_PARAMS_TYPE_INFO(GEFlowLightSweepShaderParams, FLOW_LIGHT_SWEEP, FlowLightSweep);
 GE_PARAMS_TYPE_INFO(GEXGlassMarbleEffectParams, GLASS_MARBLE_EFFECT, GlassMarbleEffect);
 GE_PARAMS_TYPE_INFO(GEXGradientFlowColorsEffectParams, GRADIENT_FLOW_COLORS, GradientFlowColors);
 GE_PARAMS_TYPE_INFO(GEXLightCaveShaderParams, LIGHT_CAVE, LightCave);
@@ -3432,6 +3436,11 @@ GE_PARAMS_FIELD_ACCESSOR(
     GEXDupoliNoiseMaskParams, granularity, DUPOLI_NOISE_MASK_GRANULARITY, DupoliNoiseMask_Granularity);
 GE_PARAMS_FIELD_ACCESSOR(GEXDupoliNoiseMaskParams, verticalMoveDistance, DUPOLI_NOISE_MASK_VERTICAL_MOVE_DISTANCE,
     DupoliNoiseMask_VerticalMoveDistance);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEFlowLightSweepShaderParams, effectColors_, FLOW_LIGHT_SWEEP_EFFECT_COLORS, FlowLightSweep_EffectColors);
+GE_PARAMS_FIELD_ACCESSOR(
+    GEFlowLightSweepShaderParams, effectStops_, FLOW_LIGHT_SWEEP_EFFECT_STOPS, FlowLightSweep_EffectStops);
+GE_PARAMS_FIELD_ACCESSOR(GEFlowLightSweepShaderParams, progress_, FLOW_LIGHT_SWEEP_PROGRESS, FlowLightSweep_Progress);
 GE_PARAMS_FIELD_ACCESSOR(
     GEXGlassMarbleEffectParams, sphereCenter, GLASS_MARBLE_EFFECT_SPHERE_CENTER, GlassMarbleEffect_SphereCenter);
 GE_PARAMS_FIELD_ACCESSOR(

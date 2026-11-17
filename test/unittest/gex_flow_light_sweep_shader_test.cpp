@@ -51,7 +51,15 @@ HWTEST_F(GEXFlowLightSweepShaderTest, CreateDynamicImpl_001, TestSize.Level0)
     std::vector<std::pair<Drawing::Color, float>> para;
     para.push_back(std::pair(Drawing::Color::COLOR_RED, 0.0f));
     para.push_back(std::pair(Drawing::Color::COLOR_GREEN, 0.5f));
-    auto shader = GEXFlowLightSweepShader::CreateDynamicImpl(para);
+
+    Drawing::GEFlowLightSweepShaderParams param;
+    for (const auto& item : para) {
+        param.effectColors_.emplace_back(
+            item.first.GetRedF(), item.first.GetGreenF(), item.first.GetBlueF(), item.first.GetAlphaF());
+        param.effectStops_.emplace_back(item.second);
+    }
+    param.progress_ = 0.0f;
+    auto shader = GEXFlowLightSweepShader::CreateDynamicImpl(param);
 
     ASSERT_NE(shader, nullptr);
 }

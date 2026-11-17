@@ -21,11 +21,12 @@ namespace OHOS {
 namespace Rosen {
 
 std::shared_ptr<GEXFlowLightSweepShader> GEXFlowLightSweepShader::CreateDynamicImpl(
-    std::vector<std::pair<Drawing::Color, float>>& param)
+    const Drawing::GEFlowLightSweepShaderParams& param)
 {
     auto type = static_cast<uint32_t>(Drawing::GEVisualEffectImpl::FilterType::FLOW_LIGHT_SWEEP);
     auto impl = GEExternalDynamicLoader::GetInstance().CreateGEXObjectByType(
-        type, sizeof(std::vector<std::pair<Drawing::Color, float>>), static_cast<void*>(&param));
+        type, sizeof(Drawing::GEFlowLightSweepShaderParams),
+        static_cast<void*>(const_cast<Drawing::GEFlowLightSweepShaderParams*>(&param)));
     if (!impl) {
         GE_LOGE("GEXFlowLightSweepShader::CreateDynamicImpl create object failed.");
         return nullptr;
