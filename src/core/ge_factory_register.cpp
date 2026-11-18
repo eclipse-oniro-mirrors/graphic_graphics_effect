@@ -141,6 +141,7 @@ GE_FACTORY_REGISTER_EXTERNAL(GASIFY_BLUR, ::OHOS::Rosen::Drawing::GEGasifyBlurFi
 GE_FACTORY_REGISTER_EXTERNAL(GASIFY_SCALE_TWIST, ::OHOS::Rosen::Drawing::GEGasifyScaleTwistFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(MAP_COLOR_BY_BRIGHTNESS, ::OHOS::Rosen::Drawing::GEMapColorByBrightnessFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(PARTICLE_ABLATION, ::OHOS::Rosen::Drawing::GEParticleAblationFilterParams)
+GE_FACTORY_REGISTER_EXTERNAL(PARTICLE_AGGREGATION, ::OHOS::Rosen::Drawing::GEParticleAggregationShaderFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(WATER_DROPLET_TRANSITION, ::OHOS::Rosen::Drawing::GEWaterDropletTransitionFilterParams)
 
 // 1.3 Dynamically loaded effects with fallback

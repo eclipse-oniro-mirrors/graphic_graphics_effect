@@ -81,6 +81,7 @@ namespace Drawing {
 #include "effect/filter/ge_mesa_blur_shader_filter.params.in"
 #include "effect/filter/ge_motion_blur_shader_filter.params.in"
 #include "effect/filter/ge_particle_ablation_filter.params.in"
+#include "effect/filter/ge_particle_aggregation_shader_filter.params.in"
 #include "effect/filter/ge_sdf_edge_light_filter.params.in"
 #include "effect/filter/ge_sdf_from_image_filter.params.in"
 #include "effect/filter/ge_sound_wave_filter.params.in"
