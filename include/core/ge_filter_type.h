@@ -131,6 +131,7 @@ enum class GEFilterType : int32_t {
     DYNAMIC_DIM,
     STICKER_HALFTONE,
     STICKER_OUTLINE,
+    PARTICLE_AGGREGATION,
     MAX,
 };
 

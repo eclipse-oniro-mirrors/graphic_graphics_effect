@@ -22,10 +22,11 @@ static bool IsDirectDrawOnCanvasSupported(Drawing::GEFilterType type)
 {
     // NOTICE: DO NOT use std::map/std::unordered_set to replace switch/case, it's worse in performance, not better.
     switch (type) {
-        // Currently only GEFrostedGlassShaderFilter is supported.
+        // Currently only GEFrostedGlassShaderFilter and GEParticleAggregationFilter are supported.
         // If you want to add new support, add a case line below to support it
         // When static reflection infrastructure refactor is done, use that to query info.
         case Drawing::GEFilterType::FROSTED_GLASS:
+        case Drawing::GEFilterType::PARTICLE_AGGREGATION:
             return true;
         default:
             return false;
