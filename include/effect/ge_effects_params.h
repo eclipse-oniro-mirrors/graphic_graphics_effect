@@ -129,6 +129,7 @@ namespace Drawing {
 #include "effect/shader/gex_cosmos_ring.params.in"
 #include "effect/shader/gex_cosmos_ring_shadow.params.in"
 #include "effect/shader/gex_distort_chroma_effect.params.in"
+#include "effect/shader/gex_flow_light_sweep_shader.params.in"
 #include "effect/shader/gex_glass_marble_effect.params.in"
 #include "effect/shader/gex_gradient_flow_colors_effect.params.in"
 #include "effect/shader/gex_light_cave_shader.params.in"

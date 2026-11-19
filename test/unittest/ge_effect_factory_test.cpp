@@ -283,7 +283,6 @@ HWTEST_F(GEEffectFactoryTest, VerifyRegistrationCoverage_001, TestSize.Level1)
         GEFilterType::GAMMA_CORRECTION,
         GEFilterType::WATER_GLASS,
         GEFilterType::REEDED_GLASS,
-        GEFilterType::FLOW_LIGHT_SWEEP,
         GEFilterType::COMPLEX_SHADER,
     };
 

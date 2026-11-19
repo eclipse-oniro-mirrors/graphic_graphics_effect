@@ -36,7 +36,7 @@ public:
     ~GEXFlowLightSweepShader() override = default;
 
     static std::shared_ptr<GEXFlowLightSweepShader> CreateDynamicImpl(
-        std::vector<std::pair<Drawing::Color, float>>& param);
+        const Drawing::GEFlowLightSweepShaderParams& param);
 
     void MakeDrawingShader(const Drawing::Rect& rect, float progress) override { }
 
