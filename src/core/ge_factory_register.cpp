@@ -47,6 +47,7 @@
 #include "effect/filter/ge_sdf_edge_light.h"
 #include "effect/filter/ge_sdf_from_image_filter.h"
 #include "effect/filter/ge_sound_wave_filter.h"
+#include "effect/filter/ge_sticker_emboss_filter.h"
 #include "effect/filter/ge_variable_radius_blur_shader_filter.h"
 #include "effect/filter/ge_water_ripple_filter.h"
 #include "effect/ge_shader_filter_params.h"
@@ -76,6 +77,7 @@
 #include "effect/shader/ge_spatial_glass_effect.h"
 #include "effect/shader/ge_spatial_point_light.h"
 #include "effect/shader/ge_sticker_halftone_shader.h"
+#include "effect/shader/ge_sticker_laser_shader.h"
 #include "effect/shader/ge_sticker_outline_shader.h"
 #include "effect/shader/ge_wavy_ripple_light_shader.h"
 #include "effect/shader/gex_dot_matrix_shader_params.h"
@@ -131,6 +133,7 @@ GE_FACTORY_REGISTER(GEMotionBlurShaderFilter)
 GE_FACTORY_REGISTER(GESDFFromImageFilter)
 GE_FACTORY_REGISTER(GESDFEdgeLight)
 GE_FACTORY_REGISTER(GESoundWaveFilter)
+GE_FACTORY_REGISTER(GEStickerEmbossFilter)
 GE_FACTORY_REGISTER_EXTERNAL(SPIN_BLUR, ::OHOS::Rosen::Drawing::GESpinBlurShaderFilterParams)
 GE_FACTORY_REGISTER_EXTERNAL(HALO_BLOOM, ::OHOS::Rosen::Drawing::GEHaloBloomShaderFilterParams)
 GE_FACTORY_REGISTER(GEWaterRippleFilter)
@@ -239,6 +242,7 @@ GE_FACTORY_REGISTER(GESDFShadowShader)
 GE_FACTORY_REGISTER(GEParticleCircularHaloShader)
 GE_FACTORY_REGISTER(GESpatialPointLightShader)
 GE_FACTORY_REGISTER(GEPointLightShader)
+GE_FACTORY_REGISTER(GEStickerLaserShader)
 GE_FACTORY_REGISTER(GEWavyRippleLightShader)
 GE_FACTORY_REGISTER(GEStickerHalftoneShader)
 GE_FACTORY_REGISTER(GEStickerOutlineShader)
