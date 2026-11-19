@@ -317,8 +317,8 @@ HWTEST_F(GEStickerEmbossFilterTest, SetEmbossShaderUniformsInvalidInput, TestSiz
 
     // A real builder keeps the reference binding well-defined; the guards under test
     // return before any uniform is written
-    constexpr char GUARD_PROBE_SHADER[] = "half4 main(float2 xy) { return half4(1.0); }";
-    auto effect = GECreateRuntimeEffectForShader(GUARD_PROBE_SHADER);
+    constexpr char guardProbeShader[] = "half4 main(float2 xy) { return half4(1.0); }";
+    auto effect = GECreateRuntimeEffectForShader(guardProbeShader);
     ASSERT_NE(effect, nullptr);
     Drawing::RuntimeShaderBuilder builder(effect);
     // null image -> early return on the image check
