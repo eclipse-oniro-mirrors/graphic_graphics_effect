@@ -17,6 +17,7 @@
 
 #include "draw/color.h"
 #include "image/bitmap.h"
+#include "ge_shader_diagnostics.h"
 #include "ge_sticker_emboss_filter.h"
 
 using namespace testing;
@@ -314,14 +315,18 @@ HWTEST_F(GEStickerEmbossFilterTest, SetEmbossShaderUniformsInvalidInput, TestSiz
     auto validFilter = std::make_shared<GEStickerEmbossFilter>(validParams);
     ASSERT_TRUE(validFilter != nullptr);
 
-    // The guards return before the builder is dereferenced, so a null builder is safe here
-    auto* nullBuilder = static_cast<Drawing::RuntimeShaderBuilder*>(nullptr);
+    // A real builder keeps the reference binding well-defined; the guards under test
+    // return before any uniform is written
+    constexpr char GUARD_PROBE_SHADER[] = "half4 main(float2 xy) { return half4(1.0); }";
+    auto effect = GECreateRuntimeEffectForShader(GUARD_PROBE_SHADER);
+    ASSERT_NE(effect, nullptr);
+    Drawing::RuntimeShaderBuilder builder(effect);
     // null image -> early return on the image check
-    validFilter->SetEmbossShaderUniforms(*nullBuilder, nullptr);
+    validFilter->SetEmbossShaderUniforms(builder, nullptr);
     // valid image but the filter has no sticker -> early return on the sticker check
-    nullStickerFilter->SetEmbossShaderUniforms(*nullBuilder, image_);
+    nullStickerFilter->SetEmbossShaderUniforms(builder, image_);
     // both invalid
-    nullStickerFilter->SetEmbossShaderUniforms(*nullBuilder, nullptr);
+    nullStickerFilter->SetEmbossShaderUniforms(builder, nullptr);
     // no crash and no shader state changed
     EXPECT_EQ(validFilter->GetCache(), nullptr);
 }

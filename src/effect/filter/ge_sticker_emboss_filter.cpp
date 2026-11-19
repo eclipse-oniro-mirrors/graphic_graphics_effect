@@ -124,7 +124,9 @@ half4 main(float2 fragCoord)
     float4 underlayColor = underlyingTex.eval(refractUV * resolution);
 
     float4 insideColor = insideTex.eval(fragCoord);
-    underlayColor.rgb = mix(underlayColor.rgb, insideColor.rgb, insideColor.a);
+    // image shaders return premultiplied colors: source-over composite without an
+    // extra alpha multiply
+    underlayColor.rgb = insideColor.rgb + underlayColor.rgb * (1.0 - insideColor.a);
 
     float3 viewDir = float3(0.0, 0.0, 1.0);
     float3 finalColor = underlayColor.rgb;

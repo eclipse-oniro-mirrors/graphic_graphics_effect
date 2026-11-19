@@ -45,6 +45,10 @@ constexpr char STICKER_LASER_SHADER[] = R"(
 )";
 
 constexpr float LASER_INFLUENCE = 0.6f;
+// The decodable SDF range must stay strictly beyond the outline threshold: the card
+// shader's step(distance, outlineWidth) treats the saturated far-field value as
+// inside the outline when the range equals the threshold.
+constexpr float OUTLINE_RANGE_MARGIN_PX = 1.0f;
 
 struct StickerLaserCache {
     uint64_t hash = 0;
@@ -105,7 +109,8 @@ void GEStickerLaserShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Re
         return;
     }
 
-    const float requiredRange = std::max(params_.outlineWidth, params_.elevationShadowRadius);
+    const float requiredRange = std::max(params_.outlineWidth + OUTLINE_RANGE_MARGIN_PX,
+        params_.elevationShadowRadius);
     const uint64_t inputHash =
         CalStickerHash(params_.sticker, GEStickerOutlineShader::CalSdfSpreadFactor(requiredRange));
     const StickerLaserCache emptyCache {};

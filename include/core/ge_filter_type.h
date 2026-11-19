@@ -131,9 +131,11 @@ enum class GEFilterType : int32_t {
     DYNAMIC_DIM,
     STICKER_HALFTONE,
     STICKER_OUTLINE,
+    PARTICLE_AGGREGATION,
+    // new types must be appended after all existing entries: the numeric values are
+    // dispatched to external effect libraries and renumbering breaks compatibility
     STICKER_EMBOSS_FILTER,
     STICKER_LASER,
-    PARTICLE_AGGREGATION,
     MAX,
 };
 
