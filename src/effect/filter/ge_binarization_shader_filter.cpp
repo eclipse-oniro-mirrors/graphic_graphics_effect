@@ -53,11 +53,14 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
     Drawing::Matrix matrix;
     auto imageShader = Drawing::ShaderEffect::CreateImageShader(*image, Drawing::TileMode::CLAMP,
         Drawing::TileMode::CLAMP, Drawing::SamplingOptions(Drawing::FilterMode::LINEAR), matrix);
+    float thresholdLow = threshold_ - thresholdRange_;
+    float thresholdHigh = threshold_ + thresholdRange_;
+    thresholdHigh = thresholdHigh <= thresholdLow ? thresholdHigh + 1e-6 : thresholdHigh;
     builder.SetChild("imageShader", imageShader);
-    builder.SetUniform("low", low_);
-    builder.SetUniform("high", high_);
-    builder.SetUniform("threshold", threshold_);
-    builder.SetUniform("thresholdRange", thresholdRange_);
+    builder.SetUniform("ubo_low", low_);
+    builder.SetUniform("ubo_high", high_);
+    builder.SetUniform("ubo_thresholdLow", thresholdLow);
+    builder.SetUniform("ubo_thresholdHigh", thresholdHigh);
 #ifdef RS_ENABLE_GPU
     auto outImage = builder.MakeImage(canvas.GetGPUContext().get(), nullptr, image->GetImageInfo(), false);
 #else
@@ -76,24 +79,18 @@ bool GEBinarizationShaderFilter::InitBinarizationEffect()
         return true;
     }
     static std::string binarizationString(R"(
+        uniform mediump float ubo_low;
+        uniform mediump float ubo_high;
+        uniform mediump float ubo_thresholdLow;
+        uniform mediump float ubo_thresholdHigh;
         uniform shader imageShader;
-        uniform mediump float low;
-        uniform mediump float high;
-        uniform mediump float threshold;
-        uniform mediump float thresholdRange;
-
         mediump vec4 main(vec2 drawing_coord) {
-            mediump vec3 c = vec3(
-                imageShader.eval(drawing_coord).r,
-                imageShader.eval(drawing_coord).g,
-                imageShader.eval(drawing_coord).b);
+            mediump vec3 c = imageShader(drawing_coord).rgb;
             float gray = 0.299 * c.r + 0.587 * c.g + 0.114 * c.b;
-            float thresholdLow = threshold - thresholdRange;
-            float thresholdHigh = threshold + thresholdRange;
-            thresholdHigh = thresholdHigh <= thresholdLow ? thresholdHigh + 1e-6 : thresholdHigh;
-            float lowRes = mix(high, -1.0, step(thresholdLow, gray));
-            float highRes = mix(-1.0, low, step(thresholdHigh, gray));
-            float midRes = (thresholdHigh - gray) * (high - low) / (thresholdHigh - thresholdLow) + low;
+            float lowRes = mix(ubo_high, -1.0, step(ubo_thresholdLow, gray));
+            float highRes = mix(-1.0, ubo_low, step(ubo_thresholdHigh, gray));
+            float midRes = (ubo_thresholdHigh - gray) * (ubo_high - ubo_low) /
+            (ubo_thresholdHigh - ubo_thresholdLow) + ubo_low;
             float invertedGray = mix(midRes, max(lowRes, highRes), step(-0.5, max(lowRes, highRes)));
             mediump vec3 invert = vec3(invertedGray);
             mediump vec4 res = vec4(invert, 1.0);
