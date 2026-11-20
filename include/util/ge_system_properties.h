@@ -39,6 +39,8 @@ public:
     static std::string GetEventProperty(const std::string& paraName);
     static GE_EXPORT bool GetBoolSystemProperty(const char* name, bool defaultValue);
     static int ConvertToInt(const char* originValue, int defaultValue);
+    static GE_EXPORT bool GetShaderFrameCacheEnabled();
+    static GE_EXPORT bool GetShaderCacheDebugOverlay();
 
 private:
     GESystemProperties() = default;

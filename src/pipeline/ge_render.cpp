@@ -22,6 +22,7 @@
 #include "ge_hps_upscale_pass.h"
 #include "ge_log.h"
 #include "ge_mesa_fusion_pass.h"
+#include "ge_shader_cache.h"
 #include "ge_system_properties.h"
 #include "ge_visual_effect_impl.h"
 
@@ -295,24 +296,29 @@ std::vector<std::shared_ptr<GEShaderFilter>> GERender::GenerateShaderFilters(
 void GERender::DrawShaderEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
     const Drawing::Rect& bounds)
 {
-    LOGD("GERender::shaderEffects %{public}zu", veContainer.GetFilters().size());
-    std::vector<std::shared_ptr<GEShader>> shaderEffects;
-    for (auto vef : veContainer.GetFilters()) {
-        if (vef == nullptr) {
-            LOGD("GERender::DrawShaderEffect vef is null");
-            continue;
-        }
-        auto ve = vef->GetImpl();
-        std::shared_ptr<GEShader> geShaderEffect = GenerateShaderEffect(ve);
-        if (geShaderEffect == nullptr) {
-            LOGD("GERender::DrawShaderEffect shader is null");
-            continue;
-        }
-        geShaderEffect->SetShaderCanvasInfo(vef->GetCanvasInfo());
-        geShaderEffect->SetCache(ve->GetCache());
-        geShaderEffect->DrawShader(canvas, bounds);
-        ve->SetCache(geShaderEffect->GetCache());
+    LOGD("GERender::DrawShaderEffect %{public}zu", veContainer.GetFilters().size());
+    GEShaderCache::DrawWithCache(*this, canvas, veContainer, bounds);
+}
+
+bool GERender::DrawSingleShaderEffect(Drawing::Canvas& targetCanvas,
+    const std::shared_ptr<Drawing::GEVisualEffect>& vef, const Drawing::Rect& bounds)
+{
+    if (!vef) {
+        return false;
     }
+    auto ve = vef->GetImpl();
+    if (!ve) {
+        return false;
+    }
+    auto geShaderEffect = GEEffectFactory::CreateShader(ve);
+    if (geShaderEffect == nullptr) {
+        return false;
+    }
+    geShaderEffect->SetShaderCanvasInfo(vef->GetCanvasInfo());
+    geShaderEffect->SetCache(ve->GetCache());
+    geShaderEffect->DrawShader(targetCanvas, bounds);
+    ve->SetCache(geShaderEffect->GetCache());
+    return true;
 }
 
 std::shared_ptr<GEShader> GERender::GenerateShaderEffect(const std::shared_ptr<Drawing::GEVisualEffectImpl>& ve)

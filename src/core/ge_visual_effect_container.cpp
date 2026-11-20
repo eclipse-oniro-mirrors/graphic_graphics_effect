@@ -26,6 +26,21 @@ namespace Drawing {
 
 GEVisualEffectContainer::GEVisualEffectContainer() {}
 
+std::vector<int32_t> GEVisualEffectContainer::GetFilterTypes() const
+{
+    std::vector<int32_t> types;
+    types.reserve(filterVec_.size());
+    for (const auto& vef : filterVec_) {
+        bool valid = vef && vef->GetImpl();
+        if (valid) {
+            types.push_back(static_cast<int32_t>(vef->GetImpl()->GetFilterType()));
+        } else {
+            types.push_back(-1);
+        }
+    }
+    return types;
+}
+
 void GEVisualEffectContainer::AddToChainedFilter(std::shared_ptr<Drawing::GEVisualEffect> visualEffect)
 {
     if (!visualEffect) {
@@ -52,6 +67,20 @@ void GEVisualEffectContainer::UpdateCacheDataFrom(const std::shared_ptr<GEVisual
             continue;
         }
         vefTarget->GetImpl()->SetCache(vef->GetImpl()->GetCache());
+    }
+    cacheStore_ = ge->cacheStore_;
+    // Trim stale per-effect caches that no longer match the current filter list.
+    if (cacheStore_) {
+        std::unordered_set<std::string> validKeys;
+        const auto& filters = GetFilters();
+        for (size_t i = 0; i < filters.size(); i++) {
+            bool valid = filters[i] && filters[i]->GetImpl();
+            if (valid) {
+                auto filterType = static_cast<int32_t>(filters[i]->GetImpl()->GetFilterType());
+                validKeys.insert(GEFrameCacheStore::MakeEffectKey(filterType, i));
+            }
+        }
+        cacheStore_->TrimEffectCaches(validKeys);
     }
 }
 

@@ -15,6 +15,7 @@
 #ifndef GRAPHICS_EFFECT_GE_VISUAL_EFFECT_CONTAINER_H
 #define GRAPHICS_EFFECT_GE_VISUAL_EFFECT_CONTAINER_H
 #include <any>
+#include "ge_frame_cache.h"
 #include "ge_visual_effect.h"
 
 namespace OHOS {
@@ -32,6 +33,8 @@ public:
     {
         return filterVec_;
     }
+
+    std::vector<int32_t> GetFilterTypes() const;
 
     void UpdateCacheDataFrom(const std::shared_ptr<GEVisualEffectContainer>& ge);
 
@@ -59,8 +62,20 @@ public:
 
     std::shared_ptr<GEVisualEffect> GetGEVisualEffect(const std::string& name);
 
+    std::shared_ptr<GEFrameCacheStore> GetCacheStore() const { return cacheStore_; }
+    GEFrameCacheStore& EnsureCacheStore()
+    {
+        if (!cacheStore_) {
+            cacheStore_ = std::make_shared<GEFrameCacheStore>();
+        }
+        return *cacheStore_;
+    }
+
+    void RemoveCacheStore() { cacheStore_ = nullptr; }
+
 private:
     std::vector<std::shared_ptr<GEVisualEffect>> filterVec_;
+    std::shared_ptr<GEFrameCacheStore> cacheStore_ = nullptr;
 };
 
 } // namespace Drawing

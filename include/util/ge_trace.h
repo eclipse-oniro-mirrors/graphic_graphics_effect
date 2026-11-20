@@ -42,6 +42,8 @@ namespace OHOS::Rosen {
     auto optionalFmtTrace = (UNLIKELY(debugFmtTraceEnable)) ?                                                         \
         std::make_unique<RSOptionalFmtTrace>(fmt, ##__VA_ARGS__) :  nullptr
 
+#define GE_TRACE_ALWAYS_FMT(fmt, ...) auto geAlwaysFmtTrace = std::make_unique<RSOptionalFmtTrace>(fmt, ##__VA_ARGS__)
+
 class GEOptionalTrace {
 public:
     GEOptionalTrace(std::string traceStr)
@@ -89,6 +91,7 @@ public:
 #define GE_TRACE(name)
 #define GE_TRACE_FUNC()
 #define GE_TRACE_NAME_FMT(fmt, ...)
+#define GE_TRACE_ALWAYS_FMT(fmt, ...)
 #endif // NOT_BUILD_FOR_OHOS_SDK
 
 #endif // GE_TRACE_H
