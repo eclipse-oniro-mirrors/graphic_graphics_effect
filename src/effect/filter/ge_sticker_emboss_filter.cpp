@@ -24,6 +24,7 @@
 #include "ge_cache_helper.h"
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
+#include "ge_sticker_sdf_cache.h"
 #include "ge_trace.h"
 
 namespace OHOS {
@@ -224,15 +225,9 @@ std::shared_ptr<Drawing::Image> GEStickerEmbossFilter::MakeDecodedStickerSDFImag
         return cache.decodedSdfImage;
     }
 
-    // Reuse the sticker SDF pipeline from the outline shader
-    auto sdfImage = GEStickerOutlineShader::MakeStickerSDFImage(canvas, sticker, requiredRangePx);
-    if (sdfImage == nullptr) {
-        GE_LOGE("GEStickerEmbossFilter::MakeDecodedStickerSDFImage make SDF image failed.");
-        cacheAnyPtr_ = nullptr;
-        return nullptr;
-    }
-    auto decodedSdfImage =
-        GEStickerOutlineShader::MakeDecodedStickerSDFImage(canvas, sdfImage, sticker->GetImageInfo(), requiredRangePx);
+    // Reuse the sticker SDF pipeline through the shared cache so emboss and laser
+    // effects share one generated SDF per sticker identity and spread factor
+    auto decodedSdfImage = GEStickerSDFCache::MakeCachedDecodedStickerSDFImage(canvas, sticker, requiredRangePx);
     if (decodedSdfImage == nullptr) {
         GE_LOGE("GEStickerEmbossFilter::MakeDecodedStickerSDFImage make decoded SDF image failed.");
         cacheAnyPtr_ = nullptr;

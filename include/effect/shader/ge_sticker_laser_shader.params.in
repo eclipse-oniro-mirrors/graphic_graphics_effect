@@ -35,5 +35,5 @@ struct [[ge::params(type=STICKER_LASER, name="StickerLaser")]] GEStickerLaserSha
                custom="PairToVector2fTransformer")]]
     Vector2f lightDir = Vector2f(0.0f, 0.0f);
     [[ge::prop("StickerLaserShader_ElevationShadowColor")]]
-    Vector4f elevationShadowColor = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
+    Vector4f elevationShadowColor = Vector4f(0.0f, 0.0f, 0.0f, 26.0f / 255.0f);
 };

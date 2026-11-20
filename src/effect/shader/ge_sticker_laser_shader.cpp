@@ -24,6 +24,7 @@
 #include "ge_log.h"
 #include "ge_shader_diagnostics.h"
 #include "ge_sticker_outline_shader.h"
+#include "ge_sticker_sdf_cache.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -51,24 +52,11 @@ constexpr float LASER_INFLUENCE = 0.6f;
 constexpr float OUTLINE_RANGE_MARGIN_PX = 1.0f;
 
 struct StickerLaserCache {
-    uint64_t hash = 0;
+    uint32_t hash = 0;
     std::shared_ptr<Drawing::Image> decodedSdfImage = nullptr;
 };
 auto PackStickerLaserCacheFunc = GECacheHelper::PackCacheAny<StickerLaserCache>;
 auto UnpackStickerLaserCacheOrDefaultFunc = GECacheHelper::UnpackCacheAnyOrDefault<StickerLaserCache>;
-
-uint64_t CalStickerHash(const std::shared_ptr<Drawing::Image>& sticker, int spreadFactor)
-{
-    if (sticker == nullptr) {
-        return 0;
-    }
-    const uintptr_t ptr = reinterpret_cast<uintptr_t>(sticker.get());
-    uint64_t hash = static_cast<uint64_t>(ptr);
-    hash = hash * 31ULL + static_cast<uint64_t>(sticker->GetWidth());
-    hash = hash * 31ULL + static_cast<uint64_t>(sticker->GetHeight());
-    hash = hash * 31ULL + static_cast<uint64_t>(spreadFactor);
-    return hash;
-}
 
 thread_local std::shared_ptr<Drawing::RuntimeEffect> g_stickerLaserColorEffect = nullptr;
 
@@ -109,24 +97,16 @@ void GEStickerLaserShader::Preprocess(Drawing::Canvas& canvas, const Drawing::Re
         return;
     }
 
-    const float requiredRange = std::max(params_.outlineWidth + OUTLINE_RANGE_MARGIN_PX,
-        params_.elevationShadowRadius);
-    const uint64_t inputHash =
-        CalStickerHash(params_.sticker, GEStickerOutlineShader::CalSdfSpreadFactor(requiredRange));
+    const float requiredRange = std::max(params_.outlineWidth + OUTLINE_RANGE_MARGIN_PX, params_.elevationShadowRadius);
+    const uint32_t inputHash = GEStickerOutlineShader::CalStickerHash(
+        params_.sticker, GEStickerOutlineShader::CalSdfSpreadFactor(requiredRange));
     const StickerLaserCache emptyCache {};
     auto cache = UnpackStickerLaserCacheOrDefaultFunc(cacheAnyPtr_, emptyCache);
     if (cache.hash == inputHash && cache.decodedSdfImage != nullptr) {
         return;
     }
 
-    auto sdfImage = GEStickerOutlineShader::MakeStickerSDFImage(canvas, params_.sticker, requiredRange);
-    if (sdfImage == nullptr) {
-        GE_LOGE("GEStickerLaserShader::Preprocess make SDF image failed");
-        cacheAnyPtr_ = nullptr;
-        return;
-    }
-    auto decodedSdfImage = GEStickerOutlineShader::MakeDecodedStickerSDFImage(
-        canvas, sdfImage, params_.sticker->GetImageInfo(), requiredRange);
+    auto decodedSdfImage = GEStickerSDFCache::MakeCachedDecodedStickerSDFImage(canvas, params_.sticker, requiredRange);
     if (decodedSdfImage == nullptr) {
         GE_LOGE("GEStickerLaserShader::Preprocess make decoded SDF image failed");
         cacheAnyPtr_ = nullptr;
