@@ -434,5 +434,141 @@ HWTEST_F(GEStickerEmbossFilterTest, TypeAndName, TestSize.Level1)
     EXPECT_EQ(filter->TypeName(), "StickerEmbossFilter");
 }
 
+/**
+ * @tc.name: ConstructorStoresParams
+ * @tc.desc: Verify the constructor copies every emboss parameter into params_
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, ConstructorStoresParams, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    params.sticker = image_;
+    params.outlineWidth = 3.0f;
+    params.refractionRate = 0.4f;
+    params.dirIntensity = 0.5f;
+    params.edgeLightWidth = 2.0f;
+    params.edgeLightFeatherRate = 0.6f;
+    params.edgeLightIntensity = Vector2f(0.7f, 0.8f);
+    params.spotLightCenter = Vector2f(10.0f, 20.0f);
+    params.spotLightIntensity = 0.9f;
+    params.specPow = 4.0f;
+    params.specIntensity = 0.3f;
+
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    EXPECT_EQ(filter->params_.sticker, image_);
+    EXPECT_FLOAT_EQ(filter->params_.outlineWidth, 3.0f);
+    EXPECT_FLOAT_EQ(filter->params_.refractionRate, 0.4f);
+    EXPECT_FLOAT_EQ(filter->params_.dirIntensity, 0.5f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightWidth, 2.0f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightFeatherRate, 0.6f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightIntensity.x_, 0.7f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightIntensity.y_, 0.8f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightCenter.x_, 10.0f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightCenter.y_, 20.0f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightIntensity, 0.9f);
+    EXPECT_FLOAT_EQ(filter->params_.specPow, 4.0f);
+    EXPECT_FLOAT_EQ(filter->params_.specIntensity, 0.3f);
+}
+
+/**
+ * @tc.name: ConstructorDefaultParams
+ * @tc.desc: Verify the constructor keeps the declared emboss parameter defaults
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, ConstructorDefaultParams, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    EXPECT_EQ(filter->params_.sticker, nullptr);
+    EXPECT_FLOAT_EQ(filter->params_.outlineWidth, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.refractionRate, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.dirIntensity, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightWidth, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightFeatherRate, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightIntensity.x_, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.edgeLightIntensity.y_, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightCenter.x_, 0.5f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightCenter.y_, 0.5f);
+    EXPECT_FLOAT_EQ(filter->params_.spotLightIntensity, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.specPow, 0.0f);
+    EXPECT_FLOAT_EQ(filter->params_.specIntensity, 0.0f);
+}
+
+/**
+ * @tc.name: OnProcessImageZeroHeightSticker
+ * @tc.desc: Verify a zero-height sticker takes the size guard and returns the input image
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, OnProcessImageZeroHeightSticker, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    params.sticker = MakeBitmapImage(TEST_IMAGE_SIZE, 0);
+    ASSERT_NE(params.sticker, nullptr);
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    EXPECT_EQ(filter->OnProcessImage(canvas_, image_, src_, dst_), image_);
+    EXPECT_EQ(filter->GetCache(), nullptr);
+}
+
+/**
+ * @tc.name: MakeDecodedStickerSDFImageCacheInvalidatedBySticker
+ * @tc.desc: Verify a different sticker identity invalidates the per-filter decoded SDF cache
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, MakeDecodedStickerSDFImageCacheInvalidatedBySticker, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    params.sticker = image_;
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    constexpr float requiredRangePx = 4.0f;
+    auto first = filter->MakeDecodedStickerSDFImage(canvas_, image_, requiredRangePx);
+    auto firstCache = filter->GetCache();
+    auto otherSticker = MakeBitmapImage(TEST_IMAGE_SIZE, TEST_IMAGE_SIZE);
+    ASSERT_NE(otherSticker, nullptr);
+
+    auto second = filter->MakeDecodedStickerSDFImage(canvas_, otherSticker, requiredRangePx);
+    if (HasGpuContext()) {
+        ASSERT_NE(first, nullptr);
+        ASSERT_NE(second, nullptr);
+        // The cache entry stores the sticker unique ID, so a new sticker replaces it
+        EXPECT_NE(filter->GetCache(), firstCache);
+    } else {
+        EXPECT_EQ(first, nullptr);
+        EXPECT_EQ(second, nullptr);
+        EXPECT_EQ(filter->GetCache(), nullptr);
+    }
+}
+
+/**
+ * @tc.name: SetEmbossShaderUniformsZeroScale
+ * @tc.desc: Verify a zero-size image hits the output-scale guard before any uniform is bound
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, SetEmbossShaderUniformsZeroScale, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    params.sticker = image_;
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    constexpr char probeShader[] = "half4 main(float2 xy) { return half4(1.0); }";
+    auto effect = GECreateRuntimeEffectForShader(probeShader);
+    ASSERT_NE(effect, nullptr);
+    Drawing::RuntimeShaderBuilder builder(effect);
+
+    // A 0x0 image makes outputPxPerStickerPx zero, which is rejected before uniform writes
+    auto zeroSizeImage = MakeBitmapImage(0, 0);
+    ASSERT_NE(zeroSizeImage, nullptr);
+    filter->SetEmbossShaderUniforms(builder, zeroSizeImage);
+    EXPECT_EQ(filter->GetCache(), nullptr);
+}
+
 } // namespace Rosen
 } // namespace OHOS
