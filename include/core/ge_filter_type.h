@@ -132,6 +132,8 @@ enum class GEFilterType : int32_t {
     STICKER_HALFTONE,
     STICKER_OUTLINE,
     PARTICLE_AGGREGATION,
+    STICKER_EMBOSS_FILTER,
+    STICKER_LASER,
     MAX,
 };
 

@@ -93,6 +93,7 @@ ohos_source_set("graphics_effect_src") {
     "src/pipeline/ge_hps_upscale_pass.cpp",
     "src/hps/ge_hps_effect_filter.cpp",
     "src/effect/ge_params_reflection.cpp",
+    "src/effect/ge_sticker_sdf_cache.cpp",
     "src/effect/filter/ge_shader_filter.cpp",
     "src/effect/filter/ge_aibar_shader_filter.cpp",
     "src/effect/filter/ge_bezier_warp_shader_filter.cpp",
@@ -124,6 +125,7 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/filter/ge_sound_wave_filter.cpp",
     "src/effect/filter/ge_sdf_edge_light.cpp",
     "src/effect/filter/ge_sdf_from_image_filter.cpp",
+    "src/effect/filter/ge_sticker_emboss_filter.cpp",
     "src/effect/filter/ge_variable_radius_blur_shader_filter.cpp",
     "src/effect/filter/ge_water_ripple_filter.cpp",
     "src/effect/shader/ge_shader.cpp",
@@ -140,6 +142,7 @@ ohos_source_set("graphics_effect_src") {
     "src/effect/shader/ge_sdf_edge_light_shader.cpp",
     "src/effect/shader/ge_spatial_point_light.cpp",
     "src/effect/shader/ge_spatial_glass_effect.cpp",
+    "src/effect/shader/ge_sticker_laser_shader.cpp",
     "src/effect/shader/ge_wavy_ripple_light_shader.cpp",
     "src/effect/shader/gex_dot_matrix_shader.cpp",
     "src/effect/shader/gex_flow_light_sweep_shader.cpp",
@@ -294,6 +297,7 @@ config("utils_config") {
 }
 
 ohos_source_set("mock_utils") {
+  branch_protector_ret = "pac_ret"
   public_configs = [ ":utils_config" ]
   sources = [
     "src/util/mock/parcel.cpp",
