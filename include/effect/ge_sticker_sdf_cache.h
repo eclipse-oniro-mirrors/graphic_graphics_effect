@@ -16,6 +16,9 @@
 #ifndef GRAPHICS_EFFECT_GE_STICKER_SDF_CACHE_H
 #define GRAPHICS_EFFECT_GE_STICKER_SDF_CACHE_H
 
+#include <memory>
+
+#include "draw/canvas.h"
 #include "image/image.h"
 
 namespace OHOS {
