@@ -38,6 +38,11 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     int32_t noise2Period = 8;
     [[ge::prop(min=0.0, max=10.0)]]
     float noise2Contrast = 1.5f;
+    // Radial offset (px) of the second noise layer's sampling strip, shifting where its
+    // highlight sits across the ring width. 0 keeps it centered on the ring center line;
+    // positive moves the sampled pattern inward (toward the ring center).
+    [[ge::prop(min=-4096.0, max=4096.0)]]
+    float noise2RadialOffset = 0.0f;
 
     // --- Second low-frequency flow field control (tunable while progress 0/1 stays seamless) ---
     // Flow frequency: integer noise cells per tile period; smaller is smoother and broader, must be positive
