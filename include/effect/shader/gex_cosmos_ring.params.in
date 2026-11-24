@@ -38,6 +38,11 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     int32_t noise2Period = 8;
     [[ge::prop(min=0.0, max=10.0)]]
     float noise2Contrast = 1.5f;
+    // Radial offset (px) of the second noise layer's sampling strip, shifting where its
+    // highlight sits across the ring width. 0 keeps it centered on the ring center line;
+    // positive moves the sampled pattern inward (toward the ring center).
+    [[ge::prop(min=-4096.0, max=4096.0)]]
+    float noise2RadialOffset = 0.0f;
 
     // --- Second low-frequency flow field control (tunable while progress 0/1 stays seamless) ---
     // Flow frequency: integer noise cells per tile period; smaller is smoother and broader, must be positive
@@ -87,14 +92,17 @@ struct [[ge::params(type=COSMOS_RING, name="CosmosRing")]] GEXCosmosRingParams {
     float hlInnerWidth = 5.78f;
     [[ge::prop(name="CosmosRing_HLDispersionStrength", min=0.0, max=10.0)]]
     float hlDispersionStrength = 1.0f;
+    // Highlight tint strength: 0 = no tint, 1 = full midColor hue tint
+    [[ge::prop(name="CosmosRing_HLTintStrength", min=0.0, max=1.0)]]
+    float hlTintStrength = 0.3f;
 
     // Three fixed colours of the highlight dispersion curve (RGB, no alpha)
     [[ge::prop(name="CosmosRing_HLCOuter", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
-    Vector3f hlCOuter = Vector3f(0.95f, 0.627f, 0.55f);
+    Vector3f hlCOuter = Vector3f(0.90f, 0.65f, 0.55f);
     [[ge::prop(name="CosmosRing_HLCMid", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
-    Vector3f hlCMid = Vector3f(0.322f, 0.816f, 0.490f);
+    Vector3f hlCMid = Vector3f(0.55f, 0.90f, 0.65f);
     [[ge::prop(name="CosmosRing_HLCInner", min={0.0f, 0.0f, 0.0f}, max={1.0f, 1.0f, 1.0f})]]
-    Vector3f hlCInner = Vector3f(0.28f, 0.4f, 0.898f);
+    Vector3f hlCInner = Vector3f(0.55f, 0.65f, 0.90f);
 
     // --- First pair, outer ring ---
     [[ge::prop(name="CosmosRing_HLP1OuterCenterAngle", min=0.0, max=360.0)]]
