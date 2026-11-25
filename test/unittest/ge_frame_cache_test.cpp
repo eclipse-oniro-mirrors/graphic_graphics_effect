@@ -172,7 +172,8 @@ HWTEST_F(GEFrameCacheTest, FrameCacheStore_SetCachePolicy_LevelChange_Invalidate
 {
     GEFrameCacheStore store;
     store.SetCachePolicy(GEFrameCacheLevel::CONTAINER, { GEFrameSkipMode::ON_PARAM_SAME, 2 });
-    store.UpdateContainerCache(100u, 200u, nullptr, 2);
+    auto image = std::make_shared<Drawing::Image>();
+    store.UpdateContainerCache(100u, 200u, image, 2);
     EXPECT_TRUE(store.IsContainerCacheValid());
 
     store.SetCachePolicy(GEFrameCacheLevel::PER_EFFECT, { GEFrameSkipMode::ON_PARAM_SAME, 2 });
@@ -206,7 +207,8 @@ HWTEST_F(GEFrameCacheTest, FrameCacheStore_MarkCacheIncompatible, TestSize.Level
 HWTEST_F(GEFrameCacheTest, FrameCacheStore_ContainerCache_UpdateAndInvalidate, TestSize.Level1)
 {
     GEFrameCacheStore store;
-    store.UpdateContainerCache(42u, 99u, nullptr, 3);
+    auto image = std::make_shared<Drawing::Image>();
+    store.UpdateContainerCache(42u, 99u, image, 3);
     EXPECT_TRUE(store.IsContainerCacheValid());
     EXPECT_EQ(store.GetContainerCache().paramHash, 42u);
     EXPECT_EQ(store.GetContainerCache().canvasHash, 99u);

@@ -113,6 +113,9 @@ public:
     void UpdateContainerCache(uint32_t paramHash, uint32_t canvasHash,
         std::shared_ptr<Drawing::Image> image, uint32_t skipFrames)
     {
+        if (!image) {
+            return;
+        }
         containerCacheData_.paramHash = paramHash;
         containerCacheData_.canvasHash = canvasHash;
         containerCacheData_.cachedImage = image;
