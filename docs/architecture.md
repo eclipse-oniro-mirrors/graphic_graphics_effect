@@ -28,6 +28,8 @@ The codebase follows a modular, layered architecture:
 - **Caching**:
   - `IGECacheProvider` (`ge_cache_provider.h`) - Cache provider interface
   - `GEImageCacheProvider` (`ge_image_cache_provider.h`) - Image-based caching implementation
+  - `GEFrameCacheStore` (`ge_frame_cache.h`) - Frame-level render result cache (levels, skip policy, invalidation)
+  - `GEShaderCache` (`ge_shader_cache.h`) - Frame cache orchestration for `DrawShaderEffect` (per-effect / container levels)
 
 ### 3. Effect Layer (`include/effect/`, `src/effect/`)
 
@@ -158,10 +160,11 @@ IGEFilterType (base interface in core/ge_filter_type.h)
 ### Caching System
 
 - **Location**: `src/pipeline/`, `include/pipeline/`
-- **Purpose**: Two independent caching mechanisms serving different scopes
+- **Purpose**: Three independent caching mechanisms serving different scopes
 - **Key Components**:
   - **Per-effect cache** (`std::any`): each effect holds frame-to-frame state. Round-trip per filter: before → `SetCache(ve->GetCache())`; after → `ve->SetCache(geShaderFilter.GetCache())`
   - **`IGECacheProvider`**: dependency-injection-style cross-effect shared store — higher layers own cache lifecycle, GE injects concrete implementations, separating construction from storage to safely share data across effects. `GEImageCacheProvider` (image caching) is one implementation; the interface supports any data type. Usage: `geShaderFilter->SetCacheProvider(context.geCacheProvider)` → effect calls `cacheProvider_->GetFirst()` to retrieve and `cacheProvider_->Store(cacheData)` to persist
+  - **Shader frame cache** (`GEFrameCacheStore` + `GEShaderCache`): frame-level render result cache for `DrawShaderEffect()`. Effect chains are fingerprinted (`GEVisualEffectImpl::Hash()` params/canvas hash) and the rendered image is reused across frames while fingerprints are unchanged, with optional skip-frame throttling (`PER_EFFECT` / `CONTAINER` levels). Opt-in per container via `EnsureCacheStore()` + `SetCachePolicy()`; master switch `persist.sys.graphic.shaderFrameCacheEnabled` → [Full details](pipeline/shader_frame_cache.md)
 
 ### HPS Integration
 
