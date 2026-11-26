@@ -97,7 +97,7 @@ The codebase follows a modular, layered architecture. → [Full architecture det
 - **SDF shapes & effects** — SDF-based shape rendering and edge lighting, shadows, borders, clipping. Flow: define shape → optionally combine shapes → generate SDF shader → bind effect shader → draw. → [Full details](docs/architecture.md#sdf-signed-distance-field-system) · [include/effect/shape/](include/effect/shape/AGENTS.md)
 - **Filter composition** — multi-pass effect composition with different rendering strategies. Four passes in fixed order: HpsBuild → MesaFusion → HpsUpscale → DirectDrawOnCanvas. → [Full details](docs/architecture.md#filter-composition-pipeline)
 - **Rendering** — main rendering interface via `GERender`. Key entry points: `DrawImageEffect`, `ApplyImageEffect`, `DrawShaderEffect`, `ApplyHpsGEImageEffect`. → [Full details](docs/architecture.md#rendering-system)
-- **Caching** — two independent mechanisms: per-effect `std::any` cache and cross-effect `IGECacheProvider` shared store. → [Full details](docs/architecture.md#caching-system)
+- **Caching** — three independent mechanisms: per-effect `std::any` cache, cross-effect `IGECacheProvider` shared store, and the shader frame cache (`GEFrameCacheStore`/`GEShaderCache`) that reuses rendered frames for `DrawShaderEffect()` across unchanged frames. → [Full details](docs/architecture.md#caching-system) · [Shader frame cache](docs/pipeline/shader_frame_cache.md)
 - **Extension dispatch** — dynamic loading of external effects via `dlopen`. Factory registration with `EXTERNAL`/`EXTERNAL_FALLBACK`/`CUSTOM` macros; runtime dispatch via system property. → [Full details](docs/architecture.md#extension-system)
 - **HPS integration** — GPU-optimized rendering via High Performance Shaders. Requires GPU extension support + system property enablement. Pure HPS or mixed GE/HPS composition. → [Full details](docs/architecture.md#hps-integration)
 
@@ -157,6 +157,7 @@ Parameters: definition (`.params.in`) → generation (`gen_metadata.py`) → run
 - **Add new effect** → [tool/create_effect/](tool/create_effect/) + [include/effect/](include/effect/AGENTS.md)
 - **SDF / edge lighting / shadow** → [include/effect/shape/](include/effect/shape/AGENTS.md) + [docs/shape/](docs/shape/)
 - **Parameter system** → [docs/effect/params_reflection.md](docs/effect/params_reflection.md) + [tool/generate_metadata/](tool/generate_metadata/README.md)
+- **Shader frame cache** → [docs/pipeline/shader_frame_cache.md](docs/pipeline/shader_frame_cache.md)
 - **C++ conventions** → [docs/cpp_guidelines.md](docs/cpp_guidelines.md) + [docs/cpp_domain_guidelines.md](docs/cpp_domain_guidelines.md)
 - **Upstream Drawing API** → [docs/drawing_api_contracts.md](docs/drawing_api_contracts.md)
 - **Writing tests** → [docs/testing_guide.md](docs/testing_guide.md) + `test/unittest/`

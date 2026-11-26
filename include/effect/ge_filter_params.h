@@ -14,11 +14,13 @@
  */
 #ifndef GRAPHICS_EFFECT_GE_FILTER_PARAMS_H
 #define GRAPHICS_EFFECT_GE_FILTER_PARAMS_H
+#include <cstdint>
 #include <memory>
 #include <optional>
 
 #include "ge_filter_type.h"
 #include "ge_filter_type_info.h"
+#include "ge_param_hash_helper.h"
 
 namespace OHOS {
 namespace Rosen {
@@ -55,6 +57,11 @@ public:
         return id;
     }
 
+    virtual uint32_t Hash() const
+    {
+        return static_cast<uint32_t>(id);
+    }
+
 protected:
     GEFilterParams(GEFilterType type) : id(type) {}
     GEFilterType id;
@@ -70,6 +77,15 @@ public:
     GEFilterParamsWrapper(const std::shared_ptr<T>& params)
         : GEFilterParams(GEFilterParamsTypeInfo<ParamType>::ID), data(params)
     {}
+
+    uint32_t Hash() const override
+    {
+        uint32_t hash = GEParamHashHelper::HashValue(static_cast<int32_t>(GetType()));
+        if (data) {
+            hash = GEParamHashHelper::Hash(data.get(), sizeof(T), hash);
+        }
+        return hash;
+    }
 
     std::shared_ptr<T> data;
 };

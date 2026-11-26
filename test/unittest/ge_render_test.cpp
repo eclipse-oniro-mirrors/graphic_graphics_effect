@@ -1355,6 +1355,27 @@ HWTEST_F(GERenderTest, DrawShaderEffect_WithEmptyFilterList, TestSize.Level1)
 }
 
 /**
+ * @tc.name: DrawSingleShaderEffect_NullImpl_ReturnsFalse
+ * @tc.desc: Verify DrawSingleShaderEffect returns false when visual effect impl is null
+ * @tc.type: FUNC
+ */
+HWTEST_F(GERenderTest, DrawSingleShaderEffect_NullImpl_ReturnsFalse, TestSize.Level1)
+{
+    GTEST_LOG_(INFO) << "GERenderTest DrawSingleShaderEffect_NullImpl_ReturnsFalse start";
+
+    auto geRender = std::make_shared<GERender>();
+    ASSERT_NE(geRender, nullptr);
+    ASSERT_NE(canvas_, nullptr);
+
+    auto visualEffect = std::make_shared<Drawing::GEVisualEffect>(Drawing::GE_FILTER_KAWASE_BLUR);
+    visualEffect->visualEffectImpl_ = nullptr;
+    EXPECT_EQ(visualEffect->GetImpl().get(), nullptr);
+    EXPECT_FALSE(geRender->DrawSingleShaderEffect(*canvas_, visualEffect, rect_));
+
+    GTEST_LOG_(INFO) << "GERenderTest DrawSingleShaderEffect_NullImpl_ReturnsFalse end";
+}
+
+/**
  * @tc.name: IsNeedExpansionFilter_DefaultState
  * @tc.desc: Verify function IsNeedExpansionFilter returns default state
  * @tc.type: FUNC

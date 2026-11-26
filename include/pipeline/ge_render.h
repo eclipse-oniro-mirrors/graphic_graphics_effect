@@ -46,6 +46,9 @@ public:
     void DrawShaderEffect(
         Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer, const Drawing::Rect& bounds);
 
+    bool DrawSingleShaderEffect(Drawing::Canvas& targetCanvas,
+        const std::shared_ptr<Drawing::GEVisualEffect>& vef, const Drawing::Rect& bounds);
+
     void DrawImageEffect(Drawing::Canvas& canvas, Drawing::GEVisualEffectContainer& veContainer,
         const std::shared_ptr<Drawing::Image>& image, const Drawing::Rect& src, const Drawing::Rect& dst,
         const Drawing::SamplingOptions& sampling);

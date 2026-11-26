@@ -635,6 +635,168 @@ HWTEST_F(GEVisualEffectContainerTest, AddToChainedFilter_MultipleFiltersPreserve
 
     GTEST_LOG_(INFO) << "GEVisualEffectContainerTest AddToChainedFilter_MultipleFiltersPreserveOrder end";
 }
+
+/**
+ * @tc.name: GetFilterTypes_EmptyContainer
+ * @tc.desc: Verify GetFilterTypes returns empty vector for empty container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, GetFilterTypes_EmptyContainer, TestSize.Level1)
+{
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    auto types = container->GetFilterTypes();
+    EXPECT_TRUE(types.empty());
+}
+
+/**
+ * @tc.name: GetFilterTypes_WithFilters
+ * @tc.desc: Verify GetFilterTypes returns types for each filter
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, GetFilterTypes_WithFilters, TestSize.Level1)
+{
+    auto visualEffect1 = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+    auto visualEffect2 = std::make_shared<GEVisualEffect>(GE_FILTER_GREY);
+
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    container->AddToChainedFilter(visualEffect1);
+    container->AddToChainedFilter(visualEffect2);
+
+    auto types = container->GetFilterTypes();
+    EXPECT_EQ(types.size(), 2u);
+}
+
+/**
+ * @tc.name: GetFilterTypes_WithNullFilter
+ * @tc.desc: Verify GetFilterTypes returns -1 for null filter entries
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, GetFilterTypes_WithNullFilter, TestSize.Level1)
+{
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    container->filterVec_.push_back(nullptr);
+
+    auto types = container->GetFilterTypes();
+    EXPECT_EQ(types.size(), 1u);
+    EXPECT_EQ(types[0], -1);
+}
+
+/**
+ * @tc.name: EnsureCacheStore_CreatesStore
+ * @tc.desc: Verify EnsureCacheStore creates a cache store on first access
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, EnsureCacheStore_CreatesStore, TestSize.Level1)
+{
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    EXPECT_EQ(container->GetCacheStore(), nullptr);
+    auto& store = container->EnsureCacheStore();
+    EXPECT_NE(container->GetCacheStore(), nullptr);
+    EXPECT_EQ(container->GetCacheStore().get(), &store);
+}
+
+/**
+ * @tc.name: EnsureCacheStore_Idempotent
+ * @tc.desc: Verify EnsureCacheStore returns the same store on repeated calls
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, EnsureCacheStore_Idempotent, TestSize.Level1)
+{
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    auto& store1 = container->EnsureCacheStore();
+    auto& store2 = container->EnsureCacheStore();
+    EXPECT_EQ(&store1, &store2);
+}
+
+/**
+ * @tc.name: RemoveCacheStore_ClearsStore
+ * @tc.desc: Verify RemoveCacheStore clears the cache store
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, RemoveCacheStore_ClearsStore, TestSize.Level1)
+{
+    auto container = std::make_shared<GEVisualEffectContainer>();
+    container->EnsureCacheStore();
+    EXPECT_NE(container->GetCacheStore(), nullptr);
+    container->RemoveCacheStore();
+    EXPECT_EQ(container->GetCacheStore(), nullptr);
+}
+
+/**
+ * @tc.name: UpdateCacheDataFrom_PropagatesCacheStore
+ * @tc.desc: Verify UpdateCacheDataFrom copies cache store from source container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, UpdateCacheDataFrom_PropagatesCacheStore, TestSize.Level1)
+{
+    auto src = std::make_shared<GEVisualEffectContainer>();
+    auto& srcStore = src->EnsureCacheStore();
+    srcStore.SetCachePolicy(GEFrameCacheLevel::CONTAINER, { GEFrameSkipMode::ON_PARAM_SAME, 2 });
+
+    auto dst = std::make_shared<GEVisualEffectContainer>();
+    dst->UpdateCacheDataFrom(src);
+
+    auto dstStore = dst->GetCacheStore();
+    ASSERT_NE(dstStore, nullptr);
+    EXPECT_EQ(dstStore->GetCacheLevel(), GEFrameCacheLevel::CONTAINER);
+    EXPECT_EQ(dstStore->GetSkipPolicy().mode, GEFrameSkipMode::ON_PARAM_SAME);
+}
+
+/**
+ * @tc.name: UpdateCacheDataFrom_NoCacheStoreInSource
+ * @tc.desc: Verify UpdateCacheDataFrom handles source without cache store
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, UpdateCacheDataFrom_NoCacheStoreInSource, TestSize.Level1)
+{
+    auto src = std::make_shared<GEVisualEffectContainer>();
+    auto dst = std::make_shared<GEVisualEffectContainer>();
+    dst->EnsureCacheStore();
+    EXPECT_NE(dst->GetCacheStore(), nullptr);
+
+    dst->UpdateCacheDataFrom(src);
+    EXPECT_EQ(dst->GetCacheStore(), nullptr);
+}
+
+/**
+ * @tc.name: UpdateCacheDataFrom_TrimsStaleEffectCaches
+ * @tc.desc: Verify UpdateCacheDataFrom trims effect caches that no longer match the filter list
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, UpdateCacheDataFrom_TrimsStaleEffectCaches, TestSize.Level1)
+{
+    auto visualEffect = std::make_shared<GEVisualEffect>(GE_FILTER_KAWASE_BLUR);
+
+    auto src = std::make_shared<GEVisualEffectContainer>();
+    src->AddToChainedFilter(visualEffect);
+    auto& srcStore = src->EnsureCacheStore();
+    srcStore.SetEffectSkipPolicy("999_0", { GEFrameSkipMode::FIXED_INTERVAL, 5 });
+
+    auto dst = std::make_shared<GEVisualEffectContainer>();
+    dst->AddToChainedFilter(visualEffect);
+    dst->UpdateCacheDataFrom(src);
+
+    auto dstStore = dst->GetCacheStore();
+    ASSERT_NE(dstStore, nullptr);
+}
+
+/**
+ * @tc.name: UpdateCacheDataFrom_NullFilterInDest
+ * @tc.desc: Verify trimming loop skips null filter entries in destination container
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEVisualEffectContainerTest, UpdateCacheDataFrom_NullFilterInDest, TestSize.Level1)
+{
+    auto src = std::make_shared<GEVisualEffectContainer>();
+    src->EnsureCacheStore();
+
+    auto dst = std::make_shared<GEVisualEffectContainer>();
+    dst->filterVec_.push_back(nullptr);
+    dst->UpdateCacheDataFrom(src);
+
+    auto dstStore = dst->GetCacheStore();
+    ASSERT_NE(dstStore, nullptr);
+}
 } // namespace Drawing
 } // namespace Rosen
 } // namespace OHOS

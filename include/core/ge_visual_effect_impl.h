@@ -112,6 +112,27 @@ public:
         return filterType_;
     }
 
+    uint32_t Hash() const
+    {
+        uint32_t hash = GEParamHashHelper::HashValue(
+            static_cast<int32_t>(filterType_));
+        if (params_) {
+            hash = GEParamHashHelper::CombineHash(hash, params_->Hash());
+        }
+        Drawing::Matrix::Buffer matBuffer;
+        canvasInfo_.mat.GetAll(matBuffer);
+        hash = GEParamHashHelper::HashFields(hash,
+            canvasInfo_.geoWidth, canvasInfo_.geoHeight,
+            canvasInfo_.tranX, canvasInfo_.tranY);
+        hash = GEParamHashHelper::Hash(matBuffer.data(),
+            matBuffer.size() * sizeof(Drawing::scalar), hash);
+        hash = GEParamHashHelper::HashFields(hash,
+            canvasInfo_.materialDst.GetLeft(), canvasInfo_.materialDst.GetTop(),
+            canvasInfo_.materialDst.GetRight(), canvasInfo_.materialDst.GetBottom(),
+            canvasInfo_.disableFilterCache);
+        return hash;
+    }
+
     // ========================================================================
     // Params management - using GEFilterParams variant
     // ========================================================================

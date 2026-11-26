@@ -15,6 +15,7 @@
 
 #include "ge_system_properties.h"
 
+
 namespace OHOS {
 namespace Rosen {
 
@@ -42,6 +43,30 @@ bool GESystemProperties::GetBoolSystemProperty(const char* name, bool defaultVal
 int GESystemProperties::ConvertToInt(const char* originValue, int defaultValue)
 {
     return originValue == nullptr ? defaultValue : std::atoi(originValue);
+}
+
+bool GESystemProperties::GetShaderFrameCacheEnabled()
+{
+#ifdef GE_OHOS
+    static CachedHandle handle = CachedParameterCreate("persist.sys.graphic.shaderFrameCacheEnabled", "1");
+    int changed = 0;
+    const char* enable = CachedParameterGetChanged(handle, &changed);
+    return ConvertToInt(enable, 1) != 0;
+#else
+    return false;
+#endif
+}
+
+bool GESystemProperties::GetShaderCacheDebugOverlay()
+{
+#ifdef GE_OHOS
+    static CachedHandle handle = CachedParameterCreate("persist.sys.graphic.shaderCacheDebugOverlay", "0");
+    int changed = 0;
+    const char* enable = CachedParameterGetChanged(handle, &changed);
+    return ConvertToInt(enable, 0) != 0;
+#else
+    return false;
+#endif
 }
 
 } // namespace Rosen
