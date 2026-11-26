@@ -43,12 +43,21 @@ constexpr int STICKER_SDF_SPREAD_DOUBLE = 2;
 constexpr char STICKER_SDF_DECODE_SHADER[] = R"(
     uniform shader sdfImage;
     uniform float sdfRange;
+    uniform vec2 sdfTexelSize;
+    uniform vec2 sdfShift;
 
     half4 main(vec2 fragCoord)
     {
-        vec4 sdfColor = sdfImage.eval(fragCoord);
+        // 5-tap cross blur to smooth JFA noise from 1/4 resolution SDF
+        vec2 shifted = fragCoord - sdfShift;
+        float a = sdfImage.eval(shifted).a;
+        a += sdfImage.eval(shifted + sdfTexelSize * vec2(1.0, 0.0)).a;
+        a += sdfImage.eval(shifted - sdfTexelSize * vec2(1.0, 0.0)).a;
+        a += sdfImage.eval(shifted + sdfTexelSize * vec2(0.0, 1.0)).a;
+        a += sdfImage.eval(shifted - sdfTexelSize * vec2(0.0, 1.0)).a;
+        a *= 0.2;
         // Encoded SDF: alpha in [0, 1] maps to distance in [-sdfRange, sdfRange]
-        float distance = (sdfColor.a * 2.0 - 1.0) * sdfRange;
+        float distance = (a * 2.0 - 1.0) * sdfRange;
         return half4(distance);
     }
 )";
@@ -73,19 +82,22 @@ constexpr char STICKER_OUTLINE_CARD_SHADER[] = R"(
         vec4 bandColor4 = bandColor.eval(fragCoord);
         vec4 tint = mix(vec4(1.0), vec4(bandColor4.rgb, 1.0), bandInfluence);
 
-        vec4 maskHoloColor = vec4(vec3(1.0), step(distance, outlineWidth));
-        float isOutline = step(imageColor.a, 0.99);
-        vec4 result = mix(imageColor * tint, maskHoloColor, isOutline);
-        result = mix(result, vec4(bandColor4.rgb, maskHoloColor.a), isOutline);
+        float outlineAlpha = 1.0 - smoothstep(outlineWidth - 2.0, outlineWidth + 2.0, distance);
+        float coverage = imageColor.a;
+        float bandAlpha = outlineAlpha * (1.0 - coverage);
+        vec3 resultPremul = imageColor.rgb * tint.rgb + bandColor4.rgb * bandAlpha;
+        float resultAlpha = coverage + bandAlpha;
 
         if (shadowRadius > 0.0) {
             vec2 shadowDir = length(lightDir) > 0.0 ? normalize(lightDir) : vec2(0.0);
             float shadowSdf = maskTex.eval(fragCoord - shadowDir * shadowDistance * shadowScale).a;
             float shadowSample = 1.0 - smoothstep(0.0, shadowRadius, shadowSdf);
-            vec4 shadowRes = vec4(shadowColor.rgb, shadowColor.a * shadowSample);
-            result = mix(shadowRes, result, result.a);
+            float shadowAlpha = shadowColor.a * shadowSample;
+            float oneMinusResult = 1.0 - resultAlpha;
+            resultPremul += shadowColor.rgb * shadowAlpha * oneMinusResult;
+            resultAlpha += shadowAlpha * oneMinusResult;
         }
-        return half4(result.rgb * result.a, result.a);
+        return half4(resultPremul, resultAlpha);
     }
 )";
 
@@ -247,6 +259,17 @@ std::shared_ptr<Drawing::Image> GEStickerOutlineShader::MakeDecodedStickerSDFIma
 
     builder->SetChild("sdfImage", sdfShader);
     builder->SetUniform("sdfRange", static_cast<float>(CalSdfSpreadFactor(requiredRangePx) * STICKER_SDF_DOWNSAMPLE));
+    builder->SetUniform("sdfTexelSize",
+        static_cast<float>(stickerInfo.GetWidth()) / static_cast<float>(sdfImage->GetWidth()),
+        static_cast<float>(stickerInfo.GetHeight()) / static_cast<float>(sdfImage->GetHeight()));
+    // Compensate JFA prepare shader's centerFragCoord = fragCoord + vec2(0.5).
+    // Must be removed if that +0.5 is ever removed, else double offset.
+    constexpr float ENCODED_SDF_SHIFT_TEXELS = 0.5f;
+    const float shiftX = ENCODED_SDF_SHIFT_TEXELS * static_cast<float>(stickerInfo.GetWidth()) /
+        static_cast<float>(sdfImage->GetWidth());
+    const float shiftY = ENCODED_SDF_SHIFT_TEXELS * static_cast<float>(stickerInfo.GetHeight()) /
+        static_cast<float>(sdfImage->GetHeight());
+    builder->SetUniform("sdfShift", shiftX, shiftY);
 
     // Use f16 format to keep sub-pixel SDF precision
     Drawing::ImageInfo decodedInfo = stickerInfo;

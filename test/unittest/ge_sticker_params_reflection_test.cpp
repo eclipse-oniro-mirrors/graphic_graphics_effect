@@ -104,6 +104,7 @@ HWTEST_F(GEStickerParamsReflectionTest, GetFilterTypeFromTagSticker, TestSize.Le
         { GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPOT_LIGHT_INTENSITY, GEFilterType::STICKER_EMBOSS_FILTER },
         { GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPEC_POW, GEFilterType::STICKER_EMBOSS_FILTER },
         { GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPEC_INTENSITY, GEFilterType::STICKER_EMBOSS_FILTER },
+        { GEParamsMemberTag::STICKER_EMBOSS_FILTER_TRANSPARENT_BG, GEFilterType::STICKER_EMBOSS_FILTER },
     };
     for (const auto& entry : embossTags) {
         EXPECT_EQ(GEParamsMemberHelper::GetFilterTypeFromTag(entry.first), entry.second);
@@ -144,6 +145,7 @@ HWTEST_F(GEStickerParamsReflectionTest, MemberTagFromStringSticker, TestSize.Lev
         { "StickerEmboss_SpotLightIntensity", GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPOT_LIGHT_INTENSITY },
         { "StickerEmboss_SpecPow", GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPEC_POW },
         { "StickerEmboss_SpecIntensity", GEParamsMemberTag::STICKER_EMBOSS_FILTER_SPEC_INTENSITY },
+        { "StickerEmboss_TransparentBg", GEParamsMemberTag::STICKER_EMBOSS_FILTER_TRANSPARENT_BG },
         { "StickerLaserShader_Sticker", GEParamsMemberTag::STICKER_LASER_STICKER },
         { "StickerLaserShader_OutlineWidth", GEParamsMemberTag::STICKER_LASER_OUTLINE_WIDTH },
         { "StickerLaserShader_Frequency", GEParamsMemberTag::STICKER_LASER_FREQUENCY },
@@ -194,6 +196,24 @@ HWTEST_F(GEStickerParamsReflectionTest, SetStickerEmbossFloatParamsByTag, TestSi
     EXPECT_FLOAT_EQ(params->spotLightIntensity, 1.2f);
     EXPECT_FLOAT_EQ(params->specPow, 8.0f);
     EXPECT_FLOAT_EQ(params->specIntensity, 0.9f);
+}
+
+/**
+ * @tc.name: SetStickerEmbossBoolParamsByTag
+ * @tc.desc: Verify the bool setter writes the transparentBg member by tag
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerParamsReflectionTest, SetStickerEmbossBoolParamsByTag, TestSize.Level1)
+{
+    auto boxed = GEFilterParams::Box(std::make_shared<GEStickerEmbossFilterParams>());
+    ASSERT_NE(boxed.get(), nullptr);
+    auto params = GEFilterParams::Unbox<GEStickerEmbossFilterParams>(*boxed);
+    ASSERT_NE(params.get(), nullptr);
+
+    EXPECT_FALSE(params->transparentBg);
+    GEParamsMemberHelper::SetParamsMemberByTag(*boxed,
+        GEParamsMemberTag::STICKER_EMBOSS_FILTER_TRANSPARENT_BG, true);
+    EXPECT_TRUE(params->transparentBg);
 }
 
 /**

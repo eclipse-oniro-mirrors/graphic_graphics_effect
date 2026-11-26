@@ -40,4 +40,6 @@ struct [[ge::params(type=STICKER_EMBOSS_FILTER, name="StickerEmbossFilter")]] GE
     float specPow = 0.0f;
     [[ge::prop("StickerEmboss_SpecIntensity")]]
     float specIntensity = 0.0f;
+    [[ge::prop("StickerEmboss_TransparentBg")]]
+    bool transparentBg = false;
 };
