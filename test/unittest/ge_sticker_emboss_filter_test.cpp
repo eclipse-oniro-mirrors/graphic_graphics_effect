@@ -419,6 +419,28 @@ HWTEST_F(GEStickerEmbossFilterTest, SetEmbossShaderUniformsValid, TestSize.Level
 }
 
 /**
+ * @tc.name: MakeStickerEmbossImageTransparentBg
+ * @tc.desc: Verify transparentBg=true path produces output without crash
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerEmbossFilterTest, MakeStickerEmbossImageTransparentBg, TestSize.Level1)
+{
+    Drawing::GEStickerEmbossFilterParams params;
+    params.sticker = image_;
+    params.outlineWidth = 2.0f;
+    params.transparentBg = true;
+    auto filter = std::make_shared<GEStickerEmbossFilter>(params);
+    ASSERT_TRUE(filter != nullptr);
+
+    auto result = filter->MakeStickerEmbossImage(canvas_, image_, image_);
+    if (HasGpuContext()) {
+        EXPECT_NE(result, nullptr);
+    } else {
+        EXPECT_EQ(result, image_);
+    }
+}
+
+/**
  * @tc.name: TypeAndName
  * @tc.desc: Verify the factory registration type and type name of the emboss filter
  * @tc.type: FUNC
@@ -453,6 +475,7 @@ HWTEST_F(GEStickerEmbossFilterTest, ConstructorStoresParams, TestSize.Level1)
     params.spotLightIntensity = 0.9f;
     params.specPow = 4.0f;
     params.specIntensity = 0.3f;
+    params.transparentBg = true;
 
     auto filter = std::make_shared<GEStickerEmbossFilter>(params);
     ASSERT_TRUE(filter != nullptr);
@@ -470,6 +493,7 @@ HWTEST_F(GEStickerEmbossFilterTest, ConstructorStoresParams, TestSize.Level1)
     EXPECT_FLOAT_EQ(filter->params_.spotLightIntensity, 0.9f);
     EXPECT_FLOAT_EQ(filter->params_.specPow, 4.0f);
     EXPECT_FLOAT_EQ(filter->params_.specIntensity, 0.3f);
+    EXPECT_TRUE(filter->params_.transparentBg);
 }
 
 /**
@@ -496,6 +520,7 @@ HWTEST_F(GEStickerEmbossFilterTest, ConstructorDefaultParams, TestSize.Level1)
     EXPECT_FLOAT_EQ(filter->params_.spotLightIntensity, 0.0f);
     EXPECT_FLOAT_EQ(filter->params_.specPow, 0.0f);
     EXPECT_FLOAT_EQ(filter->params_.specIntensity, 0.0f);
+    EXPECT_FALSE(filter->params_.transparentBg);
 }
 
 /**

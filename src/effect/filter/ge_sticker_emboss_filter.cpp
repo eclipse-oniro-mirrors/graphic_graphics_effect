@@ -71,6 +71,7 @@ uniform float specIntensity;
 uniform float edgeLightWidth;
 uniform float edgeLightFeatherRate;
 uniform float2 edgeLightIntensity;
+uniform float transparentBg;
 
 uniform float depth;
 uniform float spotTheta;
@@ -118,16 +119,20 @@ half4 main(float2 fragCoord)
     float amplified = (centerSample > alphaThreshold) ? min(centerSample * alphaAmplify, 1.0) : 0.0;
     float alpha = smoothstep(0.0, maskAA, amplified);
     if (alpha < N_EPS) {
+        if (transparentBg > 0.5) {
+            return half4(0.0);
+        }
         return half4(underlyingTex.eval(fragCoord));
     }
 
-    float2 refractUV = uv + nDir.xy * lightDir * refractionStrength * REFRACT_LIGHT_DIR_SCALE;
-    float4 underlayColor = underlyingTex.eval(refractUV * resolution);
-
     float4 insideColor = insideTex.eval(fragCoord);
-    // image shaders return premultiplied colors: source-over composite without an
-    // extra alpha multiply
-    underlayColor.rgb = insideColor.rgb + underlayColor.rgb * (1.0 - insideColor.a);
+    float4 underlayColor = insideColor;
+    if (transparentBg < 0.5) {
+        float2 refractUV = uv + nDir.xy * lightDir * refractionStrength * REFRACT_LIGHT_DIR_SCALE;
+        float4 refractColor = underlyingTex.eval(refractUV * resolution);
+        underlayColor.rgb = insideColor.rgb + refractColor.rgb * (1.0 - insideColor.a);
+        underlayColor.a = refractColor.a;
+    }
 
     float3 viewDir = float3(0.0, 0.0, 1.0);
     float3 finalColor = underlayColor.rgb;
@@ -155,6 +160,12 @@ half4 main(float2 fragCoord)
     finalColor += lightColor * edgeLightIntensity.x * diff * edgeMask;
     finalColor *= 1.0 - clamp(edgeLightIntensity.y * shaded * edgeMask, 0.0, 1.0);
 
+    if (transparentBg > 0.5) {
+        float highlight = edgeLightIntensity.x * diff * edgeMask;
+        float shadow = clamp(edgeLightIntensity.y * shaded * edgeMask, 0.0, 1.0);
+        float outAlpha = clamp(insideColor.a + highlight + shadow * (1.0 - insideColor.a), 0.0, 1.0);
+        return half4(float4(finalColor * alpha, outAlpha * alpha));
+    }
     float4 bgColor = underlyingTex.eval(fragCoord);
     float3 composite = finalColor * alpha + bgColor.rgb * (1.0 - alpha);
     float outAlpha = alpha + bgColor.a * (1.0 - alpha);
@@ -330,6 +341,7 @@ void GEStickerEmbossFilter::SetEmbossShaderUniforms(
     builder.SetUniform("dirIntensity", params_.dirIntensity);
     builder.SetUniform("specPow", params_.specPow);
     builder.SetUniform("specIntensity", params_.specIntensity);
+    builder.SetUniform("transparentBg", params_.transparentBg ? 1.0f : 0.0f);
     builder.SetUniform("edgeLightWidth", edgeLightWidthPx);
     builder.SetUniform("edgeLightFeatherRate", featherRate);
     builder.SetUniform("edgeLightIntensity", params_.edgeLightIntensity.x_, params_.edgeLightIntensity.y_);

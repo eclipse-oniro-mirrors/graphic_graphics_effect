@@ -79,7 +79,7 @@ constexpr char STICKER_HALFTONE_SHADER[] = R"__SKSL__(
             ? 1.0 - smoothstep(outerRadius - halfBand, outerRadius + halfBand, d)
             : step(d, outerRadius);
         float3 col = mix(float3(1.0), mix(colTex.rgb, float3(0.0), innerDot), outerDot);
-        return half4(float4(col, tex.a));
+        return half4(float4(col * tex.a, tex.a));
     }
 )__SKSL__";
 

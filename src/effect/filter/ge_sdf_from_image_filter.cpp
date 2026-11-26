@@ -193,10 +193,8 @@ bool GESDFFromImageFilter::InitJFAPrepareEffect()
         }
         
         half4 main(vec2 fragCoord) {
-            vec2 centerFragCoord = fragCoord + vec2(0.5);
+            float imageSample = imageInput.eval(fragCoord + vec2(0.5)).a;
 
-            float imageSample = imageInput.eval(centerFragCoord).a;
-          
           	if (imageSample <= 0.0) {
               return half4(1.0, 1.0, 0.5, 0.5);
             }
@@ -204,7 +202,7 @@ bool GESDFFromImageFilter::InitJFAPrepareEffect()
               return half4(0.5, 0.5, 1.0, 1.0);
             }
           
-          	vec2 grad = getGradient(centerFragCoord);
+          	vec2 grad = getGradient(fragCoord + vec2(0.5));
           	vec2 normGrad = normalize(grad);
           	vec2 edgeCoords = vec2(0.5);
 
