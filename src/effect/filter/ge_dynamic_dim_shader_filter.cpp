@@ -35,15 +35,15 @@ std::shared_ptr<Drawing::Image> GEDynamicDimShaderFilter::OnProcessImage(Drawing
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image) {
-        LOGE("GEDynamicDimShaderFilter::input image is null");
+        LOGD("GEDynamicDimShaderFilter::input image is null");
         return image;
     }
     if (!GE_GE(value_, 0.0f) || !GE_LNE(value_, 1.0f)) {
-        LOGE("GEDynamicDimShaderFilter::OnProcessImage invalid value");
+        LOGD("GEDynamicDimShaderFilter::OnProcessImage invalid value");
         return image;
     }
     if (!g_dynamicDimEffect) {
-        LOGE("GEDynamicDimShaderFilter::dynamicDimEffect is null");
+        LOGD("GEDynamicDimShaderFilter::dynamicDimEffect is null");
         return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_dynamicDimEffect);
@@ -58,7 +58,7 @@ std::shared_ptr<Drawing::Image> GEDynamicDimShaderFilter::OnProcessImage(Drawing
     auto outImage = builder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
     if (outImage == nullptr) {
-        LOGE("GEDynamicDimShaderFilter::OnProcessImage MakeImage failed");
+        LOGD("GEDynamicDimShaderFilter::OnProcessImage MakeImage failed");
         return image;
     }
     return outImage;
@@ -98,7 +98,7 @@ bool GEDynamicDimShaderFilter::InitDynamicDimEffect()
     )");
     g_dynamicDimEffect = GECreateRuntimeEffectForShader(dynamicDimString);
     if (g_dynamicDimEffect == nullptr) {
-        LOGE("GEDynamicDimShaderFilter::InitDynamicDimEffect effect create failed");
+        LOGD("GEDynamicDimShaderFilter::InitDynamicDimEffect effect create failed");
         return false;
     }
     return true;

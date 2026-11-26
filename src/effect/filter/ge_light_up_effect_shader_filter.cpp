@@ -35,15 +35,15 @@ std::shared_ptr<Drawing::Image> GELightUpEffectShaderFilter::OnProcessImage(Draw
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (!image) {
-        LOGE("GELightUpEffectShaderFilter::input image is null");
+        LOGD("GELightUpEffectShaderFilter::input image is null");
         return image;
     }
     if (!GE_GE(value_, 0.0f) || !GE_LNE(value_, 1.0f)) {
-        LOGE("GELightUpEffectShaderFilter::OnProcessImage invalid value");
+        LOGD("GELightUpEffectShaderFilter::OnProcessImage invalid value");
         return image;
     }
     if (!g_lightUpEffect) {
-        LOGE("GELightUpEffectShaderFilter::lightUpEffect is null");
+        LOGD("GELightUpEffectShaderFilter::lightUpEffect is null");
         return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_lightUpEffect);
@@ -58,7 +58,7 @@ std::shared_ptr<Drawing::Image> GELightUpEffectShaderFilter::OnProcessImage(Draw
     auto outImage = builder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
     if (outImage == nullptr) {
-        LOGE("GELightUpEffectShaderFilter::OnProcessImage MakeImage failed");
+        LOGD("GELightUpEffectShaderFilter::OnProcessImage MakeImage failed");
         return image;
     }
     return outImage;
@@ -101,7 +101,7 @@ bool GELightUpEffectShaderFilter::InitLightUpEffect()
     )");
     g_lightUpEffect = GECreateRuntimeEffectForShader(lightUpString);
     if (g_lightUpEffect == nullptr) {
-        LOGE("GELightUpEffectShaderFilter::InitLightUpEffect effect create failed");
+        LOGD("GELightUpEffectShaderFilter::InitLightUpEffect effect create failed");
         return false;
     }
     return true;
