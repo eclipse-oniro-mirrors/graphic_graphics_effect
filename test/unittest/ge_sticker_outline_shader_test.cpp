@@ -152,5 +152,34 @@ HWTEST_F(GEStickerOutlineShaderTest, CalSdfSpreadFactor_005, TestSize.Level1)
     EXPECT_LE(result, 1024);
 }
 
+/**
+ * @tc.name: MakeDecodedStickerSDFImageZeroSize
+ * @tc.desc: Verify MakeDecodedStickerSDFImage returns nullptr for null and zero-size sdfImage
+ * @tc.type: FUNC
+ */
+HWTEST_F(GEStickerOutlineShaderTest, MakeDecodedStickerSDFImageZeroSize, TestSize.Level1)
+{
+    Drawing::Canvas canvas;
+    auto stickerInfo = image50x50_->GetImageInfo();
+
+    // Null sdfImage
+    EXPECT_EQ(GEStickerOutlineShader::MakeDecodedStickerSDFImage(
+        canvas, nullptr, stickerInfo, 4.0f), nullptr);
+
+    // Zero-width sdfImage
+    auto zeroWidth = CreateImage(0, smallImageSize);
+    if (zeroWidth != nullptr) {
+        EXPECT_EQ(GEStickerOutlineShader::MakeDecodedStickerSDFImage(
+            canvas, zeroWidth, stickerInfo, 4.0f), nullptr);
+    }
+
+    // Zero-height sdfImage
+    auto zeroHeight = CreateImage(smallImageSize, 0);
+    if (zeroHeight != nullptr) {
+        EXPECT_EQ(GEStickerOutlineShader::MakeDecodedStickerSDFImage(
+            canvas, zeroHeight, stickerInfo, 4.0f), nullptr);
+    }
+}
+
 } // namespace GraphicsEffectEngine
 } // namespace OHOS
