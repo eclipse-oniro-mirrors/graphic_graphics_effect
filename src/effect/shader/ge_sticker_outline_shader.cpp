@@ -236,8 +236,8 @@ std::shared_ptr<Drawing::Image> GEStickerOutlineShader::MakeStickerSDFImage(
 std::shared_ptr<Drawing::Image> GEStickerOutlineShader::MakeDecodedStickerSDFImage(Drawing::Canvas& canvas,
     const std::shared_ptr<Drawing::Image>& sdfImage, const Drawing::ImageInfo& stickerInfo, float requiredRangePx)
 {
-    if (sdfImage == nullptr) {
-        GE_LOGE("GEStickerOutlineShader::MakeDecodedStickerSDFImage sdfImage is nullptr.");
+    if (sdfImage == nullptr || sdfImage->GetWidth() <= 0 || sdfImage->GetHeight() <= 0) {
+        GE_LOGE("GEStickerOutlineShader::MakeDecodedStickerSDFImage sdfImage is invalid.");
         return nullptr;
     }
     auto builder = GetStickerSdfDecodeBuilder();
