@@ -35,18 +35,18 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
     const std::shared_ptr<Drawing::Image> image, const Drawing::Rect& src, const Drawing::Rect& dst)
 {
     if (image == nullptr) {
-        LOGD("GEBinarizationShaderFilter::OnProcessImage image is null");
+        LOGE("GEBinarizationShaderFilter::OnProcessImage image is null");
         return image;
     }
     if (!GE_GE(low_, 0.0f) || !GE_LE(low_, 1.0f) ||
         !GE_GE(high_, 0.0f) || !GE_LE(high_, 1.0f) ||
         !GE_GE(threshold_, 0.0f) || !GE_LE(threshold_, 1.0f) ||
         !GE_GE(thresholdRange_, 0.0f) || !GE_LE(thresholdRange_, 1.0f)) {
-        LOGD("GEBinarizationShaderFilter::OnProcessImage invalid param");
+        LOGE("GEBinarizationShaderFilter::OnProcessImage invalid param");
         return image;
     }
     if (!g_binarizationEffect) {
-        LOGD("GEBinarizationShaderFilter::binarizationEffect is null");
+        LOGE("GEBinarizationShaderFilter::binarizationEffect is null");
         return image;
     }
     Drawing::RuntimeShaderBuilder builder(g_binarizationEffect);
@@ -67,7 +67,7 @@ std::shared_ptr<Drawing::Image> GEBinarizationShaderFilter::OnProcessImage(Drawi
     auto outImage = builder.MakeImage(nullptr, nullptr, image->GetImageInfo(), false);
 #endif
     if (outImage == nullptr) {
-        LOGD("GEBinarizationShaderFilter::OnProcessImage MakeImage failed");
+        LOGE("GEBinarizationShaderFilter::OnProcessImage MakeImage failed");
         return image;
     }
     return outImage;
@@ -99,7 +99,7 @@ bool GEBinarizationShaderFilter::InitBinarizationEffect()
     )");
     g_binarizationEffect = GECreateRuntimeEffectForShader(binarizationString);
     if (g_binarizationEffect == nullptr) {
-        LOGD("GEBinarizationShaderFilter::InitBinarizationEffect effect create failed");
+        LOGE("GEBinarizationShaderFilter::InitBinarizationEffect effect create failed");
         return false;
     }
     return true;
